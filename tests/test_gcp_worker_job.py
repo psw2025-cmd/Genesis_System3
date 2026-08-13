@@ -123,7 +123,7 @@ def test_collector_selects_newest_prior_completed_execution(monkeypatch):
     assert collector["completion_status"] == "EXECUTION_SUCCEEDED"
 
 
-@pytest.mark.parametrize("kind,runner", [("rank", "_run_rank_lane"), ("forecast", "_run_forecast_lane"), ("signals", "_run_signals_lane")])
+@pytest.mark.parametrize("kind,runner", [("rank", "_run_rank_lane"), ("forecast", "_run_forecast_lane"), ("validate", "_run_validate_lane"), ("signals", "_run_signals_lane")])
 def test_business_lane_is_bounded_and_live_off(monkeypatch, kind, runner):
     monkeypatch.setenv("SYSTEM3_JOB_PUBLISH_STATE", "0")
     monkeypatch.setenv("LIVE_TRADING_ENABLED", "0")
@@ -138,8 +138,13 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     from pathlib import Path
     workflow = (Path(__file__).parents[1] / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
     assert "gs3-rank-job@" in workflow and "gs3-forecast-job@" in workflow and "gs3-signals-job@" in workflow
+    assert "genesis-system3-validate" in workflow
+    assert "for KIND in rank forecast validate signals" in workflow
     rank_secret_mount = "--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest"
+    # Secret mount string appears once in the template; rank+validate both use the same printf branch.
     assert workflow.count(rank_secret_mount) == 1
+    assert "genesis-system3-validate-daily" in workflow
+    assert 'schedule="5 10 * * MON-FRI"' in workflow
     assert "genesis-system3-scheduler-collector-every-minute" in workflow
     assert '--schedule="* * * * *"' in workflow
     assert "COLLECTOR_URI=\"https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run\"" in workflow

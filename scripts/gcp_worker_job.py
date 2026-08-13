@@ -27,6 +27,7 @@ _TRUTHY = {"1", "true", "yes", "on", "enabled"}
 _EXPECTED_SCHEDULERS = {
     "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast"),
     "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank"),
+    "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate"),
     "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals"),
     "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate"),
     "genesis-system3-forecast-schedule": ("PAUSED", "genesis-system3-forecast"),
@@ -150,8 +151,11 @@ def _run_scheduler_collector() -> Dict[str, Any]:
         raise RuntimeError("CLOUD_RUN_EXECUTION unique owner is required")
     backend = FirestoreSchedulerEvidenceBackend()
     facts = _collect_scheduler_facts()
-    for lane in ("rank", "forecast", "signals"):
-        artifact = backend.verify_artifact(lane)
+    for lane in ("rank", "forecast", "signals", "validate"):
+        try:
+            artifact = backend.verify_artifact(lane)
+        except ValueError:
+            artifact = None
         if artifact:
             facts["artifacts"].append(artifact)
     lease = backend.acquire_lease(owner, 120)
@@ -173,7 +177,13 @@ def _business_context(lane: str) -> tuple[str, bool, str]:
     except Exception:
         return today.isoformat(), False, "UNKNOWN_CALENDAR"
     minute = now_ist.hour * 60 + now_ist.minute
-    window = (9 * 60, 15 * 60 + 30) if lane in {"rank", "forecast"} else (18 * 60 + 30, 23 * 60)
+    if lane == "validate":
+        # Post-close validation window (15:30–16:45 IST).
+        window = (15 * 60 + 30, 16 * 60 + 45)
+    elif lane in {"rank", "forecast"}:
+        window = (9 * 60, 15 * 60 + 30)
+    else:
+        window = (18 * 60 + 30, 23 * 60)
     if not (window[0] <= minute <= window[1]):
         return today.isoformat(), False, "MARKET_SESSION_CLOSED"
     return today.isoformat(), True, "OPEN_SESSION"
@@ -186,11 +196,67 @@ def _artifact(lane: str, payload: Dict[str, Any], source_bytes: bytes, output_by
     if not run_id:
         raise RuntimeError("CLOUD_RUN_EXECUTION is required for immutable business artifacts")
     code_paths = [Path(__file__), ROOT / "dashboard/backend/firestore_state_backend.py"]
-    if lane == "rank": code_paths.append(ROOT / "scripts/daily_gain_rank_and_validate.py")
-    elif lane == "signals": code_paths.append(ROOT / "scripts/run_signal_engine_from_bhavcopy.py")
+    if lane == "rank":
+        code_paths.append(ROOT / "scripts/daily_gain_rank_and_validate.py")
+    elif lane == "validate":
+        code_paths.append(ROOT / "scripts/daily_gain_rank_and_validate.py")
+        code_paths.append(ROOT / "src/validation/market_result_validator.py")
+    elif lane == "signals":
+        code_paths.append(ROOT / "scripts/run_signal_engine_from_bhavcopy.py")
     code_bytes = b"".join(path.read_bytes() for path in code_paths)
     value = {"schema_version": 1, "lane": lane, "run_id": run_id, "produced_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "business_date": business_date, "status": payload.get("status", "PASS"), "reason_code": payload.get("reason_code"), "payload": payload, "source_sha256": hashlib.sha256(source_bytes).hexdigest(), "code_sha256": hashlib.sha256(code_bytes).hexdigest(), "output_sha256": hashlib.sha256(output_bytes).hexdigest(), "output_bytes_b64": base64.b64encode(output_bytes).decode("ascii")}
     return FirestoreSchedulerEvidenceBackend().publish_artifact(lane, value)
+
+
+def _run_validate_lane() -> Dict[str, Any]:
+    """Post-close Spearman day using durable rank predictions + Dhan actuals."""
+    from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+    from src.validation.market_result_validator import MarketResultValidator
+
+    business_date, is_open_day, reason = _business_context("validate")
+    if not is_open_day:
+        status = "PENDING" if reason == "UNKNOWN_CALENDAR" else "SKIPPED"
+        raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
+        return _artifact("validate", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
+
+    backend = FirestoreSchedulerEvidenceBackend()
+    rank = backend.load_artifact("rank")
+    if not rank or rank.get("business_date") != business_date or rank.get("status") != "PASS":
+        payload = {"status": "PENDING", "reason_code": "VALIDATION_NO_PREDICTIONS", "business_date": business_date}
+        raw = json.dumps(payload, sort_keys=True).encode()
+        return _artifact("validate", payload, b"missing-rank-artifact", raw)
+
+    rows = (rank.get("payload") or {}).get("rows") or []
+    predictions = []
+    for row in rows:
+        underlying = str(row.get("underlying") or "").strip().upper()
+        if not underlying:
+            continue
+        try:
+            predictions.append({"underlying": underlying, "rank": int(row.get("rank") or len(predictions) + 1)})
+        except (TypeError, ValueError):
+            continue
+    if not predictions:
+        payload = {"status": "PENDING", "reason_code": "VALIDATION_NO_PREDICTIONS", "business_date": business_date}
+        raw = json.dumps(payload, sort_keys=True).encode()
+        return _artifact("validate", payload, b"empty-rank-rows", raw)
+
+    report = MarketResultValidator().validate_today(prediction_snapshot=predictions)
+    if report.get("error"):
+        reason_code = (
+            "VALIDATION_ACTUALS_UNAVAILABLE"
+            if "actual" in str(report.get("error") or "").lower()
+            else "VALIDATION_BLOCKED"
+        )
+        payload = {"status": "PENDING", "reason_code": reason_code, "validation": report}
+        raw = json.dumps(payload, sort_keys=True, default=str).encode()
+        return _artifact("validate", payload, b"validation-blocked", raw)
+
+    report = {**report, "source": "dhan_validate_lane", "date": report.get("date") or business_date}
+    stored_day = backend.upsert_validation_day(report)
+    output = json.dumps({"validation": report, "stored_day": stored_day}, sort_keys=True, default=str, separators=(",", ":")).encode()
+    source = base64.b64decode(rank["output_bytes_b64"], validate=True)
+    return _artifact("validate", {"status": "PASS", "validation": report, "stored_day": stored_day}, source, output)
 
 
 def _run_rank_lane() -> Dict[str, Any]:
@@ -263,6 +329,8 @@ def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
         result["detail"] = "One fenced raw scheduler control-plane collection completed"
     elif kind == "rank":
         result["business_artifact"] = _run_rank_lane()
+    elif kind == "validate":
+        result["business_artifact"] = _run_validate_lane()
     elif kind == "forecast":
         result["business_artifact"] = _run_forecast_lane()
     elif kind == "signals":

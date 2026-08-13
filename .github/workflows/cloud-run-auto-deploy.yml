@@ -291,13 +291,17 @@ jobs:
       - name: Configure bounded business lanes and evidence collector
         run: |
           IMAGE=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(spec.template.spec.containers[0].image)')
-          for KIND in rank forecast signals; do
-            case "${KIND}" in rank) JOB_SA="${RANK_JOB_SERVICE_ACCOUNT}";; forecast) JOB_SA="${FORECAST_JOB_SERVICE_ACCOUNT}";; signals) JOB_SA="${SIGNALS_JOB_SERVICE_ACCOUNT}";; esac
+          for KIND in rank forecast validate signals; do
+            case "${KIND}" in
+              rank|validate) JOB_SA="${RANK_JOB_SERVICE_ACCOUNT}";;
+              forecast) JOB_SA="${FORECAST_JOB_SERVICE_ACCOUNT}";;
+              signals) JOB_SA="${SIGNALS_JOB_SERVICE_ACCOUNT}";;
+            esac
             gcloud run jobs deploy "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
               --image="${IMAGE}" --service-account="${JOB_SA}" --command=python --args=scripts/gcp_worker_job.py \
               --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=10m \
               --set-env-vars="SYSTEM3_JOB_KIND=${KIND},SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1" \
-              $(if [ "${KIND}" = rank ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
+              $(if [ "${KIND}" = rank ] || [ "${KIND}" = validate ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
             gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
           done
           gcloud run jobs deploy genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
@@ -306,9 +310,21 @@ jobs:
             --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1"
           gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
 
-          # Rank is the sole producer; forecast consumes its durable artifact 15m later.
+          # Rank morning → forecast → post-close validate (Spearman day) → signals.
           gcloud scheduler jobs update http genesis-system3-rank-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="45 3 * * MON-FRI" --time-zone=UTC
           gcloud scheduler jobs update http genesis-system3-forecast-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="0 4 * * MON-FRI" --time-zone=UTC
+          if gcloud scheduler jobs describe genesis-system3-validate-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1; then
+            gcloud scheduler jobs update http genesis-system3-validate-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="5 10 * * MON-FRI" --time-zone=UTC
+          else
+            gcloud scheduler jobs create http genesis-system3-validate-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" \
+              --schedule="5 10 * * MON-FRI" --time-zone=UTC \
+              --uri="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-validate:run" \
+              --http-method=POST \
+              --oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}" \
+              --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" \
+              --headers="Content-Type=application/json" \
+              --message-body='{}'
+          fi
           gcloud scheduler jobs update http genesis-system3-signals-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="15 13 * * MON-FRI" --time-zone=UTC
           COLLECTOR_URI="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run"
           if gcloud scheduler jobs describe genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1; then ACTION=update; else ACTION=create; fi

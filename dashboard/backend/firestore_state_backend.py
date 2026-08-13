@@ -129,14 +129,89 @@ class FirestoreSchedulerEvidenceBackend:
         snapshot = self.collection.document("current").get()
         return _json_clone(snapshot.to_dict() or {}) if getattr(snapshot, "exists", False) else None
 
+    _BUSINESS_LANES = frozenset({"rank", "forecast", "signals", "validate"})
+    _CLOSURE_REASON_CODES = frozenset({"WEEKEND", "EXCHANGE_HOLIDAY", "MARKET_SESSION_CLOSED"})
+    _PENDING_REASON_CODES = frozenset({
+        "UNKNOWN_CALENDAR",
+        "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED",
+        "VALIDATION_NO_PREDICTIONS",
+        "VALIDATION_ACTUALS_UNAVAILABLE",
+        "VALIDATION_BLOCKED",
+    })
+
     def load_artifact(self, lane: str) -> Optional[Dict[str, Any]]:
-        if lane not in {"rank", "forecast", "signals"}:
+        if lane not in self._BUSINESS_LANES:
             raise ValueError("invalid business artifact lane")
         snapshot = self.collection.document(f"artifact_{lane}").get()
         return _json_clone(snapshot.to_dict() or {}) if getattr(snapshot, "exists", False) else None
 
+    def upsert_validation_day(self, report: Dict[str, Any]) -> Dict[str, Any]:
+        """Persist one Spearman validation day for gate accumulation (durable across deploys)."""
+        incoming = _json_clone(report)
+        day = str(incoming.get("date") or "").strip()
+        try:
+            parsed = datetime.strptime(day, "%Y-%m-%d").date()
+            if parsed.isoformat() != day:
+                raise ValueError("date roundtrip mismatch")
+        except Exception as exc:
+            raise ValueError("validation day date invalid") from exc
+        rho = incoming.get("rank_correlation_spearman", incoming.get("spearman_correlation"))
+        try:
+            rho_f = float(rho)
+        except (TypeError, ValueError) as exc:
+            raise ValueError("validation day rho invalid") from exc
+        if incoming.get("error") and rho_f == 0.0:
+            raise ValueError("validation day error reports are not durable evidence")
+        stored = {
+            "schema_version": 1,
+            "date": day,
+            "rank_correlation_spearman": rho_f,
+            "spearman_correlation": rho_f,
+            "hit_rate": incoming.get("match_rate_top3", incoming.get("hit_rate")),
+            "grade": incoming.get("grade"),
+            "predicted_top_symbols": incoming.get("predicted_top_symbols") or [],
+            "actual_top_symbols": incoming.get("actual_top_symbols") or [],
+            "source": incoming.get("source") or "market_result_validator",
+            "validated_at": incoming.get("validated_at") or self._now().isoformat().replace("+00:00", "Z"),
+            "updated_at_utc": self._now().isoformat().replace("+00:00", "Z"),
+        }
+        day_ref = self.collection.document(f"validation_day_{day}")
+        index_ref = self.collection.document("validation_days_index")
+
+        @self._transactional
+        def _persist(transaction):
+            day_ref_snap = day_ref.get(transaction=transaction)
+            existing_day = day_ref_snap.to_dict() if getattr(day_ref_snap, "exists", False) else {}
+            if existing_day and float(existing_day.get("rank_correlation_spearman", 0)) == rho_f:
+                stored_out = _json_clone(existing_day)
+            else:
+                stored_out = stored
+                transaction.set(day_ref, stored_out)
+            index_snap = index_ref.get(transaction=transaction)
+            index = index_snap.to_dict() if getattr(index_snap, "exists", False) else {}
+            dates = [str(d) for d in (index.get("dates") or []) if str(d)]
+            if day not in dates:
+                dates.append(day)
+            dates = sorted(set(dates))
+            transaction.set(index_ref, {"schema_version": 1, "dates": dates, "updated_at_utc": stored["updated_at_utc"]})
+            return stored_out
+
+        return _persist(self.client.transaction())
+
+    def list_validation_days(self) -> list:
+        index_snap = self.collection.document("validation_days_index").get()
+        if not getattr(index_snap, "exists", False):
+            return []
+        dates = [str(d) for d in ((index_snap.to_dict() or {}).get("dates") or []) if str(d)]
+        rows = []
+        for day in dates:
+            snap = self.collection.document(f"validation_day_{day}").get()
+            if getattr(snap, "exists", False):
+                rows.append(_json_clone(snap.to_dict() or {}))
+        return rows
+
     def publish_artifact(self, lane: str, artifact: Dict[str, Any]) -> Dict[str, Any]:
-        if lane not in {"rank", "forecast", "signals"}:
+        if lane not in self._BUSINESS_LANES:
             raise ValueError("invalid business artifact lane")
         incoming = _json_clone(artifact)
         allowed = {"schema_version", "lane", "run_id", "produced_at_utc", "business_date", "status", "reason_code", "payload", "source_sha256", "code_sha256", "output_sha256", "output_bytes_b64"}
@@ -151,11 +226,11 @@ class FirestoreSchedulerEvidenceBackend:
         except Exception as exc:
             raise ValueError("business artifact date invalid") from exc
         reason_code = incoming.get("reason_code")
-        if reason_code not in {None, "WEEKEND", "EXCHANGE_HOLIDAY", "MARKET_SESSION_CLOSED", "UNKNOWN_CALENDAR", "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED"}:
+        if reason_code not in {None, *self._CLOSURE_REASON_CODES, *self._PENDING_REASON_CODES}:
             raise ValueError("business artifact reason_code invalid")
         status = incoming.get("status")
-        closure_codes = {"WEEKEND", "EXCHANGE_HOLIDAY", "MARKET_SESSION_CLOSED"}
-        pending_codes = {"UNKNOWN_CALENDAR", "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED"}
+        closure_codes = self._CLOSURE_REASON_CODES
+        pending_codes = self._PENDING_REASON_CODES
         if not ((status == "PASS" and reason_code is None) or (status == "SKIPPED" and reason_code in closure_codes) or (status == "PENDING" and reason_code in pending_codes)):
             raise ValueError("business artifact status/reason_code incoherent")
         produced = self._parse_utc(incoming.get("produced_at_utc", ""))

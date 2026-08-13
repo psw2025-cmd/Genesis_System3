@@ -60,26 +60,44 @@ def _spearman_from_validation(data: Dict[str, Any]) -> Optional[float]:
 
 
 def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[float]]:
-    mv_dir = root / "state" / "market_validations"
-    days: List[Dict[str, Any]] = []
-    if not mv_dir.exists():
-        return days, 0, None
-    for path in sorted(mv_dir.glob("*.json")):
-        data = _read_json(path)
-        if not data:
-            continue
+    by_date: Dict[str, Dict[str, Any]] = {}
+
+    def _ingest(data: Dict[str, Any], fallback_date: str = "") -> None:
+        if data.get("error") and _spearman_from_validation(data) in (None, 0.0):
+            return
         rho = _spearman_from_validation(data)
         if rho is None:
-            continue
-        days.append(
-            {
-                "date": data.get("date") or path.stem.replace("market_validation_", ""),
-                "rho": round(rho, 4),
-                "hit_rate": data.get("hit_rate"),
-                "status": data.get("status"),
-                "pass": rho >= SPEARMAN_THRESHOLD,
-            }
-        )
+            return
+        day = str(data.get("date") or fallback_date or "").strip()
+        if not day:
+            return
+        by_date[day] = {
+            "date": day,
+            "rho": round(rho, 4),
+            "hit_rate": data.get("hit_rate", data.get("match_rate_top3")),
+            "status": data.get("status") or data.get("grade"),
+            "pass": rho >= SPEARMAN_THRESHOLD,
+        }
+
+    mv_dir = root / "state" / "market_validations"
+    if mv_dir.exists():
+        for path in sorted(mv_dir.glob("*.json")):
+            data = _read_json(path)
+            if not data:
+                continue
+            _ingest(data, fallback_date=path.stem.replace("market_validation_", ""))
+
+    # Durable production path wins on same date (Firestore validation_day_* docs).
+    try:
+        from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+        for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
+            if isinstance(row, dict):
+                _ingest(row)
+    except Exception:
+        pass
+
+    days = [by_date[k] for k in sorted(by_date)]
     passing = sum(1 for d in days if d["pass"])
     latest_rho = days[-1]["rho"] if days else None
     return days, passing, latest_rho

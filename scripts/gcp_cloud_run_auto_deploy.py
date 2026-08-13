@@ -30,6 +30,7 @@ SCHEDULER_SA = os.getenv(
 BUSINESS_SCHEDULES = {
     "rank": "45 3 * * MON-FRI",
     "forecast": "0 4 * * MON-FRI",
+    "validate": "5 10 * * MON-FRI",  # 15:35 IST post-close Spearman day
     "signals": "15 13 * * MON-FRI",
 }
 
