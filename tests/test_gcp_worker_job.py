@@ -129,3 +129,27 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     assert pause < resume < trigger
     assert 'IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")' in workflow
     assert 'gcloud run jobs execute "genesis-system3-${KIND}"' not in workflow
+
+
+def test_business_scheduler_configuration_is_idempotent_and_exact():
+    from pathlib import Path
+
+    workflow = (Path(__file__).parents[1] / ".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+
+    assert 'BUSINESS_SCHEDULER="genesis-system3-${KIND}-daily"' in workflow
+    assert 'BUSINESS_URI="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-${KIND}:run"' in workflow
+    assert 'gcloud scheduler jobs describe "${BUSINESS_SCHEDULER}"' in workflow
+    assert 'gcloud scheduler jobs update http "${BUSINESS_SCHEDULER}"' in workflow
+    assert 'gcloud scheduler jobs create http "${BUSINESS_SCHEDULER}"' in workflow
+    assert '--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"' in workflow
+    assert '--oauth-token-scope="https://www.googleapis.com/auth/cloud-platform"' in workflow
+    assert "--message-body='{}'" in workflow
+
+    # Never regress to update-only literals: first deployment must be able to
+    # create all three business schedules from an empty scheduler namespace.
+    for name in (
+        "genesis-system3-rank-daily",
+        "genesis-system3-forecast-daily",
+        "genesis-system3-signals-daily",
+    ):
+        assert f"gcloud scheduler jobs update http {name}" not in workflow
