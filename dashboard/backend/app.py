@@ -3072,7 +3072,7 @@ def _slim_rows_payload(payload: Any, keys: Tuple[str, ...]) -> Dict[str, Any]:
 @app.get("/api/batch/market-data")
 async def batch_market_data():
     """Dashboard boot batch #1 — slim health/state/paper/rank/pnl/gates/alerts (8s TTL)."""
-    hit = _cache_get("batch_market_data_v1", _TTL_BATCH)
+    hit = _cache_get("batch_market_data_v2", _TTL_BATCH)
     if hit is not None:
         out = dict(hit)
         out["cache_hit"] = True
@@ -3103,7 +3103,13 @@ async def batch_market_data():
     alerts = results[5] if isinstance(results[5], dict) else {"alerts": []}
     gates = results[6] if isinstance(results[6], dict) else {"proof_gates": []}
 
-    # Keep state compact: drop bulky nested blobs
+    # Keep state compact: drop bulky nested blobs, keep live ops KPIs.
+    risk = state.get("risk") if isinstance(state.get("risk"), dict) else {}
+    pnl_state = state.get("pnl") if isinstance(state.get("pnl"), dict) else {}
+    recon = state.get("reconciliation") if isinstance(state.get("reconciliation"), dict) else {}
+    qc = state.get("qc") if isinstance(state.get("qc"), dict) else {}
+    signals = state.get("signals") if isinstance(state.get("signals"), dict) else {}
+    tick_health = state.get("tick_health") if isinstance(state.get("tick_health"), dict) else {}
     slim_state = {
         "status": state.get("status"),
         "mode": state.get("mode"),
@@ -3112,6 +3118,39 @@ async def batch_market_data():
         "broker": state.get("broker") if isinstance(state.get("broker"), dict) else {},
         "market": state.get("market") if isinstance(state.get("market"), dict) else {},
         "timestamp": state.get("timestamp") or state.get("updated_at"),
+        "data_source": state.get("data_source"),
+        "cycle_count": state.get("cycle_count") or state.get("state_version"),
+        "state_version": state.get("state_version"),
+        "last_tick_age_sec": state.get("last_tick_age_sec") or tick_health.get("last_tick_age_sec"),
+        "last_fetch_ts_iso": state.get("last_fetch_ts_iso") or state.get("last_cycle_ts_iso"),
+        "last_cycle_ts_iso": state.get("last_cycle_ts_iso"),
+        "risk": {
+            "exposure": risk.get("exposure") or risk.get("total_exposure"),
+            "var95": risk.get("var95") or risk.get("var_95"),
+            "es95": risk.get("es95") or risk.get("expected_shortfall_95"),
+            "concentration": risk.get("concentration") or risk.get("concentration_risk"),
+            "limits": {"status": (risk.get("limits") or {}).get("status")} if isinstance(risk.get("limits"), dict) else {},
+            "greeks": risk.get("greeks") if isinstance(risk.get("greeks"), dict) else {},
+        },
+        "pnl": {
+            "unrealized": pnl_state.get("unrealized"),
+            "total": pnl_state.get("total"),
+            "day_total": pnl_state.get("day_total"),
+            "realized": pnl_state.get("realized"),
+        },
+        "reconciliation": {"status": recon.get("status"), "timestamp": recon.get("timestamp")},
+        "qc": {"status": qc.get("status"), "contracts_total": qc.get("contracts_total")},
+        "signals": {
+            "status": signals.get("status"),
+            "reason": signals.get("reason"),
+            "confidence": signals.get("confidence"),
+            "last_signal": signals.get("last_signal"),
+        },
+        "tick_health": {
+            "last_tick_age_sec": tick_health.get("last_tick_age_sec"),
+            "market_open": tick_health.get("market_open"),
+            "source": tick_health.get("source"),
+        },
     }
 
     payload = {
@@ -3130,7 +3169,7 @@ async def batch_market_data():
         },
         "auto_gates": _slim_gates(gates),
     }
-    return _cache_set("batch_market_data_v1", payload)
+    return _cache_set("batch_market_data_v2", payload)
 
 
 @app.get("/api/batch/positions-holdings")

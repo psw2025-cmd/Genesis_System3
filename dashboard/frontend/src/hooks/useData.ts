@@ -281,10 +281,20 @@ export function useData() {
 
   const poll = useCallback(async () => {
     try {
-      const batch = await fetchJSON('/api/batch/market-data', 25000)
+      const [batchResult, stateResult] = await Promise.allSettled([
+        fetchJSON('/api/batch/market-data', 25000),
+        fetchJSON('/api/state', 20000),
+      ])
+      if (batchResult.status !== 'fulfilled') throw batchResult.reason
+      const batch = batchResult.value
       markSuccess('core')
       if (batch?.health) setHealth(batch.health)
-      if (batch?.state) setState(batch.state)
+      // Batch state is a slim health-shaped snapshot. Prefer /api/state for live risk/PnL/cycle.
+      if (stateResult.status === 'fulfilled' && stateResult.value && typeof stateResult.value === 'object') {
+        setState(stateResult.value)
+      } else if (batch?.state) {
+        setState(batch.state)
+      }
       if (batch?.paper) setPaper(batch.paper)
       else setPaper(pendingPaper({ message: 'batch missing paper' }))
       if (batch?.gain_rank) setGainRank(batch.gain_rank)
