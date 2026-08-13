@@ -8045,6 +8045,34 @@ async def get_core_pipeline_v8_status():
 from collections import defaultdict, deque
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+def validate_params(params: dict, required: list = None, types: dict = None) -> tuple[bool, str]:
+    """Validate request parameters"""
+    if required:
+        for field in required:
+            if field not in params or params[field] is None:
+                return False, f"Missing required field: {field}"
+    
+    if types:
+        for field, expected_type in types.items():
+            if field in params and params[field] is not None:
+                if not isinstance(params[field], expected_type):
+                    return False, f"Invalid type for {field}: expected {expected_type.__name__}"
+    
+    return True, ""
+
+
+# Standardized response wrapper - applied to all endpoint returns
+def wrap_response(data=None, status="ok", code="OK", error=None):
+    """Wrap all responses in standard format"""
+    return {
+        "status": status,
+        "code": code,
+        "data": data,
+        "error": error,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
+
+
 _COMPAT_CACHE: Dict[str, Tuple[float, Any]] = {}
 _COMPAT_REQ_BUCKET: Dict[str, deque] = defaultdict(deque)
 _COMPAT_SCANNER_CACHE: Tuple[float, Dict[str, Any]] = (0.0, {})

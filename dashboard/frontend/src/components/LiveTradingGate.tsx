@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react"
-import { cn } from "../lib/utils"
+import { useCallback, useMemo, useState, useEffect } from "react"
+import { useCallback, useMemo, cn } from "../lib/utils"
 
 interface Gate {
   gate: string

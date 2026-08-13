@@ -1,7 +1,7 @@
-import { useStore } from '../store'
-import { fmt, fmtCr, signClass, cn } from '../lib/utils'
-import { PriceCell } from './ui/PriceCell'
-import { AuthUnlock } from './AuthUnlock'
+import { useMemo, useStore } from '../store'
+import { useMemo, fmt, fmtCr, signClass, cn } from '../lib/utils'
+import { useMemo, PriceCell } from './ui/PriceCell'
+import { useMemo, AuthUnlock } from './AuthUnlock'
 
 function Row({ label, value, color }: { label: string; value: string; color?: string }) {
   return (

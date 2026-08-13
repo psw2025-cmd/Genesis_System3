@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { API_BASE } from '../config'
+import { useCallback, useMemo, API_BASE } from '../config'
 import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
-import { AuthUnlock } from './AuthUnlock'
-import { MarketTopCePeTable } from './MarketTopCePeTable'
+import { useCallback, useMemo, AuthUnlock } from './AuthUnlock'
+import { useCallback, useMemo, MarketTopCePeTable } from './MarketTopCePeTable'
 
 type SignalView = {
   action: string

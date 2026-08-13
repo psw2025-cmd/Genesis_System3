@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { API_BASE } from '../config'
+import { useCallback, API_BASE } from '../config'
 import axios from 'axios'
 
 interface BackendConnectivityBannerProps {

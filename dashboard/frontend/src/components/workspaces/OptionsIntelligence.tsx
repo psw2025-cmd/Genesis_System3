@@ -12,7 +12,7 @@ function pickArray(obj: any, ...keys: string[]): any[] {
   return [];
 }
 
-export const OptionsIntelligence: React.FC = () => {
+export const OptionsIntelligence: React.FC = React.memo(() => {
   const { chain, chainSymbol, marketTop, gainRank, brokerPositions } = useStore();
 
   const currentChain = chain[chainSymbol] || null;

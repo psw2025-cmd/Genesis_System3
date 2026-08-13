@@ -1,5 +1,5 @@
-import { useStore } from '../store'
-import { BrokerPanel } from './BrokerPanel'
+import { useMemo, useStore } from '../store'
+import { useMemo, BrokerPanel } from './BrokerPanel'
 
 function ProofItem({ label, value, ok }: { label: string; value: string; ok: boolean }) {
   return (

@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusChip, PENDINGState } from './TruthUI';
 import { Sparkles, BarChart, Zap, Search } from 'lucide-react';
 
-export const MultibaggerResearch: React.FC = () => {
+export const MultibaggerResearch: React.FC = React.memo(() => {
   return (
     <div data-testid="multibagger-root" style={{ height: '100%', overflowY: 'auto', background: 'var(--surface)' }}>
       <header style={{

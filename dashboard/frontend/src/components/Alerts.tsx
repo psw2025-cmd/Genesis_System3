@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { API_BASE } from '../config'
+import { useMemo, API_BASE } from '../config'
 
 export default function Alerts() {
   const [alerts, setAlerts] = useState<any[]>([])

@@ -5,7 +5,7 @@
  */
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { API_BASE } from '../config'
+import { useCallback, useMemo, API_BASE } from '../config'
 
 interface TestResult {
   name: string

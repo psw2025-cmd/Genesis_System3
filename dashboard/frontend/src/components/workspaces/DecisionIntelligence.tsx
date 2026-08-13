@@ -3,7 +3,7 @@ import { useStore } from '../../store';
 import { StatusChip } from './TruthUI';
 import { Zap, Shield, Activity, Database, AlertTriangle } from 'lucide-react';
 
-export const DecisionIntelligence: React.FC = () => {
+export const DecisionIntelligence: React.FC = React.memo(() => {
   const {
     health, brokerConnected, marketOpen, wsStatus, apiStatus
   } = useStore();

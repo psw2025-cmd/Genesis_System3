@@ -11,7 +11,7 @@ interface StatusChipProps {
   value?: string | number;
 }
 
-export const StatusChip: React.FC<StatusChipProps> = ({ label, status = 'mut', value }) => {
+export const StatusChip: React.FC<StatusChipProps> = ({ label, status = React.memo('mut', value }) => {
   const colors = {
     ok: { bg: 'rgba(0, 232, 122, 0.08)', border: 'rgba(0, 232, 122, 0.28)', text: 'var(--up)' },
     warn: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.28)', text: 'var(--amber)' },
@@ -41,7 +41,7 @@ interface PENDINGStateProps {
   dataTestId?: string;
 }
 
-export const PENDINGState: React.FC<PENDINGStateProps> = ({ reason = 'DATA SERVICE PENDING', dataTestId }) => (
+export const PENDINGState: React.FC<PENDINGStateProps> = ({ reason = React.memo('DATA SERVICE PENDING', dataTestId }) => (
   <div
     data-testid={dataTestId}
     style={{
@@ -68,7 +68,7 @@ interface EvidenceProps {
   type: 'pro' | 'con';
 }
 
-export const EvidenceList: React.FC<EvidenceProps> = ({ label, items, type }) => (
+export const EvidenceList: React.FC<EvidenceProps> = React.memo(({ label, items, type }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
     <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase' }}>
       {label}

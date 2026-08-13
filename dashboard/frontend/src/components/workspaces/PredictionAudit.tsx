@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusChip, PENDINGState } from './TruthUI';
 import { Search, Shield, CheckCircle } from 'lucide-react';
 
-export const PredictionAudit: React.FC = () => {
+export const PredictionAudit: React.FC = React.memo(() => {
   return (
     <div data-testid="prediction-audit-root" style={{ height: '100%', overflowY: 'auto', background: 'var(--surface)' }}>
       <header style={{
