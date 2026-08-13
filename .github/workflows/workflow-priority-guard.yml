@@ -14,14 +14,25 @@ on:
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - "Genesis System3 Global Safety CI"
+      - "Cloud Run Auto Deploy"
+      - "Frontend Browser Runtime Smoke"
+      - "GCP Dhan Token Fix CI"
+      - "GCP Dhan Token Rotation Manual Recovery"
+      - "GCP Stage 2 Safety Checks"
+    types: [completed]
+  deployment_status:
 
 permissions:
   contents: read
   actions: read
+  deployments: read
 
 concurrency:
-  group: workflow-priority-guard-${{ github.ref }}
-  cancel-in-progress: true
+  group: workflow-priority-guard-${{ github.event.workflow_run.id || github.event.deployment.id || github.event.pull_request.number || github.sha }}
+  cancel-in-progress: false
 
 env:
   SYSTEM3_MODE: analyze
@@ -32,12 +43,130 @@ env:
 
 jobs:
   enforce-priority-only:
+    if: github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     name: BLOCKING - priority workflows only
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout proposed repository state
+        uses: actions/checkout@v5
+        with:
+          clean: true
+          persist-credentials: false
 
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
+
+  event-forensic-responder:
+    if: >-
+      (github.event_name == 'workflow_run' &&
+       (github.event.workflow_run.conclusion == 'failure' ||
+        github.event.workflow_run.conclusion == 'cancelled' ||
+        github.event.workflow_run.conclusion == 'timed_out' ||
+        github.event.workflow_run.conclusion == 'action_required' ||
+        github.event.workflow_run.conclusion == 'startup_failure')) ||
+      (github.event_name == 'deployment_status' &&
+       (github.event.deployment_status.state == 'failure' ||
+        github.event.deployment_status.state == 'error' ||
+        (github.event.deployment.performed_via_github_app.slug == 'render' &&
+         github.event.deployment_status.state != 'in_progress' &&
+         github.event.deployment_status.state != 'pending' &&
+         github.event.deployment_status.state != 'queued')))
+    name: FORENSIC - read-only failure event evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          clean: true
+          persist-credentials: false
+
+      - name: Capture immutable event evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="reports/latest/github_event_forensics"
+          mkdir -p "$OUT"
+          python - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+          payload = json.loads(Path(os.environ["GITHUB_EVENT_PATH"]).read_text(encoding="utf-8"))
+          workflow_run = payload.get("workflow_run") or {}
+          deployment = payload.get("deployment") or {}
+          deployment_status = payload.get("deployment_status") or {}
+          app = deployment.get("performed_via_github_app") or deployment_status.get("performed_via_github_app") or {}
+
+          if event_name == "workflow_run":
+              source = str(workflow_run.get("name") or "unknown-workflow")
+              state = str(workflow_run.get("conclusion") or "unknown")
+              event_id = workflow_run.get("id")
+              head_sha = workflow_run.get("head_sha")
+              ref = workflow_run.get("head_branch")
+              evidence_url = workflow_run.get("html_url")
+              deployment_app = None
+              retired_runtime = False
+          else:
+              source = str(deployment.get("environment") or deployment_status.get("environment") or "deployment")
+              state = str(deployment_status.get("state") or "unknown")
+              event_id = deployment.get("id")
+              head_sha = deployment.get("sha")
+              ref = deployment.get("ref")
+              evidence_url = deployment_status.get("target_url") or deployment_status.get("log_url")
+              deployment_app = str(app.get("slug") or "") or None
+              retired_runtime = deployment_app == "render"
+
+          fingerprint = hashlib.sha256(
+              "|".join([event_name, source, state, str(deployment_app or "none")]).lower().encode("utf-8")
+          ).hexdigest()[:16]
+          report = {
+              "schema_version": 1,
+              "repository": os.environ.get("GITHUB_REPOSITORY"),
+              "event_name": event_name,
+              "source": source,
+              "state": state,
+              "event_id": event_id,
+              "head_sha": head_sha,
+              "ref": ref,
+              "evidence_url": evidence_url,
+              "deployment_app": deployment_app,
+              "retired_runtime_observed": retired_runtime,
+              "fingerprint": fingerprint,
+              "safety": {
+                  "repository_write_performed": False,
+                  "deployment_mutation_performed": False,
+                  "runtime_mutation_performed": False,
+                  "order_action_performed": False,
+                  "live_trading_enabled": False,
+              },
+          }
+          out = Path("reports/latest/github_event_forensics")
+          out.mkdir(parents=True, exist_ok=True)
+          (out / "incident.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+          summary = "\n".join([
+              "# System3 Event-Driven Forensic Evidence", "",
+              f"- Event: `{event_name}`", f"- Source: `{source}`", f"- State: `{state}`",
+              f"- Event ID: `{event_id}`", f"- Head SHA: `{head_sha}`", f"- Ref: `{ref}`",
+              f"- Deployment app: `{deployment_app}`", f"- Retired runtime observed: **{retired_runtime}**",
+              f"- Fingerprint: `{fingerprint}`", "- Repository write performed: **false**",
+              "- Deployment/runtime mutation performed: **false**", "- Order action performed: **false**",
+              "- LIVE trading enabled: **false**", ""
+          ])
+          (out / "summary.md").write_text(summary, encoding="utf-8")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as fh:
+              fh.write(summary)
+          print("EVENT_FORENSIC_EVIDENCE=PASS", json.dumps(report, sort_keys=True))
+          PY
+
+      - name: Upload forensic event artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: github-event-forensics-${{ github.run_number }}-${{ github.run_attempt }}
+          path: reports/latest/github_event_forensics/
+          if-no-files-found: error
+          retention-days: 30
