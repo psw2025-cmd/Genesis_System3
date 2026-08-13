@@ -19,6 +19,7 @@ export function Positions() {
       ? paper.pnl.closed_positions
       : []
   const summary = paper?.pnl?.summary ?? paper?.pnl ?? {}
+  const summaryAvailable = paper != null && (paper?.pnl != null || paper?.summary != null)
 
   const totalPnl = Number(
     summary.total_pnl
@@ -34,18 +35,18 @@ export function Positions() {
         <div>
           <span className="text-xs text-text-muted">NET P&L</span>
           <div className={cn('num text-xl font-bold', signClass(totalPnl))}>
-            {fmtCr(totalPnl)}
+            {summaryAvailable ? fmtCr(totalPnl) : '--'}
           </div>
         </div>
         <div>
           <span className="text-xs text-text-muted">WIN RATE</span>
           <div className={cn('num text-xl font-bold', winRate >= 50 ? 'text-up' : 'text-down')}>
-            {winRate.toFixed(1)}%
+            {summaryAvailable ? `${winRate.toFixed(1)}%` : '--'}
           </div>
         </div>
         <div>
           <span className="text-xs text-text-muted">TRADES</span>
-          <div className="num text-xl font-bold text-text-primary">{totalTrades}</div>
+          <div className="num text-xl font-bold text-text-primary">{summaryAvailable ? totalTrades : '--'}</div>
         </div>
         <div>
           <span className="text-xs text-text-muted">OPEN</span>

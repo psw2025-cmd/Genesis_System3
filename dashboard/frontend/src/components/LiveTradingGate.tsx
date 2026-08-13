@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { cn } from "../lib/utils"
 
 interface Gate {
   gate: string
@@ -18,16 +17,15 @@ interface GateStatus {
 export function LiveTradingGate() {
   const [status, setStatus] = useState<GateStatus | null>(null)
   const [loading, setLoading] = useState(true)
-  const [approving, setApproving] = useState(false)
-  const [phrase, setPhrase] = useState("")
-  const [approvalResult, setApprovalResult] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
       try {
         const r = await fetch("/api/live-trading/gate")
-        setStatus(await r.json())
-      } catch { /* network error */ }
+        if (!r.ok) throw new Error(`Gate proof unavailable (HTTP ${r.status})`)
+        setStatus(await r.json()); setError(null)
+      } catch (err: any) { setError(err?.message || 'Gate proof unavailable') }
       finally { setLoading(false) }
     }
     load()
@@ -35,24 +33,10 @@ export function LiveTradingGate() {
     return () => clearInterval(t)
   }, [])
 
-  const handleApprove = async () => {
-    setApproving(true)
-    try {
-      const r = await fetch("/api/live-trading/approve", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ approval_phrase: phrase })
-      })
-      const d = await r.json()
-      setApprovalResult(d.message)
-    } catch (e) {
-      setApprovalResult("Error: " + e)
-    } finally { setApproving(false) }
-  }
-
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
       {/* Header */}
+      {error && <div className="card p-4" style={{ color: 'var(--down)' }}>{error}. Live trading remains locked.</div>}
       <div className="card p-4" style={{
         borderColor: status?.gate_open ? "var(--up)" : "var(--down)",
         borderWidth: "2px"
@@ -127,55 +111,14 @@ export function LiveTradingGate() {
         </div>
       )}
 
-      {status?.gates?.every(g => g.gate !== "human_approved" || !g.passed) &&
-       status?.gates?.filter(g => g.gate !== "human_approved").every(g => g.passed) && (
-        <div className="card p-4" style={{ borderColor: "var(--up)" }}>
-          <h3 style={{ fontSize: ".8rem", fontWeight: 700, color: "var(--up)",
-                       marginBottom: "12px" }}>
-            🔓 All Technical Gates Passed — Human Approval Required
-          </h3>
-          <p style={{ fontSize: ".75rem", color: "var(--text-mut)", marginBottom: "12px" }}>
-            Type the exact approval phrase to record your consent. This does NOT
-            enable live trading automatically — you must also change
-            LIVE_TRADING_ENABLED=1 manually on Cloud Run (keep OFF unless explicit).
-          </p>
-          <input
-            value={phrase}
-            onChange={e => setPhrase(e.target.value)}
-            placeholder="I APPROVE LIVE TRADING WITH MAX LOSS RS 5000"
-            style={{
-              width: "100%", padding: "8px 12px", borderRadius: "6px",
-              background: "var(--surface-2)", border: "1px solid var(--border)",
-              color: "var(--text-pri)", fontSize: ".75rem",
-              fontFamily: "var(--font-mono)", marginBottom: "8px"
-            }}
-          />
-          <button
-            onClick={handleApprove}
-            disabled={approving || !phrase.trim()}
-            style={{
-              padding: "8px 20px", borderRadius: "6px", fontWeight: 700,
-              fontSize: ".75rem", cursor: "pointer",
-              background: approving ? "var(--surface-3)" : "var(--up)",
-              color: "#000", border: "none"
-            }}
-          >
-            {approving ? "Recording..." : "Record Approval"}
-          </button>
-          {approvalResult && (
-            <p style={{ fontSize: ".75rem", color: "var(--amber)", marginTop: "8px" }}>
-              {approvalResult}
-            </p>
-          )}
-        </div>
-      )}
+      <div className="card p-4" style={{ borderColor: "var(--border)" }}><p style={{ fontSize: '.75rem', color: 'var(--text-mut)' }}>This public Cloud Run dashboard is read-only. Approval and configuration changes are intentionally unavailable here.</p></div>
 
       {/* Always visible warning */}
       <div className="card p-4" style={{ borderColor: "var(--surface-3)" }}>
         <p style={{ fontSize: ".7rem", color: "var(--text-mut)" }}>
           <strong>Live trading remains OFF</strong> until all gates pass,
           human approval is recorded, AND LIVE_TRADING_ENABLED is manually
-          set to 1 on Render. Max daily loss: ₹5,000.
+          set to 1 through the protected Cloud Run operations workflow. Max daily loss: ₹5,000.
           System halts automatically when limit is hit.
         </p>
       </div>
