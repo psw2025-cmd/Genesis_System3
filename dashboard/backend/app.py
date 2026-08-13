@@ -1034,7 +1034,8 @@ async def get_unified_portfolio():
     except ImportError:
         from portfolio_truth_service import build_unified_portfolio
     try:
-        return await _run_blocking(build_unified_portfolio, OUTPUTS_DIR, timeout=_TRUTH_IO_TIMEOUT_S)
+        result = await _run_blocking(build_unified_portfolio, OUTPUTS_DIR, timeout=_TRUTH_IO_TIMEOUT_S)
+        return _cache_set("portfolio", result)
     except asyncio.TimeoutError:
         return {"error": "portfolio_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
 

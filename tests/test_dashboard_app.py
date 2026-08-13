@@ -133,6 +133,23 @@ def test_safe_dashboard_reads_do_not_trip_compat_rate_bucket(app):
         assert status == 200
 
 
+def test_unified_portfolio_caches_successful_result(app, monkeypatch):
+    endpoint = route_endpoint(app, "GET", "/api/portfolio/unified")
+    endpoint.__globals__["_API_CACHE"].pop("portfolio", None)
+    calls = {"count": 0}
+
+    async def fake_run_blocking(*args, **kwargs):
+        calls["count"] += 1
+        return {"status": "ok", "live_trading_enabled": False}
+
+    monkeypatch.setitem(endpoint.__globals__, "_run_blocking", fake_run_blocking)
+    first = asyncio.run(endpoint())
+    second = asyncio.run(endpoint())
+    assert first == second
+    assert calls["count"] == 1
+    assert first["live_trading_enabled"] is False
+
+
 def test_order_create_rejected_when_approval_not_signed_off(app, monkeypatch):
     try:
         import dashboard.backend.human_approval_service as approval_mod
