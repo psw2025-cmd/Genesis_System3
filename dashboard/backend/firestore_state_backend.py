@@ -181,13 +181,13 @@ class FirestoreSchedulerEvidenceBackend:
         @self._transactional
         def _persist(transaction):
             day_ref_snap = day_ref.get(transaction=transaction)
+            index_snap = index_ref.get(transaction=transaction)
             existing_day = day_ref_snap.to_dict() if getattr(day_ref_snap, "exists", False) else {}
             if existing_day and float(existing_day.get("rank_correlation_spearman", 0)) == rho_f:
                 stored_out = _json_clone(existing_day)
             else:
                 stored_out = stored
                 transaction.set(day_ref, stored_out)
-            index_snap = index_ref.get(transaction=transaction)
             index = index_snap.to_dict() if getattr(index_snap, "exists", False) else {}
             dates = [str(d) for d in (index.get("dates") or []) if str(d)]
             if day not in dates:

@@ -12,18 +12,22 @@ export function SystemHealthDiagnostics({
 
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
-  const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
-  const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
+  const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.name || g?.gate_id || '')))
+  const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.name || g?.gate_id || '')))
 
-  const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
+  const mlOk = Boolean(mlGate?.pass)
   const paperGateOk = Boolean(paperGate?.pass ?? paperGate?.ok)
   const paperOk = paperGateOk || paperModeActive(health)
   const dhanOk = brokerIsConnected(health, brokerConnected)
   const runtimeOk = systemRuntimeOk(health)
   const wsTone: 'ok' | 'warn' | 'error' = wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'
+  const daysRec = Number(mlGate?.days_recorded)
+  const daysReq = Number(mlGate?.days_required ?? 5)
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
-    : `${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
+    : Number.isFinite(daysRec)
+      ? `${daysRec}/${Number.isFinite(daysReq) ? daysReq : 5}d`
+      : `${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const wsLabel = wsStatus === 'live' ? 'Live' : String(wsStatus)
 
   const proofItems: Array<[string, string, 'ok' | 'warn' | 'error']> = [

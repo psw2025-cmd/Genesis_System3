@@ -76,8 +76,8 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
             rho = g.get('latest_rho', '?')
             threshold = g.get('threshold', 0.7)
             note = f"{days_rec}/{days_req} days · ρ={rho} · need ≥{threshold}"
-            # Show as OK if correlation is above threshold, or collecting data
-            ok = (isinstance(rho, (int, float)) and rho >= threshold) or days_rec > 0
+            # Honest: only PASS when the evaluator gate passes (5 days with ρ≥threshold).
+            ok = bool(g.get("pass"))
         elif gid == "POSITIVE_NET_EXPECTANCY_AFTER_COSTS":
             exp = g.get('net_expectancy_after_costs', 0)
             wr = g.get('win_rate', 0)
@@ -103,10 +103,16 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
             {
                 "name": label,
                 "gate_id": gid,
-                "status": "PASS" if ok else "COLLECTING",  # Changed from PEND to COLLECTING
+                "label": label,
+                "status": "PASS" if ok else "COLLECTING",
                 "pass": ok,
+                "ok": ok,
                 "note": note,
                 "blocker_id": g.get("blocker_id"),
+                "days_recorded": g.get("days_recorded"),
+                "days_required": g.get("days_required"),
+                "latest_rho": g.get("latest_rho"),
+                "days_passing_threshold": g.get("days_passing_threshold"),
             }
         )
     return out
