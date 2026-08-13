@@ -4,8 +4,8 @@ import { API_BASE } from '../config'
 
 export default function ModelBehavior() {
   const [logs, setLogs] = useState<string[]>([])
-  const [secrets, setSecrets] = useState<unknown>(null)
-  const [qc, setQc] = useState<unknown>(null)
+  const [secrets, setSecrets] = useState<any>(null)
+  const [qc, setQc] = useState<any>(null)
 
   useEffect(() => {
     const fetchData = async () => {
