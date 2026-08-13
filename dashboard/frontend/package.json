@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
+    "typecheck:runtime": "tsc --noEmit -p tsconfig.runtime.json",
     "build": "vite build",
     "preview": "vite preview"
   },
