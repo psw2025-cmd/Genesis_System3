@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -23,6 +24,71 @@ def _ist_now_str() -> str:
     # Asia/Kolkata = UTC+5:30
     ist = timezone(timedelta(hours=5, minutes=30))
     return datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def _cloud_market_closed() -> bool:
+    """Return True only when Cloud Run can prove the NSE market is closed.
+
+    Local/unit-test callers keep their historical behavior. Cloud Run must not
+    cold-fan-out Dhan option-chain calls merely to manufacture an after-hours
+    scanner snapshot: the API route already prefers cache/disk evidence first,
+    and a cold four-index fetch is rate-limited enough to exceed the external
+    runtime-proof budget.  If market detection itself is unavailable, fail by
+    returning False so this helper never silently suppresses an open-market
+    scan.
+    """
+    if not os.environ.get("K_SERVICE"):
+        return False
+    try:
+        from utils.market_hours import is_market_open
+
+        open_now, _reason = is_market_open()
+        return not bool(open_now)
+    except Exception:
+        return False
+
+
+def _closed_market_report(top_n: int = 5, market_top_n: int = 25) -> Dict[str, Any]:
+    """Typed, deterministic response when no cached after-hours board exists."""
+    empty = {u: {
+        "underlying": u,
+        "implemented": False,
+        "status": "MARKET_CLOSED_NO_COLD_FETCH",
+        "data_source": None,
+        "message": "Market closed; cold Dhan scanner fetch suppressed",
+        "top_ce": None,
+        "top_pe": None,
+    } for u in INDEX_SEGMENTS}
+    return {
+        "generated_utc": _utc_now(),
+        "refreshed_at": _ist_now_str(),
+        "status": "market_closed",
+        "market_open": False,
+        "segments": list(INDEX_SEGMENTS),
+        "segments_implemented": 0,
+        "segments_total": len(INDEX_SEGMENTS),
+        "underlyings_scanned": 0,
+        "all_segments_live": False,
+        "missing_segments": list(INDEX_SEGMENTS),
+        "by_segment": empty,
+        "by_underlying": empty,
+        "market_wide": {
+            "top_ce": None,
+            "top_pe": None,
+            "top_ce_list": [],
+            "top_pe_list": [],
+            "top_combined_list": [],
+        },
+        "market_top_table": [],
+        "contracts_scored_total": 0,
+        "ranking_mode": "closed_market_no_network",
+        "chains_fetched": [],
+        "include_equity": False,
+        "equity_limit": 0,
+        "equity_only_board": False,
+        "note": "No cached/EOD scanner board available; network fan-out suppressed after market close",
+        "live_trading_enabled": False,
+    }
 
 
 def compute_contract_gain(contract: Dict[str, Any]) -> Tuple[Optional[float], Optional[float], Optional[float], Optional[float]]:
@@ -184,8 +250,6 @@ def scan_all_segments_from_chains(
 
     ce_all = sorted([r for r in all_scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
     pe_all = sorted([r for r in all_scored if r["option_type"] == "PE"], key=lambda x: x["gain_pct"], reverse=True)
-    # Moneycontrol-style: pure % gain ranking across CE+PE (no forced CE/PE slot mix).
-    # Index domination is handled by separate equity_focus board when requested.
     combined = sorted(all_scored, key=lambda x: x["gain_pct"], reverse=True)
 
     index_keys = set(INDEX_SEGMENTS)
@@ -237,7 +301,6 @@ def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
         all_names = list(universe.get("underlyings") or [])
         limit = max(3, min(int(limit or 12), 40))
 
-        # Always include head of momentum/priority so today's MC names are eligible.
         selected: List[str] = []
         for name in priority:
             if name not in selected:
@@ -293,7 +356,6 @@ def fetch_chains_for_market(
             ch = fetch_chain_for_api(dsm, underlying)
             return underlying, ch or {"contracts": [], "underlying": underlying}
 
-        # Indices first (required), then equity fill-in under remaining budget.
         index_syms = [u for u in symbols if u in INDEX_SEGMENTS]
         equity_syms = [u for u in symbols if u not in INDEX_SEGMENTS]
 
@@ -305,8 +367,6 @@ def fetch_chains_for_market(
 
         remaining = overall_timeout_s - (time.monotonic() - started)
         if equity_syms and remaining > 12.0:
-            # Dhan option-chain rate limit ≈ 1 unique request / 3s. Parallel fan-out
-            # for equities returns empty and Market Top never sees DIVISLAB/LTM/etc.
             for underlying in equity_syms:
                 if (time.monotonic() - started) >= overall_timeout_s - 3.0:
                     chains.setdefault(
@@ -383,6 +443,13 @@ def build_top_contract_gainers_report(
     rotate_equity: bool = True,
     equity_only_board: bool = False,
 ) -> Dict[str, Any]:
+    # In Cloud Run, after-hours scanner requests must be deterministic and
+    # network-free. The API layer already prefers cached/micro-loop/disk boards;
+    # if none exists, return typed closed-market truth instead of starting a
+    # rate-limited four-index Dhan fan-out that can exceed external proof timeouts.
+    if _cloud_market_closed():
+        return _closed_market_report(top_n=top_n, market_top_n=market_top_n)
+
     eq_limit = 16 if include_equity else 0
     if equity_limit is not None:
         eq_limit = int(equity_limit)
