@@ -19,6 +19,16 @@ AUTOMATIC = {
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
+FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
+FORENSIC_MONITORED_WORKFLOWS = {
+    "Genesis System3 Global Safety CI",
+    "Cloud Run Auto Deploy",
+    "Frontend Browser Runtime Smoke",
+    "GCP Dhan Token Fix CI",
+    "GCP Dhan Token Rotation Manual Recovery",
+    "GCP Stage 2 Safety Checks",
+}
+
 
 def _top_level_on_block(text: str) -> str:
     lines = text.splitlines()
@@ -53,7 +63,7 @@ def main() -> int:
         raise SystemExit(f"WORKFLOW_POLICY_MISSING {POLICY_PATH}")
 
     forbidden_trigger = re.compile(
-        r"^\s*(schedule|workflow_run|repository_dispatch|issue_comment|issues)\s*:",
+        r"^\s*(schedule|repository_dispatch|issue_comment|issues)\s*:",
         re.IGNORECASE | re.MULTILINE,
     )
     self_hosted = re.compile(
@@ -67,10 +77,16 @@ def main() -> int:
         r"AUTO_EXECUTE_TRADES\s*[:=]\s*[\"']?(?:1|true|yes)",
         re.IGNORECASE,
     )
+    event_trigger = re.compile(
+        r"^\s*(workflow_run|deployment_status)\s*:",
+        re.IGNORECASE | re.MULTILINE,
+    )
 
     trigger_blocks: dict[str, str] = {}
+    workflow_text: dict[str, str] = {}
     for name in files:
         text = (WORKFLOW_DIR / name).read_text(encoding="utf-8")
+        workflow_text[name] = text
         on_block = _top_level_on_block(text)
         trigger_blocks[name] = on_block
         if not on_block:
@@ -78,6 +94,11 @@ def main() -> int:
         match = forbidden_trigger.search(on_block)
         if match:
             raise SystemExit(f"WORKFLOW_FORBIDDEN_TRIGGER file={name} match={match.group(1)!r}")
+        event_match = event_trigger.search(on_block)
+        if event_match and name != FORENSIC_WORKFLOW:
+            raise SystemExit(
+                f"WORKFLOW_EVENT_TRIGGER_RESERVED file={name} match={event_match.group(1)!r}"
+            )
         if self_hosted.search(text):
             raise SystemExit(f"WORKFLOW_SELF_HOSTED_FORBIDDEN file={name}")
         if retired_runtime.search(text):
@@ -95,9 +116,33 @@ def main() -> int:
     if "pull_request:" not in ci_on or "push:" not in ci_on:
         raise SystemExit("GLOBAL_SAFETY_PRIORITY_TRIGGERS_MISSING")
 
-    guard_on = trigger_blocks["workflow-priority-guard.yml"]
-    if "pull_request:" not in guard_on or "push:" not in guard_on:
-        raise SystemExit("WORKFLOW_PRIORITY_GUARD_TRIGGERS_MISSING")
+    guard_on = trigger_blocks[FORENSIC_WORKFLOW]
+    for required in ("pull_request:", "push:", "workflow_dispatch:", "workflow_run:", "deployment_status:"):
+        if required not in guard_on:
+            raise SystemExit(f"WORKFLOW_PRIORITY_GUARD_TRIGGER_MISSING trigger={required}")
+    for monitored in sorted(FORENSIC_MONITORED_WORKFLOWS):
+        if monitored not in guard_on:
+            raise SystemExit(f"FORENSIC_MONITORED_WORKFLOW_MISSING workflow={monitored!r}")
+
+    guard_text = workflow_text[FORENSIC_WORKFLOW]
+    if re.search(
+        r"^\s*(contents|actions|deployments|issues|pull-requests|checks|statuses):\s*write\s*$",
+        guard_text,
+        re.IGNORECASE | re.MULTILINE,
+    ):
+        raise SystemExit("FORENSIC_RESPONDER_WRITE_PERMISSION_FORBIDDEN")
+    if "deployments: read" not in guard_text:
+        raise SystemExit("FORENSIC_RESPONDER_DEPLOYMENTS_READ_MISSING")
+    if "persist-credentials: false" not in guard_text:
+        raise SystemExit("FORENSIC_RESPONDER_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
+    if re.search(
+        r"ref:\s*\$\{\{\s*github\.event\.workflow_run\.(head_sha|head_branch)\s*\}\}",
+        guard_text,
+        re.IGNORECASE,
+    ):
+        raise SystemExit("FORENSIC_RESPONDER_UNTRUSTED_REF_CHECKOUT_FORBIDDEN")
+    if not re.search(r"ref:\s*main\s*$", guard_text, re.MULTILINE):
+        raise SystemExit("FORENSIC_RESPONDER_DEFAULT_BRANCH_CHECKOUT_MISSING")
 
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
@@ -117,6 +162,9 @@ def main() -> int:
             "self_hosted": False,
             "retired_runtime_workflows": False,
             "scheduled_github_workflows": False,
+            "event_forensic_responder": FORENSIC_WORKFLOW,
+            "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
+            "event_responder_write_permissions": False,
             "live_trading": False,
         },
     )
