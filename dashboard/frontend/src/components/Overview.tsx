@@ -25,23 +25,12 @@ function Metric({ label, value, sub, tone, icon }: {
   )
 }
 
-function ChartPlaceholder({ title, value, tone = 'accent' }: { title: string; value?: string; tone?: 'accent' | 'up' | 'down' }) {
-  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : 'var(--accent)'
+function ChartPlaceholder({ title, value }: { title: string; value?: string; tone?: 'accent' | 'up' | 'down' }) {
   return (
     <div className="chart-shell" style={{ minHeight: 145, padding: 12 }}>
       <div className="panel-title">{title}</div>
       {value && <div className="num" style={{ marginTop: 6, color: 'var(--text-pri)', fontSize: '1rem', fontWeight: 750 }}>{value}</div>}
-      <svg viewBox="0 0 320 72" preserveAspectRatio="none" style={{ position: 'absolute', left: 12, right: 12, bottom: 12, width: 'calc(100% - 24px)', height: 72, opacity: .85 }} aria-hidden>
-        <defs>
-          <linearGradient id={`grad-${title.replace(/\W/g, '')}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor={color} stopOpacity=".24" />
-            <stop offset="1" stopColor={color} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-        <path d="M0 58 C28 50 38 61 65 45 S105 47 128 34 S172 42 195 25 S236 33 258 18 S296 25 320 11 L320 72 L0 72 Z" fill={`url(#grad-${title.replace(/\W/g, '')})`} />
-        <path d="M0 58 C28 50 38 61 65 45 S105 47 128 34 S172 42 195 25 S236 33 258 18 S296 25 320 11" fill="none" stroke={color} strokeWidth="2" />
-      </svg>
-      <div style={{ position: 'absolute', right: 10, top: 10, color: 'var(--text-mut)', fontSize: '.52rem' }}>VISUAL TREND SHELL</div>
+      <div style={{ marginTop: 28, color: 'var(--text-mut)', fontSize: '.64rem', borderTop: '1px dashed var(--border)', paddingTop: 12 }}>NO TIME-SERIES DATA · SNAPSHOT ONLY</div>
     </div>
   )
 }

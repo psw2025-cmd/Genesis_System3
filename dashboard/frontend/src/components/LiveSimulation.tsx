@@ -81,14 +81,15 @@ export function LiveSimulation() {
       }
     }
     load()
-    if (!running) return () => { stop = true }
+    return () => { stop = true }
+  }, [scenario, tick])
+
+  useEffect(() => {
+    if (!running) return
     const pollMs = data?.market?.is_open ? 15000 : 60000
-    const id = window.setInterval(() => {
-      setTick(v => v + 1)
-      load()
-    }, pollMs)
-    return () => { stop = true; window.clearInterval(id) }
-  }, [running, scenario, tick, data?.market?.is_open])
+    const id = window.setInterval(() => setTick(v => v + 1), pollMs)
+    return () => window.clearInterval(id)
+  }, [running, data?.market?.is_open])
 
   const rows = data?.positions || []
   const rawPnl = data?.paper?.total_pnl ?? (rows.length ? rows.reduce((a, r) => a + Number(r.pnl ?? 0), 0) : null)
