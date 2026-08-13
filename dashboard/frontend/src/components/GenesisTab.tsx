@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { Activity, Brain, Database, Shield, Sparkles } from 'lucide-react'
 import { API_BASE, API_HEADERS } from '../config'
 
 type GenesisState = {
@@ -12,199 +13,231 @@ type GenesisState = {
   health?: any
   system?: any
   final?: any
-  control?: any
   loading: boolean
   error?: string
 }
 
-const card: React.CSSProperties = {
-  background: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 8,
-  padding: 16,
-}
-
-const small: React.CSSProperties = { color: 'var(--text-mut)', fontSize: 12, lineHeight: 1.5 }
-const title: React.CSSProperties = { color: 'var(--text-primary)', fontSize: 13, fontWeight: 800, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }
-
 async function getData(path: string) {
-  const res = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 10000 })
-  return res.data?.data ?? res.data
+  const response = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 10000 })
+  return response.data?.data ?? response.data
 }
 
-function Metric({ label, value, tone }: { label: string; value: any; tone?: 'up' | 'down' | 'warn' | 'accent' }) {
-  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : tone === 'warn' ? 'var(--warn)' : tone === 'accent' ? 'var(--accent)' : 'var(--text-primary)'
+function pct(value: any) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  return Math.abs(n) <= 1 ? n * 100 : n
+}
+
+function Metric({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: 'up' | 'down' | 'warn' | 'accent' }) {
+  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : tone === 'warn' ? 'var(--amber)' : tone === 'accent' ? 'var(--accent)' : 'var(--text-pri)'
   return (
-    <div style={card}>
-      <div style={{ ...small, textTransform: 'uppercase', fontWeight: 700 }}>{label}</div>
-      <div className="num" style={{ color, fontSize: 24, fontWeight: 900, marginTop: 6 }}>{String(value ?? '--')}</div>
+    <div className="metric-card">
+      <div className="metric-label">{label}</div>
+      <div className="metric-value" style={{ color, fontSize: '1.02rem' }}>{value}</div>
+      {sub && <div className="metric-sub">{sub}</div>}
     </div>
   )
 }
 
-function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
-  return <section style={card}><div style={title}>{heading}</div>{children}</section>
+function Panel({ title, children, icon }: { title: string; children: React.ReactNode; icon?: React.ReactNode }) {
+  return (
+    <section className="card" style={{ padding: 12, minWidth: 0 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 10 }}>
+        {icon && <span style={{ color: 'var(--accent)' }}>{icon}</span>}
+        <div className="panel-title">{title}</div>
+      </div>
+      {children}
+    </section>
+  )
 }
 
-function Checklist({ items }: { items: string[] }) {
-  return <div style={{ display: 'grid', gap: 8 }}>{(items || []).map((x, i) => (
-    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', color: 'var(--text-primary)', fontSize: 13 }}>
-      <span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{x}</span>
+function StatusRow({ label, value, health }: { label: string; value: string; health?: number | null }) {
+  const good = /active|healthy|connected|normal|pass|ready|ok/i.test(value)
+  const bad = /fail|error|down|invalid|disabled by error/i.test(value)
+  const tone = good ? 'var(--up)' : bad ? 'var(--down)' : 'var(--amber)'
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr auto auto', gap: 10, alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+      <span style={{ color: 'var(--text-sec)', fontSize: '.66rem' }}>{label}</span>
+      <span className="num" style={{ color: tone, fontSize: '.57rem', fontWeight: 800 }}>{value}</span>
+      <span className="num" style={{ color: 'var(--text-mut)', fontSize: '.54rem', minWidth: 34, textAlign: 'right' }}>{health == null ? '--' : `${health.toFixed(0)}%`}</span>
     </div>
-  ))}</div>
-}
-
-function JsonBlock({ data }: { data: any }) {
-  return <pre style={{ ...small, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: 12, overflow: 'auto', maxHeight: 240 }}>{JSON.stringify(data ?? {}, null, 2)}</pre>
+  )
 }
 
 export function GenesisTab() {
-  const [state, setState] = useState<GenesisState>({ loading: true })
+  const [data, setData] = useState<GenesisState>({ loading: true })
 
   const load = async () => {
-    setState(s => ({ ...s, loading: true, error: undefined }))
+    setData((current) => ({ ...current, loading: true, error: undefined }))
+    const paths = [
+      '/genesis-production-brief',
+      '/autonomous-brain',
+      '/hidden-secrets-lab',
+      '/never-die-monitor',
+      '/hunger-meter',
+      '/data-truth-score',
+      '/health',
+      '/api/system_health',
+      '/final-message',
+    ] as const
     try {
-      const paths = [
-        '/genesis-production-brief',
-        '/autonomous-brain',
-        '/hidden-secrets-lab',
-        '/never-die-monitor',
-        '/hunger-meter',
-        '/data-truth-score',
-        '/health',
-        '/api/system_health',
-        '/final-message',
-      ] as const
-      const settled = await Promise.allSettled(paths.map((p) => getData(p)))
-      const val = (i: number) => (settled[i].status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<unknown>).value : { error: String((settled[i] as PromiseRejectedResult).reason?.message || settled[i]) })
-      const failed = settled.filter((x) => x.status === 'rejected').length
-      setState({
-        brief: val(0),
-        brain: val(1),
-        lab: val(2),
-        monitor: val(3),
-        hunger: val(4),
-        truth: val(5),
-        health: val(6),
-        system: val(7),
-        final: val(8),
-        loading: false,
-        error: failed === paths.length ? 'Genesis APIs failed' : undefined,
+      const settled = await Promise.allSettled(paths.map(getData))
+      const value = (index: number) => settled[index].status === 'fulfilled'
+        ? (settled[index] as PromiseFulfilledResult<any>).value
+        : { error: String((settled[index] as PromiseRejectedResult).reason?.message || 'request failed') }
+      const failed = settled.filter((result) => result.status === 'rejected').length
+      setData({
+        brief: value(0), brain: value(1), lab: value(2), monitor: value(3), hunger: value(4),
+        truth: value(5), health: value(6), system: value(7), final: value(8), loading: false,
+        error: failed === paths.length ? 'Genesis read-only APIs failed' : undefined,
       })
-    } catch (e: any) {
-      setState({ loading: false, error: e?.response?.data?.detail || e?.message || 'Genesis APIs failed' })
+    } catch (error: any) {
+      setData({ loading: false, error: error?.response?.data?.detail || error?.message || 'Genesis APIs failed' })
     }
   }
 
   useEffect(() => { load() }, [])
 
-  const requestControl = async () => {
-    try {
-      const res = await axios.post(`${API_BASE}/agent-full-control`, { requested_from_ui: true, source: 'react_ui' }, { headers: API_HEADERS })
-      setState(s => ({ ...s, control: res.data?.data ?? res.data }))
-    } catch (e: any) {
-      setState(s => ({ ...s, control: { error: e?.message || 'request failed' } }))
-    }
-  }
+  if (data.loading) return <div className="workspace-shell"><div className="card" style={{ padding: 22, color: 'var(--text-mut)' }}>Genesis Brain is loading verified read-only intelligence…</div></div>
+  if (data.error) return <div className="workspace-shell"><div className="card" style={{ padding: 22, color: 'var(--down)', borderColor: 'rgba(255,73,100,.35)' }}>{data.error}</div></div>
 
-  const speak = () => {
-    try { window.speechSynthesis?.speak(new SpeechSynthesisUtterance('Alert: Genesis opportunity monitor is active.')) } catch {}
-  }
+  const marketOpen = data.health?.market_status === 'open' || Boolean(data.health?.market?.is_open)
+  const liveAllowed = Boolean(data.health?.live_allowed ?? data.health?.live_trading_enabled)
+  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score)
+  const confidence = pct(data.brain?.confidence ?? data.brain?.prediction_confidence ?? data.final?.confidence)
+  const accuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct)
+  const hitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate)
+  const drawdown = pct(data.brain?.max_drawdown ?? data.system?.max_drawdown)
+  const profitFactor = Number(data.brain?.profit_factor ?? data.system?.profit_factor)
+  const drift = Number(data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi)
+  const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? data.final?.bias ?? 'WAITING FOR MODEL EVIDENCE').toUpperCase()
+  const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
+  const biasTone = /bull|up|long/i.test(bias) ? 'var(--up)' : /bear|down|short/i.test(bias) ? 'var(--down)' : 'var(--amber)'
+  const sources = Array.isArray(data.brief?.sources) ? data.brief.sources : []
+  const reasons = Array.isArray(data.brain?.reasons) ? data.brain.reasons
+    : Array.isArray(data.brief?.market_open_must_show) ? data.brief.market_open_must_show
+    : []
+  const decisions = Array.isArray(data.brain?.decision_audit) ? data.brain.decision_audit
+    : Array.isArray(data.final?.audit) ? data.final.audit
+    : []
 
-  if (state.loading) return <div style={{ padding: 24, color: 'var(--text-mut)' }}>Genesis is loading production command intelligence...</div>
-  if (state.error) return <div style={{ padding: 24 }}><div style={{ ...card, borderColor: 'var(--down)', color: 'var(--down)' }}>{state.error}</div></div>
-
-  const marketOpen = state.health?.market_status === 'open' || state.health?.market?.is_open
-  const sources = state.brief?.sources || []
-  const secrets = state.lab?.items || []
+  const modules = [
+    ['Genesis Brain', data.brain?.status ?? (data.brain ? 'ACTIVE' : 'WAITING'), pct(data.brain?.health_pct ?? data.brain?.health)],
+    ['Data Truth', data.truth?.status ?? (data.truth ? 'ACTIVE' : 'WAITING'), truthScore],
+    ['System Health', data.system?.status ?? data.health?.status ?? (data.health ? 'ACTIVE' : 'WAITING'), pct(data.system?.health_pct)],
+    ['Never Die Monitor', data.monitor?.status ?? (data.monitor ? 'ACTIVE' : 'WAITING'), pct(data.monitor?.health_pct)],
+    ['Research / Sources', sources.length ? 'ACTIVE' : 'WAITING', sources.length ? 100 : null],
+    ['Broker Monitor', data.health?.broker_status ?? data.health?.broker?.status ?? 'WAITING', pct(data.health?.broker?.health_pct)],
+  ] as const
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', padding: 24, display: 'grid', gap: 18 }}>
-      <div style={{ ...card, borderColor: 'var(--accent)', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), var(--surface-2))' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 900, letterSpacing: '0.08em' }}>GENESIS PRODUCTION COMMAND CENTER</div>
-            <h1 style={{ color: 'var(--text-primary)', margin: '6px 0 4px', fontSize: 28 }}>AI Options Automation Dashboard</h1>
-            <div style={small}>One official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.</div>
+    <div className="workspace-shell">
+      <div className="card" style={{ padding: 12, marginBottom: 9 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
+            <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', color: '#78b6ff', background: 'linear-gradient(135deg, rgba(59,140,255,.20), rgba(168,85,247,.10))', border: '1px solid rgba(59,140,255,.35)' }}><Brain size={20} /></div>
+            <div>
+              <div className="workspace-title" style={{ fontSize: '1.05rem' }}>Genesis Brain / AI Decision Center</div>
+              <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.6rem' }}>Real-time model evidence, research status, health and read-only orchestration visibility</div>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={load} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 800 }}>Refresh</button>
-            <button onClick={speak} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--accent)', background: 'transparent', color: 'var(--accent)', fontWeight: 800 }}>Voice Alert</button>
+          <div style={{ display: 'flex', gap: 7 }}>
+            <button className="soft-btn" onClick={load}>Refresh evidence</button>
+            <span className="pill" style={{ color: liveAllowed ? 'var(--down)' : 'var(--up)', border: `1px solid ${liveAllowed ? 'rgba(255,73,100,.24)' : 'rgba(24,215,130,.24)'}`, background: liveAllowed ? 'rgba(255,73,100,.06)' : 'rgba(24,215,130,.06)' }}>
+              <Shield size={11} /> {liveAllowed ? 'LIVE FLAG REVIEW' : 'ANALYZER · LIVE OFF'}
+            </span>
           </div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
-        <Metric label="Operating Mode" value={state.brief?.mode || (marketOpen ? 'MARKET OPEN' : 'OFF MARKET')} tone="accent" />
-        <Metric label="Broker" value={state.health?.broker_status || '--'} tone={state.health?.broker_status === 'connected' ? 'up' : 'warn'} />
-        <Metric label="Truth Score" value={`${state.truth?.truth_score ?? 0}%`} tone="warn" />
-        <Metric label="Memory Events" value={state.brain?.memory_events ?? 0} tone="up" />
-        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'DISABLED'} tone="down" />
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', marginBottom: 9 }}>
+        <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'Read-only after hours'} tone={marketOpen ? 'up' : 'warn'} />
+        <Metric label="Prediction Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model field only" tone="accent" />
+        <Metric label="Model Ensemble" value={String(data.brain?.ensemble_status ?? data.brain?.status ?? '--').toUpperCase()} sub="Brain service" tone={data.brain ? 'up' : 'warn'} />
+        <Metric label="Truth Score" value={truthScore == null ? '--' : `${truthScore.toFixed(0)}%`} sub="Data truth evidence" tone={truthScore == null ? 'warn' : truthScore >= 90 ? 'up' : 'warn'} />
+        <Metric label="Drift Detection" value={Number.isFinite(drift) ? drift.toFixed(3) : '--'} sub="PSI / model field" tone={Number.isFinite(drift) && drift < .2 ? 'up' : 'warn'} />
+        <Metric label="Anomaly State" value={String(data.brain?.anomaly_status ?? data.truth?.anomaly_status ?? '--').toUpperCase()} sub="Existing evidence only" tone="up" />
+        <Metric label="Retraining" value={String(data.brain?.retraining_recommendation ?? data.hunger?.retraining_recommendation ?? '--').toUpperCase()} sub="No auto-promotion from UI" tone="warn" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 18 }}>
-        <Section heading={marketOpen ? 'Market Open: Trader Must See' : 'Off-Market: Trader Must See'}>
-          <Checklist items={marketOpen ? state.brief?.market_open_must_show : state.brief?.off_market_must_show} />
-        </Section>
-
-        <Section heading="Prediction Accuracy & Gain Rank Requirements">
-          <div style={{ display: 'grid', gap: 10 }}>
-            <Metric label="Accuracy Goal" value={`${state.hunger?.accuracy_goal_pct ?? 90}%`} tone="accent" />
-            <div style={small}>Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.</div>
-            <div style={{ color: 'var(--warn)', fontSize: 13, fontWeight: 700 }}>Current blocker: {state.hunger?.need_to_fix || 'Need multi-day proof rows.'}</div>
-          </div>
-        </Section>
-
-        <Section heading="Global Research Sources Integrated">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {sources.map((s: any, i: number) => (
-              <a key={i} href={s.url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
-                <div style={{ fontWeight: 800 }}>{s.name}</div>
-                <div style={small}>{s.use}</div>
-              </a>
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(280px, 1.05fr) minmax(250px, .8fr) minmax(0, 1.75fr) minmax(265px, 1fr)', alignItems: 'stretch' }}>
+        <Panel title="Why the Model / Evidence" icon={<Sparkles size={14} />}>
+          <div style={{ color: biasTone, fontSize: '1.2rem', fontWeight: 850 }}>{bias}</div>
+          <div style={{ marginTop: 5, color: 'var(--text-mut)', fontSize: '.62rem' }}>Bias is displayed only when returned by current Genesis evidence.</div>
+          <div style={{ display: 'grid', gap: 7, marginTop: 12 }}>
+            {(reasons.length ? reasons.slice(0, 6) : ['No reason list supplied by the current model response.']).map((reason: any, index: number) => (
+              <div key={index} style={{ display: 'flex', gap: 8, color: 'var(--text-sec)', fontSize: '.64rem', lineHeight: 1.45 }}><span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{String(reason?.reason ?? reason)}</span></div>
             ))}
           </div>
-        </Section>
+        </Panel>
 
-        <Section heading="Hidden Secrets Lab">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {secrets.map((item: any, idx: number) => (
-              <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
-                <div style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: 13 }}>{item.secret}</div>
-                <div style={small}>Verified: {String(item.verified)} | Impact: {item.profit_impact}</div>
-              </div>
-            ))}
+        <Panel title="Scenario / Confidence" icon={<Activity size={14} />}>
+          <div style={{ display: 'grid', gap: 8 }}>
+            <Metric label="Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model" tone="accent" />
+            <Metric label="Accuracy" value={accuracy == null ? '--' : `${accuracy.toFixed(1)}%`} sub="Only if API supplies it" tone={accuracy == null ? 'warn' : 'up'} />
+            <Metric label="Hit Rate" value={hitRate == null ? '--' : `${hitRate.toFixed(1)}%`} sub="Only if API supplies it" tone={hitRate == null ? 'warn' : 'up'} />
           </div>
-        </Section>
+        </Panel>
 
-        <Section heading="Integration Map">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {(state.brief?.integration_map || []).map((x: any, i: number) => (
-              <div key={i} style={{ borderLeft: '3px solid var(--accent)', paddingLeft: 10 }}>
-                <div style={{ color: 'var(--text-primary)', fontWeight: 900 }}>{x.layer}</div>
-                <div style={small}>Current: {x.current}</div>
-                <div style={small}>Next: {x.next}</div>
-              </div>
-            ))}
+        <Panel title="Model Performance / Quality" icon={<Brain size={14} />}>
+          <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(3, minmax(0, 1fr))' }}>
+            <Metric label="Accuracy" value={accuracy == null ? '--' : `${accuracy.toFixed(1)}%`} sub="Model evidence" tone={accuracy == null ? 'warn' : 'up'} />
+            <Metric label="Hit Rate" value={hitRate == null ? '--' : `${hitRate.toFixed(1)}%`} sub="Model evidence" tone={hitRate == null ? 'warn' : 'up'} />
+            <Metric label="Profit Factor" value={Number.isFinite(profitFactor) ? profitFactor.toFixed(2) : '--'} sub="Evidence field" tone={Number.isFinite(profitFactor) && profitFactor > 1 ? 'up' : 'warn'} />
+            <Metric label="Max Drawdown" value={drawdown == null ? '--' : `${Math.abs(drawdown).toFixed(2)}%`} sub="Evidence field" tone={drawdown == null ? 'warn' : Math.abs(drawdown) < 10 ? 'up' : 'warn'} />
+            <Metric label="Truth Score" value={truthScore == null ? '--' : `${truthScore.toFixed(0)}%`} sub="Data quality" tone={truthScore == null ? 'warn' : truthScore >= 90 ? 'up' : 'warn'} />
+            <Metric label="Memory Events" value={String(data.brain?.memory_events ?? '--')} sub="Brain state" />
           </div>
-        </Section>
+          <div className="chart-shell" style={{ minHeight: 105, marginTop: 9, padding: 10 }}>
+            <div className="panel-title">Model Confidence History</div>
+            <div className="chart-empty">Historical curve binds when the API exposes a series</div>
+          </div>
+        </Panel>
 
-        <Section heading="Never Die Monitor">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
-            <Metric label="Uptime Seconds" value={state.monitor?.uptime_seconds ?? 0} />
-            <Metric label="Last Self-Heal" value={state.monitor?.last_self_heal ?? '--'} tone="up" />
-            <Metric label="Issues Fixed" value={state.monitor?.issues_fixed_without_human ?? 0} tone="up" />
+        <Panel title="AI Agents / Modules" icon={<Database size={14} />}>
+          <div style={{ display: 'grid' }}>
+            {modules.map(([label, status, health]) => <StatusRow key={label} label={label} value={String(status)} health={health as number | null} />)}
           </div>
-        </Section>
+        </Panel>
       </div>
 
-      <Section heading="Truth, Compliance, And Control">
-        <div style={{ display: 'grid', gap: 12 }}>
-          <div style={{ color: 'var(--down)', fontWeight: 900 }}>Kill switch visible: live trading remains disabled until all proof gates pass.</div>
-          <button onClick={requestControl} style={{ width: 260, padding: '12px 14px', borderRadius: 6, border: '1px solid var(--down)', background: 'rgba(255,77,109,0.12)', color: 'var(--down)', fontWeight: 900 }}>Let Agent Take Full Control</button>
-          <JsonBlock data={state.control || state.final} />
-        </div>
-      </Section>
+      <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1.55fr', marginTop: 9 }}>
+        <Panel title="Forecast Distribution" icon={<Activity size={14} />}>
+          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No forecast distribution series returned</div></div>
+        </Panel>
+        <Panel title="Confidence History & Bands" icon={<Activity size={14} />}>
+          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No confidence-band series returned</div></div>
+        </Panel>
+        <Panel title="Decision Audit Trail" icon={<Shield size={14} />}>
+          {decisions.length === 0 ? (
+            <div style={{ color: 'var(--text-mut)', fontSize: '.66rem', padding: '16px 0' }}>No decision-audit rows supplied by current Genesis API.</div>
+          ) : (
+            <table style={{ width: '100%' }}>
+              <thead><tr>{['Time', 'Decision', 'Confidence', 'Reason'].map((heading) => <th key={heading} className="thead" style={{ textAlign: heading === 'Time' ? 'left' : 'right' }}>{heading}</th>)}</tr></thead>
+              <tbody>{decisions.slice(0, 8).map((row: any, index: number) => <tr className="trow" key={index}><td className="tcell">{row?.time ?? row?.timestamp ?? '--'}</td><td className="tcell" style={{ textAlign: 'right' }}>{row?.decision ?? row?.bias ?? '--'}</td><td className="tcell" style={{ textAlign: 'right' }}>{row?.confidence ?? '--'}</td><td className="tcell" style={{ textAlign: 'right', color: 'var(--text-mut)' }}>{row?.reason ?? '--'}</td></tr>)}</tbody>
+            </table>
+          )}
+        </Panel>
+      </div>
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: '1.25fr .9fr', marginTop: 9 }}>
+        <Panel title="Agent Orchestration / Command Console" icon={<Brain size={14} />}>
+          <div style={{ color: 'var(--text-mut)', fontSize: '.64rem', lineHeight: 1.55 }}>Visual orchestration console only. This dashboard does not send execution or order mutations.</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
+            {['Analyze NIFTY', 'Review model health', 'Check data truth', 'Explain current bias', 'Review risk evidence'].map((label) => <button key={label} className="soft-btn" disabled style={{ opacity: .7, cursor: 'default' }}>{label}</button>)}
+          </div>
+          <div style={{ marginTop: 9, height: 42, border: '1px solid var(--border)', borderRadius: 8, display: 'flex', alignItems: 'center', padding: '0 12px', color: 'var(--text-mut)', background: 'rgba(4,13,23,.55)', fontSize: '.64rem' }}>Read-only console · no mutation authority</div>
+        </Panel>
+
+        <Panel title="Research / Evidence Sources" icon={<Database size={14} />}>
+          {sources.length === 0 ? <div style={{ color: 'var(--text-mut)', fontSize: '.65rem' }}>No source list returned.</div> : <div style={{ display: 'grid', gap: 7 }}>{sources.slice(0, 6).map((source: any, index: number) => <div key={index} style={{ padding: '8px 9px', border: '1px solid var(--border)', borderRadius: 7, background: 'rgba(4,13,23,.5)' }}><div style={{ color: 'var(--text-pri)', fontSize: '.64rem', fontWeight: 750 }}>{source?.name ?? source?.source ?? 'Source'}</div><div style={{ color: 'var(--text-mut)', fontSize: '.55rem', marginTop: 3 }}>{source?.use ?? source?.purpose ?? source?.url ?? '--'}</div></div>)}</div>}
+        </Panel>
+      </div>
+
+      <div style={{ marginTop: 9, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', color: 'var(--text-mut)', fontSize: '.56rem', background: 'rgba(5,14,25,.76)' }}>
+        <span>ANALYZER MODE · PAPER MODE ONLY · LIVE EXECUTION DISABLED</span>
+        <span>Genesis evidence is displayed without inventing missing model values</span>
+      </div>
     </div>
   )
 }
