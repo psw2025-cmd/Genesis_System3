@@ -1,38 +1,36 @@
 # Genesis System3 Manual Repository QC Master Audit
 
-Updated: `2026-08-13 run #82 closure + current control loop`.
+Updated: `2026-08-13 run #83 closure`.
 
 > **Single master authority** for `psw2025-cmd/Genesis_System3`. Google Cloud / Cloud Run is the runtime authority. LIVE remains OFF/LOCKED. No live order placement, modification, cancellation or routing is permitted. A merge, green CI, Ready revision, screenshot or HTTP 200 never equals real-money readiness by itself.
 
 ## 0. Exact current authority
 
 - Repository: **`psw2025-cmd/Genesis_System3` only**.
-- Current repository `main`: **`87076ec0b91e1e366a1c331af8017c4416434232`** — merge PR #156, tooling-only public-readonly watcher cleanup.
-- Latest complete guarded **application/runtime source**: **`008f6ef18032b5ffb42a4b8b7c8fff6e78a6338b`** — merge PR #155.
-- Cloud Run Auto Deploy: **run #82 / `31652417414` / SUCCESS**.
-- Exact serving/latest-ready/latest-created revision proved by run #82: **`genesis-system3-web-00256-por`**.
-- Traffic: **`genesis-system3-web-00256-por` / 100%**.
+- Application/runtime source: **`e778db4c22044f58830bd2afdc2f4d0a4614d451`** — merge PR #159.
+- Cloud Run Auto Deploy: **run #83 / `31655170470` / SUCCESS**.
+- Exact serving/latest-ready/latest-created revision: **`genesis-system3-web-00260-mit`**.
+- Traffic: **100%** to `genesis-system3-web-00260-mit`.
 - Candidate was created at **0% traffic**, proved, then explicitly promoted.
-- Candidate image provenance: **immutable digest verified** (`sha256:90e480b92869a413539ef15db76179b99a1905719cea1be90340cb280d7f0c90`).
+- Candidate image immutable digest: **`sha256:8814c2684b1153dbcd93d15270d5f06c4540a97dba4fe97039be80752960d0c8`**.
 - Runtime posture: **ANALYZER / PAPER**.
 - `LIVE_TRADING_ENABLED=0`.
 - `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
 - `AUTO_EXECUTE_TRADES=0`.
 - Public dashboard: **credential-free / public-readonly**.
-- Dashboard API key mounted: **false**.
 - Secret payload exposed by proof: **false**.
 - Real live-order actions in this control loop: **0**.
+- Runtime evidence lock: **`ANALYZER_LOCKED`**; operational runtime blockers in run #83 evidence: **0**.
+- Production-grade/live claim allowed: **false**; performance/execution-readiness gates remain separate and must be proven honestly.
 
-PR #156 changes only proof tooling/tests and therefore does not supersede run #82 as the application runtime authority.
-
-## 1. Mandatory control-loop position
+## 1. Mandatory control-loop rule
 
 `VERIFY -> SELECT -> FORENSIC RCA -> MULTIPLE SOLUTIONS -> CHOOSE LOWEST-RISK ROOT-CAUSE FIX -> PATCH -> REGRESSION/INTEGRATION/SMOKE -> PR -> EXACT CI -> MERGE -> GUARDED DEPLOY IF RUNTIME-AFFECTING -> EXACT RUNTIME/UI PROOF -> UPDATE THIS MASTER -> CLOSE`
 
 Permanent operating rule:
 - A non-user blocker is **not** a status-report deliverable.
 - Create/attach a dedicated forensic closure task.
-- Map all affected callers, APIs, jobs, UI consumers, caches, tests and runtime paths.
+- Map affected callers, APIs, jobs, UI consumers, caches, tests and runtime paths.
 - Compare multiple technically valid remediations before selecting one.
 - Never weaken a gate, threshold, freshness rule, MutationPolicy or LIVE lock to obtain green status.
 - Report closure only after reproducible proof; interrupt the user only for a genuine user-controlled action or hard safety boundary.
@@ -40,77 +38,71 @@ Permanent operating rule:
 ## 2. PR / CI authority
 
 ### PR #130 — immutable Cloud Run digest provenance
-
 - State: **MERGED / CLOSED**.
 - Exact head: `56a37ae3841fe5342e5359c03570b9431d52166c`.
-- Merge: `e09824188ab7c30f08c0af48cf7e27bb0a22d798`.
 - Exact-head Global Safety CI: **PASS**.
 - Exact-head GCP Dhan Token Fix CI: **PASS**.
 - Canonical deploy entrypoint uses immutable Artifact Registry repository+digest proof.
 
 ### PR #129 — stale no-key cleanup lane
-
 - State: **OPEN / NON-MERGEABLE**.
 - Exact head: `04f27e100b53e464f5d6ba5b407d8faaff74b3ef`.
 - Global Safety CI: **FAIL**.
 - GCP Dhan Token Fix CI: **PASS**.
 - GCP Stage 2 Safety: **PASS**.
 - Workflow Priority Guard: **PASS**.
-- Never wholesale merge/rebase this stale lane. Salvage only focused current-main-safe slices.
+- Never wholesale merge/rebase this stale lane; salvage focused current-main-safe slices only.
 
-### PR #154 — StateTruth precedence repair
-
-- State: **MERGED**.
-- Merge: `f90545eb34cb047ac4b72bcd10917e136a2c52af`.
-- Root cause addressed: Firestore mode could allow stale `health.json` broker truth to override the same-cycle direct Dhan probe.
-- Remediation: stale local health file is no longer authoritative broker state in Firestore runtime; current direct broker truth wins fail-closed.
-
-### PR #155 — bounded Cloud Dhan broker status probe
-
-- State: **MERGED**.
-- Merge/application SHA: `008f6ef18032b5ffb42a4b8b7c8fff6e78a6338b`.
-- Root cause addressed: generic Dhan status path could perform serial SDK + REST work under the web request deadline, producing ~12 s degraded status despite a valid dynamic token.
-- Remediation: Cloud runtime uses one bounded read-only Dhan profile probe; Secret Manager dynamic reload and canonical rotator remain unchanged.
-- Regression coverage includes connected cache, invalid-token classification, bounded timeout and HTTP 401 behavior.
+### PR #154 / #155 — BrokerTruth + StateTruth closure
+- Both **MERGED**.
+- PR #154 prevents stale local health truth from overriding same-cycle direct broker truth in Firestore runtime.
+- PR #155 makes the Cloud broker probe bounded and read-only.
+- Run #82 and run #83 prove `/api/broker/status connected=true` and `/api/state broker_connected=true` simultaneously.
 
 ### PR #156 — permanent watcher public-readonly cleanup
+- **MERGED**, exact-head required CI **PASS**.
+- Removed active legacy dashboard key/session dependency from the permanent watcher.
 
-- State: **MERGED**.
-- Merge/current main: `87076ec0b91e1e366a1c331af8017c4416434232`.
-- Exact head: `8983bba92aa9cf52af6bc6d9d9124c7bcf4efcb9`.
-- Exact-head Global Safety CI: **PASS**.
-- Removed legacy `DASHBOARD_API_KEY` / `X-API-Key` / `/api/auth/session` authority from `tools/permanent_live_log_watch.mjs`.
-- Permanent watcher now proves anonymous GET-only `public_readonly` / `credential_surface=REMOVED` plus `/api/health` and `/api/broker/status` sentinels.
-- Regression contract forbids retired auth/session markers and order place/modify/cancel routes.
+### PR #158 — run #82 master refresh
+- **MERGED** after exact-head Global Safety PASS.
+
+### PR #159 — deterministic closed-market scanner
+- **MERGED**.
+- Exact head: `b65e95ae344f8c139af040680299a0884caca09a`.
+- Merge/application SHA: **`e778db4c22044f58830bd2afdc2f4d0a4614d451`**.
+- Exact-head GCP Dhan Token Fix CI: **PASS**.
+- Exact-head Global Safety blocking jobs: **PASS** including full proof-pack/backend pytest.
+- Root-cause fix was deployed and proved by Cloud Run #83.
 
 ### Parallel stale lanes
+- PR #121 Observability: **open/non-mergeable**; selective read-only correlation/synthetic/runbook concepts only.
+- PR #125 OperationsTruth: **open/non-mergeable**; selective typed read-only inventory/SLO concepts only.
+- Neither is a wholesale merge candidate.
 
-- PR #121 Observability: **open/non-mergeable**; only current-main-safe read-only correlation, redacted synthetic, uptime/runbook concepts are eligible for selective salvage.
-- PR #125 OperationsTruth: **open/non-mergeable**; only typed read-only inventory/SLO/operations evidence is eligible for selective salvage.
+## 3. Cloud Run run #83 deployment truth
 
-## 3. Exact Cloud Run run #82 deployment truth
+Run #83 completed **SUCCESS** on `e778db4c22044f58830bd2afdc2f4d0a4614d451`.
 
-Run #82 (`31652417414`) completed **SUCCESS** on application SHA `008f6ef18032b5ffb42a4b8b7c8fff6e78a6338b`.
-
-- Previous serving traffic: `genesis-system3-web-00254-kiy` / 100%.
-- Candidate: `genesis-system3-web-00256-por`.
+- Previous serving revision: `genesis-system3-web-00256-por`.
+- Candidate: **`genesis-system3-web-00260-mit`**.
 - Initial candidate traffic: **0%**.
-- Candidate image digest proof: **PASS**.
+- Candidate Ready: **true**.
+- Immutable image provenance: **PASS**.
 - Candidate HTTP proof: **PASS**.
 - Public no-key dashboard proof: **PASS**.
 - MutationPolicy proof: **PASS**.
 - Dhan rotator/Scheduler configuration: **PASS**.
-- Explicit rotation execution: **PASS**.
+- Explicit Dhan rotation execution: **PASS**.
 - Runtime identity/safety proof: **PASS**.
-- Public broker read gate: **PASS**.
+- Public read-only broker gate: **PASS**.
 - Sanitized runtime evidence: **PASS**.
 - Provenance/public-dashboard safety lock: **PASS**.
 - Explicit promotion: **PASS**.
-- Final serving traffic: **`genesis-system3-web-00256-por` / 100%**.
+- Final serving/latest-ready/latest-created authority: **`genesis-system3-web-00260-mit` / 100%**.
 
-## 4. UI/dashboard exact proof — run #82
+## 4. UI/dashboard exact proof — run #83
 
-Artifact `public-paper-dashboard-proof-82`:
+Artifact `public-paper-dashboard-proof-83`:
 
 - Matrix state: **PASS**.
 - Canonical tabs: **22**.
@@ -125,70 +117,104 @@ Artifact `public-paper-dashboard-proof-82`:
 - Browser transport: **single-session WebDriver matrix**.
 - Browser trading mutations called: **false**.
 - API-key prompt rendered: **false**.
-- API key sent: **false**.
-- Session cookie sent: **false**.
 - `/ui`: HTTP **200**.
-- `/api/auth/status`: HTTP **200**, `mode=public_readonly`, `required=false`, `credential_surface=REMOVED`.
-- Expected/deployed SHA match: **true** (`008f6ef...`).
+- Serving revision: `genesis-system3-web-00260-mit`.
+- Expected/deployed SHA match: **true**.
 
-UI rendering proof is green for the exact serving application source. This does not override red market-data/readiness gates.
-
-## 5. Permanent health / broker / StateTruth sentinels — run #82
+## 5. Permanent health / broker / StateTruth sentinels — run #83
 
 ### `/api/health`
-
 - HTTP: **200**.
 - `status=ok`.
 - `mode=PAPER`.
-- Sanitized round-trip: approximately **321 ms**.
+- Sanitized round-trip: approximately **313.3 ms**.
 
 ### `/api/broker/status`
-
 - HTTP: **200**.
 - `connected=true`.
 - `error_present=false`.
 - token source: **`GCP_SECRET_MANAGER_DYNAMIC`**.
-- Secret Manager version: **110**.
+- Secret Manager version: **111**.
 - token value exposed: **false**.
-- broker-reported internal latency: approximately **31 ms**.
-- endpoint round-trip: approximately **1.79 s**.
+- broker-reported internal latency: approximately **40 ms**.
+- endpoint round-trip: approximately **488.7 ms**.
 - LIVE trading enabled: **false**.
 - order placement allowed: **false**.
 
 ### `/api/state`
-
 - HTTP: **200**.
 - `mode=PAPER`.
 - `broker_connected=true`.
 - data source: **`BROKER_CONNECTED_MARKET_CLOSED`**.
-- state version in sample: **9872**.
-- round-trip: approximately **273 ms**.
+- state version in sample: **9931**.
+- round-trip: approximately **314.3 ms**.
 
-### Closure verdict
+### BrokerTruth/StateTruth verdict
+- **CONVERGED**: `true / true`.
+- No recurrence of the run #80 contradiction in run #83.
 
-The run #80 contradiction (`/api/broker/status connected=true` while `/api/state broker_connected=false`) is **RESOLVED on exact serving SHA `008f6ef...`** after PR #154 + PR #155.
+## 6. OptionChainTruth — run #83
 
-Measured prevention evidence:
-- broker endpoint degraded latency reduced from about **12.36 s** in run #80 to about **1.79 s** in run #82;
-- `error_present` changed from **true** to **false**;
-- StateTruth now agrees with direct BrokerTruth: **true / true**.
+The same sanitized runtime evidence proves all four required index chains simultaneously available as fresh Dhan snapshots:
 
-Do not reopen this incident without new contradictory runtime evidence.
+- **NIFTY:** HTTP 200, Dhan, **160 contracts**, stale=false, ~775.8 ms.
+- **BANKNIFTY:** HTTP 200, Dhan, **160 contracts**, stale=false, ~1068.5 ms.
+- **FINNIFTY:** HTTP 200, Dhan, **160 contracts**, stale=false, ~779.2 ms.
+- **MIDCPNIFTY:** HTTP 200, Dhan, **160 contracts**, stale=false, ~794.7 ms.
+- `all_required_chains_ready=true`.
 
-## 6. Dhan token rotator / Scheduler — run #82
+Run #82 had FINNIFTY/MIDCPNIFTY no-row samples. Run #83 proves the no-row condition is **not currently recurring**. The exact historical cause of those two no-row samples is not asserted without proof.
 
-- Dedicated rotation execution `genesis-system3-dhan-token-rotate-z5sbm`: **SUCCESS**.
-- Dynamic token secret version observed by serving runtime: **110**.
+A separate latent prevention finding remains: `DataSourceManager` prefers Dhan `expiry_list`, but its last-resort calendar fallback is stale and should not remain a production authority. This is prevention/hardening work, not a current run #83 chain outage.
+
+## 7. ScannerTruth incident — CLOSED by PR #159 + run #83
+
+### Run #82 failure
+- `/api/scanner/top_contract_gainers` exceeded the external deterministic proof budget at approximately **30.06 s**.
+
+### Proven root cause
+- The route already preferred cached/shared/disk evidence.
+- When no cached after-hours board existed, the market-closed path still invoked the cold scanner builder.
+- Cold scanner construction fanned out index Dhan option-chain reads.
+- `DataSourceManager` serializes Dhan option-chain traffic behind a process-wide lock with approximately 3.4 s minimum pacing; expiry-list + option-chain work can consume multiple paced slots.
+- The internal after-hours scanner allowance could extend to roughly **180 s**, incompatible with the bounded external sentinel.
+
+### Alternatives evaluated
+- **Increase the acceptance timeout:** rejected because it hides latency rather than fixing the cause.
+- **Parallelize Dhan calls aggressively:** rejected because it conflicts with Dhan pacing/rate-limit safety and can worsen empty-chain behavior.
+- **Reuse existing cache/EOD truth and suppress cold after-hours network fan-out:** selected as the lowest-risk root-cause fix.
+
+### Remediation
+PR #159 makes Cloud Run after-hours fallback deterministic and network-free once market-hours detection proves the market is closed; existing cache/shared/disk evidence remains preferred. Open/local behavior is preserved, and detector failure does not falsely suppress normal scanning.
+
+Regression tests prove:
+1. closed-market Cloud path cannot call the chain/network fetch;
+2. normal open/local fetch behavior remains intact;
+3. market-detector failure preserves the existing scanner path.
+
+### Run #83 closure proof
+- `/api/scanner/top_contract_gainers`: **HTTP 200**.
+- Valid JSON: **true**.
+- Round-trip: approximately **573.3 ms**.
+- Status: **`eod_snapshot`**.
+- Prior ~30 s timeout: **not reproduced**.
+
+Scanner timeout incident: **CLOSED**.
+
+## 8. Dhan token rotator / Scheduler — run #83
+
+- Dedicated rotation execution `genesis-system3-dhan-token-rotate-ptg6s`: **SUCCESS**.
+- Serving runtime dynamic token secret version: **111**.
 - Token value exposed: **false**.
 - Scheduler: **ENABLED**.
 - Schedule: **`30 7 * * *`**.
 - Timezone: **Asia/Kolkata**.
-- Intended identities remain separated: web runtime, dedicated rotator and Scheduler service accounts.
+- Web runtime, dedicated rotator and Scheduler identities remain separated.
 - No user PIN/TOTP/OAuth action required in this cycle.
 
-## 7. MutationPolicy / capability safety — run #82
+## 9. MutationPolicy / capability safety — run #83
 
-Artifact `mutation-policy-runtime-proof-82`:
+Artifact `mutation-policy-runtime-proof-83`:
 
 - State: **PASS**.
 - Capability manifest: **ENFORCED**.
@@ -206,90 +232,43 @@ Artifact `mutation-policy-runtime-proof-82`:
 - Live order endpoints called by proof: **false**.
 - Secret values exposed: **false**.
 
-## 8. Current OptionChainTruth — run #82
+## 10. Runtime evidence verdict — run #83
 
-- **NIFTY:** source Dhan; **160 contracts**; fresh snapshot available.
-- **BANKNIFTY:** source Dhan; **160 contracts**; fresh snapshot available.
-- **FINNIFTY:** Dhan spot available but option rows unavailable (`dhan_only_no_rows`) in the final run #82 sample.
-- **MIDCPNIFTY:** Dhan spot available but option rows unavailable (`dhan_only_no_rows`) in the final run #82 sample.
-- Required four-chain readiness: **NOT PROVEN**.
+- Repository source matches deployment: **true**.
+- `broker_read_only_ready=true`.
+- `all_required_chains_ready=true`.
+- Runtime lock: **`ANALYZER_LOCKED`**.
+- Operational blockers in this runtime evidence: **[]**.
+- Production-grade/live claim allowed: **false**.
 
-Dedicated forensic closure task: **Issue #157 — `P0 forensic closure: FINNIFTY/MIDCPNIFTY chain and scanner readiness`**.
+Interpretation: the Cloud Run/UI/broker/four-chain/scanner runtime path is currently green for analyzer/PAPER operation. This is **not** proof of profitable or real-money trading readiness.
 
-Current forensic facts already established:
-- index security IDs in current code are NIFTY=13, BANKNIFTY=25, FINNIFTY=27, MIDCPNIFTY=442 and use `IDX_I`;
-- Dhan Option Chain API officially requires underlying security ID + segment + an active expiry and is rate-limited around one unique request per 3 seconds;
-- current `DataSourceManager` prefers Dhan `expiry_list`, but its calendar fallback is an outdated next-Monday rule shared by every index;
-- current NSE contract specifications use Tuesday expiry; FINNIFTY and MIDCPNIFTY have monthly option expiries rather than the old weekly structure;
-- therefore expiry selection/fallback is an active forensic surface and must be proven against runtime metadata before closure, not guessed.
+## 11. Remaining readiness work
 
-No readiness gate has been relaxed while this investigation is open.
+The prior repository auto-gate report predates run #83 and must not be treated as current proof where run #83 has superseding evidence. Next control-loop priorities are:
 
-## 9. Current ScannerTruth — run #82
+1. **Regenerate SafetyTruth + ExecutionEligibility** from current-main/current-runtime evidence.
+2. Re-evaluate option-strike/F&O eligibility and feed/tick-health gates against the now-green four-chain runtime rather than repeating stale results.
+3. Continue model-performance closure: positive net expectancy after costs and sustained multi-day predictive accuracy must pass from actual evidence; thresholds may not be weakened.
+4. Selectively salvage only current-main-safe observability/OperationsTruth ideas from PR #121/#125.
+5. Remove the latent calendar-expiry guess as an authority and prefer bounded cached Dhan expiry metadata/fail-closed behavior.
 
-`/api/scanner/top_contract_gainers` did not complete within the external deterministic proof budget (~30 s).
+Trade-ready/live-ready remains **false** until all independent execution/performance/safety gates are reproducibly green.
 
-Forensic dependency facts:
-- scanner index board contains NIFTY, BANKNIFTY, FINNIFTY and MIDCPNIFTY;
-- scanner creates its own DataSourceManager and fetches index chains;
-- DataSourceManager serializes Dhan option-chain traffic with a process-wide lock and ~3.4 s minimum gap;
-- each cold index chain can require expiry-list + option-chain requests, so four-index cold fan-out can consume most/all of a 30 s external proof budget;
-- unresolved no-row chains can further consume the same serialized budget.
+## 12. Incident / prevention ledger
 
-Scanner readiness remains fail-closed. Issue #157 owns the combined chain/scanner root-cause closure; the fix must reduce redundant Dhan work or reuse authoritative chain truth rather than merely increasing the acceptance timeout.
+- Competing Dhan token writers: canonical authority is dynamic GCP Secret Manager + isolated rotator/Scheduler.
+- Firestore runtime 403: dedicated web-runtime IAM prerequisite now passes.
+- Tag-vs-digest provenance weakness: **closed by PR #130**.
+- Raw-Chrome UI proof timeout: **closed by PR #152**; canonical WebDriver matrix is visual authority.
+- Run #80 BrokerTruth/StateTruth contradiction + slow broker probe: **closed by PR #154/#155**, reconfirmed run #83.
+- Legacy dashboard key/session residue in permanent watcher: **closed by PR #156**.
+- Run #82 scanner ~30 s timeout: **closed by PR #159 + run #83**, now ~573 ms after-hours.
+- Run #82 FINNIFTY/MIDCPNIFTY no-row sample: **not recurring in run #83**; both now fresh Dhan 160-contract snapshots. Historical cause not invented.
+- Latent stale calendar expiry fallback: **prevention task required**; it must never override authoritative Dhan expiry metadata silently.
+- PR #129 remains stale/non-authoritative; never wholesale merge.
+- `conflict_120826_0310` remains quarantined; any credential material there must never be quoted or merged.
 
-## 10. Runtime health / latency tail — run #82
+## 13. USER ACTION authority
 
-- Sanitized 24h sample: no HTTP 5xx in the captured evidence.
-- Unhandled exceptions: **0**.
-- Crash/restart category: **0**.
-- OOM category: **0**.
-- P50 latency: approximately **44 ms**.
-- P95 latency: approximately **12.04 s**.
-- P99 latency: approximately **12.08 s**.
-
-Tail latency remains relevant to the chain/scanner forensic task; broker-status latency itself is no longer the dominant 12 s path.
-
-## 11. Readiness gates
-
-Latest repository auto-gate report remains conservative:
-- `REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF`: **PASS**.
-- `MODEL_ACCURACY_REPORT_PRESENT`: **PASS**.
-- `ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS`: **FAIL**.
-- `POSITIVE_NET_EXPECTANCY_AFTER_COSTS`: **FAIL**.
-- `WEBSOCKET_TICK_HEALTH_PROVEN`: **FAIL**.
-- `OPTION_STRIKE_VISIBILITY_PROVEN`: **FAIL**.
-- `EQUITY_FO_ELIGIBILITY_PROVEN`: **FAIL**.
-
-Trade ready: **false**. Analyzer-ready status must remain evidence-based; no failed performance threshold may be edited merely to create a green result.
-
-## 12. Current strict work queue
-
-1. **Issue #157:** prove and close FINNIFTY/MIDCPNIFTY no-row cause plus bounded deterministic scanner path.
-2. **P0-3 SafetyTruth + ExecutionEligibility:** one typed canonical snapshot; unknown/stale/unsafe dependency must block; LIVE remains hard denied.
-3. **Option strike / F&O eligibility:** prove current instrument universe and required contract visibility.
-4. **Tick/feed health:** prove bounded analyzer feed health; WebSocket requirement stays mandatory for any future execution authority.
-5. **Model performance:** improve and re-evaluate actual expectancy and multi-day predictive accuracy without weakening acceptance criteria.
-
-## 13. Historical incident / prevention ledger
-
-- Earlier competing Dhan token-writer incident: canonical authority is now dynamic GCP Secret Manager + isolated rotator/Scheduler.
-- Earlier Firestore 403: dedicated web-runtime Firestore grant resolved the startup prerequisite; current deploy preflight passes.
-- Earlier tag-vs-digest provenance weakness: PR #130 replaced it with immutable repository+digest proof.
-- Run #79 raw-Chrome proof timeout: PR #152 removed redundant standalone Chrome authority; canonical WebDriver matrix now proves rendering.
-- Run #80 BrokerTruth/StateTruth contradiction and ~12 s broker probe: **closed by PR #154 + #155 + run #82**.
-- Legacy dashboard API-key/session residue in permanent watcher: **closed by PR #156**; regression contract prevents reintroduction there.
-- Stale PR #129 remains non-authoritative; never wholesale merge.
-- `conflict_120826_0310` remains quarantined; plaintext credential material must never be quoted or merged. Independent user-side credential rotation is a separate exposure-remediation matter if not already completed.
-- Render is legacy migration debt only; Google Cloud is the runtime target.
-
-## 14. Safety authority
-
-- LIVE: **OFF / LOCKED**.
-- Real order actions in this proof loop: **0**.
-- Public dashboard: **credential-free / read-only**.
-- Dashboard API key: **not required / not mounted**.
-- Worker authority: separate dedicated token.
-- Dhan token value: **never exposed**.
-- No gate was weakened to obtain green status.
-- No live/order place/modify/cancel endpoint was exercised.
+Current control-loop engineering/runtime work requires **no user action**. User action should be requested only for a genuinely user-controlled permission, consent or credential operation that cannot be safely completed through existing automation.
