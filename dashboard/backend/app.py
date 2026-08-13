@@ -385,8 +385,33 @@ _default_allowed_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
-_env_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "")
-_allowed_origins = [o.strip() for o in _env_allowed_origins.split(",") if o.strip()] or _default_allowed_origins
+try:
+    from core.config.cloud_runtime import is_cloud_runtime, public_cors_origins
+
+    _cloud_allowed_origins = public_cors_origins()
+    _cloud_runtime = is_cloud_runtime()
+except Exception:
+    _cloud_allowed_origins = [
+        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+        "https://genesis-system3-web-802404398783.asia-south1.run.app",
+    ]
+    _cloud_runtime = os.environ.get("CLOUD_MODE", "").strip() in {"1", "true", "yes", "on"}
+_env_allowed_origins = [
+    o.strip().rstrip("/")
+    for o in os.environ.get("ALLOWED_ORIGINS", "").split(",")
+    if o.strip()
+]
+_cors_source = (
+    _cloud_allowed_origins + _env_allowed_origins
+    if _cloud_runtime
+    else _default_allowed_origins + _cloud_allowed_origins + _env_allowed_origins
+)
+_allowed_origins = []
+_seen_origins = set()
+for _origin in _cors_source:
+    if _origin and _origin not in _seen_origins:
+        _seen_origins.add(_origin)
+        _allowed_origins.append(_origin)
 
 if any(origin in {"*", "null"} for origin in _allowed_origins):
     raise RuntimeError(
@@ -571,11 +596,14 @@ except Exception as _e:
     print(f"[frontend] StaticFiles mount failed: {_e} — serving legacy Vue")
 
 
-# Root route - helpful message
+# Root route - helpful message. Cloud-permanent hosts must never advertise localhost.
 @app.api_route("/", methods=["GET", "HEAD"])
 async def root():
-    base_url = os.environ.get("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
-    dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")
+    from core.config.cloud_runtime import public_base_url, public_dashboard_url, public_ui_path
+
+    base_url = public_base_url()
+    dashboard_url = public_dashboard_url()
+    ui_path = public_ui_path()
     return {
         "message": "System3 Ultra Dashboard API",
         "status": "running",
@@ -589,7 +617,7 @@ async def root():
             "health": "/api/health",
             "state": "/api/state",
             "broker_status": "/api/broker/status",
-            "dashboard": "/ui",
+            "dashboard": ui_path,
         },
     }
 
@@ -8521,12 +8549,21 @@ async def compat_rate_limit_and_timing(request: Request, call_next):
         response.headers["X-Response-Time-ms"] = str(elapsed_ms)
         return response
     # Static UI / health / auth probes must never trip the dashboard into false TOKEN ERROR states.
-    _exempt_prefixes = ("/ui", "/assets", "/docs", "/openapi.json", "/redoc", "/favicon")
+    _exempt_prefixes = (
+        "/ui",
+        "/assets",
+        "/docs",
+        "/openapi.json",
+        "/redoc",
+        "/favicon",
+        "/api/security/mutation-policy",
+    )
     _exempt_exact = {
         "/api/health",
         "/api/auth/status",
         "/api/auth/session",
         "/api/deploy/info",
+        "/__system3_unknown_mutation_probe__",
     }
     if path in _exempt_exact or any(path.startswith(p) for p in _exempt_prefixes):
         response = await call_next(request)

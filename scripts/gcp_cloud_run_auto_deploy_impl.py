@@ -83,6 +83,8 @@ SAFE_ENV = (
     ("MARKET_TOP_MICRO_STREAM", "0"),
     ("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),
     ("SYSTEM3_API_BASE", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),
+    ("PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),
+    ("PUBLIC_DASHBOARD_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"),
 )
 
 
@@ -484,6 +486,20 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         )
 
     print("PROMOTED_TRAFFIC", json.dumps(promoted_traffic, sort_keys=True))
+    # Keep the candidate tag for the *next* zero-traffic proof, but do not
+    # leave 100% production traffic labeled as a candidate.
+    try:
+        _run(
+            [
+                "gcloud", "run", "services", "update-traffic", SERVICE,
+                f"--project={PROJECT}", f"--region={REGION}",
+                "--remove-tags=candidate", "--quiet",
+            ],
+            capture=True,
+        )
+        print("PRODUCTION_CANDIDATE_TAG_REMOVED", candidate)
+    except Exception as exc:
+        print("PRODUCTION_CANDIDATE_TAG_REMOVE_SKIPPED", type(exc).__name__)
     return candidate, url, previous_traffic
 
 

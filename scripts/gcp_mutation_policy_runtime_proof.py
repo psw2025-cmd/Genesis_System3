@@ -12,11 +12,15 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.request
 from pathlib import Path
 from typing import Any
 
 import requests
+
+TRANSIENT_HTTP = {429, 502, 503, 504}
+RETRY_BACKOFF_S = (0.5, 1.5, 4.0)
 
 PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
 REGION = os.getenv("GCP_REGION", "asia-south1")
@@ -96,6 +100,19 @@ def _publish_status(state: str, description: str) -> None:
             raise RuntimeError(f"commit_status_publish_failed:{response.status}")
 
 
+def _request_with_retry(method: str, url: str, **kwargs: Any) -> requests.Response:
+    response: requests.Response | None = None
+    for wait_s in (*RETRY_BACKOFF_S, None):
+        response = requests.request(method, url, **kwargs)
+        if response.status_code not in TRANSIENT_HTTP:
+            return response
+        if wait_s is None:
+            return response
+        time.sleep(wait_s)
+    assert response is not None
+    return response
+
+
 def _probe(
     base: str,
     path: str,
@@ -103,7 +120,8 @@ def _probe(
     expected_status: int,
     expected_code: str,
 ) -> dict[str, Any]:
-    response = requests.post(
+    response = _request_with_retry(
+        "POST",
         f"{base}{path}",
         json={"proof": "deny-only"},
         timeout=TIMEOUT_S,
@@ -143,8 +161,10 @@ def main() -> int:
             raise RuntimeError("expected_git_sha_missing")
         base = _service_url()
 
-        status_response = requests.get(
-            f"{base}/api/security/mutation-policy", timeout=TIMEOUT_S
+        status_response = _request_with_retry(
+            "GET",
+            f"{base}/api/security/mutation-policy",
+            timeout=TIMEOUT_S,
         )
         status = _json(status_response)
         status_ok = (
