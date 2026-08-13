@@ -8317,6 +8317,17 @@ def _compat_log_trade(row: Dict[str, Any]) -> None:
 async def compat_rate_limit_and_timing(request: Request, call_next):
     start = time.time()
     path = request.url.path or ""
+    # Public dashboard reads are already constrained by Cloud Run concurrency,
+    # response caching, and downstream provider budgets.  Counting every GET in
+    # one anonymous request.client.host bucket is unsafe behind a reverse proxy:
+    # unrelated browser sessions can share that host and collectively trip the
+    # 180/min ceiling.  Mutation/security middleware remains authoritative for
+    # unsafe methods, which continue through the compatibility rate bucket.
+    if request.method.upper() in {"GET", "HEAD", "OPTIONS"}:
+        response = await call_next(request)
+        elapsed_ms = round((time.time() - start) * 1000, 2)
+        response.headers["X-Response-Time-ms"] = str(elapsed_ms)
+        return response
     # Static UI / health / auth probes must never trip the dashboard into false TOKEN ERROR states.
     _exempt_prefixes = ("/ui", "/assets", "/docs", "/openapi.json", "/redoc", "/favicon")
     _exempt_exact = {
@@ -8357,6 +8368,7 @@ async def compat_rate_limit_and_timing(request: Request, call_next):
         return JSONResponse(
             status_code=429,
             content=_compat_ok({"error": "rate_limit", "limit": f"{limit} req/min"}),
+            headers={"Retry-After": "60"},
         )
     bucket.append(now)
     response = await call_next(request)
@@ -9274,4 +9286,3 @@ async def get_virtual_live_simulation_paper(scenario: str = "trend"):
         "order_placement_allowed": False,
         "real_broker_routes_called": False,
     }
-
