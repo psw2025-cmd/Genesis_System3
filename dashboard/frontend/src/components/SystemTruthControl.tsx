@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
-import { useCallback, API_BASE } from '../config'
+import { API_BASE } from '../config'
 
 type Status = 'PASS' | 'WAITING' | 'PARTIAL'
 type LayerRow = { layer: string; status: Status; evidence: string; requiredForMoney: boolean }

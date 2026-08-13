@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
-import { useCallback, useMemo, API_BASE, API_HEADERS } from '../config'
+import { API_BASE, API_HEADERS } from '../config'
 import DataSourceWarning from './DataSourceWarning'
 import ErrorBanner from './ErrorBanner'
 

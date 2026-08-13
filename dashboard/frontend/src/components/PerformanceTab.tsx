@@ -1,6 +1,6 @@
-import { useMemo, useEffect, useState } from 'react'
-import { useMemo, useStore } from '../store'
-import { useMemo, fmt, fmtCr, signClass, cn } from '../lib/utils'
+import { useEffect, useState } from 'react'
+import { useStore } from '../store'
+import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 
 interface PnlData {
   summary?: {

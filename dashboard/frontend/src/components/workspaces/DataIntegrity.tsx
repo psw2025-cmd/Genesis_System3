@@ -3,7 +3,7 @@ import { useStore } from '../../store';
 import { StatusChip, PENDINGState } from './TruthUI';
 import { Database, ShieldCheck, Wifi, RefreshCw } from 'lucide-react';
 
-export const DataIntegrity: React.FC = React.memo(() => {
+export const DataIntegrity: React.FC = () => {
   const { health, brokerConnected, wsStatus, lastSync, brokerStatus } = useStore();
 
   return (

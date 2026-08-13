@@ -1,6 +1,6 @@
-import { useMemo, useStore } from '../store'
-import { useMemo, cn } from '../lib/utils'
-import { useMemo, Bell, AlertTriangle, Info, CheckCircle } from 'lucide-react'
+import { useStore } from '../store'
+import { cn } from '../lib/utils'
+import { Bell, AlertTriangle, Info, CheckCircle } from 'lucide-react'
 
 const SEVERITY_STYLE: Record<string, string> = {
   CRITICAL: 'border-l-down text-down bg-down/5',

@@ -1,6 +1,6 @@
-import { useMemo, useStore } from '../store'
-import { useMemo, PriceCell } from './ui/PriceCell'
-import { useMemo, fmtCr, fmt, signClass, cn } from '../lib/utils'
+import { useStore } from '../store'
+import { PriceCell } from './ui/PriceCell'
+import { fmtCr, fmt, signClass, cn } from '../lib/utils'
 
 export function Positions() {
   const { paper } = useStore()
