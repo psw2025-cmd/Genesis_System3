@@ -1,230 +1,153 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Bell, ChevronDown, Menu, Search, Shield, Wifi } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
-
-function CloudBuildBadge() {
-  const [epoch, setEpoch] = useState<string>('')
-  useEffect(() => {
-    let alive = true
-    fetch(`${window.location.origin}/ui/assets/deploy-provenance.json?t=${Date.now()}`, {
-      cache: 'no-store',
-      headers: { Accept: 'application/json' },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        if (!alive || !j) return
-        setEpoch(String(j.build_epoch || j.buildEpoch || ''))
-      })
-      .catch(() => {})
-    return () => { alive = false }
-  }, [])
-  if (!epoch) return null
-  const short = epoch.length > 22 ? epoch.slice(-18) : epoch
-  return (
-    <div
-      data-testid="cloud-build-badge"
-      title={`Cloud frontend build epoch: ${epoch}`}
-      style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: '3px 8px', borderRadius: '8px',
-        background: 'rgba(0,232,122,.08)', border: '1px solid rgba(0,232,122,.30)',
-        flexShrink: 0,
-      }}
-    >
-      <span style={{ fontSize: '.45rem', color: 'var(--text-mut)', letterSpacing: '.14em', fontFamily: 'var(--font-mono)' }}>CLOUD BUILD</span>
-      <span style={{ fontSize: '.58rem', color: 'var(--up)', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '.04em' }}>{short}</span>
-    </div>
-  )
-}
 
 function Clock() {
   const [time, setTime] = useState('')
   useEffect(() => {
     const tick = () => setTime(new Date().toLocaleTimeString('en-IN', {
       timeZone: 'Asia/Kolkata', hour12: false,
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
     }))
-    tick(); const t = setInterval(tick, 1000); return () => clearInterval(t)
+    tick()
+    const timer = window.setInterval(tick, 1000)
+    return () => window.clearInterval(timer)
   }, [])
-  return <span className="num" style={{ color:'var(--accent)', fontSize:'1rem', fontWeight:600, letterSpacing:'.05em' }}>{time} IST</span>
+  return <span className="num" style={{ color: 'var(--text-sec)', fontSize: '.58rem' }}>{time} IST</span>
 }
 
-function IndexChip({ symbol, spot, chg, live }: { symbol:string; spot?:number; chg?:number; live?:boolean }) {
-  const isUp = (chg ?? 0) >= 0
+function MarketTicker({ label, spot, chg }: { label: string; spot?: number; chg?: number | null }) {
+  const up = (chg ?? 0) >= 0
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:'5px', padding:'3px 10px',
-                  background:'var(--surface-2)', borderRadius:'6px',
-                  border: live ? '1px solid rgba(0,232,122,.35)' : '1px solid var(--border)' }}>
-      <span style={{ fontSize:'.6rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)', fontWeight:700 }}>{symbol}</span>
-      <span className="num" style={{ fontSize:'.8rem', fontWeight:700, color:'var(--text-pri)' }}>
-        {spot ? fmt(spot, 0) : '--'}
-      </span>
-      {chg != null && spot ? (
-        <span className="num" style={{ fontSize:'.55rem', color: isUp ? 'var(--up)' : 'var(--down)' }}>
-          {isUp ? '+' : ''}{chg.toFixed(2)}%
-        </span>
-      ) : spot ? (
-        <span style={{ fontSize:'.5rem', color: live ? 'var(--up)' : 'var(--amber)', fontFamily:'var(--font-mono)', fontWeight:700 }}>
-          {live ? 'LIVE' : 'SNAP'}
-        </span>
-      ) : null}
+    <div style={{ minWidth: 94, padding: '0 11px', borderLeft: '1px solid var(--border)' }}>
+      <div className="metric-label" style={{ fontSize: '.52rem' }}>{label}</div>
+      <div className="num" style={{ marginTop: 2, fontSize: '.72rem', lineHeight: 1.05, fontWeight: 800, color: 'var(--text-pri)' }}>
+        {spot ? fmt(spot, 2) : '--'}
+      </div>
+      <div className="num" style={{ marginTop: 2, fontSize: '.52rem', color: chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
+        {chg == null ? 'WAITING' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
+      </div>
     </div>
   )
 }
 
-function hasBrokerApiError(obj: any): boolean {
+function brokerError(obj: any) {
   if (!obj) return false
   const raw = obj.raw ?? obj.data ?? obj.normalized?.raw ?? obj.funds?.raw ?? obj
   const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
-  const details = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
-  return status === 'failure' || details.includes('invalid') || details.includes('token') || details.includes('unauthorized')
+  const detail = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
+  return status === 'failure' || detail.includes('invalid') || detail.includes('unauthorized') || detail.includes('token')
 }
 
 export function TopBar() {
   const {
-    wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain,
-    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, lastSync,
+    wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus,
   } = useStore()
-  const rho = state?.signals?.spearman_rho ?? null
-  const streamLive = marketOpen && wsStatus === 'live'
 
-  const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'CLOUD_DEGRADED' || apiStatus?.status === 'RENDER_DEGRADED'
-  const authLocked = apiStatus?.status === 'API_AUTH_REQUIRED'
-  const brokerHasError = authLocked
-    || hasBrokerApiError(brokerStatus)
-    || hasBrokerApiError(brokerFunds)
-    || hasBrokerApiError(brokerHoldings)
-    || hasBrokerApiError(brokerPositions)
-  const brokerDegraded = Boolean(transientApi && (brokerConnected || brokerApiResponded))
-  const brokerLabel = brokerDegraded ? 'DEGRADED' : brokerConnected ? 'CONNECTED' : brokerHasError ? 'API ERR' : brokerApiResponded ? 'API OK' : 'OFFLINE'
-  const brokerGood = brokerConnected || (brokerApiResponded && !brokerHasError)
-  const brokerColor = brokerDegraded ? 'var(--amber)' : brokerGood ? 'var(--up)' : 'var(--down)'
-  const brokerBg = brokerDegraded ? 'rgba(245,158,11,.1)' : brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)'
-  const brokerBorder = brokerDegraded ? 'rgba(245,158,11,.25)' : brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'
-  const marketLabel = marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / DATA POLLING'
-
-  const getSpot = (sym: string) => {
-    const chainData = chain[sym]
-    if (chainData?.spot && chainData.spot > 0) {
-      const chg = chainData.change_pct ?? chainData.pct_change ?? chainData.spot_change_pct ?? null
-      return { spot: chainData.spot, chg: chg == null ? null : Number(chg) }
+  const getSpot = (symbol: string) => {
+    const row = chain?.[symbol]
+    if (Number(row?.spot) > 0) {
+      const rawChange = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
+      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange) }
     }
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
-    const entry = rankings.find((r: any) => r.underlying === sym)
-    if (entry?.spot_price) return { spot: entry.spot_price, chg: entry.change_pct ?? null }
-    return null
+    const match = rankings.find((item: any) => String(item?.underlying ?? '').toUpperCase() === symbol)
+    return Number(match?.spot_price) > 0
+      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct) }
+      : { spot: undefined, chg: null }
   }
 
-  const nifty    = getSpot('NIFTY')
-  const bnfty    = getSpot('BANKNIFTY')
-  const finnifty = getSpot('FINNIFTY')
-  const syncAgeSec = (() => {
-    if (!lastSync || lastSync === '--') return null
-    const t = Date.parse(lastSync)
-    if (!Number.isFinite(t)) return null
-    return Math.max(0, Math.round((Date.now() - t) / 1000))
-  })()
+  const nifty = getSpot('NIFTY')
+  const bank = getSpot('BANKNIFTY')
+  const mid = getSpot('MIDCPNIFTY')
+  const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
+  const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
+  const brokerGood = brokerConnected || (apiResponded && !hasError)
+  const brokerTone = brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
+  const brokerLabel = brokerConnected ? 'CONNECTED' : brokerGood ? 'API OK' : hasError ? 'AUTH ISSUE' : 'WAITING'
+  const marketTone = marketOpen ? 'var(--up)' : 'var(--amber)'
+  const wsTone = wsStatus === 'live' ? 'var(--up)' : wsStatus === 'connecting' ? 'var(--amber)' : 'var(--down)'
 
   return (
     <header style={{
-      height:'56px', background:'var(--surface-1)', borderBottom:'1px solid var(--border)',
-      display:'flex', alignItems:'center', padding:'0 12px', gap:'10px',
-      flexShrink:0, zIndex:50, overflow:'hidden'
+      height: 58,
+      flexShrink: 0,
+      display: 'flex',
+      alignItems: 'stretch',
+      background: 'linear-gradient(180deg, rgba(7,18,31,.98), rgba(5,14,25,.98))',
+      borderBottom: '1px solid var(--border)',
+      boxShadow: '0 8px 24px rgba(0,0,0,.18)',
+      zIndex: 40,
+      overflow: 'hidden',
     }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'8px', flexShrink:0 }}>
-        <div style={{ display:'flex', flexDirection:'column', lineHeight:1 }}>
-          <span style={{ color:'var(--accent)', fontWeight:900, fontSize:'.82rem', letterSpacing:'.14em' }}>SYSTEM3</span>
-          <span style={{ color:'var(--text-mut)', fontSize:'.52rem', letterSpacing:'.16em', fontFamily:'var(--font-mono)' }}>AI OPTIONS CONTROL</span>
+      <div style={{ width: 168, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 10, borderRight: '1px solid var(--border)' }}>
+        <div aria-hidden style={{ width: 25, height: 25, borderRadius: 8, display: 'grid', placeItems: 'center', color: 'var(--accent)', border: '1px solid rgba(59,140,255,.4)', background: 'rgba(59,140,255,.1)', fontWeight: 900 }}>S</div>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ color: '#63a7ff', fontWeight: 900, fontSize: '.76rem', letterSpacing: '.18em', lineHeight: 1 }}>SYSTEM3</div>
+          <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', letterSpacing: '.2em', marginTop: 4 }}>GENESIS</div>
         </div>
-        <div style={{
-          display:'flex', flexDirection:'column', justifyContent:'center', padding:'4px 10px', borderRadius:'10px',
-          background:'linear-gradient(135deg, rgba(59,130,246,.16), rgba(0,232,122,.10))',
-          border:'1px solid rgba(59,130,246,.35)', boxShadow:'0 0 18px rgba(59,130,246,.10)'
-        }} title="System owner / operator identity for visual proof">
-          <span style={{ fontSize:'.5rem', color:'var(--text-mut)', letterSpacing:'.18em', fontFamily:'var(--font-mono)' }}>OWNER</span>
-          <span style={{ fontSize:'.7rem', color:'var(--text-pri)', fontWeight:900, letterSpacing:'.08em' }}>PRITAM S. WARGHADE</span>
-        </div>
-        <CloudBuildBadge />
-      </div>
-      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
-      <Clock />
-      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
-
-      <div style={{ display:'flex', gap:'6px', flex:1, overflow:'hidden' }}>
-        <IndexChip symbol="NIFTY"    spot={nifty?.spot}    chg={nifty?.chg ?? undefined} live={streamLive && Boolean(nifty?.spot)} />
-        <IndexChip symbol="BNFTY"    spot={bnfty?.spot}    chg={bnfty?.chg ?? undefined} live={streamLive && Boolean(bnfty?.spot)} />
-        <IndexChip symbol="FINNIFTY" spot={finnifty?.spot} chg={finnifty?.chg ?? undefined} live={streamLive && Boolean(finnifty?.spot)} />
-        {syncAgeSec != null && (
-          <div style={{ display:'flex', alignItems:'center', padding:'3px 8px', borderRadius:'6px',
-                        background:'var(--surface-2)', border:'1px solid var(--border)' }}
-               title="Seconds since last dashboard stream/poll tick">
-            <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)', color: syncAgeSec <= 15 ? 'var(--up)' : 'var(--amber)' }}>
-              TICK {syncAgeSec}s
-            </span>
-          </div>
-        )}
+        <button className="soft-btn" aria-label="Menu" style={{ marginLeft: 'auto', width: 28, minHeight: 28, padding: 0 }}><Menu size={14} /></button>
       </div>
 
-      <div style={{ display:'flex', alignItems:'center', gap:'5px', flexShrink:0 }}>
-        <span style={{
-          display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
-          borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)',
-          background: marketOpen ? 'rgba(0,232,122,.1)' : 'rgba(245,158,11,.08)',
-          color: marketOpen ? 'var(--up)' : 'var(--amber)',
-          border:`1px solid ${marketOpen ? 'rgba(0,232,122,.25)' : 'rgba(245,158,11,.2)'}`,
-        }}>
-          <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: marketOpen ? 'var(--up)' : 'var(--amber)',
-                         animation: marketOpen ? 'pulseDot 1.5s infinite' : 'none' }} />
-          {marketLabel}
-        </span>
+      <div className="top-chip" style={{ border: 0, borderRadius: 0, background: 'transparent', minWidth: 128, paddingInline: 14 }}>
+        <span className="status-dot" style={{ color: marketTone }} />
+        <div>
+          <div style={{ color: marketTone, fontSize: '.58rem', fontWeight: 900 }}>{marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}</div>
+          <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', marginTop: 2 }}>{marketOpen ? 'LIVE DATA' : 'READ-ONLY / POLL'}</div>
+        </div>
+      </div>
 
-        <span onClick={() => setActiveTab('broker')} style={{
-          display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
-          borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)', cursor:'pointer',
-          background: brokerBg,
-          color: brokerColor,
-          border:`1px solid ${brokerBorder}`,
-        }} title={apiStatus?.message || "Click -> Broker Data"}>
-          <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: brokerColor }} />
-          DHAN {brokerLabel}
-        </span>
+      <div className="hide-compact" style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        <MarketTicker label="NIFTY" spot={nifty.spot} chg={nifty.chg} />
+        <MarketTicker label="BANKNIFTY" spot={bank.spot} chg={bank.chg} />
+        <MarketTicker label="MIDCPNIFTY" spot={mid.spot} chg={mid.chg} />
+      </div>
 
-        <span style={{ padding:'3px 8px', borderRadius:'6px', fontSize:'.62rem', fontWeight:700,
-                       background:'rgba(245,158,11,.1)', color:'var(--amber)',
-                       border:'1px solid rgba(245,158,11,.25)', fontFamily:'var(--font-mono)' }}>PAPER</span>
-
-        <span style={{ padding:'3px 8px', borderRadius:'6px', fontSize:'.62rem', fontWeight:700,
-                       background:'rgba(255,77,106,.06)', color:'var(--down)',
-                       border:'1px solid rgba(255,77,106,.18)', fontFamily:'var(--font-mono)' }}>LIVE OFF</span>
-
-        <div style={{ display:'flex', alignItems:'center', gap:'4px', padding:'3px 7px',
-                      background:'var(--surface-2)', borderRadius:'5px', border:'1px solid var(--border)' }}
-             title={`WebSocket: ${wsStatus}`}>
-          <span style={{
-            width:'6px', height:'6px', borderRadius:'50%',
-            background: wsStatus==='live' ? 'var(--up)' : wsStatus==='connecting' ? 'var(--amber)' : 'var(--down)',
-            animation: wsStatus==='live' ? 'pulseDot 1.5s infinite' : 'none'
-          }} />
-          <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)', color:'var(--text-mut)' }}>WS</span>
-          <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)',
-                         color: wsStatus==='live' ? 'var(--up)' : 'var(--text-mut)' }}>
-            {wsStatus === 'live' ? 'LIVE' : wsStatus === 'connecting' ? 'CONNECTING' : 'OFF'}
-          </span>
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', minWidth: 0 }}>
+        <div className="hide-compact" style={{ padding: '0 11px', borderLeft: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: wsTone }}>
+            <Wifi size={13} />
+            <span style={{ fontSize: '.55rem', fontWeight: 800 }}>WS {wsStatus === 'live' ? 'LIVE' : wsStatus.toUpperCase()}</span>
+          </div>
+          <Clock />
         </div>
 
-        {rho != null && (
-          <div style={{ padding:'3px 7px', background:'var(--surface-2)',
-                        borderRadius:'5px', border:'1px solid var(--border)' }}>
-            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>rho </span>
-            <span className="num" style={{ fontSize:'.75rem', fontWeight:700,
-                                           color: rho>=0.7 ? 'var(--up)' : rho>=0.4 ? 'var(--amber)' : 'var(--down)' }}>
-              {rho.toFixed(2)}
-            </span>
+        <button onClick={() => setActiveTab('broker')} style={{
+          height: '100%', minWidth: 108, padding: '0 12px', border: 0, borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)',
+          background: 'transparent', color: brokerTone, cursor: 'pointer', textAlign: 'left',
+        }} title={apiStatus?.message || 'Open Broker'}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.53rem', color: 'var(--text-mut)' }}><Shield size={12} /> BROKER</div>
+          <div style={{ fontSize: '.61rem', fontWeight: 900, marginTop: 3 }}>DHAN · {brokerLabel}</div>
+        </button>
+
+        <div style={{ padding: '0 10px', display: 'flex', gap: 5, alignItems: 'center' }}>
+          <span className="pill" style={{ color: 'var(--amber)', border: '1px solid rgba(245,165,36,.28)', background: 'rgba(245,165,36,.08)' }}>PAPER</span>
+          <span className="pill" style={{ color: 'var(--down)', border: '1px solid rgba(255,73,100,.24)', background: 'rgba(255,73,100,.06)' }}>LIVE OFF</span>
+        </div>
+
+        <div className="hide-compact" style={{ width: 184, marginRight: 10, position: 'relative' }}>
+          <Search size={13} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-mut)' }} />
+          <div style={{ height: 31, display: 'flex', alignItems: 'center', paddingLeft: 31, color: 'var(--text-mut)', border: '1px solid var(--border)', borderRadius: 7, fontSize: '.58rem', background: 'rgba(6,16,28,.75)' }}>
+            Search (Ctrl + K)
           </div>
-        )}
+        </div>
+
+        <button className="soft-btn" aria-label="Notifications" style={{ width: 30, minHeight: 30, padding: 0, marginRight: 8, position: 'relative' }}>
+          <Bell size={14} />
+          <span style={{ position: 'absolute', top: -4, right: -3, minWidth: 14, height: 14, display: 'grid', placeItems: 'center', borderRadius: 99, background: 'var(--down)', color: 'white', fontSize: '.45rem', fontWeight: 900 }}>!</span>
+        </button>
+
+        <div style={{ paddingRight: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 99, display: 'grid', placeItems: 'center', background: 'var(--surface-3)', border: '1px solid var(--border-hi)', color: 'var(--text-pri)', fontSize: '.58rem', fontWeight: 800 }}>PS</div>
+          <div className="hide-compact" style={{ lineHeight: 1.1 }}>
+            <div style={{ color: 'var(--text-pri)', fontSize: '.58rem', fontWeight: 750 }}>Pritam S.</div>
+            <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', marginTop: 3 }}>Admin</div>
+          </div>
+          <ChevronDown className="hide-compact" size={12} color="var(--text-mut)" />
+        </div>
       </div>
     </header>
   )

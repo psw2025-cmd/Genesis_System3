@@ -1,230 +1,245 @@
+import { Activity, Bot, Brain, Shield, TrendingUp, Wallet } from 'lucide-react'
 import { useStore } from '../store'
-import { fmtCr, signClass } from '../lib/utils'
-import { cn } from '../lib/utils'
+import { cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { AuthUnlock } from './AuthUnlock'
 
-function KPI({ label, value, sub, color }: {
-  label: string; value: string | number; sub?: string; color?: string
+function asPct(value: any) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  return Math.abs(n) <= 1 ? n * 100 : n
+}
+
+function Metric({ label, value, sub, tone, icon }: {
+  label: string; value: string; sub?: string; tone?: 'up' | 'down' | 'warn' | 'accent'; icon?: React.ReactNode
 }) {
+  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : tone === 'warn' ? 'var(--amber)' : tone === 'accent' ? 'var(--accent)' : 'var(--text-pri)'
   return (
-    <div className="card p-4 flex flex-col gap-1">
-      <span className="text-xs text-text-muted uppercase tracking-wider">{label}</span>
-      <span className={cn('num text-2xl font-bold', color ?? 'text-text-primary')}>{value}</span>
-      {sub && <span className="text-xs text-text-muted">{sub}</span>}
+    <div className="metric-card">
+      <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, alignItems: 'center' }}>
+        <div className="metric-label">{label}</div>
+        <div style={{ color: 'var(--text-mut)' }}>{icon}</div>
+      </div>
+      <div className="metric-value" style={{ color }}>{value}</div>
+      {sub && <div className="metric-sub">{sub}</div>}
     </div>
   )
 }
 
-function GateRow({ label, status, note }: { label: string; status: string; note?: string }) {
-  const statusText = typeof status === 'string' ? status : 'PEND'
-  const isPASS = statusText === 'PASS' || statusText === 'pass'
-  const isPEND = statusText === 'PEND' || statusText === 'PENDING' || statusText === 'pending'
+function ChartPlaceholder({ title, value, tone = 'accent' }: { title: string; value?: string; tone?: 'accent' | 'up' | 'down' }) {
+  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : 'var(--accent)'
   return (
-    <div className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
-      <span className={cn(
-        'pill text-[10px] w-14 justify-center',
-        isPASS ? 'bg-up/10 text-up border border-up/20' :
-        isPEND ? 'bg-amber/10 text-amber border border-amber/20' :
-                 'bg-down/10 text-down border border-down/20'
-      )}>{statusText.toUpperCase()}</span>
-      <span className="text-sm text-text-primary flex-1">{label}</span>
-      {note && <span className="text-xs text-text-muted font-mono truncate max-w-48">{note}</span>}
+    <div className="chart-shell" style={{ minHeight: 145, padding: 12 }}>
+      <div className="panel-title">{title}</div>
+      {value && <div className="num" style={{ marginTop: 6, color: 'var(--text-pri)', fontSize: '1rem', fontWeight: 750 }}>{value}</div>}
+      <svg viewBox="0 0 320 72" preserveAspectRatio="none" style={{ position: 'absolute', left: 12, right: 12, bottom: 12, width: 'calc(100% - 24px)', height: 72, opacity: .85 }} aria-hidden>
+        <defs>
+          <linearGradient id={`grad-${title.replace(/\W/g, '')}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor={color} stopOpacity=".24" />
+            <stop offset="1" stopColor={color} stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d="M0 58 C28 50 38 61 65 45 S105 47 128 34 S172 42 195 25 S236 33 258 18 S296 25 320 11 L320 72 L0 72 Z" fill={`url(#grad-${title.replace(/\W/g, '')})`} />
+        <path d="M0 58 C28 50 38 61 65 45 S105 47 128 34 S172 42 195 25 S236 33 258 18 S296 25 320 11" fill="none" stroke={color} strokeWidth="2" />
+      </svg>
+      <div style={{ position: 'absolute', right: 10, top: 10, color: 'var(--text-mut)', fontSize: '.52rem' }}>VISUAL TREND SHELL</div>
     </div>
   )
 }
 
-function DataRow({ label, status, note }: { label: string; status: string; note?: any }) {
-  const s = String(status || 'WAITING')
-  const good = s === 'LOADED' || s === 'PASS'
-  const warn = s === 'STALE' || s === 'MARKET_CLOSED' || s === 'WAITING'
-  return (
-    <div className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-      <span className={cn(
-        'pill text-[10px] w-32 justify-center',
-        good ? 'bg-up/10 text-up border border-up/20' :
-        warn ? 'bg-amber/10 text-amber border border-amber/20' :
-               'bg-down/10 text-down border border-down/20'
-      )}>{s}</span>
-      <span className="text-sm text-text-primary flex-1">{label}</span>
-      {note && <span className="text-xs text-text-muted font-mono truncate max-w-[28rem]">{String(note)}</span>}
-    </div>
-  )
-}
-
-function hasApiFailure(obj: any): boolean {
-  if (!obj) return false
-  const raw = obj.raw ?? obj.data ?? obj.normalized?.raw ?? obj.funds?.raw ?? obj
-  const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
-  const details = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
-  return obj?.success === false || status === 'failure' || details.includes('invalid') || details.includes('token') || details.includes('unauthorized')
-}
-
-function loadedStatus(obj: any) {
-  if (!obj) return 'WAITING'
-  return hasApiFailure(obj) ? 'ERROR' : 'LOADED'
+function getStatusTone(value: string) {
+  const s = value.toUpperCase()
+  if (s.includes('PASS') || s.includes('CONNECTED') || s.includes('HEALTH') || s.includes('LIVE')) return 'var(--up)'
+  if (s.includes('FAIL') || s.includes('ERROR') || s.includes('OFFLINE')) return 'var(--down)'
+  return 'var(--amber)'
 }
 
 export function Overview() {
   const {
     health, state, paper, autoGates, apiStatus, pnl, gainRank, alerts,
-    brokerStatus, brokerFunds, brokerHoldings, brokerPositions,
-    chain, chainSymbol, marketOpen,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, chain, marketOpen,
   } = useStore()
 
-  const brokerConn  = brokerStatus?.connected ?? health?.broker?.connected
-  const totalPnl    = paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? 0
-  const openPos     = paper?.positions?.open_count ?? 0
-  const cycleCount  = health?.cycle_count ?? 0
-  const chainData   = chain?.[chainSymbol]
+  const spot = (symbol: string) => Number(chain?.[symbol]?.spot || 0)
+  const change = (symbol: string) => {
+    const row = chain?.[symbol]
+    const raw = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
+    return raw == null ? null : Number(raw)
+  }
+  const totalPnl = Number(paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? paper?.summary?.total_pnl ?? 0)
+  const winRate = asPct(paper?.summary?.win_rate ?? paper?.pnl?.summary?.win_rate)
+  const modelConfidence = asPct(state?.signals?.confidence ?? state?.prediction?.confidence ?? state?.model?.confidence)
+  const drawdown = asPct(paper?.summary?.max_drawdown ?? paper?.pnl?.summary?.max_drawdown)
+  const brokerConnected = Boolean(brokerStatus?.connected ?? health?.broker?.connected)
+  const brokerResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
+  const latency = Number(brokerStatus?.latency_ms ?? brokerStatus?.latency ?? health?.broker?.latency_ms ?? 0)
+  const liveAllowed = Boolean(state?.live_trading_enabled ?? state?.live_allowed ?? health?.live_allowed)
+  const mode = String(health?.mode ?? state?.mode ?? 'ANALYZER').toUpperCase()
 
-  const dataCoverage = [
-    { label: 'Health API', status: health ? 'LOADED' : 'WAITING', note: health?.last_sync ?? health?.data_source },
-    { label: 'State API', status: state ? 'LOADED' : 'WAITING', note: state?.market?.reason ?? state?.status },
-    { label: 'Broker Status API', status: loadedStatus(brokerStatus), note: brokerStatus?.status ?? brokerStatus?.message ?? brokerStatus?.token_status },
-    { label: 'Funds API', status: loadedStatus(brokerFunds), note: brokerFunds?.error ?? brokerFunds?.message ?? brokerFunds?.normalized?.raw?.remarks?.error_message },
-    { label: 'Holdings API', status: loadedStatus(brokerHoldings), note: brokerHoldings?.error ?? brokerHoldings?.message },
-    { label: 'Positions API', status: loadedStatus(brokerPositions), note: brokerPositions?.error ?? brokerPositions?.message },
-    { label: 'P&L API', status: pnl ? 'LOADED' : paper ? 'LOADED' : 'WAITING', note: `pnl=${totalPnl}` },
-    { label: 'Gain Rank / Scanner', status: gainRank?.stale ? 'STALE' : gainRank ? 'LOADED' : 'WAITING', note: gainRank?.latest_date ?? gainRank?.latest?.date ?? gainRank?.message },
-    { label: 'Auto Gates', status: autoGates ? 'LOADED' : 'WAITING', note: Array.isArray(autoGates?.proof_gates) ? `${autoGates.proof_gates.length} gates` : undefined },
-    { label: 'Alerts', status: Array.isArray(alerts) ? 'LOADED' : 'WAITING', note: Array.isArray(alerts) ? `${alerts.length} recent` : undefined },
-    { label: 'Option Chain', status: chainData?.contracts?.length ? 'LOADED' : marketOpen ? 'WAITING' : 'MARKET_CLOSED', note: chainData?.message ?? (marketOpen ? 'waiting for rows' : 'live rows pending outside market hours') },
-  ]
-
+  const decision = String(
+    state?.signals?.directional_bias
+    ?? state?.signals?.bias
+    ?? state?.prediction?.bias
+    ?? state?.decision?.bias
+    ?? 'WAITING FOR MODEL EVIDENCE'
+  ).toUpperCase()
+  const regime = String(state?.signals?.market_regime ?? state?.market?.regime ?? 'Awaiting regime evidence')
+  const decisionTone = decision.includes('BULL') || decision.includes('UP') ? 'var(--up)' : decision.includes('BEAR') || decision.includes('DOWN') ? 'var(--down)' : 'var(--amber)'
+  const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
+  const topRows = Array.isArray(rankings) ? rankings.slice(0, 6) : []
   const proofGates = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
-  const liveAllowed = Boolean(health?.live_allowed ?? state?.live_trading_enabled ?? state?.live_allowed)
-  const mode = String(health?.mode ?? state?.mode ?? '').toUpperCase()
-  const qc = String(health?.qc_status ?? '').toUpperCase()
-  const gatesPassing = Number(autoGates?.gates_passing ?? 0)
-  const gatesTotal = Number(autoGates?.gates_total ?? proofGates.length ?? 0)
+  const passCount = proofGates.filter((gate: any) => gate?.pass === true || String(gate?.status).toUpperCase() === 'PASS').length
+  const alertCount = Array.isArray(alerts) ? alerts.length : 0
+  const systemHealth = String(health?.status ?? health?.qc_status ?? (health ? 'RESPONDED' : 'WAITING')).toUpperCase()
+  const apiAuthNeeded = apiStatus?.status === 'API_AUTH_REQUIRED'
 
-  // Runtime-only fallback when /api/auto_gates has not returned proof_gates yet.
-  // No hard-coded PASS badges — every status comes from live health/broker/state APIs.
-  const runtimeGates = [
-    {
-      label: 'Broker Connection',
-      status: brokerConn ? 'PASS' : (brokerStatus ? 'FAIL' : 'PEND'),
-      note: brokerStatus?.status ?? brokerStatus?.error ?? (brokerConn ? 'Dhan connected' : 'awaiting /api/broker status'),
-    },
-    {
-      label: 'Tick / Data Freshness',
-      status: health?.data_source ? 'PASS' : (health ? 'FAIL' : 'PEND'),
-      note: health?.data_source ? `source: ${health.data_source}` : 'awaiting /api/health',
-    },
-    {
-      label: 'QC Gate',
-      status: qc === 'PASS' ? 'PASS' : (qc ? (qc === 'NOT_READY' ? 'PEND' : 'FAIL') : 'PEND'),
-      note: health?.qc_status ?? 'awaiting /api/health.qc_status',
-    },
-    {
-      label: 'Auto Gates Matrix',
-      status: autoGates
-        ? (gatesTotal > 0 && gatesPassing >= gatesTotal ? 'PASS' : (gatesPassing > 0 ? 'PEND' : 'FAIL'))
-        : 'PEND',
-      note: autoGates ? `${gatesPassing}/${gatesTotal || '?'} from /api/auto_gates` : 'awaiting /api/auto_gates',
-    },
-    {
-      label: 'Paper / Analyzer Mode',
-      status: mode === 'PAPER' || mode === 'ANALYZER' ? 'PASS' : (mode ? 'FAIL' : 'PEND'),
-      note: mode || 'awaiting /api/health.mode',
-    },
-    {
-      label: 'Live Trading Gate',
-      status: liveAllowed ? 'FAIL' : (health || state ? 'PASS' : 'PEND'),
-      note: liveAllowed
-        ? 'LIVE FLAG DETECTED — must remain OFF'
-        : 'OFF (confirmed via /api/health|/api/state)',
-    },
-  ]
-
-  const displayGates = proofGates.length > 0
-    ? proofGates.map((g: any) => ({
-        label: typeof g?.name === 'string' ? g.name : String(g?.gate_id ?? 'Gate'),
-        status: typeof g?.status === 'string' ? g.status : (g?.pass ? 'PASS' : 'PEND'),
-        note: typeof g?.note === 'string' ? g.note : (typeof g?.evidence === 'string' ? g.evidence : undefined),
-      }))
-    : runtimeGates
-
-  const passCount = displayGates.filter(g =>
-    g.status === 'PASS' || g.status === 'pass').length
+  const indexCard = (label: string, symbol: string) => {
+    const p = spot(symbol)
+    const c = change(symbol)
+    return <Metric label={label} value={p > 0 ? fmt(p, 2) : '--'} sub={c == null ? 'Waiting for market data' : `${c >= 0 ? '+' : ''}${c.toFixed(2)}%`} tone={c == null ? undefined : c >= 0 ? 'up' : 'down'} icon={<TrendingUp size={14} />} />
+  }
 
   return (
-    <div className="p-6 space-y-6 overflow-y-auto h-full">
-      <div className="card p-4 border border-down/30 bg-down/5">
-        <div className="flex items-center justify-between gap-4">
-          <div>
-            <div className="text-xs text-text-muted uppercase tracking-wider">Analyzer / Paper Command Center</div>
-            <div className="text-sm text-text-primary font-semibold">PAPER MODE ACTIVE - LIVE TRADING DISABLED</div>
+    <div className="workspace-shell">
+      {apiAuthNeeded && <div style={{ marginBottom: 10 }}><AuthUnlock /></div>}
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(8, minmax(0, 1fr))' }}>
+        {indexCard('NIFTY', 'NIFTY')}
+        {indexCard('BANKNIFTY', 'BANKNIFTY')}
+        {indexCard('MIDCPNIFTY', 'MIDCPNIFTY')}
+        <Metric label="Total P&L (Paper)" value={fmtCr(totalPnl)} sub="Paper / analyzer truth" tone={totalPnl >= 0 ? 'up' : 'down'} icon={<Wallet size={14} />} />
+        <Metric label="Win Rate" value={winRate == null ? '--' : `${winRate.toFixed(1)}%`} sub="From paper evidence" tone={winRate == null ? undefined : winRate >= 50 ? 'up' : 'warn'} icon={<Activity size={14} />} />
+        <Metric label="Model Confidence" value={modelConfidence == null ? '--' : `${modelConfidence.toFixed(0)}%`} sub="No value invented" tone={modelConfidence == null ? undefined : 'accent'} icon={<Brain size={14} />} />
+        <Metric label="System Health" value={systemHealth} sub={`${passCount}/${proofGates.length || 0} proof gates`} tone={systemHealth.includes('PASS') || systemHealth.includes('HEALTH') ? 'up' : 'warn'} icon={<Shield size={14} />} />
+        <Metric label="Latency" value={latency > 0 ? `${latency.toFixed(0)}ms` : '--'} sub={brokerConnected ? 'Broker read-only' : brokerResponded ? 'API responded' : 'Waiting'} tone={latency > 0 && latency < 500 ? 'up' : latency > 0 ? 'warn' : undefined} icon={<Activity size={14} />} />
+      </div>
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(0, 3fr) minmax(275px, 1fr)', marginTop: 10 }}>
+        <div className="card" style={{ padding: 13 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', marginBottom: 10 }}>
+            <div>
+              <div className="panel-title" style={{ color: '#8ebcff' }}>AI Decision Center</div>
+              <div style={{ color: 'var(--text-mut)', fontSize: '.6rem', marginTop: 3 }}>Read-only presentation of existing model/state evidence</div>
+            </div>
+            <span className="pill" style={{ color: liveAllowed ? 'var(--down)' : 'var(--up)', background: liveAllowed ? 'rgba(255,73,100,.08)' : 'rgba(24,215,130,.07)', border: `1px solid ${liveAllowed ? 'rgba(255,73,100,.22)' : 'rgba(24,215,130,.22)'}` }}>
+              {liveAllowed ? 'LIVE FLAG DETECTED' : `${mode} · LIVE OFF`}
+            </span>
           </div>
-          <span className="pill text-[10px] bg-down/10 text-down border border-down/20">LIVE OFF</span>
-        </div>
-        <div className="mt-3 text-xs text-text-muted">
-          Market closed does not hide read-only broker, paper, scanner, gate, alert, or health/state data.
-        </div>
-        {apiStatus && (
-          <div className="mt-2 text-xs text-text-muted">
-            API status: <span className="font-mono text-amber">{apiStatus.status}</span> - {apiStatus.message}
-          </div>
-        )}
-      </div>
-      { (apiStatus?.status === 'API_AUTH_REQUIRED'
-        || /auth|API authentication|X-API-Key|session unlock/i.test(String(apiStatus?.message || ''))
-      ) && <AuthUnlock /> }
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI label="Broker"         value={brokerConn ? 'CONNECTED' : brokerStatus || brokerFunds || brokerHoldings || brokerPositions ? 'API RESPONDED' : 'OFFLINE'}
-             color={brokerConn ? 'text-up' : brokerStatus || brokerFunds || brokerHoldings || brokerPositions ? 'text-amber' : 'text-down'} sub="Dhan read-only" />
-        <KPI label="Paper P&L"      value={fmtCr(totalPnl)}
-             color={signClass(totalPnl)} sub="Cloud sim" />
-        <KPI label="Open Positions" value={openPos} sub="Paper only" />
-        <KPI label="Cycles"         value={cycleCount} sub="Engine ticks" />
-      </div>
-
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-text-primary">Live Data Coverage</h3>
-          <span className="text-xs text-text-muted">market closed must not hide read-only data</span>
-        </div>
-        {dataCoverage.map((r, i) => (
-          <DataRow key={i} label={r.label} status={r.status} note={r.note} />
-        ))}
-      </div>
-
-      <div className="card p-4">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-text-primary">Gate Matrix</h3>
-          <div className="flex items-center gap-2">
-            <span className="num text-xs text-text-muted">{passCount}/{displayGates.length} PASS</span>
-            <div className="w-32 h-1.5 bg-surface-3 rounded-full overflow-hidden">
-              <div className="h-full bg-up rounded-full"
-                   style={{ width: `${(passCount/displayGates.length)*100}%` }} />
+          <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr 1.2fr', gap: 8 }}>
+            <div className="metric-card" style={{ minHeight: 126 }}>
+              <div className="metric-label">Directional Bias</div>
+              <div style={{ marginTop: 12, color: decisionTone, fontSize: '1.45rem', fontWeight: 850, letterSpacing: '.02em' }}>{decision}</div>
+              <div className="metric-sub">Market regime: {regime}</div>
+            </div>
+            <div className="metric-card" style={{ minHeight: 126 }}>
+              <div className="metric-label">Prediction Confidence</div>
+              <div className="metric-value">{modelConfidence == null ? '--' : `${modelConfidence.toFixed(1)}%`}</div>
+              <div className="progress-bar" style={{ marginTop: 13 }}>
+                <div className="progress-fill" style={{ width: `${Math.min(100, Math.max(0, modelConfidence ?? 0))}%`, background: 'linear-gradient(90deg, var(--accent), var(--up))' }} />
+              </div>
+              <div className="metric-sub">Bound to current System3 model state</div>
+            </div>
+            <div className="metric-card" style={{ minHeight: 126 }}>
+              <div className="metric-label">Evidence & Safety</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginTop: 10 }}>
+                {[
+                  ['Broker', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+                  ['Market', marketOpen ? 'OPEN' : 'CLOSED / POLL'],
+                  ['Alerts', String(alertCount)],
+                  ['Proof Gates', `${passCount}/${proofGates.length || 0}`],
+                ].map(([label, value]) => (
+                  <div key={label} style={{ padding: '7px 8px', border: '1px solid var(--border)', borderRadius: 7, background: 'rgba(4,13,23,.45)' }}>
+                    <div className="metric-label">{label}</div>
+                    <div className="num" style={{ marginTop: 4, color: getStatusTone(value), fontSize: '.68rem', fontWeight: 700 }}>{value}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-        {displayGates.map((g, i) => (
-          <GateRow key={i} label={g.label} status={g.status} note={g.note} />
-        ))}
+
+        <div className="card" style={{ padding: 13 }}>
+          <div className="panel-title">Broker & Account</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
+            <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'CONNECTED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone={brokerConnected ? 'up' : 'warn'} />
+            <Metric label="Mode" value="READ-ONLY" sub="No order authority from dashboard" tone="accent" />
+            <Metric label="Available" value={brokerFunds?.normalized?.available_balance != null ? fmtCr(brokerFunds.normalized.available_balance) : brokerFunds?.available_balance != null ? fmtCr(brokerFunds.available_balance) : '--'} sub="From broker API only" />
+            <Metric label="Paper P&L" value={fmtCr(totalPnl)} sub="Simulation evidence" tone={totalPnl >= 0 ? 'up' : 'down'} />
+          </div>
+        </div>
       </div>
 
-      <div className="card p-4">
-        <h3 className="text-sm font-semibold text-text-primary mb-3">System Health</h3>
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          {[
-            ['Mode',         health?.mode        ?? '--'],
-            ['QC Status',    health?.qc_status   ?? '--'],
-            ['Data Source',  health?.data_source  ?? '--'],
-            ['Market',       health?.market?.is_open ? 'OPEN' : 'CLOSED / DATA POLLING'],
-            ['Live Allowed', String(health?.live_allowed ?? false)],
-            ['Last Sync',    health?.last_sync   ?? '--'],
-          ].map(([k, v]) => (
-            <div key={k} className="flex justify-between py-1.5 border-b border-border">
-              <span className="text-text-muted">{k}</span>
-              <span className="num text-text-primary font-mono">{v}</span>
-            </div>
-          ))}
+      <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr minmax(270px, .95fr)', marginTop: 10 }}>
+        <ChartPlaceholder title="Intraday Trend · NIFTY" value={spot('NIFTY') > 0 ? fmt(spot('NIFTY'), 2) : '--'} tone="up" />
+        <ChartPlaceholder title="Market / Volatility Monitor" value={marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'} tone="down" />
+        <ChartPlaceholder title="Paper P&L Trend" value={fmtCr(totalPnl)} tone={totalPnl >= 0 ? 'accent' : 'down'} />
+        <div className="card" style={{ padding: 12 }}>
+          <div className="panel-title">Automation Status</div>
+          <div style={{ marginTop: 9 }}>
+            {[
+              ['Data engine', health ? 'RESPONDED' : 'WAITING'],
+              ['Broker monitor', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+              ['Model state', state ? 'RESPONDED' : 'WAITING'],
+              ['Execution authority', liveAllowed ? 'LIVE FLAG' : 'LOCKED'],
+            ].map(([label, value]) => (
+              <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, padding: '8px 0', borderBottom: '1px solid var(--border)' }}>
+                <span style={{ color: 'var(--text-sec)', fontSize: '.66rem' }}>{label}</span>
+                <span className="num" style={{ color: getStatusTone(value), fontSize: '.58rem', fontWeight: 800 }}>{value}</span>
+              </div>
+            ))}
+          </div>
         </div>
+      </div>
+
+      <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(0, 3fr) minmax(280px, 1fr)', marginTop: 10 }}>
+        <div className="card" style={{ overflow: 'hidden' }}>
+          <div style={{ padding: '11px 13px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border)' }}>
+            <div className="panel-title">Top Contracts / Gain Rank</div>
+            <span style={{ color: 'var(--text-mut)', fontSize: '.58rem' }}>No synthetic contracts displayed</span>
+          </div>
+          {topRows.length === 0 ? (
+            <div style={{ padding: 26, textAlign: 'center', color: 'var(--text-mut)', fontSize: '.7rem' }}>Waiting for scanner / gain-rank rows</div>
+          ) : (
+            <table style={{ width: '100%' }}>
+              <thead><tr>{['Underlying / Contract', 'Spot', 'Change', 'Score', 'Source'].map((h) => <th key={h} className="thead" style={{ textAlign: h === 'Underlying / Contract' ? 'left' : 'right' }}>{h}</th>)}</tr></thead>
+              <tbody>
+                {topRows.map((row: any, index: number) => {
+                  const chg = Number(row?.change_pct ?? row?.gain_pct ?? 0)
+                  return (
+                    <tr className="trow" key={`${row?.symbol ?? row?.underlying ?? 'row'}-${index}`}>
+                      <td className="tcell" style={{ fontWeight: 700 }}>{row?.symbol ?? row?.contract ?? row?.underlying ?? '--'}</td>
+                      <td className="tcell" style={{ textAlign: 'right' }}>{row?.spot_price != null ? fmt(Number(row.spot_price), 2) : '--'}</td>
+                      <td className={cn('tcell', signClass(chg))} style={{ textAlign: 'right' }}>{Number.isFinite(chg) ? `${chg >= 0 ? '+' : ''}${chg.toFixed(2)}%` : '--'}</td>
+                      <td className="tcell" style={{ textAlign: 'right', color: 'var(--amber)' }}>{row?.score ?? row?.confidence ?? '--'}</td>
+                      <td className="tcell" style={{ textAlign: 'right', color: 'var(--text-mut)' }}>{row?.data_source ?? gainRank?.data_source ?? 'SCANNER'}</td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="card" style={{ padding: 13 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="panel-title">Risk Status</div>
+            <span className="pill" style={{ color: liveAllowed ? 'var(--down)' : 'var(--up)', border: `1px solid ${liveAllowed ? 'rgba(255,73,100,.25)' : 'rgba(24,215,130,.22)'}`, background: liveAllowed ? 'rgba(255,73,100,.07)' : 'rgba(24,215,130,.06)' }}>
+              {liveAllowed ? 'CHECK REQUIRED' : 'LIVE LOCKED'}
+            </span>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
+            <Metric label="Max Drawdown" value={drawdown == null ? '--' : `${Math.abs(drawdown).toFixed(2)}%`} sub="Paper evidence" tone={drawdown == null ? undefined : Math.abs(drawdown) < 10 ? 'up' : 'warn'} />
+            <Metric label="Proof Gates" value={`${passCount}/${proofGates.length || 0}`} sub="Current gate matrix" tone={proofGates.length > 0 && passCount === proofGates.length ? 'up' : 'warn'} />
+            <Metric label="Market" value={marketOpen ? 'OPEN' : 'CLOSED'} sub="Read-only data remains visible" tone={marketOpen ? 'up' : 'warn'} />
+            <Metric label="Authority" value={liveAllowed ? 'REVIEW' : 'LOCKED'} sub="Live execution state" tone={liveAllowed ? 'down' : 'up'} />
+          </div>
+        </div>
+      </div>
+
+      <div style={{ marginTop: 10, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', color: 'var(--text-mut)', fontSize: '.57rem', background: 'rgba(5,14,25,.76)' }}>
+        <span>ANALYZER MODE · PAPER MODE ONLY · LIVE EXECUTION DISABLED</span>
+        <span>Data shown only when supported by current System3 APIs</span>
       </div>
     </div>
   )
 }
-

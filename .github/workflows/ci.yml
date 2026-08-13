@@ -320,9 +320,9 @@ jobs:
           retention-days: 30
 
   frontend-build:
-    name: BLOCKING - frontend production build
+    name: BLOCKING - frontend production build + browser runtime
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     needs: workflow-policy-guard
     defaults:
       run:
@@ -343,3 +343,11 @@ jobs:
       - name: Build (vite build)
         shell: bash
         run: npm run build
+
+      - name: Compile browser runtime smoke
+        shell: bash
+        run: python -m py_compile ../../scripts/frontend_local_runtime_smoke.py
+
+      - name: Prove all 22 canonical tabs render in Chrome
+        shell: bash
+        run: timeout 180s python ../../scripts/frontend_local_runtime_smoke.py

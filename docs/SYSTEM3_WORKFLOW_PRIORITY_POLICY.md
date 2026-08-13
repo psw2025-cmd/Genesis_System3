@@ -11,10 +11,11 @@ Only the following GitHub Actions workflows are allowed in `.github/workflows`.
 3. `cloud-run-auto-deploy.yml` — path-scoped Google Cloud Run deployment from `main`.
 4. `gcp-stage2-ci.yml` — focused Google Cloud safety tests for relevant pull-request changes.
 5. `gcp-dhan-token-fix-ci.yml` — focused Dhan token/runtime contract checks for relevant pull-request changes.
+6. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard; required to catch compile-success/blank-root UI regressions before merge.
 
 ### Manual emergency workflow
 
-6. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+7. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Disabled workflow classes
 
