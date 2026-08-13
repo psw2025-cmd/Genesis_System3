@@ -13,7 +13,7 @@ function pickArray(obj: any, ...keys: string[]): any[] {
 }
 
 export const OptionsIntelligence: React.FC = () => {
-  const { chain, chainSymbol, marketTop, gainRank, brokerPositions } = useStore();
+  const { chain, chainSymbol, setChainSymbol, setActiveTab, marketTop, gainRank, brokerPositions, marketOpen } = useStore();
 
   const currentChain = chain[chainSymbol] || null;
   const rankings: any[] = Array.isArray(gainRank?.rankings) ? gainRank.rankings : [];
@@ -35,11 +35,17 @@ export const OptionsIntelligence: React.FC = () => {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <StatusChip label="SYMBOL" value={chainSymbol} status="ok" />
-          <StatusChip label="MODE" value="ANALYTICS" />
+          <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'warn'} />
         </div>
       </header>
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].map((symbol) => (
+            <button key={symbol} type="button" className={`soft-btn ${chainSymbol === symbol ? 'active' : ''}`} onClick={() => setChainSymbol(symbol)}>{symbol}</button>
+          ))}
+          <button type="button" className="soft-btn" onClick={() => setActiveTab('chain')}>OPEN FULL OPTION CHAIN</button>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
 
           <section className="card" style={{ padding: '16px' }}>
@@ -52,15 +58,16 @@ export const OptionsIntelligence: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (OI)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi || '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi ?? '—'}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (VOL)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol || '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol ?? '—'}</span>
                   </div>
                 </div>
-                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : 'ok'} />
-                <StatusChip label="OI CHANGE" value={currentChain?.oi_change || 'STABLE'} />
+                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile != null ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : currentChain?.iv_percentile != null ? 'ok' : 'mut'} />
+                <StatusChip label="OI CHANGE" value={currentChain?.oi_change ?? 'PENDING'} status={currentChain?.oi_change != null ? 'ok' : 'mut'} />
+                <StatusChip label="SOURCE" value={currentChain?.source ?? currentChain?.data_source ?? 'PENDING'} status={currentChain?.source || currentChain?.data_source ? 'ok' : 'mut'} />
               </div>
             ) : (
               <PENDINGState reason={`NO CHAIN DATA YET FOR ${chainSymbol}`} />

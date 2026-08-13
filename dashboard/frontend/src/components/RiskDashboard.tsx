@@ -1,169 +1,157 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
+import { useStore } from '../store'
+import { PENDINGState, StatusChip } from './workspaces/TruthUI'
+
+type NumericMap = Record<string, number>
+
+interface RiskMetrics {
+  var_95?: number
+  expected_shortfall_95?: number
+  total_exposure?: number
+  concentration_risk?: number
+  total_pnl?: number
+  position_count?: number
+  max_underlying_exposure?: number
+  greeks_exposure?: Partial<Record<'delta' | 'gamma' | 'theta' | 'vega', number>>
+  underlying_exposures?: NumericMap
+}
+
+type LoadState = 'loading' | 'ready' | 'partial' | 'unavailable'
+
+const numberOrUndefined = (value: unknown): number | undefined => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : undefined
+}
+
+const money = (value: unknown): string => {
+  const parsed = numberOrUndefined(value)
+  return parsed === undefined ? '—' : `₹${parsed.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`
+}
+
+const decimal = (value: unknown, digits = 2): string => {
+  const parsed = numberOrUndefined(value)
+  return parsed === undefined ? '—' : parsed.toFixed(digits)
+}
+
+function stateRiskFallback(state: any): RiskMetrics | null {
+  const risk = state?.risk
+  if (!risk || typeof risk !== 'object') return null
+  return {
+    var_95: numberOrUndefined(risk.var_95 ?? risk.var95),
+    expected_shortfall_95: numberOrUndefined(risk.expected_shortfall_95 ?? risk.es95),
+    total_exposure: numberOrUndefined(risk.total_exposure ?? risk.exposure),
+    concentration_risk: numberOrUndefined(risk.concentration_risk ?? risk.concentration),
+    total_pnl: numberOrUndefined(risk.total_pnl ?? state?.pnl?.total),
+    position_count: numberOrUndefined(risk.position_count ?? state?.positions?.length),
+    greeks_exposure: risk.greeks_exposure,
+    underlying_exposures: risk.underlying_exposures,
+  }
+}
 
 export default function RiskDashboard() {
-  const [riskMetrics, setRiskMetrics] = useState<unknown>(null)
-  const [limitCheck, setLimitCheck] = useState<unknown>(null)
+  const state = useStore((store) => store.state)
+  const fallback = useMemo(() => stateRiskFallback(state), [state])
+  const [riskMetrics, setRiskMetrics] = useState<RiskMetrics | null>(fallback)
+  const [loadState, setLoadState] = useState<LoadState>(fallback ? 'partial' : 'loading')
+  const [message, setMessage] = useState('Loading read-only portfolio risk…')
 
   useEffect(() => {
+    const controller = new AbortController()
+
     const fetchRiskData = async () => {
       try {
-        // Use SSOT for consistency
-        const stateRes = await axios.get(`${API_BASE}/api/state`)
-        const state = stateRes.data
-        
-        // Use risk data from SSOT
-        const riskData = state.risk || {}
-        const riskMetricsData = {
-          var_95: riskData.var95 || 0,
-          expected_shortfall_95: riskData.es95 || 0,
-          total_exposure: riskData.exposure || 0,
-          concentration_risk: riskData.concentration || 0,
-          total_pnl: state.pnl?.total || 0,
-          position_count: state.positions?.length || 0
-        }
-        
-        // Check limits
-        const limitsRes = await axios.post(`${API_BASE}/api/risk/check-limits`, {
-          max_positions: 5,
-          max_exposure: 100000,
-          max_loss: -5000,
-          max_concentration_pct: 50
+        const response = await axios.get(`${API_BASE}/api/risk/portfolio`, {
+          signal: controller.signal,
+          timeout: 15000,
         })
-        
-        setRiskMetrics(riskMetricsData)
-        setLimitCheck(limitsRes.data.limit_check)
-      } catch (error) {
-        console.error('Error fetching risk data:', error)
-        // Fallback to old endpoints
-        try {
-          const [riskRes, limitsRes] = await Promise.all([
-            axios.get(`${API_BASE}/api/risk/portfolio`),
-            axios.post(`${API_BASE}/api/risk/check-limits`, {
-              max_positions: 5,
-              max_exposure: 100000,
-              max_loss: -5000,
-              max_concentration_pct: 50
-            })
-          ])
-          setRiskMetrics(riskRes.data.risk_metrics)
-          setLimitCheck(limitsRes.data.limit_check)
-        } catch (fallbackError) {
-          console.error('Fallback also failed:', fallbackError)
+        const payload = response.data
+        if (payload?.status !== 'ok' || !payload?.risk_metrics) {
+          throw new Error(payload?.message || 'Portfolio risk is not available')
+        }
+        setRiskMetrics(payload.risk_metrics)
+        setLoadState('ready')
+        setMessage('Read-only portfolio risk loaded')
+      } catch (error: any) {
+        if (error?.code === 'ERR_CANCELED') return
+        if (fallback) {
+          setRiskMetrics(fallback)
+          setLoadState('partial')
+          setMessage('Showing partial risk fields from the system state snapshot')
+        } else {
+          setRiskMetrics(null)
+          setLoadState('unavailable')
+          const status = error?.response?.status
+          setMessage(status ? `Risk service unavailable (HTTP ${status})` : 'Risk service unavailable')
         }
       }
     }
 
-    fetchRiskData()
-    // Optimized polling: 5000ms (5 seconds) - already optimal
-    const interval = setInterval(fetchRiskData, 5000)
-    return () => clearInterval(interval)
+    void fetchRiskData()
+    return () => controller.abort()
   }, [])
 
+  useEffect(() => {
+    if (loadState !== 'ready' && fallback) {
+      setRiskMetrics(fallback)
+      setLoadState('partial')
+      setMessage('Showing partial risk fields from the system state snapshot')
+    }
+  }, [fallback, loadState])
+
   if (!riskMetrics) {
-    return <div className="p-6">Loading risk metrics...</div>
+    return <PENDINGState reason={loadState === 'loading' ? 'LOADING READ-ONLY PORTFOLIO RISK' : message} dataTestId="risk-data-pending" />
   }
 
+  const greeks = riskMetrics.greeks_exposure || {}
+  const exposures = riskMetrics.underlying_exposures || {}
+  const concentration = numberOrUndefined(riskMetrics.concentration_risk)
+  const pnl = numberOrUndefined(riskMetrics.total_pnl)
+
   return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Risk Management Dashboard</h2>
-
-      {/* Risk Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="text-sm text-gray-400">Value at Risk (95%)</div>
-          <div className={`text-2xl font-bold ${riskMetrics.var_95 < 0 ? 'text-red-400' : 'text-green-400'}`}>
-            ₹{riskMetrics.var_95?.toFixed(2) || '0.00'}
-          </div>
-        </div>
-
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="text-sm text-gray-400">Expected Shortfall (95%)</div>
-          <div className={`text-2xl font-bold ${riskMetrics.expected_shortfall_95 < 0 ? 'text-red-400' : 'text-green-400'}`}>
-            ₹{riskMetrics.expected_shortfall_95?.toFixed(2) || '0.00'}
-          </div>
-        </div>
-
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="text-sm text-gray-400">Total Exposure</div>
-          <div className="text-2xl font-bold">
-            ₹{riskMetrics.total_exposure?.toFixed(2) || '0.00'}
-          </div>
-        </div>
-
-        <div className="bg-gray-800 p-4 rounded-lg">
-          <div className="text-sm text-gray-400">Concentration Risk</div>
-          <div className={`text-2xl font-bold ${riskMetrics.concentration_risk > 50 ? 'text-red-400' : 'text-yellow-400'}`}>
-            {riskMetrics.concentration_risk?.toFixed(1) || '0'}%
-          </div>
-        </div>
+    <div data-testid="risk-dashboard" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <StatusChip label="SOURCE" value={loadState === 'ready' ? 'PORTFOLIO RISK API' : 'STATE SNAPSHOT'} status={loadState === 'ready' ? 'ok' : 'warn'} />
+        <StatusChip label="STATUS" value={loadState.toUpperCase()} status={loadState === 'ready' ? 'ok' : 'warn'} />
+        <span style={{ color: 'var(--text-mut)', fontSize: '11px', alignSelf: 'center' }}>{message}</span>
       </div>
 
-      {/* Greeks Exposure */}
-      <div className="bg-gray-800 p-6 rounded-lg">
-        <h3 className="text-xl font-bold mb-4">Greeks Exposure</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <div className="text-sm text-gray-400">Delta</div>
-            <div className="text-2xl font-bold">{riskMetrics.greeks_exposure?.delta?.toFixed(4) || '0'}</div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: '12px' }}>
+        {[
+          ['Value at Risk (95%)', money(riskMetrics.var_95), numberOrUndefined(riskMetrics.var_95)],
+          ['Expected Shortfall (95%)', money(riskMetrics.expected_shortfall_95), numberOrUndefined(riskMetrics.expected_shortfall_95)],
+          ['Total Exposure', money(riskMetrics.total_exposure), undefined],
+          ['Concentration Risk', concentration === undefined ? '—' : `${concentration.toFixed(1)}%`, concentration === undefined ? undefined : 50 - concentration],
+          ['Total P&L', money(pnl), pnl],
+          ['Open Positions', decimal(riskMetrics.position_count, 0), undefined],
+        ].map(([label, value, tone]) => (
+          <div key={String(label)} className="card" style={{ padding: '14px' }}>
+            <div style={{ color: 'var(--text-mut)', fontSize: '10px', textTransform: 'uppercase' }}>{label}</div>
+            <div className="num" style={{ marginTop: '6px', fontSize: '20px', fontWeight: 800, color: typeof tone === 'number' ? (tone < 0 ? 'var(--down)' : 'var(--up)') : 'var(--text-pri)' }}>{value}</div>
           </div>
-          <div>
-            <div className="text-sm text-gray-400">Gamma</div>
-            <div className="text-2xl font-bold">{riskMetrics.greeks_exposure?.gamma?.toFixed(4) || '0'}</div>
-          </div>
-          <div>
-            <div className="text-sm text-gray-400">Theta</div>
-            <div className="text-2xl font-bold">{riskMetrics.greeks_exposure?.theta?.toFixed(4) || '0'}</div>
-          </div>
-          <div>
-            <div className="text-sm text-gray-400">Vega</div>
-            <div className="text-2xl font-bold">{riskMetrics.greeks_exposure?.vega?.toFixed(4) || '0'}</div>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Risk Limits Status */}
-      {limitCheck && (
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">Risk Limits Status</h3>
-          <div className={`p-4 rounded ${limitCheck.status === 'PASS' ? 'bg-green-900' : 'bg-red-900'}`}>
-            <div className="text-lg font-bold mb-2">
-              Status: {limitCheck.status}
+      <div className="card" style={{ padding: '16px' }}>
+        <h3 style={{ margin: '0 0 12px', fontSize: '14px' }}>Greeks Exposure</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(90px, 1fr))', gap: '12px' }}>
+          {(['delta', 'gamma', 'theta', 'vega'] as const).map((name) => (
+            <div key={name}>
+              <div style={{ color: 'var(--text-mut)', fontSize: '10px', textTransform: 'uppercase' }}>{name}</div>
+              <div className="num" style={{ marginTop: '4px', fontWeight: 800 }}>{decimal(greeks[name], 4)}</div>
             </div>
-            {limitCheck.breaches && limitCheck.breaches.length > 0 && (
-              <div className="mt-2">
-                <div className="text-red-400 font-bold">Breaches:</div>
-                {limitCheck.breaches.map((b: any, idx: number) => (
-                  <div key={idx} className="text-sm">
-                    {b.limit}: {b.value} (Limit: {b.limit_value})
-                  </div>
-                ))}
-              </div>
-            )}
-            {limitCheck.warnings && limitCheck.warnings.length > 0 && (
-              <div className="mt-2">
-                <div className="text-yellow-400 font-bold">Warnings:</div>
-                {limitCheck.warnings.map((w: any, idx: number) => (
-                  <div key={idx} className="text-sm">
-                    {w.limit}: {w.value} (Limit: {w.limit_value})
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          ))}
         </div>
-      )}
+      </div>
 
-      {/* Underlying Exposures */}
-      {riskMetrics.underlying_exposures && Object.keys(riskMetrics.underlying_exposures).length > 0 && (
-        <div className="bg-gray-800 p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-4">Exposure by Underlying</h3>
-          <div className="space-y-2">
-            {Object.entries(riskMetrics.underlying_exposures).map(([underlying, exposure]: [string, any]) => (
-              <div key={underlying} className="flex justify-between">
-                <span>{underlying}</span>
-                <span className="font-bold">₹{exposure.toFixed(2)}</span>
+      {Object.keys(exposures).length > 0 && (
+        <div className="card" style={{ padding: '16px' }}>
+          <h3 style={{ margin: '0 0 12px', fontSize: '14px' }}>Exposure by Underlying</h3>
+          <div style={{ display: 'grid', gap: '8px' }}>
+            {Object.entries(exposures).map(([underlying, exposure]) => (
+              <div key={underlying} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                <span>{underlying}</span><span className="num">{money(exposure)}</span>
               </div>
             ))}
           </div>

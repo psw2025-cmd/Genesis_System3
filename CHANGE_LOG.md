@@ -1233,3 +1233,4 @@ Verification with local `REQUIRE_API_KEY=true`:
 
 
 
+[2026-08-13 21:45 IST] [Codex] DECISION: Repair public Risk & Scenarios UI by removing the anonymous POST to `/api/risk/check-limits` and its five-second retry storm. Consume the existing read-only portfolio-risk GET, retain SSOT state as partial fallback, show explicit unavailable/pending truth, and remove hard-coded factor/scenario claims. Improve Options Intelligence only with existing store/navigation primitives: symbol selection, source/status truth, zero-safe metric rendering, and a path to the full chain. No trading or mutation authority changes.
