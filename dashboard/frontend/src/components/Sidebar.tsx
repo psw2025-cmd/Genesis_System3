@@ -41,111 +41,152 @@ const GROUP_LABELS: Record<string, string> = {
   system:   'System',
 }
 
+const MOBILE_NAV_CSS = `
+@media (max-width: 767px) {
+  [data-dashboard-navigation="sidebar"] {
+    width: 58px !important;
+    padding: 8px 5px !important;
+    gap: 5px !important;
+  }
+  [data-dashboard-navigation="sidebar"] [data-dashboard-group-label],
+  [data-dashboard-navigation="sidebar"] [data-dashboard-tab-label-text],
+  [data-dashboard-navigation="sidebar"] [data-dashboard-tab-meta] {
+    display: none !important;
+  }
+  [data-dashboard-navigation="sidebar"] [data-dashboard-tab] {
+    justify-content: center !important;
+    gap: 0 !important;
+    min-height: 40px !important;
+    padding: 8px 6px !important;
+  }
+  [data-dashboard-navigation="sidebar"] [data-dashboard-group] {
+    gap: 2px !important;
+  }
+}
+`
+
 export function Sidebar() {
   const { activeTab, setActiveTab, marketOpen, brokerConnected } = useStore()
 
   const groups = ['main', 'market', 'trading', 'analysis', 'system']
 
   return (
-    <nav
-      aria-label="Dashboard navigation"
-      data-dashboard-navigation="sidebar"
-      style={{
-        width: '190px',
-        background: 'var(--surface-2)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        overflowY: 'auto',
-        overflowX: 'hidden',
-        flexShrink: 0,
-        padding: '10px 8px',
-        gap: '8px',
-      }}
-    >
-      {groups.map(group => {
-        const groupTabs = DASHBOARD_TABS.filter(t => t.group === group)
-        return (
-          <div key={group} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
-            <div style={{
-              color: 'var(--text-mut)',
-              fontSize: '10px',
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              padding: '8px 10px 4px',
-            }}>
-              {GROUP_LABELS[group]}
+    <>
+      <style>{MOBILE_NAV_CSS}</style>
+      <nav
+        aria-label="Dashboard navigation"
+        data-dashboard-navigation="sidebar"
+        data-dashboard-responsive="desktop-labels-mobile-icon-rail"
+        style={{
+          width: '190px',
+          background: 'var(--surface-2)',
+          borderRight: '1px solid var(--border)',
+          display: 'flex',
+          flexDirection: 'column',
+          overflowY: 'auto',
+          overflowX: 'hidden',
+          flexShrink: 0,
+          padding: '10px 8px',
+          gap: '8px',
+        }}
+      >
+        {groups.map(group => {
+          const groupTabs = DASHBOARD_TABS.filter(t => t.group === group)
+          return (
+            <div
+              key={group}
+              data-dashboard-group={group}
+              style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}
+            >
+              <div
+                data-dashboard-group-label={group}
+                style={{
+                  color: 'var(--text-mut)',
+                  fontSize: '10px',
+                  fontWeight: 700,
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  padding: '8px 10px 4px',
+                }}
+              >
+                {GROUP_LABELS[group]}
+              </div>
+              {groupTabs.map(({ id, label, Icon }) => {
+                const active = activeTab === id
+                const isGenesis = id === 'genesis'
+                const isProof = id === 'e2e-proof'
+                const isTruth = id === 'truth'
+                const isSim = id === 'sim-live'
+                const highlight = isGenesis || isProof || isTruth || isSim
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setActiveTab(id)}
+                    title={label}
+                    aria-label={label}
+                    aria-current={active ? 'page' : undefined}
+                    data-dashboard-tab={id}
+                    data-dashboard-tab-label={label}
+                    style={{
+                      width: '100%',
+                      minHeight: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      border: active ? '1px solid var(--accent)' : '1px solid transparent',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      background: active ? 'var(--surface-3)' : highlight ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                      transition: 'all 0.12s',
+                      position: 'relative',
+                      color: active ? 'var(--text-pri)' : 'var(--text-sec)',
+                      padding: '7px 10px',
+                      textAlign: 'left',
+                    }}
+                  >
+                    <Icon
+                      size={15}
+                      color={active || highlight ? 'var(--accent)' : 'var(--text-mut)'}
+                      style={{ flexShrink: 0 }}
+                    />
+                    <span
+                      data-dashboard-tab-label-text
+                      style={{
+                        fontSize: '12px',
+                        fontWeight: active || highlight ? 700 : 500,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        color: 'inherit',
+                      }}
+                    >
+                      {label}
+                    </span>
+                    {id === 'broker' && (
+                      <span
+                        data-dashboard-tab-meta
+                        style={{
+                          marginLeft: 'auto',
+                          width: '7px', height: '7px', borderRadius: '50%',
+                          background: brokerConnected ? 'var(--up)' : 'var(--down)',
+                        }}
+                      />
+                    )}
+                    {id === 'truth' && <span data-dashboard-tab-meta style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}
+                    {id === 'e2e-proof' && <span data-dashboard-tab-meta style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>PROOF</span>}
+                    {id === 'sim-live' && <span data-dashboard-tab-meta style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>SIM</span>}
+                    {id === 'gates' && <span data-dashboard-tab-meta style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>LOCK</span>}
+                    {['chain', 'signals', 'trade'].includes(id) && !marketOpen && (
+                      <span data-dashboard-tab-meta style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--amber)' }}>POLL</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
-            {groupTabs.map(({ id, label, Icon }) => {
-              const active = activeTab === id
-              const isGenesis = id === 'genesis'
-              const isProof = id === 'e2e-proof'
-              const isTruth = id === 'truth'
-              const isSim = id === 'sim-live'
-              const highlight = isGenesis || isProof || isTruth || isSim
-              return (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => setActiveTab(id)}
-                  title={label}
-                  aria-label={label}
-                  aria-current={active ? 'page' : undefined}
-                  data-dashboard-tab={id}
-                  data-dashboard-tab-label={label}
-                  style={{
-                    width: '100%',
-                    minHeight: '36px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    border: active ? '1px solid var(--accent)' : '1px solid transparent',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    background: active ? 'var(--surface-3)' : highlight ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
-                    transition: 'all 0.12s',
-                    position: 'relative',
-                    color: active ? 'var(--text-pri)' : 'var(--text-sec)',
-                    padding: '7px 10px',
-                    textAlign: 'left',
-                  }}
-                >
-                  <Icon
-                    size={15}
-                    color={active || highlight ? 'var(--accent)' : 'var(--text-mut)'}
-                    style={{ flexShrink: 0 }}
-                  />
-                  <span style={{
-                    fontSize: '12px',
-                    fontWeight: active || highlight ? 700 : 500,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    color: 'inherit',
-                  }}>
-                    {label}
-                  </span>
-                  {id === 'broker' && (
-                    <span style={{
-                      marginLeft: 'auto',
-                      width: '7px', height: '7px', borderRadius: '50%',
-                      background: brokerConnected ? 'var(--up)' : 'var(--down)',
-                    }} />
-                  )}
-                  {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}
-                  {id === 'e2e-proof' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>PROOF</span>}
-                  {id === 'sim-live' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>SIM</span>}
-                  {id === 'gates' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>LOCK</span>}
-                  {['chain', 'signals', 'trade'].includes(id) && !marketOpen && (
-                    <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--amber)' }}>POLL</span>
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        )
-      })}
-    </nav>
+          )
+        })}
+      </nav>
+    </>
   )
 }
