@@ -35,7 +35,7 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, paper, health, connectionHealth, error } = useStore()
+  const { autoGates, brokerConnected, health, connectionHealth, error } = useStore()
   
   // ═══════════════════════════════════════════════════════════
   // System Health Indicators
@@ -57,7 +57,7 @@ function ProductionProofBar() {
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const wsLabel = wsConnected ? `WS OK ${connectionHealth?.latency ?? 0}ms` : 'WS RECONNECTING'
   
-  const proofItems: Array<[string, string, boolean, string]> = [
+  const proofItems: Array<[string, string, boolean]> = [
     ['SYSTEM', 'v2.0', !error],
     ['STORE', 'UNIFIED', true],
     ['WS', wsLabel, wsConnected],
@@ -71,7 +71,7 @@ function ProductionProofBar() {
     <div
       data-testid="production-proof-bar"
       aria-label="Production proof status"
-      title="🟢 GENESIS SYSTEM 3 V2.0 - Production Grade"
+      title="GENESIS SYSTEM 3 V2.0 — Guarded PAPER / read-only production UI"
       style={{
         flexShrink: 0,
         display: 'flex',
@@ -93,7 +93,7 @@ function ProductionProofBar() {
         whiteSpace: 'nowrap',
       }}>≣ GENESIS v2.0</span>
       
-      {proofItems.map(([label, value, safe, _]) => (
+      {proofItems.map(([label, value, safe]) => (
         <div
           key={label}
           style={{
@@ -108,7 +108,6 @@ function ProductionProofBar() {
             boxShadow: safe ? '0 0 8px rgba(34,197,94,.15)' : 'none',
           }}
         >
-          {/* Status dot */}
           <div style={{
             width: '6px',
             height: '6px',
@@ -117,7 +116,6 @@ function ProductionProofBar() {
             boxShadow: safe ? '0 0 4px rgba(34,197,94,0.8)' : '0 0 4px rgba(239,68,68,0.8)',
             animation: safe ? 'none' : 'pulse 2s infinite',
           }} />
-          
           <span style={{
             color: 'rgba(200,220,255,0.8)',
             fontSize: '9px',
@@ -196,9 +194,18 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const { health, paper, brokerStatus, chain } = useStore()
+  const requiredChainsSettled = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
+    .every((symbol) => Boolean(chain?.[symbol]))
+  const dashboardHydrated = Boolean(health && paper && brokerStatus && requiredChainsSettled)
+
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
-                  background: 'var(--surface)', overflow: 'hidden' }}>
+    <div
+      data-dashboard-hydrated={dashboardHydrated ? 'ready' : 'loading'}
+      data-dashboard-mode="paper-readonly"
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column',
+               background: 'var(--surface)', overflow: 'hidden' }}
+    >
       <DashboardTabUrlSync />
       <TopBar />
       <ProductionProofBar />
