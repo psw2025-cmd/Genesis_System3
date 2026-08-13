@@ -12,6 +12,8 @@ from datetime import datetime, timedelta, timezone
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
+import logging
+logger = logging.getLogger(__name__)
 
 INDEX_SEGMENTS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 

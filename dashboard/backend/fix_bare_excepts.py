@@ -6,6 +6,8 @@ Replace with specific exception handling
 
 import re
 from pathlib import Path
+import logging
+logger = logging.getLogger(__name__)
 
 app_file = Path("app.py")
 content = app_file.read_text()

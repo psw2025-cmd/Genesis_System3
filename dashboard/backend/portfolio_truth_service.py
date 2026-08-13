@@ -13,6 +13,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from core.brokers.dhan.nse_option_symbol import enrich_option_row, enrich_option_rows
+import logging
+logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 

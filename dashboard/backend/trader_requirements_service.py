@@ -6,6 +6,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict
+import logging
+logger = logging.getLogger(__name__)
 
 
 def _status_from_field(field: Dict[str, Any]) -> str:

@@ -8045,6 +8045,24 @@ async def get_core_pipeline_v8_status():
 from collections import defaultdict, deque
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+import asyncio
+from functools import wraps
+
+async def with_retry(coro, max_retries=3, timeout=30):
+    """Retry async operations with timeout"""
+    for attempt in range(max_retries):
+        try:
+            return await asyncio.wait_for(coro, timeout=timeout)
+        except asyncio.TimeoutError:
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(2 ** attempt)
+        except Exception:
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(1)
+
+
 def validate_params(params: dict, required: list = None, types: dict = None) -> tuple[bool, str]:
     """Validate request parameters"""
     if required:

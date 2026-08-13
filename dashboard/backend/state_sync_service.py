@@ -13,6 +13,8 @@ from typing import Any, Dict, Optional
 import pytz
 
 from broker_alert_deduplicator import process_broker_alert
+import logging
+logger = logging.getLogger(__name__)
 
 IST = pytz.timezone("Asia/Kolkata")
 
