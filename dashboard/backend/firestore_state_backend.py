@@ -377,6 +377,7 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
     expected_contract = {
         "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast", "0 4 * * MON-FRI", "UTC", 98),
         "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
+        "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate", "5 10 * * MON-FRI", "UTC", 98),
         "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
         "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata", 26),
         "genesis-system3-forecast-schedule": ("PAUSED", None, "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
@@ -384,6 +385,11 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         "genesis-system3-signals-schedule": ("PAUSED", None, "0 10 * * 1-5", "UTC", None),
         "genesis-system3-scheduler-collector-every-minute": ("ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC", 1),
     }
+    expected_total = len(expected_contract)
+    expected_enabled = sum(1 for row in expected_contract.values() if row[0] == "ENABLED")
+    expected_paused = sum(1 for row in expected_contract.values() if row[0] == "PAUSED")
+    expected_control = 1
+    expected_workload = expected_total - expected_control
     resources = evidence.get("resources") if isinstance(evidence.get("resources"), list) else []
     names = [row.get("name") for row in resources if isinstance(row, dict)]
     if len(names) != len(set(names)):
@@ -395,8 +401,18 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
     paused = [row for row in resources if row.get("state") == "PAUSED"]
     workload = [row for row in resources if row.get("name") != "genesis-system3-scheduler-collector-every-minute"]
     control = [row for row in resources if row.get("name") == "genesis-system3-scheduler-collector-every-minute"]
-    if len(resources) != 8 or len(workload) != 7 or len(control) != 1 or len(enabled) != 5 or len(paused) != 3:
-        reasons.append(f"scheduler coverage mismatch: workload={len(workload)} control={len(control)} total={len(resources)} enabled={len(enabled)} paused={len(paused)} expected=7/1/8/5/3")
+    if (
+        len(resources) != expected_total
+        or len(workload) != expected_workload
+        or len(control) != expected_control
+        or len(enabled) != expected_enabled
+        or len(paused) != expected_paused
+    ):
+        reasons.append(
+            f"scheduler coverage mismatch: workload={len(workload)} control={len(control)} total={len(resources)} "
+            f"enabled={len(enabled)} paused={len(paused)} "
+            f"expected={expected_workload}/{expected_control}/{expected_total}/{expected_enabled}/{expected_paused}"
+        )
     for row in resources:
         expected = expected_contract.get(row.get("name"))
         actual = (row.get("state"), row.get("target_job") if row.get("state") == "ENABLED" else None, row.get("schedule"), row.get("time_zone"))
@@ -407,7 +423,9 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
                 reasons.append(f"scheduler target type invalid: {row.get('name')}")
             if row.get("target_uri_valid") is not True:
                 reasons.append(f"scheduler target URI invalid: {row.get('name')}")
-            if int(row.get("delivery_status_code", 0) or 0) != 0:
+            delivery_code = int(row.get("delivery_status_code", 0) or 0)
+            # Cloud Scheduler uses code=-1 before the first delivery attempt.
+            if delivery_code != 0 and not (delivery_code == -1 and not row.get("last_attempt_time")):
                 reasons.append(f"scheduler delivery failed: {row.get('name')} code={row.get('delivery_status_code')}")
     job_rows = evidence.get("jobs") if isinstance(evidence.get("jobs"), list) else []
     job_names = [row.get("name") for row in job_rows if isinstance(row, dict)]
@@ -419,27 +437,50 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         fact = jobs.get(target)
         if not fact:
             reasons.append(f"enabled scheduler target missing: {target}")
-        elif fact.get("completion_status") != "EXECUTION_SUCCEEDED":
-            reasons.append(f"enabled scheduler target failed: {target}={fact.get('completion_status') or 'UNKNOWN'}")
-        else:
-            try:
-                if not resource.get("last_attempt_time") or not fact.get("create_time") or not fact.get("completion_time"):
+            continue
+        status = fact.get("completion_status") or "UNKNOWN"
+        pending_first = status in {"MISSING", "UNKNOWN"} and not resource.get("last_attempt_time")
+        if status != "EXECUTION_SUCCEEDED":
+            if pending_first:
+                # New ENABLEDs (e.g. validate-daily) are healthy until first cron window.
+                continue
+            reasons.append(f"enabled scheduler target failed: {target}={status}")
+            continue
+        try:
+            if not fact.get("create_time") or not fact.get("completion_time"):
+                raise ValueError("missing required timestamps")
+            created = FirestoreSchedulerEvidenceBackend._parse_utc(fact["create_time"])
+            completed = FirestoreSchedulerEvidenceBackend._parse_utc(fact["completion_time"])
+            max_age_hours = expected_contract[resource["name"]][4]
+            historical = fact.get("evidence_role") == "last_succeeded_within_history"
+            if completed > now.replace(microsecond=0) or created > now.replace(microsecond=0):
+                reasons.append(f"scheduler/execution timestamp materially future: {target}")
+            elif resource["name"] == "genesis-system3-scheduler-collector-every-minute":
+                attempt_raw = resource.get("last_attempt_time")
+                if not attempt_raw:
+                    raise ValueError("missing required timestamps")
+                attempt = FirestoreSchedulerEvidenceBackend._parse_utc(attempt_raw)
+                if attempt > now.replace(microsecond=0):
+                    reasons.append(f"scheduler/execution timestamp materially future: {target}")
+                elif completed < created or (now - attempt).total_seconds() > 180 or (now - completed).total_seconds() > 300:
+                    reasons.append("collector control continuity stale")
+            elif historical:
+                # Prefer last successful execution within cadence grace instead of
+                # waiting for the next market-day window after a failed attempt.
+                if max_age_hours is not None and (now - completed).total_seconds() > max_age_hours * 3600:
+                    reasons.append(f"enabled scheduler execution stale beyond cadence grace: {target}")
+            else:
+                if not resource.get("last_attempt_time"):
                     raise ValueError("missing required timestamps")
                 attempt = FirestoreSchedulerEvidenceBackend._parse_utc(resource["last_attempt_time"])
-                created = FirestoreSchedulerEvidenceBackend._parse_utc(fact["create_time"])
-                completed = FirestoreSchedulerEvidenceBackend._parse_utc(fact["completion_time"])
-                max_age_hours = expected_contract[resource["name"]][4]
-                if attempt > now.replace(microsecond=0) or completed > now.replace(microsecond=0):
+                if attempt > now.replace(microsecond=0):
                     reasons.append(f"scheduler/execution timestamp materially future: {target}")
-                elif resource["name"] == "genesis-system3-scheduler-collector-every-minute":
-                    if completed < created or (now - attempt).total_seconds() > 180 or (now - completed).total_seconds() > 300:
-                        reasons.append("collector control continuity stale")
                 elif created < attempt or completed < created:
                     reasons.append(f"latest execution not linked to scheduler attempt: {target}")
                 elif max_age_hours is not None and ((now - attempt).total_seconds() > max_age_hours * 3600 or (now - completed).total_seconds() > max_age_hours * 3600):
                     reasons.append(f"enabled scheduler execution stale beyond cadence grace: {target}")
-            except Exception:
-                reasons.append(f"scheduler/execution timestamps invalid: {target}")
+        except Exception:
+            reasons.append(f"scheduler/execution timestamps invalid: {target}")
     readiness_reasons = []
     artifact_rows = evidence.get("artifacts") if isinstance(evidence.get("artifacts"), list) else []
     lane_names = [row.get("lane") for row in artifact_rows if isinstance(row, dict)]
@@ -473,5 +514,12 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         "resources": resources,
         "jobs": list(jobs.values()),
         "artifacts": artifact_rows,
-        "coverage": {"workload": len(workload), "control": len(control), "total": len(resources), "enabled": len(enabled), "paused": len(paused), "expected_total": 8},
+        "coverage": {
+            "workload": len(workload),
+            "control": len(control),
+            "total": len(resources),
+            "enabled": len(enabled),
+            "paused": len(paused),
+            "expected_total": expected_total,
+        },
     }

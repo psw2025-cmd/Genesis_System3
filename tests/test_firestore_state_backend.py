@@ -214,26 +214,63 @@ def test_business_artifact_is_hashed_durable_and_idempotent():
 
 def test_derived_scheduler_health_fails_enabled_job_failure_and_coverage():
     now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
-    contracts = [("genesis-system3-forecast-daily", "ENABLED", "genesis-system3-forecast", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-rank-daily", "ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-signals-daily", "ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC"), ("genesis-system3-dhan-token-rotate-daily", "ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata"), ("genesis-system3-forecast-schedule", "PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC"), ("genesis-system3-rank-schedule", "PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC"), ("genesis-system3-signals-schedule", "PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC")]
-    contracts[0] = (*contracts[0][:3], "0 4 * * MON-FRI", "UTC")
-    contracts.append(("genesis-system3-scheduler-collector-every-minute", "ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC"))
-    resources = [{"name": n, "state": s, "target_job": t, "schedule": schedule, "time_zone": zone, "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:58:00Z"} for n, s, t, schedule, zone in contracts]
-    jobs = [{"name": t, "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"} for t in sorted({row[2] for row in contracts})]
+    contracts = [
+        ("genesis-system3-forecast-daily", "ENABLED", "genesis-system3-forecast", "0 4 * * MON-FRI", "UTC"),
+        ("genesis-system3-rank-daily", "ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC"),
+        ("genesis-system3-validate-daily", "ENABLED", "genesis-system3-validate", "5 10 * * MON-FRI", "UTC"),
+        ("genesis-system3-signals-daily", "ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC"),
+        ("genesis-system3-dhan-token-rotate-daily", "ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata"),
+        ("genesis-system3-forecast-schedule", "PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC"),
+        ("genesis-system3-rank-schedule", "PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC"),
+        ("genesis-system3-signals-schedule", "PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC"),
+        ("genesis-system3-scheduler-collector-every-minute", "ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC"),
+    ]
+    resources = [{"name": n, "state": s, "target_job": t if s == "ENABLED" else None, "schedule": schedule, "time_zone": zone, "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:58:00Z"} for n, s, t, schedule, zone in contracts]
+    jobs = [{"name": t, "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"} for t in sorted({row[2] for row in contracts if row[1] == "ENABLED"})]
     good = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
     assert good["healthy"] is True
-    jobs[2]["completion_status"] = "EXECUTION_FAILED"
+    assert good["coverage"]["expected_total"] == 9
+    rank_job = next(row for row in jobs if row["name"] == "genesis-system3-rank")
+    rank_res = next(row for row in resources if row["name"] == "genesis-system3-rank-daily")
+    rank_job["completion_status"] = "EXECUTION_FAILED"
     bad = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
     assert bad["healthy"] is False and "failed" in " ".join(bad["unhealthy_reasons"])
-    jobs[2]["completion_status"] = "EXECUTION_SUCCEEDED"; jobs[2]["create_time"] = None
+    rank_job["completion_status"] = "EXECUTION_SUCCEEDED"; rank_job["create_time"] = None
     missing_time = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
     assert missing_time["healthy"] is False and "timestamps invalid" in " ".join(missing_time["unhealthy_reasons"])
 
-    jobs[2]["create_time"] = "2026-08-14T01:02:00Z"; jobs[2]["completion_time"] = "2026-08-14T01:03:00Z"
+    rank_job["create_time"] = "2026-08-14T01:02:00Z"; rank_job["completion_time"] = "2026-08-14T01:03:00Z"
     future = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
     assert "materially future" in " ".join(future["unhealthy_reasons"])
-    jobs[2]["create_time"] = "2026-08-09T00:58:01Z"; jobs[2]["completion_time"] = "2026-08-09T00:59:00Z"; resources[2]["last_attempt_time"] = "2026-08-09T00:58:00Z"
+    rank_job["create_time"] = "2026-08-09T00:58:01Z"; rank_job["completion_time"] = "2026-08-09T00:59:00Z"; rank_res["last_attempt_time"] = "2026-08-09T00:58:00Z"
     stale = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
     assert "stale beyond cadence" in " ".join(stale["unhealthy_reasons"])
+
+
+def test_derived_health_allows_pending_first_run_and_historical_success():
+    now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
+    resources = [
+        {"name": "genesis-system3-forecast-daily", "state": "ENABLED", "target_job": "genesis-system3-forecast", "schedule": "0 4 * * MON-FRI", "time_zone": "UTC", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-13T04:00:00Z"},
+        {"name": "genesis-system3-rank-daily", "state": "ENABLED", "target_job": "genesis-system3-rank", "schedule": "45 3 * * MON-FRI", "time_zone": "UTC", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-13T03:45:00Z"},
+        {"name": "genesis-system3-validate-daily", "state": "ENABLED", "target_job": "genesis-system3-validate", "schedule": "5 10 * * MON-FRI", "time_zone": "UTC", "target_type": "http", "target_uri_valid": True, "delivery_status_code": -1, "last_attempt_time": None},
+        {"name": "genesis-system3-signals-daily", "state": "ENABLED", "target_job": "genesis-system3-signals", "schedule": "15 13 * * MON-FRI", "time_zone": "UTC", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-13T13:15:00Z"},
+        {"name": "genesis-system3-dhan-token-rotate-daily", "state": "ENABLED", "target_job": "genesis-system3-dhan-token-rotate", "schedule": "30 7 * * *", "time_zone": "Asia/Kolkata", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:58:00Z"},
+        {"name": "genesis-system3-forecast-schedule", "state": "PAUSED", "target_job": None, "schedule": "0 4,5,6,7,8,9 * * 1-5", "time_zone": "UTC", "target_type": "missing", "target_uri_valid": False},
+        {"name": "genesis-system3-rank-schedule", "state": "PAUSED", "target_job": None, "schedule": "50 3 * * 1-5", "time_zone": "UTC", "target_type": "missing", "target_uri_valid": False},
+        {"name": "genesis-system3-signals-schedule", "state": "PAUSED", "target_job": None, "schedule": "0 10 * * 1-5", "time_zone": "UTC", "target_type": "missing", "target_uri_valid": False},
+        {"name": "genesis-system3-scheduler-collector-every-minute", "state": "ENABLED", "target_job": "genesis-system3-scheduler-collector", "schedule": "* * * * *", "time_zone": "UTC", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:59:00Z"},
+    ]
+    jobs = [
+        {"name": "genesis-system3-forecast", "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-13T22:00:00Z", "completion_time": "2026-08-13T22:01:00Z", "evidence_role": "last_succeeded_within_history"},
+        {"name": "genesis-system3-rank", "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-13T22:00:00Z", "completion_time": "2026-08-13T22:01:00Z", "evidence_role": "last_succeeded_within_history"},
+        {"name": "genesis-system3-validate", "completion_status": "MISSING"},
+        {"name": "genesis-system3-signals", "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-13T22:00:00Z", "completion_time": "2026-08-13T22:01:00Z", "evidence_role": "last_succeeded_within_history"},
+        {"name": "genesis-system3-dhan-token-rotate", "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"},
+        {"name": "genesis-system3-scheduler-collector", "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"},
+    ]
+    result = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert result["healthy"] is True
+    assert result["coverage"]["total"] == 9
 
 
 def test_derived_health_rejects_duplicate_and_swapped_target():

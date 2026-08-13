@@ -117,11 +117,54 @@ def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
     jobs = []
     targets = sorted({target for _, target in _EXPECTED_SCHEDULERS.values()})
     by_job = {str(row.get("name", "")).rsplit("/", 1)[-1]: row for row in run_rows}
-    for name in targets:
+
+    def _completion_key(row: Dict[str, Any]):
+        try:
+            return datetime.fromisoformat(str(row["completionTime"]).replace("Z", "+00:00"))
+        except Exception:
+            return datetime.min.replace(tzinfo=timezone.utc)
+
+    def _row_succeeded(row: Dict[str, Any]) -> bool:
+        return int(row.get("succeededCount", 0) or 0) >= int(row.get("taskCount", 1) or 1)
+
+    def _job_fact_from_latest(name: str) -> Dict[str, Any]:
         latest = (by_job.get(name, {}).get("latestCreatedExecution") or {})
-        jobs.append({"name": name, "execution": str(latest.get("name", "")).rsplit("/", 1)[-1] or None, "completion_status": latest.get("completionStatus") or "MISSING", "create_time": latest.get("createTime"), "completion_time": latest.get("completionTime")})
+        return {
+            "name": name,
+            "execution": str(latest.get("name", "")).rsplit("/", 1)[-1] or None,
+            "completion_status": latest.get("completionStatus") or "MISSING",
+            "create_time": latest.get("createTime"),
+            "completion_time": latest.get("completionTime"),
+            "evidence_role": "latest_created_execution",
+        }
+
+    def _prefer_last_succeeded(name: str, fallback: Dict[str, Any]) -> Dict[str, Any]:
+        if fallback.get("completion_status") == "EXECUTION_SUCCEEDED":
+            return fallback
+        try:
+            history = pages(f"{run_url}/{name}/executions", "executions")
+        except Exception:
+            return fallback
+        succeeded = [row for row in history if row.get("completionTime") and _row_succeeded(row)]
+        if not succeeded:
+            return fallback
+        succeeded.sort(key=_completion_key, reverse=True)
+        row = succeeded[0]
+        return {
+            "name": name,
+            "execution": str(row.get("name", "")).rsplit("/", 1)[-1] or None,
+            "completion_status": "EXECUTION_SUCCEEDED",
+            "create_time": row.get("createTime"),
+            "completion_time": row.get("completionTime"),
+            "evidence_role": "last_succeeded_within_history",
+            "latest_completion_status": fallback.get("completion_status"),
+        }
+
+    for name in targets:
+        jobs.append(_prefer_last_succeeded(name, _job_fact_from_latest(name)))
     # The collector is currently running, so job.latestCreatedExecution points
-    # at itself and cannot prove completion. Use the newest PRIOR completed run.
+    # at itself and cannot prove completion. Use the newest PRIOR completed run,
+    # preferring a succeeded prior so one lease collision does not poison health.
     executions_url = f"{run_url}/genesis-system3-scheduler-collector/executions"
     prior = []
     try:
@@ -130,21 +173,26 @@ def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
         prior = []
     current_execution = os.environ.get("CLOUD_RUN_EXECUTION", "")
     completed_prior = [row for row in prior if row.get("completionTime") and str(row.get("name", "")).rsplit("/", 1)[-1] != current_execution]
-    def _completion_key(row):
-        try:
-            return datetime.fromisoformat(str(row["completionTime"]).replace("Z", "+00:00"))
-        except Exception:
-            return datetime.min.replace(tzinfo=timezone.utc)
     completed_prior.sort(key=_completion_key, reverse=True)
-    if completed_prior:
-        row = completed_prior[0]
-        succeeded = int(row.get("succeededCount", 0) or 0) >= int(row.get("taskCount", 1) or 1)
-        replacement = {"name": "genesis-system3-scheduler-collector", "execution": str(row.get("name", "")).rsplit("/", 1)[-1], "completion_status": "EXECUTION_SUCCEEDED" if succeeded else "EXECUTION_FAILED", "create_time": row.get("createTime"), "completion_time": row.get("completionTime"), "evidence_role": "prior_completed_execution"}
+    succeeded_prior = [row for row in completed_prior if _row_succeeded(row)]
+    pick = succeeded_prior[0] if succeeded_prior else (completed_prior[0] if completed_prior else None)
+    if pick is not None:
+        succeeded = _row_succeeded(pick)
+        replacement = {
+            "name": "genesis-system3-scheduler-collector",
+            "execution": str(pick.get("name", "")).rsplit("/", 1)[-1],
+            "completion_status": "EXECUTION_SUCCEEDED" if succeeded else "EXECUTION_FAILED",
+            "create_time": pick.get("createTime"),
+            "completion_time": pick.get("completionTime"),
+            "evidence_role": "prior_succeeded_execution" if succeeded_prior else "prior_completed_execution",
+        }
         jobs = [replacement if fact.get("name") == "genesis-system3-scheduler-collector" else fact for fact in jobs]
     return {"schema_version": 1, "observed_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"), "resources": resources, "jobs": jobs, "artifacts": [], "summary": {"source": "google_cloud_control_plane", "live_trading_enabled": False}}
 
 
 def _run_scheduler_collector() -> Dict[str, Any]:
+    import time
+
     from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
     owner = os.environ.get("CLOUD_RUN_EXECUTION", "").strip()
     if not owner:
@@ -158,11 +206,23 @@ def _run_scheduler_collector() -> Dict[str, Any]:
             artifact = None
         if artifact:
             facts["artifacts"].append(artifact)
-    lease = backend.acquire_lease(owner, 120)
+    # Minute cadence overlaps; lease TTL must stay under 60s and collisions must
+    # not mark the control plane EXECUTION_FAILED (that poisoned Auto Deploy).
+    lease = {"acquired": False}
+    for _ in range(8):
+        lease = backend.acquire_lease(owner, 45)
+        if lease.get("acquired"):
+            break
+        time.sleep(2)
     if not lease.get("acquired"):
-        raise RuntimeError("scheduler collector lease held by another execution")
+        return {
+            **_base_result("scheduler-collector"),
+            "status": "SKIPPED",
+            "reason_code": "LEASE_HELD",
+            "detail": "Another collector holds the publish fence; skipping without failing control plane",
+            "lease_owner": lease.get("owner"),
+        }
     return backend.publish(facts, owner=owner, fence=lease["fence"])
-
 
 def _business_context(lane: str) -> tuple[str, bool, str]:
     now_ist = datetime.now(ZoneInfo("Asia/Kolkata"))
