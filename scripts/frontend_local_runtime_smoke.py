@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
-"""Fail CI if the built dashboard compiles but cannot render in a real browser.
+"""Fail CI if the built System3 dashboard compiles but cannot render in Chrome.
 
-This is a local, read-only frontend smoke. It serves Vite's production build,
-opens every canonical dashboard tab with ChromeDriver, and proves the React root,
-SYSTEM3 marker, active-tab state, and public-readonly credential surface render.
-No backend, broker, paper-order, or mutation endpoint is required or called on
-purpose; API requests made by the UI resolve against the local preview server.
+Read-only analyzer/PAPER smoke: serve the Vite production build, mount the app once,
+then activate every canonical tab through the real sidebar. This avoids 22 full app
+remounts and the network/poller amplification they cause. No broker mutation or order
+endpoint is intentionally called.
 """
 from __future__ import annotations
 
 import base64
 import json
-import os
 import shutil
 import socket
 import subprocess
@@ -24,8 +22,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
 HOST = "127.0.0.1"
-PORT = 4173
-BASE_URL = f"http://{HOST}:{PORT}/ui/"
 
 TABS = [
     "decision-intel", "truth", "genesis", "e2e-proof", "overview", "sim-live",
@@ -41,19 +37,19 @@ def _free_port() -> int:
         return int(sock.getsockname()[1])
 
 
-def _wait_preview(proc: subprocess.Popen[str]) -> None:
-    deadline = time.monotonic() + 30
+def _wait_http(url: str, proc: subprocess.Popen[str], timeout_s: float = 20.0) -> None:
+    deadline = time.monotonic() + timeout_s
     while time.monotonic() < deadline:
         if proc.poll() is not None:
-            raise RuntimeError(f"vite_preview_exited:{proc.returncode}")
+            raise RuntimeError(f"process_exited:{proc.returncode}:{url}")
         try:
-            with urllib.request.urlopen(BASE_URL, timeout=2) as response:
+            with urllib.request.urlopen(url, timeout=2) as response:
                 if response.status == 200:
                     return
         except (urllib.error.URLError, TimeoutError):
             pass
-        time.sleep(0.25)
-    raise RuntimeError("vite_preview_start_timeout")
+        time.sleep(0.2)
+    raise RuntimeError(f"http_start_timeout:{url}")
 
 
 class Browser:
@@ -63,7 +59,7 @@ class Browser:
         self.proc: subprocess.Popen[str] | None = None
         self.session_id = ""
 
-    def _request(self, method: str, path: str, payload: dict | None = None, timeout: int = 20):
+    def _request(self, method: str, path: str, payload: dict | None = None, timeout: int = 10):
         data = None if payload is None else json.dumps(payload).encode("utf-8")
         request = urllib.request.Request(
             f"{self.base}{path}", data=data, method=method,
@@ -88,31 +84,24 @@ class Browser:
             [driver, f"--port={self.port}", f"--allowed-ips={HOST}"],
             text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
         )
-        deadline = time.monotonic() + 15
-        while time.monotonic() < deadline:
-            try:
-                with urllib.request.urlopen(f"{self.base}/status", timeout=2) as response:
-                    if response.status == 200:
-                        break
-            except (urllib.error.URLError, TimeoutError):
-                pass
-            time.sleep(0.2)
-        else:
-            raise RuntimeError("chromedriver_start_timeout")
-
+        _wait_http(f"{self.base}/status", self.proc, 15)
         value = self._request("POST", "/session", {
             "capabilities": {"alwaysMatch": {
                 "browserName": "chrome",
                 "pageLoadStrategy": "eager",
                 "goog:chromeOptions": {"args": [
                     "--headless=new", "--disable-gpu", "--no-sandbox",
-                    "--disable-dev-shm-usage", "--window-size=1600,1000",
+                    "--disable-dev-shm-usage", "--disable-background-networking",
+                    "--window-size=1600,1000",
                 ]},
             }}
-        })
+        }, timeout=15)
         if not isinstance(value, dict) or not value.get("sessionId"):
             raise RuntimeError("webdriver_session_missing")
         self.session_id = str(value["sessionId"])
+        self._request("POST", f"/session/{self.session_id}/timeouts", {
+            "implicit": 0, "pageLoad": 10000, "script": 5000,
+        })
         return self
 
     def __exit__(self, exc_type, exc, tb) -> None:
@@ -129,10 +118,26 @@ class Browser:
                 self.proc.kill()
 
     def navigate(self, url: str) -> None:
-        self._request("POST", f"/session/{self.session_id}/url", {"url": url}, timeout=30)
+        self._request("POST", f"/session/{self.session_id}/url", {"url": url}, timeout=12)
+
+    def _execute(self, script: str, args: list | None = None):
+        return self._request(
+            "POST", f"/session/{self.session_id}/execute/sync",
+            {"script": script, "args": args or []}, timeout=8,
+        )
+
+    def activate(self, tab_id: str) -> bool:
+        value = self._execute(r"""
+const id = arguments[0];
+const button = document.querySelector('[data-dashboard-tab="' + CSS.escape(id) + '"]');
+if (!button) return false;
+if (button.getAttribute('aria-current') !== 'page') button.click();
+return true;
+""", [tab_id])
+        return bool(value)
 
     def snapshot(self, tab_id: str) -> dict:
-        script = r"""
+        value = self._execute(r"""
 const id = arguments[0];
 const root = document.getElementById('root');
 const button = document.querySelector('[data-dashboard-tab="' + CSS.escape(id) + '"]');
@@ -145,17 +150,24 @@ return {
   keyPrompt: text.includes('DASHBOARD API KEY') || text.includes('ENTER API KEY'),
   bodyText: text.slice(0, 300),
 };
-"""
-        value = self._request(
-            "POST", f"/session/{self.session_id}/execute/sync",
-            {"script": script, "args": [tab_id]}, timeout=15,
-        )
+""", [tab_id])
         return value if isinstance(value, dict) else {}
 
     def screenshot(self, path: Path) -> None:
-        encoded = self._request("GET", f"/session/{self.session_id}/screenshot", timeout=20)
+        encoded = self._request("GET", f"/session/{self.session_id}/screenshot", timeout=10)
         if isinstance(encoded, str) and encoded:
             path.write_bytes(base64.b64decode(encoded))
+
+
+def _wait_tab(browser: Browser, tab_id: str, timeout_s: float = 3.0) -> dict:
+    deadline = time.monotonic() + timeout_s
+    snap: dict = {}
+    while time.monotonic() < deadline:
+        snap = browser.snapshot(tab_id)
+        if snap.get("rootChildren", 0) > 0 and snap.get("system3") and snap.get("active"):
+            return snap
+        time.sleep(0.15)
+    return snap
 
 
 def main() -> int:
@@ -163,25 +175,30 @@ def main() -> int:
         print("FAIL: Vite dist missing; run npm run build first", file=sys.stderr)
         return 2
 
+    preview_port = _free_port()
+    base_url = f"http://{HOST}:{preview_port}/ui/"
     preview = subprocess.Popen(
-        ["npm", "run", "preview", "--", "--host", HOST, "--port", str(PORT), "--strictPort"],
-        cwd=FRONTEND, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        ["npm", "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"],
+        cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
     )
     failures: list[str] = []
+    started = time.monotonic()
     try:
-        _wait_preview(preview)
+        _wait_http(base_url, preview, 20)
         with Browser() as browser:
-            for tab_id in TABS:
-                browser.navigate(f"{BASE_URL}?tab={tab_id}")
-                deadline = time.monotonic() + 8
-                snap: dict = {}
-                while time.monotonic() < deadline:
-                    snap = browser.snapshot(tab_id)
-                    if snap.get("rootChildren", 0) > 0 and snap.get("system3") and snap.get("active"):
-                        break
-                    time.sleep(0.25)
+            # One mount only. Subsequent tabs use the actual sidebar/store transition.
+            browser.navigate(base_url + "?tab=decision-intel")
+            first = _wait_tab(browser, "decision-intel", 5)
+            if first.get("rootChildren", 0) <= 0 or not first.get("system3"):
+                failures.append("initial_mount:react_root_or_system3_missing")
 
-                tab_failures = []
+            for tab_id in TABS:
+                if not browser.activate(tab_id):
+                    failures.append(f"{tab_id}:sidebar_button_missing")
+                    print("TAB_FAIL", tab_id, "sidebar_button_missing")
+                    continue
+                snap = _wait_tab(browser, tab_id, 3)
+                tab_failures: list[str] = []
                 if snap.get("rootChildren", 0) <= 0:
                     tab_failures.append("react_root_empty")
                 if not snap.get("system3"):
@@ -204,15 +221,12 @@ def main() -> int:
             preview.wait(timeout=5)
         except subprocess.TimeoutExpired:
             preview.kill()
-        if preview.stdout:
-            output = preview.stdout.read()
-            if output:
-                print("VITE_PREVIEW_LOG\n" + output[-4000:])
 
+    elapsed = round(time.monotonic() - started, 2)
     if failures:
-        print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), file=sys.stderr)
+        print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), f"elapsed_s={elapsed}", file=sys.stderr)
         return 1
-    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} live_trading_actions=0")
+    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} elapsed_s={elapsed} live_trading_actions=0")
     return 0
 
 
