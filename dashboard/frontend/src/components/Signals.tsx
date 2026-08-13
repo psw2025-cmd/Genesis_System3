@@ -159,7 +159,7 @@ export default function Signals() {
       ]
 
       const qcData = {
-        status: candidate ? 'PASS' : (state.qc?.status || 'PASS'),
+        status: candidate ? 'PASS' : (state.qc?.status || 'PENDING'),
         total_contracts: state.qc?.contracts_total || 0,
         underlyings: state.qc?.underlyings || scannerImplemented || 0,
         scanner_segments: `${scannerImplemented}/${scannerTotal || '-'}`,
