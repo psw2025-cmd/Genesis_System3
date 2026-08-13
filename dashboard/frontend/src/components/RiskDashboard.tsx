@@ -3,8 +3,8 @@ import axios from 'axios'
 import { API_BASE } from '../config'
 
 export default function RiskDashboard() {
-  const [riskMetrics, setRiskMetrics] = useState<any>(null)
-  const [limitCheck, setLimitCheck] = useState<any>(null)
+  const [riskMetrics, setRiskMetrics] = useState<unknown>(null)
+  const [limitCheck, setLimitCheck] = useState<unknown>(null)
 
   useEffect(() => {
     const fetchRiskData = async () => {

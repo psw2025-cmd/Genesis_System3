@@ -698,10 +698,14 @@ async def get_state_history(limit: int = 100):
             try:
                 data = json.loads(snapshot_file.read_text())
                 history.append(data)
-            except:
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.warning(f"Failed to parse snapshot {snapshot_file.name}: {e}")
+                continue
+            except Exception as e:
+                logger.warning(f"Failed to read snapshot {snapshot_file.name}: {e}")
                 continue
     except Exception as e:
-        print(f"Error reading state history: {e}")
+        logger.error(f"Error reading state history: {e}")
 
     return {"history": history, "count": len(history), "limit": limit}
 
@@ -1111,8 +1115,12 @@ async def get_broker_deps():
             result = subprocess.run([python_path, "-m", "pip", "freeze"], capture_output=True, text=True, timeout=5)
             if "dhanhq" in result.stdout.lower():
                 pip_freeze_hit = True
-        except:
-            pass
+        except subprocess.TimeoutExpired:
+            logger.warning("pip freeze timed out")
+        except (FileNotFoundError, OSError) as e:
+            logger.warning(f"Failed to run pip freeze: {e}")
+        except Exception as e:
+            logger.warning(f"Unexpected error running pip freeze: {e}")
 
         return {
             "dhanhq_installed": dhanhq_installed,
@@ -1165,7 +1173,10 @@ async def get_status():
             health_file = OUTPUTS_DIR / "health.json"
             if health_file.exists():
                 health_data = json.loads(health_file.read_text())
-        except:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            logger.warning(f'Error handled: {e}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}', exc_info=True)
             pass
 
         # Check data freshness
@@ -1178,7 +1189,10 @@ async def get_status():
                 age_seconds = time.time() - mtime
                 data_fresh = age_seconds < 300  # 5 minutes
                 last_update = datetime.fromtimestamp(mtime).isoformat()
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # Check market status
@@ -1188,7 +1202,10 @@ async def get_status():
             try:
                 market_status = get_market_status()
                 data_source = "synthetic" if not is_market_open() else "real"
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         return {
@@ -2347,7 +2364,10 @@ async def broadcast_update(file_path: str):
         for connection in active_connections:
             try:
                 await connection.send_json(message)
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 disconnected.append(connection)
         for conn in disconnected:
             active_connections.remove(conn)
@@ -3296,7 +3316,10 @@ async def get_qc():
         if MARKET_DETECTION_AVAILABLE:
             try:
                 market_is_open, _ = is_market_open()
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # REAL_ONLY MODE: Never use synthetic data
@@ -3742,7 +3765,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
         if MARKET_DETECTION_AVAILABLE:
             try:
                 market_is_open, reason = is_market_open()
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # REAL_ONLY MODE: Never use synthetic data
@@ -3777,7 +3803,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                                         break
                                 except (ValueError, TypeError):
                                     continue
-                    except:
+                    except (ValueError, TypeError, KeyError, AttributeError) as e:
+                        logger.warning(f'Error handled: {e}')
+                    except Exception as e:
+                        logger.error(f'Unexpected error: {e}', exc_info=True)
                         pass
 
                 # Generate synthetic chain data
@@ -4121,7 +4150,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     spot_vals = [float(row.get("spot_price", 0)) for row in filtered_rows if row.get("spot_price")]
                     if spot_vals:
                         spot = spot_vals[0]
-                except:
+                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                    logger.warning(f'Error handled: {e}')
+                except Exception as e:
+                    logger.error(f'Unexpected error: {e}', exc_info=True)
                     pass
 
             # Calculate PCR
@@ -4131,7 +4163,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     pe_oi = sum(float(row.get("oi", 0)) for row in filtered_rows if row.get("option_type") == "PE")
                     ce_oi = sum(float(row.get("oi", 0)) for row in filtered_rows if row.get("option_type") == "CE")
                     pcr = float(pe_oi / ce_oi) if ce_oi > 0 else 1.0
-                except:
+                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                    logger.warning(f'Error handled: {e}')
+                except Exception as e:
+                    logger.error(f'Unexpected error: {e}', exc_info=True)
                     pcr = 1.0
 
             # Calculate liquidity scores
@@ -4154,7 +4189,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                                 contract[key] = float(value)
                             else:
                                 contract[key] = int(value)
-                        except:
+                        except (ValueError, TypeError, KeyError, AttributeError) as e:
+                            logger.warning(f'Error handled: {e}')
+                        except Exception as e:
+                            logger.error(f'Unexpected error: {e}', exc_info=True)
                             contract[key] = value
                 contracts.append(contract)
 
@@ -4237,7 +4275,10 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 pe_oi = pd.to_numeric(pe_df["oi"], errors="coerce").sum() if len(pe_df) > 0 else 1
                 ce_oi = pd.to_numeric(ce_df["oi"], errors="coerce").sum() if len(ce_df) > 0 else 1
                 pcr = float(pe_oi / ce_oi) if ce_oi > 0 else 1.0
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pcr = 1.0
 
         # Calculate liquidity scores
@@ -4309,7 +4350,10 @@ async def get_top_signal():
         if MARKET_DETECTION_AVAILABLE:
             try:
                 market_is_open, _ = is_market_open()
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # REAL_ONLY MODE: Never use synthetic data
@@ -4431,7 +4475,10 @@ async def get_positions():
                     "open_count": health.get("current_positions", 0),
                     "message": "Using health.json data (positions file error)",
                 }
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
         return {"positions": [], "open_count": 0, "message": f"No position data available: {str(e)}"}
 
@@ -4512,7 +4559,10 @@ async def get_pnl():
                     elif isinstance(ts, (int, float)):
                         # Unix timestamp
                         processed_item["timestamp"] = datetime.fromtimestamp(ts, tz=IST).isoformat()
-                except:
+                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                    logger.warning(f'Error handled: {e}')
+                except Exception as e:
+                    logger.error(f'Unexpected error: {e}', exc_info=True)
                     # If parsing fails, add current timestamp
                     processed_item["timestamp"] = datetime.now(IST).isoformat()
             else:
@@ -4574,7 +4624,10 @@ async def get_performance():
         if MARKET_DETECTION_AVAILABLE:
             try:
                 market_is_open, _ = is_market_open()
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # REAL_ONLY MODE: Never use synthetic data
@@ -4645,7 +4698,10 @@ async def get_performance():
                 {"timestamp": row[0], "cycle_duration": row[1], "fetch_duration": row[2], "strategy_duration": row[3]}
                 for row in rows
             ]
-        except:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            logger.warning(f'Error handled: {e}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}', exc_info=True)
             pass  # SQLite may not exist yet
 
         return {"current": data, "history": history, "data_source": "real"}
@@ -5007,7 +5063,10 @@ async def get_alerts():
                                             else datetime.now()
                                         )
                                     alert["ts_iso"] = dt.isoformat()
-                                except:
+                                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                                    logger.warning(f'Error handled: {e}')
+                                except Exception as e:
+                                    logger.error(f'Unexpected error: {e}', exc_info=True)
                                     alert["ts_iso"] = datetime.now(pytz.timezone("Asia/Kolkata")).isoformat()
                             else:
                                 alert["ts_iso"] = datetime.now(pytz.timezone("Asia/Kolkata")).isoformat()
@@ -5740,7 +5799,10 @@ async def startup():
 
                     sync_module.MARKET_DETECTION_AVAILABLE = MARKET_DETECTION_AVAILABLE
                     sync_module.ADVANCED_FEATURES_AVAILABLE = ADVANCED_FEATURES_AVAILABLE
-                except:
+                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                    logger.warning(f'Error handled: {e}')
+                except Exception as e:
+                    logger.error(f'Unexpected error: {e}', exc_info=True)
                     pass
 
                 sync_service = get_sync_service(state_store, OUTPUTS_DIR)
@@ -5770,7 +5832,10 @@ async def validate_data():
                         timeout=30,
                         capture_output=True,
                     )
-                except:
+                except (ValueError, TypeError, KeyError, AttributeError) as e:
+                    logger.warning(f'Error handled: {e}')
+                except Exception as e:
+                    logger.error(f'Unexpected error: {e}', exc_info=True)
                     pass
 
             thread = threading.Thread(target=run_validation, daemon=True)
@@ -5836,7 +5901,10 @@ async def predict_profit(position_id: str):
                 entry_dt = datetime.fromisoformat(entry_time.replace("Z", "+00:00"))
                 now = datetime.now(pytz.timezone("Asia/Kolkata"))
                 time_held = (now - entry_dt).total_seconds() / 3600.0
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 time_held = 0.0
         else:
             time_held = 0.0
@@ -7705,7 +7773,10 @@ async def run_learning_cycle():
                         insights = latest.get("insights", {})
                         win_rate = insights.get("win_rate", 0.0)
                         total_trades = insights.get("total_trades", 0)
-            except:
+            except (ValueError, TypeError, KeyError, AttributeError) as e:
+                logger.warning(f'Error handled: {e}')
+            except Exception as e:
+                logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
         # Also try to extract from output
@@ -7809,7 +7880,10 @@ async def runner_start(request: RunnerStartRequest = RunnerStartRequest()):
                     "message": f"Runner started: {runner_result.get('script', 'autorun')}",
                     "error": runner_result.get("error"),
                 }
-        except:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            logger.warning(f'Error handled: {e}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}', exc_info=True)
             pass
 
         return {
@@ -7853,7 +7927,10 @@ async def runner_stop():
                     "stopped": runner_result.get("stopped", 0),
                     "message": f"Stopped {runner_result.get('stopped', 0)} process(es)",
                 }
-        except:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            logger.warning(f'Error handled: {e}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}', exc_info=True)
             pass
 
         return {"success": result.returncode == 0, "output": result.stdout[-500:] if result.stdout else ""}
@@ -7924,7 +8001,10 @@ async def shutdown():
         try:
             observer.stop()
             observer.join(timeout=2)
-        except:
+        except (ValueError, TypeError, KeyError, AttributeError) as e:
+            logger.warning(f'Error handled: {e}')
+        except Exception as e:
+            logger.error(f'Unexpected error: {e}', exc_info=True)
             pass
 
 

@@ -12,7 +12,7 @@ type BacktestSummary = {
   max_drawdown?: number
   generated_at?: string
   message?: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 const formatPercent = (value: unknown): string => {

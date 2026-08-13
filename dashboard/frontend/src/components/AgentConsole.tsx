@@ -6,12 +6,12 @@ import { API_BASE } from '../config'
 declare global {
   interface Window {
     electronAPI?: {
-      getAgentMemory: () => Promise<any>
-      saveAgentMemory: (tasks: any) => Promise<any>
-      showNotification: (options: { title: string; body: string }) => Promise<any>
-      downloadProofPack: () => Promise<any>
-      getBackendStatus: () => Promise<any>
-      controlBackend: (action: string) => Promise<any>
+      getAgentMemory: () => Promise<unknown>
+      saveAgentMemory: (tasks: any) => Promise<unknown>
+      showNotification: (options: { title: string; body: string }) => Promise<unknown>
+      downloadProofPack: () => Promise<unknown>
+      getBackendStatus: () => Promise<unknown>
+      controlBackend: (action: string) => Promise<unknown>
     }
   }
 }
@@ -26,9 +26,9 @@ function safeText(value: any, fallback = 'N/A'): string {
 }
 
 export default function AgentConsole() {
-  const [agentMemory, setAgentMemory] = useState<any>(null)
-  const [upgradePlan, setUpgradePlan] = useState<any>(null)
-  const [testResults, setTestResults] = useState<any>(null)
+  const [agentMemory, setAgentMemory] = useState<unknown>(null)
+  const [upgradePlan, setUpgradePlan] = useState<unknown>(null)
+  const [testResults, setTestResults] = useState<unknown>(null)
   const [issues, setIssues] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [lastError, setLastError] = useState<string | null>(null)

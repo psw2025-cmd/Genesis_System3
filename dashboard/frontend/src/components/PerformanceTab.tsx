@@ -35,7 +35,7 @@ export function PerformanceTab() {
   const { gainRank, paper } = useStore()
   const [pnl, setPnl] = useState<PnlData | null>(null)
   const [pnlError, setPnlError] = useState<string | null>(null)
-  const [backtest, setBacktest] = useState<any>(null)
+  const [backtest, setBacktest] = useState<unknown>(null)
   const [lastChecked, setLastChecked] = useState<string>('')
 
   useEffect(() => {

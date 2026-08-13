@@ -25,7 +25,7 @@ interface Contract {
 
 function quotePrice(c: Contract | undefined, side: 'bid' | 'ask') {
   if (!c) return null
-  const anyC = c as any
+  const anyC = c as unknown
   const v = side === 'bid'
     ? (anyC.top_bid_price ?? anyC.bid ?? anyC.bid_price)
     : (anyC.top_ask_price ?? anyC.ask ?? anyC.ask_price)

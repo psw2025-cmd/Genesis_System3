@@ -91,7 +91,7 @@ function safeNoTradeChain(x: any): boolean {
 }
 
 export function SystemTruthControl() {
-  const [data, setData] = useState<any>({})
+  const [data, setData] = useState<unknown>({})
   const [loading, setLoading] = useState(true)
   const [lastRun, setLastRun] = useState('')
   const [error, setError] = useState('')

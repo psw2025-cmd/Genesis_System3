@@ -76,7 +76,7 @@ export function GenesisTab() {
         '/final-message',
       ] as const
       const settled = await Promise.allSettled(paths.map((p) => getData(p)))
-      const val = (i: number) => (settled[i].status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<any>).value : { error: String((settled[i] as PromiseRejectedResult).reason?.message || settled[i]) })
+      const val = (i: number) => (settled[i].status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<unknown>).value : { error: String((settled[i] as PromiseRejectedResult).reason?.message || settled[i]) })
       const failed = settled.filter((x) => x.status === 'rejected').length
       setState({
         brief: val(0),
