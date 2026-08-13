@@ -70,7 +70,11 @@ export const OptionsIntelligence: React.FC = () => {
                 <StatusChip label="SOURCE" value={currentChain?.source ?? currentChain?.data_source ?? 'PENDING'} status={currentChain?.source || currentChain?.data_source ? 'ok' : 'mut'} />
               </div>
             ) : (
-              <PENDINGState reason={`NO CHAIN DATA YET FOR ${chainSymbol}`} />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'CHAIN WARMING' : 'AFTER HOURS'}
+                reason={currentChain?.message || `No Dhan chain snapshot for ${chainSymbol} yet. Analyzer keeps last-good when available.`}
+              />
             )}
           </section>
 
@@ -90,7 +94,11 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <PENDINGState reason="GAIN RANK SERVICE PENDING" />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'RANKING WARMING' : 'AFTER HOURS'}
+                reason="Gain-rank rows appear when the scanner or market-top stream supplies them."
+              />
             )}
           </section>
 
@@ -110,7 +118,11 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <PENDINGState reason="MARKET TOP DATA PENDING" />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'MARKET TOP WARMING' : 'AFTER HOURS'}
+                reason="Market-wide top contract table is empty until Dhan market-top data arrives."
+              />
             )}
           </section>
 
@@ -119,7 +131,11 @@ export const OptionsIntelligence: React.FC = () => {
               <ShieldAlert size={16} color="var(--text-sec)" />
               <h2 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Abnormal Activity</h2>
             </div>
-            <PENDINGState reason="CATALYST & SENTIMENT DATA PENDING" />
+            <PENDINGState
+              tone="mut"
+              title={marketOpen ? 'NO CATALYST FEED' : 'AFTER HOURS'}
+              reason="No catalyst/sentiment feed is wired. Unusual activity is not invented from empty after-hours chains."
+            />
           </section>
         </div>
 

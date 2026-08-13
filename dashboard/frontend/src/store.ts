@@ -27,9 +27,15 @@ interface DashboardState {
   brokerFunds: any
   brokerPositions: any
 
+  // Runtime facts (deploy SHA, research contract)
+  deployInfo: any
+  research: any
+
   // UI
   activeTab: string
   chainSymbol: string
+  sidebarOpen: boolean
+  commandQuery: string
 
   // Actions
   setWsStatus: (s: DashboardState['wsStatus']) => void
@@ -49,6 +55,10 @@ interface DashboardState {
   setBrokerPositions: (d: any) => void
   setActiveTab: (t: string) => void
   setChainSymbol: (s: string) => void
+  setDeployInfo: (d: any) => void
+  setResearch: (d: any) => void
+  setSidebarOpen: (open: boolean) => void
+  setCommandQuery: (q: string) => void
 }
 
 export const useStore = create<DashboardState>((set) => ({
@@ -70,8 +80,12 @@ export const useStore = create<DashboardState>((set) => ({
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
+  deployInfo: null,
+  research: null,
   activeTab: 'decision-intel',
   chainSymbol: 'NIFTY',
+  sidebarOpen: false,
+  commandQuery: '',
 
   setWsStatus: (wsStatus) => set({ wsStatus }),
   setHealth: (health) => set((s) => {
@@ -119,6 +133,10 @@ export const useStore = create<DashboardState>((set) => ({
   setBrokerHoldings: (brokerHoldings) => set({ brokerHoldings }),
   setBrokerFunds: (brokerFunds) => set({ brokerFunds }),
   setBrokerPositions: (brokerPositions) => set({ brokerPositions }),
-  setActiveTab: (activeTab) => set({ activeTab }),
+  setActiveTab: (activeTab) => set({ activeTab, sidebarOpen: false }),
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
+  setDeployInfo: (deployInfo) => set({ deployInfo }),
+  setResearch: (research) => set({ research }),
+  setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+  setCommandQuery: (commandQuery) => set({ commandQuery }),
 }))

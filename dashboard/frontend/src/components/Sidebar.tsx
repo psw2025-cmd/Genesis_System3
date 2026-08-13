@@ -42,14 +42,16 @@ const GROUP_LABELS: Record<string, string> = {
 }
 
 export function Sidebar() {
-  const { activeTab, setActiveTab, marketOpen, brokerConnected } = useStore()
+  const { activeTab, setActiveTab, marketOpen, brokerConnected, sidebarOpen } = useStore()
 
   const groups = ['main', 'market', 'trading', 'analysis', 'system']
 
   return (
     <nav
+      id="dashboard-sidebar"
       aria-label="Dashboard navigation"
       data-dashboard-navigation="sidebar"
+      className={`dashboard-sidebar${sidebarOpen ? ' is-open' : ''}`}
       style={{
         width: '190px',
         background: 'var(--surface-2)',

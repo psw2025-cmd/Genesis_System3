@@ -6,6 +6,7 @@ import { brokerIsConnected, paperModeActive, systemRuntimeOk } from './lib/healt
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
+import ErrorBoundary from './components/ErrorBoundary'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -36,7 +37,7 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, health, wsStatus } = useStore()
+  const { autoGates, brokerConnected, health, wsStatus, deployInfo } = useStore()
 
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
@@ -62,6 +63,7 @@ function ProductionProofBar() {
     ['ML', mlLabel, mlOk ? 'ok' : 'warn'],
     ['PAPER', paperOk ? (paperGateOk ? 'OK' : 'MODE ON') : 'PENDING', paperOk ? 'ok' : 'warn'],
     ['UI', 'RENDERED', 'ok'],
+    ['SHA', deployInfo?.git_sha ? String(deployInfo.git_sha).slice(0, 7).toUpperCase() : '…', deployInfo?.git_sha ? 'ok' : 'warn'],
   ]
 
   const toneColor = {
@@ -73,6 +75,8 @@ function ProductionProofBar() {
   return (
     <div
       data-testid="production-proof-bar"
+      role="status"
+      aria-live="polite"
       aria-label="Production proof status"
       title="System3 runtime proof status"
       style={{
@@ -204,15 +208,32 @@ export default function App() {
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
                   background: 'var(--surface)', overflow: 'hidden' }}>
+      <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
       <ProductionProofBar />
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <SidebarBackdrop />
         <Sidebar />
-        <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
-          <Content />
+        <main id="dashboard-main" tabIndex={-1} style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+          <ErrorBoundary>
+            <Content />
+          </ErrorBoundary>
         </main>
       </div>
     </div>
+  )
+}
+
+function SidebarBackdrop() {
+  const { sidebarOpen, setSidebarOpen } = useStore()
+  if (!sidebarOpen) return null
+  return (
+    <button
+      type="button"
+      className="sidebar-backdrop"
+      aria-label="Close navigation"
+      onClick={() => setSidebarOpen(false)}
+    />
   )
 }
