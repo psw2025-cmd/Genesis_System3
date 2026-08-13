@@ -13,24 +13,24 @@ interface StatusChipProps {
 
 export const StatusChip: React.FC<StatusChipProps> = ({ label, status = 'mut', value }) => {
   const colors = {
-    ok: { bg: 'rgba(0, 232, 122, 0.08)', border: 'rgba(0, 232, 122, 0.28)', text: 'var(--up)' },
-    warn: { bg: 'rgba(245, 158, 11, 0.1)', border: 'rgba(245, 158, 11, 0.28)', text: 'var(--amber)' },
-    error: { bg: 'rgba(255, 77, 106, 0.1)', border: 'rgba(255, 77, 106, 0.28)', text: 'var(--down)' },
-    mut: { bg: 'var(--surface-3)', border: 'var(--border)', text: 'var(--text-mut)' },
+    ok: { bg: 'rgba(0, 232, 122, 0.08)', border: 'rgba(0, 232, 122, 0.22)', text: 'var(--up)' },
+    warn: { bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.22)', text: 'var(--amber)' },
+    error: { bg: 'rgba(255, 77, 106, 0.08)', border: 'rgba(255, 77, 106, 0.22)', text: 'var(--down)' },
+    mut: { bg: 'var(--surface-2)', border: 'transparent', text: 'var(--text-mut)' },
   };
 
   const c = colors[status];
 
   return (
     <div
-      className="pill"
+      className="quiet-chip"
       style={{
         background: c.bg,
         border: `1px solid ${c.border}`,
         color: c.text,
       }}
     >
-      <span style={{ color: 'var(--text-mut)', opacity: 0.8 }}>{label}</span>
+      <span style={{ color: 'var(--text-mut)' }}>{label}</span>
       {value !== undefined && <span className="num" style={{ color: c.text }}>{value}</span>}
     </div>
   );
@@ -82,9 +82,9 @@ export const MetricTile: React.FC<{
 }> = ({ label, value, sub, tone = 'mut' }) => {
   const color = tone === 'ok' ? 'var(--up)' : tone === 'warn' ? 'var(--amber)' : tone === 'error' ? 'var(--down)' : 'var(--text-pri)'
   return (
-    <div className="card" style={{ padding: '14px 16px' }}>
+    <div className="elevated-panel" style={{ padding: '14px 16px' }}>
       <div className="metric-label">{label}</div>
-      <div className="num" style={{ marginTop: 6, fontSize: '1.15rem', fontWeight: 800, color }}>{value}</div>
+      <div className="num" style={{ marginTop: 6, fontSize: '1.15rem', fontWeight: 700, color }}>{value}</div>
       {sub ? <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-mut)' }}>{sub}</div> : null}
     </div>
   )

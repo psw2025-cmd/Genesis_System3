@@ -35,7 +35,7 @@ export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',
-  market:   'Market Data',
+  market:   'Market data',
   trading:  'Trading',
   analysis: 'Analysis',
   system:   'System',
