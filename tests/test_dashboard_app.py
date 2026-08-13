@@ -125,6 +125,14 @@ def test_request_id_header_present_on_every_response(app):
     assert b"x-request-id" in headers
 
 
+def test_safe_dashboard_reads_do_not_trip_compat_rate_bucket(app):
+    # Regression: Cloud Run proxy clients can share request.client.host. A
+    # normal dashboard burst must not make unrelated read endpoints return 429.
+    for _ in range(181):
+        status, _, _ = call(app, "GET", "/api/state")
+        assert status == 200
+
+
 def test_order_create_rejected_when_approval_not_signed_off(app, monkeypatch):
     try:
         import dashboard.backend.human_approval_service as approval_mod
