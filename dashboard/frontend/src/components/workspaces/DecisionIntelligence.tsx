@@ -1,20 +1,37 @@
 import React from 'react';
+import { Activity, AlertTriangle, Database, Shield, Zap } from 'lucide-react';
 import { useStore } from '../../store';
-import { StatusChip } from './TruthUI';
+import { MetricTile, StatusChip } from './TruthUI';
 import { brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
+import { formatAgeSec, formatInr, formatIstStamp, shortSha } from '../../lib/formatLive';
 
 export const DecisionIntelligence: React.FC = () => {
   const {
-    health, brokerConnected, marketOpen, wsStatus, apiStatus
+    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper,
   } = useStore();
   const dhanOk = brokerIsConnected(health, brokerConnected)
-  const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok'
+  const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok' || Boolean(health?.mode)
   const predictorRaw = String(health?.predictor?.status || '').toLowerCase()
   const predictorValue = predictorRaw || (paperModeActive(health) ? 'ANALYZER' : 'N/A')
   const predictorTone = predictorRaw === 'ready' || predictorRaw === 'ok' ? 'ok' : 'mut'
   const scannerRaw = String(health?.scanner?.status || '').toLowerCase()
   const scannerValue = scannerRaw || (marketOpen ? 'OFFLINE' : 'AFTER HOURS')
   const scannerTone = scannerRaw === 'active' || scannerRaw === 'ok' ? 'ok' : 'mut'
+
+  const mode = String(health?.mode || state?.mode || 'PAPER').toUpperCase()
+  const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
+  const exposure = state?.risk?.exposure
+  const var95 = state?.risk?.var95 ?? state?.risk?.var_95
+  const unrealized = state?.pnl?.unrealized ?? pnl?.summary?.total_pnl ?? paper?.pnl?.summary?.total_pnl
+  const recon = String(state?.reconciliation?.status || state?.qc?.status || '—').toUpperCase()
+  const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
+  const cycle = state?.cycle_count ?? state?.state_version
+  const nextOpen = state?.market?.next_open || health?.market?.next_open
+  const marketReason = state?.market?.reason || health?.market?.reason
+  const brokerMs = health?.broker?.latency_ms ?? state?.broker?.latency_ms
+  const signal = String(state?.signals?.status || state?.signals?.reason || 'No signal generated')
+  const sha = shortSha(deployInfo?.git_sha)
+  const pnlTone = Number(unrealized) < 0 ? 'error' : Number(unrealized) > 0 ? 'ok' : 'mut'
 
   const sectionStyle: React.CSSProperties = {
     display: 'flex',
@@ -36,27 +53,44 @@ export const DecisionIntelligence: React.FC = () => {
         borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        gap: 12,
+        flexWrap: 'wrap',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Zap size={20} color="var(--accent)" />
+          <Zap size={20} color="var(--accent)" aria-hidden />
           <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Decision Intelligence</h1>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <StatusChip label="MODE" value="PAPER" status="warn" />
-          <StatusChip label="LIVE" value="OFF" status="error" />
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <StatusChip label="MODE" value={mode} status="warn" />
+          <StatusChip label="LIVE" value={liveOn ? 'ON' : 'OFF'} status={liveOn ? 'error' : 'ok'} />
+          <StatusChip label="SHA" value={sha} status={sha !== '—' ? 'ok' : 'mut'} />
         </div>
       </header>
 
       <div style={sectionStyle}>
-        <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
+          Live operations
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+          <MetricTile label="Exposure" value={formatInr(exposure)} sub="Read-only portfolio" />
+          <MetricTile label="Unrealized P&L" value={formatInr(unrealized)} tone={pnlTone} sub="Paper / analyzer" />
+          <MetricTile label="VaR 95" value={formatInr(var95)} sub="From /api/state" />
+          <MetricTile label="Reconciliation" value={recon || '—'} tone={recon === 'OK' || recon === 'PASS' ? 'ok' : 'warn'} />
+          <MetricTile label="Tick age" value={formatAgeSec(tickAge)} sub={marketOpen ? 'Market hours' : 'After hours poll'} />
+          <MetricTile label="Cycle" value={cycle != null ? String(cycle) : '—'} sub={formatIstStamp(state?.last_fetch_ts_iso)} />
+          <MetricTile label="Broker latency" value={brokerMs != null ? `${brokerMs} ms` : '—'} tone={Number(brokerMs) < 200 ? 'ok' : 'warn'} />
+          <MetricTile label="Next open" value={String(nextOpen || '—')} sub={String(marketReason || '')} tone={marketOpen ? 'ok' : 'mut'} />
+        </div>
+
+        <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '8px 0 0' }}>
           System Health & Truth
         </h2>
 
         <div style={gridStyle}>
           <div className="card" style={{ padding: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Shield size={16} color="var(--text-sec)" />
+              <Shield size={16} color="var(--text-sec)" aria-hidden />
               <span style={{ fontWeight: 600 }}>Truth Control</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -68,7 +102,7 @@ export const DecisionIntelligence: React.FC = () => {
 
           <div className="card" style={{ padding: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Activity size={16} color="var(--text-sec)" />
+              <Activity size={16} color="var(--text-sec)" aria-hidden />
               <span style={{ fontWeight: 600 }}>Service Availability</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -80,19 +114,19 @@ export const DecisionIntelligence: React.FC = () => {
 
           <div className="card" style={{ padding: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <Database size={16} color="var(--text-sec)" />
+              <Database size={16} color="var(--text-sec)" aria-hidden />
               <span style={{ fontWeight: 600 }}>Data Sources</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <StatusChip label="DHAN" value={dhanOk ? 'AUTH OK' : 'NO AUTH'} status={dhanOk ? 'ok' : 'error'} />
-              <StatusChip label="NSE" value={health?.nse?.status || 'FALLBACK'} status={health?.nse?.status === 'ok' ? 'ok' : 'warn'} />
-              <StatusChip label="DATA SOURCE" value={health?.data_source || 'UNKNOWN'} status={health?.data_source ? 'ok' : 'mut'} />
+              <StatusChip label="SOURCE" value={state?.data_source || health?.data_source || 'UNKNOWN'} status={state?.data_source || health?.data_source ? 'ok' : 'mut'} />
+              <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'gcp-cloud-run')} status="ok" />
             </div>
           </div>
 
           <div className="card" style={{ padding: '16px', background: 'rgba(255, 77, 106, 0.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <AlertTriangle size={16} color="var(--down)" />
+              <AlertTriangle size={16} color="var(--down)" aria-hidden />
               <span style={{ fontWeight: 600, color: 'var(--down)' }}>Critical Blockers</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-sec)' }}>
@@ -108,17 +142,17 @@ export const DecisionIntelligence: React.FC = () => {
         </div>
 
         <div className="card" style={{ padding: '16px', marginTop: '12px' }}>
-          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', marginBottom: '8px' }}>AI DECISION BRIEF CONTRACT</div>
+          <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', marginBottom: '8px' }}>LIVE DECISION BRIEF</div>
           <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--text-pri)', marginBottom: '12px' }}>
-            System is operating in <strong>PAPER</strong> mode with <strong>LIVE OFF</strong>.
-            Automated trading is inhibited by safety gates. All decisions are for simulation and research
-            purposes only. Evidence-based auditing is active.
+            Operating in <strong>{mode}</strong> with <strong>LIVE {liveOn ? 'ON' : 'OFF'}</strong>.
+            Signal: {signal}. Last fetch {formatIstStamp(state?.last_fetch_ts_iso)}.
+            Automated order placement remains inhibited by safety gates.
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <button className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('truth')}>TRUTH CONTROL</button>
-            <button className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('options-intel')}>OPTIONS INTEL</button>
-            <button className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('risk-scenarios')}>RISK & SCENARIOS</button>
-            <button className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('data-integrity')}>DATA INTEGRITY</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('truth')}>TRUTH CONTROL</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('options-intel')}>OPTIONS INTEL</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('risk-scenarios')}>RISK & SCENARIOS</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('data-integrity')}>DATA INTEGRITY</button>
           </div>
         </div>
       </div>

@@ -225,7 +225,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank, setMarketTop,
     setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
-    setPnl, setApiStatus,
+    setPnl, setApiStatus, setDeployInfo, setResearch,
   } = useStore()
 
   const wsRef = useRef<WebSocket | null>(null)
@@ -414,6 +414,15 @@ export function useData() {
     }
   }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
+  const pollRuntimeFacts = useCallback(async () => {
+    const [deploy, research] = await Promise.allSettled([
+      fetchJSON('/api/deploy/info', 12000),
+      fetchJSON('/api/research/multibagger', 15000),
+    ])
+    if (deploy.status === 'fulfilled') setDeployInfo(deploy.value)
+    if (research.status === 'fulfilled') setResearch(research.value)
+  }, [setDeployInfo, setResearch])
+
   const pollSecondary = useCallback(async () => {
     const [alerts, gates] = await Promise.allSettled([
       fetchJSON('/api/alerts/recent?limit=30'),
@@ -569,8 +578,8 @@ export function useData() {
 
   useEffect(() => {
     unmountedRef.current = false
-    // Boot with 2 parallel batch calls (market-data + positions-holdings).
-    void Promise.all([poll(), pollBroker()])
+    // Boot with market-data, broker batch, and deploy/research facts.
+    void Promise.all([poll(), pollBroker(), pollRuntimeFacts()])
     wsConnect()
 
     let coreTimer: ReturnType<typeof setInterval> | null = null
@@ -588,6 +597,7 @@ export function useData() {
       secTimer = setInterval(pollSecondary, SECONDARY_POLL_MS)
     }
     armTimers()
+    const runtimeTimer = setInterval(pollRuntimeFacts, SECONDARY_POLL_MS)
     const modeTimer = setInterval(armTimers, 30000)
 
     return () => {
@@ -595,11 +605,12 @@ export function useData() {
       if (coreTimer) clearInterval(coreTimer)
       if (brokerTimer) clearInterval(brokerTimer)
       if (secTimer) clearInterval(secTimer)
+      clearInterval(runtimeTimer)
       clearInterval(modeTimer)
       if (wsReconnectTimerRef.current) clearTimeout(wsReconnectTimerRef.current)
       wsRef.current?.close()
     }
-  }, [poll, pollBroker, pollSecondary, wsConnect])
+  }, [poll, pollBroker, pollSecondary, pollRuntimeFacts, wsConnect])
 
   useEffect(() => {
     const active = String(chainSymbol || 'NIFTY').toUpperCase()

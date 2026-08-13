@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Bell, ChevronDown, Menu, Search, Shield, Wifi } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
 import { brokerIsConnected } from '../lib/healthTruth'
+import { DASHBOARD_TABS } from './Sidebar'
 
 function Clock() {
   const [time, setTime] = useState('')
@@ -18,16 +19,17 @@ function Clock() {
   return <span className="num" style={{ color: 'var(--text-sec)', fontSize: '.58rem' }}>{time} IST</span>
 }
 
-function MarketTicker({ label, spot, chg }: { label: string; spot?: number; chg?: number | null }) {
+function MarketTicker({ label, spot, chg, marketOpen }: { label: string; spot?: number; chg?: number | null; marketOpen: boolean }) {
   const up = (chg ?? 0) >= 0
+  const missing = !spot
   return (
     <div style={{ minWidth: 94, padding: '0 11px', borderLeft: '1px solid var(--border)' }}>
       <div className="metric-label" style={{ fontSize: '.52rem' }}>{label}</div>
       <div className="num" style={{ marginTop: 2, fontSize: '.72rem', lineHeight: 1.05, fontWeight: 800, color: 'var(--text-pri)' }}>
-        {spot ? fmt(spot, 2) : '--'}
+        {missing ? '—' : fmt(spot, 2)}
       </div>
-      <div className="num" style={{ marginTop: 2, fontSize: '.52rem', color: chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
-        {chg == null ? 'WAITING' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
+      <div className="num" style={{ marginTop: 2, fontSize: '.52rem', color: missing ? 'var(--text-mut)' : chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
+        {missing ? (marketOpen ? 'WARMING' : 'AFTER HOURS') : chg == null ? 'NO CHANGE %' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
       </div>
     </div>
   )
@@ -45,7 +47,9 @@ export function TopBar() {
   const {
     wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
     brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, health,
+    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, deployInfo,
   } = useStore()
+  const [searchOpen, setSearchOpen] = useState(false)
 
   const getSpot = (symbol: string) => {
     const row = chain?.[symbol]
@@ -71,9 +75,27 @@ export function TopBar() {
   const brokerLabel = (brokerConnected || brokerGood) ? 'CONNECTED' : hasError ? 'AUTH ISSUE' : 'WAITING'
   const marketTone = marketOpen ? 'var(--up)' : 'var(--amber)'
   const wsTone = wsStatus === 'live' ? 'var(--up)' : wsStatus === 'connecting' ? 'var(--amber)' : 'var(--down)'
+  const alertCount = Array.isArray(alerts) ? alerts.length : 0
+  const matches = useMemo(() => {
+    const q = commandQuery.trim().toLowerCase()
+    if (!q) return []
+    return DASHBOARD_TABS.filter((tab) => tab.label.toLowerCase().includes(q) || tab.id.includes(q)).slice(0, 8)
+  }, [commandQuery])
+
+  useEffect(() => {
+    const onKey = (ev: KeyboardEvent) => {
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') {
+        ev.preventDefault()
+        setSearchOpen(true)
+        document.getElementById('dashboard-command')?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
-    <header style={{
+    <header role="banner" style={{
       height: 58,
       flexShrink: 0,
       display: 'flex',
@@ -82,7 +104,7 @@ export function TopBar() {
       borderBottom: '1px solid var(--border)',
       boxShadow: '0 8px 24px rgba(0,0,0,.18)',
       zIndex: 40,
-      overflow: 'hidden',
+      overflow: 'visible',
     }}>
       <div style={{ width: 168, flexShrink: 0, padding: '0 12px', display: 'flex', alignItems: 'center', gap: 10, borderRight: '1px solid var(--border)' }}>
         <div aria-hidden style={{ width: 25, height: 25, borderRadius: 8, display: 'grid', placeItems: 'center', color: 'var(--accent)', border: '1px solid rgba(59,140,255,.4)', background: 'rgba(59,140,255,.1)', fontWeight: 900 }}>S</div>
@@ -90,11 +112,21 @@ export function TopBar() {
           <div style={{ color: '#63a7ff', fontWeight: 900, fontSize: '.76rem', letterSpacing: '.18em', lineHeight: 1 }}>SYSTEM3</div>
           <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', letterSpacing: '.2em', marginTop: 4 }}>GENESIS</div>
         </div>
-        <button className="soft-btn" aria-label="Menu" style={{ marginLeft: 'auto', width: 28, minHeight: 28, padding: 0 }}><Menu size={14} /></button>
+        <button
+          type="button"
+          className="soft-btn"
+          aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
+          aria-expanded={sidebarOpen}
+          aria-controls="dashboard-sidebar"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          style={{ marginLeft: 'auto', width: 28, minHeight: 28, padding: 0 }}
+        >
+          <Menu size={14} />
+        </button>
       </div>
 
       <div className="top-chip" style={{ border: 0, borderRadius: 0, background: 'transparent', minWidth: 128, paddingInline: 14 }}>
-        <span className="status-dot" style={{ color: marketTone }} />
+        <span className="status-dot" style={{ color: marketTone }} aria-hidden />
         <div>
           <div style={{ color: marketTone, fontSize: '.58rem', fontWeight: 900 }}>{marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}</div>
           <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', marginTop: 2 }}>{marketOpen ? 'LIVE DATA' : 'READ-ONLY / POLL'}</div>
@@ -102,52 +134,80 @@ export function TopBar() {
       </div>
 
       <div className="hide-compact" style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}>
-        <MarketTicker label="NIFTY" spot={nifty.spot} chg={nifty.chg} />
-        <MarketTicker label="BANKNIFTY" spot={bank.spot} chg={bank.chg} />
-        <MarketTicker label="MIDCPNIFTY" spot={mid.spot} chg={mid.chg} />
+        <MarketTicker label="NIFTY" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
+        <MarketTicker label="BANKNIFTY" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
+        <MarketTicker label="MIDCPNIFTY" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
       </div>
 
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', minWidth: 0 }}>
         <div className="hide-compact" style={{ padding: '0 11px', borderLeft: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: wsTone }}>
-            <Wifi size={13} />
+            <Wifi size={13} aria-hidden />
             <span style={{ fontSize: '.55rem', fontWeight: 800 }}>WS {wsStatus === 'live' ? 'LIVE' : wsStatus.toUpperCase()}</span>
           </div>
           <Clock />
         </div>
 
-        <button onClick={() => setActiveTab('broker')} style={{
+        <button type="button" aria-label={`Broker ${brokerLabel}`} onClick={() => setActiveTab('broker')} style={{
           height: '100%', minWidth: 108, padding: '0 12px', border: 0, borderLeft: '1px solid var(--border)', borderRight: '1px solid var(--border)',
           background: 'transparent', color: brokerTone, cursor: 'pointer', textAlign: 'left',
         }} title={apiStatus?.message || 'Open Broker'}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.53rem', color: 'var(--text-mut)' }}><Shield size={12} /> BROKER</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '.53rem', color: 'var(--text-mut)' }}><Shield size={12} aria-hidden /> BROKER</div>
           <div style={{ fontSize: '.61rem', fontWeight: 900, marginTop: 3 }}>DHAN · {brokerLabel}</div>
         </button>
 
         <div style={{ padding: '0 10px', display: 'flex', gap: 5, alignItems: 'center' }}>
           <span className="pill" style={{ color: 'var(--amber)', border: '1px solid rgba(245,165,36,.28)', background: 'rgba(245,165,36,.08)' }}>PAPER</span>
-          <span className="pill" style={{ color: 'var(--down)', border: '1px solid rgba(255,73,100,.24)', background: 'rgba(255,73,100,.06)' }}>LIVE OFF</span>
+          <span className="pill" style={{ color: 'var(--text-sec)', border: '1px solid var(--border)', background: 'var(--surface-3)' }}>LIVE OFF</span>
         </div>
 
         <div className="hide-compact" style={{ width: 184, marginRight: 10, position: 'relative' }}>
-          <Search size={13} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-mut)' }} />
-          <div style={{ height: 31, display: 'flex', alignItems: 'center', paddingLeft: 31, color: 'var(--text-mut)', border: '1px solid var(--border)', borderRadius: 7, fontSize: '.58rem', background: 'rgba(6,16,28,.75)' }}>
-            Search (Ctrl + K)
-          </div>
+          <Search size={13} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-mut)' }} aria-hidden />
+          <input
+            id="dashboard-command"
+            type="search"
+            aria-label="Search dashboard tabs"
+            placeholder="Search tabs (Ctrl+K)"
+            value={commandQuery}
+            onChange={(e) => { setCommandQuery(e.target.value); setSearchOpen(true) }}
+            onFocus={() => setSearchOpen(true)}
+            onBlur={() => window.setTimeout(() => setSearchOpen(false), 150)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && matches[0]) {
+                setActiveTab(matches[0].id)
+                setCommandQuery('')
+                setSearchOpen(false)
+              }
+            }}
+            style={{ height: 31, width: '100%', paddingLeft: 31, color: 'var(--text-sec)', border: '1px solid var(--border)', borderRadius: 7, fontSize: '.58rem', background: 'rgba(6,16,28,.75)' }}
+          />
+          {searchOpen && matches.length > 0 && (
+            <ul role="listbox" aria-label="Matching tabs" style={{ position: 'absolute', top: 36, left: 0, right: 0, zIndex: 50, margin: 0, padding: 6, listStyle: 'none', background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: 8 }}>
+              {matches.map((tab) => (
+                <li key={tab.id}>
+                  <button type="button" className="nav-item" onMouseDown={(e) => e.preventDefault()} onClick={() => { setActiveTab(tab.id); setCommandQuery(''); setSearchOpen(false) }}>
+                    {tab.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        <button className="soft-btn" aria-label="Notifications" style={{ width: 30, minHeight: 30, padding: 0, marginRight: 8, position: 'relative' }}>
-          <Bell size={14} />
-          <span style={{ position: 'absolute', top: -4, right: -3, minWidth: 14, height: 14, display: 'grid', placeItems: 'center', borderRadius: 99, background: 'var(--down)', color: 'white', fontSize: '.45rem', fontWeight: 900 }}>!</span>
+        <button type="button" className="soft-btn" aria-label={alertCount ? `${alertCount} alerts` : 'No active alerts'} onClick={() => setActiveTab('alerts')} style={{ width: 30, minHeight: 30, padding: 0, marginRight: 8, position: 'relative' }}>
+          <Bell size={14} aria-hidden />
+          {alertCount > 0 && (
+            <span aria-hidden style={{ position: 'absolute', top: -4, right: -3, minWidth: 14, height: 14, display: 'grid', placeItems: 'center', borderRadius: 99, background: 'var(--down)', color: 'white', fontSize: '.45rem', fontWeight: 900 }}>{alertCount}</span>
+          )}
         </button>
 
         <div style={{ paddingRight: 12, display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 28, height: 28, borderRadius: 99, display: 'grid', placeItems: 'center', background: 'var(--surface-3)', border: '1px solid var(--border-hi)', color: 'var(--text-pri)', fontSize: '.58rem', fontWeight: 800 }}>PS</div>
+          <div aria-hidden style={{ width: 28, height: 28, borderRadius: 99, display: 'grid', placeItems: 'center', background: 'var(--surface-3)', border: '1px solid var(--border-hi)', color: 'var(--text-pri)', fontSize: '.48rem', fontWeight: 800 }}>RO</div>
           <div className="hide-compact" style={{ lineHeight: 1.1 }}>
-            <div style={{ color: 'var(--text-pri)', fontSize: '.58rem', fontWeight: 750 }}>Pritam S.</div>
-            <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', marginTop: 3 }}>Admin</div>
+            <div style={{ color: 'var(--text-pri)', fontSize: '.58rem', fontWeight: 750 }}>Public</div>
+            <div style={{ color: 'var(--text-mut)', fontSize: '.48rem', marginTop: 3 }}>Read-only · {deployInfo?.git_sha ? String(deployInfo.git_sha).slice(0, 7) : 'analyzer'}</div>
           </div>
-          <ChevronDown className="hide-compact" size={12} color="var(--text-mut)" />
+          <ChevronDown className="hide-compact" size={12} color="var(--text-mut)" aria-hidden />
         </div>
       </div>
     </header>

@@ -39,28 +39,56 @@ export const StatusChip: React.FC<StatusChipProps> = ({ label, status = 'mut', v
 interface PENDINGStateProps {
   reason?: string;
   dataTestId?: string;
+  title?: string;
+  tone?: 'warn' | 'mut';
 }
 
-export const PENDINGState: React.FC<PENDINGStateProps> = ({ reason = 'DATA SERVICE PENDING', dataTestId }) => (
-  <div
-    data-testid={dataTestId}
-    style={{
-      padding: '24px',
-      textAlign: 'center',
-      background: 'rgba(245, 158, 11, 0.05)',
-      border: '1px dashed var(--amber)',
-      borderRadius: '8px',
-      color: 'var(--amber)',
-      fontSize: '12px',
-      fontWeight: 600,
-      letterSpacing: '0.05em',
-      textTransform: 'uppercase',
-    }}
-  >
-    <div style={{ marginBottom: '8px' }}>⚠️ PENDING</div>
-    <div>{reason}</div>
-  </div>
-);
+export const PENDINGState: React.FC<PENDINGStateProps> = ({
+  reason = 'DATA SERVICE PENDING',
+  dataTestId,
+  title,
+  tone = 'warn',
+}) => {
+  const warn = tone === 'warn'
+  return (
+    <div
+      data-testid={dataTestId}
+      role="status"
+      style={{
+        padding: '24px',
+        textAlign: 'center',
+        background: warn ? 'rgba(245, 158, 11, 0.05)' : 'rgba(88, 112, 141, 0.08)',
+        border: warn ? '1px dashed var(--amber)' : '1px dashed var(--border)',
+        borderRadius: '8px',
+        color: warn ? 'var(--amber)' : 'var(--text-sec)',
+        fontSize: '12px',
+        fontWeight: 600,
+        letterSpacing: '0.05em',
+      }}
+    >
+      <div style={{ marginBottom: '8px', textTransform: 'uppercase' }}>
+        {title || (warn ? '⚠️ PENDING' : 'NO VERIFIED CONTRACT')}
+      </div>
+      <div style={{ textTransform: 'none', fontWeight: 500, color: 'var(--text-sec)' }}>{reason}</div>
+    </div>
+  )
+}
+
+export const MetricTile: React.FC<{
+  label: string
+  value: string
+  sub?: string
+  tone?: 'ok' | 'warn' | 'error' | 'mut'
+}> = ({ label, value, sub, tone = 'mut' }) => {
+  const color = tone === 'ok' ? 'var(--up)' : tone === 'warn' ? 'var(--amber)' : tone === 'error' ? 'var(--down)' : 'var(--text-pri)'
+  return (
+    <div className="card" style={{ padding: '14px 16px' }}>
+      <div className="metric-label">{label}</div>
+      <div className="num" style={{ marginTop: 6, fontSize: '1.15rem', fontWeight: 800, color }}>{value}</div>
+      {sub ? <div style={{ marginTop: 4, fontSize: 11, color: 'var(--text-mut)' }}>{sub}</div> : null}
+    </div>
+  )
+}
 
 interface EvidenceProps {
   label: string;
