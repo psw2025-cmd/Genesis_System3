@@ -2306,7 +2306,15 @@ async def get_scheduler_health():
          restart it — this is exactly the silent-failure shape that
          caused the original bug)
     """
-    STALE_THRESHOLD_S = 180  # daemon ticks every ~60s; 3 missed ticks = stale
+    if os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower() == "firestore":
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend, derive_scheduler_health
+            evidence = await asyncio.to_thread(FirestoreSchedulerEvidenceBackend().load_current)
+            return derive_scheduler_health(evidence)
+        except Exception as exc:
+            return {"healthy": False, "status": "UNHEALTHY", "unhealthy_reasons": [f"scheduler evidence unavailable: {type(exc).__name__}"], "live_trading_enabled": False}
+
+    STALE_THRESHOLD_S = 180  # legacy local/Render compatibility only
 
     state = _scheduler_health_state
     healthy = True

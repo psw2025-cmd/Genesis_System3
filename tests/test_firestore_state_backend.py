@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime, timezone
 
-from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend, FirestoreStateBackend
+from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend, FirestoreStateBackend, derive_scheduler_health
 
 
 class FakeSnapshot:
@@ -170,3 +170,37 @@ def test_publish_rechecks_trusted_time_inside_transaction_callback():
             owner="execution-a",
             fence=lease["fence"],
         )
+
+
+def test_derived_scheduler_health_fails_enabled_job_failure_and_coverage():
+    now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
+    contracts = [("genesis-system3-forecast-daily", "ENABLED", "genesis-system3-forecast", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-rank-daily", "ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC"), ("genesis-system3-signals-daily", "ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC"), ("genesis-system3-dhan-token-rotate-daily", "ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata"), ("genesis-system3-forecast-schedule", "PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC"), ("genesis-system3-rank-schedule", "PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC"), ("genesis-system3-signals-schedule", "PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC")]
+    resources = [{"name": n, "state": s, "target_job": t, "schedule": schedule, "time_zone": zone, "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0, "last_attempt_time": "2026-08-14T00:58:00Z"} for n, s, t, schedule, zone in contracts]
+    jobs = [{"name": t, "completion_status": "EXECUTION_SUCCEEDED", "create_time": "2026-08-14T00:58:01Z", "completion_time": "2026-08-14T00:59:00Z"} for t in sorted({row[2] for row in contracts})]
+    good = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert good["healthy"] is True
+    jobs[2]["completion_status"] = "EXECUTION_FAILED"
+    bad = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert bad["healthy"] is False and "failed" in " ".join(bad["unhealthy_reasons"])
+    jobs[2]["completion_status"] = "EXECUTION_SUCCEEDED"; jobs[2]["create_time"] = None
+    missing_time = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert missing_time["healthy"] is False and "timestamps invalid" in " ".join(missing_time["unhealthy_reasons"])
+
+    jobs[2]["create_time"] = "2026-08-14T01:02:00Z"; jobs[2]["completion_time"] = "2026-08-14T01:03:00Z"
+    future = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert "materially future" in " ".join(future["unhealthy_reasons"])
+    jobs[2]["create_time"] = "2026-08-09T00:58:01Z"; jobs[2]["completion_time"] = "2026-08-09T00:59:00Z"; resources[2]["last_attempt_time"] = "2026-08-09T00:58:00Z"
+    stale = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": jobs}, now=now)
+    assert "stale beyond cadence" in " ".join(stale["unhealthy_reasons"])
+
+
+def test_derived_health_rejects_duplicate_and_swapped_target():
+    now = datetime(2026, 8, 14, 1, 0, tzinfo=timezone.utc)
+    resources = [
+        {"name": "genesis-system3-forecast-daily", "state": "ENABLED", "target_job": "genesis-system3-rank", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0},
+        {"name": "genesis-system3-forecast-daily", "state": "ENABLED", "target_job": "genesis-system3-forecast", "target_type": "http", "target_uri_valid": True, "delivery_status_code": 0},
+    ]
+    result = derive_scheduler_health({"observed_at_utc": "2026-08-14T01:00:00Z", "resources": resources, "jobs": []}, now=now)
+    assert result["healthy"] is False
+    assert "duplicate" in " ".join(result["unhealthy_reasons"])
+    assert "contract mismatch" in " ".join(result["unhealthy_reasons"])

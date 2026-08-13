@@ -190,3 +190,86 @@ class FirestoreSchedulerEvidenceBackend:
             return {"acquired": True, **value}
 
         return _acquire(self.client.transaction())
+
+
+def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional[datetime] = None) -> Dict[str, Any]:
+    """Derive health only from stored raw facts; producer status is never trusted."""
+    now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    reasons = []
+    if not evidence:
+        return {"healthy": False, "status": "UNHEALTHY", "unhealthy_reasons": ["scheduler evidence missing"]}
+    try:
+        age = (now - FirestoreSchedulerEvidenceBackend._parse_utc(evidence["observed_at_utc"])).total_seconds()
+        if age < -60 or age > 180:
+            reasons.append(f"scheduler evidence stale or future-dated: age_seconds={age:.0f}")
+    except Exception:
+        reasons.append("scheduler evidence timestamp invalid")
+    expected_contract = {
+        "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast", "45 3 * * MON-FRI", "UTC", 98),
+        "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
+        "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
+        "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata", 26),
+        "genesis-system3-forecast-schedule": ("PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
+        "genesis-system3-rank-schedule": ("PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC", None),
+        "genesis-system3-signals-schedule": ("PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC", None),
+    }
+    resources = evidence.get("resources") if isinstance(evidence.get("resources"), list) else []
+    names = [row.get("name") for row in resources if isinstance(row, dict)]
+    if len(names) != len(set(names)):
+        reasons.append("duplicate scheduler resource names")
+    missing = sorted(set(expected_contract) - set(names)); extras = sorted(set(names) - set(expected_contract))
+    if missing or extras:
+        reasons.append(f"scheduler identity mismatch: missing={missing} extras={extras}")
+    enabled = [row for row in resources if row.get("state") == "ENABLED"]
+    paused = [row for row in resources if row.get("state") == "PAUSED"]
+    if len(resources) != 7 or len(enabled) != 4 or len(paused) != 3:
+        reasons.append(f"scheduler coverage mismatch: total={len(resources)} enabled={len(enabled)} paused={len(paused)} expected=7/4/3")
+    for row in resources:
+        expected = expected_contract.get(row.get("name"))
+        if expected and (row.get("state"), row.get("target_job"), row.get("schedule"), row.get("time_zone")) != expected[:4]:
+            reasons.append(f"scheduler contract mismatch: {row.get('name')}")
+        if row.get("target_type") != "http":
+            reasons.append(f"scheduler target type invalid: {row.get('name')}")
+        if row.get("target_uri_valid") is not True:
+            reasons.append(f"scheduler target URI invalid: {row.get('name')}")
+        if row.get("state") == "ENABLED" and int(row.get("delivery_status_code", 0) or 0) != 0:
+            reasons.append(f"scheduler delivery failed: {row.get('name')} code={row.get('delivery_status_code')}")
+    job_rows = evidence.get("jobs") if isinstance(evidence.get("jobs"), list) else []
+    job_names = [row.get("name") for row in job_rows if isinstance(row, dict)]
+    if len(job_names) != len(set(job_names)):
+        reasons.append("duplicate Cloud Run job facts")
+    jobs = {row.get("name"): row for row in job_rows if isinstance(row, dict)}
+    for resource in enabled:
+        target = resource.get("target_job")
+        fact = jobs.get(target)
+        if not fact:
+            reasons.append(f"enabled scheduler target missing: {target}")
+        elif fact.get("completion_status") != "EXECUTION_SUCCEEDED":
+            reasons.append(f"enabled scheduler target failed: {target}={fact.get('completion_status') or 'UNKNOWN'}")
+        else:
+            try:
+                if not resource.get("last_attempt_time") or not fact.get("create_time") or not fact.get("completion_time"):
+                    raise ValueError("missing required timestamps")
+                attempt = FirestoreSchedulerEvidenceBackend._parse_utc(resource["last_attempt_time"])
+                created = FirestoreSchedulerEvidenceBackend._parse_utc(fact["create_time"])
+                completed = FirestoreSchedulerEvidenceBackend._parse_utc(fact["completion_time"])
+                if created < attempt or completed < created:
+                    reasons.append(f"latest execution not linked to scheduler attempt: {target}")
+                max_age_hours = expected_contract[resource["name"]][4]
+                if attempt > now.replace(microsecond=0) or completed > now.replace(microsecond=0):
+                    reasons.append(f"scheduler/execution timestamp materially future: {target}")
+                elif max_age_hours is not None and ((now - attempt).total_seconds() > max_age_hours * 3600 or (now - completed).total_seconds() > max_age_hours * 3600):
+                    reasons.append(f"enabled scheduler execution stale beyond cadence grace: {target}")
+            except Exception:
+                reasons.append(f"scheduler/execution timestamps invalid: {target}")
+    return {
+        "healthy": not reasons,
+        "status": "HEALTHY" if not reasons else "UNHEALTHY",
+        "unhealthy_reasons": reasons,
+        "observed_at_utc": evidence.get("observed_at_utc"),
+        "evidence_version": evidence.get("evidence_version"),
+        "evidence_sha256": evidence.get("evidence_sha256"),
+        "resources": resources,
+        "jobs": list(jobs.values()),
+        "coverage": {"total": len(resources), "enabled": len(enabled), "paused": len(paused), "expected_total": 7},
+    }
