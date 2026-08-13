@@ -47,11 +47,14 @@ def test_batch_market_data_keeps_live_ops_kpis():
 
 def test_multibagger_empty_state_is_operator_friendly():
     source = (FRONTEND / "components" / "workspaces" / "MultibaggerResearch.tsx").read_text(encoding="utf-8")
-    assert "No verified candidates yet" in source
-    assert "View data integrity" in source
-    assert "View research criteria" in source
+    assert "No research candidates are ready" in source
+    assert "View data status" in source
+    assert "How candidates are selected" in source
+    assert "Research readiness details" in source
     assert "NO VERIFIED CANDIDATES" not in source
+    assert "NO_VERIFIED_EVIDENCE" not in source
     assert "Analyzer mode" not in source
+    assert "Paper / analyzer" not in source
     assert "humanizeContractReason" in source
 
 

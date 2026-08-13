@@ -20,7 +20,7 @@ export const DASHBOARD_TABS = [
   { id: 'paper',          label: 'Paper Trades',   Icon: BookOpen,        group: 'trading' },
   { id: 'positions',      label: 'Positions',      Icon: Database,        group: 'trading' },
   { id: 'risk-scenarios', label: 'Risk & Scenarios', Icon: Shield,        group: 'analysis' },
-  { id: 'multibagger',    label: 'Multibagger V4', Icon: Sparkles,        group: 'analysis' },
+  { id: 'multibagger',    label: 'Multibagger', Icon: Sparkles,        group: 'analysis' },
   { id: 'prediction-audit', label: 'Prediction Audit', Icon: Search,       group: 'analysis' },
   { id: 'performance',    label: 'Performance',    Icon: BarChart3,       group: 'analysis' },
   { id: 'ml',             label: 'ML Model',       Icon: Brain,           group: 'analysis' },

@@ -71,15 +71,21 @@ export function resolveFeedQuality(input: {
 
 export function humanizeContractReason(reason: unknown): string {
   const raw = String(reason || '').trim()
-  if (!raw) return 'No producer has supplied provenance-valid candidates yet.'
+  if (!raw) {
+    return 'We do not yet have enough validated market and research evidence to publish a candidate.'
+  }
   const map: Record<string, string> = {
-    NO_VERIFIED_EVIDENCE: 'No producer has supplied provenance-valid candidates.',
-    PRODUCER_SOURCE_UNVERIFIED: 'Producer source is not on the approved list.',
-    INVALID_OR_FUTURE_AS_OF: 'Evidence timestamp is missing or invalid.',
-    CANDIDATE_EVIDENCE_UNAVAILABLE: 'Candidate evidence is not available.',
-    NO_CANDIDATE_PASSED_PROVENANCE_VALIDATION: 'Candidates were rejected for missing price or model provenance.',
-    ADDITIONAL_RESEARCH_SECTIONS_UNAVAILABLE: 'Ranking is partial; other research sections are still pending.',
+    NO_VERIFIED_EVIDENCE:
+      'We do not yet have enough validated market and research evidence to publish a candidate.',
+    PRODUCER_SOURCE_UNVERIFIED: 'The research producer source is not on the approved list.',
+    INVALID_OR_FUTURE_AS_OF: 'The evidence timestamp is missing or invalid.',
+    CANDIDATE_EVIDENCE_UNAVAILABLE: 'Candidate evidence is not available yet.',
+    NO_CANDIDATE_PASSED_PROVENANCE_VALIDATION:
+      'Candidates were rejected because price or model proof was incomplete.',
+    ADDITIONAL_RESEARCH_SECTIONS_UNAVAILABLE:
+      'Ranking is partial; other research sections are still waiting.',
   }
   if (map[raw]) return map[raw]
-  return raw.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  const spaced = raw.replace(/_/g, ' ').toLowerCase()
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1)
 }

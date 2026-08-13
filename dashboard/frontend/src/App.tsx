@@ -101,7 +101,10 @@ export default function App() {
       <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
-      {/* Engineering diagnostics stay in the DOM for deploy proofs, but are hidden from the trading workspace. */}
+      {/*
+        Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden
+        on every normal page. Visible API/SHA/ML chips live only under Data Integrity → System health.
+      */}
       <SystemHealthDiagnostics variant="sr-only" />
       <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <SidebarBackdrop />
