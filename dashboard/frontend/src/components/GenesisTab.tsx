@@ -89,17 +89,16 @@ export function GenesisTab() {
       setData({
         brief: value(0), brain: value(1), lab: value(2), monitor: value(3), hunger: value(4),
         truth: value(5), health: value(6), system: value(7), final: value(8), loading: false,
-        error: failed === paths.length ? 'Genesis read-only APIs failed' : undefined,
+        error: failed === paths.length ? 'Genesis read-only APIs unavailable in this runtime' : undefined,
       })
     } catch (error: any) {
-      setData({ loading: false, error: error?.response?.data?.detail || error?.message || 'Genesis APIs failed' })
+      setData({ loading: false, error: error?.response?.data?.detail || error?.message || 'Genesis APIs unavailable' })
     }
   }
 
   useEffect(() => { load() }, [])
 
   if (data.loading) return <div className="workspace-shell"><div className="card" style={{ padding: 22, color: 'var(--text-mut)' }}>Genesis Brain is loading verified read-only intelligence…</div></div>
-  if (data.error) return <div className="workspace-shell"><div className="card" style={{ padding: 22, color: 'var(--down)', borderColor: 'rgba(255,73,100,.35)' }}>{data.error}</div></div>
 
   const marketOpen = data.health?.market_status === 'open' || Boolean(data.health?.market?.is_open)
   const liveAllowed = Boolean(data.health?.live_allowed ?? data.health?.live_trading_enabled)
@@ -122,16 +121,23 @@ export function GenesisTab() {
     : []
 
   const modules = [
-    ['Genesis Brain', data.brain?.status ?? (data.brain ? 'ACTIVE' : 'WAITING'), pct(data.brain?.health_pct ?? data.brain?.health)],
-    ['Data Truth', data.truth?.status ?? (data.truth ? 'ACTIVE' : 'WAITING'), truthScore],
-    ['System Health', data.system?.status ?? data.health?.status ?? (data.health ? 'ACTIVE' : 'WAITING'), pct(data.system?.health_pct)],
-    ['Never Die Monitor', data.monitor?.status ?? (data.monitor ? 'ACTIVE' : 'WAITING'), pct(data.monitor?.health_pct)],
+    ['Genesis Brain', data.brain?.status ?? (data.brain && !data.brain?.error ? 'ACTIVE' : 'WAITING'), pct(data.brain?.health_pct ?? data.brain?.health)],
+    ['Data Truth', data.truth?.status ?? (data.truth && !data.truth?.error ? 'ACTIVE' : 'WAITING'), truthScore],
+    ['System Health', data.system?.status ?? data.health?.status ?? (data.health && !data.health?.error ? 'ACTIVE' : 'WAITING'), pct(data.system?.health_pct)],
+    ['Never Die Monitor', data.monitor?.status ?? (data.monitor && !data.monitor?.error ? 'ACTIVE' : 'WAITING'), pct(data.monitor?.health_pct)],
     ['Research / Sources', sources.length ? 'ACTIVE' : 'WAITING', sources.length ? 100 : null],
     ['Broker Monitor', data.health?.broker_status ?? data.health?.broker?.status ?? 'WAITING', pct(data.health?.broker?.health_pct)],
   ] as const
 
   return (
     <div className="workspace-shell">
+      {data.error && (
+        <div className="card" style={{ padding: '9px 12px', marginBottom: 9, borderColor: 'rgba(245,165,36,.34)', background: 'linear-gradient(90deg, rgba(245,165,36,.07), rgba(7,18,31,.9))' }}>
+          <span style={{ color: 'var(--amber)', fontSize: '.62rem', fontWeight: 800 }}>DEGRADED READ-ONLY MODE</span>
+          <span style={{ color: 'var(--text-mut)', fontSize: '.6rem', marginLeft: 10 }}>{data.error}. Layout remains visible; unavailable values stay WAITING/--.</span>
+        </div>
+      )}
+
       <div className="card" style={{ padding: 12, marginBottom: 9 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', gap: 11, alignItems: 'center' }}>
@@ -153,11 +159,11 @@ export function GenesisTab() {
       <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', marginBottom: 9 }}>
         <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'Read-only after hours'} tone={marketOpen ? 'up' : 'warn'} />
         <Metric label="Prediction Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model field only" tone="accent" />
-        <Metric label="Model Ensemble" value={String(data.brain?.ensemble_status ?? data.brain?.status ?? '--').toUpperCase()} sub="Brain service" tone={data.brain ? 'up' : 'warn'} />
+        <Metric label="Model Ensemble" value={String(data.brain?.ensemble_status ?? data.brain?.status ?? 'WAITING').toUpperCase()} sub="Brain service" tone={data.brain && !data.brain?.error ? 'up' : 'warn'} />
         <Metric label="Truth Score" value={truthScore == null ? '--' : `${truthScore.toFixed(0)}%`} sub="Data truth evidence" tone={truthScore == null ? 'warn' : truthScore >= 90 ? 'up' : 'warn'} />
         <Metric label="Drift Detection" value={Number.isFinite(drift) ? drift.toFixed(3) : '--'} sub="PSI / model field" tone={Number.isFinite(drift) && drift < .2 ? 'up' : 'warn'} />
-        <Metric label="Anomaly State" value={String(data.brain?.anomaly_status ?? data.truth?.anomaly_status ?? '--').toUpperCase()} sub="Existing evidence only" tone="up" />
-        <Metric label="Retraining" value={String(data.brain?.retraining_recommendation ?? data.hunger?.retraining_recommendation ?? '--').toUpperCase()} sub="No auto-promotion from UI" tone="warn" />
+        <Metric label="Anomaly State" value={String(data.brain?.anomaly_status ?? data.truth?.anomaly_status ?? 'WAITING').toUpperCase()} sub="Existing evidence only" tone="warn" />
+        <Metric label="Retraining" value={String(data.brain?.retraining_recommendation ?? data.hunger?.retraining_recommendation ?? 'WAITING').toUpperCase()} sub="No auto-promotion from UI" tone="warn" />
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(280px, 1.05fr) minmax(250px, .8fr) minmax(0, 1.75fr) minmax(265px, 1fr)', alignItems: 'stretch' }}>
@@ -165,7 +171,7 @@ export function GenesisTab() {
           <div style={{ color: biasTone, fontSize: '1.2rem', fontWeight: 850 }}>{bias}</div>
           <div style={{ marginTop: 5, color: 'var(--text-mut)', fontSize: '.62rem' }}>Bias is displayed only when returned by current Genesis evidence.</div>
           <div style={{ display: 'grid', gap: 7, marginTop: 12 }}>
-            {(reasons.length ? reasons.slice(0, 6) : ['No reason list supplied by the current model response.']).map((reason: any, index: number) => (
+            {(reasons.length ? reasons.slice(0, 6) : ['No verified reason list supplied by the current model response.']).map((reason: any, index: number) => (
               <div key={index} style={{ display: 'flex', gap: 8, color: 'var(--text-sec)', fontSize: '.64rem', lineHeight: 1.45 }}><span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{String(reason?.reason ?? reason)}</span></div>
             ))}
           </div>
@@ -203,10 +209,10 @@ export function GenesisTab() {
 
       <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1.55fr', marginTop: 9 }}>
         <Panel title="Forecast Distribution" icon={<Activity size={14} />}>
-          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No forecast distribution series returned</div></div>
+          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No verified forecast-distribution series returned</div></div>
         </Panel>
         <Panel title="Confidence History & Bands" icon={<Activity size={14} />}>
-          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No confidence-band series returned</div></div>
+          <div className="chart-shell" style={{ minHeight: 145 }}><div className="chart-empty">No verified confidence-band series returned</div></div>
         </Panel>
         <Panel title="Decision Audit Trail" icon={<Shield size={14} />}>
           {decisions.length === 0 ? (
