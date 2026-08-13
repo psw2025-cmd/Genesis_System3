@@ -35,7 +35,7 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, paper, health, connectionHealth, error } = useStore()
+  const { autoGates, brokerConnected, health, wsStatus, error } = useStore()
   
   // ═══════════════════════════════════════════════════════════
   // System Health Indicators
@@ -43,19 +43,17 @@ function ProductionProofBar() {
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
-  const profitGate = gatesObj.POSITIVE_NET_EXPECTANCY_AFTER_COSTS || proofList.find((g: any) => /expectancy|profit/i.test(String(g?.label || g?.gate_id || '')))
   const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
   
   const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
-  const profitOk = Boolean(profitGate?.pass ?? profitGate?.ok)
   const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
-  const wsConnected = connectionHealth?.status === 'connected'
+  const wsConnected = wsStatus === 'live'
   const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
   
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
-  const wsLabel = wsConnected ? `WS OK ${connectionHealth?.latency ?? 0}ms` : 'WS RECONNECTING'
+  const wsLabel = wsStatus === 'live' ? 'WS LIVE' : `WS ${wsStatus.toUpperCase()}`
   
   const proofItems: Array<[string, string, boolean, string]> = [
     ['SYSTEM', 'v2.0', !error],
