@@ -102,6 +102,27 @@ def test_collector_timeout_prevents_evidence_collection(monkeypatch):
         gcp_worker_job._collect_scheduler_facts(Session())
 
 
+def test_collector_selects_newest_prior_completed_execution(monkeypatch):
+    monkeypatch.setenv("GOOGLE_CLOUD_PROJECT", "project")
+    monkeypatch.setenv("CLOUD_RUN_EXECUTION", "current")
+    class Response:
+        def __init__(self, body): self.body = body
+        def raise_for_status(self): return None
+        def json(self): return self.body
+    class Session:
+        def get(self, url, params, timeout):
+            if url.endswith("/executions"):
+                return Response({"executions": [
+                    {"name": "x/older-failed", "completionTime": "2026-08-14T00:01:00Z", "createTime": "2026-08-14T00:00:00Z", "failedCount": 1, "taskCount": 1},
+                    {"name": "x/newer-success", "completionTime": "2026-08-14T00:03:00Z", "createTime": "2026-08-14T00:02:00Z", "succeededCount": 1, "taskCount": 1},
+                ]})
+            return Response({"jobs": []})
+    facts = gcp_worker_job._collect_scheduler_facts(Session())
+    collector = next(row for row in facts["jobs"] if row["name"] == "genesis-system3-scheduler-collector")
+    assert collector["execution"] == "newer-success"
+    assert collector["completion_status"] == "EXECUTION_SUCCEEDED"
+
+
 @pytest.mark.parametrize("kind,runner", [("rank", "_run_rank_lane"), ("forecast", "_run_forecast_lane"), ("signals", "_run_signals_lane")])
 def test_business_lane_is_bounded_and_live_off(monkeypatch, kind, runner):
     monkeypatch.setenv("SYSTEM3_JOB_PUBLISH_STATE", "0")

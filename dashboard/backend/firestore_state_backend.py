@@ -304,9 +304,9 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
         "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
         "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata", 26),
-        "genesis-system3-forecast-schedule": ("PAUSED", "genesis-system3-forecast", "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
-        "genesis-system3-rank-schedule": ("PAUSED", "genesis-system3-rank", "50 3 * * 1-5", "UTC", None),
-        "genesis-system3-signals-schedule": ("PAUSED", "genesis-system3-signals", "0 10 * * 1-5", "UTC", None),
+        "genesis-system3-forecast-schedule": ("PAUSED", None, "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
+        "genesis-system3-rank-schedule": ("PAUSED", None, "50 3 * * 1-5", "UTC", None),
+        "genesis-system3-signals-schedule": ("PAUSED", None, "0 10 * * 1-5", "UTC", None),
         "genesis-system3-scheduler-collector-every-minute": ("ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC", 1),
     }
     resources = evidence.get("resources") if isinstance(evidence.get("resources"), list) else []
@@ -324,14 +324,16 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         reasons.append(f"scheduler coverage mismatch: workload={len(workload)} control={len(control)} total={len(resources)} enabled={len(enabled)} paused={len(paused)} expected=7/1/8/5/3")
     for row in resources:
         expected = expected_contract.get(row.get("name"))
-        if expected and (row.get("state"), row.get("target_job"), row.get("schedule"), row.get("time_zone")) != expected[:4]:
+        actual = (row.get("state"), row.get("target_job") if row.get("state") == "ENABLED" else None, row.get("schedule"), row.get("time_zone"))
+        if expected and actual != expected[:4]:
             reasons.append(f"scheduler contract mismatch: {row.get('name')}")
-        if row.get("target_type") != "http":
-            reasons.append(f"scheduler target type invalid: {row.get('name')}")
-        if row.get("target_uri_valid") is not True:
-            reasons.append(f"scheduler target URI invalid: {row.get('name')}")
-        if row.get("state") == "ENABLED" and int(row.get("delivery_status_code", 0) or 0) != 0:
-            reasons.append(f"scheduler delivery failed: {row.get('name')} code={row.get('delivery_status_code')}")
+        if row.get("state") == "ENABLED":
+            if row.get("target_type") != "http":
+                reasons.append(f"scheduler target type invalid: {row.get('name')}")
+            if row.get("target_uri_valid") is not True:
+                reasons.append(f"scheduler target URI invalid: {row.get('name')}")
+            if int(row.get("delivery_status_code", 0) or 0) != 0:
+                reasons.append(f"scheduler delivery failed: {row.get('name')} code={row.get('delivery_status_code')}")
     job_rows = evidence.get("jobs") if isinstance(evidence.get("jobs"), list) else []
     job_names = [row.get("name") for row in job_rows if isinstance(row, dict)]
     if len(job_names) != len(set(job_names)):
