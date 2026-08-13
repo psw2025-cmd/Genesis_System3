@@ -14,6 +14,7 @@ AUTOMATIC = {
     "cloud-run-auto-deploy.yml",
     "gcp-stage2-ci.yml",
     "gcp-dhan-token-fix-ci.yml",
+    "frontend-runtime-smoke.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -102,7 +103,7 @@ def main() -> int:
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
 
-    for name in ("gcp-stage2-ci.yml", "gcp-dhan-token-fix-ci.yml"):
+    for name in ("gcp-stage2-ci.yml", "gcp-dhan-token-fix-ci.yml", "frontend-runtime-smoke.yml"):
         if "pull_request:" not in trigger_blocks[name]:
             raise SystemExit(f"FOCUSED_PRIORITY_PR_TRIGGER_MISSING file={name}")
 
