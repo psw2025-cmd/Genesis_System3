@@ -311,7 +311,7 @@ jobs:
           echo "proof_pack_closure_gate=PASS"
 
       - name: Upload proof pack artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: system3-proof-pack-${{ github.run_number }}

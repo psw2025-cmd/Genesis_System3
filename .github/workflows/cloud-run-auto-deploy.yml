@@ -191,7 +191,7 @@ jobs:
 
       - name: Upload public dashboard visual proof
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: public-paper-dashboard-proof-${{ github.run_number }}
           path: reports/latest/public_dashboard_proof/
@@ -205,7 +205,7 @@ jobs:
 
       - name: Upload mutation policy runtime proof
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: mutation-policy-runtime-proof-${{ github.run_number }}
           path: reports/latest/mutation_policy_runtime_proof/
@@ -319,7 +319,7 @@ jobs:
 
       - name: Upload GCP runtime evidence
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: system3-gcp-runtime-evidence-${{ github.run_number }}
           path: reports/latest/gcp_runtime_lock/

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
+import { brokerIsConnected, paperModeActive, systemRuntimeOk } from './lib/healthTruth'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
@@ -35,36 +36,39 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, health, wsStatus, error } = useStore()
-  
-  // ═══════════════════════════════════════════════════════════
-  // System Health Indicators
-  // ═══════════════════════════════════════════════════════════
+  const { autoGates, brokerConnected, health, wsStatus } = useStore()
+
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
   const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
-  
+
   const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
-  const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
-  const wsConnected = wsStatus === 'live'
-  const apiObserved = Boolean(health && !error)
-  const systemVersion = health?.version || health?.system_version
-  
+  const paperGateOk = Boolean(paperGate?.pass ?? paperGate?.ok)
+  const paperOk = paperGateOk || paperModeActive(health)
+  const dhanOk = brokerIsConnected(health, brokerConnected)
+  const runtimeOk = systemRuntimeOk(health)
+  const wsTone: 'ok' | 'warn' | 'error' = wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const wsLabel = wsStatus === 'live' ? 'WS LIVE' : `WS ${wsStatus.toUpperCase()}`
-  
-  const proofItems: Array<[string, string, boolean]> = [
-    ['SYSTEM', systemVersion ? String(systemVersion) : 'PENDING', Boolean(systemVersion) && !error],
-    ['API', apiObserved ? 'RESPONDING' : 'CHECK', apiObserved],
-    ['WS', wsLabel, wsConnected],
-    ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
-    ['ML', mlLabel, mlOk],
-    ['PAPER', paperOk ? 'OK' : 'PENDING', paperOk],
-    ['UI', error ? 'DEGRADED' : 'RENDERED', !error],
+
+  const proofItems: Array<[string, string, 'ok' | 'warn' | 'error']> = [
+    ['SYSTEM', runtimeOk ? String(health?.mode || health?.status || 'OK').toUpperCase() : 'PENDING', runtimeOk ? 'ok' : 'error'],
+    ['API', runtimeOk ? 'RESPONDING' : 'CHECK', runtimeOk ? 'ok' : 'warn'],
+    ['WS', wsLabel, wsTone],
+    ['DATA', dhanOk ? 'DHAN' : 'DHAN REQ', dhanOk ? 'ok' : 'error'],
+    ['ML', mlLabel, mlOk ? 'ok' : 'warn'],
+    ['PAPER', paperOk ? (paperGateOk ? 'OK' : 'MODE ON') : 'PENDING', paperOk ? 'ok' : 'warn'],
+    ['UI', 'RENDERED', 'ok'],
   ]
+
+  const toneColor = {
+    ok: { bg: 'rgba(34,197,94,.12)', border: 'rgba(34,197,94,.4)', dot: '#22c55e', text: '#4ade80' },
+    warn: { bg: 'rgba(245,158,11,.12)', border: 'rgba(245,158,11,.4)', dot: '#f59e0b', text: '#fbbf24' },
+    error: { bg: 'rgba(239,68,68,.12)', border: 'rgba(239,68,68,.4)', dot: '#ef4444', text: '#fca5a5' },
+  }
 
   return (
     <div
@@ -79,7 +83,7 @@ function ProductionProofBar() {
         padding: '6px 12px',
         minHeight: '40px',
         background: 'linear-gradient(90deg, rgba(15,23,42,.95) 0%, rgba(20,30,50,.95) 100%)',
-        borderBottom: `2px solid ${error ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)'}`,
+        borderBottom: `2px solid ${runtimeOk ? 'rgba(34,197,94,.5)' : 'rgba(239,68,68,.5)'}`,
         overflowX: 'auto',
       }}
     >
@@ -92,7 +96,9 @@ function ProductionProofBar() {
         whiteSpace: 'nowrap',
       }}>≣ GENESIS v2.0</span>
       
-      {proofItems.map(([label, value, safe, _]) => (
+      {proofItems.map(([label, value, tone]) => {
+        const colors = toneColor[tone]
+        return (
         <div
           key={label}
           style={{
@@ -101,20 +107,19 @@ function ProductionProofBar() {
             gap: '6px',
             padding: '4px 10px',
             borderRadius: '4px',
-            background: safe ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)',
-            border: safe ? '1px solid rgba(34,197,94,.4)' : '1px solid rgba(239,68,68,.4)',
+            background: colors.bg,
+            border: `1px solid ${colors.border}`,
             whiteSpace: 'nowrap',
-            boxShadow: safe ? '0 0 8px rgba(34,197,94,.15)' : 'none',
+            boxShadow: tone === 'ok' ? '0 0 8px rgba(34,197,94,.15)' : 'none',
           }}
         >
-          {/* Status dot */}
           <div style={{
             width: '6px',
             height: '6px',
             borderRadius: '50%',
-            background: safe ? '#22c55e' : '#ef4444',
-            boxShadow: safe ? '0 0 4px rgba(34,197,94,0.8)' : '0 0 4px rgba(239,68,68,0.8)',
-            animation: safe ? 'none' : 'pulse 2s infinite',
+            background: colors.dot,
+            boxShadow: `0 0 4px ${colors.dot}`,
+            animation: tone === 'error' ? 'pulse 2s infinite' : 'none',
           }} />
           
           <span style={{
@@ -125,13 +130,14 @@ function ProductionProofBar() {
             letterSpacing: '0.05em',
           }}>{label}</span>
           <span style={{
-            color: safe ? '#4ade80' : '#fca5a5',
+            color: colors.text,
             fontSize: '10px',
             fontFamily: 'monospace',
             fontWeight: 800,
           }}>{value}</span>
         </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
