@@ -58,7 +58,7 @@ jobs:
         run: python scripts/frontend_local_runtime_smoke.py
 
       - name: Upload 22-tab visual proof
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: always()
         with:
           name: frontend-ui-proof-${{ github.run_number }}

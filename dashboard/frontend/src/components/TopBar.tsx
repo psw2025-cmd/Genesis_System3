@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Bell, ChevronDown, Menu, Search, Shield, Wifi } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
+import { brokerIsConnected } from '../lib/healthTruth'
 
 function Clock() {
   const [time, setTime] = useState('')
@@ -43,7 +44,7 @@ function brokerError(obj: any) {
 export function TopBar() {
   const {
     wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
-    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, health,
   } = useStore()
 
   const getSpot = (symbol: string) => {
@@ -65,9 +66,9 @@ export function TopBar() {
   const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
-  const brokerGood = brokerConnected || (apiResponded && !hasError)
-  const brokerTone = brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
-  const brokerLabel = brokerConnected ? 'CONNECTED' : brokerGood ? 'API OK' : hasError ? 'AUTH ISSUE' : 'WAITING'
+  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus) || (apiResponded && !hasError)
+  const brokerTone = brokerConnected || brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
+  const brokerLabel = (brokerConnected || brokerGood) ? 'CONNECTED' : hasError ? 'AUTH ISSUE' : 'WAITING'
   const marketTone = marketOpen ? 'var(--up)' : 'var(--amber)'
   const wsTone = wsStatus === 'live' ? 'var(--up)' : wsStatus === 'connecting' ? 'var(--amber)' : 'var(--down)'
 

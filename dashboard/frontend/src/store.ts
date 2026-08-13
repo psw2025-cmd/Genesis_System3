@@ -78,9 +78,10 @@ export const useStore = create<DashboardState>((set) => ({
     // CRITICAL: health uses cached SSOT and must NOT clobber a live broker_status=true.
     // This race was the long-standing "broker disconnect flicker" on the TopBar/Sidebar.
     const healthConnected = health?.broker?.connected
+    const statusText = String(health?.broker_status || health?.broker?.status || '').toLowerCase()
     const statusConnected = s.brokerStatus?.connected
     let brokerConnected = s.brokerConnected
-    if (healthConnected === true) brokerConnected = true
+    if (healthConnected === true || statusText === 'connected' || statusText === 'ok') brokerConnected = true
     else if (healthConnected === false && statusConnected !== true) brokerConnected = false
     // if health says false/missing but brokerStatus says true → keep true
     return {

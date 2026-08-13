@@ -383,7 +383,7 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         "gcloud", "run", "deploy", SERVICE,
         f"--project={PROJECT}", f"--region={REGION}", f"--image={image}",
         f"--service-account={RUNTIME_SA}", "--port=8080",
-        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=0", "--max=1",
+        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=1", "--max=2",
         "--memory=1Gi", "--cpu=1", "--concurrency=50", "--timeout=300",
         "--allow-unauthenticated", f"--update-env-vars={_env_arg(sha)}",
         "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",

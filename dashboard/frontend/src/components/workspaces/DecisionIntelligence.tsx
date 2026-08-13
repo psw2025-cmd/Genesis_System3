@@ -1,12 +1,20 @@
 import React from 'react';
 import { useStore } from '../../store';
 import { StatusChip } from './TruthUI';
-import { Zap, Shield, Activity, Database, AlertTriangle } from 'lucide-react';
+import { brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
 
 export const DecisionIntelligence: React.FC = () => {
   const {
     health, brokerConnected, marketOpen, wsStatus, apiStatus
   } = useStore();
+  const dhanOk = brokerIsConnected(health, brokerConnected)
+  const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok'
+  const predictorRaw = String(health?.predictor?.status || '').toLowerCase()
+  const predictorValue = predictorRaw || (paperModeActive(health) ? 'ANALYZER' : 'N/A')
+  const predictorTone = predictorRaw === 'ready' || predictorRaw === 'ok' ? 'ok' : 'mut'
+  const scannerRaw = String(health?.scanner?.status || '').toLowerCase()
+  const scannerValue = scannerRaw || (marketOpen ? 'OFFLINE' : 'AFTER HOURS')
+  const scannerTone = scannerRaw === 'active' || scannerRaw === 'ok' ? 'ok' : 'mut'
 
   const sectionStyle: React.CSSProperties = {
     display: 'flex',
@@ -52,8 +60,8 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Truth Control</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="BROKER" value={brokerConnected ? 'CONNECTED' : 'DISCONNECTED'} status={brokerConnected ? 'ok' : 'error'} />
-              <StatusChip label="WS" value={wsStatus.toUpperCase()} status={wsStatus === 'live' ? 'ok' : 'warn'} />
+              <StatusChip label="BROKER" value={dhanOk ? 'CONNECTED' : 'DISCONNECTED'} status={dhanOk ? 'ok' : 'error'} />
+              <StatusChip label="WS" value={wsStatus.toUpperCase()} status={wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'} />
               <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'mut'} />
             </div>
           </div>
@@ -64,9 +72,9 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Service Availability</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="API" value={apiStatus?.status || 'UNKNOWN'} status={apiStatus?.status === 'ok' ? 'ok' : 'warn'} />
-              <StatusChip label="SCANNER" value={health?.scanner?.status || 'OFFLINE'} status={health?.scanner?.status === 'active' ? 'ok' : 'mut'} />
-              <StatusChip label="PREDICTOR" value={health?.predictor?.status || 'PENDING'} status={health?.predictor?.status === 'ready' ? 'ok' : 'error'} />
+              <StatusChip label="API" value={apiOk ? 'OK' : (apiStatus?.status || 'UNKNOWN')} status={apiOk ? 'ok' : 'warn'} />
+              <StatusChip label="SCANNER" value={scannerValue.toUpperCase()} status={scannerTone} />
+              <StatusChip label="PREDICTOR" value={predictorValue.toUpperCase()} status={predictorTone} />
             </div>
           </div>
 
@@ -76,7 +84,7 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Data Sources</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="DHAN" value={brokerConnected ? 'AUTH OK' : 'NO AUTH'} status={brokerConnected ? 'ok' : 'error'} />
+              <StatusChip label="DHAN" value={dhanOk ? 'AUTH OK' : 'NO AUTH'} status={dhanOk ? 'ok' : 'error'} />
               <StatusChip label="NSE" value={health?.nse?.status || 'FALLBACK'} status={health?.nse?.status === 'ok' ? 'ok' : 'warn'} />
               <StatusChip label="DATA SOURCE" value={health?.data_source || 'UNKNOWN'} status={health?.data_source ? 'ok' : 'mut'} />
             </div>
