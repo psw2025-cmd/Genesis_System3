@@ -94,6 +94,47 @@ def test_health_endpoint_returns_200(app):
     assert "broker_status" in data
 
 
+def test_multibagger_contract_is_truthful_pending_without_evidence(app):
+    status, _, body = call(app, "GET", "/api/research/multibagger")
+    assert status == 200
+    data = json.loads(body)
+    assert data["schema_version"] == "1.0.0"
+    assert data["status"] == "pending"
+    assert data["candidates"] == []
+    assert data["sections"]["candidate_ranking"] == "pending"
+    assert data["safety"] == {"read_only": True, "orders_enabled": False}
+
+
+def test_multibagger_contract_requires_price_and_model_provenance(app):
+    endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    result = endpoint.__globals__["_build_multibagger_contract"]({
+        "candidates": [{"candidate_id": "c-1", "symbol": "RELIANCE", "price": {"value": 100}}]
+    })
+    assert result["status"] == "pending"
+    assert result["validation"]["accepted"] == 0
+    assert "PRICE_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+    assert "MODEL_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+
+
+def test_multibagger_contract_exposes_only_validated_partial_evidence(app):
+    endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    result = endpoint.__globals__["_build_multibagger_contract"]({
+        "as_of": "2026-08-14T09:30:00+05:30",
+        "source": "GENESIS_FORECAST_EVALUATOR",
+        "candidates": [{
+            "candidate_id": "c-1", "symbol": "reliance", "rank": 1,
+            "price": {"value": 1500.5, "currency": "inr", "source": "DHAN", "observed_at": "2026-08-14T09:29:59+05:30"},
+            "model": {"name": "gain-rank", "version": "2026.08", "generated_at": "2026-08-14T09:30:00+05:30"},
+        }],
+    })
+    assert result["status"] == "partial"
+    assert result["sections"]["candidate_ranking"] == "partial"
+    assert result["sections"]["probability_ladder"] == "pending"
+    assert result["candidates"][0]["symbol"] == "RELIANCE"
+    assert result["candidates"][0]["price"]["source"] == "DHAN"
+    assert result["validation"] == {"accepted": 1, "rejected": 0, "rejections": []}
+
+
 def test_state_endpoint_returns_200(app):
     status, _, body = call(app, "GET", "/api/state")
     assert status == 200

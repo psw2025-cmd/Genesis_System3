@@ -1300,6 +1300,138 @@ def _filter_rows_fo(rows):
     return kept, rejected
 
 
+_MULTIBAGGER_SCHEMA_VERSION = "1.0.0"
+
+
+def _is_iso_timestamp(value: Any) -> bool:
+    text = str(value or "").strip()
+    if not text:
+        return False
+    try:
+        datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return True
+    except ValueError:
+        return False
+
+
+def _multibagger_pending_contract(reason: str = "NO_VERIFIED_EVIDENCE") -> Dict[str, Any]:
+    """Return the stable public contract without implying missing research is empty."""
+    return {
+        "schema_version": _MULTIBAGGER_SCHEMA_VERSION,
+        "status": "pending",
+        "as_of": None,
+        "source": None,
+        "candidates": [],
+        "sections": {
+            "candidate_ranking": "pending",
+            "forecast_horizons": "pending",
+            "probability_ladder": "pending",
+            "fundamentals": "pending",
+            "governance": "pending",
+            "ownership_flows": "pending",
+            "valuation": "pending",
+            "outcome_ledger": "pending",
+        },
+        "reason": reason,
+        "safety": {"read_only": True, "orders_enabled": False},
+    }
+
+
+def _build_multibagger_contract(payload: Any) -> Dict[str, Any]:
+    """Validate producer evidence before it can enter the public read contract.
+
+    Wave 1 deliberately accepts only candidate identity plus mandatory observed
+    price and model provenance. It does not manufacture probabilities or infer
+    unavailable research sections from unrelated dashboard state.
+    """
+    if not isinstance(payload, dict):
+        return _multibagger_pending_contract()
+    rows = payload.get("candidates")
+    if not isinstance(rows, list):
+        return _multibagger_pending_contract("CANDIDATE_EVIDENCE_UNAVAILABLE")
+
+    accepted = []
+    rejected = []
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            rejected.append({"index": index, "reason": "INVALID_CANDIDATE"})
+            continue
+        candidate_id = str(row.get("candidate_id") or "").strip()
+        symbol = str(row.get("symbol") or "").strip().upper()
+        price = row.get("price")
+        model = row.get("model")
+        failures = []
+        if not candidate_id or not symbol:
+            failures.append("IDENTITY_PROVENANCE_REQUIRED")
+        if not isinstance(price, dict):
+            failures.append("PRICE_PROVENANCE_REQUIRED")
+        else:
+            try:
+                price_value = float(price.get("value"))
+            except (TypeError, ValueError):
+                price_value = 0.0
+            if (
+                price_value <= 0
+                or not str(price.get("currency") or "").strip()
+                or not str(price.get("source") or "").strip()
+                or not _is_iso_timestamp(price.get("observed_at"))
+            ):
+                failures.append("PRICE_PROVENANCE_REQUIRED")
+        if (
+            not isinstance(model, dict)
+            or not all(str(model.get(key) or "").strip() for key in ("name", "version"))
+            or not _is_iso_timestamp(model.get("generated_at"))
+        ):
+            failures.append("MODEL_PROVENANCE_REQUIRED")
+        if failures:
+            rejected.append({"candidate_id": candidate_id or None, "index": index, "reason": ";".join(failures)})
+            continue
+        accepted.append({
+            "candidate_id": candidate_id,
+            "symbol": symbol,
+            "rank": row.get("rank"),
+            "price": {
+                "value": price_value,
+                "currency": str(price["currency"]).upper(),
+                "source": str(price["source"]),
+                "observed_at": str(price["observed_at"]),
+            },
+            "model": {
+                "name": str(model["name"]),
+                "version": str(model["version"]),
+                "generated_at": str(model["generated_at"]),
+            },
+        })
+
+    if not accepted:
+        result = _multibagger_pending_contract("NO_CANDIDATE_PASSED_PROVENANCE_VALIDATION")
+        result["validation"] = {"accepted": 0, "rejected": len(rejected), "rejections": rejected}
+        return result
+
+    result = _multibagger_pending_contract("ADDITIONAL_RESEARCH_SECTIONS_UNAVAILABLE")
+    result.update({
+        "status": "partial",
+        "as_of": payload.get("as_of"),
+        "source": payload.get("source"),
+        "candidates": accepted,
+        "validation": {"accepted": len(accepted), "rejected": len(rejected), "rejections": rejected},
+    })
+    result["sections"]["candidate_ranking"] = "partial"
+    return result
+
+
+@app.get("/api/research/multibagger")
+async def get_multibagger_research():
+    """Versioned, read-only research evidence contract; pending by default."""
+    payload = None
+    if SSOT_AVAILABLE and state_store is not None:
+        try:
+            payload = state_store.get_state().get("multibagger_research")
+        except Exception:
+            payload = None
+    return _build_multibagger_contract(payload)
+
+
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
     """Latest gain rank predictions — file history, or live scanner fallback."""
