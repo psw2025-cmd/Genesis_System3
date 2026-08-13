@@ -56,3 +56,12 @@ jobs:
       - name: Prove all canonical tabs render in Chrome
         shell: bash
         run: python scripts/frontend_local_runtime_smoke.py
+
+      - name: Upload 22-tab visual proof
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-ui-proof-${{ github.run_number }}
+          path: frontend-ui-proof/
+          if-no-files-found: error
+          retention-days: 30
