@@ -48,28 +48,29 @@ function ProductionProofBar() {
   const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
   const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
   const wsConnected = wsStatus === 'live'
-  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
+  const apiObserved = Boolean(health && !error)
+  const systemVersion = health?.version || health?.system_version
   
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const wsLabel = wsStatus === 'live' ? 'WS LIVE' : `WS ${wsStatus.toUpperCase()}`
   
-  const proofItems: Array<[string, string, boolean, string]> = [
-    ['SYSTEM', 'v2.0', !error],
-    ['STORE', 'UNIFIED', true],
+  const proofItems: Array<[string, string, boolean]> = [
+    ['SYSTEM', systemVersion ? String(systemVersion) : 'PENDING', Boolean(systemVersion) && !error],
+    ['API', apiObserved ? 'RESPONDING' : 'CHECK', apiObserved],
     ['WS', wsLabel, wsConnected],
     ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
     ['ML', mlLabel, mlOk],
     ['PAPER', paperOk ? 'OK' : 'PENDING', paperOk],
-    ['UI', cloudUiOk ? 'LIVE' : 'CHECK', cloudUiOk],
+    ['UI', error ? 'DEGRADED' : 'RENDERED', !error],
   ]
 
   return (
     <div
       data-testid="production-proof-bar"
       aria-label="Production proof status"
-      title="🟢 GENESIS SYSTEM 3 V2.0 - Production Grade"
+      title="System3 runtime proof status"
       style={{
         flexShrink: 0,
         display: 'flex',

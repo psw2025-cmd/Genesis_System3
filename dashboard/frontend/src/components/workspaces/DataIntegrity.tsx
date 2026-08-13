@@ -5,6 +5,8 @@ import { Database, ShieldCheck, Wifi, RefreshCw } from 'lucide-react';
 
 export const DataIntegrity: React.FC = () => {
   const { health, brokerConnected, wsStatus, lastSync, brokerStatus } = useStore();
+  const brokerObserved = brokerStatus != null || health?.broker != null;
+  const errorsObserved = Array.isArray(health?.errors);
 
   return (
     <div data-testid="data-integrity-root" style={{ height: '100%', overflowY: 'auto', background: 'var(--surface)' }}>
@@ -31,10 +33,10 @@ export const DataIntegrity: React.FC = () => {
               <h2 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Authentication State</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <StatusChip label="DHAN LOGIN" value={brokerConnected ? 'AUTHENTICATED' : 'REQUIRED'} status={brokerConnected ? 'ok' : 'error'} />
+              <StatusChip label="DHAN LOGIN" value={brokerConnected ? 'AUTHENTICATED' : brokerObserved ? 'NOT CONNECTED' : 'PENDING'} status={brokerConnected ? 'ok' : brokerObserved ? 'error' : 'warn'} />
               <StatusChip label="TOKEN EXPIRY" value={brokerStatus?.token_expiry || 'UNKNOWN'} status={brokerStatus?.token_expiry ? 'ok' : 'warn'} />
               <div style={{ fontSize: '11px', color: 'var(--text-sec)', padding: '8px', background: brokerConnected ? 'rgba(0,232,122,0.05)' : 'rgba(255,77,106,0.05)', borderRadius: '4px' }}>
-                {brokerConnected ? 'Session is active and secure.' : 'CRITICAL: Authentication disabled or token invalid.'}
+                {brokerConnected ? 'Backend reports an active read-only broker session.' : brokerObserved ? (brokerStatus?.message || brokerStatus?.error || 'Backend reports broker not connected.') : 'Waiting for broker status evidence.'}
               </div>
             </div>
           </section>
@@ -45,7 +47,7 @@ export const DataIntegrity: React.FC = () => {
               <h2 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Broker Connectivity</h2>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <StatusChip label="API ENDPOINT" value="web.dhan.co" status="mut" />
+              <StatusChip label="API PATH" value="CLOUD RUN → DHAN" status="mut" />
               <StatusChip label="WS STATUS" value={wsStatus.toUpperCase()} status={wsStatus === 'live' ? 'ok' : 'warn'} />
               <StatusChip label="LATENCY" value={health?.network?.latency ? `${health.network.latency}ms` : '—'} status={health?.network?.latency < 100 ? 'ok' : 'warn'} />
             </div>
@@ -66,7 +68,7 @@ export const DataIntegrity: React.FC = () => {
 
         <section className="card" style={{ padding: '16px' }}>
           <h2 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '12px' }}>API Error Log & Blockers</h2>
-          {health?.errors?.length > 0 ? (
+          {errorsObserved && health.errors.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {health.errors.map((err: any, i: number) => (
                 <div key={i} style={{ padding: '10px', background: 'rgba(255, 77, 106, 0.05)', border: '1px solid var(--border)', borderRadius: '4px', fontSize: '12px' }}>
@@ -76,8 +78,10 @@ export const DataIntegrity: React.FC = () => {
                 </div>
               ))}
             </div>
-          ) : (
+          ) : errorsObserved ? (
             <div style={{ textAlign: 'center', padding: '20px', color: 'var(--up)', fontWeight: 600 }}>✓ NO ACTIVE DATA BLOCKERS</div>
+          ) : (
+            <PENDINGState reason="ERROR AND BLOCKER STATUS NOT REPORTED" />
           )}
         </section>
 
