@@ -1,5 +1,7 @@
+import ast
 import types
 import unittest
+from pathlib import Path
 
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
 
@@ -66,6 +68,28 @@ class CloudDhanStatusProbeTests(unittest.TestCase):
         module = _module(rest)
         result = get_cloud_status(module, timeout_s=5)
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+
+    def test_cloud_deployer_keeps_idempotent_business_scheduler_contract(self):
+        path = Path("scripts/gcp_cloud_run_auto_deploy.py")
+        text = path.read_text(encoding="utf-8")
+        ast.parse(text)
+        for marker in (
+            'BUSINESS_SCHEDULES = {',
+            '"rank": "45 3 * * MON-FRI"',
+            '"forecast": "0 4 * * MON-FRI"',
+            '"signals": "15 13 * * MON-FRI"',
+            'def _scheduler_exists(name: str) -> bool:',
+            'def _business_scheduler_command(kind: str, *, exists: bool) -> list[str]:',
+            'action = "update" if exists else "create"',
+            'https://run.googleapis.com/v2/projects/',
+            '--oauth-token-scope=https://www.googleapis.com/auth/cloud-platform',
+            'def _ensure_business_scheduler_contract() -> None:',
+            '"business_job_executed": False',
+            '_ensure_business_scheduler_contract()',
+        ):
+            self.assertIn(marker, text)
+        self.assertNotIn("gcloud run jobs execute", text)
+        self.assertIn("business_scheduler_describe_failed", text)
 
 
 if __name__ == "__main__":
