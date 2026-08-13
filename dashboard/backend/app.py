@@ -1300,6 +1300,197 @@ def _filter_rows_fo(rows):
     return kept, rejected
 
 
+_MULTIBAGGER_SCHEMA_VERSION = "1.0.0"
+_MULTIBAGGER_FRESHNESS_TTL_S = 1800
+_MULTIBAGGER_FUTURE_TOLERANCE_S = 300
+_MULTIBAGGER_PRODUCER_SOURCES = {"GENESIS_FORECAST_EVALUATOR"}
+_MULTIBAGGER_PRICE_SOURCES = {"DHAN"}
+
+
+def _parse_aware_timestamp(value: Any) -> Optional[datetime]:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+        return parsed if parsed.tzinfo is not None and parsed.utcoffset() is not None else None
+    except ValueError:
+        return None
+
+
+def _evidence_age(timestamp: Any, now: datetime) -> Optional[float]:
+    parsed = _parse_aware_timestamp(timestamp)
+    return None if parsed is None else (now - parsed.astimezone(timezone.utc)).total_seconds()
+
+
+def _multibagger_pending_contract(reason: str = "NO_VERIFIED_EVIDENCE") -> Dict[str, Any]:
+    """Return the stable public contract without implying missing research is empty."""
+    return {
+        "schema_version": _MULTIBAGGER_SCHEMA_VERSION,
+        "status": "pending",
+        "as_of": None,
+        "source": None,
+        "candidates": [],
+        "sections": {
+            "candidate_ranking": "pending",
+            "forecast_horizons": "pending",
+            "probability_ladder": "pending",
+            "fundamentals": "pending",
+            "governance": "pending",
+            "ownership_flows": "pending",
+            "valuation": "pending",
+            "outcome_ledger": "pending",
+        },
+        "reason": reason,
+        "safety": {"read_only": True, "orders_enabled": False},
+    }
+
+
+def _build_multibagger_contract(payload: Any) -> Dict[str, Any]:
+    """Validate producer evidence before it can enter the public read contract.
+
+    Wave 1 deliberately accepts only candidate identity plus mandatory observed
+    price and model provenance. It does not manufacture probabilities or infer
+    unavailable research sections from unrelated dashboard state.
+    """
+    if not isinstance(payload, dict):
+        return _multibagger_pending_contract()
+    now = datetime.now(timezone.utc)
+    producer_source = str(payload.get("source") or "").strip().upper()
+    as_of = payload.get("as_of")
+    envelope_age = _evidence_age(as_of, now)
+    if producer_source not in _MULTIBAGGER_PRODUCER_SOURCES:
+        return _multibagger_pending_contract("PRODUCER_SOURCE_UNVERIFIED")
+    if envelope_age is None or envelope_age < -_MULTIBAGGER_FUTURE_TOLERANCE_S:
+        return _multibagger_pending_contract("INVALID_OR_FUTURE_AS_OF")
+    rows = payload.get("candidates")
+    if not isinstance(rows, list):
+        return _multibagger_pending_contract("CANDIDATE_EVIDENCE_UNAVAILABLE")
+
+    accepted = []
+    rejected = []
+    seen_ids = set()
+    seen_symbols = set()
+    seen_ranks = set()
+    for index, row in enumerate(rows):
+        if not isinstance(row, dict):
+            rejected.append({"index": index, "reason": "INVALID_CANDIDATE"})
+            continue
+        candidate_id = str(row.get("candidate_id") or "").strip()
+        symbol = str(row.get("symbol") or "").strip().upper()
+        price = row.get("price")
+        model = row.get("model")
+        failures = []
+        if not candidate_id or not symbol:
+            failures.append("IDENTITY_PROVENANCE_REQUIRED")
+        if candidate_id in seen_ids or symbol in seen_symbols:
+            failures.append("DUPLICATE_CANDIDATE_OR_SYMBOL")
+        rank = row.get("rank")
+        if isinstance(rank, bool) or not isinstance(rank, int) or rank <= 0:
+            failures.append("POSITIVE_INTEGRAL_RANK_REQUIRED")
+        elif rank in seen_ranks:
+            failures.append("DUPLICATE_RANK")
+        if not isinstance(price, dict):
+            failures.append("PRICE_PROVENANCE_REQUIRED")
+        else:
+            try:
+                price_value = float(price.get("value"))
+            except (TypeError, ValueError):
+                price_value = 0.0
+            price_source = str(price.get("source") or "").strip().upper()
+            price_age = _evidence_age(price.get("observed_at"), now)
+            if (
+                price_value <= 0
+                or str(price.get("currency") or "").strip().upper() != "INR"
+                or price_source not in _MULTIBAGGER_PRICE_SOURCES
+                or price_age is None
+                or price_age < -_MULTIBAGGER_FUTURE_TOLERANCE_S
+            ):
+                failures.append("PRICE_PROVENANCE_REQUIRED")
+            elif price_age > _MULTIBAGGER_FRESHNESS_TTL_S:
+                failures.append("PRICE_EVIDENCE_STALE")
+        model_generated_age = _evidence_age(model.get("generated_at"), now) if isinstance(model, dict) else None
+        if (
+            not isinstance(model, dict)
+            or not all(str(model.get(key) or "").strip() for key in ("name", "version", "scoring_method"))
+            or model_generated_age is None
+            or model_generated_age < -_MULTIBAGGER_FUTURE_TOLERANCE_S
+        ):
+            failures.append("MODEL_PROVENANCE_REQUIRED")
+        elif model_generated_age > _MULTIBAGGER_FRESHNESS_TTL_S:
+            failures.append("MODEL_EVIDENCE_STALE")
+        if failures:
+            rejected.append({"candidate_id": candidate_id or None, "index": index, "reason": ";".join(failures)})
+            continue
+        seen_ids.add(candidate_id)
+        seen_symbols.add(symbol)
+        seen_ranks.add(rank)
+        proof = model.get("proof") if isinstance(model.get("proof"), dict) else {}
+        artifact_sha = str(proof.get("artifact_sha256") or "").lower()
+        data_sha = str(proof.get("data_sha256") or "").lower()
+        code_sha = str(proof.get("code_sha") or "").lower()
+        manifest_complete = bool(
+            re.fullmatch(r"[0-9a-f]{64}", artifact_sha)
+            and re.fullmatch(r"[0-9a-f]{64}", data_sha)
+            and re.fullmatch(r"(?:[0-9a-f]{40}|[0-9a-f]{64})", code_sha)
+        )
+        accepted.append({
+            "candidate_id": candidate_id,
+            "symbol": symbol,
+            "rank": rank,
+            "price": {
+                "value": price_value,
+                "currency": str(price["currency"]).upper(),
+                "source": str(price["source"]),
+                "observed_at": str(price["observed_at"]),
+            },
+            "model": {
+                "name": str(model["name"]),
+                "version": str(model["version"]),
+                "scoring_method": str(model["scoring_method"]),
+                "generated_at": str(model["generated_at"]),
+                "evidence_status": "unverified",
+                "proof_ready": False,
+                "producer_asserted_hashes": ({
+                    "artifact_sha256": artifact_sha,
+                    "data_sha256": data_sha,
+                    "code_sha": code_sha,
+                } if manifest_complete else None),
+                "manifest_complete": manifest_complete,
+            },
+        })
+
+    if not accepted:
+        result = _multibagger_pending_contract("NO_CANDIDATE_PASSED_PROVENANCE_VALIDATION")
+        result["validation"] = {"accepted": 0, "rejected": len(rejected), "rejections": rejected}
+        return result
+
+    result = _multibagger_pending_contract("ADDITIONAL_RESEARCH_SECTIONS_UNAVAILABLE")
+    result.update({
+        "status": "stale" if envelope_age > _MULTIBAGGER_FRESHNESS_TTL_S else "partial",
+        "as_of": str(as_of),
+        "source": producer_source,
+        "age_seconds": round(max(0.0, envelope_age), 3),
+        "stale": envelope_age > _MULTIBAGGER_FRESHNESS_TTL_S,
+        "candidates": accepted,
+        "validation": {"accepted": len(accepted), "rejected": len(rejected), "rejections": rejected},
+    })
+    result["sections"]["candidate_ranking"] = "stale" if result["stale"] else "partial"
+    return result
+
+
+@app.get("/api/research/multibagger")
+async def get_multibagger_research():
+    """Versioned, read-only research evidence contract; pending by default."""
+    payload = None
+    if SSOT_AVAILABLE and state_store is not None:
+        try:
+            payload = state_store.get_state().get("multibagger_research")
+        except Exception:
+            payload = None
+    return _build_multibagger_contract(payload)
+
+
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
     """Latest gain rank predictions — file history, or live scanner fallback."""
