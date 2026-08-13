@@ -35,28 +35,35 @@ import MLPerformance from './components/MLPerformance'
 import { GenesisTab } from './components/GenesisTab'
 
 function ProductionProofBar() {
-  const { autoGates, brokerConnected, paper, health } = useStore()
+  const { autoGates, brokerConnected, paper, health, connectionHealth, error } = useStore()
+  
+  // ═══════════════════════════════════════════════════════════
+  // System Health Indicators
+  // ═══════════════════════════════════════════════════════════
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
   const profitGate = gatesObj.POSITIVE_NET_EXPECTANCY_AFTER_COSTS || proofList.find((g: any) => /expectancy|profit/i.test(String(g?.label || g?.gate_id || '')))
   const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
+  
   const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
   const profitOk = Boolean(profitGate?.pass ?? profitGate?.ok)
   const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
+  const wsConnected = connectionHealth?.status === 'connected'
+  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
+  
   const mlLabel = mlOk
     ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
     : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
-  const paperLabel = paperOk
-    ? 'PAPER OK'
-    : (profitOk ? 'PROVENANCE' : `EXP ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? '—'}`)
-  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
-  const proofItems: Array<[string, string, boolean]> = [
-    ['LIVE', 'OFF', true],
-    ['MODE', 'PAPER', true],
+  const wsLabel = wsConnected ? `WS OK ${connectionHealth?.latency ?? 0}ms` : 'WS RECONNECTING'
+  
+  const proofItems: Array<[string, string, boolean, string]> = [
+    ['SYSTEM', 'v2.0', !error],
+    ['STORE', 'UNIFIED', true],
+    ['WS', wsLabel, wsConnected],
     ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
     ['ML', mlLabel, mlOk],
-    ['PAPER', paperLabel, paperOk],
+    ['PAPER', paperOk ? 'OK' : 'PENDING', paperOk],
     ['UI', cloudUiOk ? 'LIVE' : 'CHECK', cloudUiOk],
   ]
 
@@ -64,53 +71,65 @@ function ProductionProofBar() {
     <div
       data-testid="production-proof-bar"
       aria-label="Production proof status"
-      title="Proof status from /api/auto_gates + broker health"
+      title="🟢 GENESIS SYSTEM 3 V2.0 - Production Grade"
       style={{
         flexShrink: 0,
         display: 'flex',
         alignItems: 'center',
         gap: '8px',
         padding: '6px 12px',
-        minHeight: '36px',
-        background: 'var(--surface-1)',
-        borderBottom: '1px solid var(--border)',
+        minHeight: '40px',
+        background: 'linear-gradient(90deg, rgba(15,23,42,.95) 0%, rgba(20,30,50,.95) 100%)',
+        borderBottom: `2px solid ${error ? 'rgba(239,68,68,.5)' : 'rgba(34,197,94,.5)'}`,
         overflowX: 'auto',
       }}
     >
       <span style={{
-        color: 'var(--text-mut)',
-        fontSize: '10px',
-        fontFamily: 'var(--font-mono)',
-        fontWeight: 700,
-        letterSpacing: '0.08em',
+        color: 'rgba(100,200,255,0.9)',
+        fontSize: '11px',
+        fontFamily: 'monospace',
+        fontWeight: 800,
+        letterSpacing: '0.12em',
         whiteSpace: 'nowrap',
-      }}>PROOF</span>
-      {proofItems.map(([label, value, safe]) => (
+      }}>≣ GENESIS v2.0</span>
+      
+      {proofItems.map(([label, value, safe, _]) => (
         <div
           key={label}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '6px',
-            padding: '3px 8px',
-            borderRadius: '6px',
-            background: safe ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.10)',
-            border: safe ? '1px solid rgba(0,232,122,.28)' : '1px solid rgba(245,158,11,.28)',
+            padding: '4px 10px',
+            borderRadius: '4px',
+            background: safe ? 'rgba(34,197,94,.12)' : 'rgba(239,68,68,.12)',
+            border: safe ? '1px solid rgba(34,197,94,.4)' : '1px solid rgba(239,68,68,.4)',
             whiteSpace: 'nowrap',
+            boxShadow: safe ? '0 0 8px rgba(34,197,94,.15)' : 'none',
           }}
         >
+          {/* Status dot */}
+          <div style={{
+            width: '6px',
+            height: '6px',
+            borderRadius: '50%',
+            background: safe ? '#22c55e' : '#ef4444',
+            boxShadow: safe ? '0 0 4px rgba(34,197,94,0.8)' : '0 0 4px rgba(239,68,68,0.8)',
+            animation: safe ? 'none' : 'pulse 2s infinite',
+          }} />
+          
           <span style={{
-            color: 'var(--text-mut)',
-            fontSize: '10px',
-            fontFamily: 'var(--font-mono)',
+            color: 'rgba(200,220,255,0.8)',
+            fontSize: '9px',
+            fontFamily: 'monospace',
             fontWeight: 700,
-            letterSpacing: '0.06em',
+            letterSpacing: '0.05em',
           }}>{label}</span>
           <span style={{
-            color: safe ? 'var(--up)' : 'var(--amber)',
-            fontSize: '11px',
-            fontFamily: 'var(--font-mono)',
-            fontWeight: 700,
+            color: safe ? '#4ade80' : '#fca5a5',
+            fontSize: '10px',
+            fontFamily: 'monospace',
+            fontWeight: 800,
           }}>{value}</span>
         </div>
       ))}
