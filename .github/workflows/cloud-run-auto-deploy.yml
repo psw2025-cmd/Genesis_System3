@@ -10,6 +10,9 @@ on:
       - "dashboard/**"
       - "core/**"
       - "scripts/gcp_worker_job.py"
+      - "scripts/gcp_paper_job.py"
+      - "scripts/gcp_control_plane_verify.py"
+      - "scripts/gcp_ui_tab_visual_proof.py"
       - "scripts/smoke_ml_validate_e2e.py"
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
@@ -54,6 +57,8 @@ jobs:
       SIGNALS_JOB_SERVICE_ACCOUNT: gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATION_JOB: genesis-system3-dhan-token-rotate
       DHAN_ROTATION_SCHEDULER: genesis-system3-dhan-token-rotate-daily
+      PAPER_JOB: genesis-system3-paper
+      PAPER_SCHEDULER: genesis-system3-paper-market
       GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
       GCP_DEPLOY_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
       CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
@@ -87,6 +92,9 @@ jobs:
               "core/brokers/dhan/cloud_token_provider.py": "GCP_SECRET_MANAGER_DYNAMIC",
               "core/brokers/dhan/cloud_runtime_patch.py": "order_placement_allowed",
               "scripts/gcp_dhan_token_rotation_job.py": "order_endpoints_called",
+              "scripts/gcp_paper_job.py": "LIVE_FLAGS_FORBIDDEN",
+              "scripts/gcp_control_plane_verify.py": "coverage_expectations",
+              "scripts/gcp_ui_tab_visual_proof.py": "semantic_contract_version",
               "scripts/gcp_runtime_iam_preflight.py": "FIRESTORE_RUNTIME_IAM_OK",
               "scripts/gcp_failed_revision_forensic.py": "FAILED_REVISION_FORENSIC",
               "scripts/gcp_runtime_evidence.py": "dashboard_public_readonly",
@@ -94,6 +102,8 @@ jobs:
               "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
               "scripts/gcp_mutation_policy_runtime_proof.py": "MUTATION_POLICY_RUNTIME_PROOF",
               "scripts/gcp_runtime_identity_safety.py": "CLOUD_RUNTIME_SAFETY_OK",
+              "dashboard/backend/paper_ledger_backend.py": "FIRESTORE_PAPER_LEDGER",
+              "dashboard/backend/durable_paper_job.py": "run_durable_paper_once",
               "dashboard/frontend/src/App.tsx": "public/read-only",
               "dashboard/backend/security_policy.py": "PUBLIC_DASHBOARD_READ_ONLY",
               "dashboard/backend/mutation_policy.py": "LIVE_MUTATION_LOCKED",
@@ -116,8 +126,11 @@ jobs:
           assert not legacy_auth_hits, f"legacy service-account-key auth found: {legacy_auth_hits}"
           assert "DHAN_ROTATOR_SERVICE_ACCOUNT" in workflow
           assert "DHAN_SCHEDULER_SERVICE_ACCOUNT" in workflow
+          assert "PAPER_JOB" in workflow and "PAPER_SCHEDULER" in workflow
           assert '--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"' in workflow
           assert '--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"' in workflow
+          assert 'scripts/gcp_paper_job.py' in workflow
+          assert 'scripts/gcp_control_plane_verify.py' in workflow
 
           # Construct forbidden Secret Manager role fragments so the guard does
           # not match its own source. Scan executable/non-comment lines only;
@@ -190,16 +203,16 @@ jobs:
       - name: Deploy guarded public PAPER Cloud Run service
         run: python scripts/gcp_cloud_run_auto_deploy.py
 
-      - name: Prove and capture public PAPER dashboard without API key
+      - name: Prove and capture early public PAPER dashboard without API key
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/gcp_public_dashboard_runtime_proof.py
 
-      - name: Upload public dashboard visual proof
+      - name: Upload early public dashboard visual proof
         if: always()
         uses: actions/upload-artifact@v6
         with:
-          name: public-paper-dashboard-proof-${{ github.run_number }}
+          name: public-paper-dashboard-early-${{ github.run_number }}
           path: reports/latest/public_dashboard_proof/
           if-no-files-found: warn
           retention-days: 14
@@ -290,7 +303,7 @@ jobs:
             --region="${GCP_REGION}" \
             --wait
 
-      - name: Configure bounded business lanes and evidence collector
+      - name: Configure bounded business lanes, durable Paper job, and evidence collector
         run: |
           IMAGE=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(spec.template.spec.containers[0].image)')
           for KIND in rank forecast validate signals; do
@@ -306,13 +319,33 @@ jobs:
               $(if [ "${KIND}" = rank ] || [ "${KIND}" = validate ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
             gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
           done
+
+          # PAPER authority is a bounded job, never the web process. The web
+          # runtime identity already has Firestore and read-only Dhan client/token
+          # access; it has no PIN/TOTP and no broker-order authority.
+          gcloud run jobs deploy "${PAPER_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+            --image="${IMAGE}" --service-account="${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_paper_job.py \
+            --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=3m \
+            --set-env-vars="SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,SYSTEM3_REAL_ONLY=1,SYSTEM3_PAPER_MAX_OPEN=3,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
+            --set-secrets="DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest"
+          gcloud run jobs add-iam-policy-binding "${PAPER_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+            --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
+
+          PAPER_URI="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/${PAPER_JOB}:run"
+          if gcloud scheduler jobs describe "${PAPER_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1; then PAPER_ACTION=update; else PAPER_ACTION=create; fi
+          gcloud scheduler jobs "${PAPER_ACTION}" http "${PAPER_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" \
+            --schedule="* 9-15 * * MON-FRI" --time-zone="Asia/Kolkata" --uri="${PAPER_URI}" --http-method=POST \
+            --oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" \
+            --message-body='{}'
+
           gcloud run jobs deploy genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
             --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
             --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=2m \
             --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
           gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
 
-          # Rank morning → forecast → post-close validate (Spearman day) → signals.
+          # Rank morning → forecast → post-close validate → signals. Paper is
+          # minute-bounded by Scheduler and exchange-calendar truth in the job.
           gcloud scheduler jobs update http genesis-system3-rank-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="45 3 * * MON-FRI" --time-zone=UTC
           gcloud scheduler jobs update http genesis-system3-forecast-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="0 4 * * MON-FRI" --time-zone=UTC
           if gcloud scheduler jobs describe genesis-system3-validate-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1; then
@@ -335,13 +368,16 @@ jobs:
             --oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --oauth-token-scope="https://www.googleapis.com/auth/cloud-platform" \
             --message-body='{}'
 
+          # Bootstrap the durable ledger before control-plane acceptance. Market
+          # closed/no-chain is a truthful successful tick; it still persists the
+          # durable Paper state and never invents a trade.
+          gcloud run jobs execute "${PAPER_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
+
           # Control-plane canary: invoke through Scheduler, then run one direct
-          # Control-plane only: never manufacture business-lane evidence during deploy.
+          # collection. Never manufacture business-lane evidence during deploy.
           gcloud scheduler jobs pause genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
           trap 'gcloud scheduler jobs resume genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" >/dev/null 2>&1 || true' EXIT
           BEFORE_EXEC=$(gcloud run jobs describe genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.latestCreatedExecution.name)')
-          # Resume before triggering: the canary evidence must observe the
-          # collector control schedule as ENABLED, never claim health while paused.
           gcloud scheduler jobs resume genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
           gcloud scheduler jobs run genesis-system3-scheduler-collector-every-minute --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}"
           CANARY_EXEC=""
@@ -355,7 +391,6 @@ jobs:
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > /tmp/scheduler-health.json
-          # Coverage must match SSOT-derived expected_* fields (never hardcode lane counts again).
           jq -e '
             .coverage.contract_matched == true
             and .coverage.total == .coverage.expected_total
@@ -376,8 +411,7 @@ jobs:
             )
           ' /tmp/scheduler-health.json >/dev/null
 
-          # Cloud self-bootstrap (GitHub Actions → Cloud Run Jobs only; never laptop-seeded):
-          # one bounded execution per business lane so history-aware health has cloud-native proof.
+          # Cloud self-bootstrap (GitHub Actions → Cloud Run Jobs only; never laptop-seeded).
           for LANE in rank forecast validate signals; do
             gcloud run jobs execute "genesis-system3-${LANE}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
@@ -394,7 +428,7 @@ jobs:
             and .coverage.contract_matched == true
             and .live_trading_enabled != true
             and (.observability.alert_severity == "none")
-            and ([.jobs[] | select(.completion_status == "EXECUTION_SUCCEEDED")] | length) >= 6
+            and (([.jobs[] | select(.completion_status == "EXECUTION_SUCCEEDED")] | length) >= .coverage.expected_enabled)
           ' /tmp/scheduler-health-after-bootstrap.json >/dev/null
 
           # Cloud ML history bootstrap (replaces laptop: smoke_ml_validate_e2e.py --write-firestore)
@@ -414,11 +448,11 @@ jobs:
             and (.gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.pass == false or .gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.days_passing_threshold < 5)
           ' /tmp/auto-gates.json >/dev/null
 
-          # 4× cloud control-plane verify (upstream health API ← downstream Firestore evidence).
+          # 4× cloud control-plane verify using the contract-derived verifier.
           gcloud run jobs deploy genesis-system3-control-plane-verify --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
-            --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
+            --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_control_plane_verify.py \
             --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=3m \
-            --set-env-vars="SYSTEM3_JOB_KIND=control-plane-verify,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},SYSTEM3_SERVICE_URL=${SERVICE_URL},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
+            --set-env-vars="SYSTEM3_SERVICE_URL=${SERVICE_URL},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
           for PASS in 1 2 3 4; do
             gcloud run jobs execute genesis-system3-control-plane-verify \
               --project="${GOOGLE_CLOUD_PROJECT}" \
@@ -426,15 +460,30 @@ jobs:
               --update-env-vars="SYSTEM3_VERIFY_PASS=${PASS}" \
               --wait
             curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > "/tmp/scheduler-health-pass-${PASS}.json"
-            jq -e --argjson pass "${PASS}" '
+            jq -e '
               .healthy == true
               and .coverage.contract_matched == true
+              and .coverage.total == .coverage.expected_total
               and .live_trading_enabled != true
               and (.observability.alert_severity == "none")
             ' "/tmp/scheduler-health-pass-${PASS}.json" >/dev/null
             sleep 8
           done
           trap - EXIT
+
+      - name: Prove final deployed URL semantics after durable Paper bootstrap
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/gcp_public_dashboard_runtime_proof.py
+
+      - name: Upload final URL semantic proof
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: public-paper-dashboard-final-${{ github.run_number }}
+          path: reports/latest/public_dashboard_proof/
+          if-no-files-found: error
+          retention-days: 30
 
       - name: Prove service, rotator identity and scheduler safety
         run: |
@@ -458,6 +507,8 @@ jobs:
           curl -fsS --max-time 30 "${SERVICE_URL}/api/auth/status" > /tmp/auth.json
           jq -e '.required == false and .configured == false and .authenticated == false and .mode == "public_readonly" and .credential_surface == "REMOVED" and .session == null' /tmp/auth.json >/dev/null
           curl -fsS --max-time 30 "${SERVICE_URL}/api/state" > /tmp/state.json
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/paper" > /tmp/paper.json
+          jq -e '.positions_source == "FIRESTORE_PAPER_LEDGER" and .paper_truth.durable == true and .broker_order_endpoints_called == false and .live_trading_enabled == false and (.status == "ok" or .status == "EMPTY")' /tmp/paper.json >/dev/null
           for ATTEMPT in 1 2 3 4 5 6; do
             curl -fsS --max-time 30 "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
             if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then break; fi
@@ -502,7 +553,9 @@ jobs:
         run: |
           gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(status.traffic.revisionName,status.traffic.percent,status.url)' || true
           gcloud run jobs describe "${DHAN_ROTATION_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(metadata.name,spec.template.spec.template.spec.serviceAccountName)' || true
+          gcloud run jobs describe "${PAPER_JOB}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='table(metadata.name,status.latestCreatedExecution.name)' || true
           gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='table(name,schedule,timeZone,state,httpTarget.oauthToken.serviceAccountEmail)' || true
+          gcloud scheduler jobs describe "${PAPER_SCHEDULER}" --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='table(name,schedule,timeZone,state,httpTarget.oauthToken.serviceAccountEmail)' || true
 
       - name: Publish exact-SHA runtime proof success
         if: ${{ success() }}
