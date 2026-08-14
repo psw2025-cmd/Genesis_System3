@@ -4,11 +4,22 @@ on:
   pull_request:
     paths:
       - "dashboard/backend/**"
+      - "dashboard/frontend/src/trafficResilience.ts"
       - "scripts/gcp_worker_job.py"
+      - "scripts/gcp_paper_job.py"
+      - "scripts/gcp_control_plane_verify.py"
+      - "scripts/gcp_ui_tab_visual_proof.py"
+      - "scripts/gcp_configure_traffic_monitoring.py"
+      - "scripts/gcp_cloud_run_auto_deploy.py"
       - "deploy/gcp/**"
       - "tests/test_firestore_state_backend.py"
       - "tests/test_gcp_worker_job.py"
       - "tests/test_runtime_state_cloud_safety.py"
+      - "tests/test_paper_ledger_durable.py"
+      - "tests/test_gcp_ui_tab_semantic_proof.py"
+      - "tests/test_gcp_control_plane_verify.py"
+      - "tests/test_traffic_shield.py"
+      - "tests/test_gcp_traffic_monitoring.py"
       - ".github/workflows/gcp-stage2-ci.yml"
   workflow_dispatch:
 
@@ -18,30 +29,60 @@ permissions:
 jobs:
   safety-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
+    env:
+      SYSTEM3_MODE: analyze
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      AUTO_EXECUTE_TRADES: "0"
+      SYSTEM3_REAL_ONLY: "1"
+      DEFER_INSTRUMENT_WARMUP: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install pytest==8.4.1 pytz==2026.2
+      - name: Install focused safety-test dependencies
+        run: |
+          python -m pip install \
+            pytest==8.4.1 \
+            pytz==2026.2 \
+            "fastapi>=0.111,<1" \
+            "google-auth>=2.28" \
+            "requests>=2.31"
       - name: Compile changed Python entry points
         run: |
           python -m py_compile \
             dashboard/backend/firestore_state_backend.py \
             dashboard/backend/runtime_state_store.py \
             dashboard/backend/state_sync_service.py \
-            scripts/gcp_worker_job.py
-      - name: Run focused cloud safety tests
+            dashboard/backend/paper_ledger_backend.py \
+            dashboard/backend/durable_paper_job.py \
+            dashboard/backend/traffic_shield.py \
+            scripts/gcp_worker_job.py \
+            scripts/gcp_paper_job.py \
+            scripts/gcp_control_plane_verify.py \
+            scripts/gcp_ui_tab_visual_proof.py \
+            scripts/gcp_configure_traffic_monitoring.py \
+            scripts/gcp_cloud_run_auto_deploy.py
+      - name: Run focused cloud safety and resilience tests
         run: |
           python -m pytest -q \
             tests/test_firestore_state_backend.py \
             tests/test_gcp_worker_job.py \
-            tests/test_runtime_state_cloud_safety.py
+            tests/test_runtime_state_cloud_safety.py \
+            tests/test_paper_ledger_durable.py \
+            tests/test_gcp_ui_tab_semantic_proof.py \
+            tests/test_gcp_control_plane_verify.py \
+            tests/test_traffic_shield.py \
+            tests/test_gcp_traffic_monitoring.py
       - name: Verify deploy scripts remain guarded and no-trade
         run: |
           grep -q 'ALLOW_GCP_DEPLOY' deploy/gcp/deploy_web.sh
           grep -q 'ALLOW_GCP_DEPLOY' deploy/gcp/deploy_smoke_job.sh
           grep -q 'LIVE_TRADING_ENABLED=0' deploy/gcp/deploy_web.sh
           grep -q 'LIVE_TRADING_ENABLED=0' deploy/gcp/deploy_smoke_job.sh
+          grep -q 'roles/monitoring.alertPolicyEditor' deploy/gcp/bootstrap_github_wif.sh
+          grep -q 'roles/monitoring.notificationChannelViewer' deploy/gcp/bootstrap_github_wif.sh
           test ! -e render.yaml
