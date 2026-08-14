@@ -30,7 +30,6 @@ FORENSIC_MONITORED_WORKFLOWS = {
     "GCP Dhan Token Fix CI",
     "GCP Dhan Token Rotation Manual Recovery",
     "GCP Stage 2 Safety Checks",
-    "GCP Market Data UI Parity Proof",
 }
 
 
