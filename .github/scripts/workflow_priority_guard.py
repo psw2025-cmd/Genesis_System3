@@ -15,11 +15,14 @@ AUTOMATIC = {
     "gcp-stage2-ci.yml",
     "gcp-dhan-token-fix-ci.yml",
     "frontend-runtime-smoke.yml",
+    "gcp-market-data-ui-parity-proof.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
+UI_PARITY_WORKFLOW = "gcp-market-data-ui-parity-proof.yml"
+EVENT_TRIGGER_ALLOWED = {FORENSIC_WORKFLOW, UI_PARITY_WORKFLOW}
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
     "Cloud Run Auto Deploy",
@@ -95,7 +98,7 @@ def main() -> int:
         if match:
             raise SystemExit(f"WORKFLOW_FORBIDDEN_TRIGGER file={name} match={match.group(1)!r}")
         event_match = event_trigger.search(on_block)
-        if event_match and name != FORENSIC_WORKFLOW:
+        if event_match and name not in EVENT_TRIGGER_ALLOWED:
             raise SystemExit(
                 f"WORKFLOW_EVENT_TRIGGER_RESERVED file={name} match={event_match.group(1)!r}"
             )
@@ -123,6 +126,12 @@ def main() -> int:
     for monitored in sorted(FORENSIC_MONITORED_WORKFLOWS):
         if monitored not in guard_on:
             raise SystemExit(f"FORENSIC_MONITORED_WORKFLOW_MISSING workflow={monitored!r}")
+
+    parity_on = trigger_blocks[UI_PARITY_WORKFLOW]
+    if "workflow_run:" not in parity_on or "workflow_dispatch:" not in parity_on:
+        raise SystemExit("UI_PARITY_PROOF_TRIGGER_MISSING")
+    if 'workflows: ["Cloud Run Auto Deploy"]' not in parity_on:
+        raise SystemExit("UI_PARITY_PROOF_DEPLOY_DEPENDENCY_MISSING")
 
     guard_text = workflow_text[FORENSIC_WORKFLOW]
     if re.search(

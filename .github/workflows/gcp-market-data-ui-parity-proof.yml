@@ -1,0 +1,109 @@
+name: GCP Market Data UI Parity Proof
+
+on:
+  workflow_run:
+    workflows: ["Cloud Run Auto Deploy"]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: "40-char deployed commit SHA to prove"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: gcp-market-data-ui-parity-proof
+  cancel-in-progress: false
+
+jobs:
+  option-chain-ui-proof:
+    if: >-
+      ${{
+        github.event_name == 'workflow_dispatch' ||
+        (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
+      }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
+      GCP_REGION: asia-south1
+      GCP_CLOUD_RUN_SERVICE: genesis-system3-web
+      GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+      GCP_DEPLOY_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
+      EXPECTED_SHA: ${{ github.event_name == 'workflow_dispatch' && inputs.expected_sha || github.event.workflow_run.head_sha }}
+    steps:
+      - name: Checkout proof harness from current authoritative main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Validate target SHA
+        run: |
+          test "${#EXPECTED_SHA}" -eq 40
+          git cat-file -e "${EXPECTED_SHA}^{commit}"
+
+      - name: Authenticate to Google Cloud with keyless WIF
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install proof dependencies
+        run: python -m pip install "requests>=2.31.0"
+
+      - name: Wait for exact target SHA to be the single serving revision
+        env:
+          GITHUB_SHA: ${{ env.EXPECTED_SHA }}
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, time
+          expected = os.environ['GITHUB_SHA']
+          for attempt in range(30):
+              raw = subprocess.check_output([
+                  'gcloud','run','services','describe','genesis-system3-web',
+                  '--project=system3-openalgo-safe','--region=asia-south1','--format=json'
+              ], text=True)
+              service = json.loads(raw)
+              traffic = (service.get('status') or {}).get('traffic') or []
+              serving = [str(r.get('revisionName') or '').split('/')[-1] for r in traffic if int(r.get('percent') or 0) == 100]
+              if len(serving) == 1:
+                  rev_raw = subprocess.check_output([
+                      'gcloud','run','revisions','describe',serving[0],
+                      '--project=system3-openalgo-safe','--region=asia-south1','--format=json'
+                  ], text=True)
+                  revision = json.loads(rev_raw)
+                  containers = ((revision.get('spec') or {}).get('containers') or [])
+                  env = {str(x.get('name')): str(x.get('value') or '') for x in (containers[0].get('env') if containers else []) if isinstance(x, dict)}
+                  if env.get('DEPLOY_GIT_SHA') == expected:
+                      print('EXACT_SHA_SERVING', expected, serving[0])
+                      raise SystemExit(0)
+              time.sleep(10)
+          raise SystemExit('exact target SHA did not become single 100% serving revision')
+          PY
+
+      - name: Prove full broker option-chain parity from actual production UI
+        env:
+          GITHUB_SHA: ${{ env.EXPECTED_SHA }}
+        run: python scripts/gcp_option_chain_ui_parity_proof.py
+
+      - name: Upload UI parity screenshots and proof
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: gcp-market-data-ui-parity-${{ env.EXPECTED_SHA }}
+          path: reports/latest/public_dashboard_proof/option_chain_parity/
+          if-no-files-found: error
+          retention-days: 30
