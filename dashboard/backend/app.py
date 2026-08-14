@@ -304,6 +304,13 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(title="System3 Genesis API")
 
+# Register unique chain discovery/expiry routes after FastAPI exists.
+# Must run post-construction: chain module is imported earlier for helpers.
+try:
+    chain_router.install_legacy_bridge()
+except Exception as _chain_bridge_exc:
+    print(f"[startup] chain legacy bridge deferred/failed: {type(_chain_bridge_exc).__name__}: {_chain_bridge_exc}")
+
 # ── Modular routers DISABLED — they duplicated 19 existing routes and
 # overrode the rich endpoint versions the frontend depends on, breaking
 # all dashboard tabs. Proper modularization requires MOVING code out of

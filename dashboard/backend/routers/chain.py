@@ -158,13 +158,16 @@ def _legacy_app_module():
 
 
 def _install_legacy_bridge() -> None:
-    """At startup, upgrade legacy discovery and register unique read-only routes."""
+    """Upgrade discovery + register unique read-only expiry routes.
+
+    Routes are registered immediately (not only on startup) so Cloud Run
+    revisions never serve HTTP_404 for /api/expiries/{underlying}.
+    """
     parent = _legacy_app_module()
-    if parent is None:
+    if parent is None or getattr(parent, "app", None) is None:
         return
 
-    @parent.app.on_event("startup")
-    async def _refresh_supported_underlyings_from_dhan_master() -> None:
+    def _apply() -> None:
         try:
             payload = build_underlyings_payload()
             values: List[str] = list(payload.get("underlyings") or [])
@@ -172,8 +175,8 @@ def _install_legacy_bridge() -> None:
                 parent.DEFAULT_UNDERLYINGS = values
                 parent.SYSTEM3_UNDERLYINGS_METADATA = payload
 
-            # app.py already owns /api/underlyings. Replace its callable truth at
-            # startup instead of registering a duplicate route.
+            # app.py already owns /api/underlyings. Replace its callable truth
+            # instead of registering a duplicate route.
             for route in parent.app.routes:
                 if getattr(route, "path", None) == "/api/underlyings":
                     route.endpoint = get_underlyings
@@ -205,5 +208,19 @@ def _install_legacy_bridge() -> None:
                 "live_trading_enabled": False,
             }
 
+    _apply()
 
-_install_legacy_bridge()
+    @parent.app.on_event("startup")
+    async def _refresh_supported_underlyings_from_dhan_master() -> None:
+        _apply()
+
+
+# Do NOT call at import time — app.py imports this module before
+# ``app = FastAPI(...)`` exists, so the bridge would no-op and leave
+# /api/expiries/{underlying} unregistered (UI shows EXPIRY DATA HTTP_404).
+# app.py must call install_legacy_bridge() after the FastAPI app is created.
+
+
+def install_legacy_bridge() -> None:
+    """Public startup hook for app.py after FastAPI() construction."""
+    _install_legacy_bridge()

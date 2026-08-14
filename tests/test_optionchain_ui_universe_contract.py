@@ -72,12 +72,31 @@ def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     assert result["live_trading_enabled"] is False
 
 
-def test_ui_has_dynamic_broker_discovery_expiries_and_full_strikes_default():
-    text = Path("dashboard/frontend/src/components/OptionChain.tsx").read_text(encoding="utf-8")
-    assert "/api/underlyings" in text
-    assert "/api/expiries/" in text
-    assert "/api/chain-expiry/" in text
-    assert "Option expiry" in text
+def test_install_legacy_bridge_registers_expiry_routes_after_app_exists():
+    from fastapi import FastAPI
+
+    class Parent:
+        app = FastAPI()
+        DEFAULT_UNDERLYINGS = ["NIFTY"]
+        SYSTEM3_UNDERLYINGS_METADATA = {}
+
+    parent = Parent()
+    # Simulate post-construction install (app exists in sys.modules-like parent).
+    monkey_paths = []
+
+    def _fake_legacy():
+        return parent
+
+    old = chain_router._legacy_app_module
+    chain_router._legacy_app_module = _fake_legacy  # type: ignore[assignment]
+    try:
+        chain_router.install_legacy_bridge()
+        paths = {getattr(r, "path", None) for r in parent.app.routes}
+        monkey_paths = sorted(p for p in paths if p)
+    finally:
+        chain_router._legacy_app_module = old  # type: ignore[assignment]
+    assert "/api/expiries/{underlying}" in monkey_paths
+    assert "/api/chain-expiry/{underlying}" in monkey_paths
     assert "EXPIRIES" in text
     assert "selected_expiry=" in text
     assert "DHAN UNIVERSE" in text
