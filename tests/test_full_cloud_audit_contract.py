@@ -26,19 +26,19 @@ class FullCloudAuditContractTests(unittest.TestCase):
 
     def test_cloud_audit_contains_required_read_only_evidence(self):
         for marker in (
-            'roles/run.invoker',
-            'allUsers',
-            '/api/health',
-            '/api/broker/status',
-            'ssl.create_default_context',
-            'http_429',
-            'rate_limit_text',
-            'firestore_permission',
+            "roles/run.invoker",
+            "allUsers",
+            "/api/health",
+            "/api/broker/status",
+            "ssl.create_default_context",
+            "http_429",
+            "rate_limit_text",
+            "firestore_permission",
             'gcloud", "logging", "read',
             'gcloud", "logging", "sinks", "list',
             'gcloud", "run", "jobs", "executions", "list',
-            'payload_accessed": False,
-            'order_actions_performed": False,
+            '"payload_accessed": False',
+            '"order_actions_performed": False',
         ):
             self.assertIn(marker, self.cloud)
 
@@ -74,15 +74,15 @@ class FullCloudAuditContractTests(unittest.TestCase):
 
     def test_exact_security_fetch_rejects_stale_evidence(self):
         self.assertIn("head_sha", self.exact)
-        self.assertIn("r.get(\"head_sha\") == SHA", self.exact)
+        self.assertIn('r.get("head_sha") == SHA', self.exact)
         self.assertIn("stale_evidence_accepted", self.exact)
         self.assertIn("BLOCKED_EXACT_SECURITY_RUN_TIMEOUT", self.exact)
 
     def test_ai_consensus_cannot_override_deterministic_failure(self):
         self.assertIn('OPENAI_MODEL = os.getenv("OPENAI_AUDIT_MODEL", "gpt-4o")', self.ai)
         self.assertIn('ANTHROPIC_MODEL = os.getenv("ANTHROPIC_AUDIT_MODEL", "claude-sonnet-4-20250514")', self.ai)
-        self.assertIn("security.get(\"state\") == \"PASS\"", self.ai)
-        self.assertIn("cloud.get(\"state\") == \"PASS\"", self.ai)
+        self.assertIn('security.get("state") == "PASS"', self.ai)
+        self.assertIn('cloud.get("state") == "PASS"', self.ai)
         self.assertIn('"ai_can_override_deterministic_failure": False', self.ai)
         self.assertIn("BLOCKED_MISSING_API_KEY", self.ai)
         self.assertIn("BLOCKED_EXTERNAL_AI", self.ai)
