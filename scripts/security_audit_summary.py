@@ -31,19 +31,50 @@ def _npm(data: Any | None, err: str | None) -> dict[str, Any]:
         state = "WARN"
     else:
         state = "PASS"
-    return {"state": state, "counts": counts}
+    vulnerable = []
+    for name, row in sorted((data.get("vulnerabilities") or {}).items()):
+        if isinstance(row, dict):
+            vulnerable.append({
+                "name": name,
+                "severity": row.get("severity"),
+                "direct": bool(row.get("isDirect")),
+                "range": row.get("range"),
+                "fix_available": bool(row.get("fixAvailable")),
+            })
+    return {"state": state, "counts": counts, "vulnerable_packages": vulnerable[:100]}
 
 
 def _pip(data: Any | None, err: str | None) -> dict[str, Any]:
-    if err or not isinstance(data, list):
-        return {"state": "NOT_PROVEN", "error": err or "invalid_json"}
+    if err:
+        return {"state": "NOT_PROVEN", "error": err}
+    if isinstance(data, dict):
+        deps = data.get("dependencies")
+    elif isinstance(data, list):
+        deps = data
+    else:
+        deps = None
+    if not isinstance(deps, list):
+        return {"state": "NOT_PROVEN", "error": "invalid_schema"}
     vuln_count = 0
     vulnerable_packages = 0
     ids: list[str] = []
-    for dep in data:
-        vulns = dep.get("vulns") or [] if isinstance(dep, dict) else []
+    packages: list[dict[str, Any]] = []
+    for dep in deps:
+        if not isinstance(dep, dict):
+            continue
+        vulns = dep.get("vulns") or []
         if vulns:
             vulnerable_packages += 1
+            packages.append({
+                "name": dep.get("name"),
+                "version": dep.get("version"),
+                "ids": sorted(str(v.get("id")) for v in vulns if isinstance(v, dict) and v.get("id")),
+                "fix_versions": sorted({
+                    str(fix)
+                    for v in vulns if isinstance(v, dict)
+                    for fix in (v.get("fix_versions") or [])
+                }),
+            })
         vuln_count += len(vulns)
         for vuln in vulns:
             if isinstance(vuln, dict) and vuln.get("id"):
@@ -53,6 +84,7 @@ def _pip(data: Any | None, err: str | None) -> dict[str, Any]:
         "vulnerability_count": vuln_count,
         "vulnerable_packages": vulnerable_packages,
         "ids": sorted(set(ids))[:100],
+        "packages": packages[:100],
     }
 
 
@@ -61,17 +93,30 @@ def _bandit(data: Any | None, err: str | None) -> dict[str, Any]:
         return {"state": "NOT_PROVEN", "error": err or "invalid_json"}
     results = data.get("results") or []
     counts = {"LOW": 0, "MEDIUM": 0, "HIGH": 0}
+    high_findings: list[dict[str, Any]] = []
     for row in results:
         sev = str((row or {}).get("issue_severity") or "").upper()
         if sev in counts:
             counts[sev] += 1
+        if sev == "HIGH" and isinstance(row, dict):
+            high_findings.append({
+                "file": row.get("filename"),
+                "line": row.get("line_number"),
+                "test_id": row.get("test_id"),
+                "test_name": row.get("test_name"),
+            })
     if counts["HIGH"]:
         state = "FAIL"
     elif counts["MEDIUM"] or counts["LOW"]:
         state = "WARN"
     else:
         state = "PASS"
-    return {"state": state, "counts": counts, "finding_count": len(results)}
+    return {
+        "state": state,
+        "counts": counts,
+        "finding_count": len(results),
+        "high_findings": high_findings[:100],
+    }
 
 
 def main() -> int:
@@ -119,7 +164,7 @@ def main() -> int:
     ]
     for name, row in checks.items():
         detail = json.dumps({k: v for k, v in row.items() if k != "state"}, sort_keys=True)
-        lines.append(f"| `{name}` | **{row.get('state')}** | `{detail[:500]}` |")
+        lines.append(f"| `{name}` | **{row.get('state')}** | `{detail[:900]}` |")
     lines += [
         "",
         "Safety: ANALYZER/PAPER audit only; no order endpoint invoked; no secret payload stored.",
