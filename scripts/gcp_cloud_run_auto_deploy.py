@@ -12,9 +12,12 @@ Cloud Run/Monitoring traffic-resilience contract.
 """
 from __future__ import annotations
 
+import json
 import os
 import subprocess
+import urllib.request
 from pathlib import Path
+from typing import Any
 
 import gcp_cloud_run_auto_deploy_impl as deployer
 from gcp_image_provenance import assert_same_artifact_image
@@ -22,6 +25,7 @@ from gcp_image_provenance import assert_same_artifact_image
 _IMPL = Path(__file__).with_name("gcp_cloud_run_auto_deploy_impl.py")
 PROJECT = deployer.PROJECT
 REGION = os.getenv("GCP_REGION", "asia-south1")
+SERVICE = os.getenv("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
 RUNTIME_SA = f"genesis-system3-web@{PROJECT}.iam.gserviceaccount.com"
 SCHEDULER_SA = os.getenv(
     "DHAN_SCHEDULER_SERVICE_ACCOUNT",
@@ -229,6 +233,62 @@ def _configure_traffic_monitoring() -> None:
     print("SYSTEM3_TRAFFIC_MONITORING_CONTRACT enforced")
 
 
+def _validate_traffic_runtime(payload: Any) -> list[str]:
+    body = payload if isinstance(payload, dict) else {}
+    failures: list[str] = []
+    if body.get("status") != "ENFORCED":
+        failures.append("traffic_shield_not_enforced")
+    if body.get("legacy_fixed_delay_middleware_retired") is not True:
+        failures.append("legacy_delay_middleware_not_retired")
+    if int(body.get("legacy_fixed_delay_middleware_removed_count", 0) or 0) != 1:
+        failures.append("legacy_delay_middleware_removed_count_not_one")
+    if int(body.get("max_concurrent_producers", 0) or 0) != int(TRAFFIC_RUNTIME_ENV["SYSTEM3_TRAFFIC_SHIELD_MAX_PRODUCERS"]):
+        failures.append("traffic_producer_cap_mismatch")
+    if body.get("mutation_routes_shielded") is not False:
+        failures.append("mutation_routes_unexpectedly_shielded")
+    if body.get("live_trading_enabled") is not False:
+        failures.append("traffic_runtime_live_not_false")
+    if body.get("client_contract") != "RETRY_AFTER_EXPONENTIAL_BACKOFF_JITTER":
+        failures.append("client_backoff_contract_missing")
+    if body.get("public_dashboard_read_only") is not True:
+        failures.append("public_readonly_contract_missing")
+    return failures
+
+
+def _prove_traffic_runtime() -> None:
+    service_url = _ORIGINAL_RUN(
+        [
+            "gcloud", "run", "services", "describe", SERVICE,
+            f"--project={PROJECT}", f"--region={REGION}", "--format=value(status.url)",
+        ],
+        capture=True,
+    ).strip().rstrip("/")
+    if not service_url.startswith("https://"):
+        raise RuntimeError("traffic_runtime_service_url_missing")
+    request = urllib.request.Request(
+        f"{service_url}/api/traffic/health",
+        headers={"User-Agent": "genesis-system3-traffic-runtime-proof"},
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        if int(getattr(response, "status", 0) or 0) != 200:
+            raise RuntimeError(f"traffic_runtime_http_{getattr(response, 'status', 0)}")
+        payload = json.loads(response.read().decode("utf-8"))
+    failures = _validate_traffic_runtime(payload)
+    if failures:
+        raise RuntimeError(f"traffic_runtime_proof_failed:{failures}")
+    print(
+        "SYSTEM3_TRAFFIC_RUNTIME_PROOF",
+        {
+            "status": "PASS",
+            "service_url": service_url,
+            "max_concurrent_producers": payload.get("max_concurrent_producers"),
+            "legacy_fixed_delay_middleware_retired": True,
+            "mutation_routes_shielded": False,
+            "live_trading_enabled": False,
+        },
+    )
+
+
 def main() -> int:
     _verify_implementation_contract()
     # Alerting must converge before a candidate can alter production runtime.
@@ -238,6 +298,8 @@ def main() -> int:
     result = deployer.main()
     if result:
         return result
+    # The serving revision must prove the new shield before the deploy can pass.
+    _prove_traffic_runtime()
     _ensure_business_scheduler_contract()
     return 0
 
