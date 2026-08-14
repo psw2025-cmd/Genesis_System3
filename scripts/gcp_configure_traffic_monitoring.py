@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import json
 import os
-import sys
 from typing import Any, Dict, Iterable, List
 
 from google.auth import default as google_auth_default
@@ -67,16 +66,31 @@ def _condition(
     }
 
 
+def _alert_strategy(channels: List[str]) -> Dict[str, Any]:
+    # notificationRateLimit is for LogMatch policies and is not implemented for
+    # metric thresholds. Use supported OPENED/CLOSED prompts and a per-channel
+    # 30-minute reminder interval for still-open incidents.
+    strategy: Dict[str, Any] = {
+        "autoClose": "1800s",
+        "notificationPrompts": ["OPENED", "CLOSED"],
+    }
+    if channels:
+        strategy["notificationChannelStrategy"] = [
+            {
+                "notificationChannelNames": channels,
+                "renotifyInterval": "1800s",
+            }
+        ]
+    return strategy
+
+
 def desired_policies(notification_channels: Iterable[str] = ()) -> List[Dict[str, Any]]:
     channels = [str(x) for x in notification_channels if str(x)]
     common = {
         "combiner": "OR",
         "enabled": True,
         "notificationChannels": channels,
-        "alertStrategy": {
-            "autoClose": "1800s",
-            "notificationRateLimit": {"period": "300s"},
-        },
+        "alertStrategy": _alert_strategy(channels),
     }
     docs = {
         "content": (
