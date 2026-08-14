@@ -108,6 +108,8 @@ for ROLE in \
   roles/cloudbuild.builds.editor \
   roles/artifactregistry.reader \
   roles/cloudscheduler.admin \
+  roles/monitoring.alertPolicyEditor \
+  roles/monitoring.notificationChannelViewer \
   roles/serviceusage.serviceUsageConsumer \
   roles/browser; do
   gcloud projects add-iam-policy-binding "$PROJECT_ID" \
@@ -204,7 +206,7 @@ Least-privilege boundaries:
 - web runtime -> Firestore + client-id/access-token/worker-token read only
 - rotator -> client-id/access-token/PIN/TOTP read + access-token version add
 - scheduler -> no broker secrets; invoke job only after job IAM binding
-- deployer -> no broker Secret Manager role
+- deployer -> deployment control + alert-policy edit + notification-channel read; no broker Secret Manager role
 
 Safety unchanged: ANALYZE_MODE=1, LIVE=0, AUTO_EXECUTE_TRADES=0, public PAPER dashboard read-only.
 EOF
