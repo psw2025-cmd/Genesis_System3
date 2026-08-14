@@ -1,0 +1,94 @@
+name: SonarQube Audit
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "23 2 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  readiness:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.preflight.outputs.configured }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - id: preflight
+        name: Prove Sonar configuration state
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ vars.SONAR_PROJECT_KEY }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
+        shell: bash
+        run: |
+          mkdir -p reports/latest/sonar_audit
+          if [ -n "${SONAR_TOKEN:-}" ] && [ -n "${SONAR_PROJECT_KEY:-}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            state=CONFIGURED
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            state=BLOCKED_MISSING_CONFIGURATION
+          fi
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          configured=bool(os.getenv('SONAR_TOKEN')) and bool(os.getenv('SONAR_PROJECT_KEY'))
+          Path('reports/latest/sonar_audit/readiness.json').write_text(json.dumps({
+            'state':'CONFIGURED' if configured else 'BLOCKED_MISSING_CONFIGURATION',
+            'token_present':bool(os.getenv('SONAR_TOKEN')),
+            'project_key_present':bool(os.getenv('SONAR_PROJECT_KEY')),
+            'host_url_present':bool(os.getenv('SONAR_HOST_URL')),
+            'organization_present':bool(os.getenv('SONAR_ORGANIZATION')),
+            'secret_value_exposed':False,
+          }, indent=2, sort_keys=True), encoding='utf-8')
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: sonar-readiness-${{ github.run_number }}
+          path: reports/latest/sonar_audit/
+          if-no-files-found: error
+          retention-days: 30
+
+  scan-cloud:
+    needs: readiness
+    if: ${{ needs.readiness.outputs.configured == 'true' && vars.SONAR_ORGANIZATION != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: SonarQube Cloud scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+            -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+
+  scan-server:
+    needs: readiness
+    if: ${{ needs.readiness.outputs.configured == 'true' && vars.SONAR_ORGANIZATION == '' && vars.SONAR_HOST_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: SonarQube Server scan
+        uses: SonarSource/sonarqube-scan-action@v7
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+        with:
+          args: >-
+            -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
