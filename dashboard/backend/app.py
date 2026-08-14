@@ -1083,12 +1083,18 @@ async def get_market_live_board():
         )
         from core.brokers.dhan.dhan_readonly import get_holdings
 
-        # Prefer live marketfeed; fall back to paced index chain spots already in memory.
+        # Prefer live marketfeed; fall back to paced/TTL chain spots already in memory.
         fallback = {}
         try:
-            for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"):
+            for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "INDIAVIX"):
+                row = None
                 pushed = _PUSHED_CHAIN_CACHE.get(sym) if isinstance(_PUSHED_CHAIN_CACHE, dict) else None
-                row = (pushed or {}).get("data") if isinstance(pushed, dict) else None
+                if isinstance(pushed, dict) and isinstance(pushed.get("data"), dict):
+                    row = pushed["data"]
+                if not isinstance(row, dict) or not (row.get("spot") or row.get("underlying_spot")):
+                    ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
+                    if isinstance(ttl_hit, dict):
+                        row = ttl_hit
                 if not isinstance(row, dict):
                     continue
                 spot = row.get("spot") or row.get("underlying_spot")
@@ -3146,10 +3152,40 @@ def _slim_gates(g: Any) -> Dict[str, Any]:
     }
 
 
+def _slim_token_proof(proof: Any) -> Dict[str, Any]:
+    """Safe token provenance for System tab — never include raw access tokens."""
+    if not isinstance(proof, dict):
+        return {}
+    out: Dict[str, Any] = {}
+    for key in (
+        "source",
+        "secret_id",
+        "secret_version",
+        "secret_version_created_at_utc",
+        "loaded_at_utc",
+        "cache_age_s",
+        "cache_ttl_s",
+        "expires_at_utc",
+        "hours_remaining",
+        "expired",
+        "reload_count",
+        "last_reload_reason",
+        "last_error_type",
+        "rotation_job",
+        "rotation_schedule",
+        "token_value_exposed",
+    ):
+        if key in proof and proof.get(key) is not None:
+            out[key] = proof.get(key)
+    # Explicitly prove raw token is not shipped to the UI.
+    out["token_value_exposed"] = False
+    return out
+
+
 def _slim_broker_status(s: Any) -> Dict[str, Any]:
     if not isinstance(s, dict):
         return {"connected": False}
-    return {
+    slim: Dict[str, Any] = {
         "broker": s.get("broker", "dhan"),
         "connected": s.get("connected"),
         "status": s.get("status"),
@@ -3160,6 +3196,24 @@ def _slim_broker_status(s: Any) -> Dict[str, Any]:
         "latency_ms": s.get("latency_ms"),
         "mode": s.get("mode"),
     }
+    proof = _slim_token_proof(s.get("token_proof"))
+    if proof:
+        slim["token_proof"] = proof
+    reload = s.get("token_reload")
+    if isinstance(reload, dict):
+        slim["token_reload"] = {
+            "attempted": bool(reload.get("attempted")),
+            "success": reload.get("success"),
+            "reason": reload.get("reason"),
+        }
+    rotation = s.get("canonical_rotation")
+    if isinstance(rotation, dict):
+        slim["canonical_rotation"] = {
+            "state": rotation.get("state") or rotation.get("status"),
+            "status": rotation.get("status"),
+            "success": rotation.get("success"),
+        }
+    return slim
 
 
 def _slim_rows_payload(payload: Any, keys: Tuple[str, ...]) -> Dict[str, Any]:
