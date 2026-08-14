@@ -1712,12 +1712,19 @@ async def get_top_contract_gainers(
     market_top_n = min(max(int(market_top_n or 25), 5), 50)
     cache_key = f"scanner_gainers:{top_n}:{market_top_n}:{int(bool(include_equity))}"
     _hit = _cache_get(cache_key, max(_TTL_SCANNER, 90.0))
-    if _hit is not None:
+    if _hit is not None and (
+        (_hit.get("market_top_table") or [])
+        or not _market_open_from_state()
+    ):
         return _hit
     # Prefer shared micro-stream cache even if query params differ slightly.
     shared = _cache_get("scanner_gainers:5:25:1", max(_TTL_SCANNER, 90.0))
-    if shared is not None and include_equity:
+    if shared is not None and include_equity and (shared.get("market_top_table") or []):
         return shared
+    warmed = _build_market_top_from_chain_cache(top_n=top_n, market_top_n=market_top_n)
+    if warmed is not None:
+        _cache_set(cache_key, warmed)
+        return warmed
     if _MARKET_TOP_STATE_FILE.exists():
         try:
             disk = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
@@ -1757,45 +1764,22 @@ async def get_top_contract_gainers(
             return {**_scanner_market_closed_response(), "status": "timeout"}
         except Exception as exc:
             return {**_scanner_market_closed_response(), "error": str(exc)[:200]}
-    try:
-        from dashboard.backend.contract_gain_scanner import (
-            build_top_contract_gainers_report,
-        )
-
-        # Request path: index-first for latency. Equity enrichment is background micro-loop.
-        report = await _run_blocking(
-            build_top_contract_gainers_report,
-            top_n,
-            market_top_n,
-            False,
-            timeout=min(max(_SCANNER_IO_TIMEOUT_S, 60.0), 75.0),
-        )
-        scored = int(report.get("contracts_scored_total") or 0)
-        report["status"] = "ok" if scored > 0 or report.get("segments_implemented", 0) > 0 else "no_data"
-        report["market_open"] = True
-        report["include_equity"] = False
-        report["note"] = "Index board (request path). Equity CE/PE fills via ultra-micro stream cache."
-        _cache_set(cache_key, report)
-        _cache_set("scanner_gainers:5:25:0", report)
-        return report
-    except asyncio.TimeoutError:
-        return {
-            "status": "timeout",
-            "error": f"scanner exceeded {_SCANNER_IO_TIMEOUT_S}s",
-            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
-            "segments_implemented": 0,
-            "by_segment": {},
-            "market_top_table": [],
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)[:300],
-            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
-            "segments_implemented": 0,
-            "by_segment": {},
-            "market_top_table": [],
-        }
+    # The index micro-loop is the sole Dhan OC owner. A second four-index fan-out
+    # here contends on Dhan's process-wide 1 request / ~3s gate and makes both the
+    # scanner and otherwise healthy chains flap. During cold start, return honest
+    # typed warming state; do not cache this empty response.
+    return {
+        "status": "warming",
+        "market_open": True,
+        "scanner_warming": True,
+        "message": "Market Top is warming from the paced Dhan index-chain stream",
+        "segments": list(_INDEX_STREAM_SYMBOLS),
+        "segments_implemented": 0,
+        "by_segment": {},
+        "market_top_table": [],
+        "contracts_scored_total": 0,
+        "live_trading_enabled": False,
+    }
 
 
 @app.get("/api/scanner/equity_options")
@@ -3932,6 +3916,43 @@ def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _build_market_top_from_chain_cache(
+    top_n: int = 5,
+    market_top_n: int = 25,
+) -> Optional[Dict[str, Any]]:
+    """Rank the last good paced index chains without making another Dhan call."""
+    chains: Dict[str, Dict[str, Any]] = {}
+    for sym in _INDEX_STREAM_SYMBOLS:
+        chain = _chain_from_push_cache(sym)
+        if chain is None:
+            ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
+            if isinstance(ttl_hit, dict):
+                chain = dict(ttl_hit)
+        if isinstance(chain, dict) and (chain.get("contracts") or []):
+            chains[sym] = chain
+    if not chains:
+        return None
+
+    from dashboard.backend.contract_gain_scanner import scan_all_segments_from_chains
+
+    report = scan_all_segments_from_chains(
+        chains,
+        top_n=top_n,
+        market_top_n=market_top_n,
+    )
+    if int(report.get("contracts_scored_total") or 0) <= 0:
+        return None
+    report["status"] = "ok"
+    report["market_open"] = bool(_market_open_from_state())
+    report["include_equity"] = False
+    report["stream_mode"] = "index_chain_cache"
+    report["data_provenance"] = "DHAN_OPTION_CHAIN_LIVE"
+    report["chains_fetched"] = list(chains)
+    report["note"] = "Ranked from last good paced Dhan index-chain snapshots; no scanner fan-out."
+    report["live_trading_enabled"] = False
+    return report
+
+
 @app.get("/api/batch/chains")
 async def batch_chains():
     """Index chains for TopBar/Overview — cache/push only, never blocks on Dhan OC."""
@@ -5731,60 +5752,17 @@ async def index_chain_micro_loop():
 async def market_top_micro_loop():
     """Background ultra-micro refresh for Market Top CE/PE board.
 
-    Rebuilds ranked table on a slower cadence so index_chain_micro_loop keeps
-    Dhan OC budget for Trade/TopBar streaming. /ws/stream reads cache only.
-    Rotating equity shards merge into prior state for Moneycontrol-parity coverage.
+    Rebuilds the ranked table from the last good paced chain snapshots so the
+    index_chain_micro_loop remains the sole Dhan OC owner. /ws/stream reads cache only.
     """
     await asyncio.sleep(8)
     while True:
         started = time.time()
         try:
-
-            def _refresh():
-                from dashboard.backend.contract_gain_scanner import (
-                    build_top_contract_gainers_report,
-                    merge_market_top_reports,
-                )
-
-                prior = {}
-                if _MARKET_TOP_STATE_FILE.exists():
-                    try:
-                        prior = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
-                    except Exception:
-                        prior = {}
-
-                # Fast index board only — DSM serializes OC internally.
-                report = build_top_contract_gainers_report(
-                    top_n=5,
-                    market_top_n=25,
-                    include_equity=False,
-                )
-                # Equity enrich off by default so index micro keeps OC budget.
-                if os.environ.get("MARKET_TOP_EQUITY_ENRICH", "0") in ("1", "true", "True"):
-                    try:
-                        with_eq = build_top_contract_gainers_report(
-                            top_n=5,
-                            market_top_n=40,
-                            include_equity=True,
-                            equity_limit=8,
-                            overall_timeout_s=95.0,
-                            rotate_equity=True,
-                        )
-                        report = merge_market_top_reports(report, with_eq, market_top_n=25)
-                    except Exception as eq_exc:
-                        report["equity_enrich_error"] = str(eq_exc)[:200]
-                if prior and int(prior.get("contracts_scored_total") or 0) > 0:
-                    report = merge_market_top_reports(prior, report, market_top_n=25)
-                scored = int(report.get("contracts_scored_total") or 0)
-                report["status"] = "ok" if scored > 0 else report.get("status") or "no_data"
-                report["market_open"] = bool(_market_open_from_state())
-                report["stream_mode"] = "ultra_micro"
+            report = _build_market_top_from_chain_cache(top_n=5, market_top_n=25)
+            if report is not None:
+                report["stream_mode"] = "ultra_micro_cache"
                 report["streamed_at"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M:%S")
-                report["data_provenance"] = "DHAN_OPTION_CHAIN_LIVE"
-                return report
-
-            report = await _run_blocking(_refresh, timeout=150.0)
-            if int(report.get("contracts_scored_total") or 0) > 0:
                 for key in (
                     "scanner_gainers:5:25:1",
                     "scanner_gainers:8:25:1",
@@ -5801,6 +5779,8 @@ async def market_top_micro_loop():
                     f"scored={report.get('contracts_scored_total')} "
                     f"shard={report.get('shard_last_syms')}"
                 )
+            elif _market_open_from_state():
+                print("[market-top-micro] warming: no scorable paced chain snapshot yet")
         except Exception as exc:
             print(f"[market-top-micro] refresh failed: {exc}")
         elapsed = time.time() - started
