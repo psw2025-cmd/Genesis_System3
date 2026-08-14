@@ -2,15 +2,16 @@
 """Fetch the Security Audit artifact for the exact GitHub SHA.
 
 Uses GitHub Actions read API only. Failure/timeout is explicit; no stale artifact
-is accepted as exact-source evidence.
+is accepted as exact-source evidence. GitHub auth is used only for api.github.com;
+the signed blob redirect is downloaded without forwarding the GitHub token.
 """
 from __future__ import annotations
 
 import io
 import json
 import os
-import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
@@ -23,16 +24,50 @@ API = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
 OUT = Path(os.getenv("SYSTEM3_SECURITY_AUDIT_DIR", "reports/latest/security_audit"))
 TIMEOUT_S = int(os.getenv("SYSTEM3_SECURITY_WAIT_SECONDS", "600"))
 
+_API_HEADERS = {
+    "Authorization": f"Bearer {TOKEN}",
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+    "User-Agent": "Genesis-System3-audit",
+}
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Expose GitHub's signed artifact Location instead of forwarding auth."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D401
+        return None
+
 
 def _request(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {TOKEN}",
-        "Accept": "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "Genesis-System3-audit",
-    })
+    req = urllib.request.Request(url, headers=_API_HEADERS)
     with urllib.request.urlopen(req, timeout=30) as r:
         return r.read()
+
+
+def _download_artifact(url: str) -> bytes:
+    """Download GitHub artifact ZIP without leaking GITHUB_TOKEN to blob host."""
+    req = urllib.request.Request(url, headers=_API_HEADERS)
+    opener = urllib.request.build_opener(_NoRedirect)
+    try:
+        with opener.open(req, timeout=30) as r:
+            return r.read()
+    except urllib.error.HTTPError as exc:
+        if exc.code not in {301, 302, 303, 307, 308}:
+            raise
+        location = exc.headers.get("Location")
+        if not location:
+            raise RuntimeError("artifact_redirect_location_missing") from exc
+    parsed_api = urllib.parse.urlparse(url)
+    parsed_blob = urllib.parse.urlparse(location)
+    if not parsed_blob.scheme.startswith("http") or not parsed_blob.netloc:
+        raise RuntimeError("artifact_redirect_invalid")
+    if parsed_blob.netloc == parsed_api.netloc:
+        raise RuntimeError("artifact_redirect_host_not_changed")
+    # Signed storage URL contains its own authorization. Never send GitHub auth.
+    blob_req = urllib.request.Request(location, headers={"User-Agent": "Genesis-System3-audit"})
+    with urllib.request.urlopen(blob_req, timeout=60) as response:
+        return response.read()
 
 
 def _json(url: str):
@@ -67,7 +102,7 @@ def main() -> int:
     if not candidates:
         state_path.write_text(json.dumps({"state": "BLOCKED_SECURITY_ARTIFACT_MISSING", "run_id": run_id}, indent=2), encoding="utf-8")
         return 2
-    blob = _request(str(candidates[0]["archive_download_url"]))
+    blob = _download_artifact(str(candidates[0]["archive_download_url"]))
     with zipfile.ZipFile(io.BytesIO(blob)) as zf:
         names = zf.namelist()
         target = next((n for n in names if n.endswith("security_audit.json")), None)
@@ -82,6 +117,7 @@ def main() -> int:
         "run_id": run_id,
         "run_conclusion": chosen.get("conclusion"),
         "artifact_id": candidates[0].get("id"),
+        "artifact_redirect_auth_forwarded": False,
         "stale_evidence_accepted": False,
     }
     state_path.write_text(json.dumps(state, indent=2, sort_keys=True), encoding="utf-8")

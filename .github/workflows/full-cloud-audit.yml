@@ -66,6 +66,7 @@ jobs:
         run: |
           python -m py_compile scripts/gcp_full_cloud_audit.py
           python -m py_compile scripts/fetch_exact_security_audit.py
+          python -m py_compile scripts/evaluate_rotator_reliability.py
           python -m py_compile scripts/multi_ai_audit_consensus.py
 
       - name: Collect Google Cloud runtime, logging, TLS and latency evidence
@@ -75,6 +76,15 @@ jobs:
           python scripts/gcp_full_cloud_audit.py
           rc=$?
           echo "CLOUD_AUDIT_RC=${rc}" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Evaluate Dhan rotator reliability separately from broker health
+        shell: bash
+        run: |
+          set +e
+          python scripts/evaluate_rotator_reliability.py
+          rc=$?
+          echo "ROTATOR_RELIABILITY_RC=${rc}" >> "$GITHUB_ENV"
           exit 0
 
       - name: Fetch exact-SHA security audit artifact
@@ -117,23 +127,26 @@ jobs:
                   return {'state':'NOT_PROVEN','error':type(exc).__name__}
 
           cloud=load('reports/latest/full_cloud_audit/full_cloud_audit.json')
+          rotator=load('reports/latest/rotator_reliability/rotator_reliability.json')
           security=load('reports/latest/security_audit/security_audit.json')
           exact=load('reports/latest/security_audit/exact_fetch_state.json')
           ai=load('reports/latest/ai_consensus/ai_consensus.json')
           conditions={
               'cloud_audit_pass': cloud.get('state') == 'PASS',
               'cloud_safety_pass': (cloud.get('safety') or {}).get('state') == 'PASS',
+              'rotator_reliability_pass': rotator.get('state') == 'PASS',
               'exact_security_evidence': exact.get('state') == 'PASS' and exact.get('sha') == os.environ.get('GITHUB_SHA'),
               'security_audit_pass': security.get('state') == 'PASS',
               'ai_consensus_pass': ai.get('state') == 'PASS',
           }
           overall='PASS' if all(conditions.values()) else 'FAIL'
           report={
-              'schema':'genesis-system3-unified-cloud-audit-v1',
+              'schema':'genesis-system3-unified-cloud-audit-v2',
               'state':overall,
               'github_sha':os.environ.get('GITHUB_SHA'),
               'conditions':conditions,
               'cloud_state':cloud.get('state'),
+              'rotator_reliability_state':rotator.get('state'),
               'security_state':security.get('state'),
               'ai_state':ai.get('state'),
               'external_adapter_states':((cloud.get('durable_trail') or {}).get('external_adapters') or {}),
@@ -149,10 +162,12 @@ jobs:
           md=[
               '# Unified Cloud Audit Verdict','',f"Overall: **{overall}**",'',
               f"- Cloud runtime audit: `{cloud.get('state')}`",
+              f"- Dhan rotator reliability: `{rotator.get('state')}`",
               f"- Exact security audit: `{security.get('state')}`",
               f"- AI consensus: `{ai.get('state')}`",
               f"- Exact-SHA security artifact: `{conditions['exact_security_evidence']}`",
               '- LIVE trading: **OFF/LOCKED**','- Order actions performed: **false**','',
+              'Healthy broker state cannot override rotator reliability failure.',
               'A deterministic FAIL/BLOCKED state cannot be overridden by AI.',''
           ]
           (out/'unified_verdict.md').write_text('\n'.join(md), encoding='utf-8')
@@ -166,6 +181,7 @@ jobs:
           name: full-cloud-audit-${{ github.run_number }}-${{ github.run_attempt }}
           path: |
             reports/latest/full_cloud_audit/
+            reports/latest/rotator_reliability/
             reports/latest/security_audit/
             reports/latest/ai_consensus/
           if-no-files-found: error
