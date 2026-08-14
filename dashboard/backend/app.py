@@ -2046,7 +2046,7 @@ _PUSHED_CHAIN_FRESH_S = 45
 _PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) before live fetch
 _PUSHED_CHAIN_STALE_SERVE_S_CLOSED = 86400  # after hours: never block UI waiting on Dhan OC
 _PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
-_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
+_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX")
 _CHAIN_LIVE_TIMEOUT_OPEN_S = 25.0
 _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 
@@ -3279,6 +3279,43 @@ async def get_memory():
         }
     except Exception as e:
         return {"error": str(e), "status": "UNKNOWN"}
+
+
+@app.get("/api/orch/ready")
+async def orch_cloud_ready():
+    """Cloud-native readiness for System3boat / ORCH (replaces localhost:5000).
+
+    WhatsApp/ORCH scanners that probe flask_port_5000 should call this URL on
+    Cloud Run instead — never a laptop Flask port.
+    """
+    try:
+        health = await get_health()
+    except Exception as exc:
+        return {
+            "ready": False,
+            "backend": "cloud_run",
+            "reason": f"health_error:{type(exc).__name__}",
+            "flask_port_5000_required": False,
+            "live_trading_enabled": False,
+            "recommended_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+        }
+    broker = health.get("broker") if isinstance(health.get("broker"), dict) else {}
+    connected = bool(broker.get("connected")) or str(health.get("broker_status") or "").lower() == "connected"
+    market_open = bool((health.get("market") or {}).get("is_open")) or str(health.get("market_status") or "").lower() == "open"
+    return {
+        "ready": connected,
+        "backend": "cloud_run",
+        "flask_port_5000_required": False,
+        "broker_connected": connected,
+        "market_open": market_open,
+        "status": health.get("status"),
+        "mode": health.get("mode"),
+        "live_trading_enabled": False,
+        "scanner_hint": "/api/scanner/top_contract_gainers?top_n=5&market_top_n=10&include_equity=1",
+        "ui": "/ui/?tab=genesis",
+        "recommended_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+        "message": "Use Cloud Run — do not probe localhost:5000",
+    }
 
 
 @app.get("/api/health")
@@ -5693,7 +5730,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             "market_open": market_open_now,
                             "reason": market_close_reason if not market_open_now else "MARKET_OPEN",
                             "chain_cache_ages_s": cache_health,
-                            "stream_ok": any(v is not None and v < 60 for v in cache_health.values()),
+                            "stream_ok": any(v is not None and v < 180 for v in cache_health.values()),
                             "timestamp": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
                         }
                     )

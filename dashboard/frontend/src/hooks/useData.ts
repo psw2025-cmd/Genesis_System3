@@ -573,8 +573,12 @@ export function useData() {
           }
         }
         if (m.type === 'heartbeat') {
-          // Only flag stream failure during market hours when chain cache is empty/stale.
-          if (m.market_open && m.stream_ok === false) setWsStatus('error')
+          // WS transport is healthy if the socket is open. Cache-age stream_ok=false
+          // means paced Dhan refresh is catching up — keep LIVE, not a false
+          // "WebSocket error / Disconnected" top-bar state.
+          const socketOpen = wsRef.current?.readyState === WebSocket.OPEN
+          if (socketOpen) setWsStatus('live')
+          else if (m.market_open && m.stream_ok === false) setWsStatus('error')
           else setWsStatus('live')
           if (typeof m.market_open === 'boolean') {
             useStore.setState({ marketOpen: m.market_open })
