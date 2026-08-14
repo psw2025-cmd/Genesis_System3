@@ -148,24 +148,39 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
     if not client_id or not token:
         return None, "CONFIG_MISSING"
 
-    body = {seg: list(ids) for seg, ids in securities.items()}
-    try:
-        resp = requests.post(
-            url,
-            headers={
-                "access-token": token,
-                "client-id": client_id,
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            json=body,
-            timeout=8,
-        )
-        if resp.status_code >= 400:
-            return None, f"HTTP_{resp.status_code}:{(resp.text or '')[:120]}"
-        return resp.json(), None
-    except Exception as exc:
-        return None, f"{type(exc).__name__}:{str(exc)[:120]}"
+    headers = {
+        "access-token": token,
+        "client-id": client_id,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+    }
+    # Try string ids first (docs), then int ids (some SDK paths).
+    bodies = [
+        {seg: list(ids) for seg, ids in securities.items()},
+        {
+            seg: [int(x) if str(x).isdigit() else x for x in ids]
+            for seg, ids in securities.items()
+        },
+    ]
+    last_err = None
+    for body in bodies:
+        try:
+            resp = requests.post(url, headers=headers, json=body, timeout=8)
+            if resp.status_code >= 400:
+                last_err = f"HTTP_{resp.status_code}:{(resp.text or '')[:120]}"
+                continue
+            payload = resp.json()
+            # Surface soft failures like DH-901 without raising.
+            if isinstance(payload, dict):
+                status = str(payload.get("status") or "").lower()
+                if status in ("failure", "error"):
+                    remarks = payload.get("remarks") or payload.get("message") or payload.get("errorMessage") or ""
+                    last_err = f"API_{status}:{str(remarks)[:120]}"
+                    continue
+            return payload, None
+        except Exception as exc:
+            last_err = f"{type(exc).__name__}:{str(exc)[:120]}"
+    return None, last_err or "empty"
 
 
 def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
@@ -178,24 +193,30 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
     if not cleaned:
         return {}
 
+    errors: List[str] = []
     # Prefer REST — Cloud Run SDK marketfeed methods are inconsistent across dhanhq versions.
     for url in (_DHAN_OHLC_URL, _DHAN_QUOTE_URL, _DHAN_LTP_URL):
         payload, err = _rest_marketfeed(url, cleaned)
         if err:
+            errors.append(f"{url.rsplit('/', 1)[-1]}:{err}")
             logger.info("market_ltp REST %s: %s", url.rsplit("/", 1)[-1], err)
             continue
         parsed = _flatten_quotes(payload)
         if parsed:
             return parsed
+        errors.append(f"{url.rsplit('/', 1)[-1]}:unparsed")
 
     try:
         from core.brokers.dhan.dhan_readonly import create_dhan_client
     except Exception as exc:
         logger.warning("market_ltp: cannot import create_dhan_client: %s", exc)
+        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
         return {}
 
     client = create_dhan_client()
     if client is None:
+        errors.append("sdk:no_client")
+        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
         return {}
 
     for method_name in ("ohlc_data", "quote_data", "ticker_data", "get_ohlc_data", "get_ltp_data"):
@@ -207,9 +228,15 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
             parsed = _flatten_quotes(payload)
             if parsed:
                 return parsed
+            errors.append(f"{method_name}:unparsed")
         except Exception as exc:
+            errors.append(f"{method_name}:{type(exc).__name__}")
             logger.info("market_ltp.%s failed: %s", method_name, exc)
+    fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
     return {}
+
+
+fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
 
 
 def build_index_board(
@@ -220,6 +247,7 @@ def build_index_board(
     wanted = [str(s).upper() for s in (symbols or DEFAULT_INDEX_BOARD)]
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
     quotes = fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
+    feed_errors = list(getattr(fetch_market_quotes, "last_errors", []) or [])
     rows: List[Dict[str, Any]] = []
     for sym in wanted:
         sid = INDEX_SECURITY_IDS.get(sym)
@@ -257,6 +285,7 @@ def build_index_board(
         "count": len(rows),
         "live_count": live_n,
         "feed_hits": len(quotes),
+        "feed_errors": feed_errors[:6],
         "indices": rows,
     }
 
