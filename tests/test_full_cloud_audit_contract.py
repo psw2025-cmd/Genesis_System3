@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CLOUD = ROOT / "scripts" / "gcp_full_cloud_audit.py"
+ROTATOR = ROOT / "scripts" / "evaluate_rotator_reliability.py"
 EXACT = ROOT / "scripts" / "fetch_exact_security_audit.py"
 AI = ROOT / "scripts" / "multi_ai_audit_consensus.py"
 WF = ROOT / ".github" / "workflows" / "full-cloud-audit.yml"
@@ -18,6 +19,7 @@ class FullCloudAuditContractTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.cloud = CLOUD.read_text(encoding="utf-8")
+        cls.rotator = ROTATOR.read_text(encoding="utf-8")
         cls.exact = EXACT.read_text(encoding="utf-8")
         cls.ai = AI.read_text(encoding="utf-8")
         cls.wf = WF.read_text(encoding="utf-8")
@@ -78,11 +80,29 @@ class FullCloudAuditContractTests(unittest.TestCase):
         self.assertIn("stale_evidence_accepted", self.exact)
         self.assertIn("BLOCKED_EXACT_SECURITY_RUN_TIMEOUT", self.exact)
 
+    def test_artifact_redirect_does_not_forward_github_authorization(self):
+        self.assertIn("class _NoRedirect", self.exact)
+        self.assertIn("artifact_redirect_auth_forwarded", self.exact)
+        self.assertIn('headers={"User-Agent": "Genesis-System3-audit"}', self.exact)
+        self.assertIn("artifact_redirect_host_not_changed", self.exact)
+        blob_section = self.exact.split("blob_req =", 1)[1]
+        self.assertNotIn("_API_HEADERS", blob_section.split("with urllib.request.urlopen", 1)[0])
+
+    def test_rotator_reliability_is_not_overridden_by_broker_health(self):
+        self.assertIn("recent_failed_executions", self.rotator)
+        self.assertIn("broker_health_is_not_rotator_reliability", self.rotator)
+        self.assertIn("timeout_signatures", self.rotator)
+        self.assertIn("dhan_auth_signatures", self.rotator)
+        self.assertIn("error_or_crash_signatures", self.rotator)
+        self.assertIn('"order_actions_performed": False', self.rotator)
+        self.assertIn('"live_trading_enabled": False', self.rotator)
+
     def test_ai_consensus_cannot_override_deterministic_failure(self):
         self.assertIn('OPENAI_MODEL = os.getenv("OPENAI_AUDIT_MODEL", "gpt-4o")', self.ai)
         self.assertIn('ANTHROPIC_MODEL = os.getenv("ANTHROPIC_AUDIT_MODEL", "claude-sonnet-4-20250514")', self.ai)
         self.assertIn('security.get("state") == "PASS"', self.ai)
         self.assertIn('cloud.get("state") == "PASS"', self.ai)
+        self.assertIn('rotator.get("state") == "PASS"', self.ai)
         self.assertIn('"ai_can_override_deterministic_failure": False', self.ai)
         self.assertIn("BLOCKED_MISSING_API_KEY", self.ai)
         self.assertIn("BLOCKED_EXTERNAL_AI", self.ai)
@@ -98,6 +118,7 @@ class FullCloudAuditContractTests(unittest.TestCase):
         for marker in (
             "cloud_audit_pass",
             "cloud_safety_pass",
+            "rotator_reliability_pass",
             "exact_security_evidence",
             "security_audit_pass",
             "ai_consensus_pass",
