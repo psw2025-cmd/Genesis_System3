@@ -15,6 +15,9 @@ AUTOMATIC = {
     "gcp-stage2-ci.yml",
     "gcp-dhan-token-fix-ci.yml",
     "frontend-runtime-smoke.yml",
+    "codeql-security.yml",
+    "security-audit.yml",
+    "sonarqube-audit.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -27,6 +30,9 @@ FORENSIC_MONITORED_WORKFLOWS = {
     "GCP Dhan Token Fix CI",
     "GCP Dhan Token Rotation Manual Recovery",
     "GCP Stage 2 Safety Checks",
+    "CodeQL Security Audit",
+    "Security Audit Evidence",
+    "SonarQube Audit",
 }
 
 
@@ -148,7 +154,14 @@ def main() -> int:
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
 
-    for name in ("gcp-stage2-ci.yml", "gcp-dhan-token-fix-ci.yml", "frontend-runtime-smoke.yml"):
+    for name in (
+        "gcp-stage2-ci.yml",
+        "gcp-dhan-token-fix-ci.yml",
+        "frontend-runtime-smoke.yml",
+        "codeql-security.yml",
+        "security-audit.yml",
+        "sonarqube-audit.yml",
+    ):
         if "pull_request:" not in trigger_blocks[name]:
             raise SystemExit(f"FOCUSED_PRIORITY_PR_TRIGGER_MISSING file={name}")
 

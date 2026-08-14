@@ -6,10 +6,12 @@ pandas>=2.2.3
 numpy>=1.26.4
 
 # python-dotenv: local .env loading while keeping GitHub Actions secrets separate
-python-dotenv==1.0.1
+# >=1.2.2 fixes PYSEC-2026-2270 symlink rewrite vulnerability.
+python-dotenv>=1.2.2
 
 # requests: HTTP API calls for NSE fallback, broker integrations
-requests==2.32.3
+# >=2.33.0 includes fixes for PYSEC-2026-1872 and PYSEC-2026-2275.
+requests>=2.33.0
 
 # Google Secret Manager is an explicit production dependency for the dynamic
 # Dhan token provider and the canonical Cloud Run rotation job.
