@@ -52,7 +52,7 @@ function liveTradingState(state: any, brokerStatus: any) {
 }
 
 export function BrokerPanel() {
-  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen, state } = useStore()
+  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen, state, liveBoard } = useStore()
 
   const funds = brokerFunds?.normalized ?? brokerFunds?.funds ?? brokerFunds ?? null
   const authNeeded = apiStatus?.status === 'API_AUTH_REQUIRED'
@@ -81,6 +81,15 @@ export function BrokerPanel() {
 
   const holdings = pickArray(brokerHoldings, 'rows', 'holdings', 'data')
   const positions = pickArray(brokerPositions, 'rows', 'positions', 'data')
+  const portfolio = liveBoard?.portfolio
+  const investment = Number(portfolio?.investment)
+    || holdings.reduce((s: number, h: any) => s + (Number(h.avg_price || h.avgCostPrice || 0) * Number(h.quantity || h.totalQty || 0)), 0)
+  const currentValue = Number(portfolio?.current_value)
+    || holdings.reduce((s: number, h: any) => s + (Number(h.ltp || h.lastTradedPrice || 0) * Number(h.quantity || h.totalQty || 0)), 0)
+  const overallPnl = portfolio?.overall_pnl != null ? Number(portfolio.overall_pnl) : (currentValue - investment)
+  const overallPnlPct = portfolio?.overall_pnl_pct != null
+    ? Number(portfolio.overall_pnl_pct)
+    : (investment > 0 ? (overallPnl / investment) * 100 : null)
 
   const holdingsError = Boolean(
     brokerHoldings
@@ -109,8 +118,8 @@ export function BrokerPanel() {
   const usedMargin = funds?.utilized_amount ?? funds?.utilizedAmount ?? null
   const totalBal = funds?.total_limit ?? funds?.total_balance ?? funds?.totalBalance ?? null
 
-  const getAvg = (h: any) => h.avg_price ?? h.average_price ?? 0
-  const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.entry_price ?? 0
+  const getAvg = (h: any) => h.avg_price ?? h.average_price ?? h.avgCostPrice ?? 0
+  const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.buyAvg ?? p.entry_price ?? 0
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
@@ -131,6 +140,32 @@ export function BrokerPanel() {
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
         <Row label="Data Visibility" value={authNeeded ? 'VISIBLE AFTER API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authNeeded || brokerTokenBad ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
+      </div>
+
+      <div className="card p-4">
+        <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          Portfolio Value (Dhan live)
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10, marginBottom: 8 }}>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Investment</div>
+            <div className="num" style={{ fontWeight: 700 }}>{fmtCr(investment)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Current Value</div>
+            <div className="num" style={{ fontWeight: 700 }}>{fmtCr(currentValue)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Overall P&L</div>
+            <div className={cn('num', signClass(overallPnl))} style={{ fontWeight: 700 }}>
+              {fmtCr(overallPnl)}{overallPnlPct == null ? '' : ` (${overallPnlPct >= 0 ? '+' : ''}${Number(overallPnlPct).toFixed(2)}%)`}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Open Positions</div>
+            <div className="num" style={{ fontWeight: 700 }}>{positions.length}</div>
+          </div>
+        </div>
       </div>
 
       <div className="card p-4">
@@ -178,20 +213,20 @@ export function BrokerPanel() {
               <tr>{['Symbol', 'Qty', 'Avg Cost', 'LTP', 'P&L', 'P&L%'].map(h => <th key={h} className="thead" style={{ textAlign: h === 'Symbol' ? 'left' : 'right' }}>{h}</th>)}</tr>
             </thead>
             <tbody>
-              {holdings.slice(0, 15).map((h: any, i: number) => {
-                const avg = getAvg(h)
-                const ltp = h.ltp ?? 0
-                const qty = h.quantity ?? 0
-                const pnl = h.pnl ?? ((ltp - avg) * qty)
-                const pnlPct = h.pnl_pct ?? (avg > 0 ? ((ltp - avg) / avg) * 100 : 0)
+              {holdings.map((h: any, i: number) => {
+                const avg = Number(getAvg(h) || 0)
+                const ltp = Number(h.ltp ?? h.lastTradedPrice ?? 0)
+                const qty = Number(h.quantity ?? h.totalQty ?? 0)
+                const pnl = Number(h.pnl ?? ((ltp - avg) * qty))
+                const pnlPct = Number(h.pnl_pct ?? (avg > 0 ? ((ltp - avg) / avg) * 100 : 0))
                 return (
                   <tr key={i} className="trow">
-                    <td className="tcell" style={{ fontWeight: 600 }}>{h.trading_symbol ?? h.symbol ?? '--'}</td>
+                    <td className="tcell" style={{ fontWeight: 600 }}>{h.trading_symbol ?? h.tradingSymbol ?? h.symbol ?? '--'}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}>{qty || '--'}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}>{fmt(avg)}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}><PriceCell value={ltp} /></td>
                     <td className={cn('tcell', signClass(pnl))} style={{ textAlign: 'right', fontWeight: 600 }}>{fmtCr(pnl)}</td>
-                    <td className={cn('tcell', signClass(pnlPct))} style={{ textAlign: 'right' }}>{pnlPct >= 0 ? '+' : ''}{(pnlPct ?? 0).toFixed(2)}%</td>
+                    <td className={cn('tcell', signClass(pnlPct))} style={{ textAlign: 'right' }}>{pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%</td>
                   </tr>
                 )
               })}
@@ -220,16 +255,24 @@ export function BrokerPanel() {
               <tr>{['Symbol', 'Side', 'Qty', 'Entry', 'LTP', 'P&L'].map(h => <th key={h} className="thead">{h}</th>)}</tr>
             </thead>
             <tbody>
-              {positions.map((p: any, i: number) => (
-                <tr key={i} className="trow">
-                  <td className="tcell" style={{ fontWeight: 600 }}>{p.trading_symbol ?? p.symbol ?? '--'}</td>
-                  <td className="tcell"><span className={cn('pill text-xs', p.position_type === 'LONG' ? 'tx-up' : 'tx-down')} style={{ fontSize: '.6rem' }}>{p.position_type ?? p.side ?? '--'}</span></td>
-                  <td className="tcell">{p.net_qty ?? p.quantity ?? '--'}</td>
-                  <td className="tcell">{fmt(getEntry(p))}</td>
-                  <td className="tcell"><PriceCell value={p.ltp ?? 0} /></td>
-                  <td className={cn('tcell', signClass(p.unrealized_pnl ?? p.pnl ?? 0))} style={{ fontWeight: 600 }}>{fmtCr(p.unrealized_pnl ?? p.pnl ?? 0)}</td>
-                </tr>
-              ))}
+              {positions.map((p: any, i: number) => {
+                const entry = Number(getEntry(p) || 0)
+                const qty = Number(p.net_qty ?? p.netQty ?? p.quantity ?? 0)
+                const upnl = Number(p.unrealized_pnl ?? p.unrealizedProfit ?? p.pnl ?? 0)
+                let ltp = Number(p.ltp ?? 0)
+                if (!(ltp > 0) && qty) ltp = entry + (upnl / qty)
+                const side = p.position_type ?? p.positionType ?? p.side ?? '--'
+                return (
+                  <tr key={i} className="trow">
+                    <td className="tcell" style={{ fontWeight: 600 }}>{p.trading_symbol ?? p.tradingSymbol ?? p.symbol ?? '--'}</td>
+                    <td className="tcell"><span className={cn('pill text-xs', side === 'LONG' ? 'tx-up' : 'tx-down')} style={{ fontSize: '.6rem' }}>{side}</span></td>
+                    <td className="tcell">{qty || '--'}</td>
+                    <td className="tcell">{fmt(entry)}</td>
+                    <td className="tcell"><PriceCell value={ltp} /></td>
+                    <td className={cn('tcell', signClass(upnl))} style={{ fontWeight: 600 }}>{fmtCr(upnl)}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}

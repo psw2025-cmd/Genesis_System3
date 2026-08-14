@@ -26,6 +26,7 @@ interface DashboardState {
   brokerHoldings: any
   brokerFunds: any
   brokerPositions: any
+  liveBoard: any
 
   // Runtime facts (deploy SHA, research contract)
   deployInfo: any
@@ -53,6 +54,7 @@ interface DashboardState {
   setBrokerHoldings: (d: any) => void
   setBrokerFunds: (d: any) => void
   setBrokerPositions: (d: any) => void
+  setLiveBoard: (d: any) => void
   setActiveTab: (t: string) => void
   setChainSymbol: (s: string) => void
   setDeployInfo: (d: any) => void
@@ -80,6 +82,7 @@ export const useStore = create<DashboardState>((set) => ({
   brokerHoldings: null,
   brokerFunds: null,
   brokerPositions: null,
+  liveBoard: null,
   deployInfo: null,
   research: null,
   activeTab: 'decision-intel',
@@ -133,6 +136,7 @@ export const useStore = create<DashboardState>((set) => ({
   setBrokerHoldings: (brokerHoldings) => set({ brokerHoldings }),
   setBrokerFunds: (brokerFunds) => set({ brokerFunds }),
   setBrokerPositions: (brokerPositions) => set({ brokerPositions }),
+  setLiveBoard: (liveBoard) => set({ liveBoard, lastSync: new Date().toISOString() }),
   setActiveTab: (activeTab) => set({ activeTab, sidebarOpen: false }),
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
   setDeployInfo: (deployInfo) => set({ deployInfo }),

@@ -17,12 +17,14 @@ const isOptionalChain = (sym: string) => OPTIONAL_CHAIN_SYMBOLS.includes(String(
 // Fast HTTP chain polls during market hours were stampeding Dhan (~1 OC / 3s).
 const CORE_POLL_MS_OPEN = 20000
 const CORE_POLL_MS_CLOSED = 60000
-const BROKER_POLL_MS = 120000
+const BROKER_POLL_MS = 30000
 const SECONDARY_POLL_MS = 180000
 const ACTIVE_CHAIN_POLL_MS_OPEN = 30000
 const ACTIVE_CHAIN_POLL_MS_CLOSED = 60000
 const TOPBAR_CHAIN_POLL_MS_OPEN = 60000
 const TOPBAR_CHAIN_POLL_MS_CLOSED = 180000
+const LIVE_BOARD_POLL_MS_OPEN = 5000
+const LIVE_BOARD_POLL_MS_CLOSED = 30000
 
 type ApiErrorKind = 'http' | 'timeout' | 'network'
 
@@ -225,7 +227,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank, setMarketTop,
     setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
-    setPnl, setApiStatus, setDeployInfo, setResearch,
+    setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch,
   } = useStore()
 
   const wsRef = useRef<WebSocket | null>(null)
@@ -278,6 +280,32 @@ export function useData() {
       }
     }
   }, [setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions, markFailure, markSuccess])
+
+  const pollLiveBoard = useCallback(async () => {
+    try {
+      const board = await fetchJSON('/api/market/live_board', 12000)
+      if (board && typeof board === 'object') {
+        setLiveBoard(board)
+        markSuccess('live_board')
+        // Merge index spots into chain so TopBar stays continuous even between OC polls.
+        for (const row of board.indices || []) {
+          const sym = String(row?.symbol || '').toUpperCase()
+          if (!sym || !(Number(row?.ltp) > 0)) continue
+          const prev = useStore.getState().chain?.[sym] || {}
+          setChain(sym, {
+            ...prev,
+            spot: Number(row.ltp),
+            change_pct: row.change_pct == null ? prev.change_pct : Number(row.change_pct),
+            pct_change: row.change_pct == null ? prev.pct_change : Number(row.change_pct),
+            live_board: true,
+            source: 'dhan_live_board',
+          })
+        }
+      }
+    } catch {
+      // Keep last-good board; TopBar falls back to chain spots.
+    }
+  }, [setLiveBoard, setChain, markSuccess])
 
   const poll = useCallback(async () => {
     try {
@@ -592,21 +620,24 @@ export function useData() {
 
   useEffect(() => {
     unmountedRef.current = false
-    // Boot with market-data, broker batch, and deploy/research facts.
-    void Promise.all([poll(), pollBroker(), pollRuntimeFacts()])
+    // Boot with market-data, broker batch, live board, and deploy/research facts.
+    void Promise.all([poll(), pollBroker(), pollLiveBoard(), pollRuntimeFacts()])
     wsConnect()
 
     let coreTimer: ReturnType<typeof setInterval> | null = null
     let brokerTimer: ReturnType<typeof setInterval> | null = null
+    let liveBoardTimer: ReturnType<typeof setInterval> | null = null
     let secTimer: ReturnType<typeof setInterval> | null = null
 
     const armTimers = () => {
       if (coreTimer) clearInterval(coreTimer)
       if (brokerTimer) clearInterval(brokerTimer)
+      if (liveBoardTimer) clearInterval(liveBoardTimer)
       if (secTimer) clearInterval(secTimer)
       const open = useStore.getState().marketOpen
       coreTimer = setInterval(poll, open ? CORE_POLL_MS_OPEN : CORE_POLL_MS_CLOSED)
       brokerTimer = setInterval(pollBroker, BROKER_POLL_MS)
+      liveBoardTimer = setInterval(pollLiveBoard, open ? LIVE_BOARD_POLL_MS_OPEN : LIVE_BOARD_POLL_MS_CLOSED)
       // alerts/gates already included in market-data batch; keep rare secondary refresh as safety net
       secTimer = setInterval(pollSecondary, SECONDARY_POLL_MS)
     }
@@ -618,13 +649,14 @@ export function useData() {
       unmountedRef.current = true
       if (coreTimer) clearInterval(coreTimer)
       if (brokerTimer) clearInterval(brokerTimer)
+      if (liveBoardTimer) clearInterval(liveBoardTimer)
       if (secTimer) clearInterval(secTimer)
       clearInterval(runtimeTimer)
       clearInterval(modeTimer)
       if (wsReconnectTimerRef.current) clearTimeout(wsReconnectTimerRef.current)
       wsRef.current?.close()
     }
-  }, [poll, pollBroker, pollSecondary, pollRuntimeFacts, wsConnect])
+  }, [poll, pollBroker, pollLiveBoard, pollSecondary, pollRuntimeFacts, wsConnect])
 
   useEffect(() => {
     const active = String(chainSymbol || 'NIFTY').toUpperCase()

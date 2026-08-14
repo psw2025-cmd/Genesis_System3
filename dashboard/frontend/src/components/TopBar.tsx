@@ -48,11 +48,21 @@ export function TopBar() {
   const {
     wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
     brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, health,
-    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, state,
+    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, state, liveBoard,
   } = useStore()
   const [searchOpen, setSearchOpen] = useState(false)
 
+  const boardSpot = (symbol: string) => {
+    const row = (liveBoard?.indices || []).find((item: any) => String(item?.symbol || '').toUpperCase() === symbol)
+    if (Number(row?.ltp) > 0) {
+      return { spot: Number(row.ltp), chg: row?.change_pct == null ? null : Number(row.change_pct) }
+    }
+    return { spot: undefined as number | undefined, chg: null as number | null }
+  }
+
   const getSpot = (symbol: string) => {
+    const fromBoard = boardSpot(symbol)
+    if (fromBoard.spot) return fromBoard
     const row = chain?.[symbol]
     if (Number(row?.spot) > 0) {
       const rawChange = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
@@ -67,7 +77,10 @@ export function TopBar() {
 
   const nifty = getSpot('NIFTY')
   const bank = getSpot('BANKNIFTY')
+  const fin = getSpot('FINNIFTY')
+  const vix = getSpot('INDIAVIX')
   const mid = getSpot('MIDCPNIFTY')
+  const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
   const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
@@ -138,9 +151,17 @@ export function TopBar() {
         </div>
 
         <div className="hide-compact" style={{ display: 'flex', alignItems: 'center' }}>
-          <MarketTicker label="Nifty" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
+          <MarketTicker label="Nifty 50" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
           <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
-          <MarketTicker label="Midcap Nifty" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+          <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
+          <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} />
+          <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+          <div className="hide-phone" style={{ minWidth: 54, padding: '0 8px', borderLeft: '1px solid var(--border)' }}>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Board</div>
+            <div className="num" style={{ marginTop: 2, fontSize: 11, fontWeight: 700, color: liveBoardOk ? 'var(--up)' : 'var(--amber)' }}>
+              {liveBoardOk ? 'Live' : marketOpen ? 'Warming' : 'Idle'}
+            </div>
+          </div>
         </div>
       </div>
 

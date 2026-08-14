@@ -1023,20 +1023,28 @@ async def get_broker_diagnose():
 
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
+    """Dhan open positions — read-only. No orders. LTP enriched via marketfeed when missing."""
     _hit = _cache_get("broker_positions", _TTL_BROKER)
     if _hit is not None:
         return _hit
-    """Dhan open positions — read-only. No orders."""
     try:
         from core.brokers.dhan.dhan_payload_normalizer import (
             normalize_position_row,
             normalize_positions_payload,
         )
         from core.brokers.dhan.dhan_readonly import get_positions
+        from core.brokers.dhan.market_ltp import enrich_positions_with_market_ltp
 
         result = await _run_blocking(get_positions, timeout=_BROKER_IO_TIMEOUT_S)
         raw_rows = normalize_positions_payload(result.get("data"))
         normalized = [normalize_position_row(r) for r in raw_rows]
+        try:
+            normalized = await _run_blocking(
+                enrich_positions_with_market_ltp, normalized, timeout=8.0
+            )
+        except Exception:
+            # Keep broker rows even if marketfeed enrichment fails.
+            pass
         return {
             "live_trading_enabled": False,
             "order_placement_allowed": False,
@@ -1054,6 +1062,101 @@ async def get_broker_positions_live():
             "data": None,
             "live_trading_enabled": False,
             "order_placement_allowed": False,
+        }
+
+
+@app.get("/api/market/live_board")
+async def get_market_live_board():
+    """
+    Dhan-parity live board: index ribbon (Nifty/Bank/Fin/VIX) + equity watch from holdings.
+    Continuous poll target for TopBar — not static snapshots.
+    """
+    _hit = _cache_get("market_live_board", 3.0)
+    if _hit is not None:
+        return _hit
+
+    def _build():
+        from core.brokers.dhan.market_ltp import build_index_board, fetch_market_quotes
+        from core.brokers.dhan.dhan_payload_normalizer import (
+            normalize_holding_row,
+            normalize_holdings_payload,
+        )
+        from core.brokers.dhan.dhan_readonly import get_holdings
+
+        board = build_index_board()
+        equity_rows = []
+        try:
+            holdings = get_holdings()
+            for raw in normalize_holdings_payload(holdings.get("data")):
+                norm = normalize_holding_row(raw)
+                sid = str((raw or {}).get("securityId") or "").strip()
+                equity_rows.append(
+                    {
+                        "symbol": norm.get("symbol"),
+                        "security_id": sid,
+                        "exchange_segment": "NSE_EQ",
+                        "quantity": norm.get("quantity"),
+                        "avg_price": norm.get("avg_price"),
+                        "ltp": norm.get("ltp"),
+                        "change_pct": None,
+                        "pnl": norm.get("pnl"),
+                        "pnl_pct": norm.get("pnl_pct"),
+                        "current_value": norm.get("current_value"),
+                        "live": bool(norm.get("ltp")),
+                    }
+                )
+            # Refresh equity LTPs via marketfeed when holdings LTP is stale/missing.
+            need_ids = [r["security_id"] for r in equity_rows if r.get("security_id")]
+            if need_ids:
+                quotes = fetch_market_quotes({"NSE_EQ": need_ids[:40]})
+                for row in equity_rows:
+                    q = quotes.get(str(row.get("security_id") or ""), {})
+                    if q.get("ltp") is not None:
+                        row["ltp"] = q["ltp"]
+                        row["change"] = q.get("change")
+                        row["change_pct"] = q.get("change_pct")
+                        row["live"] = True
+                        qty = float(row.get("quantity") or 0)
+                        avg = float(row.get("avg_price") or 0)
+                        ltp = float(q["ltp"])
+                        row["current_value"] = ltp * qty
+                        row["pnl"] = (ltp - avg) * qty if qty else 0.0
+                        row["pnl_pct"] = ((ltp - avg) / avg * 100.0) if avg else None
+        except Exception as exc:
+            board["holdings_error"] = str(exc)[:160]
+
+        inv = sum(float(r.get("avg_price") or 0) * float(r.get("quantity") or 0) for r in equity_rows)
+        cur = sum(float(r.get("current_value") or 0) for r in equity_rows)
+        pnl = cur - inv
+        board["portfolio"] = {
+            "investment": round(inv, 2),
+            "current_value": round(cur, 2),
+            "overall_pnl": round(pnl, 2),
+            "overall_pnl_pct": round((pnl / inv * 100.0), 2) if inv else None,
+            "holdings_count": len(equity_rows),
+        }
+        board["equities"] = equity_rows
+        board["generated_at"] = datetime.now(IST).isoformat()
+        return board
+
+    try:
+        result = await _run_blocking(_build, timeout=12.0)
+        return _cache_set("market_live_board", result)
+    except asyncio.TimeoutError:
+        return {
+            "success": False,
+            "error": "live_board_timeout",
+            "indices": [],
+            "equities": [],
+            "live_trading_enabled": False,
+        }
+    except Exception as exc:
+        return {
+            "success": False,
+            "error": str(exc)[:200],
+            "indices": [],
+            "equities": [],
+            "live_trading_enabled": False,
         }
 
 
@@ -3050,7 +3153,16 @@ def _slim_rows_payload(payload: Any, keys: Tuple[str, ...]) -> Dict[str, Any]:
         for row in rows[:80]:
             if not isinstance(row, dict):
                 continue
-            slim.append({k: row.get(k) for k in keys})
+            raw = row.get("raw") if isinstance(row.get("raw"), dict) else {}
+            slim_row = {}
+            for k in keys:
+                if k in row and row.get(k) is not None:
+                    slim_row[k] = row.get(k)
+                elif k in raw and raw.get(k) is not None:
+                    slim_row[k] = raw.get(k)
+                else:
+                    slim_row[k] = row.get(k)
+            slim.append(slim_row)
     out = {
         "success": payload.get("success", True),
         "rows": slim,
@@ -3216,29 +3328,52 @@ async def batch_positions_holdings():
             holdings,
             (
                 "tradingSymbol",
+                "trading_symbol",
                 "symbol",
                 "totalQty",
                 "quantity",
                 "avgCostPrice",
                 "averagePrice",
+                "avg_price",
                 "lastTradedPrice",
                 "ltp",
+                "current_value",
+                "pnl",
+                "pnl_pct",
+                "securityId",
+                "security_id",
             ),
         ),
         "positions": _slim_rows_payload(
             positions,
             (
                 "tradingSymbol",
+                "trading_symbol",
                 "symbol",
                 "positionType",
+                "product",
                 "netQty",
+                "net_qty",
                 "quantity",
                 "buyAvg",
+                "avg_price",
+                "ltp",
+                "ltp_source",
                 "unrealizedProfit",
+                "unrealized_pnl",
                 "realizedProfit",
+                "realized_pnl",
                 "drvOptionType",
+                "option_type",
                 "drvStrikePrice",
+                "strike",
                 "drvExpiryDate",
+                "expiry_date",
+                "underlying",
+                "securityId",
+                "security_id",
+                "exchangeSegment",
+                "exchange_segment",
             ),
         ),
     }
