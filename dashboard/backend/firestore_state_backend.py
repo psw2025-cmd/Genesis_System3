@@ -137,6 +137,9 @@ class FirestoreSchedulerEvidenceBackend:
         "VALIDATION_NO_PREDICTIONS",
         "VALIDATION_ACTUALS_UNAVAILABLE",
         "VALIDATION_BLOCKED",
+        "RANK_LANE_TIMEOUT",
+        "RANK_SUMMARY_MISSING",
+        "RANK_NOT_READY",
     })
 
     def load_artifact(self, lane: str) -> Optional[Dict[str, Any]]:
@@ -374,22 +377,9 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
             reasons.append(f"scheduler evidence stale or future-dated: age_seconds={age:.0f}")
     except Exception:
         reasons.append("scheduler evidence timestamp invalid")
-    expected_contract = {
-        "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast", "0 4 * * MON-FRI", "UTC", 98),
-        "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
-        "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate", "5 10 * * MON-FRI", "UTC", 98),
-        "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
-        "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata", 26),
-        "genesis-system3-forecast-schedule": ("PAUSED", None, "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
-        "genesis-system3-rank-schedule": ("PAUSED", None, "50 3 * * 1-5", "UTC", None),
-        "genesis-system3-signals-schedule": ("PAUSED", None, "0 10 * * 1-5", "UTC", None),
-        "genesis-system3-scheduler-collector-every-minute": ("ENABLED", "genesis-system3-scheduler-collector", "* * * * *", "UTC", 1),
-    }
-    expected_total = len(expected_contract)
-    expected_enabled = sum(1 for row in expected_contract.values() if row[0] == "ENABLED")
-    expected_paused = sum(1 for row in expected_contract.values() if row[0] == "PAUSED")
-    expected_control = 1
-    expected_workload = expected_total - expected_control
+    from dashboard.backend.scheduler_contract import EXPECTED_SCHEDULER_CONTRACT, coverage_snapshot
+
+    expected_contract = EXPECTED_SCHEDULER_CONTRACT
     resources = evidence.get("resources") if isinstance(evidence.get("resources"), list) else []
     names = [row.get("name") for row in resources if isinstance(row, dict)]
     if len(names) != len(set(names)):
@@ -399,19 +389,13 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         reasons.append(f"scheduler identity mismatch: missing={missing} extras={extras}")
     enabled = [row for row in resources if row.get("state") == "ENABLED"]
     paused = [row for row in resources if row.get("state") == "PAUSED"]
-    workload = [row for row in resources if row.get("name") != "genesis-system3-scheduler-collector-every-minute"]
-    control = [row for row in resources if row.get("name") == "genesis-system3-scheduler-collector-every-minute"]
-    if (
-        len(resources) != expected_total
-        or len(workload) != expected_workload
-        or len(control) != expected_control
-        or len(enabled) != expected_enabled
-        or len(paused) != expected_paused
-    ):
+    coverage = coverage_snapshot(resources)
+    if not coverage.get("contract_matched"):
         reasons.append(
-            f"scheduler coverage mismatch: workload={len(workload)} control={len(control)} total={len(resources)} "
-            f"enabled={len(enabled)} paused={len(paused)} "
-            f"expected={expected_workload}/{expected_control}/{expected_total}/{expected_enabled}/{expected_paused}"
+            f"scheduler coverage mismatch: workload={coverage['workload']} control={coverage['control']} "
+            f"total={coverage['total']} enabled={coverage['enabled']} paused={coverage['paused']} "
+            f"expected={coverage['expected_workload']}/{coverage['expected_control']}/{coverage['expected_total']}/"
+            f"{coverage['expected_enabled']}/{coverage['expected_paused']}"
         )
     for row in resources:
         expected = expected_contract.get(row.get("name"))
@@ -513,12 +497,5 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         "resources": resources,
         "jobs": list(jobs.values()),
         "artifacts": artifact_rows,
-        "coverage": {
-            "workload": len(workload),
-            "control": len(control),
-            "total": len(resources),
-            "enabled": len(enabled),
-            "paused": len(paused),
-            "expected_total": expected_total,
-        },
+        "coverage": coverage,
     }

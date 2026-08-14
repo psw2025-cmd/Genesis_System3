@@ -170,10 +170,13 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     assert "genesis-system3-scheduler-collector-every-minute" in workflow
     assert '--schedule="* * * * *"' in workflow
     assert "COLLECTOR_URI=\"https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run\"" in workflow
-    assert ".coverage.workload == 8 and .coverage.control == 1 and .coverage.total == 9" in workflow
+    assert "coverage.contract_matched == true" in workflow
+    assert ".coverage.total == .coverage.expected_total" in workflow
+    assert "Cloud self-bootstrap" in workflow
+    assert 'gcloud run jobs execute "genesis-system3-${LANE}"' in workflow
+    assert ".healthy == true" in workflow
     pause = workflow.index("scheduler jobs pause genesis-system3-scheduler-collector-every-minute")
     resume = workflow.index("scheduler jobs resume genesis-system3-scheduler-collector-every-minute", pause)
     trigger = workflow.index("scheduler jobs run genesis-system3-scheduler-collector-every-minute", resume)
     assert pause < resume < trigger
     assert 'IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")' in workflow
-    assert 'gcloud run jobs execute "genesis-system3-${KIND}"' not in workflow

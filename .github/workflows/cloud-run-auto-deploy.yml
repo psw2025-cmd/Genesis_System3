@@ -353,7 +353,18 @@ jobs:
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health.json
-          jq -e '.coverage.workload == 8 and .coverage.control == 1 and .coverage.total == 9 and (.evidence_version > 0) and (.evidence_sha256 | length == 64) and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")) and .live_trading_enabled != true' /tmp/scheduler-health.json >/dev/null
+          # Coverage must match SSOT-derived expected_* fields (never hardcode lane counts again).
+          jq -e '
+            .coverage.contract_matched == true
+            and .coverage.total == .coverage.expected_total
+            and .coverage.workload == .coverage.expected_workload
+            and .coverage.control == .coverage.expected_control
+            and .coverage.enabled == .coverage.expected_enabled
+            and (.evidence_version > 0)
+            and (.evidence_sha256 | length == 64)
+            and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED"))
+            and .live_trading_enabled != true
+          ' /tmp/scheduler-health.json >/dev/null
           jq -e --arg execution "${CANARY_EXEC##*/}" '
             (.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .completion_status == "EXECUTION_SUCCEEDED")
             and (
@@ -361,6 +372,26 @@ jobs:
               or (.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .evidence_role == "prior_succeeded_execution")
             )
           ' /tmp/scheduler-health.json >/dev/null
+
+          # Cloud self-bootstrap (GitHub Actions → Cloud Run Jobs only; never laptop-seeded):
+          # one bounded execution per business lane so history-aware health has cloud-native proof.
+          for LANE in rank forecast validate signals; do
+            gcloud run jobs execute "genesis-system3-${LANE}" \
+              --project="${GOOGLE_CLOUD_PROJECT}" \
+              --region="${GCP_REGION}" \
+              --wait
+          done
+          gcloud run jobs execute genesis-system3-scheduler-collector \
+            --project="${GOOGLE_CLOUD_PROJECT}" \
+            --region="${GCP_REGION}" \
+            --wait
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health-after-bootstrap.json
+          jq -e '
+            .healthy == true
+            and .coverage.contract_matched == true
+            and .live_trading_enabled != true
+            and ([.jobs[] | select(.completion_status == "EXECUTION_SUCCEEDED")] | length) >= 6
+          ' /tmp/scheduler-health-after-bootstrap.json >/dev/null
           trap - EXIT
 
       - name: Prove service, rotator identity and scheduler safety

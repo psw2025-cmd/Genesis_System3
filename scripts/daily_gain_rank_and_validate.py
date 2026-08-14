@@ -101,20 +101,35 @@ def _oi_total(df: pd.DataFrame) -> int:
 
 
 def load_live_chain_data() -> Tuple[Dict[str, pd.DataFrame], Dict[str, float]]:
-    """Load official Dhan option-chain rows only."""
+    """Load official Dhan option-chain rows only (no NSE/Yahoo fallbacks that hang on Cloud Run)."""
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+
     dsm = get_datasource_manager()
     all_data: Dict[str, pd.DataFrame] = {}
     spots: Dict[str, float] = {}
     blocked: Dict[str, str] = {}
+    per_symbol_timeout = float(os.environ.get("DHAN_OPTION_CHAIN_TIMEOUT_S", "45"))
     for idx, sym in enumerate(ENABLED_UNDERLYINGS):
         if idx:
             time.sleep(float(os.environ.get("DHAN_OPTION_CHAIN_SPACING_S", "3.25")))
-        df, spot = dsm.fetch_option_chain(sym)
-        if df is None or df.empty or float(spot or 0) <= 0:
-            reason = dsm.last_error or "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-            blocked[sym] = reason
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                fut = pool.submit(dsm._fetch_dhan_real, sym, "")
+                result = fut.result(timeout=per_symbol_timeout)
+        except FuturesTimeout:
+            blocked[sym] = f"DHAN_OPTION_CHAIN_TIMEOUT_{int(per_symbol_timeout)}S"
+            print(f"  {sym}: BLOCKED — {blocked[sym]}")
+            continue
+        except Exception as exc:
+            blocked[sym] = f"DHAN_OPTION_CHAIN_ERROR:{type(exc).__name__}"
+            print(f"  {sym}: BLOCKED — {blocked[sym]}")
+            continue
+        if not result or result[0] is None or getattr(result[0], "empty", True) or float(result[1] or 0) <= 0:
+            reason = getattr(dsm, "last_error", None) or "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+            blocked[sym] = str(reason)
             print(f"  {sym}: BLOCKED — {reason}")
             continue
+        df, spot = result
         all_data[sym] = df
         spots[sym] = float(spot)
         print(f"  {sym}: Dhan official chain rows={len(df)} spot={float(spot):.2f}")

@@ -24,17 +24,6 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 _TRUTHY = {"1", "true", "yes", "on", "enabled"}
-_EXPECTED_SCHEDULERS = {
-    "genesis-system3-forecast-daily": ("ENABLED", "genesis-system3-forecast"),
-    "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank"),
-    "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate"),
-    "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals"),
-    "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate"),
-    "genesis-system3-forecast-schedule": ("PAUSED", "genesis-system3-forecast"),
-    "genesis-system3-rank-schedule": ("PAUSED", "genesis-system3-rank"),
-    "genesis-system3-signals-schedule": ("PAUSED", "genesis-system3-signals"),
-    "genesis-system3-scheduler-collector-every-minute": ("ENABLED", "genesis-system3-scheduler-collector"),
-}
 
 
 def _parse_scheduler_target(uri: str, project: str, region: str) -> tuple[Optional[str], bool]:
@@ -115,7 +104,9 @@ def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
         target_job, target_valid = _parse_scheduler_target(uri, project, region)
         resources.append({"name": name, "state": row.get("state", "MISSING"), "target_job": target_job, "target_uri_valid": target_valid, "target_type": "http" if uri else ("pubsub" if row.get("pubsubTarget") else "missing"), "schedule": row.get("schedule"), "time_zone": row.get("timeZone"), "last_attempt_time": row.get("lastAttemptTime"), "delivery_status_code": (row.get("status") or {}).get("code", 0), "delivery_status_message": str((row.get("status") or {}).get("message") or "")[:200]})
     jobs = []
-    targets = sorted({target for _, target in _EXPECTED_SCHEDULERS.values()})
+    from dashboard.backend.scheduler_contract import expected_job_targets
+
+    targets = expected_job_targets()
     by_job = {str(row.get("name", "")).rsplit("/", 1)[-1]: row for row in run_rows}
 
     def _completion_key(row: Dict[str, Any]):
@@ -320,18 +311,41 @@ def _run_validate_lane() -> Dict[str, Any]:
 
 
 def _run_rank_lane() -> Dict[str, Any]:
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+
     from scripts.daily_gain_rank_and_validate import REPORT_DIR, run_ranking
     business_date, is_open_day, reason = _business_context("rank")
     if not is_open_day:
         status = "PENDING" if reason == "UNKNOWN_CALENDAR" else "SKIPPED"
         raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
         return _artifact("rank", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
-    run_ranking()
-    summary = json.loads((REPORT_DIR / "summary.json").read_text(encoding="utf-8"))
-    rows = json.loads((REPORT_DIR / "ranked.json").read_text(encoding="utf-8")) if (REPORT_DIR / "ranked.json").exists() else []
+    # Hard wall clock so Cloud Run never sits on hung broker/NSE fallbacks until task timeout.
+    rank_deadline_s = int(os.environ.get("SYSTEM3_RANK_LANE_TIMEOUT_S", "480"))
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            pool.submit(run_ranking).result(timeout=rank_deadline_s)
+    except FuturesTimeout:
+        payload = {"status": "PENDING", "reason_code": "RANK_LANE_TIMEOUT", "business_date": business_date, "timeout_s": rank_deadline_s}
+        raw = json.dumps(payload, sort_keys=True).encode()
+        return _artifact("rank", payload, b"rank-lane-timeout", raw)
+    summary_path = REPORT_DIR / "summary.json"
+    ranked_path = REPORT_DIR / "ranked.json"
+    if not summary_path.exists():
+        payload = {"status": "PENDING", "reason_code": "RANK_SUMMARY_MISSING", "business_date": business_date}
+        raw = json.dumps(payload, sort_keys=True).encode()
+        return _artifact("rank", payload, b"missing-rank-summary", raw)
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    rows = json.loads(ranked_path.read_text(encoding="utf-8")) if ranked_path.exists() else []
     if summary.get("status") != "PASS" or not rows:
-        raise RuntimeError("rank lane did not produce verified rows")
-    output = (REPORT_DIR / "ranked.json").read_bytes()
+        payload = {
+            "status": "PENDING",
+            "reason_code": "RANK_NOT_READY",
+            "business_date": business_date,
+            "summary": summary,
+        }
+        raw = json.dumps(payload, sort_keys=True, default=str).encode()
+        return _artifact("rank", payload, b"rank-not-ready", raw)
+    output = ranked_path.read_bytes()
     return _artifact("rank", {"summary": summary, "rows": rows}, output, output)
 
 
