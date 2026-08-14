@@ -243,7 +243,7 @@ jobs:
             --parallelism=1 \
             --max-retries=0 \
             --task-timeout=10m \
-            --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ROTATE_WHEN_HOURS_LEFT=6,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1" \
+            --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ROTATE_WHEN_HOURS_LEFT=6,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
             --set-secrets="DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest,DHAN_PIN=dhan-pin:latest,DHAN_TOTP_SECRET=dhan-totp-secret:latest"
 
           # The web runtime may request canonical self-heal; Scheduler may invoke
