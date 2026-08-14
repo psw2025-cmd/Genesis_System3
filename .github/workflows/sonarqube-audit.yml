@@ -5,8 +5,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  schedule:
-    - cron: "23 2 * * 1"
   workflow_dispatch:
 
 permissions:
@@ -33,10 +31,8 @@ jobs:
           mkdir -p reports/latest/sonar_audit
           if [ -n "${SONAR_TOKEN:-}" ] && [ -n "${SONAR_PROJECT_KEY:-}" ]; then
             echo "configured=true" >> "$GITHUB_OUTPUT"
-            state=CONFIGURED
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            state=BLOCKED_MISSING_CONFIGURATION
           fi
           python - <<'PY'
           import json, os
