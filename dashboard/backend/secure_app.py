@@ -11,12 +11,14 @@ Dedicated worker ingestion remains bound to its separate worker token.
 """
 from __future__ import annotations
 
+import asyncio
 from collections import Counter
 import hashlib
 import json
 import os
 
 from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 
 # Permanent architecture invariant: these retired dashboard-auth knobs have no
 # runtime meaning. Scrub them before importing the legacy backend so even a
@@ -55,17 +57,24 @@ if hasattr(legacy, "_API_KEY"):
 if hasattr(legacy, "_has_dashboard_api_access"):
     legacy._has_dashboard_api_access = lambda _request: False
 
-# Only the informational status route survives. Login/logout/session endpoints
-# are deliberately absent from the serving route table.
+# Auth compatibility routes and the legacy file-backed paper GET are removed
+# from the serving table.  The canonical /api/paper route below reads the
+# durable Firestore paper ledger; local Cloud Run files are never production
+# authority.
 _RETIRED_AUTH_PATHS = {
     "/api/auth/" + "session",
     "/api/auth/" + "logout",
     "/api/auth/" + "status",
 }
-app.router.routes = [
-    route for route in app.router.routes
-    if getattr(route, "path", None) not in _RETIRED_AUTH_PATHS
-]
+
+def _retire_serving_route(route) -> bool:
+    path = getattr(route, "path", None)
+    if path in _RETIRED_AUTH_PATHS:
+        return True
+    methods = set(getattr(route, "methods", None) or set())
+    return path == "/api/paper" and "GET" in methods
+
+app.router.routes = [route for route in app.router.routes if not _retire_serving_route(route)]
 
 
 def _capability_aware_request_policy(**kwargs) -> SecurityDecision:
@@ -153,6 +162,52 @@ async def dashboard_auth_status():
         "credential_surface": "REMOVED",
         "session": None,
     }
+
+
+@app.get("/api/paper")
+async def durable_paper_status():
+    """Single self-contained public truth endpoint for the Paper Trades tab.
+
+    Reads only Firestore.  It never invokes Dhan, scanner, order, mutation or
+    local-file code, so dashboard rendering cannot trigger broker fan-out or
+    depend on the lifetime of a Cloud Run container.
+    """
+    try:
+        from dashboard.backend.paper_ledger_backend import FirestorePaperLedgerBackend
+
+        payload = await asyncio.wait_for(
+            asyncio.to_thread(FirestorePaperLedgerBackend().public_snapshot),
+            timeout=8.0,
+        )
+        payload["api_contract"] = "paper_public_truth_v1"
+        payload["public_dashboard_read_only"] = True
+        return JSONResponse(payload, status_code=200, headers={"Cache-Control": "no-store"})
+    except Exception as exc:
+        # A durable ledger outage is not represented as an empty/zero portfolio.
+        # Fail visibly so semantic browser proof blocks deployment acceptance.
+        payload = {
+            "status": "UNAVAILABLE",
+            "mode": "PAPER",
+            "engine": "cloud_paper_firestore_v1",
+            "positions_source": "FIRESTORE_PAPER_LEDGER",
+            "data_source": "DURABLE_LEDGER_UNAVAILABLE",
+            "positions": {"positions": [], "open_positions": [], "open_count": 0},
+            "pnl": {"summary": {}, "closed_positions": []},
+            "trades": {"entries": [], "exits": [], "count": 0},
+            "paper_truth": {
+                "ledger_source": "FIRESTORE_PAPER_LEDGER",
+                "durable": True,
+                "available": False,
+                "broker_order_endpoints_called": False,
+                "order_endpoints_label": "INTENTIONALLY_NOT_CALLED_PAPER_SAFE",
+                "error_type": type(exc).__name__,
+            },
+            "broker_order_endpoints_called": False,
+            "live_trading_enabled": False,
+            "api_contract": "paper_public_truth_v1",
+            "public_dashboard_read_only": True,
+        }
+        return JSONResponse(payload, status_code=503, headers={"Cache-Control": "no-store"})
 
 
 def _sentinel_reached(capability: str) -> None:
