@@ -262,9 +262,15 @@ def run_once() -> Tuple[Dict[str, Any], int]:
         art = by_lane.get(lane) or {}
         st = str(art.get("status") or "").upper()
         reason = str(art.get("reason_code") or "")
+        if lane == "forecast" and st == "PENDING" and reason == "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED":
+            soft_gaps.append("forecast_model_not_configured")
+            agent_notes["business_lanes"].append("forecast PENDING until validated model contract")
+            continue
         if st == "SKIPPED" and reason == "MARKET_SESSION_CLOSED":
             bad_lanes.append(lane)
         elif st in {"", "SKIPPED"} and lane in {"rank", "forecast"} and session["in_session"]:
+            bad_lanes.append(lane)
+        elif lane == "rank" and st == "PENDING":
             bad_lanes.append(lane)
     if bad_lanes:
         hard_fails.append("business_skipped_in_session")
