@@ -22,6 +22,9 @@ on:
       - "GCP Dhan Token Fix CI"
       - "GCP Dhan Token Rotation Manual Recovery"
       - "GCP Stage 2 Safety Checks"
+      - "CodeQL Security Audit"
+      - "Security Audit Evidence"
+      - "SonarQube Audit"
     types: [completed]
   deployment_status:
 
