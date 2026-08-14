@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following seven GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following ten GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -12,17 +12,24 @@ Only the following seven GitHub Actions workflows are allowed in `.github/workfl
 4. `gcp-stage2-ci.yml` — focused Google Cloud safety tests for relevant pull-request changes.
 5. `gcp-dhan-token-fix-ci.yml` — focused Dhan token/runtime contract checks for relevant pull-request changes.
 6. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard.
+7. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
+8. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
+9. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
 
 ### Manual emergency workflow
 
-7. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+10. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Event observer rule
 
 Only `workflow-priority-guard.yml` may use `workflow_run` or `deployment_status`.
-It may observe only the six existing System3 workflows named in its event allow-list.
+It may observe only the nine approved workflow names listed in its event allow-list.
 The observer is evidence-only: GitHub-hosted runner, read permissions, trusted `main` checkout, credential persistence disabled, no repository or deployment mutation, and no trading/order action.
 It writes event metadata and a recurrence fingerprint only to the workflow summary and retained artifact.
+
+## Scheduling authority
+
+GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security scans execute on every relevant PR/main commit and may also be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
 
 ## Disabled workflow classes
 
