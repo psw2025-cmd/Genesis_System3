@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Canonical Cloud Run deployment entrypoint with immutable digest proof.
 
-The original deployment state machine is preserved byte-for-byte in
+The original deployment state machine is preserved in
 ``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
 implementation still contains every critical PAPER/LIVE-OFF/candidate safety
 invariant, replaces only the image-provenance assertion with the fail-closed
 Artifact Registry repository+digest verifier, removes retired dashboard
-credential secret mounts before any candidate revision can be created, and
-converges the bounded business-lane Cloud Scheduler definitions before the
-workflow's scheduler-proof stage.
+credential secret mounts before any candidate revision can be created,
+converges bounded business-lane Cloud Scheduler definitions, and enforces the
+Cloud Run/Monitoring traffic-resilience contract.
 """
 from __future__ import annotations
 
@@ -34,6 +34,18 @@ BUSINESS_SCHEDULES = {
     "signals": "15 13 * * MON-FRI",
 }
 
+# Keep max instances unchanged until saturation telemetry proves Cloud Run is
+# the dominant 429 source. Raising it prematurely can multiply process-local
+# Dhan request budgets across instances.
+TRAFFIC_RUNTIME_ENV = {
+    "SYSTEM3_TRAFFIC_SHIELD_MAX_PRODUCERS": "8",
+    "SYSTEM3_TRAFFIC_SHIELD_FRESH_S": "3",
+    "SYSTEM3_TRAFFIC_SHIELD_STALE_S": "60",
+    "SYSTEM3_TRAFFIC_SHIELD_WAIT_S": "1.5",
+    "SYSTEM3_TRAFFIC_SHIELD_RETRY_AFTER_S": "3",
+    "SYSTEM3_CLOUD_RUN_MAX_INSTANCES": "2",
+}
+
 # These are executable preconditions: the wrapper refuses to deploy if the
 # preserved implementation loses any of these exact safety/provenance markers.
 _REQUIRED_IMPLEMENTATION_MARKERS = (
@@ -55,6 +67,8 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     '_wait_revision_ready',
     'gcp_failed_revision_forensic.py',
     'PREVIOUS_TRAFFIC_RESTORED',
+    '"--min=1", "--max=2"',
+    '"--concurrency=50"',
 )
 
 _RETIRED_DASHBOARD_SECRET_ENV = "DASHBOARD_API_KEY"
@@ -68,14 +82,36 @@ def _verify_implementation_contract() -> None:
         raise RuntimeError(f"deployment_safety_contract_missing:{missing}")
 
 
-def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
-    """Ensure every Cloud Run candidate explicitly removes retired dashboard auth.
+def _harden_candidate_runtime_args(args: list[str]) -> list[str]:
+    """Converge one candidate command to the traffic/WebSocket runtime contract."""
+    if args[:3] != ["gcloud", "run", "deploy"]:
+        return list(args)
+    result = list(args)
 
-    This is deliberately applied in the canonical wrapper because the preserved
-    implementation is the PR #130 provenance state machine. It changes no LIVE,
-    order, worker-token, or broker authority; it only removes a retired secret
-    mount that must not survive on newly-created revisions.
-    """
+    # Cloud Run WebSockets are still requests; 300s caused periodic reconnect
+    # bursts. 60m is Cloud Run's supported maximum, while browser reconnects
+    # remain exponential/jittered. Session affinity is best effort only; durable
+    # truth remains Firestore and never depends on reconnecting to one instance.
+    result = ["--timeout=3600" if item == "--timeout=300" else item for item in result]
+    if "--session-affinity" not in result:
+        quiet_index = result.index("--quiet") if "--quiet" in result else len(result)
+        result.insert(quiet_index, "--session-affinity")
+
+    env_indexes = [i for i, item in enumerate(result) if item.startswith("--update-env-vars=")]
+    if len(env_indexes) != 1:
+        raise RuntimeError(f"candidate_update_env_contract_invalid:{len(env_indexes)}")
+    env_index = env_indexes[0]
+    env_blob = result[env_index].split("=", 1)[1]
+    for name, value in TRAFFIC_RUNTIME_ENV.items():
+        marker = f"{name}="
+        if marker not in env_blob:
+            env_blob += f",{name}={value}"
+    result[env_index] = "--update-env-vars=" + env_blob
+    return result
+
+
+def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
+    """Ensure every Cloud Run candidate explicitly removes retired dashboard auth."""
     if args[:3] != ["gcloud", "run", "deploy"]:
         return list(args)
 
@@ -94,11 +130,11 @@ def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
     return result
 
 
-def _run_with_retired_dashboard_secret_scrub(
-    args: list[str], *, capture: bool = False
-) -> str:
-    scrubbed = _scrub_retired_dashboard_secret_arg(args)
-    if scrubbed != args:
+def _run_with_runtime_contract(args: list[str], *, capture: bool = False) -> str:
+    hardened = _harden_candidate_runtime_args(args)
+    scrubbed = _scrub_retired_dashboard_secret_arg(hardened)
+    if scrubbed != args and args[:3] == ["gcloud", "run", "deploy"]:
+        print("CANDIDATE_TRAFFIC_RUNTIME_CONTRACT enforced")
         print("RETIRED_DASHBOARD_SECRET_SCRUB enforced")
     return _ORIGINAL_RUN(scrubbed, capture=capture)
 
@@ -118,14 +154,8 @@ def _scheduler_exists(name: str) -> bool:
     """Return exact scheduler existence; auth/API errors fail closed."""
     proc = subprocess.run(
         [
-            "gcloud",
-            "scheduler",
-            "jobs",
-            "describe",
-            name,
-            f"--project={PROJECT}",
-            f"--location={REGION}",
-            "--format=value(name)",
+            "gcloud", "scheduler", "jobs", "describe", name,
+            f"--project={PROJECT}", f"--location={REGION}", "--format=value(name)",
         ],
         text=True,
         capture_output=True,
@@ -158,31 +188,18 @@ def _business_scheduler_command(kind: str, *, exists: bool) -> list[str]:
         else "--headers=Content-Type=application/json"
     )
     return [
-        "gcloud",
-        "scheduler",
-        "jobs",
-        action,
-        "http",
-        name,
-        f"--project={PROJECT}",
-        f"--location={REGION}",
-        f"--schedule={BUSINESS_SCHEDULES[kind]}",
-        "--time-zone=UTC",
-        f"--uri={uri}",
-        "--http-method=POST",
+        "gcloud", "scheduler", "jobs", action, "http", name,
+        f"--project={PROJECT}", f"--location={REGION}",
+        f"--schedule={BUSINESS_SCHEDULES[kind]}", "--time-zone=UTC",
+        f"--uri={uri}", "--http-method=POST",
         f"--oauth-service-account-email={SCHEDULER_SA}",
         "--oauth-token-scope=https://www.googleapis.com/auth/cloud-platform",
-        header_flag,
-        "--message-body={}",
+        header_flag, "--message-body={}",
     ]
 
 
 def _ensure_business_scheduler_contract() -> None:
-    """Create or fully reconcile the three bounded business schedules.
-
-    This function configures Scheduler metadata only. It never executes a Cloud
-    Run job and never changes broker, token, order, or LIVE-trading authority.
-    """
+    """Create or fully reconcile the bounded business schedules."""
     for kind in BUSINESS_SCHEDULES:
         exists = _scheduler_exists(f"genesis-system3-{kind}-daily")
         command = _business_scheduler_command(kind, exists=exists)
@@ -200,10 +217,24 @@ def _ensure_business_scheduler_contract() -> None:
         )
 
 
+def _configure_traffic_monitoring() -> None:
+    """Fail before production mutation if 24x7 Monitoring cannot be converged."""
+    from gcp_configure_traffic_monitoring import main as monitoring_main
+
+    # Keep the monitor's saturation threshold bound to the exact deploy cap.
+    os.environ.setdefault("SYSTEM3_CLOUD_RUN_MAX_INSTANCES", TRAFFIC_RUNTIME_ENV["SYSTEM3_CLOUD_RUN_MAX_INSTANCES"])
+    rc = int(monitoring_main() or 0)
+    if rc != 0:
+        raise RuntimeError(f"traffic_monitoring_configuration_failed:{rc}")
+    print("SYSTEM3_TRAFFIC_MONITORING_CONTRACT enforced")
+
+
 def main() -> int:
     _verify_implementation_contract()
+    # Alerting must converge before a candidate can alter production runtime.
+    _configure_traffic_monitoring()
     deployer._assert_candidate_image = _assert_candidate_image
-    deployer._run = _run_with_retired_dashboard_secret_scrub
+    deployer._run = _run_with_runtime_contract
     result = deployer.main()
     if result:
         return result
