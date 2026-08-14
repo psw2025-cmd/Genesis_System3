@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Parallel external AI consultation over exact sanitized deterministic evidence.
 
-No AI can override deterministic safety/runtime/security failures. Missing exact
-security evidence or provider access is BLOCKED, never PASS.
+No AI can override deterministic safety/runtime/security/rotator failures. Missing
+exact evidence or provider access is BLOCKED, never PASS.
 """
 from __future__ import annotations
 
@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 CLOUD_PATH = Path(os.getenv("SYSTEM3_CLOUD_AUDIT_JSON", "reports/latest/full_cloud_audit/full_cloud_audit.json"))
+ROTATOR_PATH = Path(os.getenv("SYSTEM3_ROTATOR_RELIABILITY_JSON", "reports/latest/rotator_reliability/rotator_reliability.json"))
 SECURITY_PATH = Path(os.getenv("SYSTEM3_SECURITY_AUDIT_JSON", "reports/latest/security_audit/security_audit.json"))
 OUT = Path(os.getenv("SYSTEM3_AI_CONSENSUS_DIR", "reports/latest/ai_consensus"))
 OPENAI_MODEL = os.getenv("OPENAI_AUDIT_MODEL", "gpt-4o")
@@ -63,9 +64,9 @@ def _prompt(bundle: dict[str, Any]) -> str:
     compact = json.dumps(bundle, sort_keys=True, separators=(",", ":"))
     return (
         "You are an independent cloud/security forensic reviewer. Analyze the supplied exact-SHA sanitized Genesis System3 evidence. "
-        "Do not assume missing evidence is healthy. Deterministic FAIL or safety/security failure cannot be overridden. "
-        "Return ONLY JSON with keys: verdict (PASS or FAIL), confidence (0..1), blocking_findings (array of strings), "
-        "rationale (string <= 600 chars). PASS only if both cloud/runtime and code-security evidence prove PASS.\nEVIDENCE="
+        "Do not assume missing evidence is healthy. Deterministic FAIL in cloud safety, rotator reliability, or code security cannot be overridden. "
+        "A healthy broker session does not prove reliable token rotation. Return ONLY JSON with keys: verdict (PASS or FAIL), confidence (0..1), "
+        "blocking_findings (array of strings), rationale (string <= 600 chars). PASS only if cloud/runtime, rotator, and code-security evidence all prove PASS.\nEVIDENCE="
         + compact
     )
 
@@ -138,12 +139,13 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     try:
         cloud = json.loads(CLOUD_PATH.read_text(encoding="utf-8"))
+        rotator = json.loads(ROTATOR_PATH.read_text(encoding="utf-8"))
         security = json.loads(SECURITY_PATH.read_text(encoding="utf-8"))
     except Exception as exc:
         report = {"state": "BLOCKED_DETERMINISTIC_EVIDENCE_MISSING", "error": type(exc).__name__}
         (OUT / "ai_consensus.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
         return 2
-    bundle = {"cloud_audit": cloud, "security_audit": security}
+    bundle = {"cloud_audit": cloud, "rotator_reliability": rotator, "security_audit": security}
     bundle_hash = hashlib.sha256(json.dumps(bundle, sort_keys=True).encode()).hexdigest()
     with ThreadPoolExecutor(max_workers=2) as ex:
         f_openai = ex.submit(_openai, bundle)
@@ -155,6 +157,7 @@ def main() -> int:
     both_pass = providers_ready and openai.get("verdict") == "PASS" and anthropic.get("verdict") == "PASS"
     deterministic_pass = (
         cloud.get("state") == "PASS" and (cloud.get("safety") or {}).get("state") == "PASS"
+        and rotator.get("state") == "PASS"
         and security.get("state") == "PASS"
     )
     if not providers_ready:
@@ -164,29 +167,33 @@ def main() -> int:
     else:
         state = "PASS"
     report = {
-        "schema": "genesis-system3-ai-consensus-v1",
+        "schema": "genesis-system3-ai-consensus-v2",
         "state": state,
         "cloud_audit_state": cloud.get("state"),
         "cloud_safety_state": (cloud.get("safety") or {}).get("state"),
+        "rotator_reliability_state": rotator.get("state"),
         "security_audit_state": security.get("state"),
         "evidence_sha256": bundle_hash,
         "openai": openai,
         "anthropic": anthropic,
-        "consensus_rule": "exact deterministic cloud PASS + security PASS + OpenAI PASS + Anthropic PASS",
+        "consensus_rule": "exact deterministic cloud PASS + rotator PASS + security PASS + OpenAI PASS + Anthropic PASS",
         "ai_can_override_deterministic_failure": False,
         "secret_values_exposed": False,
     }
     (OUT / "ai_consensus.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
     md = [
         "# Multi-AI Audit Consensus", "", f"Consensus: **{state}**", "",
-        f"- Cloud audit: `{cloud.get('state')}`", f"- Security audit: `{security.get('state')}`",
-        f"- OpenAI: `{openai.get('state')}` / `{openai.get('verdict')}`",
+        f"- Cloud audit: `{cloud.get('state')}`", f"- Rotator reliability: `{rotator.get('state')}`",
+        f"- Security audit: `{security.get('state')}`", f"- OpenAI: `{openai.get('state')}` / `{openai.get('verdict')}`",
         f"- Anthropic: `{anthropic.get('state')}` / `{anthropic.get('verdict')}`",
         f"- Claude 1M context proven: `{anthropic.get('context_1m_proven')}`", "",
+        "Healthy broker state cannot override rotator reliability failure.",
         "AI cannot override deterministic failure evidence.", "",
     ]
     (OUT / "ai_consensus.md").write_text("\n".join(md), encoding="utf-8")
-    print("AI_AUDIT_CONSENSUS " + json.dumps({"state": state, "openai": openai.get("state"), "anthropic": anthropic.get("state")}, sort_keys=True))
+    print("AI_AUDIT_CONSENSUS " + json.dumps({
+        "state": state, "rotator": rotator.get("state"), "openai": openai.get("state"), "anthropic": anthropic.get("state")
+    }, sort_keys=True))
     return 0 if state == "PASS" else 2
 
 
