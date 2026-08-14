@@ -69,6 +69,32 @@ _stats = Counter()
 _stats_lock = asyncio.Lock()
 
 
+def retire_legacy_delay_middleware(app: Any, dispatch_fn: Any) -> int:
+    """Remove the old fixed-delay pseudo-rate-limiter before the app serves.
+
+    The legacy middleware merely slept 50 ms on broker/chain requests. It did
+    not cap concurrency, honor Retry-After, or coalesce duplicate work, and it
+    could increase queued request pressure. The real traffic shield replaces it.
+    """
+    if app is None or dispatch_fn is None:
+        return 0
+    rows = list(getattr(app, "user_middleware", []) or [])
+    kept = []
+    removed = 0
+    for row in rows:
+        kwargs = getattr(row, "kwargs", {}) or {}
+        if kwargs.get("dispatch") is dispatch_fn:
+            removed += 1
+            continue
+        kept.append(row)
+    if removed:
+        app.user_middleware[:] = kept
+        # Starlette builds this lazily; clear defensively if already materialized.
+        if hasattr(app, "middleware_stack"):
+            app.middleware_stack = None
+    return removed
+
+
 def _is_shielded(path: str) -> bool:
     return path in _SHIELDED_EXACT or any(path.startswith(prefix) for prefix in _SHIELDED_PREFIXES)
 
@@ -225,5 +251,6 @@ def traffic_shield_status() -> Dict[str, Any]:
         "stale_usable_entries": cached_stale_usable,
         "stats": dict(_stats),
         "mutation_routes_shielded": False,
+        "legacy_fixed_delay_middleware_required": False,
         "live_trading_enabled": False,
     }
