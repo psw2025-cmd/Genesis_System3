@@ -33,10 +33,24 @@ os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
 
 
 def _hist_days() -> list[dict]:
-    """Historical-shaped days for smoke (not a live-trading claim)."""
-    # Keep most days below 0.70 so the gate does not falsely PASS; one day >= 0.70
-    # proves "passing day" counting works.
+    """Historical-shaped days for smoke (not a live-trading claim).
+
+    Continuum covers prior sessions through the current business day so the
+    Firestore series is complete (days_recorded). Most rhos stay <0.70 on
+    purpose — gate PASS still requires five real days with ρ≥0.70 (no soft-pass).
+    """
+    now_z = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return [
+        {
+            "date": "2026-08-07",
+            "rank_correlation_spearman": 0.51,
+            "match_rate_top3": 0.33,
+            "grade": "C",
+            "predicted_top_symbols": ["BANKNIFTY", "NIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "actual_top_symbols": ["NIFTY", "BANKNIFTY", "MIDCPNIFTY", "FINNIFTY"],
+            "source": "smoke_e2e_historical_replay",
+            "validated_at": now_z,
+        },
         {
             "date": "2026-08-08",
             "rank_correlation_spearman": 0.42,
@@ -45,7 +59,7 @@ def _hist_days() -> list[dict]:
             "predicted_top_symbols": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
             "actual_top_symbols": ["BANKNIFTY", "NIFTY", "MIDCPNIFTY", "FINNIFTY"],
             "source": "smoke_e2e_historical_replay",
-            "validated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "validated_at": now_z,
         },
         {
             "date": "2026-08-11",
@@ -55,7 +69,7 @@ def _hist_days() -> list[dict]:
             "predicted_top_symbols": ["NIFTY", "FINNIFTY", "BANKNIFTY", "MIDCPNIFTY"],
             "actual_top_symbols": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
             "source": "smoke_e2e_historical_replay",
-            "validated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "validated_at": now_z,
         },
         {
             "date": "2026-08-12",
@@ -65,7 +79,7 @@ def _hist_days() -> list[dict]:
             "predicted_top_symbols": ["BANKNIFTY", "NIFTY", "MIDCPNIFTY", "FINNIFTY"],
             "actual_top_symbols": ["BANKNIFTY", "NIFTY", "FINNIFTY", "MIDCPNIFTY"],
             "source": "smoke_e2e_historical_replay",
-            "validated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "validated_at": now_z,
         },
         {
             "date": "2026-08-13",
@@ -75,7 +89,17 @@ def _hist_days() -> list[dict]:
             "predicted_top_symbols": ["MIDCPNIFTY", "NIFTY", "BANKNIFTY", "FINNIFTY"],
             "actual_top_symbols": ["NIFTY", "MIDCPNIFTY", "BANKNIFTY", "FINNIFTY"],
             "source": "smoke_e2e_historical_replay",
-            "validated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "validated_at": now_z,
+        },
+        {
+            "date": "2026-08-14",
+            "rank_correlation_spearman": 0.55,
+            "match_rate_top3": 0.33,
+            "grade": "C",
+            "predicted_top_symbols": ["FINNIFTY", "NIFTY", "BANKNIFTY", "MIDCPNIFTY"],
+            "actual_top_symbols": ["NIFTY", "FINNIFTY", "BANKNIFTY", "MIDCPNIFTY"],
+            "source": "smoke_e2e_historical_replay",
+            "validated_at": now_z,
         },
     ]
 
