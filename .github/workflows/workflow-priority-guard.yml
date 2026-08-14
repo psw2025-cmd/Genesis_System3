@@ -7,12 +7,20 @@ on:
       - ".github/workflows/**"
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - "scripts/gcp_full_cloud_audit.py"
+      - "scripts/fetch_exact_security_audit.py"
+      - "scripts/multi_ai_audit_consensus.py"
+      - "tests/test_full_cloud_audit_contract.py"
   push:
     branches: [main]
     paths:
       - ".github/workflows/**"
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - "scripts/gcp_full_cloud_audit.py"
+      - "scripts/fetch_exact_security_audit.py"
+      - "scripts/multi_ai_audit_consensus.py"
+      - "tests/test_full_cloud_audit_contract.py"
   workflow_dispatch:
   workflow_run:
     workflows:
@@ -60,6 +68,9 @@ jobs:
 
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
+
+      - name: Execute full cloud audit adversarial contract tests
+        run: python -m unittest tests.test_full_cloud_audit_contract -v
 
   event-forensic-responder:
     if: >-
