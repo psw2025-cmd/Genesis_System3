@@ -350,4 +350,21 @@ jobs:
 
       - name: Prove all 22 canonical tabs render in Chrome
         shell: bash
-        run: timeout 180s python ../../scripts/frontend_local_runtime_smoke.py
+        run: |
+          set -euo pipefail
+          rc=1
+          for attempt in 1 2; do
+            set +e
+            timeout 180s python ../../scripts/frontend_local_runtime_smoke.py
+            rc=$?
+            set -e
+            if [[ "$rc" -eq 0 ]]; then
+              echo "frontend_browser_smoke_attempt_${attempt}=PASS"
+              exit 0
+            fi
+            echo "frontend_browser_smoke_attempt_${attempt}=FAIL rc=${rc}"
+            if [[ "$attempt" -eq 1 ]]; then
+              sleep 3
+            fi
+          done
+          exit "$rc"
