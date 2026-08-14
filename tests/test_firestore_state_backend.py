@@ -277,14 +277,15 @@ def test_derived_health_allows_pending_first_run_and_historical_success():
     validate_resource = next(row for row in resources if row["name"] == "genesis-system3-validate-daily")
     validate_resource["delivery_status_code"] = -1
     validate_resource["last_attempt_time"] = None
-    # Preserve the more recent control/rotation/paper scheduler evidence.
+    # Preserve recent control/rotation/paper evidence with chronology matching
+    # scheduler attempt -> Cloud Run execution creation -> completion.
     for row in resources:
         if row["name"] in {
             "genesis-system3-dhan-token-rotate-daily",
             "genesis-system3-scheduler-collector-every-minute",
             "genesis-system3-paper-market",
         }:
-            row["last_attempt_time"] = "2026-08-14T00:59:00Z"
+            row["last_attempt_time"] = "2026-08-14T00:58:00Z"
 
     jobs = _successful_jobs(resources, create_time="2026-08-13T22:00:00Z", completion_time="2026-08-13T22:01:00Z")
     validate_job = next(row for row in jobs if row["name"] == "genesis-system3-validate")
