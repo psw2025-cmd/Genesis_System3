@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { installTrafficResilience } from './trafficResilience'
 
 // Production UI is served same-origin from Google Cloud Run
 // (https://genesis-system3-web-doq2wplepa-el.a.run.app). Leave VITE_API_BASE_URL
@@ -35,4 +36,9 @@ export const API_HEADERS: Record<string, string> = {}
 
 axios.defaults.withCredentials = true
 axios.defaults.headers.common.Accept = 'application/json'
+axios.defaults.timeout = 15_000
 
+// One policy covers both axios-based workspaces and native-fetch hooks.
+// GET/HEAD may retry transient 429/502/503/504 with Retry-After-aware jitter;
+// mutation methods are never retried automatically.
+installTrafficResilience()
