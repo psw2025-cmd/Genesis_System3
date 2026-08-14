@@ -2291,28 +2291,32 @@ async def approve_live_trading(payload: Dict[str, Any]):
 
 
 @app.get("/api/scheduler/health")
-async def get_scheduler_health():
+async def get_scheduler_health(refresh: bool = False):
     """
-    Job scheduler health, as last pushed by the worker service (see
-    /api/scheduler/health/push above). NOT a local-file read — the
-    scheduler daemon runs on a different Render container than this web
-    service, so local files here would always be empty.
+    Job scheduler health from Firestore evidence (cloud SSOT).
 
-    `healthy=False` covers three real failure modes:
-      1. Worker has never pushed at all (never deployed / crashed at boot)
-      2. Worker's own config_alert is set (broken scheduler config)
-      3. Last push is older than STALE_THRESHOLD_S (worker thread died
-         but the worker process itself is still up, so Render wouldn't
-         restart it — this is exactly the silent-failure shape that
-         caused the original bug)
+    `healthy=False` covers transport/control-plane failure modes.
+    Use `?refresh=true` to bypass the short in-process cache.
     """
     if os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower() == "firestore":
         try:
+            cache_key = "scheduler_health_firestore"
+            if not refresh:
+                hit = _cache_get(cache_key, 30.0)
+                if isinstance(hit, dict):
+                    out = dict(hit)
+                    out["cache_hit"] = True
+                    out["cache_ttl_s"] = 30
+                    return out
             from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend, derive_scheduler_health
             evidence = await asyncio.to_thread(FirestoreSchedulerEvidenceBackend().load_current)
-            return derive_scheduler_health(evidence)
+            payload = derive_scheduler_health(evidence)
+            payload["cache_hit"] = False
+            payload["cache_ttl_s"] = 30
+            payload["deploy_git_sha"] = os.environ.get("DEPLOY_GIT_SHA") or os.environ.get("SYSTEM3_GIT_SHA")
+            return _cache_set(cache_key, payload)
         except Exception as exc:
-            return {"healthy": False, "status": "UNHEALTHY", "unhealthy_reasons": [f"scheduler evidence unavailable: {type(exc).__name__}"], "live_trading_enabled": False}
+            return {"healthy": False, "status": "UNHEALTHY", "unhealthy_reasons": [f"scheduler evidence unavailable: {type(exc).__name__}"], "live_trading_enabled": False, "cache_hit": False}
 
     STALE_THRESHOLD_S = 180  # legacy local/Render compatibility only
 

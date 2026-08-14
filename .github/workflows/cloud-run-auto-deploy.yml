@@ -9,6 +9,8 @@ on:
     paths:
       - "dashboard/**"
       - "core/**"
+      - "scripts/gcp_worker_job.py"
+      - "scripts/smoke_ml_validate_e2e.py"
       - "scripts/start_cloud_run.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
@@ -300,14 +302,14 @@ jobs:
             gcloud run jobs deploy "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
               --image="${IMAGE}" --service-account="${JOB_SA}" --command=python --args=scripts/gcp_worker_job.py \
               --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=10m \
-              --set-env-vars="SYSTEM3_JOB_KIND=${KIND},SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1" \
+              --set-env-vars="SYSTEM3_JOB_KIND=${KIND},SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
               $(if [ "${KIND}" = rank ] || [ "${KIND}" = validate ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
             gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
           done
           gcloud run jobs deploy genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
             --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
             --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=2m \
-            --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1"
+            --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
           gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
 
           # Rank morning → forecast → post-close validate (Spearman day) → signals.
@@ -352,7 +354,7 @@ jobs:
           test -n "${CANARY_EXEC}" && test "${CANARY_EXEC}" != "${BEFORE_EXEC}" && test "${CANARY_STATUS}" = "EXECUTION_SUCCEEDED"
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
-          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health.json
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > /tmp/scheduler-health.json
           # Coverage must match SSOT-derived expected_* fields (never hardcode lane counts again).
           jq -e '
             .coverage.contract_matched == true
@@ -362,6 +364,7 @@ jobs:
             and .coverage.enabled == .coverage.expected_enabled
             and (.evidence_version > 0)
             and (.evidence_sha256 | length == 64)
+            and (.observability.alert_severity == "none")
             and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED"))
             and .live_trading_enabled != true
           ' /tmp/scheduler-health.json >/dev/null
@@ -385,11 +388,12 @@ jobs:
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
             --wait
-          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health" > /tmp/scheduler-health-after-bootstrap.json
+          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > /tmp/scheduler-health-after-bootstrap.json
           jq -e '
             .healthy == true
             and .coverage.contract_matched == true
             and .live_trading_enabled != true
+            and (.observability.alert_severity == "none")
             and ([.jobs[] | select(.completion_status == "EXECUTION_SUCCEEDED")] | length) >= 6
           ' /tmp/scheduler-health-after-bootstrap.json >/dev/null
 
@@ -397,7 +401,7 @@ jobs:
           gcloud run jobs deploy genesis-system3-ml-history-bootstrap --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
             --image="${IMAGE}" --service-account="${RANK_JOB_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
             --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=5m \
-            --set-env-vars="SYSTEM3_JOB_KIND=ml-history-bootstrap,SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1"
+            --set-env-vars="SYSTEM3_JOB_KIND=ml-history-bootstrap,SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
           gcloud run jobs execute genesis-system3-ml-history-bootstrap \
             --project="${GOOGLE_CLOUD_PROJECT}" \
             --region="${GCP_REGION}" \
@@ -409,6 +413,27 @@ jobs:
             and (.gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.days_recorded | tonumber) >= 4
             and (.gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.pass == false or .gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.days_passing_threshold < 5)
           ' /tmp/auto-gates.json >/dev/null
+
+          # 4× cloud control-plane verify (upstream health API ← downstream Firestore evidence).
+          gcloud run jobs deploy genesis-system3-control-plane-verify --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+            --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
+            --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=3m \
+            --set-env-vars="SYSTEM3_JOB_KIND=control-plane-verify,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},SYSTEM3_SERVICE_URL=${SERVICE_URL},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
+          for PASS in 1 2 3 4; do
+            gcloud run jobs execute genesis-system3-control-plane-verify \
+              --project="${GOOGLE_CLOUD_PROJECT}" \
+              --region="${GCP_REGION}" \
+              --update-env-vars="SYSTEM3_VERIFY_PASS=${PASS}" \
+              --wait
+            curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > "/tmp/scheduler-health-pass-${PASS}.json"
+            jq -e --argjson pass "${PASS}" '
+              .healthy == true
+              and .coverage.contract_matched == true
+              and .live_trading_enabled != true
+              and (.observability.alert_severity == "none")
+            ' "/tmp/scheduler-health-pass-${PASS}.json" >/dev/null
+            sleep 8
+          done
           trap - EXIT
 
       - name: Prove service, rotator identity and scheduler safety

@@ -365,7 +365,23 @@ class FirestoreSchedulerEvidenceBackend:
             transaction.set(ref, stored)
             return _json_clone(stored)
 
-        return _persist(self.client.transaction())
+        import time
+
+        delay = 0.25
+        last_exc: Exception | None = None
+        for _ in range(4):
+            try:
+                return _persist(self.client.transaction())
+            except Exception as exc:
+                last_exc = exc
+                msg = str(exc).lower()
+                transient = any(token in msg for token in ("aborted", "deadline", "unavailable", "contention", "timeout"))
+                if not transient:
+                    raise
+                time.sleep(delay)
+                delay = min(delay * 2, 2.0)
+        assert last_exc is not None
+        raise last_exc
 
     def acquire_lease(self, owner: str, ttl_seconds: int) -> Dict[str, Any]:
         if not owner or not (1 <= int(ttl_seconds) <= 900):
@@ -511,6 +527,36 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
     closure_codes = {"WEEKEND", "EXCHANGE_HOLIDAY", "MARKET_SESSION_CLOSED"}
     closed = len(by_lane) == 3 and all(row.get("verified") is True and row.get("status") == "SKIPPED" and row.get("reason_code") in closure_codes and row.get("business_date") == current_ist_date for row in by_lane.values())
     unknown_calendar = any(row.get("reason_code") == "UNKNOWN_CALENDAR" for row in by_lane.values())
+    alert_signals = [
+        reason
+        for reason in reasons
+        if any(
+            token in reason
+            for token in (
+                "stale",
+                "failed",
+                "mismatch",
+                "missing",
+                "delivery failed",
+                "continuity",
+            )
+        )
+    ]
+    observability = {
+        "alert_signals": alert_signals,
+        "miss_or_stale_signal_count": len(alert_signals),
+        "contract_matched": bool(coverage.get("contract_matched")),
+        "collector_control_ok": not any("collector control continuity" in r for r in reasons),
+        "practice": "cadence_grace_not_raw_consecutive_count",
+    }
+    if not reasons:
+        observability["alert_severity"] = "none"
+    elif any("failed" in r or "mismatch" in r for r in alert_signals):
+        observability["alert_severity"] = "critical"
+    elif alert_signals or reasons:
+        observability["alert_severity"] = "warning"
+    else:
+        observability["alert_severity"] = "none"
     return {
         "healthy": not reasons,
         "transport_healthy": not reasons,
@@ -525,4 +571,6 @@ def derive_scheduler_health(evidence: Optional[Dict[str, Any]], *, now: Optional
         "jobs": list(jobs.values()),
         "artifacts": artifact_rows,
         "coverage": coverage,
+        "observability": observability,
+        "live_trading_enabled": False,
     }

@@ -410,6 +410,74 @@ def _run_ml_history_bootstrap() -> Dict[str, Any]:
     }
 
 
+def _log_structured(event: str, **fields: Any) -> None:
+    """Cloud Logging–friendly JSON line (severity + execution kind as trace)."""
+    payload = {
+        "severity": str(fields.pop("severity", "INFO")),
+        "message": event,
+        "event": event,
+        "system3_job_kind": os.environ.get("SYSTEM3_JOB_KIND"),
+        "cloud_run_execution": os.environ.get("CLOUD_RUN_EXECUTION"),
+        "cloud_run_job": os.environ.get("CLOUD_RUN_JOB"),
+        "deploy_git_sha": os.environ.get("DEPLOY_GIT_SHA") or os.environ.get("SYSTEM3_GIT_SHA"),
+        "live_trading_enabled": False,
+        **fields,
+    }
+    print(json.dumps(payload, sort_keys=True, default=str), flush=True)
+
+
+def _run_control_plane_verify() -> Dict[str, Any]:
+    """Upstream/downstream cloud proof: public health API must match SSOT contract."""
+    import urllib.error
+    import urllib.request
+
+    base = (os.environ.get("SYSTEM3_SERVICE_URL") or "").strip().rstrip("/")
+    if not base:
+        raise RuntimeError("SYSTEM3_SERVICE_URL is required for control-plane-verify")
+    pass_no = int(os.environ.get("SYSTEM3_VERIFY_PASS", "1") or "1")
+    url = f"{base}/api/scheduler/health?refresh=true"
+    req = urllib.request.Request(url, headers={"User-Agent": "genesis-system3-control-plane-verify"})
+    try:
+        with urllib.request.urlopen(req, timeout=45) as resp:
+            body = json.loads(resp.read().decode("utf-8"))
+            http_status = int(getattr(resp, "status", 200) or 200)
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"scheduler health HTTP {exc.code}") from exc
+    except Exception as exc:
+        raise RuntimeError(f"scheduler health unreachable: {type(exc).__name__}") from exc
+
+    coverage = body.get("coverage") if isinstance(body.get("coverage"), dict) else {}
+    observability = body.get("observability") if isinstance(body.get("observability"), dict) else {}
+    checks = {
+        "http_ok": http_status == 200,
+        "healthy": body.get("healthy") is True,
+        "contract_matched": coverage.get("contract_matched") is True,
+        "total_nine": coverage.get("total") == 9 and coverage.get("expected_total") == 9,
+        "live_off": body.get("live_trading_enabled") is not True,
+        "alert_none": observability.get("alert_severity") in {None, "none"},
+    }
+    ok = all(checks.values())
+    result = {
+        "status": "PASS" if ok else "FAIL",
+        "pass_number": pass_no,
+        "service_url": base,
+        "checks": checks,
+        "evidence_version": body.get("evidence_version"),
+        "coverage": {
+            "total": coverage.get("total"),
+            "enabled": coverage.get("enabled"),
+            "paused": coverage.get("paused"),
+            "contract_matched": coverage.get("contract_matched"),
+        },
+        "observability": observability,
+        "deploy_git_sha": body.get("deploy_git_sha") or os.environ.get("DEPLOY_GIT_SHA"),
+        "live_trading_enabled": False,
+    }
+    if not ok:
+        raise RuntimeError(f"control-plane-verify failed pass={pass_no} checks={checks}")
+    return result
+
+
 def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
     _assert_analyzer_only()
     kind = (kind or os.environ.get("SYSTEM3_JOB_KIND", "smoke")).strip().lower()
@@ -431,6 +499,9 @@ def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
     elif kind == "ml-history-bootstrap":
         result["ml_history_bootstrap"] = _run_ml_history_bootstrap()
         result["detail"] = "Cloud Firestore historical Spearman days upserted"
+    elif kind == "control-plane-verify":
+        result["control_plane_verify"] = _run_control_plane_verify()
+        result["detail"] = "Upstream/downstream scheduler health contract verified"
     elif kind == "state-sync":
         from dashboard.backend.runtime_state_store import get_state_store
 
@@ -462,10 +533,21 @@ def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
 
 
 def main() -> int:
+    kind = (os.environ.get("SYSTEM3_JOB_KIND", "smoke") or "smoke").strip().lower()
+    _log_structured("job_start", severity="INFO", kind=kind)
     try:
-        print(json.dumps(run_job(), sort_keys=True, default=str))
+        result = run_job(kind)
+        _log_structured(
+            "job_complete",
+            severity="INFO",
+            kind=kind,
+            status=result.get("status"),
+            detail=result.get("detail"),
+        )
+        print(json.dumps(result, sort_keys=True, default=str))
         return 0
     except Exception as exc:
+        _log_structured("job_fail", severity="ERROR", kind=kind, error=str(exc))
         print(json.dumps({"status": "FAIL", "error": str(exc), "live_trading_enabled": False}), file=sys.stderr)
         return 1
 

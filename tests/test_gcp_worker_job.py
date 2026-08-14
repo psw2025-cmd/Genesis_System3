@@ -177,6 +177,11 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     assert "genesis-system3-ml-history-bootstrap" in workflow
     assert "SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1" in workflow
     assert "/api/auto_gates" in workflow
+    assert "genesis-system3-control-plane-verify" in workflow
+    assert "for PASS in 1 2 3 4" in workflow
+    assert "DEPLOY_GIT_SHA=${GITHUB_SHA}" in workflow
+    assert "/api/scheduler/health?refresh=true" in workflow
+    assert ".observability.alert_severity == \"none\"" in workflow
     assert ".healthy == true" in workflow
     pause = workflow.index("scheduler jobs pause genesis-system3-scheduler-collector-every-minute")
     resume = workflow.index("scheduler jobs resume genesis-system3-scheduler-collector-every-minute", pause)
