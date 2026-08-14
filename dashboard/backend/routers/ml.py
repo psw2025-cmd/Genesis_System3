@@ -39,14 +39,29 @@ def _load_history() -> List[Dict]:
 
 
 def _load_validations() -> List[Dict]:
-    if not VAL_DIR.exists():
-        return []
     rows: List[Dict] = []
-    for f in sorted(VAL_DIR.glob("market_validation_*.json")):
-        data = _load_json(f, None)
-        if isinstance(data, dict):
-            data.setdefault("_file", f.name)
-            rows.append(data)
+    by_date: Dict[str, Dict] = {}
+    if VAL_DIR.exists():
+        for f in sorted(VAL_DIR.glob("market_validation_*.json")):
+            data = _load_json(f, None)
+            if isinstance(data, dict):
+                data.setdefault("_file", f.name)
+                day = str(data.get("date") or f.stem.replace("market_validation_", ""))
+                if day:
+                    by_date[day] = data
+    # Cloud durable path (Firestore) wins — never depend on laptop local state/.
+    try:
+        import os
+
+        if os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore" or os.environ.get("SYSTEM3_FIRESTORE_PROJECT"):
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
+                if isinstance(row, dict) and row.get("date"):
+                    by_date[str(row["date"])] = row
+    except Exception:
+        pass
+    rows = [by_date[k] for k in sorted(by_date)]
     return rows
 
 

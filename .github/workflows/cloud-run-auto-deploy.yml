@@ -392,6 +392,23 @@ jobs:
             and .live_trading_enabled != true
             and ([.jobs[] | select(.completion_status == "EXECUTION_SUCCEEDED")] | length) >= 6
           ' /tmp/scheduler-health-after-bootstrap.json >/dev/null
+
+          # Cloud ML history bootstrap (replaces laptop: smoke_ml_validate_e2e.py --write-firestore)
+          gcloud run jobs deploy genesis-system3-ml-history-bootstrap --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+            --image="${IMAGE}" --service-account="${RANK_JOB_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
+            --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=5m \
+            --set-env-vars="SYSTEM3_JOB_KIND=ml-history-bootstrap,SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1"
+          gcloud run jobs execute genesis-system3-ml-history-bootstrap \
+            --project="${GOOGLE_CLOUD_PROJECT}" \
+            --region="${GCP_REGION}" \
+            --wait
+          curl -fsS --max-time 45 "${SERVICE_URL}/api/auto_gates?refresh=true" > /tmp/auto-gates.json
+          jq -e '
+            .live_trading_enabled != true
+            and .analyzer_ready == true
+            and (.gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.days_recorded | tonumber) >= 4
+            and (.gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.pass == false or .gates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS.days_passing_threshold < 5)
+          ' /tmp/auto-gates.json >/dev/null
           trap - EXIT
 
       - name: Prove service, rotator identity and scheduler safety

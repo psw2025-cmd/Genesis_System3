@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Smoke E2E for durable ML Spearman accumulation (PAPER / analyzer only).
 
-Replays historical-shaped validation days into Firestore so /api/auto_gates and
-the System Health UI can prove days_recorded increments — without enabling LIVE.
+Production path is Cloud Run job kind ``ml-history-bootstrap`` invoked from
+GitHub Actions Auto Deploy (not laptop). This script remains for local unit
+debug only — prefer cloud:
 
-Usage:
+  SYSTEM3_JOB_KIND=ml-history-bootstrap SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1 \\
+    python scripts/gcp_worker_job.py
+
+Legacy local helpers:
   python scripts/smoke_ml_validate_e2e.py
   python scripts/smoke_ml_validate_e2e.py --write-firestore
 """

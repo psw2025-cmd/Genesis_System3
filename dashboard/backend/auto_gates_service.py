@@ -122,15 +122,27 @@ def build_auto_gates_report(
     refresh: bool = True,
     live_state: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
+    import os
+
+    cloud_mode = (
+        os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore"
+        or bool(os.environ.get("SYSTEM3_FIRESTORE_PROJECT"))
+        or os.environ.get("CLOUD_MODE", "").strip() in {"1", "true", "yes", "on"}
+    )
     payload: Dict[str, Any] = {}
-    if refresh or not GATES_JSON.exists():
+    # Cloud web: never run laptop-oriented local proof generators; evaluate from Firestore + live state.
+    if cloud_mode:
+        try:
+            payload = _evaluate_inline(live_state, skip_proofs=True)
+        except Exception:
+            payload = _read(GATES_JSON) or {}
+    elif refresh or not GATES_JSON.exists():
         try:
             from scripts.runtime_gate_proofs import ensure_runtime_proofs
 
             ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=refresh)
         except Exception:
             pass
-    if refresh or not GATES_JSON.exists():
         try:
             payload = _evaluate_inline(live_state, skip_proofs=True)
         except Exception:
@@ -153,9 +165,10 @@ def build_auto_gates_report(
 
     if not payload.get("gates"):
         try:
-            from scripts.runtime_gate_proofs import ensure_runtime_proofs
+            if not cloud_mode:
+                from scripts.runtime_gate_proofs import ensure_runtime_proofs
 
-            ensure_runtime_proofs(ROOT, live_state=live_state, force=True, include_lifecycle=True)
+                ensure_runtime_proofs(ROOT, live_state=live_state, force=True, include_lifecycle=True)
             payload = _evaluate_inline(live_state, skip_proofs=True)
         except Exception:
             pass
@@ -177,8 +190,9 @@ def build_auto_gates_report(
     return {
         "generated_utc": payload.get("generated_utc") or _utc(),
         "status": "ok",
-        "source": "inline_gate_evaluator",
+        "source": "cloud_gate_evaluator" if cloud_mode else "inline_gate_evaluator",
         "runtime_driven": True,
+        "evidence_plane": "firestore" if cloud_mode else "local_reports",
         "market_open": market.get("is_open"),
         "market_reason": market.get("reason"),
         "broker_connected": broker_connected,

@@ -80,7 +80,11 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         }
 
     mv_dir = root / "state" / "market_validations"
-    if mv_dir.exists():
+    cloud_backend = os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore" or bool(
+        os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("CLOUD_MODE")
+    )
+    # Cloud Run has no durable local state/; prefer Firestore and skip empty laptop paths.
+    if not cloud_backend and mv_dir.exists():
         for path in sorted(mv_dir.glob("*.json")):
             data = _read_json(path)
             if not data:

@@ -391,6 +391,25 @@ def _run_signals_lane() -> Dict[str, Any]:
     return _artifact("signals", payload, source_path.read_bytes(), SIGNALS_CSV.read_bytes())
 
 
+def _run_ml_history_bootstrap() -> Dict[str, Any]:
+    """Cloud-only historical Spearman seed (replaces laptop smoke --write-firestore)."""
+    if not _truthy(os.environ.get("SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP", "0")):
+        raise RuntimeError("ml-history-bootstrap requires SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1")
+    from scripts.smoke_ml_validate_e2e import _hist_days, _write_firestore
+
+    days = _hist_days()
+    for day in days:
+        day["source"] = "cloud_ml_history_bootstrap"
+    written = _write_firestore(days)
+    return {
+        "status": "PASS",
+        "writes": len(written),
+        "dates": [row.get("date") for row in written],
+        "source": "cloud_ml_history_bootstrap",
+        "live_trading_enabled": False,
+    }
+
+
 def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
     _assert_analyzer_only()
     kind = (kind or os.environ.get("SYSTEM3_JOB_KIND", "smoke")).strip().lower()
@@ -409,6 +428,9 @@ def run_job(kind: Optional[str] = None) -> Dict[str, Any]:
         result["business_artifact"] = _run_forecast_lane()
     elif kind == "signals":
         result["business_artifact"] = _run_signals_lane()
+    elif kind == "ml-history-bootstrap":
+        result["ml_history_bootstrap"] = _run_ml_history_bootstrap()
+        result["detail"] = "Cloud Firestore historical Spearman days upserted"
     elif kind == "state-sync":
         from dashboard.backend.runtime_state_store import get_state_store
 

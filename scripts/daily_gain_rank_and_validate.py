@@ -74,6 +74,15 @@ def is_expiry_day(today: date | None = None) -> bool:
 
 
 def load_oi_cache() -> Dict[str, int]:
+    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            remote = FirestoreSchedulerEvidenceBackend().load_oi_cache()
+            if remote:
+                return remote
+        except Exception:
+            pass
     try:
         if OI_CACHE_FILE.exists():
             data = json.loads(OI_CACHE_FILE.read_text(encoding="utf-8"))
@@ -84,9 +93,17 @@ def load_oi_cache() -> Dict[str, int]:
 
 
 def save_oi_cache(snapshot: Dict[str, int]) -> None:
+    clean = {str(k): int(v) for k, v in snapshot.items() if int(v) > 0}
+    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            FirestoreSchedulerEvidenceBackend().save_oi_cache(clean)
+        except Exception as exc:
+            print(f"  OI cache Firestore write warning: {exc}")
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     tmp = OI_CACHE_FILE.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(snapshot, indent=2, sort_keys=True), encoding="utf-8")
+    tmp.write_text(json.dumps(clean, indent=2, sort_keys=True), encoding="utf-8")
     os.replace(tmp, OI_CACHE_FILE)
 
 
@@ -167,6 +184,12 @@ def run_ranking(top_n: int = 5) -> None:
         _write_status("BLOCKED", "Rank engine produced no rows from verified Dhan chains")
         print("  BLOCKED: no ranked rows")
         return
+
+    # Persist current OI snapshot for next cloud run (Firestore when configured).
+    try:
+        save_oi_cache({sym: _oi_total(df) for sym, df in all_data.items()})
+    except Exception as exc:
+        print(f"  OI cache save warning: {exc}")
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     ranked_df.to_json(REPORT_DIR / "ranked.json", orient="records", indent=2)

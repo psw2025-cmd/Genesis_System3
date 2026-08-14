@@ -213,6 +213,33 @@ class FirestoreSchedulerEvidenceBackend:
                 rows.append(_json_clone(snap.to_dict() or {}))
         return rows
 
+    def load_oi_cache(self) -> Dict[str, int]:
+        snap = self.collection.document("dhan_oi_cache").get()
+        if not getattr(snap, "exists", False):
+            return {}
+        data = snap.to_dict() or {}
+        underlyings = data.get("underlyings") if isinstance(data.get("underlyings"), dict) else {}
+        out: Dict[str, int] = {}
+        for key, value in underlyings.items():
+            try:
+                oi = int(value)
+            except (TypeError, ValueError):
+                continue
+            if oi > 0:
+                out[str(key).upper()] = oi
+        return out
+
+    def save_oi_cache(self, snapshot: Dict[str, int]) -> Dict[str, Any]:
+        clean = {str(k).upper(): int(v) for k, v in snapshot.items() if int(v) > 0}
+        value = {
+            "schema_version": 1,
+            "underlyings": clean,
+            "updated_at_utc": self._now().isoformat().replace("+00:00", "Z"),
+            "live_trading_enabled": False,
+        }
+        self.collection.document("dhan_oi_cache").set(value)
+        return value
+
     def publish_artifact(self, lane: str, artifact: Dict[str, Any]) -> Dict[str, Any]:
         if lane not in self._BUSINESS_LANES:
             raise ValueError("invalid business artifact lane")
