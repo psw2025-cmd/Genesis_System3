@@ -113,6 +113,98 @@ def _enrich_trading_symbol(row: Dict[str, Any]) -> Dict[str, Any]:
         return row
 
 
+def _rows_from_chain_payload(sym: str, chain: Dict[str, Any]) -> List[Dict[str, Any]]:
+    out: List[Dict[str, Any]] = []
+    for c in chain.get("contracts") or []:
+        if not isinstance(c, dict):
+            continue
+        opt = str(c.get("option_type") or "").upper()
+        if opt not in {"CE", "PE"}:
+            continue
+        try:
+            ltp = float(c.get("ltp") or 0)
+            strike = float(c.get("strike") or 0)
+        except (TypeError, ValueError):
+            continue
+        if ltp <= 0 or strike <= 0:
+            continue
+        oi_chg = int(c.get("oi_change") or c.get("dOI") or 0)
+        out.append(
+            {
+                "underlying": str(sym).upper(),
+                "option_type": opt,
+                "strike": strike,
+                "ltp": ltp,
+                "oi": int(c.get("oi") or 0),
+                "oi_change": oi_chg,
+                "volume": int(c.get("volume") or 0),
+                "gain_pct": float(oi_chg),
+                "gain_metric": "live_oi_change",
+                "expiry_date": str(c.get("expiry_date") or chain.get("expiry_date") or "")[:10],
+                "instrument_type": "OPTSTK",
+            }
+        )
+    return out
+
+
+def _equity_rows_from_app_chain_cache() -> Tuple[List[Dict[str, Any]], Dict[str, Any], int]:
+    rows: List[Dict[str, Any]] = []
+    live_chains: Dict[str, Any] = {}
+    live_ok = 0
+    symbols = list(dict.fromkeys([*PRIORITY_EQUITY_FO, "POWERGRID"]))
+    app_mod = None
+    try:
+        from dashboard.backend import app as app_mod  # type: ignore
+    except Exception:
+        app_mod = None
+    for sym in symbols[:12]:
+        chain = None
+        if app_mod is not None:
+            getter = getattr(app_mod, "_chain_from_push_cache", None)
+            if callable(getter):
+                try:
+                    chain = getter(sym)
+                except Exception:
+                    chain = None
+            if chain is None:
+                cache_get = getattr(app_mod, "_cache_get", None)
+                if callable(cache_get):
+                    try:
+                        hit = cache_get(f"chain_{sym}", 400.0)
+                        if isinstance(hit, dict):
+                            chain = hit
+                    except Exception:
+                        chain = None
+        if not isinstance(chain, dict):
+            snap = ROOT / "state" / "chain_cache" / f"{sym}.json"
+            if snap.exists():
+                try:
+                    import json
+
+                    loaded = json.loads(snap.read_text(encoding="utf-8"))
+                    chain = loaded.get("data") if isinstance(loaded, dict) and "data" in loaded else loaded
+                except Exception:
+                    chain = None
+        if not isinstance(chain, dict) or not (chain.get("contracts") or []):
+            continue
+        parsed = _rows_from_chain_payload(sym, chain)
+        if not parsed:
+            continue
+        live_ok += 1
+        live_chains[sym] = {
+            "underlying": sym,
+            "spot": chain.get("spot"),
+            "total_contracts": chain.get("total_contracts") or len(chain.get("contracts") or []),
+            "pcr": chain.get("pcr"),
+            "expiry_date": chain.get("expiry_date"),
+            "status": chain.get("status"),
+            "data_source": chain.get("data_source"),
+            "sample_contracts": (chain.get("contracts") or [])[:6],
+        }
+        rows.extend(parsed)
+    return rows, live_chains, live_ok
+
+
 def scan_equity_top_gainers(
     rows: List[Dict[str, Any]],
     priority_only: bool = False,
@@ -161,53 +253,13 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
     live_chains: Dict[str, Any] = {}
     live_chain_ok = 0
 
-    # When bhavcopy is absent (Cloud ephemeral FS), pull Dhan option chains for
-    # priority equity FO names so the Equity Options panel is not empty.
+    # When bhavcopy is absent, reuse last-good Dhan equity chains already in
+    # the dashboard cache. Extra OC fetches here starve the paced index stream.
     if not rows:
-        try:
-            from core.data.datasource_manager import DataSourceManager
-            from dashboard.backend.chain_adapter import fetch_chain_for_api
-
-            dsm = DataSourceManager()
-            # Keep Cloud Run under request budget / Dhan rate limits.
-            priority = list(universe.get("priority_underlyings") or PRIORITY_EQUITY_FO)[:3]
-            for sym in priority:
-                try:
-                    chain = fetch_chain_for_api(dsm, sym)
-                    if not chain or int(chain.get("total_contracts") or 0) <= 0:
-                        continue
-                    live_chains[sym] = {
-                        "underlying": sym,
-                        "spot": chain.get("spot"),
-                        "total_contracts": chain.get("total_contracts"),
-                        "pcr": chain.get("pcr"),
-                        "expiry_date": chain.get("expiry_date"),
-                        "status": chain.get("status"),
-                        "data_source": chain.get("data_source"),
-                        "sample_contracts": (chain.get("contracts") or [])[:6],
-                    }
-                    live_chain_ok += 1
-                    # Rank rows from live chain by OI for CE/PE lists
-                    for c in chain.get("contracts") or []:
-                        rows.append(
-                            {
-                                "underlying": sym,
-                                "option_type": str(c.get("option_type") or "").upper(),
-                                "strike": float(c.get("strike") or 0),
-                                "ltp": float(c.get("ltp") or 0),
-                                "oi": int(c.get("oi") or 0),
-                                "oi_change": int(c.get("oi_change") or 0),
-                                "volume": int(c.get("volume") or 0),
-                                "gain_pct": float(c.get("oi_change") or 0),
-                                "gain_metric": "live_oi_change",
-                                "expiry_date": c.get("expiry_date") or chain.get("expiry_date") or "",
-                                "instrument_type": "OPTSTK",
-                            }
-                        )
-                except Exception:
-                    continue
-        except Exception:
-            pass
+        cached_rows, cached_chains, cached_ok = _equity_rows_from_app_chain_cache()
+        rows.extend(cached_rows)
+        live_chains.update(cached_chains)
+        live_chain_ok += cached_ok
 
     scan = scan_equity_top_gainers(rows, priority_only=priority_only, top_n=top_n) if rows else {}
 
@@ -230,9 +282,9 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
             "live_chain_per_stock": live_chain_ok > 0,
             "live_chains_ok": live_chain_ok,
             "note": (
-                "Live Dhan equity option chains for priority FO names"
+                "Live Dhan equity option chains from last-good cache"
                 if live_chain_ok > 0
-                else "Full per-stock Dhan chain scan deferred — uses bhavcopy OPTSTK + security master"
+                else "Waiting for a Dhan equity option-chain snapshot (load RELIANCE/HDFCBANK on Trade tab, or last-good cache)"
             ),
         },
         "cash_equity": {

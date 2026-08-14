@@ -44,6 +44,21 @@ def test_expiry_discovery_returns_all_broker_master_expiries(monkeypatch):
     assert payload["live_trading_enabled"] is False
 
 
+def test_sensex_expiries_resolve_from_trading_symbol_not_bsxopt():
+    chain_router._expiry_map.cache_clear()
+    row = {
+        "SEM_TRADING_SYMBOL": "SENSEX-Aug2026-78000-CE",
+        "SEM_CUSTOM_SYMBOL": "SENSEX 14 AUG 78000 CALL",
+        "SM_SYMBOL_NAME": "BSXOPT",
+    }
+    assert chain_router.underlying_from_master_row(row) == "SENSEX"
+    payload = asyncio.run(chain_router.get_expiries("SENSEX"))
+    assert payload["underlying"] == "SENSEX"
+    assert payload["count"] >= 1
+    assert payload["status"] == "OK"
+    assert any(str(x).startswith("2026-") for x in payload["expiries"])
+
+
 def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     monkeypatch.delenv("CHAIN_MAX_CONTRACTS", raising=False)
     rows = []

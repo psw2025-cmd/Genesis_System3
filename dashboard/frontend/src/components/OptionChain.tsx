@@ -147,6 +147,7 @@ export function OptionChain() {
         if (cancelled) return
         const values = Array.isArray(payload?.expiries) ? payload.expiries.map((x: any) => String(x)).filter(Boolean) : []
         setExpiries(values)
+        // Live chain can still be valid while master expiry lookup is catching up.
         if (!values.length) setExpiryError(String(payload?.status || 'NO_EXPIRIES_IN_BROKER_MASTER'))
       })
       .catch(err => {
@@ -176,7 +177,19 @@ export function OptionChain() {
     return Array.from(new Set(all.map(s => String(s).toUpperCase()).filter(Boolean))).sort((a, b) => a.localeCompare(b))
   }, [discovery])
   const liveDefaultData = chain[chainSymbol]
+  const harvestedExpiries = useMemo(() => {
+    const fromLive = new Set<string>(expiries)
+    const contracts = liveDefaultData?.contracts
+    if (Array.isArray(contracts)) {
+      for (const row of contracts) {
+        const exp = String(row?.expiry_date || row?.expiry || '').slice(0, 10)
+        if (/^\d{4}-\d{2}-\d{2}$/.test(exp)) fromLive.add(exp)
+      }
+    }
+    return Array.from(fromLive).sort()
+  }, [expiries, liveDefaultData])
   const data = selectedExpiry ? expiryData : liveDefaultData
+  const expiryWarning = selectedExpiry ? expiryError : (harvestedExpiries.length ? '' : expiryError)
 
   useEffect(() => { if (atmRef.current) atmRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' }) }, [data?.spot, chainSymbol, selectedExpiry, range])
 
@@ -210,9 +223,9 @@ export function OptionChain() {
     <SymbolControls chainSymbol={chainSymbol} setChainSymbol={setChainSymbol} universe={universe} discovery={discovery} discoveryError={discoveryError} />
     <div className="flex flex-wrap items-center gap-3 px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
       <span className={cn('pill text-[10px] border', streamLive ? 'bg-up/10 text-up border-up/20' : 'bg-amber/10 text-amber border-amber/20')}>{streamLabel}</span>
-      <label className="flex items-center gap-1.5"><span className="text-text-muted text-xs">EXPIRY</span><select aria-label="Option expiry" value={selectedExpiry} onChange={e => { setSelectedExpiry(e.target.value); setRange(0) }} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value="">AUTO / NEAREST</option>{expiries.map(expiry => <option value={expiry} key={expiry}>{expiry}</option>)}</select></label>
-      <span className="pill text-[10px]">EXPIRIES {expiries.length}</span>
-      {expiryError && <span className="pill text-amber text-[10px]">EXPIRY DATA {expiryError}</span>}
+      <label className="flex items-center gap-1.5"><span className="text-text-muted text-xs">EXPIRY</span><select aria-label="Option expiry" value={selectedExpiry} onChange={e => { setSelectedExpiry(e.target.value); setRange(0) }} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value="">AUTO / NEAREST</option>{harvestedExpiries.map(expiry => <option value={expiry} key={expiry}>{expiry}</option>)}</select></label>
+      <span className="pill text-[10px]">EXPIRIES {harvestedExpiries.length}</span>
+      {expiryWarning && <span className="pill text-amber text-[10px]">EXPIRY DATA {expiryWarning}</span>}
       <div><span className="text-text-muted text-xs"> SYMBOL </span><span className="num text-sm font-semibold">{chainSymbol}</span></div>
       <div><span className="text-text-muted text-xs"> SPOT </span><span className="num text-sm font-semibold">{spot ? fmt(spot, 2) : '--'}</span></div>
       <div><span className="text-text-muted text-xs"> PCR </span><span className="num text-sm font-semibold">{typeof pcr === 'number' ? pcr.toFixed(2) : pcr}</span></div>

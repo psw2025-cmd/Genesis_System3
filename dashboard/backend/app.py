@@ -6888,18 +6888,60 @@ async def get_risk():
 
 @app.get("/api/risk/portfolio")
 async def get_portfolio_risk():
-    """Get portfolio risk metrics"""
+    """Get portfolio risk metrics from paper + read-only Dhan holdings/positions."""
     try:
         if not ADVANCED_FEATURES_AVAILABLE:
             return {"status": "ERROR", "message": "Risk management not available"}
 
         positions_data = await get_positions()
-        positions = positions_data.get("positions", [])
+        positions = list(positions_data.get("positions") or [])
+
+        def _as_risk_row(item: Dict[str, Any], kind: str) -> Dict[str, Any]:
+            qty = float(item.get("qty") or item.get("quantity") or item.get("net_qty") or item.get("netQty") or 0)
+            entry = float(item.get("entry_price") or item.get("avg_price") or item.get("avgCostPrice") or item.get("buyAvg") or 0)
+            ltp = float(item.get("current_price") or item.get("ltp") or item.get("lastTradedPrice") or entry)
+            pnl = item.get("unrealized_pnl")
+            if pnl is None:
+                pnl = item.get("pnl")
+            if pnl is None:
+                pnl = (ltp - entry) * qty
+            return {
+                "underlying": str(item.get("underlying") or item.get("symbol") or item.get("trading_symbol") or kind).upper(),
+                "entry_price": entry,
+                "current_price": ltp,
+                "qty": qty,
+                "unrealized_pnl": float(pnl or 0),
+                "delta": float(item.get("delta") or 0),
+                "gamma": float(item.get("gamma") or 0),
+                "theta": float(item.get("theta") or 0),
+                "vega": float(item.get("vega") or 0),
+                "source": kind,
+            }
+
+        try:
+            holdings = await get_broker_holdings()
+            for row in holdings.get("rows") or []:
+                if isinstance(row, dict):
+                    positions.append(_as_risk_row(row, "dhan_holding"))
+        except Exception:
+            pass
+        try:
+            live_pos = await get_broker_positions_live()
+            for row in live_pos.get("rows") or []:
+                if isinstance(row, dict):
+                    positions.append(_as_risk_row(row, "dhan_position"))
+        except Exception:
+            pass
 
         risk_mgmt = get_risk_management()
         risk_metrics = risk_mgmt.calculate_portfolio_risk(positions)
-
-        return {"status": "ok", "risk_metrics": risk_metrics}
+        return {
+            "status": "ok",
+            "risk_metrics": risk_metrics,
+            "position_count": len(positions),
+            "live_trading_enabled": False,
+            "source": "paper_plus_dhan_readonly",
+        }
     except Exception as e:
         return {"status": "ERROR", "message": str(e)}
 
