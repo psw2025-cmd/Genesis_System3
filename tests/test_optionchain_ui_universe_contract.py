@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import asyncio
 import pandas as pd
 
 from dashboard.backend import chain_adapter
@@ -16,13 +17,27 @@ def test_underlyings_are_derived_from_broker_security_master(monkeypatch):
             "source": "dhan_security_master",
         },
     )
-
-    import asyncio
-
     payload = asyncio.run(chain_router.get_underlyings())
     assert "ZZZTEST" in payload["underlyings"]
     assert payload["counts"]["equity_options"] == 3
     assert payload["counts"]["option_contracts"] == 4321
+    assert payload["source"] == "dhan_security_master"
+    assert payload["broker"] == "DHAN"
+    assert payload["read_only"] is True
+    assert payload["live_trading_enabled"] is False
+    assert payload["expiry_endpoint"] == "/api/expiries/{underlying}"
+
+
+def test_expiry_discovery_returns_all_broker_master_expiries(monkeypatch):
+    monkeypatch.setattr(
+        chain_router,
+        "_expiry_map",
+        lambda: {"RELIANCE": ["2026-08-27", "2026-09-24", "2026-10-29"]},
+    )
+    payload = asyncio.run(chain_router.get_expiries("reliance"))
+    assert payload["underlying"] == "RELIANCE"
+    assert payload["expiries"] == ["2026-08-27", "2026-09-24", "2026-10-29"]
+    assert payload["count"] == 3
     assert payload["source"] == "dhan_security_master"
     assert payload["broker"] == "DHAN"
     assert payload["read_only"] is True
@@ -53,11 +68,18 @@ def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     assert result["complete_chain"] is True
     assert result["limited_for_web"] is False
     assert result["max_contracts"] == 0
+    assert result["requested_expiry"] == "2026-08-27"
+    assert result["live_trading_enabled"] is False
 
 
-def test_ui_has_dynamic_broker_discovery_and_full_strikes_default():
+def test_ui_has_dynamic_broker_discovery_expiries_and_full_strikes_default():
     text = Path("dashboard/frontend/src/components/OptionChain.tsx").read_text(encoding="utf-8")
     assert "/api/underlyings" in text
+    assert "/api/expiries/" in text
+    assert "/api/chain-expiry/" in text
+    assert "Option expiry" in text
+    assert "EXPIRIES" in text
+    assert "selected_expiry=" in text
     assert "DHAN UNIVERSE" in text
     assert "EQ OPT" in text
     assert "DISCOVERY DEGRADED" in text
