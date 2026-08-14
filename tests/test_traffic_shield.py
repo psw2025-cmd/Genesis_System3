@@ -1,5 +1,6 @@
 import asyncio
 import time
+from types import SimpleNamespace
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
@@ -108,3 +109,24 @@ def test_cache_buster_does_not_create_new_singleflight_lane():
     assert shield._key(_request(query=b"_ts=1&symbol=NIFTY")) == shield._key(
         _request(query=b"symbol=NIFTY&_ts=999999")
     )
+
+
+def test_legacy_fixed_delay_middleware_is_removed_exactly_without_touching_others():
+    def old_delay(*_args, **_kwargs):
+        return None
+
+    def keep_me(*_args, **_kwargs):
+        return None
+
+    app = SimpleNamespace(
+        user_middleware=[
+            SimpleNamespace(kwargs={"dispatch": keep_me}),
+            SimpleNamespace(kwargs={"dispatch": old_delay}),
+        ],
+        middleware_stack=object(),
+    )
+    removed = shield.retire_legacy_delay_middleware(app, old_delay)
+    assert removed == 1
+    assert len(app.user_middleware) == 1
+    assert app.user_middleware[0].kwargs["dispatch"] is keep_me
+    assert app.middleware_stack is None
