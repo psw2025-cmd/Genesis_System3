@@ -13,6 +13,10 @@ from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional,
 
 logger = logging.getLogger("dhan_market_ltp")
 
+_DHAN_LTP_URL = "https://api.dhan.co/v2/marketfeed/ltp"
+_DHAN_OHLC_URL = "https://api.dhan.co/v2/marketfeed/ohlc"
+_DHAN_QUOTE_URL = "https://api.dhan.co/v2/marketfeed/quote"
+
 # Official IDX_I security IDs (DhanHQ docs / instrument master)
 INDEX_SECURITY_IDS: Dict[str, str] = {
     "NIFTY": "13",
@@ -92,14 +96,7 @@ def _parse_quote_blob(blob: Any) -> Dict[str, Any]:
     }
 
 
-def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
-    """
-    Batch OHLC/quote via Dhan marketfeed.
-
-    Returns map keyed by security_id string -> quote fields.
-    """
-    if not securities:
-        return {}
+def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> Dict[str, List[str]]:
     cleaned: Dict[str, List[str]] = {}
     for seg, ids in securities.items():
         bucket: List[str] = []
@@ -109,39 +106,22 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
                 bucket.append(s)
         if bucket:
             cleaned[str(seg)] = bucket
-    if not cleaned:
-        return {}
+    return cleaned
 
-    try:
-        from core.brokers.dhan.dhan_readonly import create_dhan_client
-    except Exception as exc:
-        logger.warning("market_ltp: cannot import create_dhan_client: %s", exc)
-        return {}
 
-    client = create_dhan_client()
-    if client is None:
-        return {}
-
-    payload = None
-    for method_name in ("ohlc_data", "quote_data", "ticker_data"):
-        method = getattr(client, method_name, None)
-        if not callable(method):
-            continue
-        try:
-            payload = method(cleaned)
-            if payload:
-                break
-        except Exception as exc:
-            logger.info("market_ltp.%s failed: %s", method_name, exc)
-            payload = None
-
+def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
     out: Dict[str, Dict[str, Any]] = {}
     data = _unwrap_feed(payload)
-    # Shape A: { "IDX_I": { "13": {...} } }
-    # Shape B: { "13": {...} }
     for key, val in data.items():
         if isinstance(val, dict) and any(
-            isinstance(v, dict) and ("last_price" in v or "ohlc" in v or "LTP" in v or "ltp" in v)
+            isinstance(v, dict)
+            and (
+                "last_price" in v
+                or "ohlc" in v
+                or "LTP" in v
+                or "ltp" in v
+                or "lastPrice" in v
+            )
             for v in val.values()
         ):
             for sid, blob in val.items():
@@ -155,7 +135,87 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
     return out
 
 
-def build_index_board(symbols: Optional[Iterable[str]] = None) -> Dict[str, Any]:
+def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple[Optional[Any], Optional[str]]:
+    try:
+        import requests
+        from core.brokers.dhan.dhan_readonly import get_dhan_credentials
+    except Exception as exc:
+        return None, f"import:{type(exc).__name__}"
+
+    creds = get_dhan_credentials()
+    client_id = (creds.get("client_id") or "").strip()
+    token = (creds.get("access_token") or "").strip()
+    if not client_id or not token:
+        return None, "CONFIG_MISSING"
+
+    body = {seg: list(ids) for seg, ids in securities.items()}
+    try:
+        resp = requests.post(
+            url,
+            headers={
+                "access-token": token,
+                "client-id": client_id,
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+            json=body,
+            timeout=8,
+        )
+        if resp.status_code >= 400:
+            return None, f"HTTP_{resp.status_code}:{(resp.text or '')[:120]}"
+        return resp.json(), None
+    except Exception as exc:
+        return None, f"{type(exc).__name__}:{str(exc)[:120]}"
+
+
+def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
+    """
+    Batch OHLC/quote via Dhan marketfeed (REST first, SDK fallback).
+
+    Returns map keyed by security_id string -> quote fields.
+    """
+    cleaned = _normalize_securities(securities)
+    if not cleaned:
+        return {}
+
+    # Prefer REST — Cloud Run SDK marketfeed methods are inconsistent across dhanhq versions.
+    for url in (_DHAN_OHLC_URL, _DHAN_QUOTE_URL, _DHAN_LTP_URL):
+        payload, err = _rest_marketfeed(url, cleaned)
+        if err:
+            logger.info("market_ltp REST %s: %s", url.rsplit("/", 1)[-1], err)
+            continue
+        parsed = _flatten_quotes(payload)
+        if parsed:
+            return parsed
+
+    try:
+        from core.brokers.dhan.dhan_readonly import create_dhan_client
+    except Exception as exc:
+        logger.warning("market_ltp: cannot import create_dhan_client: %s", exc)
+        return {}
+
+    client = create_dhan_client()
+    if client is None:
+        return {}
+
+    for method_name in ("ohlc_data", "quote_data", "ticker_data", "get_ohlc_data", "get_ltp_data"):
+        method = getattr(client, method_name, None)
+        if not callable(method):
+            continue
+        try:
+            payload = method(cleaned)
+            parsed = _flatten_quotes(payload)
+            if parsed:
+                return parsed
+        except Exception as exc:
+            logger.info("market_ltp.%s failed: %s", method_name, exc)
+    return {}
+
+
+def build_index_board(
+    symbols: Optional[Iterable[str]] = None,
+    fallback_spots: Optional[Mapping[str, Mapping[str, Any]]] = None,
+) -> Dict[str, Any]:
     """Live index ribbon matching Dhan web (LTP + change %)."""
     wanted = [str(s).upper() for s in (symbols or DEFAULT_INDEX_BOARD)]
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
@@ -164,27 +224,39 @@ def build_index_board(symbols: Optional[Iterable[str]] = None) -> Dict[str, Any]
     for sym in wanted:
         sid = INDEX_SECURITY_IDS.get(sym)
         q = quotes.get(str(sid), {}) if sid else {}
+        fb = (fallback_spots or {}).get(sym) or {}
+        ltp = q.get("ltp")
+        change = q.get("change")
+        change_pct = q.get("change_pct")
+        source = "dhan_marketfeed" if ltp is not None else None
+        if ltp is None and _as_float(fb.get("spot") or fb.get("ltp")):
+            ltp = _as_float(fb.get("spot") or fb.get("ltp"))
+            change_pct = _as_float(fb.get("change_pct") or fb.get("pct_change"))
+            change = _as_float(fb.get("change"))
+            source = str(fb.get("source") or "chain_fallback")
         rows.append(
             {
                 "symbol": sym,
                 "label": INDEX_LABELS.get(sym, sym),
                 "security_id": sid,
                 "exchange_segment": "IDX_I",
-                "ltp": q.get("ltp"),
-                "change": q.get("change"),
-                "change_pct": q.get("change_pct"),
+                "ltp": ltp,
+                "change": change,
+                "change_pct": change_pct,
                 "close": q.get("close"),
-                "live": q.get("ltp") is not None,
+                "live": ltp is not None,
+                "source": source,
             }
         )
     live_n = sum(1 for r in rows if r.get("live"))
     return {
         "success": live_n > 0,
-        "source": "dhan_marketfeed_ohlc",
+        "source": "dhan_marketfeed_ohlc" if quotes else "chain_fallback_or_empty",
         "live_trading_enabled": False,
         "order_placement_allowed": False,
         "count": len(rows),
         "live_count": live_n,
+        "feed_hits": len(quotes),
         "indices": rows,
     }
 

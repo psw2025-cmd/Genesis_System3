@@ -63,3 +63,21 @@ def test_enrich_positions_prefers_marketfeed(monkeypatch):
     )
     assert rows[0]["ltp"] == 0.70
     assert rows[0]["ltp_source"] == "dhan_marketfeed"
+
+
+def test_build_index_board_uses_fallback(monkeypatch):
+    monkeypatch.setattr(
+        "core.brokers.dhan.market_ltp.fetch_market_quotes",
+        lambda securities: {},
+    )
+    from core.brokers.dhan.market_ltp import build_index_board
+
+    board = build_index_board(
+        symbols=["NIFTY", "INDIAVIX"],
+        fallback_spots={"NIFTY": {"spot": 24320.55, "change_pct": -0.31, "source": "paced_chain_cache"}},
+    )
+    assert board["success"] is True
+    nifty = next(r for r in board["indices"] if r["symbol"] == "NIFTY")
+    assert nifty["ltp"] == 24320.55
+    assert nifty["source"] == "paced_chain_cache"
+

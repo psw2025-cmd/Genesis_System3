@@ -1083,7 +1083,25 @@ async def get_market_live_board():
         )
         from core.brokers.dhan.dhan_readonly import get_holdings
 
-        board = build_index_board()
+        # Prefer live marketfeed; fall back to paced index chain spots already in memory.
+        fallback = {}
+        try:
+            for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"):
+                pushed = _PUSHED_CHAIN_CACHE.get(sym) if isinstance(_PUSHED_CHAIN_CACHE, dict) else None
+                row = (pushed or {}).get("data") if isinstance(pushed, dict) else None
+                if not isinstance(row, dict):
+                    continue
+                spot = row.get("spot") or row.get("underlying_spot")
+                if spot:
+                    fallback[sym] = {
+                        "spot": spot,
+                        "change_pct": row.get("change_pct") or row.get("pct_change"),
+                        "source": "paced_chain_cache",
+                    }
+        except Exception:
+            fallback = {}
+
+        board = build_index_board(fallback_spots=fallback)
         equity_rows = []
         try:
             holdings = get_holdings()
