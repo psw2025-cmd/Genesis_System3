@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following ten GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following eleven GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -15,21 +15,29 @@ Only the following ten GitHub Actions workflows are allowed in `.github/workflow
 7. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
 8. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
 9. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
+10. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
 
 ### Manual emergency workflow
 
-10. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+11. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Event observer rule
 
 Only `workflow-priority-guard.yml` may use `workflow_run` or `deployment_status`.
-It may observe only the nine approved workflow names listed in its event allow-list.
+It may observe only the ten approved workflow names listed in its event allow-list.
 The observer is evidence-only: GitHub-hosted runner, read permissions, trusted `main` checkout, credential persistence disabled, no repository or deployment mutation, and no trading/order action.
 It writes event metadata and a recurrence fingerprint only to the workflow summary and retained artifact.
 
 ## Scheduling authority
 
-GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security scans execute on every relevant PR/main commit and may also be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
+GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security/cloud audits execute on every relevant `main` commit; code/security checks also execute on pull requests where configured and may be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
+
+## AI and external observability rule
+
+- External AI review is advisory-plus-consensus only; it can never override deterministic safety/runtime/security failure evidence.
+- Missing OpenAI, Anthropic, Sonar, Elasticsearch, Jaeger, Grafana or PowerBI configuration is a typed BLOCKED state, never PASS.
+- GCP Cloud Logging/Monitoring is the default runtime evidence authority until external adapters are explicitly configured and proven.
+- Secret payloads and broker credentials must not be copied into AI prompts, GitHub artifacts, logs, dashboards or external observability stores.
 
 ## Disabled workflow classes
 

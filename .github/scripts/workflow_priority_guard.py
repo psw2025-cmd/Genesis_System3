@@ -18,6 +18,7 @@ AUTOMATIC = {
     "codeql-security.yml",
     "security-audit.yml",
     "sonarqube-audit.yml",
+    "full-cloud-audit.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -33,6 +34,7 @@ FORENSIC_MONITORED_WORKFLOWS = {
     "CodeQL Security Audit",
     "Security Audit Evidence",
     "SonarQube Audit",
+    "Full Cloud Audit and Forensic Consensus",
 }
 
 
@@ -153,6 +155,12 @@ def main() -> int:
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
+
+    full_audit_on = trigger_blocks["full-cloud-audit.yml"]
+    if "push:" not in full_audit_on or not re.search(r"branches:\s*\[\s*main\s*\]", full_audit_on):
+        raise SystemExit("FULL_CLOUD_AUDIT_MAIN_TRIGGER_MISSING")
+    if "workflow_dispatch:" not in full_audit_on:
+        raise SystemExit("FULL_CLOUD_AUDIT_MANUAL_TRIGGER_MISSING")
 
     for name in (
         "gcp-stage2-ci.yml",
