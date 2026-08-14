@@ -25,6 +25,7 @@ on:
       - "CodeQL Security Audit"
       - "Security Audit Evidence"
       - "SonarQube Audit"
+      - "Full Cloud Audit and Forensic Consensus"
     types: [completed]
   deployment_status:
 
