@@ -44,6 +44,10 @@ from dashboard.backend.mutation_policy import (  # noqa: E402
     unclassified_write_routes,
 )
 from dashboard.backend.security_policy import SecurityDecision, evaluate_request  # noqa: E402
+from dashboard.backend.traffic_shield import (  # noqa: E402
+    traffic_shield_middleware,
+    traffic_shield_status,
+)
 
 
 app = legacy.app
@@ -67,12 +71,14 @@ _RETIRED_AUTH_PATHS = {
     "/api/auth/" + "status",
 }
 
+
 def _retire_serving_route(route) -> bool:
     path = getattr(route, "path", None)
     if path in _RETIRED_AUTH_PATHS:
         return True
     methods = set(getattr(route, "methods", None) or set())
     return path == "/api/paper" and "GET" in methods
+
 
 app.router.routes = [route for route in app.router.routes if not _retire_serving_route(route)]
 
@@ -115,12 +121,7 @@ legacy.evaluate_request = _capability_aware_request_policy
 
 @app.middleware("http")
 async def strip_retired_dashboard_credentials(request: Request, call_next):
-    """Make retired dashboard credential input inert before inner middleware.
-
-    This middleware is registered last and therefore wraps the legacy stack.
-    It removes only the retired dashboard credential header/cookie; unrelated
-    cookies and worker/control headers are preserved.
-    """
+    """Make retired dashboard credential input inert before inner middleware."""
     headers = []
     retired_header = b"x-" + b"api-key"
     retired_cookie_name = "system3_dashboard_" + "session"
@@ -151,6 +152,16 @@ async def strip_retired_dashboard_credentials(request: Request, call_next):
     return await call_next(request)
 
 
+@app.middleware("http")
+async def public_read_traffic_shield(request: Request, call_next):
+    """Coalesce expensive public GETs and fail over to recent good snapshots.
+
+    This never wraps write methods. MutationPolicy therefore remains the only
+    mutation authority and LIVE remains hard-disabled.
+    """
+    return await traffic_shield_middleware(request, call_next)
+
+
 @app.get("/api/auth/status")
 async def dashboard_auth_status():
     """Stable non-secret proof that dashboard credential authority is absent."""
@@ -161,6 +172,18 @@ async def dashboard_auth_status():
         "mode": "public_readonly",
         "credential_surface": "REMOVED",
         "session": None,
+    }
+
+
+@app.get("/api/traffic/health")
+async def traffic_health_status():
+    """Non-secret 429/self-healing evidence for monitoring and runtime proof."""
+    return {
+        **traffic_shield_status(),
+        "client_contract": "RETRY_AFTER_EXPONENTIAL_BACKOFF_JITTER",
+        "websocket_preferred": True,
+        "durable_truth": "FIRESTORE_AND_BROKER_READ_ONLY",
+        "public_dashboard_read_only": True,
     }
 
 
