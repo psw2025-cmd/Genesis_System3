@@ -45,12 +45,21 @@ from dashboard.backend.mutation_policy import (  # noqa: E402
 )
 from dashboard.backend.security_policy import SecurityDecision, evaluate_request  # noqa: E402
 from dashboard.backend.traffic_shield import (  # noqa: E402
+    retire_legacy_delay_middleware,
     traffic_shield_middleware,
     traffic_shield_status,
 )
 
 
 app = legacy.app
+
+# The legacy "rate_limit_middleware" slept 50ms on every broker/chain request;
+# it did not actually limit concurrency or honor Retry-After. Remove it from the
+# Cloud Run serving stack before adding the real single-flight traffic shield.
+_RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT = retire_legacy_delay_middleware(
+    app,
+    getattr(legacy, "rate_limit_middleware", None),
+)
 
 # Belt-and-suspenders protection for the already-imported legacy compatibility
 # globals. They are not authority and can never be changed by request input.
@@ -180,6 +189,8 @@ async def traffic_health_status():
     """Non-secret 429/self-healing evidence for monitoring and runtime proof."""
     return {
         **traffic_shield_status(),
+        "legacy_fixed_delay_middleware_retired": _RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT == 1,
+        "legacy_fixed_delay_middleware_removed_count": _RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT,
         "client_contract": "RETRY_AFTER_EXPONENTIAL_BACKOFF_JITTER",
         "websocket_preferred": True,
         "durable_truth": "FIRESTORE_AND_BROKER_READ_ONLY",
