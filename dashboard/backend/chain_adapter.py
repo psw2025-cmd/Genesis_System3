@@ -11,24 +11,26 @@ import pandas as pd
 from core.brokers.dhan.nse_option_symbol import build_trading_symbol
 
 
-def _int_env(name: str, default: int) -> int:
+def _configured_chain_limit() -> int:
+    """Return explicit web contract limit; 0 means full broker chain.
+
+    GCP is the production authority. The previous implicit 160-contract cap was
+    inherited from a legacy 512 MB Render constraint and silently prevented the
+    UI from proving a complete broker chain. A limit is now opt-in only.
+    """
     try:
-        return max(10, int(os.environ.get(name, str(default)) or default))
+        raw = int(os.environ.get("CHAIN_MAX_CONTRACTS", "0") or 0)
+        return max(0, raw)
     except Exception:
-        return default
+        return 0
 
 
 def _limit_chain_df(df: pd.DataFrame, spot: Any) -> pd.DataFrame:
-    """Reduce option chain size before JSON conversion/caching.
-
-    Render Starter has 512MB RAM. Returning/caching full option-chain frames can
-    push the web service near OOM. Keep contracts around ATM plus enough liquid
-    rows for dashboard/scanner use. Worker can still compute fuller datasets.
-    """
-    max_contracts = _int_env("CHAIN_MAX_CONTRACTS", 160)
+    """Apply an explicit operator cap only; default is the complete chain."""
+    max_contracts = _configured_chain_limit()
+    if max_contracts <= 0 or df is None or df.empty or len(df) <= max_contracts:
+        return df
     try:
-        if df is None or df.empty or len(df) <= max_contracts:
-            return df
         strike_col = "strike" if "strike" in df.columns else "strike_price" if "strike_price" in df.columns else None
         if not strike_col:
             return df.head(max_contracts)
@@ -37,38 +39,30 @@ def _limit_chain_df(df: pd.DataFrame, spot: Any) -> pd.DataFrame:
             return df.head(max_contracts)
         work = df.copy()
         work["_atm_distance"] = pd.to_numeric(work[strike_col], errors="coerce").sub(spot_f).abs()
-        work = work.sort_values("_atm_distance").head(max_contracts).drop(columns=["_atm_distance"], errors="ignore")
-        return work
+        return work.sort_values("_atm_distance").head(max_contracts).drop(columns=["_atm_distance"], errors="ignore")
     except Exception:
         return df.head(max_contracts)
 
 
 def _normalize_chain_source(source: Any) -> str:
-    """Return externally visible source truth.
-
-    DataSourceManager is only an internal adapter name. If a chain row arrived
-    through DataSourceManager, the upstream source is Dhan because the manager is
-    Dhan-only. Exposing `datasource_manager` confuses dashboard proof and can
-    block a real Dhan payload as non-Dhan.
-    """
     src = str(source or "").strip().lower()
     if src in ("", "datasource_manager", "real", "dhan_option_chain_live"):
         return "dhan"
     return src
 
 
-def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
-    """Fetch option chain via DataSourceManager and normalize for /api/chain."""
+def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional[Dict[str, Any]]:
+    """Fetch one requested expiry from Dhan and normalize for /api/chain."""
     if not hasattr(dsm, "fetch_option_chain"):
         return None
-    result = dsm.fetch_option_chain(underlying.upper())
-    # DSM returns (None, 0.0) on miss — treat as empty, not a valid payload.
+    result = dsm.fetch_option_chain(underlying.upper(), expiry=expiry)
     if not result or result[0] is None:
         return None
     df, spot = result
     if df is None or getattr(df, "empty", True):
         return None
 
+    broker_rows_total = int(len(df))
     df = _limit_chain_df(df, spot)
 
     contracts: List[Dict[str, Any]] = []
@@ -81,12 +75,10 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         oi = int(row.get("oi", 0) or 0)
         prev_oi = int(row.get("previous_oi", row.get("prev_oi", 0)) or 0)
         if chain_expiry is None:
-            chain_expiry = row.get("expiry") or row.get("expiry_date")
+            chain_expiry = row.get("expiry") or row.get("expiry_date") or expiry or None
         row_source = _normalize_chain_source(row.get("source", "dhan"))
         ltp_val = float(row.get("ltp", row.get("last_price", 0)) or 0)
         prev_close = float(row.get("previous_close_price", row.get("previous_close", 0)) or 0)
-        # Prefer computed LTP vs previous_close. Dhan often sends change_percent=0
-        # even when previous_close and ltp differ materially.
         if ltp_val > 0 and prev_close > 0:
             change_rs = ltp_val - prev_close
             change_pct = (ltp_val - prev_close) / prev_close * 100.0
@@ -117,13 +109,9 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
             "source": row_source,
             "data_source": row_source,
         }
-        # Fast path for dashboard: Dhan already supplies security_id. Avoid
-        # per-row instrument-master enrich (125k-row scan) that freezes /api/chain.
         if not base.get("trading_symbol") and chain_expiry:
             try:
-                built = build_trading_symbol(
-                    underlying.upper(), chain_expiry, strike, opt
-                )
+                built = build_trading_symbol(underlying.upper(), chain_expiry, strike, opt)
                 if built:
                     base["trading_symbol"] = built
                     base["symbol"] = built
@@ -138,6 +126,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
     ce_oi = sum(c["oi"] for c in contracts if c["option_type"] == "CE")
     pcr = float(pe_oi / ce_oi) if ce_oi > 0 else 1.0
     source = _normalize_chain_source(contracts[0].get("source", "dhan"))
+    configured_limit = _configured_chain_limit()
 
     return {
         "underlying": underlying.upper(),
@@ -145,12 +134,16 @@ def fetch_chain_for_api(dsm: Any, underlying: str) -> Optional[Dict[str, Any]]:
         "pcr": pcr,
         "contracts": contracts,
         "total_contracts": len(contracts),
+        "broker_rows_total": broker_rows_total,
         "data_source": source,
         "source_priority": "dhan_option_chain_live" if source == "dhan" else source,
         "status": "OK",
         "stale": False,
         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
         "expiry_date": chain_expiry,
-        "limited_for_web": True,
-        "max_contracts": _int_env("CHAIN_MAX_CONTRACTS", 160),
+        "requested_expiry": expiry or None,
+        "complete_chain": configured_limit <= 0 or len(contracts) >= broker_rows_total,
+        "limited_for_web": configured_limit > 0 and len(contracts) < broker_rows_total,
+        "max_contracts": configured_limit,
+        "live_trading_enabled": False,
     }
