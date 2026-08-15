@@ -10,7 +10,9 @@
     "live_trading_enabled": false,
     "auto_execute_trades": false,
     "secret_payload_access_by_deployer": false,
-    "dhan_web_self_heal_mint": false
+    "dhan_web_self_heal_mint": false,
+    "strict_scheduler_only_iam": false,
+    "deployer_run_admin_temporary": true
   },
   "project_bindings": [
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.admin"},
@@ -60,6 +62,24 @@
     {"secret": "system3-dhan-client-id", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
     {"secret": "dhan-access-token", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"}
   ],
+  "secret_safety": {
+    "protected_secrets": [
+      "system3-dhan-client-id",
+      "dhan-access-token",
+      "dhan-pin",
+      "dhan-totp-secret",
+      "system3-dashboard-worker-push-token"
+    ],
+    "forbidden_payload_members": [
+      "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "serviceAccount:gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com",
+      "serviceAccount:gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com"
+    ],
+    "forbidden_payload_roles": [
+      "roles/secretmanager.secretAccessor",
+      "roles/secretmanager.secretVersionAdder"
+    ]
+  },
   "dhan_job": {
     "name": "genesis-system3-dhan-token-rotate",
     "required_invokers": [
@@ -95,7 +115,7 @@
       "resourcemanager.projects.get"
     ],
     "workflow_ref": "psw2025-cmd/Genesis_System3/.github/workflows/gcp-authority-repair.yml@refs/heads/main",
-    "allowed_actions": ["restore_declared_project_bindings", "restore_declared_service_account_bindings", "restore_declared_secret_iam", "restore_dhan_job_invokers", "remove_known_forbidden_dhan_job_invokers"],
+    "allowed_actions": ["restore_declared_project_bindings", "restore_declared_service_account_bindings", "restore_declared_secret_iam", "remove_forbidden_secret_payload_iam", "restore_dhan_job_invokers", "remove_known_forbidden_dhan_job_invokers"],
     "forbidden_actions": ["read_secret_payload", "create_service_account_key", "enable_live_trading", "execute_dhan_rotation_job", "place_modify_cancel_order", "delete_project"]
   }
 }
