@@ -1,10 +1,11 @@
 # Genesis System3 — Universal Agent Operating Contract
 
-> Mandatory for every human or automated agent operating from GitHub Actions, GCP/Cloud Run/Scheduler, a local laptop, browser automation, broker integration, IDE/CLI, or any future environment. Read `SYSTEM_STATE.md`, `CHANGE_LOG.md`, and `state/FAILURE_REMEDIATION_CHECKLIST.md` before action.
+> Mandatory for every human or automated agent operating from GitHub Actions, GCP/Cloud Run/Scheduler, a local laptop, browser automation, broker integration, IDE/CLI, or any future environment. Read `state/AUTONOMOUS_ENGINEERING_MASTER_PLAN.md`, `state/FAILURE_REMEDIATION_CHECKLIST.md`, `CHANGE_LOG.md`, active P0 issue(s), and then `SYSTEM_STATE.md` as historical/contextual input only until its claims are cross-verified against current machine evidence.
 
 ## A. Authority
 - Work only in `psw2025-cmd/Genesis_System3` unless owner explicitly changes scope.
 - GCP is production/deployment authority; Render is legacy/non-authoritative.
+- `SYSTEM_STATE.md` is not allowed to override newer GitHub/GCP/runtime/UI evidence and currently contains stale June/Render-era material.
 - Never infer production state from localhost, Vite preview, unit tests, CI screenshots, historical reports, email, or prose.
 - Production claims require exact GCP service/revision/image/SHA/traffic plus current production API/UI evidence.
 
@@ -24,7 +25,7 @@ Agents MUST NOT do these merely to make a check green:
 
 ## C. Mandatory bootstrap before mutation
 1. Resolve repo, branch, current `main` SHA, PR head SHA, UTC/IST time.
-2. Read this file + `SYSTEM_STATE.md` + `CHANGE_LOG.md` + failure checklist + active P0.
+2. Read this file + current master plan + failure checklist + `CHANGE_LOG.md` + active P0; read `SYSTEM_STATE.md` only as contextual history until cross-verified.
 3. Resolve mandatory workflows and exact artifacts.
 4. For production work resolve Cloud Run service, serving revision, image, `DEPLOY_GIT_SHA`, traffic and HTTPS URL.
 5. Confirm analyzer/LIVE safety flags before and after work.
@@ -76,7 +77,7 @@ Fail closed for missing tab coverage, blank/loading/placeholder UI, credential p
 CodeQL, dependency audit, Bandit/static security, secret scanning and architecture safety are fail-closed. Declassification requires exact-code-shape review + regression tests; raw findings remain visible. Never globally suppress a detector to get green.
 
 ## M. Checkpoint/documentation
-`SYSTEM_STATE.md` is current state only after machine cross-verification; `CHANGE_LOG.md` is chronology; `state/FAILURE_REMEDIATION_CHECKLIST.md` is recursive work ledger. Checkpoint after inventory, dependency map, each defect, implementation, test group, workflow result, deployment and production verification. Minimum: `timestamp | SHA | branch | work_id | status | evidence | finding | next_action`.
+`state/AUTONOMOUS_ENGINEERING_MASTER_PLAN.md` is the current execution/checklist contract; `SYSTEM_STATE.md` becomes current factual state only after machine cross-verification; `CHANGE_LOG.md` is chronology; `state/FAILURE_REMEDIATION_CHECKLIST.md` is recursive work ledger. Checkpoint after inventory, dependency map, each defect, implementation, test group, workflow result, deployment and production verification. Minimum: `timestamp | SHA | branch | work_id | status | evidence | finding | next_action`.
 
 ## N. User-action escalation
 Default autonomous read-only investigation and safe repo/test remediation. Ask owner only for genuinely non-automatable account-owner action such as interactive broker consent, owner-only permission or billing/account verification. State exact action/reason. Never ask owner to restart/rotate/redeploy as diagnostic shortcut.
