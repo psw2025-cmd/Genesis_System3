@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -88,22 +89,49 @@ def _pip(data: Any | None, err: str | None) -> dict[str, Any]:
     }
 
 
-def _reviewed_static_shell_finding(row: dict[str, Any]) -> str | None:
-    """Return a review reason only for exact non-user-controlled legacy shell forms.
+def _bandit_finding_source_line(row: dict[str, Any]) -> str:
+    """Return only the source line Bandit identified, never a neighboring snippet line.
 
-    This is deliberately code-shape based rather than a global Bandit skip. Any new
-    B602/B605 finding, any changed command, or any dynamic/user-controlled shell text
-    remains a hard failure.
+    Bandit's JSON `code` field may contain context lines. Security declassification must
+    be tied to the exact `line_number`, otherwise a reviewed static command on an
+    adjacent line could accidentally mask a different dynamic shell finding.
+    Missing or ambiguous line mapping fails closed by returning an empty string.
     """
-    test_id = str(row.get("test_id") or "")
     code = str(row.get("code") or "")
-    compact = " ".join(code.split())
+    try:
+        target = int(row.get("line_number"))
+    except (TypeError, ValueError):
+        return ""
 
-    if test_id == "B605" and 'os.system("cls" if os.name == "nt" else "clear")' in compact:
+    numbered: list[tuple[int, str]] = []
+    for raw in code.splitlines():
+        match = re.match(r"^\s*(\d+)\s+(.*)$", raw)
+        if match:
+            numbered.append((int(match.group(1)), match.group(2).strip()))
+
+    matches = [text for number, text in numbered if number == target]
+    if len(matches) == 1:
+        return " ".join(matches[0].split())
+
+    # Some Bandit producers may emit a single unnumbered source line. Accept only when
+    # there is exactly one non-empty line, so multi-line ambiguity remains fail-closed.
+    non_empty = [line.strip() for line in code.splitlines() if line.strip()]
+    if not numbered and len(non_empty) == 1:
+        return " ".join(non_empty[0].split())
+    return ""
+
+
+def _reviewed_static_shell_finding(row: dict[str, Any]) -> str | None:
+    """Return a review reason only for the exact non-user-controlled finding line."""
+    test_id = str(row.get("test_id") or "")
+    finding_line = _bandit_finding_source_line(row)
+
+    terminal_clear = 'os.system("cls" if os.name == "nt" else "clear")'
+    if test_id == "B605" and finding_line == terminal_clear:
         return "STATIC_TERMINAL_CLEAR_ONLY"
 
     taskkill = 'subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)'
-    if test_id == "B602" and taskkill in compact:
+    if test_id == "B602" and finding_line == taskkill:
         return "STATIC_WINDOWS_TASKKILL_ARGV_ONLY"
 
     return None
