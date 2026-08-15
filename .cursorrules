@@ -12,7 +12,7 @@ Read first:
 - Repository: `psw2025-cmd/Genesis_System3`.
 - Production runtime: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`.
 - Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
-- Broker: **Dhan only**. Legacy Angel/Render instructions are retired and must not be used as current authority.
+- Broker: **Dhan only**. Legacy Angel/Render instructions are retired, non-authoritative, and must not be used as current authority.
 - GitHub Actions -> GCP must use keyless WIF; never create/export service-account JSON keys.
 
 ## Absolute live/current truth rule
