@@ -121,9 +121,17 @@ jobs:
           assert '--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"' in workflow
           assert '--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"' in workflow
           forbidden_rotator_step = "Execute token rotator once" + " and wait"
-          forbidden_rotator_exec = 'gcloud run jobs execute "${DHAN_ROTATION_JOB}"'
+          forbidden_rotator_exec = "gcloud run jobs execute " + '"${DHAN_ROTATION_JOB}"'
           assert forbidden_rotator_step not in workflow
           assert forbidden_rotator_exec not in workflow
+          # Also reject any executable shell line that runs the rotator job.
+          rotator_exec_lines = [
+              line.strip()
+              for line in workflow.splitlines()
+              if line.strip().startswith("gcloud run jobs execute ")
+              and "DHAN_ROTATION_JOB" in line
+          ]
+          assert not rotator_exec_lines, f"deploy must not execute rotator: {rotator_exec_lines}"
           assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
           assert 'os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
 
