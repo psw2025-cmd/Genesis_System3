@@ -23,12 +23,13 @@ env:
   AUTO_EXECUTE_TRADES: "0"
   SYSTEM3_REAL_ONLY: "1"
   SYSTEM3_PUBLIC_BASE_URL: "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+  SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS: "720"
 
 jobs:
   frontend-browser-runtime-smoke:
     name: BLOCKING - frontend browser runtime smoke
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -95,10 +96,10 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Capture request-scoped read-only live production UI lifecycle proof
+      - name: Capture exact-SHA request-scoped read-only live production UI lifecycle proof
         if: github.ref == 'refs/heads/main'
         shell: bash
-        run: timeout 300s python scripts/gcp_live_ui_snapshot.py
+        run: timeout 900s python scripts/gcp_live_ui_snapshot.py
 
       - name: Upload live production UI lifecycle proof
         if: always() && github.ref == 'refs/heads/main'
