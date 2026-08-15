@@ -2,31 +2,33 @@
 
 ## Permanent standing rule
 
-Only the following eleven GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following twelve GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
 1. `ci.yml` — blocking analyzer/paper safety validation for pull requests and protected branches.
-2. `workflow-priority-guard.yml` — enforces this allow-list and is the only approved read-only observer for `workflow_run` and `deployment_status` events.
-3. `cloud-run-auto-deploy.yml` — path-scoped Google Cloud Run deployment from `main`.
-4. `gcp-stage2-ci.yml` — focused Google Cloud safety tests for relevant pull-request changes.
-5. `gcp-dhan-token-fix-ci.yml` — focused Dhan token/runtime contract checks for relevant pull-request changes.
-6. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard.
-7. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
-8. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
-9. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
-10. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
+2. `workflow-priority-guard.yml` — enforces this allow-list and is the approved read-only forensic observer for `workflow_run` and `deployment_status` events.
+3. `cloud-run-auto-deploy.yml` — path-scoped Google Cloud Run deployment from `main`; also reusable only by the approved IAM repair workflow.
+4. `gcp-authority-repair.yml` — bounded IAM-drift repair after a failed `Cloud Run Auto Deploy` on `main`; primary/fallback keyless repair identities, declared-baseline convergence only, no GitHub write token, no Dhan job execution, and one reusable deploy only when actual IAM drift changed.
+5. `gcp-stage2-ci.yml` — focused Google Cloud safety tests for relevant pull-request changes.
+6. `gcp-dhan-token-fix-ci.yml` — focused Dhan token/runtime contract checks for relevant pull-request changes.
+7. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard.
+8. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
+9. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
+10. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
+11. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
 
 ### Manual emergency workflow
 
-11. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+12. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
-## Event observer rule
+## Event workflow rules
 
-Only `workflow-priority-guard.yml` may use `workflow_run` or `deployment_status`.
-It may observe only the ten approved workflow names listed in its event allow-list.
-The observer is evidence-only: GitHub-hosted runner, read permissions, trusted `main` checkout, credential persistence disabled, no repository or deployment mutation, and no trading/order action.
-It writes event metadata and a recurrence fingerprint only to the workflow summary and retained artifact.
+`workflow-priority-guard.yml` may use `workflow_run` and `deployment_status` only as an evidence-only observer. It may observe only the approved workflow names listed in its event allow-list. It uses a GitHub-hosted runner, read permissions, trusted `main` checkout, credential persistence disabled, and performs no repository/deployment/trading mutation.
+
+`gcp-authority-repair.yml` is the sole additional workflow allowed to use `workflow_run`. Its source must be exactly `Cloud Run Auto Deploy`; automatic repair is restricted to failed runs whose `head_branch` is `main`. It may also support `workflow_dispatch` for bounded recovery. It must not use `deployment_status`, `push`, `pull_request`, GitHub `actions: write`/`contents: write`, Dhan/Cloud Run job execution, or arbitrary IAM mutation code outside the repository-declared baseline reconciler. Its only deployment continuation is one reusable invocation of `cloud-run-auto-deploy.yml` when the reconciler reports actual IAM changes.
+
+No other workflow may use `workflow_run` or `deployment_status`.
 
 ## Scheduling authority
 
@@ -41,7 +43,7 @@ GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Goo
 
 ## Disabled workflow classes
 
-All additional workflow files are prohibited, including Render workflows, self-hosted workflows, scheduled proof writers, legacy failure trackers, duplicate proof workflows, repair runners, experimental swarms, and unapproved ML workflows.
+All additional workflow files are prohibited, including Render workflows, self-hosted workflows, scheduled proof writers, legacy failure trackers, duplicate proof workflows, unapproved repair runners, experimental swarms, and unapproved ML workflows.
 
 ## Operating rules
 

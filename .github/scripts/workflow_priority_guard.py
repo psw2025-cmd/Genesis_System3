@@ -12,6 +12,7 @@ AUTOMATIC = {
     "ci.yml",
     "workflow-priority-guard.yml",
     "cloud-run-auto-deploy.yml",
+    "gcp-authority-repair.yml",
     "gcp-stage2-ci.yml",
     "gcp-dhan-token-fix-ci.yml",
     "frontend-runtime-smoke.yml",
@@ -24,6 +25,8 @@ MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
+IAM_REPAIR_WORKFLOW = "gcp-authority-repair.yml"
+EVENT_TRIGGER_WORKFLOWS = {FORENSIC_WORKFLOW, IAM_REPAIR_WORKFLOW}
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
     "Cloud Run Auto Deploy",
@@ -103,7 +106,7 @@ def main() -> int:
         if match:
             raise SystemExit(f"WORKFLOW_FORBIDDEN_TRIGGER file={name} match={match.group(1)!r}")
         event_match = event_trigger.search(on_block)
-        if event_match and name != FORENSIC_WORKFLOW:
+        if event_match and name not in EVENT_TRIGGER_WORKFLOWS:
             raise SystemExit(
                 f"WORKFLOW_EVENT_TRIGGER_RESERVED file={name} match={event_match.group(1)!r}"
             )
@@ -152,9 +155,34 @@ def main() -> int:
     if not re.search(r"ref:\s*main\s*$", guard_text, re.MULTILINE):
         raise SystemExit("FORENSIC_RESPONDER_DEFAULT_BRANCH_CHECKOUT_MISSING")
 
+    repair_on = trigger_blocks[IAM_REPAIR_WORKFLOW]
+    repair_text = workflow_text[IAM_REPAIR_WORKFLOW]
+    if "workflow_run:" not in repair_on or "workflow_dispatch:" not in repair_on:
+        raise SystemExit("IAM_REPAIR_REQUIRED_TRIGGERS_MISSING")
+    if "deployment_status:" in repair_on:
+        raise SystemExit("IAM_REPAIR_DEPLOYMENT_STATUS_TRIGGER_FORBIDDEN")
+    if re.search(r"^\s*(push|pull_request)\s*:", repair_on, re.MULTILINE):
+        raise SystemExit("IAM_REPAIR_DIRECT_CODE_EVENT_TRIGGER_FORBIDDEN")
+    if 'workflows: ["Cloud Run Auto Deploy"]' not in repair_on:
+        raise SystemExit("IAM_REPAIR_WORKFLOW_RUN_SOURCE_NOT_EXACT")
+    if "head_branch == 'main'" not in repair_text:
+        raise SystemExit("IAM_REPAIR_MAIN_BRANCH_GUARD_MISSING")
+    if "actions: write" in repair_text or "contents: write" in repair_text:
+        raise SystemExit("IAM_REPAIR_GITHUB_WRITE_PERMISSION_FORBIDDEN")
+    if "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com" not in repair_text:
+        raise SystemExit("IAM_REPAIR_PRIMARY_IDENTITY_MISSING")
+    if "gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com" not in repair_text:
+        raise SystemExit("IAM_REPAIR_FALLBACK_IDENTITY_MISSING")
+    if repair_text.count("uses: ./.github/workflows/cloud-run-auto-deploy.yml") != 1:
+        raise SystemExit("IAM_REPAIR_BOUNDED_DEPLOY_REUSE_INVALID")
+    if "gcloud run jobs execute" in repair_text:
+        raise SystemExit("IAM_REPAIR_DHAN_OR_JOB_EXECUTION_FORBIDDEN")
+
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
+    if "workflow_call:" not in deploy_on:
+        raise SystemExit("CLOUD_RUN_REUSABLE_TRIGGER_MISSING")
 
     full_audit_on = trigger_blocks["full-cloud-audit.yml"]
     if "push:" not in full_audit_on or not re.search(r"branches:\s*\[\s*main\s*\]", full_audit_on):
@@ -184,8 +212,10 @@ def main() -> int:
             "retired_runtime_workflows": False,
             "scheduled_github_workflows": False,
             "event_forensic_responder": FORENSIC_WORKFLOW,
+            "event_iam_repair": IAM_REPAIR_WORKFLOW,
             "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
             "event_responder_write_permissions": False,
+            "iam_repair_github_write_permissions": False,
             "live_trading": False,
         },
     )

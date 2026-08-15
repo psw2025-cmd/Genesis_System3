@@ -1,0 +1,73 @@
+# Genesis System3 Autonomous Operations Policy
+
+## Authority
+
+- Google Cloud project `system3-openalgo-safe` is the authoritative production/runtime platform.
+- GitHub repository `psw2025-cmd/Genesis_System3` is the authoritative code/configuration source.
+- Render is retired/non-authoritative for production.
+- GitHub Actions authenticates to Google Cloud only through keyless Workload Identity Federation (WIF). User-managed Google service-account JSON keys are forbidden.
+
+## Operating objective
+
+Routine production engineering must not depend on the user running technical commands. The control plane should investigate, patch, test, deploy, roll back, repair declared IAM drift, collect logs/evidence, and verify runtime/UI truth through GitHub Actions and Google Cloud.
+
+## Safety boundary
+
+The autonomous control plane MUST NOT:
+
+1. enable LIVE trading;
+2. set `AUTO_EXECUTE_TRADES=1`;
+3. place, modify, cancel, or square-off real orders;
+4. print/read broker secret payloads except inside the dedicated runtime identity that already requires them;
+5. create or export service-account private keys;
+6. delete the Google Cloud project or change billing ownership;
+7. remove unknown IAM principals automatically without forensic classification.
+
+Analyzer/PAPER remains the default. `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`, and `ANALYZE_MODE=1` are mandatory production deployment locks until a separate explicit human live-enablement process exists.
+
+## Identity separation
+
+- `genesis-system3-automation`: normal deployment/configuration identity. No broker secret payload role.
+- `gs3-iam-repair`: primary guarded IAM-reconciliation identity.
+- `gs3-iam-repair-b`: fallback guarded IAM-reconciliation identity used only if the primary repair path itself fails. Either repair identity may restore only the repository-declared System3 IAM baseline and known safety deny-lists through the canonical repair workflow; neither may execute the Dhan rotation job or read broker secret payloads.
+- `genesis-system3-dhan-rotator`: only identity that reads PIN/TOTP/client-id/access-token material and adds a new canonical access-token version.
+- `gs3-scheduler`: normal 07:30 Asia/Kolkata Dhan rotation invoker.
+- `gs3-token-recovery`: bounded manual/recovery invoker.
+- `genesis-system3-web`: runtime web identity; may read canonical client-id/access-token and worker token, but must not mint Dhan tokens.
+
+## IAM drift behavior
+
+`deploy/gcp/system3_iam_baseline.json` is the machine-readable minimum authority baseline.
+
+When Cloud Run Auto Deploy fails due to missing declared IAM:
+
+1. `GCP Authority Repair` runs from trusted `main`.
+2. It first authenticates as `gs3-iam-repair` through a WIF claim restricted to the exact repair workflow. If that path fails, `gs3-iam-repair-b` performs the same bounded reconciliation.
+3. It compares live IAM with the declared baseline.
+4. It restores only declared bindings and removes only explicit safety deny-list entries: forbidden broker-secret payload roles on deploy/repair identities and forbidden Dhan rotator invokers.
+5. It never reads Secret Manager payloads and never invokes the rotator.
+6. It invokes the existing guarded Cloud Run deployment once only when IAM drift was actually repaired.
+7. If no declared IAM drift exists, it stops; no retry loop is permitted.
+
+The two repair identities reduce single-identity IAM drift risk. They do not claim immunity from project-owner removal, WIF-provider deletion, organization-level policy changes, account suspension, or other failures above the delegated project control plane.
+
+## Temporary deploy-authority debt
+
+`genesis-system3-automation` temporarily retains project `roles/run.admin` because the current production deployment workflow configures and directly executes several non-Dhan Cloud Run business/control jobs. Therefore **strict scheduler-only `run.jobs.run` authority is not yet PASS**. The machine baseline explicitly records `strict_scheduler_only_iam=false` and `deployer_run_admin_temporary=true`.
+
+After the one-time autonomous authority bootstrap is proven in production, the next least-privilege migration is to replace deployer `run.admin` with a custom deployment role that excludes `run.jobs.run`, delegate only required non-Dhan job execution narrowly, remove project-level excess execution authorities, and re-run the project/job authority inventory. This migration must be proven before changing the baseline to strict scheduler-only PASS.
+
+## Broker rotation authority
+
+- Daily scheduler at 07:30 Asia/Kolkata remains the normal mint authority.
+- Web self-heal minting remains OFF (`DHAN_CANONICAL_ROTATION_SELF_HEAL=0`).
+- Deploy workflows configure the rotator/scheduler but must not execute the rotator.
+- Recovery must remain single-flight/cooldown guarded; repeated mint retries are forbidden.
+
+## Evidence rule
+
+No production-ready claim is allowed from source code alone. Final proof must include exact deployed SHA/revision, runtime safety flags, broker status, health status, and visible UI data where the feature is UI-facing.
+
+## Human-only break-glass boundary
+
+Human intervention can still be required for external account/billing suspension, organization-level policy outside this project, revoked GitHub/GCP account ownership, WIF-provider destruction when neither delegated repair identity can authenticate, external broker identity/MFA reset, or intentionally destructive actions. These are not normal System3 operational tasks.
