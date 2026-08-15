@@ -36,6 +36,7 @@ jobs:
         with:
           clean: true
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Setup Node 20
         uses: actions/setup-node@v4
@@ -58,6 +59,7 @@ jobs:
           python -m py_compile scripts/frontend_local_runtime_smoke.py
           python -m py_compile scripts/gcp_live_ui_snapshot.py
           python -m py_compile scripts/system3_temporal_truth_guard.py
+          python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
 
       - name: Enforce temporal truth and live UI remediation contracts
         shell: bash
@@ -95,6 +97,11 @@ jobs:
           path: frontend-ui-proof/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Resolve expected runtime-affecting serving SHA
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: python scripts/system3_resolve_runtime_deploy_sha.py --write-github-env
 
       - name: Capture exact-SHA request-scoped read-only live production UI lifecycle proof
         if: github.ref == 'refs/heads/main'
