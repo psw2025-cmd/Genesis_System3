@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -88,26 +89,82 @@ def _pip(data: Any | None, err: str | None) -> dict[str, Any]:
     }
 
 
+def _bandit_finding_source_line(row: dict[str, Any]) -> str:
+    """Return only the source line Bandit identified, never a neighboring snippet line.
+
+    Bandit's JSON `code` field may contain context lines. Security declassification must
+    be tied to the exact `line_number`, otherwise a reviewed static command on an
+    adjacent line could accidentally mask a different dynamic shell finding.
+    Missing or ambiguous line mapping fails closed by returning an empty string.
+    """
+    code = str(row.get("code") or "")
+    try:
+        target = int(row.get("line_number"))
+    except (TypeError, ValueError):
+        return ""
+
+    numbered: list[tuple[int, str]] = []
+    for raw in code.splitlines():
+        match = re.match(r"^\s*(\d+)\s+(.*)$", raw)
+        if match:
+            numbered.append((int(match.group(1)), match.group(2).strip()))
+
+    matches = [text for number, text in numbered if number == target]
+    if len(matches) == 1:
+        return " ".join(matches[0].split())
+
+    non_empty = [line.strip() for line in code.splitlines() if line.strip()]
+    if not numbered and len(non_empty) == 1:
+        return " ".join(non_empty[0].split())
+    return ""
+
+
+def _reviewed_static_shell_finding(row: dict[str, Any]) -> str | None:
+    """Return a review reason only for the exact non-user-controlled finding line."""
+    test_id = str(row.get("test_id") or "")
+    finding_line = _bandit_finding_source_line(row)
+
+    terminal_clear = 'os.system("cls" if os.name == "nt" else "clear")'
+    if test_id == "B605" and finding_line == terminal_clear:
+        return "STATIC_TERMINAL_CLEAR_ONLY"
+
+    taskkill = 'subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)'
+    if test_id == "B602" and finding_line == taskkill:
+        return "STATIC_WINDOWS_TASKKILL_ARGV_ONLY"
+
+    return None
+
+
 def _bandit(data: Any | None, err: str | None) -> dict[str, Any]:
     if err or not isinstance(data, dict):
         return {"state": "NOT_PROVEN", "error": err or "invalid_json"}
     results = data.get("results") or []
     counts = {"LOW": 0, "MEDIUM": 0, "HIGH": 0}
     high_findings: list[dict[str, Any]] = []
+    reviewed_static_high_findings: list[dict[str, Any]] = []
+    unreviewed_high_count = 0
+
     for row in results:
         sev = str((row or {}).get("issue_severity") or "").upper()
         if sev in counts:
             counts[sev] += 1
         if sev == "HIGH" and isinstance(row, dict):
-            high_findings.append({
+            finding = {
                 "file": row.get("filename"),
                 "line": row.get("line_number"),
                 "test_id": row.get("test_id"),
                 "test_name": row.get("test_name"),
-            })
-    if counts["HIGH"]:
+            }
+            reason = _reviewed_static_shell_finding(row)
+            if reason:
+                reviewed_static_high_findings.append({**finding, "review_reason": reason})
+            else:
+                unreviewed_high_count += 1
+                high_findings.append(finding)
+
+    if unreviewed_high_count:
         state = "FAIL"
-    elif counts["MEDIUM"] or counts["LOW"]:
+    elif counts["MEDIUM"] or counts["LOW"] or counts["HIGH"]:
         state = "WARN"
     else:
         state = "PASS"
@@ -115,7 +172,9 @@ def _bandit(data: Any | None, err: str | None) -> dict[str, Any]:
         "state": state,
         "counts": counts,
         "finding_count": len(results),
+        "unreviewed_high_count": unreviewed_high_count,
         "high_findings": high_findings[:100],
+        "reviewed_static_high_findings": reviewed_static_high_findings[:100],
     }
 
 
