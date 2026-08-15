@@ -27,6 +27,7 @@ on:
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
   workflow_dispatch:
+  workflow_call:
 
 concurrency:
   group: cloud-run-auto-deploy
