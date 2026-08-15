@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Fail CI if the built System3 dashboard cannot satisfy deploy/runtime proof.
+"""Fail CI if the built System3 dashboard cannot satisfy local render/runtime proof.
+
+IMPORTANT: this is LOCAL_NON_PRODUCTION proof only. It serves the compiled Vite
+bundle from 127.0.0.1 and must never be interpreted as GCP production broker,
+market-data, deployment, revision, or exact-SHA proof.
 
 Read-only analyzer/PAPER smoke: verify the same compiled frontend markers required
 by the Cloud Run Docker build, serve the Vite production build, mount the app once,
@@ -24,6 +28,9 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
 PROOF_DIR = ROOT / "frontend-ui-proof"
 HOST = "127.0.0.1"
+PROOF_SCOPE = "LOCAL_NON_PRODUCTION"
+PRODUCTION_AUTHORITY = False
+BROKER_CONNECTIVITY_PROVEN = False
 
 # Keep this contract aligned with dashboard/backend/Dockerfile. A PR must fail
 # before merge if Vite succeeds but the immutable deploy-proof bundle would fail.
@@ -261,6 +268,11 @@ def main() -> int:
 
     elapsed = round(time.monotonic() - started, 2)
     manifest = {
+        "proof_scope": PROOF_SCOPE,
+        "production_authority": PRODUCTION_AUTHORITY,
+        "broker_connectivity_proven": BROKER_CONNECTIVITY_PROVEN,
+        "served_from": "127.0.0.1_vite_preview",
+        "production_claim_allowed": False,
         "tabs_expected": len(TABS),
         "screenshots_captured": captured,
         "failures": failures,
@@ -272,9 +284,13 @@ def main() -> int:
     (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     if failures:
-        print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), f"elapsed_s={elapsed}", file=sys.stderr)
+        print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), f"proof_scope={PROOF_SCOPE}", f"elapsed_s={elapsed}", file=sys.stderr)
         return 1
-    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} screenshots={captured} elapsed_s={elapsed} live_trading_actions=0")
+    print(
+        f"FRONTEND_RUNTIME_SMOKE=PASS proof_scope={PROOF_SCOPE} production_authority=false "
+        f"broker_connectivity_proven=false tabs={len(TABS)} screenshots={captured} "
+        f"elapsed_s={elapsed} live_trading_actions=0"
+    )
     return 0
 
 
