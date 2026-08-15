@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-"""Capture fresh, request-scoped, read-only System3 production UI truth.
+"""Capture fresh, request-scoped, exact-revision System3 production UI truth.
 
-This is the authoritative browser path for claims about what the live UI shows now.
-It opens the real public GCP service in a new Chrome/WebDriver session, captures every
-canonical tab plus required Option Chain subviews, records visible text + timestamps,
-and brackets the browser session with sanitized production APIs. Stored outputs become
-historical after capture; consumers must apply SYSTEM3_TEMPORAL_TRUTH_V1 before calling
-them current/live.
+SYSTEM3_TEMPORAL_TRUTH_V1: a new browser session is necessary but not sufficient after
+a deploy-triggering change. Before any screenshot is accepted, the public production
+`/api/deploy-info` must prove that Cloud Run is serving the expected GitHub SHA. This
+prevents a same-push browser workflow from photographing the previous revision while a
+new deployment is still in flight.
 """
 from __future__ import annotations
 
@@ -27,6 +26,8 @@ DEFAULT_BASE = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 BASE_URL = os.getenv("SYSTEM3_PUBLIC_BASE_URL", DEFAULT_BASE).rstrip("/")
 MAX_AGE_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_MAX_AGE_SECONDS", "300"))
 SETTLE_SECONDS = float(os.getenv("SYSTEM3_LIVE_TAB_SETTLE_SECONDS", "2.0"))
+DEPLOY_WAIT_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS", "720"))
+DEPLOY_POLL_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_POLL_SECONDS", "10"))
 REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
 
 
@@ -35,13 +36,88 @@ def _utc_now() -> str:
 
 
 def _json_get(url: str) -> dict:
-    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/3.0"})
+    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.0"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             payload = json.loads(response.read().decode("utf-8") or "{}")
             return payload if isinstance(payload, dict) else {}
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError):
         return {}
+
+
+def _unwrap(payload: dict) -> dict:
+    data = payload.get("data")
+    return data if isinstance(data, dict) else payload
+
+
+def _sanitize_deploy(payload: dict) -> dict:
+    value = _unwrap(payload)
+    return {
+        "git_sha": value.get("git_sha") or value.get("github_sha") or value.get("sha"),
+        "revision": value.get("revision") or value.get("cloud_run_revision") or value.get("revision_name"),
+        "deploy_target": value.get("deploy_target") or value.get("platform"),
+        "image": value.get("image") or value.get("image_ref"),
+    }
+
+
+def _sha_matches(expected: str, actual: str) -> bool:
+    expected = expected.strip().lower()
+    actual = actual.strip().lower()
+    if not expected or not actual:
+        return False
+    if expected == actual:
+        return True
+    # Allow a conventional short SHA only when it is unambiguous enough to be evidence.
+    if len(actual) >= 7 and expected.startswith(actual):
+        return True
+    if len(expected) >= 7 and actual.startswith(expected):
+        return True
+    return False
+
+
+def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
+    expected = str(os.getenv("SYSTEM3_EXPECTED_SERVING_SHA") or os.getenv("GITHUB_SHA") or "").strip()
+    started_at = _utc_now()
+    deadline = time.monotonic() + DEPLOY_WAIT_SECONDS
+    attempts = 0
+    last: dict = {}
+    while True:
+        attempts += 1
+        last = _sanitize_deploy(_json_get(f"{BASE_URL}/api/deploy-info"))
+        actual = str(last.get("git_sha") or "")
+        match = bool(expected) and _sha_matches(expected, actual)
+        print("SERVING_SHA_PROBE", json.dumps({
+            "attempt": attempts,
+            "expected_sha": expected or None,
+            "actual_sha": actual or None,
+            "revision": last.get("revision"),
+            "match": match,
+            "observed_at_utc": _utc_now(),
+        }, sort_keys=True))
+        if match:
+            return True, last, {
+                "wait_started_at_utc": started_at,
+                "converged_at_utc": _utc_now(),
+                "attempts": attempts,
+                "expected_sha": expected,
+            }
+        if not expected:
+            return False, last, {
+                "wait_started_at_utc": started_at,
+                "failed_at_utc": _utc_now(),
+                "attempts": attempts,
+                "expected_sha": None,
+                "reason": "EXPECTED_SERVING_SHA_MISSING",
+            }
+        if time.monotonic() >= deadline:
+            return False, last, {
+                "wait_started_at_utc": started_at,
+                "failed_at_utc": _utc_now(),
+                "attempts": attempts,
+                "expected_sha": expected,
+                "reason": "EXPECTED_SERVING_SHA_NOT_CONVERGED",
+            }
+        time.sleep(max(1, DEPLOY_POLL_SECONDS))
 
 
 def _sanitize_broker(payload: dict) -> dict:
@@ -94,6 +170,7 @@ def _sanitize_live_board(payload: dict) -> dict:
 def _api_snapshot() -> dict:
     return {
         "captured_at_utc": _utc_now(),
+        "deploy": _sanitize_deploy(_json_get(f"{BASE_URL}/api/deploy-info")),
         "broker": _sanitize_broker(_json_get(f"{BASE_URL}/api/broker/status")),
         "health": _sanitize_health(_json_get(f"{BASE_URL}/api/health")),
         "live_board": _sanitize_live_board(_json_get(f"{BASE_URL}/api/market/live_board")),
@@ -106,7 +183,6 @@ def _visible_text(browser: Browser) -> str:
 
 
 def _semantic_alerts(text: str) -> list[str]:
-    """Return status-like visible lines, avoiding false positives from headings/prose."""
     found: list[str] = []
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw.strip())
@@ -189,8 +265,36 @@ def main() -> int:
         if old.is_file():
             old.unlink()
 
+    serving_ok, serving_deploy, convergence = _wait_for_expected_serving_sha()
+    if not serving_ok:
+        failure = {
+            "schema": "system3-live-production-ui-proof-v4",
+            "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
+            "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
+            "state": "NOT_CURRENT_SERVING_SHA",
+            "base_url": BASE_URL,
+            "serving_deploy": serving_deploy,
+            "serving_sha_convergence": convergence,
+            "safety": {
+                "read_only_capture": True,
+                "mutation_endpoints_called": False,
+                "order_endpoints_called": False,
+                "secret_values_exposed": False,
+            },
+        }
+        (PROOF_DIR / "manifest.json").write_text(json.dumps(failure, indent=2, sort_keys=True), encoding="utf-8")
+        print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=NOT_CURRENT_SERVING_SHA", json.dumps(failure, sort_keys=True))
+        return 5
+
+    # Temporal capture starts only after serving-sha convergence. The wait itself is not UI evidence.
     capture_started = _utc_now()
     api_start = _api_snapshot()
+    expected_sha = str(convergence.get("expected_sha") or "")
+    start_sha = str((api_start.get("deploy") or {}).get("git_sha") or "")
+    if not _sha_matches(expected_sha, start_sha):
+        print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=SERVING_SHA_CHANGED_BEFORE_CAPTURE")
+        return 6
+
     tabs: dict[str, dict] = {}
     render_failures: list[str] = []
     required_chain_subviews: dict[str, dict] = {}
@@ -205,11 +309,7 @@ def main() -> int:
             activated = browser.activate(tab_id)
             if not activated:
                 render_failures.append(f"{tab_id}:sidebar_button_missing")
-                tabs[tab_id] = {
-                    "captured_at_utc": _utc_now(),
-                    "rendered": False,
-                    "failure": "sidebar_button_missing",
-                }
+                tabs[tab_id] = {"captured_at_utc": _utc_now(), "rendered": False, "failure": "sidebar_button_missing"}
                 continue
             snap = _wait_tab(browser, tab_id, 6)
             time.sleep(SETTLE_SECONDS)
@@ -247,17 +347,15 @@ def main() -> int:
 
     api_end = _api_snapshot()
     capture_finished = _utc_now()
+    end_sha = str((api_end.get("deploy") or {}).get("git_sha") or "")
+    exact_sha_stable = _sha_matches(expected_sha, start_sha) and _sha_matches(expected_sha, end_sha)
     all_rendered = len(tabs) == len(TABS) and all(item.get("rendered") is True for item in tabs.values())
     all_required_chains_ready = len(required_chain_subviews) == len(REQUIRED_CHAIN_SYMBOLS) and all(
         required_chain_subviews.get(symbol, {}).get("ready") is True for symbol in REQUIRED_CHAIN_SYMBOLS
     )
-    semantic_attention = {
-        tab_id: item.get("semantic_alerts", [])
-        for tab_id, item in tabs.items()
-        if item.get("semantic_alerts")
-    }
+    semantic_attention = {tab_id: item.get("semantic_alerts", []) for tab_id, item in tabs.items() if item.get("semantic_alerts")}
     manifest = {
-        "schema": "system3-live-production-ui-proof-v3",
+        "schema": "system3-live-production-ui-proof-v4",
         "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
         "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
         "capture_started_at_utc": capture_started,
@@ -266,6 +364,12 @@ def main() -> int:
         "max_age_seconds": MAX_AGE_SECONDS,
         "base_url": BASE_URL,
         "source_authority": "GCP_PRODUCTION_PUBLIC_URL",
+        "serving_sha_convergence": convergence,
+        "serving_deploy_before_capture": serving_deploy,
+        "expected_serving_sha": expected_sha,
+        "serving_sha_at_capture_start": start_sha,
+        "serving_sha_at_capture_end": end_sha,
+        "exact_serving_sha_stable": exact_sha_stable,
         "github": {
             "sha": os.getenv("GITHUB_SHA"),
             "run_id": os.getenv("GITHUB_RUN_ID"),
@@ -292,6 +396,7 @@ def main() -> int:
             "live_trading_changed": False,
         },
         "interpretation": {
+            "fresh_browser_is_not_enough_without_exact_serving_sha": True,
             "render_pass_is_not_semantic_data_pass": True,
             "required_chain_subviews_are_semantically_checked": True,
             "stored_artifact_becomes_historical_after_capture": True,
@@ -300,13 +405,16 @@ def main() -> int:
     }
     (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
     print("LIVE_PRODUCTION_UI_PROOF", json.dumps(manifest, sort_keys=True))
+    if not exact_sha_stable:
+        print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=SERVING_SHA_CHANGED_DURING_CAPTURE")
+        return 7
     if not all_rendered:
         print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=TAB_RENDER")
         return 1
     if not all_required_chains_ready:
         print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=REQUIRED_CHAIN_SUBVIEW_SEMANTICS")
         return 4
-    print(f"LIVE_PRODUCTION_UI_CAPTURE=PASS tabs={len(tabs)} required_chains={len(required_chain_subviews)} semantic_attention_tabs={len(semantic_attention)}")
+    print(f"LIVE_PRODUCTION_UI_CAPTURE=PASS tabs={len(tabs)} required_chains={len(required_chain_subviews)} exact_sha={expected_sha[:12]} semantic_attention_tabs={len(semantic_attention)}")
     return 0
 
 
