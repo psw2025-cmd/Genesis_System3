@@ -96,7 +96,7 @@ def _api_snapshot() -> dict:
         "captured_at_utc": _utc_now(),
         "broker": _sanitize_broker(_json_get(f"{BASE_URL}/api/broker/status")),
         "health": _sanitize_health(_json_get(f"{BASE_URL}/api/health")),
-        "live_board": _sanitize_live_board(_json_get(f"{BASE_URL}/api/market/live-board")),
+        "live_board": _sanitize_live_board(_json_get(f"{BASE_URL}/api/market/live_board")),
     }
 
 
@@ -151,7 +151,6 @@ def _capture_required_chain_subviews(browser: Browser) -> dict[str, dict]:
         if not clicked:
             result[symbol] = {"captured_at_utc": _utc_now(), "ready": False, "reason": "SYMBOL_BUTTON_MISSING"}
             continue
-        # Store-backed default chain changes immediately; allow expiry/discovery UI and table to settle.
         time.sleep(max(2.5, SETTLE_SECONDS))
         text = _visible_text(browser)
         upper = text.upper()
