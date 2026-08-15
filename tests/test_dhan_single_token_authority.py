@@ -120,5 +120,71 @@ class DhanRotationVersionCoordinationTests(unittest.TestCase):
         self.assertIn("expected_secret_version=expected_version", self.job)
 
 
+class DhanRotationTriStateGuardTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.job = CANONICAL.read_text(encoding="utf-8")
+        cls.tree = ast.parse(cls.job)
+
+        decision_nodes = [
+            node
+            for node in cls.tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name in {"_near_expiry", "_should_rotate", "_non_rotation_status"}
+        ]
+        module = ast.Module(body=decision_nodes, type_ignores=[])
+        ast.fix_missing_locations(module)
+        cls.ns = {
+            "MIN_HOURS": 6.0,
+            "PROFILE_VALID": "VALID",
+            "PROFILE_AUTH_INVALID": "AUTH_INVALID",
+            "PROFILE_TRANSIENT_ERROR": "TRANSIENT_ERROR",
+            "PROFILE_CONFIG_ERROR": "CONFIG_ERROR",
+        }
+        exec(compile(module, str(CANONICAL), "exec"), cls.ns)
+
+    def test_transient_network_error_does_not_authorize_mint(self):
+        should_rotate = self.ns["_should_rotate"]
+        before = {"auth_state": "TRANSIENT_ERROR", "hours_remaining": 12.0, "valid": False}
+        self.assertFalse(should_rotate(before))
+
+    def test_explicit_auth_rejection_authorizes_mint(self):
+        should_rotate = self.ns["_should_rotate"]
+        before = {"auth_state": "AUTH_INVALID", "hours_remaining": 12.0, "valid": False}
+        self.assertTrue(should_rotate(before))
+
+    def test_proven_near_expiry_authorizes_rotation_even_when_profile_probe_is_transient(self):
+        should_rotate = self.ns["_should_rotate"]
+        before = {"auth_state": "TRANSIENT_ERROR", "hours_remaining": 1.0, "valid": False}
+        self.assertTrue(should_rotate(before))
+
+    def test_config_error_without_expiry_cannot_mint(self):
+        should_rotate = self.ns["_should_rotate"]
+        before = {"auth_state": "CONFIG_ERROR", "hours_remaining": None, "valid": False}
+        self.assertFalse(should_rotate(before))
+
+    def test_transient_non_rotation_is_visible_failure_not_false_green(self):
+        status, rc = self.ns["_non_rotation_status"](
+            {"auth_state": "TRANSIENT_ERROR"}, "SKIPPED_TOKEN_HEALTHY"
+        )
+        self.assertEqual(status, "BLOCKED_TRANSIENT_PROFILE_ERROR")
+        self.assertEqual(rc, 2)
+
+    def test_exception_classification_is_conservative(self):
+        self.assertIn("PROFILE_TRANSIENT_ERROR", self.job)
+        self.assertIn("PROFILE_AUTH_INVALID if auth_invalid else PROFILE_TRANSIENT_ERROR", self.job)
+        self.assertIn("status_code == 401", self.job)
+        self.assertIn('"transient_errors_authorize_mint": False', self.job)
+        self.assertIn("BLOCKED_STAGGER_REVALIDATION_ERROR", self.job)
+        self.assertIn("BLOCKED_MINT_NOT_AUTHORIZED", self.job)
+
+    def test_generated_token_is_validated_once_before_persistence(self):
+        self.assertEqual(self.job.count("generated_check = _profile_probe(client_id, new_token)"), 1)
+        persist_index = self.job.index("new_version = _persist_authoritative_token(new_token)")
+        generated_index = self.job.index("generated_check = _profile_probe(client_id, new_token)")
+        self.assertLess(generated_index, persist_index)
+        self.assertIn('"post_persist_profile_reprobe_performed": False', self.job)
+
+
 if __name__ == "__main__":
     unittest.main()
