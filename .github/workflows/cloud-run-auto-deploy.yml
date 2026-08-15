@@ -124,7 +124,6 @@ jobs:
           forbidden_rotator_exec = "gcloud run jobs execute " + '"${DHAN_ROTATION_JOB}"'
           assert forbidden_rotator_step not in workflow
           assert forbidden_rotator_exec not in workflow
-          # Also reject any executable shell line that runs the rotator job.
           rotator_exec_lines = [
               line.strip()
               for line in workflow.splitlines()
@@ -135,9 +134,6 @@ jobs:
           assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
           assert 'os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
 
-          # Construct forbidden Secret Manager role fragments so the guard does
-          # not match its own source. Scan executable/non-comment lines only;
-          # any real role grant remains a hard failure.
           secret_accessor_marker = "secret" + "Accessor"
           secret_version_adder_marker = "secretVersion" + "Adder"
           secret_role_hits = [
@@ -165,14 +161,18 @@ jobs:
           assert '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")' in deployer
           assert "--remove-secrets=API_KEY" in deployer
           assert "WORKER_PUSH_TOKEN_SECRET_ID" in deployer
+          for stale in ("DHAN_APP_ID", "DHAN_APP_SECRET", "DHAN_ACCESS_TOKEN", "DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP", "dhan-access-token"):
+              assert stale in deployer, f"missing canonical web secret scrub marker {stale}"
+          assert "system3-dhan-client-id:latest" in deployer
+          assert "WORKER_SECRET_VALIDATION_DEFERRED_TO_ZERO_TRAFFIC_CANDIDATE" in deployer
+          assert "gcloud secrets describe" not in workflow
           print("STATIC_GATES_OK", sorted(required))
           PY
 
-      - name: Verify worker Secret Manager secret exists
+      - name: Validate worker secret contract without deployer metadata access
         run: |
-          gcloud secrets describe "${WORKER_PUSH_TOKEN_SECRET_ID}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" >/dev/null \
-            || { echo "Required worker secret '${WORKER_PUSH_TOKEN_SECRET_ID}' does not exist." >&2; exit 1; }
+          test -n "${WORKER_PUSH_TOKEN_SECRET_ID}"
+          echo "Worker secret existence/access is validated by zero-traffic Cloud Run candidate readiness; deployer performs no Secret Manager metadata read."
 
       - name: Ensure required Firestore IAM for web runtime
         run: python scripts/gcp_runtime_iam_preflight.py
@@ -184,10 +184,11 @@ jobs:
           npm run build
           grep -R -q "SYSTEM3" dist/assets
 
-      - name: Install deploy dependencies
+      - name: Install deploy dependencies and test canonical secret convergence
         run: |
           python -m pip install --upgrade pip
           python -m pip install "google-auth>=2.28.0" "requests>=2.31.0"
+          python -m unittest -q tests.test_gcp_retired_dashboard_secret_scrub
 
       - name: Verify required Google Cloud APIs are available
         run: |
@@ -375,7 +376,6 @@ jobs:
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > /tmp/scheduler-health.json
-          # Coverage must match SSOT-derived expected_* fields (never hardcode lane counts again).
           jq -e '
             .coverage.contract_matched == true
             and .coverage.total == .coverage.expected_total
