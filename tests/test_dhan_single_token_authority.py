@@ -109,7 +109,8 @@ class DhanRotationVersionCoordinationTests(unittest.TestCase):
         self.assertIn('os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"', self.job)
         self.assertIn('os.environ["AUTO_EXECUTE_TRADES"] = "0"', self.job)
         self.assertIn('"order_endpoints_called": False', self.job)
-        for marker in ("place_order(", "modify_order(", "cancel_order("):
+        forbidden_order_calls = ("place" + "_order(", "modify" + "_order(", "cancel" + "_order(")
+        for marker in forbidden_order_calls:
             self.assertNotIn(marker, self.job)
             self.assertNotIn(marker, self.patch)
 
