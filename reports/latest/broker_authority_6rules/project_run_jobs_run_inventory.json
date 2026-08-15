@@ -1,0 +1,150 @@
+{
+  "as_of_utc": "2026-08-15T12:42:59.816719+00:00",
+  "project": "system3-openalgo-safe",
+  "job": "genesis-system3-dhan-token-rotate",
+  "roles_of_interest": [
+    "roles/editor",
+    "roles/owner",
+    "roles/run.admin",
+    "roles/run.developer",
+    "roles/run.invoker",
+    "roles/run.jobsExecutor",
+    "roles/run.jobsExecutorWithOverrides"
+  ],
+  "custom_roles_with_run_jobs_run": [],
+  "project_bindings": [
+    {
+      "source": "project",
+      "role": "roles/editor",
+      "members": [
+        "serviceAccount:802404398783-compute@developer.gserviceaccount.com",
+        "serviceAccount:802404398783@cloudservices.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "source": "project",
+      "role": "roles/owner",
+      "members": [
+        "user:warghade2012@gmail.com"
+      ],
+      "condition": null
+    },
+    {
+      "source": "project",
+      "role": "roles/run.admin",
+      "members": [
+        "serviceAccount:claude-system3-executor@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "source": "project",
+      "role": "roles/run.developer",
+      "members": [
+        "serviceAccount:cloud-run-job-sa@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:gs3-ops-controller@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:gs3-rollback@system3-openalgo-safe.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "source": "project",
+      "role": "roles/run.invoker",
+      "members": [
+        "serviceAccount:cloud-run-job-sa@system3-openalgo-safe.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    }
+  ],
+  "job_bindings": [
+    {
+      "source": "resource:cloud_run_job",
+      "resource": "genesis-system3-dhan-token-rotate",
+      "role": "projects/system3-openalgo-safe/roles/system3RunJobIamBinder",
+      "members": [
+        "serviceAccount:github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com"
+      ]
+    },
+    {
+      "source": "resource:cloud_run_job",
+      "resource": "genesis-system3-dhan-token-rotate",
+      "role": "roles/run.invoker",
+      "members": [
+        "serviceAccount:gs3-ops-controller@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com"
+      ]
+    }
+  ],
+  "intended": {
+    "scheduler_invoker": "serviceAccount:gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+    "manual_recovery_invoker": "serviceAccount:gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+    "web_must_not_invoke": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+    "default_compute_should_not_invoke": "serviceAccount:802404398783-compute@developer.gserviceaccount.com"
+  },
+  "checks": {
+    "web_invoker_absent": true,
+    "default_compute_invoker_absent": true,
+    "scheduler_invoker_present": true,
+    "recovery_invoker_present": true
+  },
+  "remaining_project_principals_with_run_jobs_run_capability": [
+    {
+      "member": "serviceAccount:802404398783-compute@developer.gserviceaccount.com",
+      "role": "roles/editor",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:802404398783@cloudservices.gserviceaccount.com",
+      "role": "roles/editor",
+      "source": "project"
+    },
+    {
+      "member": "user:warghade2012@gmail.com",
+      "role": "roles/owner",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:claude-system3-executor@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.admin",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.admin",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:cloud-run-job-sa@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.developer",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.developer",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:gs3-ops-controller@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.developer",
+      "source": "project"
+    },
+    {
+      "member": "serviceAccount:gs3-rollback@system3-openalgo-safe.iam.gserviceaccount.com",
+      "role": "roles/run.developer",
+      "source": "project"
+    }
+  ],
+  "rule1_verdict": "PARTIAL",
+  "least_privilege_remediation_plan": [
+    "Keep job-level run.invoker for gs3-scheduler and gs3-token-recovery only.",
+    "Do not remove project roles/run.admin from genesis-system3-automation until deploy no longer needs job deploy/IAM bind; replace with least-privilege custom role excluding run.jobs.run if deploy execute is retired.",
+    "Replace default compute roles/editor with workload-specific roles before claiming Rule-1 PASS.",
+    "Shrink gs3-ops-controller and github-actions-deploy run.developer if unused for rotator execute.",
+    "Re-run this inventory after each IAM change; do not blind-delete project roles."
+  ],
+  "inherited_org_folder_note": "Org/folder IAM not queried in this pass; re-check with asset inventory if Rule-1 remains PARTIAL after project scrub."
+}

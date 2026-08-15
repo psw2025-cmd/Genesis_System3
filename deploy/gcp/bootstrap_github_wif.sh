@@ -18,6 +18,7 @@ WEB_RUNTIME_SA_NAME="${WEB_RUNTIME_SA_NAME:-genesis-system3-web}"
 ROTATOR_SA_NAME="${ROTATOR_SA_NAME:-genesis-system3-dhan-rotator}"
 # GCP service-account IDs are capped at 30 characters; keep this short.
 SCHEDULER_SA_NAME="${SCHEDULER_SA_NAME:-gs3-scheduler}"
+RECOVERY_SA_NAME="${RECOVERY_SA_NAME:-gs3-token-recovery}"
 COLLECTOR_SA_NAME="${COLLECTOR_SA_NAME:-gs3-scheduler-collector}"
 RANK_SA_NAME="${RANK_SA_NAME:-gs3-rank-job}"
 FORECAST_SA_NAME="${FORECAST_SA_NAME:-gs3-forecast-job}"
@@ -51,6 +52,7 @@ BUILDER_SA="${BUILDER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 WEB_RUNTIME_SA="${WEB_RUNTIME_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 ROTATOR_SA="${ROTATOR_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 SCHEDULER_SA="${SCHEDULER_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+RECOVERY_SA="${RECOVERY_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 COLLECTOR_SA="${COLLECTOR_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 RANK_SA="${RANK_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 FORECAST_SA="${FORECAST_SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -85,6 +87,7 @@ for SPEC in \
   "$WEB_RUNTIME_SA_NAME|Genesis System3 web runtime" \
   "$ROTATOR_SA_NAME|Genesis System3 Dhan token rotator" \
   "$SCHEDULER_SA_NAME|Genesis System3 scheduler invoker" \
+  "$RECOVERY_SA_NAME|Genesis System3 Dhan token manual recovery" \
   "$COLLECTOR_SA_NAME|Genesis System3 scheduler evidence collector" \
   "$RANK_SA_NAME|Genesis System3 bounded rank job" \
   "$FORECAST_SA_NAME|Genesis System3 bounded forecast job" \
@@ -96,7 +99,7 @@ for SPEC in \
 done
 
 PRINCIPAL_SET="principalSet://iam.googleapis.com/${POOL_NAME}/attribute.repository_id/${GITHUB_REPOSITORY_ID}"
-for SA in "$DEPLOY_SA" "$EVIDENCE_SA"; do
+for SA in "$DEPLOY_SA" "$EVIDENCE_SA" "$RECOVERY_SA"; do
   gcloud iam service-accounts add-iam-policy-binding "$SA" \
     --project="$PROJECT_ID" --member="$PRINCIPAL_SET" \
     --role="roles/iam.workloadIdentityUser" >/dev/null
@@ -126,7 +129,7 @@ if exists_sa "$BUILDER_SA"; then
     --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
     --role="roles/iam.serviceAccountUser" >/dev/null
 fi
-for SA in "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA" "$COLLECTOR_SA" "$RANK_SA" "$FORECAST_SA" "$SIGNALS_SA"; do
+for SA in "$WEB_RUNTIME_SA" "$ROTATOR_SA" "$SCHEDULER_SA" "$RECOVERY_SA" "$COLLECTOR_SA" "$RANK_SA" "$FORECAST_SA" "$SIGNALS_SA"; do
   gcloud iam service-accounts add-iam-policy-binding "$SA" \
     --project="$PROJECT_ID" --member="serviceAccount:${DEPLOY_SA}" \
     --role="roles/iam.serviceAccountUser" >/dev/null

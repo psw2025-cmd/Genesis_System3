@@ -144,14 +144,54 @@ jobs:
 
           RUNTIME_SA=$(jq -r '.spec.template.spec.serviceAccountName // ""' /tmp/service.json)
           test -n "${RUNTIME_SA}"
+          SCHEDULER_SA="gs3-scheduler@${PROJECT_ID}.iam.gserviceaccount.com"
+          RECOVERY_SA="gs3-token-recovery@${PROJECT_ID}.iam.gserviceaccount.com"
           gcloud run jobs get-iam-policy "${ROTATION_JOB}" \
             --project="${PROJECT_ID}" \
             --region="${REGION}" \
             --format=json > /tmp/rotation-job-iam.json
-          jq -e --arg member "serviceAccount:${RUNTIME_SA}" \
+
+          # Negative: web runtime must NOT invoke the Dhan rotator.
+          if jq -e --arg member "serviceAccount:${RUNTIME_SA}" \
+            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
+            /tmp/rotation-job-iam.json >/dev/null; then
+            echo "WEB_RUNTIME_CAN_INVOKE_DHAN_ROTATOR=true service_account=${RUNTIME_SA}" >&2
+            exit 1
+          fi
+          echo "WEB_RUNTIME_CANNOT_INVOKE_DHAN_ROTATOR service_account=${RUNTIME_SA}"
+
+          jq -e --arg member "serviceAccount:${SCHEDULER_SA}" \
             '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
             /tmp/rotation-job-iam.json >/dev/null
-          echo "RUNTIME_CAN_INVOKE_CANONICAL_ROTATION_JOB service_account=${RUNTIME_SA}"
+          echo "SCHEDULER_CAN_INVOKE_DHAN_ROTATOR service_account=${SCHEDULER_SA}"
+
+          jq -e --arg member "serviceAccount:${RECOVERY_SA}" \
+            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
+            /tmp/rotation-job-iam.json >/dev/null
+          echo "MANUAL_RECOVERY_IDENTITY_CAN_INVOKE_DHAN_ROTATOR service_account=${RECOVERY_SA}"
+
+          # Negative effective-permission probe for web identity (IAM policy truth).
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          project = os.environ["PROJECT_ID"]
+          policy = json.loads(Path("/tmp/rotation-job-iam.json").read_text(encoding="utf-8"))
+          svc = json.loads(Path("/tmp/service.json").read_text(encoding="utf-8"))
+          runtime = (
+              ((svc.get("spec") or {}).get("template") or {}).get("spec") or {}
+          ).get("serviceAccountName") or ""
+          members = set()
+          for binding in policy.get("bindings") or []:
+              if binding.get("role") == "roles/run.invoker":
+                  members.update(binding.get("members") or [])
+          web_member = f"serviceAccount:{runtime}"
+          assert web_member not in members, f"web still has run.invoker: {web_member}"
+          assert f"serviceAccount:gs3-scheduler@{project}.iam.gserviceaccount.com" in members
+          assert f"serviceAccount:gs3-token-recovery@{project}.iam.gserviceaccount.com" in members
+          print("NEGATIVE_EFFECTIVE_PERMISSION_TEST_WEB_RUNTIME_PASS")
+          PY
 
       - name: Classify broker runtime truth without production mutation
         run: |
