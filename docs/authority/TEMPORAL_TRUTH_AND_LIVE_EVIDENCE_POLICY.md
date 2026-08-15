@@ -17,16 +17,34 @@ For any claim containing or implying **now, current, present, live, still, curre
 For UI-facing production truth, the only acceptable sequence is:
 
 1. Record investigation/request start time in UTC.
-2. Open the authoritative GCP production URL in a **new Chrome/WebDriver browser session**.
-3. Capture the relevant live tab(s) after the request/investigation start time.
-4. Capture visible page text and a timestamped screenshot.
-5. Capture the relevant read-only production APIs during the same proof session.
-6. Compare UI-visible state with backend/API state and identify contradictions.
-7. Record capture start/end UTC, source URL, tab, GitHub run ID/attempt/SHA when applicable, and safety state.
-8. Report the evidence time to the user/agent. Never hide evidence age.
-9. If a fix is made, the previous capture becomes historical. Run a **new** production browser proof before claiming the fix is visible/live.
+2. If the investigation follows a deploy-triggering change, first prove the authoritative production service is serving the exact intended GitHub SHA.
+3. Open the authoritative GCP production URL in a **new Chrome/WebDriver browser session**.
+4. Capture the relevant live tab(s) after the request/investigation start time and after serving-SHA convergence.
+5. Capture visible page text and a timestamped screenshot.
+6. Capture the relevant read-only production APIs during the same proof session.
+7. Compare UI-visible state with backend/API state and identify contradictions.
+8. Re-check serving SHA at the end of capture; it must still match the intended SHA.
+9. Record capture start/end UTC, source URL, tab, GitHub run ID/attempt/SHA, serving SHA/revision when applicable, and safety state.
+10. Report the evidence time to the user/agent. Never hide evidence age.
+11. If a fix is made, the previous capture becomes historical. Run a **new** production browser proof before claiming the fix is visible/live.
 
 A pre-existing artifact MAY NOT satisfy a new request for `live/current/now`, even if it is the newest stored artifact.
+
+## Exact-serving-SHA lock
+
+A fresh browser session can still be wrong when it starts during a deployment race. A workflow triggered by the same `main` push as Cloud Run deployment can execute before the new revision receives production traffic.
+
+Therefore, for any post-deploy/current-main UI proof:
+
+- query the authoritative public `/api/deploy-info` endpoint before the capture;
+- compare its serving `git_sha` with the intended/current GitHub SHA;
+- wait boundedly for convergence rather than photographing the previous revision;
+- fail closed as `NOT_CURRENT_SERVING_SHA` if convergence does not occur;
+- capture only after convergence;
+- re-check the serving SHA at the end of the browser lifecycle;
+- reject the proof if the serving SHA changes or does not match at either boundary.
+
+Artifact timestamp, GitHub run SHA, or workflow start time alone does **not** prove which revision the browser actually observed.
 
 ## Full live UI lifecycle authority
 
@@ -64,13 +82,15 @@ For each tab, capture:
 - any visible loading/unknown/waiting/degraded/empty state;
 - semantic data evidence where the tab is data-bearing.
 
-The lifecycle proof must also capture broker and health APIs at the start and end of the browser session so UI/API contradictions cannot be hidden by timing.
+For required option-chain production proof, capture NIFTY, BANKNIFTY, FINNIFTY, and MIDCPNIFTY subviews separately and prove the visible symbol/source/contracts/strikes rather than assuming one default chain represents all required symbols.
+
+The lifecycle proof must also capture broker, health, live-board, and deploy-info APIs at the start and end of the browser session so UI/API/revision contradictions cannot be hidden by timing.
 
 ## Evidence classes
 
 | Class | Meaning | Can prove `live/current/now`? |
 |---|---|---|
-| `REQUEST_SCOPED_LIVE_BROWSER` | New production browser observation started after the current investigation/request began | **YES** |
+| `REQUEST_SCOPED_LIVE_BROWSER` | New production browser observation started after the current investigation/request began and, post-deploy, after exact-serving-SHA convergence | **YES** |
 | `REQUEST_SCOPED_LIVE_API` | New read-only production API observation from the same investigation/request | **YES**, for API truth only |
 | `LIVE_LOG_OBSERVATION` | New production log query scoped to the current investigation window | **YES**, for the logged fact only |
 | `DEPLOYMENT_METADATA` | Serving revision/SHA/traffic queried during current investigation | **YES**, for deployment metadata only |
@@ -82,10 +102,11 @@ The lifecycle proof must also capture broker and health APIs at the start and en
 ## Freshness rules
 
 1. **Interactive current/live request:** a new observation must start after the request/investigation start time. Age alone is insufficient.
-2. **Scheduled/automated verdict:** evidence must declare `captured_at_utc` and a bounded `max_age_seconds`; default live-proof freshness ceiling is 300 seconds at verdict time.
-3. If evidence exceeds its freshness ceiling, label it `STALE_HISTORICAL` and re-observe before a current-state verdict.
-4. If capture time is absent, freshness is `UNKNOWN`; fail closed for current/live claims.
-5. If clocks/timestamps contradict, fail closed and refresh from authoritative live sources.
+2. **Post-deploy current/live request:** capture must additionally begin after exact serving-SHA convergence.
+3. **Scheduled/automated verdict:** evidence must declare `captured_at_utc` and a bounded `max_age_seconds`; default live-proof freshness ceiling is 300 seconds at verdict time.
+4. If evidence exceeds its freshness ceiling, label it `STALE_HISTORICAL` and re-observe before a current-state verdict.
+5. If capture time is absent, freshness is `UNKNOWN`; fail closed for current/live claims.
+6. If clocks/timestamps or serving-SHA boundaries contradict, fail closed and refresh from authoritative live sources.
 
 ## Forbidden shortcuts
 
@@ -94,12 +115,14 @@ Agents/workflows MUST NOT:
 - equate the directory name `latest` with current truth;
 - use artifact creation time as proof that the underlying runtime is still in that state;
 - reuse an earlier screenshot to answer a later `show me now` request;
+- assume the GitHub run SHA equals the revision currently serving the browser;
+- accept a same-push screenshot taken before Cloud Run serving-SHA convergence;
 - call a localhost/Vite browser smoke production proof;
 - call a successful CI/deploy job proof that live market data is populated;
 - call HTTP 200 proof that a data-bearing UI is semantically healthy;
 - infer current broker connectivity from a token expiry timestamp;
 - infer current UI state from source code or backend JSON alone;
-- hide `captured_at_utc`, evidence age, or source type when making current-state claims.
+- hide `captured_at_utc`, evidence age, serving SHA, or source type when making current-state claims.
 
 ## Historical evidence use
 
@@ -119,6 +142,8 @@ Every agent entry point (`AGENTS.md`, `GEMINI.md`, `.cursorrules`, `.github/CLAU
 
 When two agents disagree about current runtime/UI state, neither old artifact wins. Generate a new request-scoped live observation and use that as the arbiter.
 
+After a deploy-triggering change, agents must additionally arbitrate against exact serving-SHA truth. A fresh screenshot from the wrong serving revision is not current proof.
+
 ## Safety
 
 Live evidence collection is read-only:
@@ -134,4 +159,4 @@ Live evidence collection is read-only:
 
 `scripts/system3_temporal_truth_guard.py` defines the machine-evaluable freshness contract. `tests/test_temporal_truth_contract.py` locks this policy into agent instructions and the live browser workflow.
 
-The production browser proof script must emit request/run-scoped timestamps and evidence classification. Consumers must validate those timestamps before using stored evidence for time-sensitive claims.
+`scripts/gcp_live_ui_snapshot.py` must wait for exact expected serving-SHA convergence, emit request/run-scoped timestamps and serving-SHA boundaries, capture the full production UI lifecycle, and fail closed if revision identity is not stable. Consumers must validate timestamps and serving identity before using stored evidence for time-sensitive claims.
