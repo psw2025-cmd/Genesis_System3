@@ -58,9 +58,12 @@ jobs:
           python -m py_compile scripts/gcp_live_ui_snapshot.py
           python -m py_compile scripts/system3_temporal_truth_guard.py
 
-      - name: Enforce temporal truth and cross-agent evidence contract
+      - name: Enforce temporal truth and live UI remediation contracts
         shell: bash
-        run: python -m unittest tests.test_temporal_truth_contract
+        run: |
+          python -m unittest \
+            tests.test_temporal_truth_contract \
+            tests.test_live_ui_truth_remediation_contract
 
       - name: Prove all canonical tabs render in local Chrome
         shell: bash

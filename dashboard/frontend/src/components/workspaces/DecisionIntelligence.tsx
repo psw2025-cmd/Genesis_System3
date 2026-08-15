@@ -32,6 +32,7 @@ export const DecisionIntelligence: React.FC = () => {
   const signal = String(state?.signals?.status || state?.signals?.reason || 'No signal generated')
   const sha = shortSha(deployInfo?.git_sha)
   const pnlTone = Number(unrealized) < 0 ? 'error' : Number(unrealized) > 0 ? 'ok' : 'mut'
+  const runtimeBlockers = Array.isArray(health?.blockers) ? health.blockers : []
 
   const sectionStyle: React.CSSProperties = {
     display: 'flex',
@@ -124,18 +125,21 @@ export const DecisionIntelligence: React.FC = () => {
             </div>
           </div>
 
-          <div className="card" style={{ padding: '16px', background: 'rgba(255, 77, 106, 0.03)' }}>
+          <div className="card" style={{ padding: '16px', background: runtimeBlockers.length ? 'rgba(255, 77, 106, 0.03)' : 'rgba(16,185,129,.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <AlertTriangle size={16} color="var(--down)" aria-hidden />
-              <span style={{ fontWeight: 600, color: 'var(--down)' }}>Critical Blockers</span>
+              <AlertTriangle size={16} color={runtimeBlockers.length ? 'var(--down)' : 'var(--up)'} aria-hidden />
+              <span style={{ fontWeight: 600, color: runtimeBlockers.length ? 'var(--down)' : 'var(--up)' }}>Runtime Connectivity Blockers</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-sec)' }}>
-              {health?.blockers?.length > 0 ? (
+              {runtimeBlockers.length > 0 ? (
                 <ul style={{ margin: 0, paddingLeft: '16px' }}>
-                  {health.blockers.map((b: any, i: number) => <li key={i}>{b}</li>)}
+                  {runtimeBlockers.map((b: any, i: number) => <li key={i}>{b}</li>)}
                 </ul>
               ) : (
-                <div style={{ color: 'var(--up)', fontWeight: 600 }}>✓ NO SYSTEM BLOCKERS</div>
+                <div>
+                  <div style={{ color: 'var(--up)', fontWeight: 600 }}>✓ NO RUNTIME CONNECTIVITY BLOCKERS</div>
+                  <div style={{ color: 'var(--text-mut)', marginTop: 6, lineHeight: 1.45 }}>This does not mean model maturity, E2E evidence, human approval, or live-money gates are complete. See E2E Proof and Live Gate for those independent blockers.</div>
+                </div>
               )}
             </div>
           </div>

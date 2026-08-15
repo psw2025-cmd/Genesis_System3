@@ -20,17 +20,18 @@ function Clock() {
   return <span className="num" style={{ color: 'var(--text-sec)', fontSize: 11 }}>{time} IST</span>
 }
 
-function MarketTicker({ label, spot, chg, marketOpen }: { label: string; spot?: number; chg?: number | null; marketOpen: boolean }) {
+function MarketTicker({ label, spot, chg, marketOpen, missingLabel }: { label: string; spot?: number; chg?: number | null; marketOpen: boolean; missingLabel?: string }) {
   const up = (chg ?? 0) >= 0
   const missing = !spot
+  const missingText = missingLabel || (marketOpen ? 'Warming' : 'After hours')
   return (
-    <div className="hide-phone" style={{ minWidth: 88, padding: '0 10px', borderLeft: '1px solid var(--border)' }}>
+    <div className="hide-phone" style={{ minWidth: 88, padding: '0 10px', borderLeft: '1px solid var(--border)' }} title={missing ? missingText : undefined}>
       <div style={{ fontSize: 10, color: 'var(--text-mut)', letterSpacing: '0.02em' }}>{label}</div>
       <div className="num" style={{ marginTop: 2, fontSize: 13, lineHeight: 1.1, fontWeight: 700, color: 'var(--text-pri)' }}>
         {missing ? '—' : fmt(spot, 2)}
       </div>
-      <div className="num" style={{ marginTop: 2, fontSize: 10, color: missing ? 'var(--text-mut)' : chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
-        {missing ? (marketOpen ? 'Warming' : 'After hours') : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
+      <div className="num" style={{ marginTop: 2, fontSize: 10, color: missing ? 'var(--amber)' : chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
+        {missing ? missingText : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
       </div>
     </div>
   )
@@ -55,9 +56,9 @@ export function TopBar() {
   const boardSpot = (symbol: string) => {
     const row = (liveBoard?.indices || []).find((item: any) => String(item?.symbol || '').toUpperCase() === symbol)
     if (Number(row?.ltp) > 0) {
-      return { spot: Number(row.ltp), chg: row?.change_pct == null ? null : Number(row.change_pct) }
+      return { spot: Number(row.ltp), chg: row?.change_pct == null ? null : Number(row.change_pct), rowFound: true }
     }
-    return { spot: undefined as number | undefined, chg: null as number | null }
+    return { spot: undefined as number | undefined, chg: null as number | null, rowFound: Boolean(row) }
   }
 
   const getSpot = (symbol: string) => {
@@ -66,13 +67,13 @@ export function TopBar() {
     const row = chain?.[symbol]
     if (Number(row?.spot) > 0) {
       const rawChange = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
-      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange) }
+      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange), rowFound: fromBoard.rowFound }
     }
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
     const match = rankings.find((item: any) => String(item?.underlying ?? '').toUpperCase() === symbol)
     return Number(match?.spot_price) > 0
-      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct) }
-      : { spot: undefined, chg: null }
+      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct), rowFound: fromBoard.rowFound }
+      : { spot: undefined, chg: null, rowFound: fromBoard.rowFound }
   }
 
   const nifty = getSpot('NIFTY')
@@ -81,6 +82,15 @@ export function TopBar() {
   const vix = getSpot('INDIAVIX')
   const mid = getSpot('MIDCPNIFTY')
   const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
+  const vixMissingLabel = vix.spot
+    ? undefined
+    : vix.rowFound
+      ? 'Dhan no quote'
+      : liveBoardOk
+        ? 'Dhan unavailable'
+        : marketOpen
+          ? 'Feed warming'
+          : 'After-hours n/a'
   const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
@@ -154,7 +164,7 @@ export function TopBar() {
           <MarketTicker label="Nifty 50" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
           <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
           <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
-          <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} />
+          <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={vixMissingLabel} />
           <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
           <div className="hide-phone" style={{ minWidth: 54, padding: '0 8px', borderLeft: '1px solid var(--border)' }}>
             <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Board</div>

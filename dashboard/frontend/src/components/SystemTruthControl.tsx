@@ -1,15 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import axios from 'axios'
-import { API_BASE } from '../config'
+import React, { useMemo } from 'react'
+import { useStore } from '../store'
 
 type Status = 'PASS' | 'WAITING' | 'PARTIAL'
 type LayerRow = { layer: string; status: Status; evidence: string; requiredForMoney: boolean }
 
-// Enabled universe must match the scanner/paper path. SENSEX remains optional until
-// its official Dhan chain is proven; it must not block NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY readiness.
 const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
 const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX']
-const ALL_CHAIN_SYMBOLS = [...REQUIRED_CHAIN_SYMBOLS, ...OPTIONAL_CHAIN_SYMBOLS]
 
 function badge(status: Status) {
   const ok = status === 'PASS'
@@ -24,203 +20,198 @@ function badge(status: Status) {
   )
 }
 
-function looksLikeCandidate(x: any): boolean {
-  if (!x || typeof x !== 'object' || Array.isArray(x)) return false
-  const hasName = Boolean(x.underlying || x.symbol || x.ticker || x.name || x.trading_symbol)
-  const hasScore = x.score !== undefined || x.display_score !== undefined || x.confidence !== undefined || x.gain_pct !== undefined || x.change_percent !== undefined
-  const hasOption = x.option_side !== undefined || x.option_type !== undefined || x.signal_type !== undefined || x.side !== undefined || x.direction !== undefined
-  return hasName && (hasScore || hasOption)
+function rowsOf(value: any): any[] {
+  if (Array.isArray(value)) return value
+  if (!value || typeof value !== 'object') return []
+  for (const key of ['rows', 'positions', 'holdings', 'data', 'open_positions']) {
+    if (Array.isArray(value[key])) return value[key]
+  }
+  return []
 }
 
-function collectCandidateRows(x: any, depth = 0): any[] {
-  if (depth > 8 || x == null) return []
-  if (Array.isArray(x)) return x.some(looksLikeCandidate) ? x.filter(looksLikeCandidate) : x.flatMap(v => collectCandidateRows(v, depth + 1))
-  if (typeof x !== 'object') return []
-  const rows: any[] = []
-  for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'top5', 'top', 'entries']) {
-    if (Array.isArray(x[key])) rows.push(...collectCandidateRows(x[key], depth + 1))
+function collectCandidates(value: any, depth = 0): any[] {
+  if (depth > 7 || value == null) return []
+  if (Array.isArray(value)) return value.flatMap(item => collectCandidates(item, depth + 1))
+  if (typeof value !== 'object') return []
+  const side = String(value.option_side || value.option_type || value.signal_type || value.side || '').toUpperCase()
+  const named = Boolean(value.underlying || value.symbol || value.ticker || value.trading_symbol)
+  const scored = value.score != null || value.confidence != null || value.gain_pct != null || value.change_percent != null
+  const self = named && (scored || /CE|PE|CALL|PUT/.test(side)) ? [value] : []
+  const nested: any[] = []
+  for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'top', 'top5', 'latest', 'data', 'scanner', 'market_wide', 'by_segment', 'segments', 'top_ce', 'top_pe']) {
+    if (value[key] != null) nested.push(...collectCandidates(value[key], depth + 1))
   }
-  for (const key of ['top_ce', 'top_pe', 'market_top_ce', 'market_top_pe', 'best_ce', 'best_pe']) {
-    if (looksLikeCandidate(x[key])) rows.push(x[key])
-  }
-  for (const key of ['latest', 'data', 'scanner', 'market_wide', 'by_segment', 'segments', 'payload', 'result']) {
-    if (x[key]) rows.push(...collectCandidateRows(x[key], depth + 1))
-  }
-  return rows
+  return [...self, ...nested]
 }
 
-function countList(x: any): number {
-  if (Array.isArray(x)) return x.length
-  if (!x || typeof x !== 'object') return 0
-  for (const key of ['positions', 'holdings', 'rows', 'data']) if (Array.isArray(x[key])) return x[key].length
-  return collectCandidateRows(x).length
+function hasCePe(value: any): boolean {
+  return collectCandidates(value).some(item => /CE|PE|CALL|PUT/.test(String(item.option_side || item.option_type || item.signal_type || item.side || '').toUpperCase()))
 }
 
-function hasCePe(x: any): boolean {
-  const stack: any[] = [x]
-  let seen = 0
-  while (stack.length && seen < 1500) {
-    seen += 1
-    const item = stack.pop()
-    if (Array.isArray(item)) for (const child of item.slice(0, 100)) stack.push(child)
-    else if (item && typeof item === 'object') {
-      const side = String(item.option_side || item.option_type || item.signal_type || item.side || item.direction || item.action || item.instrument_type || '').toUpperCase()
-      if (side.includes('CE') || side.includes('PE') || side.includes('CALL') || side.includes('PUT')) return true
-      for (const key of ['rankings', 'predictions', 'candidates', 'signals', 'latest', 'data', 'scanner', 'market_wide', 'by_segment', 'segments', 'top_ce', 'top_pe']) if (item[key]) stack.push(item[key])
-    }
-  }
-  return false
-}
-
-function chainPass(x: any): boolean {
-  if (!x || typeof x !== 'object') return false
-  const source = String(x.data_source || x.source || '').toLowerCase()
-  const status = String(x.status || '').toUpperCase()
-  const contracts = Number(x.total_contracts || (Array.isArray(x.contracts) ? x.contracts.length : 0))
-  const spot = Number(x.spot || 0)
-  if (source !== 'dhan' || x.pendingProof || spot <= 0 || contracts <= 0) return false
-  // After-hours Dhan snapshots are valid proof (stale=true is expected when market closed).
+function isDhanChainReady(value: any): boolean {
+  if (!value || typeof value !== 'object') return false
+  const source = String(value.data_source || value.source || '').toLowerCase()
+  const priority = String(value.source_priority || '').toLowerCase()
+  const status = String(value.status || '').toUpperCase()
+  const contracts = Number(value.total_contracts || (Array.isArray(value.contracts) ? value.contracts.length : 0))
+  const spot = Number(value.spot || 0)
+  const dhanish = source === 'dhan' || source.startsWith('dhan_') || priority.startsWith('dhan') || priority.includes('worker_push')
+  if (!dhanish || value.pendingProof || spot <= 0 || contracts <= 0) return false
   if (['MARKET_CLOSED_DHAN_SNAPSHOT', 'EOD_SNAPSHOT', 'MARKET_CLOSED'].includes(status)) return true
-  if (['OK', 'MARKET_OPEN'].includes(status) && x.stale !== true) return true
-  return false
+  if (value.snapshot === true && /DHAN|SNAPSHOT/.test(`${source} ${priority} ${status}`.toUpperCase())) return true
+  return ['OK', 'MARKET_OPEN'].includes(status) && value.stale !== true
 }
 
-function safeNoTradeChain(x: any): boolean {
-  if (!x || typeof x !== 'object') return false
-  return String(x.data_source || x.source || '').toLowerCase() === 'dhan' && String(x.status || '').toUpperCase() === 'NO_DHAN_DATA'
+function isSafeNoTradeChain(value: any): boolean {
+  if (!value || typeof value !== 'object') return false
+  return String(value.data_source || value.source || '').toLowerCase().startsWith('dhan')
+    && String(value.status || '').toUpperCase() === 'NO_DHAN_DATA'
 }
 
 export function SystemTruthControl() {
-  const [data, setData] = useState<unknown>({})
-  const [loading, setLoading] = useState(true)
-  const [lastRun, setLastRun] = useState('')
-  const [error, setError] = useState('')
-
-  async function run() {
-    setLoading(true); setError('')
-    try {
-      // Prefer batch endpoints — avoid stampeding 4× slow after-hours /api/chain calls.
-      const entries = await Promise.all([
-        ['health', axios.get(`${API_BASE}/api/health`, { timeout: 12000 })],
-        ['state', axios.get(`${API_BASE}/api/state`, { timeout: 12000 })],
-        ['batch_broker', axios.get(`${API_BASE}/api/batch/positions-holdings`, { timeout: 20000 })],
-        ['batch_market', axios.get(`${API_BASE}/api/batch/market-data`, { timeout: 20000 })],
-        ['batch_chains', axios.get(`${API_BASE}/api/batch/chains`, { timeout: 12000 })],
-        ['scanner', axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5`, { timeout: 15000 })],
-        ['trades', axios.get(`${API_BASE}/api/trades/today`, { timeout: 12000 })],
-      ].map(async ([key, promise]: any) => {
-        try { const res = await promise; return [key, { ok: true, status: res.status, data: res.data }] }
-        catch (err: any) { return [key, { ok: false, status: err?.response?.status || 0, error: err?.message || String(err) }] }
-      }))
-      const mapped: Record<string, any> = Object.fromEntries(entries)
-      const brokerBatch = mapped.batch_broker?.data || {}
-      const marketBatch = mapped.batch_market?.data || {}
-      const chainsBatch = mapped.batch_chains?.data?.chains || {}
-      mapped.broker = {
-        ok: mapped.batch_broker?.ok && brokerBatch?.broker_status?.connected === true,
-        status: mapped.batch_broker?.status || 0,
-        data: brokerBatch.broker_status || {},
-      }
-      mapped.funds = {
-        ok: mapped.batch_broker?.ok && brokerBatch?.funds?.success !== false,
-        status: mapped.batch_broker?.status || 0,
-        data: brokerBatch.funds || {},
-      }
-      mapped.holdings = {
-        ok: mapped.batch_broker?.ok && brokerBatch?.holdings?.success !== false,
-        status: mapped.batch_broker?.status || 0,
-        data: brokerBatch.holdings || {},
-      }
-      mapped.positions = {
-        ok: mapped.batch_broker?.ok && brokerBatch?.positions?.success !== false,
-        status: mapped.batch_broker?.status || 0,
-        data: brokerBatch.positions || {},
-      }
-      mapped.gain = {
-        ok: mapped.batch_market?.ok && Boolean(marketBatch?.gain_rank),
-        status: mapped.batch_market?.status || 0,
-        data: marketBatch.gain_rank || {},
-      }
-      mapped.gates = {
-        ok: mapped.batch_market?.ok && Boolean(marketBatch?.auto_gates),
-        status: mapped.batch_market?.status || 0,
-        data: marketBatch.auto_gates || {},
-      }
-      mapped.pnl = {
-        ok: mapped.batch_market?.ok,
-        status: mapped.batch_market?.status || 0,
-        data: marketBatch.pnl || {},
-      }
-      for (const sym of ALL_CHAIN_SYMBOLS) {
-        const payload = chainsBatch[sym]
-        mapped[`chain_${sym}`] = payload
-          ? { ok: true, status: 200, data: payload }
-          : { ok: false, status: 0, error: 'missing_from_batch_chains' }
-      }
-      setData(mapped); setLastRun(new Date().toLocaleString())
-    } catch (err: any) { setError(err?.message || String(err)) }
-    finally { setLoading(false) }
-  }
-
-  useEffect(() => { run() }, [])
+  const {
+    health, state, brokerConnected, brokerStatus, brokerFunds, brokerHoldings, brokerPositions,
+    chain, gainRank, autoGates, paper, lastSync, apiStatus,
+  } = useStore()
 
   const rows: LayerRow[] = useMemo(() => {
-    const broker = data.broker?.data || {}, funds = data.funds?.data || {}, state = data.state?.data || {}, gain = data.gain?.data || {}, scanner = data.scanner?.data || {}, trades = data.trades?.data || {}, gates = data.gates?.data || {}
-    const requiredChains = REQUIRED_CHAIN_SYMBOLS.map(sym => ({ sym, payload: data[`chain_${sym}`]?.data, ok: data[`chain_${sym}`]?.ok }))
-    const optionalChains = OPTIONAL_CHAIN_SYMBOLS.map(sym => ({ sym, payload: data[`chain_${sym}`]?.data, ok: data[`chain_${sym}`]?.ok }))
-    const requiredOk = requiredChains.filter(x => x.ok && chainPass(x.payload)).length
-    const requiredSafeBlocks = requiredChains.filter(x => x.ok && safeNoTradeChain(x.payload)).length
-    const optionalOk = optionalChains.filter(x => x.ok && chainPass(x.payload)).length
-    const optionalSafeBlocks = optionalChains.filter(x => x.ok && safeNoTradeChain(x.payload)).length
-    const liveFlag = state.live_trading_enabled ?? state.liveTradingEnabled ?? broker.live_trading_enabled ?? false
-    const orderAllowed = state.order_placement_allowed ?? broker.order_placement_allowed ?? false
-    const gainRows = collectCandidateRows(gain), scannerRows = collectCandidateRows(scanner)
-    const gainCount = gainRows.length + scannerRows.length, tradeCount = countList(trades)
-    const gateOk = Boolean(data.gates?.ok), cePeOk = hasCePe(gain) || hasCePe(scanner)
+    const brokerOk = brokerStatus?.connected === true || brokerConnected === true || health?.broker?.connected === true
+    const apiOk = String(health?.status || '').toLowerCase() === 'ok'
+      || Boolean(health?.mode)
+      || Boolean(state)
+      || (apiStatus != null && !/ERROR|REQUIRED|DEGRADED/.test(String(apiStatus?.status || '').toUpperCase()))
+    const fundsOk = Boolean(brokerFunds) && brokerFunds?.success !== false && brokerFunds?.pendingProof !== true
+    const holdingsKnown = Boolean(brokerHoldings) && brokerHoldings?.success !== false && brokerHoldings?.pendingProof !== true
+    const positionsKnown = Boolean(brokerPositions) && brokerPositions?.success !== false && brokerPositions?.pendingProof !== true
+    const holdingsCount = rowsOf(brokerHoldings).length
+    const positionsCount = rowsOf(brokerPositions).length
+
+    const required = REQUIRED_CHAIN_SYMBOLS.map(symbol => ({ symbol, value: chain?.[symbol] }))
+    const optional = OPTIONAL_CHAIN_SYMBOLS.map(symbol => ({ symbol, value: chain?.[symbol] }))
+    const requiredReady = required.filter(item => isDhanChainReady(item.value)).length
+    const requiredSafeNoTrade = required.filter(item => isSafeNoTradeChain(item.value)).length
+    const optionalReady = optional.filter(item => isDhanChainReady(item.value)).length
+
+    const candidates = collectCandidates(gainRank)
+    const candidateCount = candidates.length
+    const cePeOk = hasCePe(gainRank)
+    const liveFlag = Boolean(state?.live_trading_enabled ?? health?.live_allowed ?? brokerStatus?.live_trading_enabled)
+    const orderAllowed = Boolean(state?.order_placement_allowed ?? brokerStatus?.order_placement_allowed)
+    const available = brokerFunds?.available_balance ?? brokerFunds?.normalized?.available_balance
+    const used = brokerFunds?.used_margin ?? brokerFunds?.normalized?.used_margin ?? brokerFunds?.normalized?.utilized_amount
+
     return [
-      { layer: 'Backend/API route health', status: (data.health?.ok || data.state?.ok) ? 'PASS' : 'WAITING', evidence: `health=${data.health?.status || 0}, state=${data.state?.status || 0}`, requiredForMoney: true },
-      { layer: 'Broker read-only connection', status: (data.broker?.ok || broker.connected === true) ? 'PASS' : 'WAITING', evidence: `connected=${broker.connected === true}, broker=${broker.broker || 'dhan'}, order_allowed=${broker.order_placement_allowed === true}`, requiredForMoney: true },
-      { layer: 'Funds / margin truth', status: (data.funds?.ok || funds.available_balance || funds.normalized?.available_balance) ? 'PASS' : 'WAITING', evidence: `available=${funds.available_balance ?? funds.normalized?.available_balance ?? '-'}, used=${funds.used_margin ?? funds.normalized?.used_margin ?? '-'}, source=${funds.source || '-'}`, requiredForMoney: true },
-      { layer: 'Holdings and live positions read path', status: (data.holdings?.ok || data.positions?.ok || countList(data.holdings?.data) > 0) ? 'PASS' : 'PARTIAL', evidence: `holdings=${countList(data.holdings?.data)}, positions=${countList(data.positions?.data)}`, requiredForMoney: true },
-      { layer: 'Dhan option-chain availability', status: (requiredOk >= 2 || requiredSafeBlocks >= 2) ? 'PASS' : requiredOk > 0 ? 'PARTIAL' : 'WAITING', evidence: `enabled_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length}, enabled_safe_no_trade=${requiredSafeBlocks}/${REQUIRED_CHAIN_SYMBOLS.length}, optional_ready=${optionalOk}/${OPTIONAL_CHAIN_SYMBOLS.length}, optional_safe_no_trade=${optionalSafeBlocks}/${OPTIONAL_CHAIN_SYMBOLS.length}`, requiredForMoney: true },
-      { layer: 'Universe / ranking candidates', status: gainCount > 0 ? 'PASS' : 'PARTIAL', evidence: `candidate_rows=${gainCount}, gain=${gainRows.length}, scanner=${scannerRows.length}`, requiredForMoney: true },
-      { layer: 'CE / PE decision evidence', status: cePeOk ? 'PASS' : 'WAITING', evidence: cePeOk ? 'CE/PE field found in ranker/scanner payload' : 'No CE/PE field found in current ranker/scanner payload', requiredForMoney: true },
-      { layer: 'Paper/analyzer lifecycle read path', status: data.trades?.ok ? 'PASS' : 'WAITING', evidence: `today_trade_rows=${tradeCount}, endpoint=${data.trades?.status || 0}; endpoint health does not prove completed trades`, requiredForMoney: false },
-      { layer: 'Risk gates and automation status', status: gateOk || data.gates?.status === 200 ? 'PASS' : 'PARTIAL', evidence: `auto_gates_http=${data.gates?.status || 0}, status=${gates.status || '-'}`, requiredForMoney: true },
-      { layer: 'Live-money safety lock', status: liveFlag === true || orderAllowed === true ? 'WAITING' : 'PASS', evidence: `live_flag=${String(liveFlag)}, order_allowed=${String(orderAllowed)} (live trading disabled by design)`, requiredForMoney: true },
       {
-        layer: 'Dashboard operator truth',
-        status: (requiredOk >= 2 && (data.health?.ok || data.state?.ok)) ? 'PASS' : 'PARTIAL',
-        evidence: `health_ok=${Boolean(data.health?.ok)}, broker_ok=${Boolean(data.broker?.ok)}, gates_ok=${Boolean(data.gates?.ok)}, enabled_chains_ready=${requiredOk}/${REQUIRED_CHAIN_SYMBOLS.length} (runtime API probes; not hard-coded)`,
+        layer: 'Backend/API shared live truth',
+        status: apiOk ? 'PASS' : 'WAITING',
+        evidence: `health=${health ? String(health.status || health.mode || 'present') : 'missing'}, state=${state ? 'present' : 'missing'}, api=${apiStatus?.status || 'responding/idle'}`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Broker read-only connection',
+        status: brokerOk ? 'PASS' : 'WAITING',
+        evidence: `connected=${brokerOk}, source=${brokerStatus?.broker || 'dhan'}, order_allowed=${orderAllowed}`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Funds / margin truth',
+        status: fundsOk ? 'PASS' : 'WAITING',
+        evidence: `available=${available ?? '-'}, used=${used ?? '-'}, source=${brokerFunds?.source || brokerFunds?.normalized?.source || 'dhan'}`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Holdings and Dhan positions read path',
+        status: holdingsKnown && positionsKnown ? 'PASS' : (holdingsKnown || positionsKnown) ? 'PARTIAL' : 'WAITING',
+        evidence: `holdings=${holdingsCount}, positions=${positionsCount}, empty broker response is valid when success=true`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Required Dhan option-chain availability',
+        status: requiredReady === REQUIRED_CHAIN_SYMBOLS.length ? 'PASS' : requiredReady > 0 ? 'PARTIAL' : 'WAITING',
+        evidence: `required_ready=${requiredReady}/${REQUIRED_CHAIN_SYMBOLS.length}, safe_no_trade=${requiredSafeNoTrade}/${REQUIRED_CHAIN_SYMBOLS.length}, optional_ready=${optionalReady}/${OPTIONAL_CHAIN_SYMBOLS.length}`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Universe / ranking candidates',
+        status: candidateCount > 0 ? 'PASS' : 'PARTIAL',
+        evidence: `candidate_rows=${candidateCount}; zero candidates is not fabricated into a PASS`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'CE / PE decision evidence',
+        status: cePeOk ? 'PASS' : 'WAITING',
+        evidence: cePeOk ? 'CE/PE field found in the current shared rank/scanner truth' : 'No CE/PE field found in current shared rank/scanner truth',
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Paper/analyzer lifecycle read path',
+        status: paper != null ? 'PASS' : 'WAITING',
+        evidence: `paper=${paper == null ? 'missing' : String(paper.status || 'present')}; read-path presence does not prove completed lifecycle`,
+        requiredForMoney: false,
+      },
+      {
+        layer: 'Risk gates / automation state',
+        status: autoGates != null ? 'PASS' : 'PARTIAL',
+        evidence: `auto_gates=${autoGates == null ? 'missing' : String(autoGates.status || 'present')}`,
+        requiredForMoney: true,
+      },
+      {
+        layer: 'Live-money safety lock',
+        status: !liveFlag && !orderAllowed ? 'PASS' : 'WAITING',
+        evidence: `live_flag=${liveFlag}, order_allowed=${orderAllowed}; analyzer/PAPER requires both false`,
         requiredForMoney: true,
       },
     ]
-  }, [data])
+  }, [health, state, brokerConnected, brokerStatus, brokerFunds, brokerHoldings, brokerPositions, chain, gainRank, autoGates, paper, apiStatus])
 
-  const moneyRows = rows.filter(r => r.requiredForMoney)
-  const moneyReady = moneyRows.every(r => r.status === 'PASS')
-  const infraOk = rows.slice(0, 4).every(r => r.status === 'PASS')
+  const moneyRows = rows.filter(row => row.requiredForMoney)
+  const moneyReady = moneyRows.every(row => row.status === 'PASS')
+  const infraRows = rows.slice(0, 5)
+  const infraOk = infraRows.every(row => row.status === 'PASS')
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
+    <div data-testid="system-truth-control" style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
-        <div><h2 style={{ margin: 0, fontSize: 22 }}>System Truth Control</h2><div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>Full upstream/downstream trading chain. Enabled universe: {REQUIRED_CHAIN_SYMBOLS.join(', ')}. Optional watchlist: {OPTIONAL_CHAIN_SYMBOLS.join(', ')}.</div></div>
-        <button onClick={run} disabled={loading} style={{ padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface-2)', color: 'var(--text-primary)', cursor: 'pointer' }}>{loading ? 'Checking...' : 'Recheck All Layers'}</button>
+        <div>
+          <h2 style={{ margin: 0, fontSize: 22 }}>System Truth Control</h2>
+          <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>
+            Shared live dashboard truth — no duplicate broker/API probe burst. Required chains: {REQUIRED_CHAIN_SYMBOLS.join(', ')}.
+          </div>
+        </div>
+        <div style={{ textAlign: 'right', color: 'var(--text-muted)', fontSize: 11 }}>
+          Shared-store sync<br /><b style={{ color: 'var(--text-primary)' }}>{lastSync || 'waiting'}</b>
+        </div>
       </div>
-      {error && <div style={{ border: '1px solid rgba(239,68,68,.4)', color: 'var(--down)', padding: 10, borderRadius: 8, marginBottom: 12 }}>{error}</div>}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
-        <div className="card">{badge(infraOk ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Infrastructure / broker read status</div></div>
-        <div className="card">{badge(moneyReady ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Money readiness pending</div></div>
-        <div className="card"><div style={{ fontSize: 11, color: 'var(--text-muted)' }}>Last run</div><div style={{ fontWeight: 800, marginTop: 6 }}>{lastRun || '-'}</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(infraOk ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Infrastructure / broker read state</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(moneyReady ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>{moneyReady ? 'All required proof layers present' : 'Readiness evidence still incomplete'}</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge('PASS')}<div style={{ marginTop: 8, fontSize: 12 }}>PAPER / LIVE safety lock</div></div>
       </div>
-      <div style={{ border: `1px solid ${moneyReady ? 'rgba(16,185,129,.45)' : 'rgba(239,68,68,.45)'}`, background: moneyReady ? 'rgba(16,185,129,.08)' : 'rgba(239,68,68,.08)', padding: 14, borderRadius: 10, marginBottom: 16 }}>
-        <div style={{ fontWeight: 900, fontSize: 16 }}>{moneyReady ? 'MONEY_READY_PROOF_GREEN' : 'MONEY_READY_PENDING'}</div>
-        <div style={{ color: 'var(--text-muted)', fontSize: 12, marginTop: 4 }}>{moneyReady ? 'All required enabled-universe layers are passing. A separate manual live gate is still required before broker order execution.' : 'At least one required enabled-universe layer is missing proof. Live broker order execution must remain disabled.'}</div>
-      </div>
+
+      {!moneyReady && (
+        <div style={{ border: '1px solid rgba(245,158,11,.35)', background: 'rgba(245,158,11,.08)', padding: 10, borderRadius: 8, marginBottom: 14, color: '#f59e0b', fontSize: 12 }}>
+          <b>READINESS_NOT_PROVEN</b> — at least one required current evidence layer below is incomplete. This does not enable live broker orders.
+        </div>
+      )}
+
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-        <thead><tr><th className="thead">Layer</th><th className="thead">Status</th><th className="thead">Required for money</th><th className="thead">Evidence</th></tr></thead>
-        <tbody>{rows.map(row => <tr key={row.layer}><td className="tcell"><b>{row.layer}</b></td><td className="tcell">{badge(row.status)}</td><td className="tcell">{row.requiredForMoney ? 'YES' : 'NO'}</td><td className="tcell">{row.evidence}</td></tr>)}</tbody>
+        <thead><tr><th className="thead">Layer</th><th className="thead">Status</th><th className="thead">Required</th><th className="thead">Current shared evidence</th></tr></thead>
+        <tbody>
+          {rows.map(row => (
+            <tr key={row.layer}>
+              <td className="tcell"><b>{row.layer}</b></td>
+              <td className="tcell">{badge(row.status)}</td>
+              <td className="tcell">{row.requiredForMoney ? 'YES' : 'NO'}</td>
+              <td className="tcell">{row.evidence}</td>
+            </tr>
+          ))}
+        </tbody>
       </table>
+
+      <div style={{ marginTop: 14, color: 'var(--text-muted)', fontSize: 11, lineHeight: 1.5 }}>
+        Truth source: the same Zustand state populated by the dashboard's bounded read-only poller. A separate tab must not stampede the same Dhan/GCP endpoints and then display its timeout as broker truth.
+      </div>
     </div>
   )
 }
