@@ -13,7 +13,7 @@ concurrency:
 permissions:
   contents: read
   id-token: write
-  actions: write
+  statuses: write
 
 env:
   GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
@@ -149,10 +149,4 @@ jobs:
     if: >-
       always() &&
       (needs.primary-repair.outputs.changed == 'true' || needs.fallback-repair.outputs.changed == 'true')
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Trigger exactly one fresh Cloud Run deploy after real IAM repair
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: gh workflow run cloud-run-auto-deploy.yml --repo "${GITHUB_REPOSITORY}" --ref main
+    uses: ./.github/workflows/cloud-run-auto-deploy.yml
