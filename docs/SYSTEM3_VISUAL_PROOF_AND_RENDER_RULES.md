@@ -73,6 +73,20 @@ Examples:
 - `—`, `UNKNOWN`, `WAITING`, `LOADING`, `POLL`, `NO DATA`, or similar markers are observations to classify; they must not be silently treated as healthy.
 - Contradictory UI states are blockers even when each component rendered successfully.
 
+### Option-chain source-field rule
+
+For required-chain semantic proof, classify the **explicit visible `source=<value>` field for that same symbol** as the market-data source.
+
+Do not infer data source from unrelated provenance fields on the same line. In particular:
+
+```text
+source=dhan · universe=security_id_list.csv
+```
+
+means **Dhan market-data source** with a CSV instrument-universe provenance file. The `.csv` universe filename does **not** make the chain a CSV fallback.
+
+Only an explicit chain source such as `source=csv`, `source=synthetic`, `source=yahoo`, `source=mock`, or `source=fake` is a prohibited non-Dhan source for this proof. Parser/tests must preserve this distinction.
+
 ## Evidence age
 
 Interactive `now/current/live` requests require a new capture started after the request began; a previous artifact cannot be reused even if only minutes old.
