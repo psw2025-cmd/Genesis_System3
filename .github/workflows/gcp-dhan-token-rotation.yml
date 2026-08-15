@@ -98,9 +98,7 @@ jobs:
               fi
             fi
             if [ -n "${CREATE_TIME}" ] && [ "${CONNECTED}" = "true" ]; then
-              CREATE_EPOCH=$(python -c 'import os,sys; from datetime import datetime
-raw=os.environ["CREATE_TIME"].replace("Z","+00:00")
-print(int(datetime.fromisoformat(raw).timestamp()))' )
+              CREATE_EPOCH=$(python -c 'import os; from datetime import datetime; raw=os.environ["CREATE_TIME"].replace("Z","+00:00"); print(int(datetime.fromisoformat(raw).timestamp()))')
               AGE_MIN=$(( (NOW_EPOCH - CREATE_EPOCH) / 60 ))
               if [ "${AGE_MIN}" -lt "${COOLDOWN_MINUTES}" ]; then
                 STATUS="SKIPPED"
