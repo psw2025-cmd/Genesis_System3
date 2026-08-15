@@ -206,6 +206,18 @@ def _number_after(label: str, text: str) -> int | None:
     return int(match.group(1)) if match else None
 
 
+def _chain_source(text: str) -> str | None:
+    """Return the declared chain data source only, never incidental metadata values.
+
+    Production after-hours Dhan snapshots legitimately include instrument-master metadata
+    such as ``universe=security_id_list.csv`` on the same line.  Treating any later CSV
+    token as the data source creates a false negative, so classification is bound to the
+    explicit ``source=...`` field.
+    """
+    match = re.search(r"\bsource\s*=\s*([a-z0-9_.-]+)", text, flags=re.IGNORECASE)
+    return match.group(1).lower() if match else None
+
+
 def _click_chain_symbol(browser: Browser, symbol: str) -> bool:
     value = browser._execute(
         r"""
@@ -237,8 +249,9 @@ def _capture_required_chain_subviews(browser: Browser) -> dict[str, dict]:
         contracts = _number_after("CONTRACTS", text)
         strikes = _number_after("STRIKES", text)
         symbol_visible = bool(re.search(rf"\bSYMBOL\s+{re.escape(symbol)}\b", upper))
-        dhan_source = bool(re.search(r"SOURCE\s*=\s*DHAN|DATA\s+DHAN|DHAN\s+(?:VERIFIED|SESSION|LIVE|SNAPSHOT)", upper))
-        bad_source = bool(re.search(r"SOURCE\s*=.*\b(CSV|YAHOO|SYNTHETIC|MOCK|FAKE)\b", upper))
+        declared_source = _chain_source(text)
+        dhan_source = declared_source == "dhan" or bool(re.search(r"DATA\s+DHAN|DHAN\s+(?:VERIFIED|SESSION|LIVE|SNAPSHOT)", upper))
+        bad_source = declared_source in {"csv", "yahoo", "synthetic", "mock", "fake"}
         populated = (contracts or 0) > 0 and (strikes or 0) > 0
         ready = clicked and symbol_visible and dhan_source and not bad_source and populated
         screenshot = f"chain-{symbol.lower()}-live.png"
@@ -250,6 +263,7 @@ def _capture_required_chain_subviews(browser: Browser) -> dict[str, dict]:
             "ready": ready,
             "clicked": clicked,
             "symbol_visible": symbol_visible,
+            "declared_source": declared_source,
             "dhan_source_visible": dhan_source,
             "bad_source_visible": bad_source,
             "contracts_visible": contracts,
