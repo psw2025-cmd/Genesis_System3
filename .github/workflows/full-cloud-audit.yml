@@ -65,6 +65,7 @@ jobs:
       - name: Compile cloud audit and consensus tools
         run: |
           python -m py_compile scripts/gcp_full_cloud_audit.py
+          python -m py_compile scripts/gcp_dhan_rotator_forensic.py
           python -m py_compile scripts/fetch_exact_security_audit.py
           python -m py_compile scripts/evaluate_rotator_reliability.py
           python -m py_compile scripts/multi_ai_audit_consensus.py
@@ -85,6 +86,15 @@ jobs:
           python scripts/evaluate_rotator_reliability.py
           rc=$?
           echo "ROTATOR_RELIABILITY_RC=${rc}" >> "$GITHUB_ENV"
+          exit 0
+
+      - name: Classify latest Dhan rotator execution from logs read-only
+        shell: bash
+        run: |
+          set +e
+          python scripts/gcp_dhan_rotator_forensic.py
+          rc=$?
+          echo "ROTATOR_FORENSIC_RC=${rc}" >> "$GITHUB_ENV"
           exit 0
 
       - name: Fetch exact-SHA security audit artifact
@@ -182,6 +192,7 @@ jobs:
           path: |
             reports/latest/full_cloud_audit/
             reports/latest/rotator_reliability/
+            reports/latest/dhan_rotator_forensics/
             reports/latest/security_audit/
             reports/latest/ai_consensus/
           if-no-files-found: error
