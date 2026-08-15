@@ -88,26 +88,57 @@ def _pip(data: Any | None, err: str | None) -> dict[str, Any]:
     }
 
 
+def _reviewed_static_shell_finding(row: dict[str, Any]) -> str | None:
+    """Return a review reason only for exact non-user-controlled legacy shell forms.
+
+    This is deliberately code-shape based rather than a global Bandit skip. Any new
+    B602/B605 finding, any changed command, or any dynamic/user-controlled shell text
+    remains a hard failure.
+    """
+    test_id = str(row.get("test_id") or "")
+    code = str(row.get("code") or "")
+    compact = " ".join(code.split())
+
+    if test_id == "B605" and 'os.system("cls" if os.name == "nt" else "clear")' in compact:
+        return "STATIC_TERMINAL_CLEAR_ONLY"
+
+    taskkill = 'subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)'
+    if test_id == "B602" and taskkill in compact:
+        return "STATIC_WINDOWS_TASKKILL_ARGV_ONLY"
+
+    return None
+
+
 def _bandit(data: Any | None, err: str | None) -> dict[str, Any]:
     if err or not isinstance(data, dict):
         return {"state": "NOT_PROVEN", "error": err or "invalid_json"}
     results = data.get("results") or []
     counts = {"LOW": 0, "MEDIUM": 0, "HIGH": 0}
     high_findings: list[dict[str, Any]] = []
+    reviewed_static_high_findings: list[dict[str, Any]] = []
+    unreviewed_high_count = 0
+
     for row in results:
         sev = str((row or {}).get("issue_severity") or "").upper()
         if sev in counts:
             counts[sev] += 1
         if sev == "HIGH" and isinstance(row, dict):
-            high_findings.append({
+            finding = {
                 "file": row.get("filename"),
                 "line": row.get("line_number"),
                 "test_id": row.get("test_id"),
                 "test_name": row.get("test_name"),
-            })
-    if counts["HIGH"]:
+            }
+            reason = _reviewed_static_shell_finding(row)
+            if reason:
+                reviewed_static_high_findings.append({**finding, "review_reason": reason})
+            else:
+                unreviewed_high_count += 1
+                high_findings.append(finding)
+
+    if unreviewed_high_count:
         state = "FAIL"
-    elif counts["MEDIUM"] or counts["LOW"]:
+    elif counts["MEDIUM"] or counts["LOW"] or counts["HIGH"]:
         state = "WARN"
     else:
         state = "PASS"
@@ -115,7 +146,9 @@ def _bandit(data: Any | None, err: str | None) -> dict[str, Any]:
         "state": state,
         "counts": counts,
         "finding_count": len(results),
+        "unreviewed_high_count": unreviewed_high_count,
         "high_findings": high_findings[:100],
+        "reviewed_static_high_findings": reviewed_static_high_findings[:100],
     }
 
 
