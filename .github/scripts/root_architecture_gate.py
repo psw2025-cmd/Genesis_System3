@@ -17,12 +17,8 @@ REPORT_MD = OUT_DIR / "ROOT_ARCHITECTURE_GATE.md"
 DIFF_DEBUG_JSON = OUT_DIR / "changed_files_debug.json"
 
 PROTECTED_PATH_PREFIXES = (
-    # core/ sub-paths that are safe to modify (data layer refactoring allowed):
-    # core/data/ — data source changes (e.g. NSE→Dhan migration) are allowed
-    # core/brokers/ — broker config changes allowed with explicit approval
-    # Truly protected: trading logic, order execution, model artifacts
-    "core/engine/",           # Scheduler engine — never touch without review
-    "core/models/",           # ML model files
+    "core/engine/",
+    "core/models/",
     "services/",
     "strategies/",
     "broker/",
@@ -31,9 +27,6 @@ PROTECTED_PATH_PREFIXES = (
     "database/",
     "models/",
 )
-
-# Note: core/data/ is explicitly NOT protected — data source layer can be
-# refactored (e.g. NSE scraping → Dhan API) without trading safety risk.
 
 SECRET_PATTERNS = [
     r"api[_-]?key\s*=\s*['\"][A-Za-z0-9_\-]{12,}",
@@ -47,6 +40,11 @@ CRITICAL_FILES = [
     "run_system3.py",
     ".github/workflows/ci.yml",
     "requirements-ci.txt",
+    "AGENTS.md",
+    "state/FAILURE_REMEDIATION_CHECKLIST.md",
+    "state/AUTONOMOUS_ENGINEERING_MASTER_PLAN.md",
+    "scripts/frontend_local_runtime_smoke.py",
+    "scripts/gcp_ui_tab_visual_proof.py",
 ]
 
 CRITICAL_DIRS = [
@@ -131,6 +129,77 @@ def check_required_files() -> dict:
     }
 
 
+def check_governance_contract() -> dict:
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8", errors="ignore")
+    master = (ROOT / "state/AUTONOMOUS_ENGINEERING_MASTER_PLAN.md").read_text(encoding="utf-8", errors="ignore")
+    failure = (ROOT / "state/FAILURE_REMEDIATION_CHECKLIST.md").read_text(encoding="utf-8", errors="ignore")
+    local = (ROOT / "scripts/frontend_local_runtime_smoke.py").read_text(encoding="utf-8", errors="ignore")
+    deployed = (ROOT / "scripts/gcp_ui_tab_visual_proof.py").read_text(encoding="utf-8", errors="ignore")
+
+    required_agent_markers = [
+        "GCP is production/deployment authority",
+        "Recursive 10-step failure loop",
+        "LOCAL_NON_PRODUCTION",
+        "Production broker-connected claims are forbidden unless Layer B passes",
+        "AGENT_EXECUTION_FAILED",
+        "CLOSED — PROVEN",
+    ]
+    required_master_markers = [
+        "Authority ladder",
+        "Repository-wide forensic inventory checklist",
+        "Automation self-check matrix",
+        "Smoke-test ladder",
+        "Issue #188 market-data completeness checklist",
+        "SYSTEM_STATE.md` is stale",
+    ]
+    required_failure_markers = [
+        "Universal 10-step loop",
+        "Child-loop rule",
+        "UI-001",
+        "Closure rule",
+    ]
+    required_local_markers = [
+        '"proof_scope": "LOCAL_NON_PRODUCTION"',
+        '"production_authority": False',
+        '"broker_connectivity_proven": False',
+        '"production_claim_allowed": False',
+    ]
+    required_deployed_markers = [
+        '"source": "real_deployed_cloud_run_ui"',
+        "EXPECTED_SHA",
+        "gcloud",
+        "https://",
+    ]
+
+    missing = []
+    for scope, text, markers in (
+        ("AGENTS.md", agents, required_agent_markers),
+        ("master_plan", master, required_master_markers),
+        ("failure_checklist", failure, required_failure_markers),
+        ("local_ui_proof", local, required_local_markers),
+        ("deployed_ui_proof", deployed, required_deployed_markers),
+    ):
+        for marker in markers:
+            if marker not in text:
+                missing.append({"scope": scope, "marker": marker})
+
+    forbidden_local = [
+        '"production_authority": True',
+        '"broker_connectivity_proven": True',
+        '"production_claim_allowed": True',
+        '"proof_scope": "PRODUCTION"',
+    ]
+    forbidden_hits = [marker for marker in forbidden_local if marker in local]
+
+    return {
+        "name": "universal_agent_and_ui_provenance_contract",
+        "status": "PASS" if not missing and not forbidden_hits else "FAIL",
+        "missing_markers": missing,
+        "forbidden_local_markers": forbidden_hits,
+        "note": "Local browser proof may never claim GCP/broker production authority; recursive governance files are mandatory.",
+    }
+
+
 def check_python_compile() -> dict:
     candidates = [
         ROOT / "run_system3.py",
@@ -172,18 +241,8 @@ def check_protected_paths_not_changed(files: list[str]) -> dict:
 
 def check_no_env_or_db_or_model_artifacts_changed(files: list[str]) -> dict:
     blocked_suffix = (
-        ".env",
-        ".db",
-        ".duckdb",
-        ".sqlite",
-        ".sqlite3",
-        ".pkl",
-        ".joblib",
-        ".onnx",
-        ".pt",
-        ".pth",
-        ".h5",
-        ".keras",
+        ".env", ".db", ".duckdb", ".sqlite", ".sqlite3", ".pkl", ".joblib",
+        ".onnx", ".pt", ".pth", ".h5", ".keras",
     )
     blocked = []
     for f in files:
@@ -218,9 +277,6 @@ def check_secret_like_values_in_changed_files(files: list[str]) -> dict:
 
 
 def _added_lines_from_diff(files, gate_script):
-    """Return (file, line_text) for every line newly added in this PR.
-    Pre-existing code not introduced by this PR never triggers the check.
-    """
     scan_files = [f for f in files if f != gate_script]
     if not scan_files:
         return []
@@ -243,11 +299,8 @@ def _added_lines_from_diff(files, gate_script):
         return added
     return []
 
+
 def check_trading_safety_text(files: list) -> dict:
-    """Flag suspicious live-trading terms newly introduced in this PR only.
-    Scans added diff lines so pre-existing compatibility code (e.g. legacy
-    place_order wrapper already on main) is not a false positive.
-    """
     suspicious_terms = [
         "LIVE_TRADING_ENABLED=true", "TRADING_MODE=live",
         "STRATEGY_MODE=LIVE", "placeOrder(", "place_order(", "dhanhq.placeOrder",
@@ -258,8 +311,7 @@ def check_trading_safety_text(files: list) -> dict:
     for file_name, line_text in added_lines:
         for term in suspicious_terms:
             if term in line_text:
-                suspicious.append({"file": file_name, "term": term,
-                                   "added_line": line_text.strip()})
+                suspicious.append({"file": file_name, "term": term, "added_line": line_text.strip()})
     return {
         "name": "no_obvious_live_trading_enablement_in_changed_files",
         "status": "PASS" if not suspicious else "FAIL",
@@ -267,10 +319,12 @@ def check_trading_safety_text(files: list) -> dict:
         "note": "Scans only newly added diff lines; pre-existing code not flagged.",
     }
 
+
 def main() -> int:
     files = changed_files()
     checks = [
         check_required_files(),
+        check_governance_contract(),
         check_python_compile(),
         check_protected_paths_not_changed(files),
         check_no_env_or_db_or_model_artifacts_changed(files),
@@ -280,7 +334,7 @@ def main() -> int:
     failed = [c for c in checks if c["status"] != "PASS"]
     payload = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
-        "policy": "Architecture and trading safety must be FULL PASS. Only ci.yml is the active workflow.",
+        "policy": "Architecture, universal agent governance, proof provenance and trading safety must be FULL PASS.",
         "blocking": True,
         "changed_files": files,
         "checks": checks,
