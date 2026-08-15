@@ -18,7 +18,19 @@ class DhanRotatorIdentityContractTests(unittest.TestCase):
         self.assertNotIn("genesis-system3-scheduler-invoker", workflow)
         self.assertIn('--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"', workflow)
         self.assertIn('--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"', workflow)
-        self.assertIn('"${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" "${DHAN_SCHEDULER_SERVICE_ACCOUNT}"', workflow)
+        self.assertIn('"${DHAN_SCHEDULER_SERVICE_ACCOUNT}" "${DHAN_RECOVERY_SERVICE_ACCOUNT}"', workflow)
+        self.assertIn("DHAN_RECOVERY_SERVICE_ACCOUNT: gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com", workflow)
+        self.assertIn('remove-iam-policy-binding "${DHAN_ROTATION_JOB}"', workflow)
+        self.assertNotIn('"${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" "${DHAN_SCHEDULER_SERVICE_ACCOUNT}"', workflow)
+        forbidden_rotator_step = "Execute token rotator once" + " and wait"
+        self.assertNotIn(forbidden_rotator_step, workflow)
+        execute_rotator_lines = [
+            line.strip()
+            for line in workflow.splitlines()
+            if line.strip().startswith("gcloud run jobs execute ")
+            and "DHAN_ROTATION_JOB" in line
+        ]
+        self.assertEqual(execute_rotator_lines, [])
         self.assertNotIn('--service-account="${RUNTIME_SA}"', workflow)
         self.assertNotIn('--oauth-service-account-email="${RUNTIME_SA}"', workflow)
         # Production deploy must consume pre-provisioned IAM. It must not make

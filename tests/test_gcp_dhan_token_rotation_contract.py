@@ -112,9 +112,26 @@ class StaticSafetyContractTests(unittest.TestCase):
         deploy = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
         self.assertIn("workflow_dispatch", manual)
         self.assertNotIn("schedule:", manual)
+        self.assertNotIn("credentials_json", manual)
+        self.assertNotIn("GCP_SA_KEY", manual)
+        self.assertIn("workload_identity_provider", manual)
+        self.assertIn("gs3-token-recovery@", manual)
+        self.assertIn("MANUAL_ROTATION_PRECHECK", manual)
+        self.assertIn("ACTIVE_ROTATION_IN_FLIGHT", manual)
+        self.assertIn("COOLDOWN_TOKEN_FRESH_AND_CONNECTED", manual)
         self.assertIn('gcloud scheduler jobs create http', deploy)
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
         self.assertIn('--schedule="30 7 * * *"', deploy)
+        forbidden_rotator_step = "Execute token rotator once" + " and wait"
+        self.assertNotIn(forbidden_rotator_step, deploy)
+
+    def test_self_heal_defaults_fail_closed(self):
+        patch = Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
+        deployer = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+        self.assertIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', patch)
+        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', deployer)
+        self.assertNotIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', patch)
+        self.assertNotIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', deployer)
 
     def test_legacy_token_writers_are_permanently_non_mutating(self):
         codespace = Path("scripts/codespace_startup.sh").read_text(encoding="utf-8")

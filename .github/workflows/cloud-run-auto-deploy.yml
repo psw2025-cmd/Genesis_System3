@@ -48,6 +48,7 @@ jobs:
       GCP_WEB_RUNTIME_SERVICE_ACCOUNT: genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_ROTATOR_SERVICE_ACCOUNT: genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com
       DHAN_SCHEDULER_SERVICE_ACCOUNT: gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com
+      DHAN_RECOVERY_SERVICE_ACCOUNT: gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com
       SCHEDULER_COLLECTOR_SERVICE_ACCOUNT: gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com
       RANK_JOB_SERVICE_ACCOUNT: gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com
       FORECAST_JOB_SERVICE_ACCOUNT: gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com
@@ -116,8 +117,15 @@ jobs:
           assert not legacy_auth_hits, f"legacy service-account-key auth found: {legacy_auth_hits}"
           assert "DHAN_ROTATOR_SERVICE_ACCOUNT" in workflow
           assert "DHAN_SCHEDULER_SERVICE_ACCOUNT" in workflow
+          assert "DHAN_RECOVERY_SERVICE_ACCOUNT" in workflow
           assert '--service-account="${DHAN_ROTATOR_SERVICE_ACCOUNT}"' in workflow
           assert '--oauth-service-account-email="${DHAN_SCHEDULER_SERVICE_ACCOUNT}"' in workflow
+          forbidden_rotator_step = "Execute token rotator once" + " and wait"
+          forbidden_rotator_exec = 'gcloud run jobs execute "${DHAN_ROTATION_JOB}"'
+          assert forbidden_rotator_step not in workflow
+          assert forbidden_rotator_exec not in workflow
+          assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+          assert 'os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
 
           # Construct forbidden Secret Manager role fragments so the guard does
           # not match its own source. Scan executable/non-comment lines only;
@@ -246,13 +254,21 @@ jobs:
             --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ROTATE_WHEN_HOURS_LEFT=6,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
             --set-secrets="DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest,DHAN_PIN=dhan-pin:latest,DHAN_TOTP_SECRET=dhan-totp-secret:latest"
 
-          # The web runtime may request canonical self-heal; Scheduler may invoke
-          # the same job. Neither identity can read PIN/TOTP or mint tokens.
-          for INVOKER in "${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" "${DHAN_SCHEDULER_SERVICE_ACCOUNT}"; do
+          # Invokers: Cloud Scheduler (daily) + dedicated manual-recovery SA.
+          # Web runtime must NEVER have run.invoker on the rotator (zero web rotation).
+          for INVOKER in "${DHAN_SCHEDULER_SERVICE_ACCOUNT}" "${DHAN_RECOVERY_SERVICE_ACCOUNT}"; do
             gcloud run jobs add-iam-policy-binding "${DHAN_ROTATION_JOB}" \
               --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
               --member="serviceAccount:${INVOKER}" --role="roles/run.invoker" \
               --quiet >/dev/null
+          done
+          for REMOVE_INVOKER in \
+              "${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" \
+              "802404398783-compute@developer.gserviceaccount.com"; do
+            gcloud run jobs remove-iam-policy-binding "${DHAN_ROTATION_JOB}" \
+              --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
+              --member="serviceAccount:${REMOVE_INVOKER}" --role="roles/run.invoker" \
+              --quiet >/dev/null 2>&1 || true
           done
 
           SCHEDULER_URI="https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/${DHAN_ROTATION_JOB}:run"
@@ -283,12 +299,8 @@ jobs:
               --message-body='{}'
           fi
 
-      - name: Execute token rotator once and wait
-        run: |
-          gcloud run jobs execute "${DHAN_ROTATION_JOB}" \
-            --project="${GOOGLE_CLOUD_PROJECT}" \
-            --region="${GCP_REGION}" \
-            --wait
+      # Token mint authority is Cloud Scheduler only (plus optional manual recovery).
+      # Deploy configures/updates the rotator Job but must never execute it.
 
       - name: Configure bounded business lanes and evidence collector
         run: |
@@ -460,10 +472,21 @@ jobs:
           curl -fsS --max-time 30 "${SERVICE_URL}/api/state" > /tmp/state.json
           for ATTEMPT in 1 2 3 4 5 6; do
             curl -fsS --max-time 30 "${SERVICE_URL}/api/broker/status" > /tmp/broker.json || true
-            if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then break; fi
+            if jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then break; fi
             sleep 10
           done
-          jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null
+          # Hard-fail safety contracts (not token freshness / connectedness).
+          jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC"' /tmp/broker.json >/dev/null
+          jq -e '.token_proof.token_value_exposed == false' /tmp/broker.json >/dev/null
+          jq -e '.live_trading_enabled == false' /tmp/broker.json >/dev/null
+          jq -e '.order_placement_allowed == false' /tmp/broker.json >/dev/null
+          jq '{connected,error,token_proof:{source:.token_proof.source,secret_version:.token_proof.secret_version,hours_remaining:.token_proof.hours_remaining,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker.json
+          if jq -e '.connected == true and (.error == null)' /tmp/broker.json >/dev/null 2>&1; then
+            echo "BROKER_CONNECTED=OK"
+          else
+            echo "BROKER_CONNECTED=DEGRADED"
+            echo "::warning::Broker connectedness is DEGRADED/WARN; token freshness is scheduler/manual-recovery domain, not a hard deploy failure."
+          fi
 
       - name: Generate sanitized GCP runtime evidence
         if: always()

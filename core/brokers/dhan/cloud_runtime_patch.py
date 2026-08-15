@@ -88,7 +88,8 @@ def _live_is_locked() -> bool:
 
 
 def _canonical_heal_enabled() -> bool:
-    raw = os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1").strip().lower()
+    # Fail-closed: web must reload Secret Manager only unless explicitly enabled.
+    raw = os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0").strip().lower()
     return raw in {"1", "true", "yes", "on"}
 
 
