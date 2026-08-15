@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import sys
 import unittest
 from pathlib import Path
 
-from scripts.gcp_live_ui_snapshot import _chain_source
-
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from scripts.gcp_live_ui_snapshot import _chain_source
 
 
 class LiveUiTruthRemediationContractTests(unittest.TestCase):
