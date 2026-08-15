@@ -1,0 +1,158 @@
+name: GCP Authority Repair
+
+on:
+  workflow_run:
+    workflows: ["Cloud Run Auto Deploy"]
+    types: [completed]
+  workflow_dispatch:
+
+concurrency:
+  group: gcp-authority-repair
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+  actions: write
+
+env:
+  GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
+  GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+  GCP_IAM_REPAIR_PRIMARY: gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com
+  GCP_IAM_REPAIR_FALLBACK: gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com
+
+jobs:
+  primary-repair:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      changed: ${{ steps.result.outputs.changed }}
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Authenticate primary repair identity with keyless WIF
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_IAM_REPAIR_PRIMARY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Static authority safety contract
+        run: |
+          python -m compileall -q scripts/gcp_authority_repair.py
+          python -m unittest -q tests.test_gcp_authority_repair_contract
+
+      - name: Reconcile declared System3 IAM baseline
+        run: python scripts/gcp_authority_repair.py --apply
+
+      - name: Publish repair result
+        id: result
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          p = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
+          assert p["secret_payloads_accessed"] is False
+          assert p["service_account_keys_created"] is False
+          assert p["dhan_rotation_job_executed"] is False
+          assert p["live_trading_changed"] is False
+          assert p["order_action_performed"] is False
+          print(f"changed={'true' if p['change_count'] > 0 else 'false'}")
+          PY
+
+      - name: Upload sanitized authority repair proof
+        uses: actions/upload-artifact@v6
+        with:
+          name: gcp-authority-repair-primary-${{ github.run_number }}
+          path: reports/latest/gcp_authority_repair/summary.json
+          if-no-files-found: error
+          retention-days: 14
+
+  fallback-repair:
+    needs: primary-repair
+    if: >-
+      always() && needs.primary-repair.result == 'failure' &&
+      (github.event_name == 'workflow_dispatch' ||
+       (github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      changed: ${{ steps.result.outputs.changed }}
+    steps:
+      - name: Checkout trusted main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Authenticate fallback repair identity with keyless WIF
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_IAM_REPAIR_FALLBACK }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Static authority safety contract
+        run: |
+          python -m compileall -q scripts/gcp_authority_repair.py
+          python -m unittest -q tests.test_gcp_authority_repair_contract
+
+      - name: Reconcile declared System3 IAM baseline
+        run: python scripts/gcp_authority_repair.py --apply
+
+      - name: Publish repair result
+        id: result
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          p = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
+          assert p["secret_payloads_accessed"] is False
+          assert p["service_account_keys_created"] is False
+          assert p["dhan_rotation_job_executed"] is False
+          assert p["live_trading_changed"] is False
+          assert p["order_action_performed"] is False
+          print(f"changed={'true' if p['change_count'] > 0 else 'false'}")
+          PY
+
+      - name: Upload sanitized authority repair proof
+        uses: actions/upload-artifact@v6
+        with:
+          name: gcp-authority-repair-fallback-${{ github.run_number }}
+          path: reports/latest/gcp_authority_repair/summary.json
+          if-no-files-found: error
+          retention-days: 14
+
+  retry-deploy-once:
+    needs: [primary-repair, fallback-repair]
+    if: >-
+      always() &&
+      (needs.primary-repair.outputs.changed == 'true' || needs.fallback-repair.outputs.changed == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger exactly one fresh Cloud Run deploy after real IAM repair
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run cloud-run-auto-deploy.yml --repo "${GITHUB_REPOSITORY}" --ref main
