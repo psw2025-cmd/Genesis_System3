@@ -96,12 +96,23 @@ for SA in "$REPAIR_SA" "$REPAIR_FALLBACK_SA"; do
   fi
 done
 
-say "Prove no repair identity has broker Secret Manager payload roles"
+say "Remove known-forbidden broker Secret Manager payload roles from deploy/repair identities"
+for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret system3-dashboard-worker-push-token; do
+  for SA in "$REPAIR_SA" "$REPAIR_FALLBACK_SA" "$DEPLOY_SA"; do
+    for ROLE in roles/secretmanager.secretAccessor roles/secretmanager.secretVersionAdder; do
+      gcloud secrets remove-iam-policy-binding "$SECRET" \
+        --project="$PROJECT_ID" --member="serviceAccount:${SA}" --role="$ROLE" \
+        --quiet >/dev/null 2>&1 || true
+    done
+  done
+done
+
+say "Verify deploy/repair identities have no broker Secret Manager payload roles"
 for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret system3-dashboard-worker-push-token; do
   POLICY="$(gcloud secrets get-iam-policy "$SECRET" --project="$PROJECT_ID" --format=json)"
   for SA in "$REPAIR_SA" "$REPAIR_FALLBACK_SA" "$DEPLOY_SA"; do
     if printf '%s' "$POLICY" | python3 -c 'import json,sys; p=json.load(sys.stdin); sa=sys.argv[1]; bad={"roles/secretmanager.secretAccessor","roles/secretmanager.secretVersionAdder"}; raise SystemExit(0 if any(b.get("role") in bad and ("serviceAccount:"+sa) in (b.get("members") or []) for b in p.get("bindings",[])) else 1)' "$SA"; then
-      echo "ERROR: forbidden broker secret payload role found on ${SA} for ${SECRET}." >&2
+      echo "ERROR: forbidden broker secret payload role remains on ${SA} for ${SECRET}." >&2
       exit 4
     fi
   done
@@ -120,4 +131,6 @@ SECRET_PAYLOAD_ACCESS_FOR_DEPLOY_REPAIR=false
 DHAN_ROTATION_EXECUTED=false
 LIVE_TRADING_CHANGED=false
 ORDER_ACTION_PERFORMED=false
+STRICT_SCHEDULER_ONLY_IAM=false
+DEPLOYER_RUN_ADMIN_TEMPORARY=true
 EOF
