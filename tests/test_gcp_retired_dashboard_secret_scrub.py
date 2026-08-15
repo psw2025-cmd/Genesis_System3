@@ -20,7 +20,7 @@ _SPEC.loader.exec_module(wrapper)
 
 
 class RetiredDashboardSecretScrubTests(unittest.TestCase):
-    def test_candidate_deploy_adds_retired_dashboard_secret_to_remove_list(self):
+    def test_candidate_deploy_converges_canonical_web_secret_surface(self):
         args = [
             "gcloud", "run", "deploy", "genesis-system3-web",
             "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
@@ -29,17 +29,35 @@ class RetiredDashboardSecretScrubTests(unittest.TestCase):
         scrubbed = wrapper._scrub_retired_dashboard_secret_arg(args)
         remove_arg = next(x for x in scrubbed if x.startswith("--remove-secrets="))
         names = remove_arg.split("=", 1)[1].split(",")
-        self.assertIn("API_KEY", names)
-        self.assertIn("DASHBOARD_API_KEY", names)
-        self.assertIn("DHAN_PIN", names)
-        self.assertIn("DHAN_TOTP_SECRET", names)
-        self.assertIn("DHAN_TOTP", names)
-        self.assertEqual(names.count("DASHBOARD_API_KEY"), 1)
+        for required in (
+            "API_KEY",
+            "DASHBOARD_API_KEY",
+            "DHAN_APP_ID",
+            "DHAN_APP_SECRET",
+            "DHAN_ACCESS_TOKEN",
+            "DHAN_PIN",
+            "DHAN_TOTP_SECRET",
+            "DHAN_TOTP",
+            "dhan-access-token",
+        ):
+            self.assertIn(required, names)
+            self.assertEqual(names.count(required), 1)
+
+        update_arg = next(x for x in scrubbed if x.startswith("--update-secrets="))
+        bindings = wrapper._parse_secret_bindings(update_arg)
+        self.assertEqual(bindings["WORKER_PUSH_TOKEN"], "worker-secret:latest")
+        self.assertEqual(
+            bindings["DHAN_CLIENT_ID"],
+            "system3-dhan-client-id:latest",
+        )
+        for forbidden in wrapper._STALE_WEB_DHAN_SECRET_ENVS:
+            self.assertNotIn(forbidden, bindings)
 
     def test_scrub_is_idempotent(self):
         args = [
             "gcloud", "run", "deploy", "genesis-system3-web",
-            "--remove-secrets=API_KEY,DASHBOARD_API_KEY",
+            "--remove-secrets=API_KEY,DASHBOARD_API_KEY,DHAN_APP_ID,DHAN_APP_SECRET,DHAN_ACCESS_TOKEN,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP,dhan-access-token",
+            "--update-secrets=WORKER_PUSH_TOKEN=worker-secret:latest,DHAN_CLIENT_ID=system3-dhan-client-id:latest",
         ]
         once = wrapper._scrub_retired_dashboard_secret_arg(args)
         twice = wrapper._scrub_retired_dashboard_secret_arg(once)
@@ -52,7 +70,10 @@ class RetiredDashboardSecretScrubTests(unittest.TestCase):
     def test_missing_remove_secrets_fails_closed(self):
         with self.assertRaisesRegex(RuntimeError, "candidate_remove_secrets_contract_invalid"):
             wrapper._scrub_retired_dashboard_secret_arg(
-                ["gcloud", "run", "deploy", "genesis-system3-web"]
+                [
+                    "gcloud", "run", "deploy", "genesis-system3-web",
+                    "--update-secrets=WORKER_PUSH_TOKEN=worker-secret:latest",
+                ]
             )
 
     def test_missing_api_key_scrub_fails_closed(self):
@@ -61,8 +82,37 @@ class RetiredDashboardSecretScrubTests(unittest.TestCase):
                 [
                     "gcloud", "run", "deploy", "genesis-system3-web",
                     "--remove-secrets=DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
+                    "--update-secrets=WORKER_PUSH_TOKEN=worker-secret:latest",
                 ]
             )
+
+    def test_missing_update_secrets_fails_closed(self):
+        with self.assertRaisesRegex(RuntimeError, "candidate_update_secrets_contract_invalid"):
+            wrapper._scrub_retired_dashboard_secret_arg(
+                [
+                    "gcloud", "run", "deploy", "genesis-system3-web",
+                    "--remove-secrets=API_KEY",
+                ]
+            )
+
+    def test_stale_dhan_secret_cannot_be_readded(self):
+        with self.assertRaisesRegex(RuntimeError, "candidate_stale_dhan_secret_update_forbidden"):
+            wrapper._scrub_retired_dashboard_secret_arg(
+                [
+                    "gcloud", "run", "deploy", "genesis-system3-web",
+                    "--remove-secrets=API_KEY",
+                    "--update-secrets=WORKER_PUSH_TOKEN=worker-secret:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest",
+                ]
+            )
+
+    def test_worker_secret_metadata_preflight_is_deferred_without_api_read(self):
+        session = SimpleNamespace(get=mock.Mock(side_effect=AssertionError("metadata read forbidden")))
+        wrapper._defer_worker_secret_validation_to_candidate(session, "worker-secret")
+        session.get.assert_not_called()
+
+    def test_empty_worker_secret_id_fails_closed(self):
+        with self.assertRaisesRegex(RuntimeError, "worker_push_token_secret_id_empty"):
+            wrapper._defer_worker_secret_validation_to_candidate(object(), "  ")
 
 
 class BusinessSchedulerContractTests(unittest.TestCase):
@@ -98,7 +148,7 @@ class BusinessSchedulerContractTests(unittest.TestCase):
         ) as run:
             wrapper._ensure_business_scheduler_contract()
 
-        self.assertEqual(run.call_count, 3)
+        self.assertEqual(run.call_count, 4)
         for kind, call in zip(wrapper.BUSINESS_SCHEDULES, run.call_args_list):
             command = call.args[0]
             self._assert_common_contract(command, kind, "create")
@@ -112,7 +162,7 @@ class BusinessSchedulerContractTests(unittest.TestCase):
         ) as run:
             wrapper._ensure_business_scheduler_contract()
 
-        self.assertEqual(run.call_count, 3)
+        self.assertEqual(run.call_count, 4)
         for kind, call in zip(wrapper.BUSINESS_SCHEDULES, run.call_args_list):
             command = call.args[0]
             self._assert_common_contract(command, kind, "update")
