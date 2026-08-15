@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Capture deployed Genesis System3 visual proof for every dashboard tab.
+"""Capture deployed Genesis System3 semantic + visual proof for every tab.
 
-Read-only evidence only: no mutation/order endpoint is called. The proof uses
-one ChromeDriver/WebDriver browser session so each tab is navigated once, then
-captures desktop and mobile screenshots from the same loaded page. This avoids
-re-triggering slow backend reads three times per tab while still proving the
-actual deployed UI, active navigation state and responsive layout.
+A screenshot existing is not proof that a dashboard tab works.  The verifier
+therefore proves three independent things from the deployed Cloud Run URL:
+1. navigation: the requested tab is active;
+2. semantics: active <main> content is meaningful and settled (not loading/error);
+3. visuals: desktop and mobile screenshots are non-empty.
+
+Read-only evidence only: no mutation/order endpoint is called.
 """
 from __future__ import annotations
 
@@ -32,7 +34,9 @@ TABS_OUT = OUT / "tabs"
 TIMEOUT_S = 30
 PAGE_LOAD_TIMEOUT_S = 45
 RETRY_PAGE_LOAD_TIMEOUT_S = 60
-ACTIVE_TAB_WAIT_S = 12
+ACTIVE_TAB_WAIT_S = 30
+MIN_MAIN_TEXT_CHARS = 60
+SEMANTIC_CONTRACT_VERSION = 2
 
 TABS = [
     ("decision-intel", "Decision Intel"),
@@ -58,6 +62,47 @@ TABS = [
     ("system", "System"),
     ("gates", "Live Gate"),
 ]
+
+# These strings are never an acceptable final state of an active dashboard
+# panel.  PENDING/BLOCKED are deliberately not forbidden: they can be truthful
+# analyzer states.  The defect being prevented is a false PASS on a panel that
+# has not settled or that crashed.
+FORBIDDEN_MAIN_MARKERS = (
+    "LOADING ",
+    "LOADING…",
+    "REQUEST FAILED",
+    "FAILED TO FETCH",
+    "NETWORK ERROR",
+    "SOMETHING WENT WRONG",
+    "ERROR BOUNDARY",
+    "DASHBOARD API KEY",
+    "ENTER API KEY",
+)
+
+
+def evaluate_tab_semantics(tab_id: str, snapshot: dict) -> list[str]:
+    """Pure contract used by browser proof and unit tests."""
+    failures: list[str] = []
+    main_text = str(snapshot.get("mainText") or "").strip().upper()
+    if len(main_text) < MIN_MAIN_TEXT_CHARS:
+        failures.append(f"main_content_too_thin:{len(main_text)}")
+    for marker in FORBIDDEN_MAIN_MARKERS:
+        if marker in main_text:
+            failures.append(f"unsettled_or_error_marker:{marker.strip()}")
+
+    # Paper is the regression that exposed the old false-PASS design.  It gets
+    # a stronger contract: the DOM itself must say it settled and must prove the
+    # durable Firestore authority + paper order safety.
+    if tab_id == "paper":
+        if str(snapshot.get("paperProofState") or "").lower() != "settled":
+            failures.append("paper_not_settled")
+        if str(snapshot.get("paperLedgerSource") or "").upper() != "FIRESTORE_PAPER_LEDGER":
+            failures.append("paper_firestore_ledger_not_proven")
+        for marker in ("PAPER TRADING CONSOLE", "PAPER TRUTH PROVENANCE", "FIRESTORE_PAPER_LEDGER", "INTENTIONALLY NOT CALLED"):
+            if marker not in main_text:
+                failures.append(f"paper_required_marker_missing:{marker}")
+
+    return failures
 
 
 def _run(*args: str, timeout: int = 90) -> str:
@@ -158,11 +203,7 @@ class ChromeDriverSession:
         self._request(
             "POST",
             f"/session/{self.session_id}/timeouts",
-            {
-                "implicit": 0,
-                "pageLoad": self.page_load_timeout_s * 1000,
-                "script": 10000,
-            },
+            {"implicit": 0, "pageLoad": self.page_load_timeout_s * 1000, "script": 10000},
         )
         return self
 
@@ -180,15 +221,7 @@ class ChromeDriverSession:
                 self.proc.kill()
         self.session_id = ""
 
-    def _request(
-        self,
-        method: str,
-        path: str,
-        payload: dict | None = None,
-        *,
-        timeout: int | None = None,
-        sessionless: bool = False,
-    ):
+    def _request(self, method: str, path: str, payload: dict | None = None, *, timeout: int | None = None, sessionless: bool = False):
         response = requests.request(
             method,
             f"{self.base}{path}",
@@ -226,11 +259,18 @@ class ChromeDriverSession:
 const id = arguments[0];
 const button = document.querySelector('[data-dashboard-tab="' + CSS.escape(id) + '"]');
 const bodyText = (document.body && document.body.innerText || '').toUpperCase();
+const main = document.querySelector('#dashboard-main');
+const mainText = (main && main.innerText || '').trim();
+const paper = document.querySelector('[data-paper-proof-state]');
 return {
   active: !!button && button.getAttribute('aria-current') === 'page',
   system3: bodyText.includes('SYSTEM3'),
   dashboardKeyPrompt: bodyText.includes('DASHBOARD API KEY') || bodyText.includes('ENTER API KEY'),
-  readyState: document.readyState
+  readyState: document.readyState,
+  mainText: mainText,
+  mainTextLength: mainText.length,
+  paperProofState: paper ? paper.getAttribute('data-paper-proof-state') : null,
+  paperLedgerSource: paper ? paper.getAttribute('data-paper-ledger-source') : null
 };
 """
         value = self._request(
@@ -241,14 +281,14 @@ return {
         )
         return value if isinstance(value, dict) else {}
 
-    def wait_for_active(self, tab_id: str) -> dict:
+    def wait_for_settled(self, tab_id: str) -> dict:
         deadline = time.monotonic() + ACTIVE_TAB_WAIT_S
         last: dict = {}
         while time.monotonic() < deadline:
             last = self.proof_snapshot(tab_id)
-            if last.get("active") and last.get("system3"):
+            if last.get("active") and last.get("system3") and not evaluate_tab_semantics(tab_id, last):
                 return last
-            time.sleep(0.4)
+            time.sleep(0.5)
         return last
 
     def screenshot(self, path: Path) -> str:
@@ -284,23 +324,25 @@ def _capture_tab(
         "capture_retry": retry,
         "browser_transport": "webdriver_single_session",
         "mobile_reload_required": False,
+        "semantic_contract_version": SEMANTIC_CONTRACT_VERSION,
     }
     failures: list[str] = []
     try:
         browser.set_viewport(1600, 1000)
         browser.navigate(url)
-        snapshot = browser.wait_for_active(tab_id)
+        snapshot = browser.wait_for_settled(tab_id)
         active = bool(snapshot.get("active"))
         login_prompt = bool(snapshot.get("dashboardKeyPrompt"))
         system3_marker = bool(snapshot.get("system3"))
+        desktop_semantic_failures = evaluate_tab_semantics(tab_id, snapshot)
 
         desktop = TABS_OUT / f"{index:02d}-{tab_id}-desktop.png"
         mobile = TABS_OUT / f"{index:02d}-{tab_id}-mobile.png"
         desktop_hash = browser.screenshot(desktop)
 
         browser.set_viewport(430, 932)
-        time.sleep(0.5)
-        mobile_snapshot = browser.proof_snapshot(tab_id)
+        mobile_snapshot = browser.wait_for_settled(tab_id)
+        mobile_semantic_failures = evaluate_tab_semantics(tab_id, mobile_snapshot)
         mobile_hash = browser.screenshot(mobile)
 
         local_failures: list[str] = []
@@ -312,6 +354,8 @@ def _capture_tab(
             local_failures.append("dashboard_api_key_prompt_rendered")
         if not system3_marker or not mobile_snapshot.get("system3"):
             local_failures.append("system3_marker_missing")
+        local_failures.extend(f"desktop_semantic:{item}" for item in desktop_semantic_failures)
+        local_failures.extend(f"mobile_semantic:{item}" for item in mobile_semantic_failures)
 
         row.update({
             "proof_state": "PASS" if not local_failures else "FAIL",
@@ -319,6 +363,12 @@ def _capture_tab(
             "mobile_active_tab_proven": bool(mobile_snapshot.get("active")),
             "dashboard_api_key_prompt_rendered": bool(login_prompt or mobile_snapshot.get("dashboardKeyPrompt")),
             "system3_marker": bool(system3_marker and mobile_snapshot.get("system3")),
+            "desktop_main_text_length": int(snapshot.get("mainTextLength") or 0),
+            "mobile_main_text_length": int(mobile_snapshot.get("mainTextLength") or 0),
+            "desktop_semantic_settled": not desktop_semantic_failures,
+            "mobile_semantic_settled": not mobile_semantic_failures,
+            "paper_proof_state": snapshot.get("paperProofState") if tab_id == "paper" else None,
+            "paper_ledger_source": snapshot.get("paperLedgerSource") if tab_id == "paper" else None,
             "desktop_file": str(desktop.relative_to(OUT)),
             "desktop_sha256": desktop_hash,
             "mobile_file": str(mobile.relative_to(OUT)),
@@ -352,9 +402,7 @@ def _write_matrix(matrix: dict, rows: dict[int, dict], failures: list[str], *, f
         if final
         else "IN_PROGRESS"
     )
-    (OUT / "tab_visual_matrix.json").write_text(
-        json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8"
-    )
+    (OUT / "tab_visual_matrix.json").write_text(json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def _capture_pass(
@@ -371,9 +419,7 @@ def _capture_pass(
     with ChromeDriverSession(page_load_timeout_s=page_load_timeout_s) as browser:
         for index in indexes:
             tab_id, label = TABS[index - 1]
-            index, row, row_failures = _capture_tab(
-                browser, index, tab_id, label, dashboard_url, retry=retry
-            )
+            index, row, row_failures = _capture_tab(browser, index, tab_id, label, dashboard_url, retry=retry)
             rows[index] = row
             next_failures = [item for item in next_failures if not item.startswith(f"{tab_id}:")]
             next_failures.extend(row_failures)
@@ -405,6 +451,8 @@ def main() -> int:
         "page_load_timeout_seconds": PAGE_LOAD_TIMEOUT_S,
         "retry_page_load_timeout_seconds": RETRY_PAGE_LOAD_TIMEOUT_S,
         "retry_mode": "failed_tabs_fresh_browser_once",
+        "semantic_contract_version": SEMANTIC_CONTRACT_VERSION,
+        "semantic_rule": "active main must be non-thin and free of persistent loading/error markers",
         "viewports": {"desktop": "1600x1000", "mobile": "430x932"},
         "mobile_reload_required": False,
         "expected_page_navigations_initial": len(TABS),
@@ -434,10 +482,7 @@ def main() -> int:
             page_load_timeout_s=PAGE_LOAD_TIMEOUT_S,
         )
 
-        retry_indexes = [
-            index for index, row in sorted(rows.items())
-            if row.get("proof_state") != "PASS"
-        ]
+        retry_indexes = [index for index, row in sorted(rows.items()) if row.get("proof_state") != "PASS"]
         matrix["initial_fail_count"] = len(retry_indexes)
         matrix["retry_count"] = len(retry_indexes)
         if retry_indexes:
@@ -467,6 +512,7 @@ def main() -> int:
             "pass_count": matrix["pass_count"],
             "fail_count": matrix["fail_count"],
             "retry_count": matrix.get("retry_count", 0),
+            "semantic_contract_version": SEMANTIC_CONTRACT_VERSION,
             "browser_transport": "webdriver_single_session",
             "mutations_called": False,
         }, sort_keys=True))
@@ -474,12 +520,9 @@ def main() -> int:
     except Exception as exc:
         matrix["fatal_error"] = f"{type(exc).__name__}:{str(exc)[:180]}"
         matrix["state"] = "FAIL"
-        (OUT / "tab_visual_matrix.json").write_text(
-            json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8"
-        )
+        (OUT / "tab_visual_matrix.json").write_text(json.dumps(matrix, indent=2, sort_keys=True), encoding="utf-8")
         print(
-            "UI_TAB_VISUAL_PROOF "
-            + json.dumps({"state": "FAIL", "error": matrix["fatal_error"]}),
+            "UI_TAB_VISUAL_PROOF " + json.dumps({"state": "FAIL", "error": matrix["fatal_error"]}),
             file=sys.stderr,
         )
         return 1

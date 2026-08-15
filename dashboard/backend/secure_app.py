@@ -11,12 +11,14 @@ Dedicated worker ingestion remains bound to its separate worker token.
 """
 from __future__ import annotations
 
+import asyncio
 from collections import Counter
 import hashlib
 import json
 import os
 
 from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
 
 # Permanent architecture invariant: these retired dashboard-auth knobs have no
 # runtime meaning. Scrub them before importing the legacy backend so even a
@@ -42,9 +44,22 @@ from dashboard.backend.mutation_policy import (  # noqa: E402
     unclassified_write_routes,
 )
 from dashboard.backend.security_policy import SecurityDecision, evaluate_request  # noqa: E402
+from dashboard.backend.traffic_shield import (  # noqa: E402
+    retire_legacy_delay_middleware,
+    traffic_shield_middleware,
+    traffic_shield_status,
+)
 
 
 app = legacy.app
+
+# The legacy "rate_limit_middleware" slept 50ms on every broker/chain request;
+# it did not actually limit concurrency or honor Retry-After. Remove it from the
+# Cloud Run serving stack before adding the real single-flight traffic shield.
+_RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT = retire_legacy_delay_middleware(
+    app,
+    getattr(legacy, "rate_limit_middleware", None),
+)
 
 # Belt-and-suspenders protection for the already-imported legacy compatibility
 # globals. They are not authority and can never be changed by request input.
@@ -55,17 +70,26 @@ if hasattr(legacy, "_API_KEY"):
 if hasattr(legacy, "_has_dashboard_api_access"):
     legacy._has_dashboard_api_access = lambda _request: False
 
-# Only the informational status route survives. Login/logout/session endpoints
-# are deliberately absent from the serving route table.
+# Auth compatibility routes and the legacy file-backed paper GET are removed
+# from the serving table.  The canonical /api/paper route below reads the
+# durable Firestore paper ledger; local Cloud Run files are never production
+# authority.
 _RETIRED_AUTH_PATHS = {
     "/api/auth/" + "session",
     "/api/auth/" + "logout",
     "/api/auth/" + "status",
 }
-app.router.routes = [
-    route for route in app.router.routes
-    if getattr(route, "path", None) not in _RETIRED_AUTH_PATHS
-]
+
+
+def _retire_serving_route(route) -> bool:
+    path = getattr(route, "path", None)
+    if path in _RETIRED_AUTH_PATHS:
+        return True
+    methods = set(getattr(route, "methods", None) or set())
+    return path == "/api/paper" and "GET" in methods
+
+
+app.router.routes = [route for route in app.router.routes if not _retire_serving_route(route)]
 
 
 def _capability_aware_request_policy(**kwargs) -> SecurityDecision:
@@ -106,12 +130,7 @@ legacy.evaluate_request = _capability_aware_request_policy
 
 @app.middleware("http")
 async def strip_retired_dashboard_credentials(request: Request, call_next):
-    """Make retired dashboard credential input inert before inner middleware.
-
-    This middleware is registered last and therefore wraps the legacy stack.
-    It removes only the retired dashboard credential header/cookie; unrelated
-    cookies and worker/control headers are preserved.
-    """
+    """Make retired dashboard credential input inert before inner middleware."""
     headers = []
     retired_header = b"x-" + b"api-key"
     retired_cookie_name = "system3_dashboard_" + "session"
@@ -142,6 +161,16 @@ async def strip_retired_dashboard_credentials(request: Request, call_next):
     return await call_next(request)
 
 
+@app.middleware("http")
+async def public_read_traffic_shield(request: Request, call_next):
+    """Coalesce expensive public GETs and fail over to recent good snapshots.
+
+    This never wraps write methods. MutationPolicy therefore remains the only
+    mutation authority and LIVE remains hard-disabled.
+    """
+    return await traffic_shield_middleware(request, call_next)
+
+
 @app.get("/api/auth/status")
 async def dashboard_auth_status():
     """Stable non-secret proof that dashboard credential authority is absent."""
@@ -153,6 +182,66 @@ async def dashboard_auth_status():
         "credential_surface": "REMOVED",
         "session": None,
     }
+
+
+@app.get("/api/traffic/health")
+async def traffic_health_status():
+    """Non-secret 429/self-healing evidence for monitoring and runtime proof."""
+    return {
+        **traffic_shield_status(),
+        "legacy_fixed_delay_middleware_retired": _RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT == 1,
+        "legacy_fixed_delay_middleware_removed_count": _RETIRED_FIXED_DELAY_MIDDLEWARE_COUNT,
+        "client_contract": "RETRY_AFTER_EXPONENTIAL_BACKOFF_JITTER",
+        "websocket_preferred": True,
+        "durable_truth": "FIRESTORE_AND_BROKER_READ_ONLY",
+        "public_dashboard_read_only": True,
+    }
+
+
+@app.get("/api/paper")
+async def durable_paper_status():
+    """Single self-contained public truth endpoint for the Paper Trades tab.
+
+    Reads only Firestore.  It never invokes Dhan, scanner, order, mutation or
+    local-file code, so dashboard rendering cannot trigger broker fan-out or
+    depend on the lifetime of a Cloud Run container.
+    """
+    try:
+        from dashboard.backend.paper_ledger_backend import FirestorePaperLedgerBackend
+
+        payload = await asyncio.wait_for(
+            asyncio.to_thread(FirestorePaperLedgerBackend().public_snapshot),
+            timeout=8.0,
+        )
+        payload["api_contract"] = "paper_public_truth_v1"
+        payload["public_dashboard_read_only"] = True
+        return JSONResponse(payload, status_code=200, headers={"Cache-Control": "no-store"})
+    except Exception as exc:
+        # A durable ledger outage is not represented as an empty/zero portfolio.
+        # Fail visibly so semantic browser proof blocks deployment acceptance.
+        payload = {
+            "status": "UNAVAILABLE",
+            "mode": "PAPER",
+            "engine": "cloud_paper_firestore_v1",
+            "positions_source": "FIRESTORE_PAPER_LEDGER",
+            "data_source": "DURABLE_LEDGER_UNAVAILABLE",
+            "positions": {"positions": [], "open_positions": [], "open_count": 0},
+            "pnl": {"summary": {}, "closed_positions": []},
+            "trades": {"entries": [], "exits": [], "count": 0},
+            "paper_truth": {
+                "ledger_source": "FIRESTORE_PAPER_LEDGER",
+                "durable": True,
+                "available": False,
+                "broker_order_endpoints_called": False,
+                "order_endpoints_label": "INTENTIONALLY_NOT_CALLED_PAPER_SAFE",
+                "error_type": type(exc).__name__,
+            },
+            "broker_order_endpoints_called": False,
+            "live_trading_enabled": False,
+            "api_contract": "paper_public_truth_v1",
+            "public_dashboard_read_only": True,
+        }
+        return JSONResponse(payload, status_code=503, headers={"Cache-Control": "no-store"})
 
 
 def _sentinel_reached(capability: str) -> None:

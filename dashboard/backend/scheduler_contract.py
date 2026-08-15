@@ -2,7 +2,7 @@
 
 Coverage counts, identity, cadence grace, and expected job targets must all derive
 from this module so Auto Deploy proofs and live health cannot drift apart when a
-lane is added (validate-daily taught that lesson).
+lane is added. Hard-coded expected lane counts are forbidden.
 """
 
 from __future__ import annotations
@@ -17,6 +17,10 @@ EXPECTED_SCHEDULER_CONTRACT: Dict[str, SchedulerContractRow] = {
     "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
     "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate", "5 10 * * MON-FRI", "UTC", 98),
     "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
+    # Durable PAPER authority: Scheduler invokes one bounded job each minute
+    # during market-hour clock range; the job itself enforces exact exchange
+    # market/holiday truth and never calls broker order endpoints.
+    "genesis-system3-paper-market": ("ENABLED", "genesis-system3-paper", "* 9-15 * * MON-FRI", "Asia/Kolkata", 1),
     "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 7 * * *", "Asia/Kolkata", 26),
     "genesis-system3-forecast-schedule": ("PAUSED", None, "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
     "genesis-system3-rank-schedule": ("PAUSED", None, "50 3 * * 1-5", "UTC", None),
