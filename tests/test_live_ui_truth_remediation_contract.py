@@ -3,6 +3,8 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+from scripts.gcp_live_ui_snapshot import _chain_source
+
 ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -74,6 +76,20 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("strikes_visible", text)
         self.assertIn("dhan_source_visible", text)
         self.assertIn("bad_source_visible", text)
+        self.assertIn("declared_source", text)
+
+    def test_chain_source_uses_explicit_source_field_not_universe_filename(self):
+        visible = (
+            "SYMBOL NIFTY\nCONTRACTS 462\nSTRIKES 231\n"
+            "source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT "
+            "complete_chain=true universe=security_id_list.csv"
+        )
+        self.assertEqual(_chain_source(visible), "dhan")
+
+    def test_chain_source_rejects_actual_non_dhan_source(self):
+        self.assertEqual(_chain_source("source=csv universe=security_id_list.csv"), "csv")
+        self.assertEqual(_chain_source("source=yahoo contracts 100 strikes 50"), "yahoo")
+        self.assertIsNone(_chain_source("universe=security_id_list.csv without declared source"))
 
     def test_live_proof_semantic_alerts_do_not_use_naive_error_substring_scan(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
