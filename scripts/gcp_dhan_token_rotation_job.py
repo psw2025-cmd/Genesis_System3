@@ -184,21 +184,23 @@ def _safe_profile_valid(client_id: str, token: str) -> dict[str, Any]:
 
 
 def _latest_token_snapshot() -> tuple[str, dict[str, Any]]:
-    """Return latest token internally plus non-secret version proof."""
+    """Return latest token internally plus non-secret version proof.
+
+    ``AccessSecretVersion`` already returns the concrete version resource name.
+    Do not make a second ``GetSecretVersion`` metadata call here: the rotator's
+    least-privilege runtime role intentionally has ``versions.access`` and
+    ``versions.add`` only, not ``versions.get``.
+    """
     client = secretmanager.SecretManagerServiceClient()
     resource = f"projects/{PROJECT}/secrets/{SECRET_ID}/versions/latest"
     response = client.access_secret_version(request={"name": resource})
     version_name = str(getattr(response, "name", "") or "")
     payload = getattr(getattr(response, "payload", None), "data", b"") or b""
     token = payload.decode("utf-8").strip() if payload else ""
-    version = client.get_secret_version(request={"name": version_name}) if version_name else None
-    created = getattr(version, "create_time", None)
-    if hasattr(created, "isoformat"):
-        created = created.isoformat()
     proof = {
         "secret_id": SECRET_ID,
         "version": version_name.rsplit("/", 1)[-1] if version_name else None,
-        "created_at": str(created) if created else None,
+        "created_at": None,
         "token_present": bool(token),
         "raw_token_exposed": False,
     }
