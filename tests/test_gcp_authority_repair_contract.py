@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "deploy/gcp/system3_iam_baseline.json"
 REPAIR_SCRIPT = ROOT / "scripts/gcp_authority_repair.py"
 REPAIR_WORKFLOW = ROOT / ".github/workflows/gcp-authority-repair.yml"
+CLOUD_DEPLOY_WORKFLOW = ROOT / ".github/workflows/cloud-run-auto-deploy.yml"
 BOOTSTRAP = ROOT / "deploy/gcp/bootstrap_autonomous_authority.sh"
 
 
@@ -75,15 +76,20 @@ class GcpAuthorityRepairContractTests(unittest.TestCase):
         ):
             self.assertIn(marker, text)
 
-    def test_repair_workflow_has_primary_fallback_and_bounded_retry(self):
+    def test_repair_workflow_has_primary_fallback_and_readonly_bounded_retry(self):
         text = REPAIR_WORKFLOW.read_text(encoding="utf-8")
+        deploy = CLOUD_DEPLOY_WORKFLOW.read_text(encoding="utf-8")
         self.assertIn('workflows: ["Cloud Run Auto Deploy"]', text)
         self.assertIn("gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", text)
         self.assertIn("gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com", text)
         self.assertIn("needs.primary-repair.result == 'failure'", text)
         self.assertIn("needs.primary-repair.outputs.changed == 'true'", text)
         self.assertIn("needs.fallback-repair.outputs.changed == 'true'", text)
-        self.assertEqual(text.count("gh workflow run cloud-run-auto-deploy.yml"), 1)
+        self.assertNotIn("actions: write", text)
+        self.assertNotIn("contents: write", text)
+        self.assertNotIn("gh workflow run", text)
+        self.assertEqual(text.count("uses: ./.github/workflows/cloud-run-auto-deploy.yml"), 1)
+        self.assertIn("workflow_call:", deploy)
         self.assertNotIn("gcloud run jobs execute", text)
 
     def test_bootstrap_uses_exact_repair_workflow_claim_and_keyless_identities(self):
