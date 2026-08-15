@@ -60,9 +60,9 @@ class GcpAuthorityRepairContractTests(unittest.TestCase):
     def test_reconciler_is_secret_safe_and_non_trading(self):
         text = REPAIR_SCRIPT.read_text(encoding="utf-8")
         self.assertNotIn("access_secret_version", text)
-        self.assertNotIn("secretmanager.versions.access", "\n".join(
-            line for line in text.splitlines() if "forbidden_custom_permissions" not in line
-        ))
+        self.assertEqual(text.count("secretmanager.versions.access"), 1)
+        self.assertEqual(text.count("secretmanager.versions.add"), 1)
+        self.assertEqual(text.count("iam.serviceAccountKeys.create"), 1)
         self.assertNotIn("AUTO_EXECUTE_TRADES=1", text)
         self.assertNotIn("LIVE_TRADING_ENABLED=1", text)
         self.assertNotIn('"execute"', text)
