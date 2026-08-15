@@ -131,6 +131,129 @@ Rerun #48 still failed, but the hard-failure set narrowed from `[npm_audit, band
 - [ ] Re-run after dependency remediation to ensure the toolchain upgrade does not regress UI.
 - [ ] Production proof remains required after exact-main deployment.
 
+## UI-002 — Local-vs-production proof provenance incident
+
+### Root cause already proven
+- [x] Frontend Browser Runtime Smoke serves the built Vite UI from `127.0.0.1`; it is a local render/runtime harness.
+- [x] Its 22 screenshots can prove tab mounting and visual state but cannot prove authoritative GCP broker connectivity.
+- [x] The GCP production visual-proof path is a separate script, `scripts/gcp_ui_tab_visual_proof.py`, whose matrix source is `real_deployed_cloud_run_ui` and whose service URL is resolved from Cloud Run.
+- [x] Therefore `Dhan · Waiting` in a local smoke screenshot is not equivalent to a production broker disconnect; treating it as such is a proof-provenance defect.
+
+### Permanent prevention checklist
+- [x] Local harness source must declare `PROOF_SCOPE=LOCAL_NON_PRODUCTION`.
+- [x] Local harness source must declare `PRODUCTION_AUTHORITY=False`.
+- [x] Local harness source must declare `BROKER_CONNECTIVITY_PROVEN=False`.
+- [x] Local manifest must write `production_claim_allowed=false`.
+- [x] Local manifest must write `served_from=127.0.0.1_vite_preview`.
+- [x] Local stdout PASS line must include `proof_scope=LOCAL_NON_PRODUCTION` and `production_authority=false`.
+- [x] Static regression must fail if local harness changes any of those false values to true.
+- [x] Static regression must prove the production browser harness still uses `real_deployed_cloud_run_ui`, `GITHUB_SHA`, Cloud Run service discovery and HTTPS.
+- [ ] Latest exact-head Frontend Browser Runtime Smoke must regenerate a manifest with all new provenance fields.
+- [ ] Local proof reports must never be used as production broker-connected evidence in status/master documentation.
+
+### Production broker UI proof checklist — all mandatory
+- [ ] Resolve Cloud Run service URL from GCP, never localhost/static config.
+- [ ] Record exact expected Git SHA.
+- [ ] Record actual serving revision.
+- [ ] Record actual deployed SHA and require equality with expected SHA.
+- [ ] Require intended revision at 100% traffic or explicitly record canary percentage.
+- [ ] `/api/health` HTTP 200 and lightweight.
+- [ ] `/api/broker/status` HTTP 200.
+- [ ] Sanitized broker status says connected/read-only-ready.
+- [ ] Token source/provenance visible without token payload.
+- [ ] Broker latency numerically recorded.
+- [ ] Overview UI visibly says Dhan CONNECTED/READY.
+- [ ] Broker tab visibly says CONNECTED/PROOF READY.
+- [ ] System tab visibly says Broker PROVEN/CONNECTED.
+- [ ] Data Integrity tab has no broker-data blocker.
+- [ ] WebSocket state is CONNECTED or explicitly not required for the tested read path; CONNECTING/DISCONNECTED cannot pass a realtime-data claim.
+- [ ] At least one index quote/chain is visibly non-placeholder.
+- [ ] At least one equity quote is visibly non-placeholder.
+- [ ] At least one equity-option underlying is visible.
+- [ ] Equity option expiry discovery > 0.
+- [ ] Equity option contract count > 0.
+- [ ] Equity option strike count > 0 and ALL STRIKES visible.
+- [ ] API counts and visible UI counts correlate.
+- [ ] Refresh page and repeat broker/connectivity/data assertions.
+- [ ] Second browser session repeats the same assertions to remove one-session bias.
+- [ ] No browser credential injection, mutation call or order call.
+- [ ] Screenshot + semantic JSON + revision/SHA metadata saved in one production artifact.
+
+### Broker-connected claim rule
+A broker-connected statement is allowed only when at least three independent production-visible surfaces agree in the same proof window: Overview + Broker + System, and the production API/runtime evidence agrees. A local browser artifact can never satisfy this rule.
+
+## AUTO-001 — Automation self-verification checklist
+
+Every automated checker must itself be tested before its result can be trusted.
+
+1. **Identity/provenance**
+   - [ ] Workflow name, trigger, exact SHA, runner and proof scope recorded.
+   - [ ] Local, staging/candidate and production scopes cannot share an unlabeled artifact schema.
+2. **Positive case**
+   - [ ] Known-good fixture/input produces PASS.
+3. **Negative case**
+   - [ ] Known-bad fixture/input produces FAIL.
+4. **Adversarial case**
+   - [ ] Missing fields, stale evidence, wrong SHA, wrong URL and placeholder UI cannot pass.
+5. **Freshness**
+   - [ ] Artifact carries generated timestamp and source timestamp where applicable.
+6. **Authority**
+   - [ ] Production claims require deployed GCP authority; local mocks cannot promote status.
+7. **Safety**
+   - [ ] LIVE flags remain locked and automation performs zero order/mutation actions.
+8. **Failure behavior**
+   - [ ] Failure emits exact blocker, file/path or endpoint, expected state, observed state and safest next action.
+9. **Retry behavior**
+   - [ ] At most one bounded retry for proven transient transport failure; semantic/product failures are not retried-to-green.
+10. **Recurrence behavior**
+   - [ ] Repeated same-class failure increments recurrence and creates a child-loop investigation instead of resetting history.
+
+## AUTO-002 — Required automation chain for Issue #188
+
+The following automated checks are individually necessary and jointly insufficient until all pass on the same current-main deployment generation:
+
+- [ ] Repository/sidebar ↔ 22-tab browser contract.
+- [ ] Local render/runtime smoke with `LOCAL_NON_PRODUCTION` provenance.
+- [ ] Frontend type/build smoke.
+- [ ] Security Audit Evidence.
+- [ ] CodeQL.
+- [ ] Global Safety.
+- [ ] Exact-main Cloud Run deployment.
+- [ ] Exact serving SHA/revision/traffic proof.
+- [ ] Production `/api/health` proof.
+- [ ] Production broker status + sanitized token provenance proof.
+- [ ] Dhan rotator execution reliability proof.
+- [ ] Scheduler/job configuration proof.
+- [ ] Production semantic browser proof for Overview/Broker/System/Data Integrity.
+- [ ] NSE equity coverage.
+- [ ] BSE equity coverage where broker-supported.
+- [ ] NSE/BSE index coverage where supported.
+- [ ] Index derivatives coverage.
+- [ ] Equity derivatives coverage.
+- [ ] Index option chains across multiple expiries.
+- [ ] Equity option chains across multiple symbols and expiries.
+- [ ] Full supported strike visibility and CE/PE coverage.
+- [ ] Quote freshness/stale labeling.
+- [ ] WebSocket reconnect/resubscribe proof.
+- [ ] Rate-limit/backoff/circuit-breaker proof.
+- [ ] Broker-outage degraded-mode UI proof.
+- [ ] Backend API ↔ production UI count/parity proof.
+- [ ] Repeat-browser refresh proof.
+- [ ] 60-minute uninterrupted market-session observation after every prerequisite is green.
+
+### Automation failure handling
+If any automation item fails:
+- [ ] Freeze its exact logs/artifact first.
+- [ ] Mark FAIL vs BLOCKED vs CI_INFRASTRUCTURE explicitly.
+- [ ] Create the standard 10-step child loop.
+- [ ] Do not rerun until a hypothesis and expected result are written.
+- [ ] Add a regression/adversarial test where technically possible.
+- [ ] Implement smallest durable fix.
+- [ ] Rerun only the failed/focused gate first.
+- [ ] Then rerun adjacent gates.
+- [ ] Then rerun the complete mandatory chain.
+- [ ] Update this checklist only from fresh machine evidence.
+
 ## Closure rule
 
 No item is `CLOSED — PROVEN` until source → tests → security → merge → exact-main deployment → runtime → broker/data → semantic UI → recurrence observation → documentation all pass on the same causal chain.
