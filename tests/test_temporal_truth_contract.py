@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -65,7 +64,7 @@ class TemporalTruthContractTests(unittest.TestCase):
         self.assertFalse(verdict["current_live_allowed"])
         self.assertIn("CAPTURE_TIME_MISSING_OR_INVALID", verdict["reasons"])
 
-    def test_agent_entry_points_reference_temporal_policy(self):
+    def test_agent_and_governance_entry_points_reference_temporal_policy(self):
         required = [
             ROOT / "AGENTS.md",
             ROOT / "GEMINI.md",
@@ -74,6 +73,10 @@ class TemporalTruthContractTests(unittest.TestCase):
             ROOT / "GOVERNANCE.md",
             ROOT / "docs" / "authority" / "AUTONOMOUS_OPERATIONS_POLICY.md",
             ROOT / "docs" / "project_control" / "SYSTEM3_MASTER_GOAL_LOCK.md",
+            ROOT / "docs" / "SYSTEM3_VISUAL_PROOF_AND_RENDER_RULES.md",
+            ROOT / "docs" / "SYSTEM3_CURRENT_BLOCKER_RUNBOOK.md",
+            ROOT / "docs" / "runtime" / "AUTHORITATIVE_RUNTIME_AND_DATA_MAP.md",
+            ROOT / "docs" / "project_control" / "PRODUCTION_GRADE_BLOCKER_MATRIX.md",
         ]
         for path in required:
             text = path.read_text(encoding="utf-8", errors="replace")
@@ -89,6 +92,7 @@ class TemporalTruthContractTests(unittest.TestCase):
             '"api_end": api_end',
             '"tabs_expected": list(TABS)',
             '"new_current_request_requires_new_capture": True',
+            '"stored_artifact_becomes_historical_after_capture": True',
         ]:
             self.assertIn(marker, text)
 
@@ -97,6 +101,27 @@ class TemporalTruthContractTests(unittest.TestCase):
         self.assertIn("tests.test_temporal_truth_contract", text)
         self.assertIn("system3_temporal_truth_guard.py", text)
         self.assertIn("gcp_live_ui_snapshot.py", text)
+        self.assertIn("request-scoped read-only live production UI lifecycle proof", text.lower())
+
+    def test_multi_agent_coordinator_does_not_promote_reports_latest_or_http_200(self):
+        text = (ROOT / "tools" / "multi_agent_production_coordinator.py").read_text(encoding="utf-8")
+        for marker in [
+            "SYSTEM3_TEMPORAL_TRUTH_V1",
+            '"evidence_class": "HISTORICAL_EVIDENCE"',
+            '"evidence_class": "REQUEST_SCOPED_LIVE_API"',
+            '"reports_latest_is_current_truth": False',
+            '"http_200_is_semantic_ui_pass": False',
+            '"semantic_dashboard_production_grade": False',
+            "DEFAULT_GCP_URL",
+        ]:
+            self.assertIn(marker, text)
+
+    def test_retired_render_and_angel_are_not_current_authority_in_entry_files(self):
+        for path in [ROOT / "AGENTS.md", ROOT / "GEMINI.md", ROOT / ".cursorrules"]:
+            text = path.read_text(encoding="utf-8", errors="replace").lower()
+            self.assertIn("dhan", text)
+            self.assertIn("retired", text)
+            self.assertIn("non-authoritative", text)
 
 
 if __name__ == "__main__":
