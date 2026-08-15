@@ -12,6 +12,7 @@
 | Dhan guarded recovery | `gs3-token-recovery` -> rotator | Yes, bounded/single-flight | Retry storms |
 | Dhan token secret write | `genesis-system3-dhan-rotator` | Yes | Any web/deployer/repair writer |
 | Web Dhan token read | `genesis-system3-web` dynamic Secret Manager source | Yes | Mounted static access-token env secret |
+| Strict scheduler-only `run.jobs.run` | **PARTIAL**: Dhan job-level invokers are scheduler/recovery only, but deployer temporarily retains project `roles/run.admin` for non-Dhan deployment work | Migration pending | Claiming Rule-1 PASS before project IAM scrub |
 | UI/API runtime proof | Cloud Run + browser/API proof workflows | Yes | Readiness claim from source only |
 | LIVE trading enablement | none | No | Autonomous LIVE enablement/order execution |
 | Project deletion/billing ownership | human owner break-glass | No | Autonomous destructive project/account changes |
@@ -22,10 +23,14 @@
 
 ## IAM failure sequence
 
-`deploy permission failure -> primary repair -> fallback only if primary fails -> compare baseline -> add only missing declared authority -> one deploy retry -> verify exact SHA`
+`deploy permission failure -> primary repair -> fallback only if primary fails -> compare baseline -> restore declared authority/safety deny-lists -> one guarded deploy reuse -> verify exact SHA`
 
-A repair run with zero IAM changes must not trigger a deploy retry. This prevents repair/deploy loops for non-IAM failures.
+A repair run with zero IAM changes must not invoke a deploy retry. This prevents repair/deploy loops for non-IAM failures.
 
 ## Bootstrap sequence
 
-`deploy/gcp/bootstrap_all.sh` is the authoritative one-time owner/admin entrypoint. It runs the existing WIF/runtime bootstrap first, then installs the redundant repair identities and exact-workflow repair claim.
+`deploy/gcp/bootstrap_all.sh` is the authoritative one-time owner/admin entrypoint. It runs the existing WIF/runtime bootstrap, installs the redundant repair identities and exact-workflow repair claim, runs authority contract tests, applies the machine baseline, and performs a second read-only convergence check.
+
+## Required post-bootstrap least-privilege migration
+
+After production authority/recovery is proven, replace the deployer's temporary project `roles/run.admin` with a custom deployment role excluding `run.jobs.run`, grant only narrowly required non-Dhan job execution authority, remove excess project-level job execution holders, and re-run `scripts/inventory_run_jobs_run_principals.py`. Only a clean resulting inventory may change strict scheduler-only IAM from PARTIAL to PASS.
