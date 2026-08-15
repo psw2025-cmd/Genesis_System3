@@ -11,7 +11,9 @@ Safety contract:
 - never expose a raw token;
 - never mint a Dhan token inside the serving web process;
 - canonical rotation is allowed only while every LIVE flag is OFF;
-- single-flight + cooldown prevents dashboard polling from creating job storms.
+- local single-flight + cooldown bounds one process;
+- the expected Secret Manager version is passed to the Job so separate Cloud Run
+  instances/executions can coordinate without exposing token payloads.
 """
 from __future__ import annotations
 
@@ -157,6 +159,7 @@ def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
 
         before = token_metadata()
         before_version = str(before.get("secret_version") or "")
+        proof["expected_secret_version"] = before_version or None
         project = (
             os.getenv("GOOGLE_CLOUD_PROJECT")
             or os.getenv("GCP_PROJECT")
@@ -173,7 +176,23 @@ def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
             f"https://run.googleapis.com/v2/projects/{project}/locations/{region}/"
             f"jobs/{job}:run"
         )
-        response = requests.post(run_url, headers=headers, json={}, timeout=30)
+        request_body: dict[str, Any] = {}
+        if before_version:
+            request_body = {
+                "overrides": {
+                    "containerOverrides": [
+                        {
+                            "env": [
+                                {
+                                    "name": "DHAN_ROTATION_EXPECTED_VERSION",
+                                    "value": before_version,
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        response = requests.post(run_url, headers=headers, json=request_body, timeout=30)
         response.raise_for_status()
         operation = response.json() or {}
         op_name = str(operation.get("name") or "")
