@@ -101,7 +101,7 @@ class TemporalTruthContractTests(unittest.TestCase):
         self.assertIn("tests.test_temporal_truth_contract", text)
         self.assertIn("system3_temporal_truth_guard.py", text)
         self.assertIn("gcp_live_ui_snapshot.py", text)
-        self.assertIn("request-scoped read-only live production UI lifecycle proof", text.lower())
+        self.assertIn("request-scoped read-only live production ui lifecycle proof", text.lower())
 
     def test_multi_agent_coordinator_does_not_promote_reports_latest_or_http_200(self):
         text = (ROOT / "tools" / "multi_agent_production_coordinator.py").read_text(encoding="utf-8")
