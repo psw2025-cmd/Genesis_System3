@@ -159,10 +159,13 @@ def check_governance_contract() -> dict:
         "Closure rule",
     ]
     required_local_markers = [
-        '"proof_scope": "LOCAL_NON_PRODUCTION"',
-        '"production_authority": False',
-        '"broker_connectivity_proven": False',
+        'PROOF_SCOPE = "LOCAL_NON_PRODUCTION"',
+        "PRODUCTION_AUTHORITY = False",
+        "BROKER_CONNECTIVITY_PROVEN = False",
         '"production_claim_allowed": False',
+        '"proof_scope": PROOF_SCOPE',
+        '"production_authority": PRODUCTION_AUTHORITY',
+        '"broker_connectivity_proven": BROKER_CONNECTIVITY_PROVEN',
     ]
     required_deployed_markers = [
         '"source": "real_deployed_cloud_run_ui"',
@@ -184,10 +187,10 @@ def check_governance_contract() -> dict:
                 missing.append({"scope": scope, "marker": marker})
 
     forbidden_local = [
-        '"production_authority": True',
-        '"broker_connectivity_proven": True',
+        "PRODUCTION_AUTHORITY = True",
+        "BROKER_CONNECTIVITY_PROVEN = True",
         '"production_claim_allowed": True',
-        '"proof_scope": "PRODUCTION"',
+        'PROOF_SCOPE = "PRODUCTION"',
     ]
     forbidden_hits = [marker for marker in forbidden_local if marker in local]
 
