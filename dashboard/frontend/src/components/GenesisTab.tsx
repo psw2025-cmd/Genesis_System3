@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { Activity, Brain, Database, Shield, Sparkles } from 'lucide-react'
 import { API_BASE, API_HEADERS } from '../config'
+import { useStore } from '../store'
 
 type GenesisState = {
   brief?: any
@@ -18,7 +19,7 @@ type GenesisState = {
 }
 
 async function getData(path: string) {
-  const response = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 10000 })
+  const response = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 5000 })
   return response.data?.data ?? response.data
 }
 
@@ -65,7 +66,13 @@ function StatusRow({ label, value, health }: { label: string; value: string; hea
 }
 
 export function GenesisTab() {
-  const [data, setData] = useState<GenesisState>({ loading: true })
+  const {
+    health: sharedHealth, state: sharedState, brokerStatus, brokerConnected,
+    gainRank, research, lastSync,
+  } = useStore()
+  // The layout must never disappear behind slow optional/legacy evidence endpoints.
+  // Shared dashboard truth renders immediately; Genesis-specific modules refresh in background.
+  const [data, setData] = useState<GenesisState>({ loading: false })
 
   const load = async () => {
     setData((current) => ({ ...current, loading: true, error: undefined }))
@@ -89,52 +96,67 @@ export function GenesisTab() {
       setData({
         brief: value(0), brain: value(1), lab: value(2), monitor: value(3), hunger: value(4),
         truth: value(5), health: value(6), system: value(7), final: value(8), loading: false,
-        error: failed === paths.length ? 'Genesis read-only APIs unavailable in this runtime' : undefined,
+        error: failed === paths.length ? 'Optional Genesis module APIs unavailable; shared live dashboard truth remains active' : undefined,
       })
     } catch (error: any) {
-      setData({ loading: false, error: error?.response?.data?.detail || error?.message || 'Genesis APIs unavailable' })
+      setData((current) => ({ ...current, loading: false, error: error?.response?.data?.detail || error?.message || 'Optional Genesis APIs unavailable' }))
     }
   }
 
   useEffect(() => { load() }, [])
 
-  if (data.loading) return <div className="workspace-shell"><div className="card" style={{ padding: 22, color: 'var(--text-mut)' }}>Genesis Brain is loading verified read-only intelligence…</div></div>
-
-  const marketOpen = data.health?.market_status === 'open' || Boolean(data.health?.market?.is_open)
-  const liveAllowed = Boolean(data.health?.live_allowed ?? data.health?.live_trading_enabled)
-  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score)
+  const effectiveHealth = data.health && !data.health?.error ? data.health : sharedHealth
+  const effectiveSystem = data.system && !data.system?.error ? data.system : sharedState
+  const marketOpen = effectiveHealth?.market_status === 'open'
+    || Boolean(effectiveHealth?.market?.is_open)
+    || Boolean(sharedState?.market?.is_open)
+  const liveAllowed = Boolean(sharedState?.live_trading_enabled ?? effectiveHealth?.live_allowed ?? effectiveHealth?.live_trading_enabled)
+  const brokerOk = brokerStatus?.connected === true || brokerConnected === true || effectiveHealth?.broker?.connected === true
+  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score ?? effectiveHealth?.truth_score)
   const confidence = pct(data.brain?.confidence ?? data.brain?.prediction_confidence ?? data.final?.confidence)
   const accuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct)
   const hitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate)
-  const drawdown = pct(data.brain?.max_drawdown ?? data.system?.max_drawdown)
-  const profitFactor = Number(data.brain?.profit_factor ?? data.system?.profit_factor)
+  const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown)
+  const profitFactor = Number(data.brain?.profit_factor ?? effectiveSystem?.profit_factor)
   const drift = Number(data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi)
   const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? data.final?.bias ?? 'WAITING FOR MODEL EVIDENCE').toUpperCase()
   const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
   const biasTone = /bull|up|long/i.test(bias) ? 'var(--up)' : /bear|down|short/i.test(bias) ? 'var(--down)' : 'var(--amber)'
-  const sources = Array.isArray(data.brief?.sources) ? data.brief.sources : []
+  const researchSources = Array.isArray(research?.sources) ? research.sources : []
+  const sources = Array.isArray(data.brief?.sources) ? data.brief.sources : researchSources
   const reasons = Array.isArray(data.brain?.reasons) ? data.brain.reasons
     : Array.isArray(data.brief?.market_open_must_show) ? data.brief.market_open_must_show
     : []
   const decisions = Array.isArray(data.brain?.decision_audit) ? data.brain.decision_audit
     : Array.isArray(data.final?.audit) ? data.final.audit
     : []
+  const candidateCount = useMemo(() => {
+    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []
+    return Array.isArray(rankings) ? rankings.length : 0
+  }, [gainRank])
 
   const modules = [
+    ['Shared GCP Truth', sharedHealth || sharedState ? 'ACTIVE' : 'WAITING', sharedHealth || sharedState ? 100 : null],
+    ['Dhan Broker', brokerOk ? 'CONNECTED' : 'WAITING', brokerOk ? 100 : null],
     ['Genesis Brain', data.brain?.status ?? (data.brain && !data.brain?.error ? 'ACTIVE' : 'WAITING'), pct(data.brain?.health_pct ?? data.brain?.health)],
     ['Data Truth', data.truth?.status ?? (data.truth && !data.truth?.error ? 'ACTIVE' : 'WAITING'), truthScore],
-    ['System Health', data.system?.status ?? data.health?.status ?? (data.health && !data.health?.error ? 'ACTIVE' : 'WAITING'), pct(data.system?.health_pct)],
+    ['System Health', effectiveSystem?.status ?? effectiveHealth?.status ?? (effectiveHealth ? 'ACTIVE' : 'WAITING'), pct(effectiveSystem?.health_pct)],
     ['Never Die Monitor', data.monitor?.status ?? (data.monitor && !data.monitor?.error ? 'ACTIVE' : 'WAITING'), pct(data.monitor?.health_pct)],
     ['Research / Sources', sources.length ? 'ACTIVE' : 'WAITING', sources.length ? 100 : null],
-    ['Broker Monitor', data.health?.broker_status ?? data.health?.broker?.status ?? 'WAITING', pct(data.health?.broker?.health_pct)],
   ] as const
 
   return (
-    <div className="workspace-shell">
+    <div className="workspace-shell" data-testid="genesis-brain-live">
+      {data.loading && (
+        <div className="card" style={{ padding: '8px 12px', marginBottom: 9, borderColor: 'rgba(59,140,255,.28)', background: 'rgba(59,140,255,.05)' }}>
+          <span style={{ color: '#78b6ff', fontSize: '.62rem', fontWeight: 800 }}>BACKGROUND REFRESH</span>
+          <span style={{ color: 'var(--text-mut)', fontSize: '.6rem', marginLeft: 10 }}>Optional Genesis modules are refreshing. Shared GCP/Dhan truth below stays visible and current.</span>
+        </div>
+      )}
       {data.error && (
         <div className="card" style={{ padding: '9px 12px', marginBottom: 9, borderColor: 'rgba(245,165,36,.34)', background: 'linear-gradient(90deg, rgba(245,165,36,.07), rgba(7,18,31,.9))' }}>
-          <span style={{ color: 'var(--amber)', fontSize: '.62rem', fontWeight: 800 }}>DEGRADED READ-ONLY MODE</span>
-          <span style={{ color: 'var(--text-mut)', fontSize: '.6rem', marginLeft: 10 }}>{data.error}. Layout remains visible; unavailable values stay WAITING/--.</span>
+          <span style={{ color: 'var(--amber)', fontSize: '.62rem', fontWeight: 800 }}>OPTIONAL MODULES DEGRADED</span>
+          <span style={{ color: 'var(--text-mut)', fontSize: '.6rem', marginLeft: 10 }}>{data.error}. Shared broker/market truth remains visible; unavailable model-only values stay WAITING/--.</span>
         </div>
       )}
 
@@ -144,26 +166,29 @@ export function GenesisTab() {
             <div style={{ width: 38, height: 38, borderRadius: 10, display: 'grid', placeItems: 'center', color: '#78b6ff', background: 'linear-gradient(135deg, rgba(59,140,255,.20), rgba(168,85,247,.10))', border: '1px solid rgba(59,140,255,.35)' }}><Brain size={20} /></div>
             <div>
               <div className="workspace-title" style={{ fontSize: '1.05rem' }}>Genesis Brain / AI Decision Center</div>
-              <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.6rem' }}>Real-time model evidence, research status, health and read-only orchestration visibility</div>
+              <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.6rem' }}>Shared GCP/Dhan truth renders immediately; model-specific evidence refreshes independently</div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 7 }}>
-            <button className="soft-btn" onClick={load}>Refresh evidence</button>
+          <div style={{ display: 'flex', gap: 7, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="pill" style={{ color: brokerOk ? 'var(--up)' : 'var(--amber)' }}>DHAN {brokerOk ? 'CONNECTED' : 'WAITING'}</span>
+            <span className="pill">CANDIDATES {candidateCount}</span>
+            <button className="soft-btn" onClick={load} disabled={data.loading}>{data.loading ? 'Refreshing…' : 'Refresh model evidence'}</button>
             <span className="pill" style={{ color: liveAllowed ? 'var(--down)' : 'var(--up)', border: `1px solid ${liveAllowed ? 'rgba(255,73,100,.24)' : 'rgba(24,215,130,.24)'}`, background: liveAllowed ? 'rgba(255,73,100,.06)' : 'rgba(24,215,130,.06)' }}>
               <Shield size={11} /> {liveAllowed ? 'LIVE FLAG REVIEW' : 'ANALYZER · LIVE OFF'}
             </span>
           </div>
         </div>
+        <div style={{ color: 'var(--text-mut)', fontSize: '.55rem', marginTop: 7 }}>Shared truth sync: {lastSync || 'waiting'}</div>
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', marginBottom: 9 }}>
         <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'Read-only after hours'} tone={marketOpen ? 'up' : 'warn'} />
-        <Metric label="Prediction Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model field only" tone="accent" />
-        <Metric label="Model Ensemble" value={String(data.brain?.ensemble_status ?? data.brain?.status ?? 'WAITING').toUpperCase()} sub="Brain service" tone={data.brain && !data.brain?.error ? 'up' : 'warn'} />
-        <Metric label="Truth Score" value={truthScore == null ? '--' : `${truthScore.toFixed(0)}%`} sub="Data truth evidence" tone={truthScore == null ? 'warn' : truthScore >= 90 ? 'up' : 'warn'} />
+        <Metric label="Prediction Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Model field only" tone={confidence == null ? 'warn' : 'accent'} />
+        <Metric label="Model Ensemble" value={String(data.brain?.ensemble_status ?? data.brain?.status ?? 'WAITING').toUpperCase()} sub="Optional brain service" tone={data.brain && !data.brain?.error ? 'up' : 'warn'} />
+        <Metric label="Truth Score" value={truthScore == null ? '--' : `${truthScore.toFixed(0)}%`} sub="Model/data truth evidence" tone={truthScore == null ? 'warn' : truthScore >= 90 ? 'up' : 'warn'} />
         <Metric label="Drift Detection" value={Number.isFinite(drift) ? drift.toFixed(3) : '--'} sub="PSI / model field" tone={Number.isFinite(drift) && drift < .2 ? 'up' : 'warn'} />
         <Metric label="Anomaly State" value={String(data.brain?.anomaly_status ?? data.truth?.anomaly_status ?? 'WAITING').toUpperCase()} sub="Existing evidence only" tone="warn" />
-        <Metric label="Retraining" value={String(data.brain?.retraining_recommendation ?? data.hunger?.retraining_recommendation ?? 'WAITING').toUpperCase()} sub="No auto-promotion from UI" tone="warn" />
+        <Metric label="Retraining" value={String(data.brain?.retraining_recommendation ?? data.hunger?.retraining_recommendation ?? 'WAITING').toUpperCase()} sub="No UI auto-promotion" tone="warn" />
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(280px, 1.05fr) minmax(250px, .8fr) minmax(0, 1.75fr) minmax(265px, 1fr)', alignItems: 'stretch' }}>
@@ -179,7 +204,7 @@ export function GenesisTab() {
 
         <Panel title="Scenario / Confidence" icon={<Activity size={14} />}>
           <div style={{ display: 'grid', gap: 8 }}>
-            <Metric label="Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model" tone="accent" />
+            <Metric label="Confidence" value={confidence == null ? '--' : `${confidence.toFixed(1)}%`} sub="Current model" tone={confidence == null ? 'warn' : 'accent'} />
             <Metric label="Accuracy" value={accuracy == null ? '--' : `${accuracy.toFixed(1)}%`} sub="Only if API supplies it" tone={accuracy == null ? 'warn' : 'up'} />
             <Metric label="Hit Rate" value={hitRate == null ? '--' : `${hitRate.toFixed(1)}%`} sub="Only if API supplies it" tone={hitRate == null ? 'warn' : 'up'} />
           </div>
@@ -240,9 +265,9 @@ export function GenesisTab() {
         </Panel>
       </div>
 
-      <div style={{ marginTop: 9, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', color: 'var(--text-mut)', fontSize: '.56rem', background: 'rgba(5,14,25,.76)' }}>
+      <div style={{ marginTop: 9, padding: '8px 12px', border: '1px solid var(--border)', borderRadius: 8, display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', color: 'var(--text-mut)', fontSize: '.56rem', background: 'rgba(5,14,25,.76)' }}>
         <span>ANALYZER MODE · PAPER MODE ONLY · LIVE EXECUTION DISABLED</span>
-        <span>Genesis evidence is displayed without inventing missing model values</span>
+        <span>Shared live truth stays visible while optional model evidence refreshes</span>
       </div>
     </div>
   )
