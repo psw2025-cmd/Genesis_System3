@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "project": "system3-openalgo-safe",
+  "project_number": "802404398783",
   "region": "asia-south1",
   "policy": {
     "gcp_is_production_authority": true,
@@ -18,6 +19,9 @@
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudscheduler.admin"},
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/serviceusage.serviceUsageConsumer"},
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/browser"},
+    {"member": "serviceAccount:gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/resourcemanager.projectIamAdmin"},
+    {"member": "serviceAccount:gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.roleAdmin"},
+    {"member": "serviceAccount:gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", "role": "projects/system3-openalgo-safe/roles/GenesisSystem3IamRepair"},
     {"member": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
     {"member": "serviceAccount:gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
     {"member": "serviceAccount:gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.viewer"},
@@ -25,6 +29,32 @@
     {"member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
     {"member": "serviceAccount:gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
     {"member": "serviceAccount:gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"}
+  ],
+  "service_account_bindings": [
+    {"service_account": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.repository_id/1168640800", "role": "roles/iam.workloadIdentityUser"},
+    {"service_account": "system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.repository_id/1168640800", "role": "roles/iam.workloadIdentityUser"},
+    {"service_account": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.repository_id/1168640800", "role": "roles/iam.workloadIdentityUser"},
+    {"service_account": "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.authority/repair", "role": "roles/iam.workloadIdentityUser"},
+    {"service_account": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
+    {"service_account": "gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"}
+  ],
+  "secret_bindings": [
+    {"secret": "system3-dhan-client-id", "member": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-access-token", "member": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "system3-dashboard-worker-push-token", "member": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "system3-dhan-client-id", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-access-token", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-pin", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-totp-secret", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-access-token", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretVersionAdder"},
+    {"secret": "system3-dhan-client-id", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
+    {"secret": "dhan-access-token", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"}
   ],
   "dhan_job": {
     "name": "genesis-system3-dhan-token-rotate",
