@@ -96,12 +96,34 @@ class TemporalTruthContractTests(unittest.TestCase):
         ]:
             self.assertIn(marker, text)
 
+    def test_live_ui_proof_requires_exact_serving_sha_before_and_after_capture(self):
+        text = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
+        for marker in [
+            "_wait_for_expected_serving_sha",
+            "/api/deploy-info",
+            "SYSTEM3_EXPECTED_SERVING_SHA",
+            "GITHUB_SHA",
+            "EXPECTED_SERVING_SHA_NOT_CONVERGED",
+            '"exact_serving_sha_stable": exact_sha_stable',
+            '"serving_sha_at_capture_start": start_sha',
+            '"serving_sha_at_capture_end": end_sha',
+            '"fresh_browser_is_not_enough_without_exact_serving_sha": True',
+            "NOT_CURRENT_SERVING_SHA",
+        ]:
+            self.assertIn(marker, text)
+        policy = (ROOT / "docs" / "authority" / "TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md").read_text(encoding="utf-8")
+        self.assertIn("Exact-serving-SHA lock", policy)
+        self.assertIn("same `main` push", policy)
+        self.assertIn("NOT_CURRENT_SERVING_SHA", policy)
+
     def test_frontend_workflow_runs_temporal_contract_before_live_capture(self):
         text = (ROOT / ".github" / "workflows" / "frontend-runtime-smoke.yml").read_text(encoding="utf-8")
         self.assertIn("tests.test_temporal_truth_contract", text)
         self.assertIn("system3_temporal_truth_guard.py", text)
         self.assertIn("gcp_live_ui_snapshot.py", text)
         self.assertIn("request-scoped read-only live production ui lifecycle proof", text.lower())
+        self.assertIn("SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS", text)
+        self.assertIn("timeout 900s python scripts/gcp_live_ui_snapshot.py", text)
 
     def test_multi_agent_coordinator_does_not_promote_reports_latest_or_http_200(self):
         text = (ROOT / "tools" / "multi_agent_production_coordinator.py").read_text(encoding="utf-8")
