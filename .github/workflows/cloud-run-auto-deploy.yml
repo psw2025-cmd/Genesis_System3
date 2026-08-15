@@ -165,7 +165,8 @@ jobs:
               assert stale in deployer, f"missing canonical web secret scrub marker {stale}"
           assert "system3-dhan-client-id:latest" in deployer
           assert "WORKER_SECRET_VALIDATION_DEFERRED_TO_ZERO_TRAFFIC_CANDIDATE" in deployer
-          assert "gcloud secrets describe" not in workflow
+          forbidden_secret_describe = "gcloud secrets " + "describe"
+          assert forbidden_secret_describe not in workflow
           print("STATIC_GATES_OK", sorted(required))
           PY
 
