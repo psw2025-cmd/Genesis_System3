@@ -5,10 +5,16 @@ The original deployment state machine is preserved byte-for-byte in
 ``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
 implementation still contains every critical PAPER/LIVE-OFF/candidate safety
 invariant, replaces only the image-provenance assertion with the fail-closed
-Artifact Registry repository+digest verifier, removes retired dashboard
-credential secret mounts before any candidate revision can be created, and
-converges the bounded business-lane Cloud Scheduler definitions before the
+Artifact Registry repository+digest verifier, removes retired/stale dashboard
+and Dhan secret mounts before any candidate revision can be created, preserves
+only the canonical web-side Dhan client-id binding plus worker token binding,
+and converges the bounded business-lane Cloud Scheduler definitions before the
 workflow's scheduler-proof stage.
+
+Secret existence is intentionally not preflighted with Secret Manager metadata
+reads by the deploy service account. The zero-traffic Cloud Run candidate is the
+control-plane validator for referenced secrets: a missing/inaccessible binding
+must fail candidate readiness before any production traffic is promoted.
 """
 from __future__ import annotations
 
@@ -58,6 +64,16 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
 )
 
 _RETIRED_DASHBOARD_SECRET_ENV = "DASHBOARD_API_KEY"
+_STALE_WEB_DHAN_SECRET_ENVS = (
+    "DHAN_APP_ID",
+    "DHAN_APP_SECRET",
+    "DHAN_ACCESS_TOKEN",
+    "DHAN_PIN",
+    "DHAN_TOTP_SECRET",
+    "DHAN_TOTP",
+    "dhan-access-token",
+)
+_CANONICAL_WEB_DHAN_CLIENT_BINDING = "system3-dhan-client-id:latest"
 _ORIGINAL_RUN = deployer._run
 
 
@@ -68,29 +84,66 @@ def _verify_implementation_contract() -> None:
         raise RuntimeError(f"deployment_safety_contract_missing:{missing}")
 
 
-def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
-    """Ensure every Cloud Run candidate explicitly removes retired dashboard auth.
+def _parse_secret_bindings(arg: str) -> dict[str, str]:
+    bindings: dict[str, str] = {}
+    raw = arg.split("=", 1)[1] if "=" in arg else ""
+    for item in raw.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        if "=" not in item:
+            raise RuntimeError(f"candidate_update_secret_binding_invalid:{item}")
+        name, target = item.split("=", 1)
+        name = name.strip()
+        target = target.strip()
+        if not name or not target:
+            raise RuntimeError(f"candidate_update_secret_binding_invalid:{item}")
+        bindings[name] = target
+    return bindings
 
-    This is deliberately applied in the canonical wrapper because the preserved
-    implementation is the PR #130 provenance state machine. It changes no LIVE,
-    order, worker-token, or broker authority; it only removes a retired secret
-    mount that must not survive on newly-created revisions.
+
+def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
+    """Converge every Cloud Run candidate to the canonical web secret surface.
+
+    Web needs only:
+    - ``WORKER_PUSH_TOKEN`` for worker ingestion; and
+    - ``DHAN_CLIENT_ID`` for read-only Dhan requests.
+
+    The Dhan access token is loaded dynamically from Secret Manager by the web
+    runtime service account. PIN/TOTP/app-secret/access-token mounts therefore
+    have no place on the web service and are removed on every candidate deploy.
     """
     if args[:3] != ["gcloud", "run", "deploy"]:
         return list(args)
 
     result = list(args)
-    indexes = [i for i, arg in enumerate(result) if arg.startswith("--remove-secrets=")]
-    if len(indexes) != 1:
-        raise RuntimeError(f"candidate_remove_secrets_contract_invalid:{len(indexes)}")
+    remove_indexes = [i for i, arg in enumerate(result) if arg.startswith("--remove-secrets=")]
+    if len(remove_indexes) != 1:
+        raise RuntimeError(f"candidate_remove_secrets_contract_invalid:{len(remove_indexes)}")
 
-    idx = indexes[0]
-    names = [name.strip() for name in result[idx].split("=", 1)[1].split(",") if name.strip()]
+    remove_idx = remove_indexes[0]
+    names = [name.strip() for name in result[remove_idx].split("=", 1)[1].split(",") if name.strip()]
     if "API_KEY" not in names:
         raise RuntimeError("candidate_api_key_scrub_missing")
-    if _RETIRED_DASHBOARD_SECRET_ENV not in names:
-        names.append(_RETIRED_DASHBOARD_SECRET_ENV)
-    result[idx] = "--remove-secrets=" + ",".join(names)
+    for name in (_RETIRED_DASHBOARD_SECRET_ENV, *_STALE_WEB_DHAN_SECRET_ENVS):
+        if name not in names:
+            names.append(name)
+    result[remove_idx] = "--remove-secrets=" + ",".join(names)
+
+    update_indexes = [i for i, arg in enumerate(result) if arg.startswith("--update-secrets=")]
+    if len(update_indexes) != 1:
+        raise RuntimeError(f"candidate_update_secrets_contract_invalid:{len(update_indexes)}")
+    update_idx = update_indexes[0]
+    bindings = _parse_secret_bindings(result[update_idx])
+    if "WORKER_PUSH_TOKEN" not in bindings:
+        raise RuntimeError("candidate_worker_push_token_binding_missing")
+    forbidden = sorted(set(bindings).intersection(_STALE_WEB_DHAN_SECRET_ENVS))
+    if forbidden:
+        raise RuntimeError(f"candidate_stale_dhan_secret_update_forbidden:{forbidden}")
+    bindings["DHAN_CLIENT_ID"] = _CANONICAL_WEB_DHAN_CLIENT_BINDING
+    result[update_idx] = "--update-secrets=" + ",".join(
+        f"{name}={target}" for name, target in bindings.items()
+    )
     return result
 
 
@@ -99,8 +152,21 @@ def _run_with_retired_dashboard_secret_scrub(
 ) -> str:
     scrubbed = _scrub_retired_dashboard_secret_arg(args)
     if scrubbed != args:
-        print("RETIRED_DASHBOARD_SECRET_SCRUB enforced")
+        print("CANONICAL_WEB_SECRET_SURFACE enforced")
     return _ORIGINAL_RUN(scrubbed, capture=capture)
+
+
+def _defer_worker_secret_validation_to_candidate(_session: object, secret_id: str) -> None:
+    """Avoid a deployer Secret Manager metadata read it is not authorized to do.
+
+    ``gcloud run deploy --update-secrets`` plus zero-traffic candidate readiness
+    is the actual validation boundary. This keeps the deployer least-privileged
+    while still failing closed before traffic promotion if the binding is bad.
+    """
+    normalized = str(secret_id or "").strip()
+    if not normalized:
+        raise RuntimeError("worker_push_token_secret_id_empty")
+    print("WORKER_SECRET_VALIDATION_DEFERRED_TO_ZERO_TRAFFIC_CANDIDATE", normalized)
 
 
 def _assert_candidate_image(revision: dict, image: str) -> None:
@@ -178,7 +244,7 @@ def _business_scheduler_command(kind: str, *, exists: bool) -> list[str]:
 
 
 def _ensure_business_scheduler_contract() -> None:
-    """Create or fully reconcile the three bounded business schedules.
+    """Create or fully reconcile the four bounded business schedules.
 
     This function configures Scheduler metadata only. It never executes a Cloud
     Run job and never changes broker, token, order, or LIVE-trading authority.
@@ -204,6 +270,7 @@ def main() -> int:
     _verify_implementation_contract()
     deployer._assert_candidate_image = _assert_candidate_image
     deployer._run = _run_with_retired_dashboard_secret_scrub
+    deployer._require_secret_exists = _defer_worker_secret_validation_to_candidate
     result = deployer.main()
     if result:
         return result
