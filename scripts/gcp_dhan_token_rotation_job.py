@@ -55,6 +55,27 @@ _AUTH_MARKERS = (
     "status_code=401",
 )
 
+# stdout is intentionally limited to constant, allow-listed evidence lines.
+# No object that has ever contained a token, broker response, PIN, TOTP, or
+# exception body is serialized to logs. Detailed decisions stay in process.
+_SAFE_STATUS_LINES = {
+    "ROTATED_AND_VERIFIED": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"ROTATED_AND_VERIFIED"}',
+    "ROTATION_FAILED": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"ROTATION_FAILED"}',
+    "SKIPPED_CONCURRENT_ROTATION_WON": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_CONCURRENT_ROTATION_WON"}',
+    "SKIPPED_TOKEN_HEALTHY": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_TOKEN_HEALTHY"}',
+    "SKIPPED_TOKEN_HEALTHY_AFTER_STAGGER": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_TOKEN_HEALTHY_AFTER_STAGGER"}',
+    "BLOCKED_TRANSIENT_PROFILE_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_TRANSIENT_PROFILE_ERROR"}',
+    "BLOCKED_PROFILE_CONFIG_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_PROFILE_CONFIG_ERROR"}',
+    "BLOCKED_STAGGER_REVALIDATION_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_STAGGER_REVALIDATION_ERROR"}',
+    "BLOCKED_MINT_NOT_AUTHORIZED": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_MINT_NOT_AUTHORIZED"}',
+}
+
+
+def _emit_status(status: str) -> None:
+    """Emit a constant non-secret status record; unknown values fail closed."""
+    line = _SAFE_STATUS_LINES.get(status, _SAFE_STATUS_LINES["ROTATION_FAILED"])
+    print(line)
+
 
 def _jwt_expiry(token: str) -> datetime | None:
     try:
@@ -326,7 +347,7 @@ def main() -> int:
             "order_endpoints_called": False,
             "raw_token_exposed": False,
         }
-        print(json.dumps(proof, sort_keys=True))
+        _emit_status("ROTATION_FAILED")
         return 2
 
     before = _profile_probe(client_id, token)
@@ -343,7 +364,7 @@ def main() -> int:
             cloud_run_execution_present=bool(execution),
             coordination="version_mismatch_latest_valid",
         )
-        print(json.dumps(proof, sort_keys=True))
+        _emit_status("SKIPPED_CONCURRENT_ROTATION_WON")
         return 0
 
     if not _should_rotate(before):
@@ -357,7 +378,7 @@ def main() -> int:
             cloud_run_execution_present=bool(execution),
             transient_errors_authorize_mint=False,
         )
-        print(json.dumps(proof, sort_keys=True))
+        _emit_status(status)
         return rc
 
     settle_s = _execution_stagger_s()
@@ -380,7 +401,7 @@ def main() -> int:
                     cloud_run_execution_present=bool(execution),
                     coordination="post_stagger_latest_valid",
                 )
-                print(json.dumps(proof, sort_keys=True))
+                _emit_status("SKIPPED_CONCURRENT_ROTATION_WON")
                 return 0
             token, before_secret, before = settled_token, settled_secret, settled_before
             current_version = settled_version
@@ -396,7 +417,7 @@ def main() -> int:
                     cloud_run_execution_present=bool(execution),
                     transient_errors_authorize_mint=False,
                 )
-                print(json.dumps(proof, sort_keys=True))
+                _emit_status(status)
                 return rc
         except Exception as exc:
             # A transient revalidation failure must never increase authority.
@@ -411,7 +432,7 @@ def main() -> int:
                 error_type=type(exc).__name__,
                 transient_errors_authorize_mint=False,
             )
-            print(json.dumps(proof, sort_keys=True))
+            _emit_status("BLOCKED_STAGGER_REVALIDATION_ERROR")
             return 2
 
     # Last fail-closed authority check immediately before the only mint call.
@@ -426,7 +447,7 @@ def main() -> int:
             cloud_run_execution_present=bool(execution),
             transient_errors_authorize_mint=False,
         )
-        print(json.dumps(proof, sort_keys=True))
+        _emit_status("BLOCKED_MINT_NOT_AUTHORIZED")
         return 2
 
     try:
@@ -473,8 +494,11 @@ def main() -> int:
             "order_endpoints_called": False,
             "raw_token_exposed": False,
         }
-        print(json.dumps(proof, sort_keys=True))
-        return 0 if success else 2
+        if success:
+            _emit_status("ROTATED_AND_VERIFIED")
+            return 0
+        _emit_status("ROTATION_FAILED")
+        return 2
     except Exception as exc:
         proof = {
             "status": "ROTATION_FAILED",
@@ -482,7 +506,7 @@ def main() -> int:
             "generated_at_utc": started.isoformat(),
             "completed_at_utc": datetime.now(timezone.utc).isoformat(),
             "error_type": type(exc).__name__,
-            "message": str(exc)[:200],
+            "message": "token rotation failed",
             "before": before,
             "secret_before": before_secret,
             "expected_secret_version": expected_version or None,
@@ -495,7 +519,7 @@ def main() -> int:
             "order_endpoints_called": False,
             "raw_token_exposed": False,
         }
-        print(json.dumps(proof, sort_keys=True))
+        _emit_status("ROTATION_FAILED")
         return 2
 
 
