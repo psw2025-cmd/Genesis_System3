@@ -1,5 +1,9 @@
 # Genesis System3 Autonomous Operations Policy
 
+**Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
+
+Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
+
 ## Authority
 
 - Google Cloud project `system3-openalgo-safe` is the authoritative production/runtime platform.
@@ -10,6 +14,18 @@
 ## Operating objective
 
 Routine production engineering must not depend on the user running technical commands. The control plane should investigate, patch, test, deploy, roll back, repair declared IAM drift, collect logs/evidence, and verify runtime/UI truth through GitHub Actions and Google Cloud.
+
+## Temporal truth override
+
+No autonomous agent/workflow may promote stored evidence into a current/live claim merely because it is named `latest`, is the newest artifact, or came from the newest successful workflow.
+
+For any new `now/current/live/present/still/fixed now/connected now/UI now` investigation, a new observation must be generated after the investigation/request start time. For UI-facing claims this means a new Chrome/WebDriver session against the authoritative GCP production URL, fresh screenshots/visible text, and same-session read-only API evidence.
+
+`SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, prior screenshots, PR descriptions, old workflow artifacts, and source code are historical/contextual unless refreshed at the authoritative boundary.
+
+Use `scripts/gcp_live_ui_snapshot.py` for full request-scoped production UI proof and `scripts/system3_temporal_truth_guard.py` for machine freshness validation. After a fix/deployment/recovery, pre-change evidence becomes historical and must not be reused as post-change proof.
+
+If parallel agents disagree on a current runtime/UI state, generate a new live observation; old artifacts do not arbitrate.
 
 ## Safety boundary
 
@@ -66,7 +82,9 @@ After the one-time autonomous authority bootstrap is proven in production, the n
 
 ## Evidence rule
 
-No production-ready claim is allowed from source code alone. Final proof must include exact deployed SHA/revision, runtime safety flags, broker status, health status, and visible UI data where the feature is UI-facing.
+No production-ready claim is allowed from source code alone. Current production proof must be request-scoped/fresh and include applicable exact deployed SHA/revision, runtime safety flags, broker status, health status, and visible production UI data.
+
+A green deployment or 22/22 render-only smoke does not prove semantic data readiness. Stored evidence is historical after capture and must be freshness-validated before time-sensitive use.
 
 ## Human-only break-glass boundary
 

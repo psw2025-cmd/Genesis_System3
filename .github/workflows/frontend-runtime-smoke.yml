@@ -28,7 +28,7 @@ jobs:
   frontend-browser-runtime-smoke:
     name: BLOCKING - frontend browser runtime smoke
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,13 +51,18 @@ jobs:
         shell: bash
         run: npm run build
 
-      - name: Compile browser smoke harness
+      - name: Compile browser and temporal-truth harnesses
         shell: bash
         run: |
           python -m py_compile scripts/frontend_local_runtime_smoke.py
           python -m py_compile scripts/gcp_live_ui_snapshot.py
+          python -m py_compile scripts/system3_temporal_truth_guard.py
 
-      - name: Prove all canonical tabs render in Chrome
+      - name: Enforce temporal truth and cross-agent evidence contract
+        shell: bash
+        run: python -m unittest tests.test_temporal_truth_contract
+
+      - name: Prove all canonical tabs render in local Chrome
         shell: bash
         run: |
           set -euo pipefail
@@ -78,7 +83,7 @@ jobs:
           done
           exit "$rc"
 
-      - name: Upload 22-tab visual proof
+      - name: Upload 22-tab local visual proof
         uses: actions/upload-artifact@v6
         if: always()
         with:
@@ -87,12 +92,12 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Capture read-only live production Decision Intel proof
+      - name: Capture request-scoped read-only live production UI lifecycle proof
         if: github.ref == 'refs/heads/main'
         shell: bash
-        run: timeout 120s python scripts/gcp_live_ui_snapshot.py
+        run: timeout 300s python scripts/gcp_live_ui_snapshot.py
 
-      - name: Upload live production UI proof
+      - name: Upload live production UI lifecycle proof
         if: always() && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@v6
         with:

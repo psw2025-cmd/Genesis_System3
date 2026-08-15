@@ -1,153 +1,82 @@
-# 🤖 PERMANENT INSTRUCTIONS FOR ALL CLAUDE INSTANCES
+# Genesis System3 — Permanent Claude Operating Instructions
 
-## Repository Information
-- **GitHub URL**: https://github.com/psw2025-cmd/Genesis_System3
-- **Clone Command**: `git clone git@github.com:psw2025-cmd/Genesis_System3.git`
-- **Branch**: main
-- **Owner**: Pritam Singh (psw2025-cmd)
+**Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
-## Cloud Resources
-- **Cloud Run App**: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
-- **Cloud Project**: system3-openalgo-safe
-- **Region**: asia-south1
-- **Service**: genesis-system3-web
-- **Token rotate job**: genesis-system3-dhan-token-rotate
-- **Logs**: https://console.cloud.google.com/run/detail/asia-south1/genesis-system3-web/logs?project=system3-openalgo-safe
+Read first:
+1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
+3. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
+4. `AGENTS.md`
 
-## PERMANENT RULES FOR ALL CLAUDE INSTANCES
+## Authority
 
-### Rule 1: ALWAYS Work in Repo Only
-```
-✅ Work location: https://github.com/psw2025-cmd/Genesis_System3
-❌ Do NOT work externally
-❌ Do NOT use temp files
-✅ Everything version controlled
-```
+- GitHub repository: `psw2025-cmd/Genesis_System3`.
+- Production platform: Google Cloud project `system3-openalgo-safe`.
+- Region: `asia-south1`.
+- Cloud Run service: `genesis-system3-web`.
+- Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
+- Dhan rotator job: `genesis-system3-dhan-token-rotate`.
+- Broker: **Dhan**. Render/Angel-era material is historical/non-authoritative.
+- Normal cloud authentication: GitHub Actions keyless Workload Identity Federation. Do not create/export long-lived service-account JSON keys.
 
-### Rule 2: PROOF ONLY FROM GITHUB & GOOGLE CLOUD
-```
-GitHub Proof Format:
-  https://github.com/psw2025-cmd/Genesis_System3/commit/HASH
+## Temporal truth: mandatory for every Claude instance
 
-Google Cloud Proof Format:
-  https://console.cloud.google.com/run/detail/...
-  
-❌ Never accept non-repo screenshots
-✅ Always link directly to actual sources
-```
+`latest` does not mean `live`.
 
-### Rule 3: SSH ONLY (No Tokens Needed!)
-```
-Clone: git@github.com:psw2025-cmd/Genesis_System3.git
-Never: https://... with credentials
-Deploy Key: Already configured
-Auth: SSH handles everything
-```
+Do not use the newest stored screenshot, `reports/latest/`, prior workflow artifact, prior API response, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, PR description, or old proof pack to answer a later question about what is happening now.
 
-### Rule 4: Google Cloud Access
-```
-If gcloud CLI available:
-  gcloud auth activate-service-account
-  gcloud config set project PROJECT_ID
+For any claim implying **now/current/live/present/still/fixed now/connected now/UI now**:
 
-Access Cloud Run:
-  Cloud Console: https://console.cloud.google.com/run/
-  View logs: gcloud run logs read --limit 50
-  Deploy updates: gcloud run deploy ...
-```
+1. Record the investigation/request start time in UTC.
+2. Generate a new observation after that time.
+3. For UI claims, open a **new Chrome/WebDriver session** to the actual GCP production URL.
+4. Capture fresh screenshots + visible text.
+5. Capture relevant read-only production APIs in the same proof session.
+6. Compare UI/backend truth and report contradictions.
+7. Include capture time/evidence age.
+8. After any fix, deployment, broker recovery, or token rotation, run a new capture. Pre-change proof is historical.
 
-### Rule 5: Every Future Claude Must
-```
-1. Read this file FIRST: .github/CLAUDE_INSTRUCTIONS.md
-2. Clone with SSH: git clone git@github.com:psw2025-cmd/Genesis_System3.git
-3. Do work in repository
-4. Commit: git add . && git commit -m "description"
-5. Push: git push origin main
-6. Provide proof as GitHub commit URL
-7. For Cloud: Use gcloud or Cloud Console (links above)
-8. Provide Cloud proof as console URLs
-```
+Use `scripts/gcp_live_ui_snapshot.py` for the fresh full production UI lifecycle and `scripts/system3_temporal_truth_guard.py` when evaluating stored evidence.
 
-## ABSOLUTE RULES
+A CI/deploy SUCCESS means only that its actual assertions passed. It does not prove live market data is populated. HTTP 200 and “tab rendered” are not enough for semantic UI readiness.
 
-```
-NEVER ❌
-- Ask for token
-- Ask for password
-- Use HTTPS with credentials
-- Work outside repo
-- Accept non-official proof
-- Assume credentials exist
+## Full UI proof
 
-ALWAYS ✅
-- Use SSH for Git
-- Work in THIS repo
-- Share GitHub URLs
-- Share Cloud Console URLs
-- Read this file first
-- Commit everything
-- Push to main
-```
+For a full UI/current-state investigation, capture all 22 canonical tabs from the actual production service in one request-scoped browser lifecycle. Save screenshots, visible text, per-tab timestamps, and start/end broker/health API snapshots. Investigate semantic empty/loading/degraded states even if rendering succeeds.
 
-## Proof Sources
+## Safety
 
-### GitHub Proof
-```
-Format: https://github.com/psw2025-cmd/Genesis_System3/commit/HASH
-Example: https://github.com/psw2025-cmd/Genesis_System3/commit/abc123xyz
-```
+- PAPER/ANALYZER only.
+- `ANALYZE_MODE=1`.
+- `LIVE_TRADING_ENABLED=0`.
+- `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
+- `AUTO_EXECUTE_TRADES=0`.
+- No real order placement/modification/cancellation/square-off.
+- No broker secret payload exposure.
+- Read-only production UI/API/market-data verification is allowed.
+- Dhan token minting only through the dedicated bounded scheduler/recovery authority defined in governance.
 
-### Google Cloud Proof
-```
-Cloud Run: https://console.cloud.google.com/run/
-Logs: gcloud run logs read ...
-Monitoring: https://console.cloud.google.com/monitoring/
-```
+## Engineering and multi-agent behavior
 
-### Investigation Access
+- Inspect current `main`, serving production state, and relevant open PRs before editing.
+- Other agents may run in parallel; do not silently overwrite newer changes.
+- An old PR narrative cannot establish current runtime truth.
+- Verify the symptom from current authoritative evidence, then investigate root cause.
+- Implement on a branch; run exact-head tests/CI; merge only proven changes.
+- After merge/deploy, prove the actual end state with a new live observation.
+- If agents disagree about current production state, generate a new live observation. Do not vote between stale artifacts.
 
-#### Full GitHub Investigation
-- Commit history: https://github.com/psw2025-cmd/Genesis_System3/commits/main
-- Pull requests: https://github.com/psw2025-cmd/Genesis_System3/pulls
-- Issues: https://github.com/psw2025-cmd/Genesis_System3/issues
-- Full repository: https://github.com/psw2025-cmd/Genesis_System3
+## User-action boundary
 
-#### Full Cloud Investigation
-- Cloud Console: https://console.cloud.google.com/
-- Cloud Run: https://console.cloud.google.com/run/
-- Logs: gcloud run logs read ...
-- Monitoring: https://console.cloud.google.com/monitoring/
+Routine engineering should be autonomous through GitHub/GCP: investigation, code fixes, CI, deployment, IAM drift repair, logs, browser proof, and bounded broker recovery. User action is reserved for true break-glass/account-level events outside delegated authority.
 
-## Current Status
-- **Setup Date**: 2026-08-15
-- **SSH Deploy Key**: Configured ✅
-- **Files**: 21+ (AUDIT + AGENT_COORDINATION)
-- **Token Needed**: NEVER ❌
-- **Password Needed**: NEVER ❌
+## Evidence hierarchy for a current-state claim
 
-## Quick Start for Future Claude
+1. Request-scoped fresh production browser evidence.
+2. Same-session fresh production API evidence.
+3. Fresh production logs/runtime metadata.
+4. Current serving SHA/revision/config.
+5. Source code.
+6. Stored reports/artifacts/history, clearly labeled historical.
 
-```bash
-# Read this file
-curl -s https://raw.githubusercontent.com/psw2025-cmd/Genesis_System3/main/.github/CLAUDE_INSTRUCTIONS.md
-
-# Clone repo
-git clone git@github.com:psw2025-cmd/Genesis_System3.git
-
-# Make changes
-# ... do work ...
-
-# Commit and push
-git add .
-git commit -m "Description of changes"
-git push origin main
-
-# Share proof
-# GitHub: https://github.com/psw2025-cmd/Genesis_System3/commit/HASH
-# Cloud: https://console.cloud.google.com/run/...
-```
-
----
-**Last Updated**: 2026-08-15
-**This is the SOURCE OF TRUTH**
-**No setup needed. Just follow the rules.**
+**Canonical temporal policy:** `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
