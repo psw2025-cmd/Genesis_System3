@@ -2,8 +2,8 @@
 """Reconcile only the declared Genesis System3 IAM authority baseline.
 
 This tool never reads Secret Manager payloads, never executes Cloud Run jobs,
-and never changes LIVE/order flags. It is intentionally additive except for the
-small explicit deny-list of known-forbidden Dhan rotator invokers.
+and never changes LIVE/order flags. It is additive except for explicit safety
+deny-lists: forbidden broker-secret payload roles and forbidden Dhan invokers.
 """
 from __future__ import annotations
 
@@ -61,11 +61,13 @@ def _load_baseline() -> dict[str, Any]:
         "auto_execute_trades": False,
         "secret_payload_access_by_deployer": False,
         "dhan_web_self_heal_mint": False,
+        "strict_scheduler_only_iam": False,
+        "deployer_run_admin_temporary": True,
     }
     for key, expected in required.items():
         if policy.get(key) is not expected:
             raise ValueError(
-                f"unsafe baseline policy {key}={policy.get(key)!r}; expected {expected!r}"
+                f"unsafe or contradictory baseline policy {key}={policy.get(key)!r}; expected {expected!r}"
             )
 
     repair = data.get("repair") or {}
@@ -90,10 +92,23 @@ def _load_baseline() -> dict[str, Any]:
                 "deployer/repair identities must not receive broker secret payload authority"
             )
 
+    secret_safety = data.get("secret_safety") or {}
+    expected_forbidden_members = {DEPLOYER} | REPAIR_SAS
+    if set(secret_safety.get("forbidden_payload_members") or []) != expected_forbidden_members:
+        raise ValueError("secret payload deny-list must exactly cover deployer and both repair identities")
+    expected_forbidden_roles = {
+        "roles/secretmanager.secretAccessor",
+        "roles/secretmanager.secretVersionAdder",
+    }
+    if set(secret_safety.get("forbidden_payload_roles") or []) != expected_forbidden_roles:
+        raise ValueError("secret payload deny-list roles changed from hard safety contract")
+    if not set(secret_safety.get("protected_secrets") or []):
+        raise ValueError("protected broker secret set must not be empty")
+
     dhan = data.get("dhan_job") or {}
     required_invokers = set(dhan.get("required_invokers") or [])
     if required_invokers & ({DEPLOYER} | REPAIR_SAS):
-        raise ValueError("deployer/repair identities must not invoke Dhan rotator")
+        raise ValueError("deployer/repair identities must not be Dhan rotator job-level invokers")
 
     forbidden_custom_permissions = {
         "run.jobs.run",
@@ -293,6 +308,38 @@ def reconcile(*, apply: bool) -> dict[str, Any]:
                     ]
                 )
 
+    secret_safety = baseline["secret_safety"]
+    for secret in secret_safety.get("protected_secrets") or []:
+        policy = _json(
+            ["gcloud", "secrets", "get-iam-policy", secret, f"--project={project}", "--format=json"]
+        )
+        for role in secret_safety.get("forbidden_payload_roles") or []:
+            current_members = _members(policy, role)
+            for member in secret_safety.get("forbidden_payload_members") or []:
+                if member not in current_members:
+                    continue
+                _record(
+                    changes,
+                    scope="secret_iam_safety",
+                    resource=secret,
+                    role=role,
+                    member=member,
+                    action="remove_known_forbidden_payload_role",
+                )
+                if apply:
+                    _run(
+                        [
+                            "gcloud",
+                            "secrets",
+                            "remove-iam-policy-binding",
+                            secret,
+                            f"--project={project}",
+                            f"--member={member}",
+                            f"--role={role}",
+                            "--quiet",
+                        ]
+                    )
+
     dhan = baseline["dhan_job"]
     job = dhan["name"]
     job_policy = _json(
@@ -366,6 +413,8 @@ def reconcile(*, apply: bool) -> dict[str, Any]:
         "drift_detected": bool(changes),
         "change_count": len(changes),
         "changes": changes,
+        "strict_scheduler_only_iam": baseline["policy"]["strict_scheduler_only_iam"],
+        "deployer_run_admin_temporary": baseline["policy"]["deployer_run_admin_temporary"],
         "secret_payloads_accessed": False,
         "service_account_keys_created": False,
         "dhan_rotation_job_executed": False,
