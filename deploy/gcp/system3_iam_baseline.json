@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "project": "system3-openalgo-safe",
+  "region": "asia-south1",
+  "policy": {
+    "gcp_is_production_authority": true,
+    "render_is_production_authority": false,
+    "service_account_keys_allowed": false,
+    "live_trading_enabled": false,
+    "auto_execute_trades": false,
+    "secret_payload_access_by_deployer": false,
+    "dhan_web_self_heal_mint": false
+  },
+  "project_bindings": [
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.admin"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudbuild.builds.editor"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/artifactregistry.reader"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudscheduler.admin"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/serviceusage.serviceUsageConsumer"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/browser"},
+    {"member": "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
+    {"member": "serviceAccount:gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
+    {"member": "serviceAccount:gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.viewer"},
+    {"member": "serviceAccount:gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudscheduler.viewer"},
+    {"member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
+    {"member": "serviceAccount:gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"},
+    {"member": "serviceAccount:gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/datastore.user"}
+  ],
+  "dhan_job": {
+    "name": "genesis-system3-dhan-token-rotate",
+    "required_invokers": [
+      "serviceAccount:gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+      "serviceAccount:gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com"
+    ],
+    "forbidden_invokers": [
+      "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "serviceAccount:802404398783-compute@developer.gserviceaccount.com"
+    ]
+  },
+  "repair": {
+    "service_account": "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com",
+    "custom_role_id": "GenesisSystem3IamRepair",
+    "workflow_ref": "psw2025-cmd/Genesis_System3/.github/workflows/gcp-authority-repair.yml@refs/heads/main",
+    "allowed_actions": ["restore_declared_project_bindings", "restore_declared_service_account_bindings", "restore_declared_secret_iam", "restore_dhan_job_invokers", "remove_known_forbidden_dhan_job_invokers"],
+    "forbidden_actions": ["read_secret_payload", "create_service_account_key", "enable_live_trading", "execute_dhan_rotation_job", "place_modify_cancel_order", "delete_project"]
+  }
+}
