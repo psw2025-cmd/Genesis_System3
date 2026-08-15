@@ -28,7 +28,8 @@ Analyzer/PAPER remains the default. `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRAD
 ## Identity separation
 
 - `genesis-system3-automation`: normal deployment/configuration identity. No broker secret payload role.
-- `gs3-iam-repair`: guarded IAM-reconciliation identity. It may only restore the repository-declared System3 IAM baseline and known Dhan job invoker restrictions. It must never execute the Dhan rotation job.
+- `gs3-iam-repair`: primary guarded IAM-reconciliation identity.
+- `gs3-iam-repair-b`: fallback guarded IAM-reconciliation identity used only if the primary repair path itself fails. Either repair identity may restore only the repository-declared System3 IAM baseline and known Dhan job invoker restrictions through the canonical repair workflow; neither may execute the Dhan rotation job or read broker secret payloads.
 - `genesis-system3-dhan-rotator`: only identity that reads PIN/TOTP/client-id/access-token material and adds a new canonical access-token version.
 - `gs3-scheduler`: normal 07:30 Asia/Kolkata Dhan rotation invoker.
 - `gs3-token-recovery`: bounded manual/recovery invoker.
@@ -41,12 +42,14 @@ Analyzer/PAPER remains the default. `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRAD
 When Cloud Run Auto Deploy fails due to missing declared IAM:
 
 1. `GCP Authority Repair` runs from trusted `main`.
-2. It authenticates as `gs3-iam-repair` through a WIF claim restricted to the exact repair workflow.
+2. It first authenticates as `gs3-iam-repair` through a WIF claim restricted to the exact repair workflow. If that path fails, `gs3-iam-repair-b` performs the same bounded reconciliation.
 3. It compares live IAM with the declared baseline.
 4. It adds only missing allowlisted bindings and removes only explicitly listed forbidden Dhan job invokers.
 5. It never reads Secret Manager payloads and never invokes the rotator.
 6. It triggers one Cloud Run Auto Deploy retry only when IAM drift was actually repaired.
 7. If no declared IAM drift exists, it stops; no retry loop is permitted.
+
+The two repair identities reduce single-identity IAM drift risk. They do not claim immunity from project-owner removal, WIF-provider deletion, organization-level policy changes, account suspension, or other failures above the delegated project control plane.
 
 ## Broker rotation authority
 
@@ -61,4 +64,4 @@ No production-ready claim is allowed from source code alone. Final proof must in
 
 ## Human-only break-glass boundary
 
-Human intervention can still be required for external account/billing suspension, organization-level policy outside this project, revoked GitHub/GCP account ownership, external broker identity/MFA reset, or intentionally destructive actions. These are not normal System3 operational tasks.
+Human intervention can still be required for external account/billing suspension, organization-level policy outside this project, revoked GitHub/GCP account ownership, WIF-provider destruction when neither delegated repair identity can authenticate, external broker identity/MFA reset, or intentionally destructive actions. These are not normal System3 operational tasks.
