@@ -3,7 +3,7 @@
 Status: ACTIVE CONTROL PLAN. This file complements `AGENTS.md` and `state/FAILURE_REMEDIATION_CHECKLIST.md`. It does not override machine evidence. `SYSTEM_STATE.md` contains historical/stale material and must not be used as sole production authority until reconciled against current GCP/GitHub evidence.
 
 ## 0. Mission
-Build a resumable, fail-closed engineering loop where every user-visible/runtime/security failure becomes evidence, a root-cause investigation, a regression, a smallest durable repair, an automated verification, production proof where applicable, and a recurrence guard. No agent may claim closure from a local/CI-only green result.
+Build a resumable, fail-closed engineering loop where every user-visible/runtime/security failure becomes evidence, root-cause investigation, regression, smallest durable repair, automated verification, production proof where applicable, and recurrence guard. No agent may claim closure from a local/CI-only green result.
 
 ## 1. Authority ladder
 1. Current GCP production runtime/revision/traffic evidence.
@@ -14,16 +14,12 @@ Build a resumable, fail-closed engineering loop where every user-visible/runtime
 6. Repository source/tests.
 7. Current control Markdown.
 8. Historical Markdown/email/chat.
-
 Any conflict creates `AUTHORITY_CONFLICT` and blocks mutation until explained.
 
 ## 2. Mandatory pre-work checklist
 - [ ] Record UTC/IST time, repo, branch, main SHA, PR head SHA.
-- [ ] Read `AGENTS.md`.
-- [ ] Read this plan.
-- [ ] Read `state/FAILURE_REMEDIATION_CHECKLIST.md`.
-- [ ] Read active P0 issue(s), especially #188 when market-data/UI related.
-- [ ] Read relevant current workflow/artifact evidence.
+- [ ] Read `AGENTS.md`, this plan, failure checklist and active P0 issue(s).
+- [ ] Read current workflow/artifact evidence.
 - [ ] Verify LIVE safety flags remain zero/off.
 - [ ] For production claims identify Cloud Run URL/revision/image/traffic/`DEPLOY_GIT_SHA`.
 - [ ] Create durable checkpoint with work ID before mutation.
@@ -51,153 +47,90 @@ For every affected UI feature map:
 `tab -> component -> state/hook -> HTTP/WS -> route -> service -> cache/storage -> broker/provider -> parser -> response -> renderer`.
 For automated data paths also map:
 `Scheduler -> Cloud Run Job -> service account -> Secret Manager metadata/version -> token rotator -> broker auth -> runtime refresh -> UI/API`.
-No fix is accepted until the initiating cause and downstream blast radius are known.
+No fix is accepted until initiating cause and downstream blast radius are known.
 
 ## 5. UI proof architecture
 ### Layer A — LOCAL_NON_PRODUCTION
-Purpose: build/mount/navigation/render regression only.
-Required manifest fields:
-- [ ] `proof_scope=LOCAL_NON_PRODUCTION`;
-- [ ] `production_authority=false`;
-- [ ] `broker_connectivity_proven=false`;
-- [ ] `production_claim_allowed=false`;
-- [ ] localhost/Vite preview source recorded;
-- [ ] 22 current sidebar tabs exercised;
-- [ ] zero credential prompt;
-- [ ] zero trading mutation/order action.
-A PASS here never proves Dhan, market data, GCP revision, production UI, or production readiness.
+Required: explicit non-production scope/authority fields, localhost/Vite origin, all 22 current tabs, zero credential prompt and zero order/mutation action. PASS never proves Dhan, GCP revision, production data or readiness.
 
 ### Layer B — GCP_DEPLOYED_SEMANTIC
-Required before any production UI/broker claim:
-- [ ] HTTPS Cloud Run URL derived from GCP;
-- [ ] expected SHA recorded;
-- [ ] serving revision/image/traffic recorded;
-- [ ] `DEPLOY_GIT_SHA == expected current main`;
-- [ ] `/api/health` current and lightweight;
-- [ ] `/api/broker/status` current, sanitized and latency recorded;
-- [ ] Overview, Broker and System tabs agree on Dhan state in same proof window;
-- [ ] WebSocket state visible/correlated;
-- [ ] visible non-placeholder market rows;
-- [ ] second refresh/session repeats the result;
-- [ ] screenshots + semantic JSON manifest;
-- [ ] zero credentials/mutations/order calls.
+Required before production broker/data claim: HTTPS Cloud Run URL; exact expected/deployed SHA and revision; traffic; health/broker status; sanitized token provenance; Overview+Broker+System agreement; WebSocket correlation; visible non-placeholder data; repeated refresh/second session; screenshot+semantic manifest; zero mutations/orders.
 
 ## 6. Issue #188 market-data completeness checklist
-For broker-supported legal/API universe prove expected/backend/UI/missing counts plus source/freshness/latency:
-- [ ] NSE cash equities;
-- [ ] BSE cash equities;
-- [ ] NSE indices;
-- [ ] BSE indices where supported;
-- [ ] equity derivatives;
-- [ ] index derivatives;
-- [ ] instrument/security-ID discovery;
-- [ ] multiple index option chains;
-- [ ] multiple equity option chains;
-- [ ] all broker-returned expiries;
-- [ ] CE and PE coverage;
-- [ ] all returned strikes / ALL STRIKES default;
-- [ ] bid/ask/LTP/volume/OI/change-OI/IV/Greeks when genuinely provided/derived and source-labelled;
-- [ ] quote freshness and stale reason;
-- [ ] candle/chart continuity where supported;
-- [ ] API↔UI count/value parity;
-- [ ] broker outage degraded state, no blank/hang;
-- [ ] rate-limit/backoff/circuit breaker;
-- [ ] WebSocket disconnect/reconnect/resubscribe expected coverage.
+- [ ] NSE/BSE cash equities where broker-supported.
+- [ ] NSE/BSE supported indices.
+- [ ] Equity and index derivatives.
+- [ ] Instrument/security-ID discovery.
+- [ ] Multiple index option chains.
+- [ ] Multiple equity option chains.
+- [ ] All broker-returned expiries.
+- [ ] CE/PE coverage.
+- [ ] All returned strikes / ALL STRIKES.
+- [ ] LTP/bid/ask/volume/OI/change-OI/IV/Greeks when genuinely supplied/derived and source-labelled.
+- [ ] Freshness/stale reason.
+- [ ] API↔UI count/value parity.
+- [ ] Broker-outage degraded state.
+- [ ] Rate-limit/backoff/circuit breaker.
+- [ ] WebSocket disconnect/reconnect/resubscribe.
 
 ## 7. Dhan reliability checklist
-Treat broker connectivity and rotator reliability separately.
-- [ ] recent rotation attempts count;
-- [ ] success/failure ratio;
-- [ ] auth error count;
-- [ ] timeout count;
-- [ ] concurrency/version-conflict count;
-- [ ] crash/exit-code count;
-- [ ] scheduler enabled/timezone/identity;
-- [ ] job execution identity;
-- [ ] Secret Manager version metadata only, never payload;
-- [ ] expected-version/concurrency protection;
-- [ ] runtime observes winning/latest valid version;
-- [ ] broker read-only call succeeds;
-- [ ] connected duration measured;
-- [ ] repeated consecutive rotations succeed;
-- [ ] UI and API remain connected through rotations.
-One success never closes reliability.
+Broker connectivity and rotator reliability remain separate. Track attempts/successes/failures/auth/timeouts/concurrency/crashes/latency/connected duration; prove Scheduler→Job→identity→Secret Manager metadata/version→rotator→runtime→read-only broker→UI; multiple consecutive rotations and connected-duration proof are required.
 
 ## 8. Security checklist
-- [ ] pip root audit;
-- [ ] pip backend audit;
+- [ ] root/backend pip audit;
 - [ ] npm audit;
 - [ ] CodeQL Python/JS-TS;
 - [ ] Bandit/static security;
 - [ ] secret scan;
 - [ ] dependency compatibility/lock determinism;
 - [ ] architecture/order safety;
-- [ ] raw findings retained even when exact reviewed shape is declassified;
-- [ ] no global suppression;
-- [ ] no forced incompatible dependency upgrade.
-Current known child loop: npm audit remains 4 vulnerabilities (3 HIGH, 1 MODERATE) on run #53; direct/transitive Vite/PostCSS/esbuild/nanoid path remains open until lock-compatible patched versions are proven.
+- [ ] raw findings retained when exact reviewed shape is declassified;
+- [ ] no global suppression/forced major upgrade;
+- [ ] declassification tied to scanner finding location, not neighboring context.
+
+Known open security child loops:
+- `SEC-001.1`: npm audit 4 vulnerabilities (3 HIGH, 1 MODERATE) on the last inspected completed security artifact; Vite/PostCSS/esbuild/nanoid compatible-lock remediation pending.
+- `SEC-001.2`: mixed-snippet Bandit false-green risk found by independent PR review; source and adversarial tests repaired, current exact-head verification pending.
 
 ## 9. Automation design checklist
-Automation must itself be tested.
-- [ ] authoritative existing workflows reused; avoid workflow sprawl;
-- [ ] read-only permissions for CI gates;
-- [ ] GitHub-hosted runners for global safety;
+- [ ] reuse authoritative workflows; avoid sprawl;
+- [ ] least-privilege/read-only safety CI;
 - [ ] deterministic exact-SHA checkout/provenance;
 - [ ] bounded retry only for classified transient infrastructure failure;
-- [ ] second identical failure becomes RECURRENCE;
-- [ ] artifacts uploaded even on fail when safe;
-- [ ] failure reason/step preserved;
-- [ ] local proof labeled non-production;
-- [ ] production proof waits for exact serving SHA;
-- [ ] security and safety remain fail-closed;
-- [ ] no auto-live/order authority;
-- [ ] no secret payload access;
-- [ ] no stale artifact accepted as current;
-- [ ] automation produces machine-readable PASS/FAIL/BLOCKED plus blocker list;
-- [ ] automation contract has adversarial regression tests.
+- [ ] repeated semantic failure = RECURRENCE;
+- [ ] safe artifacts uploaded on failure;
+- [ ] exact failing step preserved;
+- [ ] local/production provenance separated;
+- [ ] stale artifact rejected;
+- [ ] final enforcement consumes all sub-results;
+- [ ] machine-readable PASS/FAIL/BLOCKED + blockers;
+- [ ] adversarial tests for the checker itself.
 
 ## 10. Automation self-check matrix
-Every change affecting automation must verify:
-- [ ] trigger coverage appropriate for changed paths;
-- [ ] concurrency/cancel behavior cannot hide required final proof;
-- [ ] permissions least-privilege;
-- [ ] environment safety flags explicit;
-- [ ] timeouts bounded;
-- [ ] retry count bounded and visible;
-- [ ] exact SHA included in artifact/report;
-- [ ] artifact retention adequate;
-- [ ] failure step cannot be skipped by `continue-on-error` without final enforcement;
-- [ ] final enforcement consumes all sub-results;
-- [ ] stale evidence rejected;
-- [ ] local-vs-production provenance distinct;
-- [ ] downstream workflow only starts after valid upstream condition;
-- [ ] manual dispatch cannot bypass required invariants;
-- [ ] no write-back/deploy in read-only safety workflow.
+Every automation change verifies trigger coverage, cancel/concurrency behavior, permissions, safety flags, timeouts, retry visibility, exact SHA in evidence, artifact retention, no hidden `continue-on-error` green, final enforcement, stale-evidence rejection, proof provenance, downstream dependency ordering, manual-dispatch invariants and no write-back/deploy from read-only safety workflow.
 
 ## 11. Universal recursive failure micro-loop
-For EVERY failed checklist item:
 1. Freeze evidence.
-2. Assign atomic ID and classify NEW/RECURRENCE.
+2. Assign atomic ID; classify NEW/RECURRENCE.
 3. Reproduce exact smallest failure.
-4. Trace every upstream/downstream dependency.
-5. Research source, machine logs/artifacts, and authoritative upstream docs when tool/dependency-related.
-6. Form at least two plausible remediation paths when material and falsify the weaker one.
-7. Create failing regression plus adversarial/negative case.
-8. Implement smallest durable repair with rollback boundary.
-9. Run focused -> adjacent -> full smoke/security/safety -> exact artifact review -> production proof when relevant.
-10. Checkpoint. Any failed item creates a new child 10-step loop before another retry.
+4. Trace upstream/downstream dependencies.
+5. Research source + machine evidence + authoritative upstream docs where relevant.
+6. Compare/falsify remediation alternatives.
+7. Add failing + adversarial regression.
+8. Implement smallest durable repair.
+9. Run focused→adjacent→full smoke/security/safety→artifact review→production proof where relevant.
+10. Checkpoint. Any failed item creates another child 10-step loop.
 
 ## 12. Smoke-test ladder
-A change cannot jump directly to production closure.
 - [ ] syntax/compile/import;
 - [ ] unit regression;
 - [ ] adversarial regression;
 - [ ] adjacent integration;
 - [ ] backend/API contract;
-- [ ] frontend strict/build;
+- [ ] frontend build;
 - [ ] local 22-tab browser smoke;
 - [ ] security/safety gates;
-- [ ] exact-head mandatory workflow set;
+- [ ] exact-head mandatory workflows;
 - [ ] merge eligibility;
 - [ ] exact-main deploy;
 - [ ] Cloud Run provenance/health;
@@ -208,26 +141,21 @@ A change cannot jump directly to production closure.
 - [ ] recurrence-free market-session observation.
 
 ## 13. Documentation update checklist
-Before marking any checkbox complete in current-state docs:
-- [ ] source evidence checked;
-- [ ] workflow/artifact evidence checked;
-- [ ] GCP runtime checked if production-related;
-- [ ] production UI checked if user-visible;
-- [ ] SHA/revision/timestamp recorded;
-- [ ] stale/contradictory historical statement explicitly marked stale rather than silently reused;
-- [ ] result status is one of `PROVEN|FAILED|BLOCKED|IN_PROGRESS|STALE|UNKNOWN`.
+Before marking current state complete: source checked; exact workflow/artifact checked; GCP checked for production; UI checked for user-visible claims; SHA/revision/timestamp recorded; stale historical claims marked; status only `PROVEN|FAILED|BLOCKED|IN_PROGRESS|STALE|UNKNOWN`.
 
 ## 14. Current cross-verification snapshot — 2026-08-15
-- [x] PR #219 local browser proof expanded to 22 tabs.
-- [x] Local browser proof explicitly separated from production authority.
-- [x] Global Safety #1613 PASS on head `d9c38ec...`.
-- [x] Frontend Browser Runtime Smoke #166 PASS on head `d9c38ec...`.
-- [x] CodeQL #53 PASS on head `d9c38ec...`.
-- [x] SonarQube Audit #53 workflow SUCCESS on head `d9c38ec...` (workflow success is not a substitute for external Sonar configuration/quality proof if scans are skipped/blocked).
-- [ ] Security Audit Evidence #53 FAIL: exact hard blocker `npm_audit`; 4 vulnerabilities = 3 HIGH + 1 MODERATE. Artifact `security-audit-53`, ID `9243029535`, digest `sha256:df12d214bb7442dcf3762735d0b61858476789fd949903fdc8f592f17521d6b0`.
-- [ ] Production Dhan connected from deployed GCP UI NOT YET PROVEN by a current exact-main Layer-B proof.
+- [x] PR #219 remains OPEN and mergeable; base remains `bcce7fb149eba5860989df56b7c98b50b5ff54be` at the last metadata check.
+- [x] PR changed-file scope is 10 files: governance, proof harnesses, security summarizer/tests, and Playwright truth gate; no order/trading runtime file is in the changed-file list.
+- [x] All three independent PR review threads are now resolved after fixes: Option Chain discovery race, governance marker mismatch, and Bandit neighboring-snippet false-green risk.
+- [x] Governance architecture gate previously failed on its own detector mismatch and then passed after correction, proving the child-loop/self-check behavior.
+- [x] Latest completed local Frontend Browser Runtime Smoke before this documentation checkpoint passed all canonical tab rendering and artifact upload; by contract it remains non-production.
+- [x] SonarQube workflow passed on the latest inspected generation before this documentation checkpoint.
+- [x] Bandit declassifier now maps the exact scanner `line_number` and requires equality to the reviewed static command; mixed safe+unsafe B602/B605 and ambiguous multiline adversarial tests are present.
+- [ ] Current exact-head workflow set after the latest QC/documentation commits must complete; documentation commits themselves are not exempt from re-verification.
+- [ ] npm audit remains the known genuine security blocker until a fresh exact-head artifact proves otherwise.
+- [ ] Production Dhan connected from deployed GCP UI is NOT PROVEN by a current exact-main Layer-B proof.
 - [ ] Issue #188 remains OPEN.
-- [ ] `SYSTEM_STATE.md` is stale and contains June/Render/manual-token instructions; do not use it as sole current authority.
+- [ ] `SYSTEM_STATE.md` remains STALE for current production authority and still contains June/Render/manual-token material.
 
 ## 15. Closure
 Only `CODE -> TEST -> SECURITY -> MERGE -> EXACT MAIN DEPLOY -> RUNTIME -> BROKER -> DATA -> 22-TAB PRODUCTION UI -> STABILITY -> CROSS-VERIFY -> DOCUMENT` may become `CLOSED — PROVEN`.
