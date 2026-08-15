@@ -22,6 +22,7 @@ env:
   SYSTEM3_LIVE_TRADING_ALLOWED: "0"
   AUTO_EXECUTE_TRADES: "0"
   SYSTEM3_REAL_ONLY: "1"
+  SYSTEM3_PUBLIC_BASE_URL: "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 jobs:
   frontend-browser-runtime-smoke:
@@ -52,7 +53,9 @@ jobs:
 
       - name: Compile browser smoke harness
         shell: bash
-        run: python -m py_compile scripts/frontend_local_runtime_smoke.py
+        run: |
+          python -m py_compile scripts/frontend_local_runtime_smoke.py
+          python -m py_compile scripts/gcp_live_ui_snapshot.py
 
       - name: Prove all canonical tabs render in Chrome
         shell: bash
@@ -83,3 +86,17 @@ jobs:
           path: frontend-ui-proof/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Capture read-only live production Decision Intel proof
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: timeout 120s python scripts/gcp_live_ui_snapshot.py
+
+      - name: Upload live production UI proof
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v6
+        with:
+          name: live-production-ui-proof-${{ github.run_number }}
+          path: live-production-ui-proof/
+          if-no-files-found: error
+          retention-days: 14
