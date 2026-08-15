@@ -36,13 +36,15 @@ A fresh browser session can still be wrong when it starts during a deployment ra
 
 Therefore, for any post-deploy/current-main UI proof:
 
-- query the authoritative public `/api/deploy-info` endpoint before the capture;
+- query the authoritative public `/api/deploy/info` endpoint before the capture;
 - compare its serving `git_sha` with the intended/current GitHub SHA;
 - wait boundedly for convergence rather than photographing the previous revision;
 - fail closed as `NOT_CURRENT_SERVING_SHA` if convergence does not occur;
 - capture only after convergence;
 - re-check the serving SHA at the end of the browser lifecycle;
 - reject the proof if the serving SHA changes or does not match at either boundary.
+
+The production frontend itself consumes `/api/deploy/info`; proof code must use the same canonical route. A route spelling mismatch is a proof failure, not a reason to weaken or bypass the serving-SHA lock.
 
 Artifact timestamp, GitHub run SHA, or workflow start time alone does **not** prove which revision the browser actually observed.
 
@@ -84,7 +86,7 @@ For each tab, capture:
 
 For required option-chain production proof, capture NIFTY, BANKNIFTY, FINNIFTY, and MIDCPNIFTY subviews separately and prove the visible symbol/source/contracts/strikes rather than assuming one default chain represents all required symbols.
 
-The lifecycle proof must also capture broker, health, live-board, and deploy-info APIs at the start and end of the browser session so UI/API/revision contradictions cannot be hidden by timing.
+The lifecycle proof must also capture broker, health, live-board, and `/api/deploy/info` at the start and end of the browser session so UI/API/revision contradictions cannot be hidden by timing.
 
 ## Evidence classes
 
@@ -159,4 +161,4 @@ Live evidence collection is read-only:
 
 `scripts/system3_temporal_truth_guard.py` defines the machine-evaluable freshness contract. `tests/test_temporal_truth_contract.py` locks this policy into agent instructions and the live browser workflow.
 
-`scripts/gcp_live_ui_snapshot.py` must wait for exact expected serving-SHA convergence, emit request/run-scoped timestamps and serving-SHA boundaries, capture the full production UI lifecycle, and fail closed if revision identity is not stable. Consumers must validate timestamps and serving identity before using stored evidence for time-sensitive claims.
+`scripts/gcp_live_ui_snapshot.py` must wait for exact expected serving-SHA convergence through the same canonical `/api/deploy/info` route used by production UI, emit request/run-scoped timestamps and serving-SHA boundaries, capture the full production UI lifecycle, and fail closed if revision identity is not stable. Consumers must validate timestamps and serving identity before using stored evidence for time-sensitive claims.

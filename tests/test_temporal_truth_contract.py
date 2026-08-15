@@ -9,6 +9,7 @@ from scripts.system3_resolve_runtime_deploy_sha import DEPLOY_TRIGGER_PATTERNS, 
 from scripts.system3_temporal_truth_guard import evaluate_manifest
 
 ROOT = Path(__file__).resolve().parents[1]
+CANONICAL_DEPLOY_INFO_PATH = "/api/deploy/info"
 
 
 class TemporalTruthContractTests(unittest.TestCase):
@@ -102,7 +103,7 @@ class TemporalTruthContractTests(unittest.TestCase):
         text = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
         for marker in [
             "_wait_for_expected_serving_sha",
-            "/api/deploy-info",
+            'DEPLOY_INFO_PATH = "/api/deploy/info"',
             "SYSTEM3_EXPECTED_SERVING_SHA",
             "GITHUB_SHA",
             "EXPECTED_SERVING_SHA_NOT_CONVERGED",
@@ -113,10 +114,21 @@ class TemporalTruthContractTests(unittest.TestCase):
             "NOT_CURRENT_SERVING_SHA",
         ]:
             self.assertIn(marker, text)
+        self.assertNotIn("/api/deploy-info", text)
         policy = (ROOT / "docs" / "authority" / "TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md").read_text(encoding="utf-8")
         self.assertIn("Exact-serving-SHA lock", policy)
         self.assertIn("same `main` push", policy)
         self.assertIn("NOT_CURRENT_SERVING_SHA", policy)
+        self.assertIn(CANONICAL_DEPLOY_INFO_PATH, policy)
+        self.assertNotIn("/api/deploy-info", policy)
+
+    def test_live_proof_deploy_info_route_matches_production_frontend(self):
+        proof = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
+        frontend = (ROOT / "dashboard" / "frontend" / "src" / "hooks" / "useData.ts").read_text(encoding="utf-8")
+        self.assertIn(CANONICAL_DEPLOY_INFO_PATH, frontend)
+        self.assertIn(f'DEPLOY_INFO_PATH = "{CANONICAL_DEPLOY_INFO_PATH}"', proof)
+        self.assertNotIn("/api/deploy-info", frontend)
+        self.assertNotIn("/api/deploy-info", proof)
 
     def test_runtime_sha_resolver_exactly_tracks_cloud_run_deploy_trigger_paths(self):
         workflow = (ROOT / ".github" / "workflows" / "cloud-run-auto-deploy.yml").read_text(encoding="utf-8")

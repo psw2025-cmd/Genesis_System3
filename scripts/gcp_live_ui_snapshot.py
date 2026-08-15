@@ -3,9 +3,9 @@
 
 SYSTEM3_TEMPORAL_TRUTH_V1: a new browser session is necessary but not sufficient after
 a deploy-triggering change. Before any screenshot is accepted, the public production
-`/api/deploy-info` must prove that Cloud Run is serving the expected GitHub SHA. This
-prevents a same-push browser workflow from photographing the previous revision while a
-new deployment is still in flight.
+`/api/deploy/info` endpoint must prove that Cloud Run is serving the expected GitHub
+SHA. This prevents a same-push browser workflow from photographing the previous
+revision while a new deployment is still in flight.
 """
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROOF_DIR = ROOT / "live-production-ui-proof"
 DEFAULT_BASE = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 BASE_URL = os.getenv("SYSTEM3_PUBLIC_BASE_URL", DEFAULT_BASE).rstrip("/")
+DEPLOY_INFO_PATH = "/api/deploy/info"
 MAX_AGE_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_MAX_AGE_SECONDS", "300"))
 SETTLE_SECONDS = float(os.getenv("SYSTEM3_LIVE_TAB_SETTLE_SECONDS", "2.0"))
 DEPLOY_WAIT_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS", "720"))
@@ -36,7 +37,7 @@ def _utc_now() -> str:
 
 
 def _json_get(url: str) -> dict:
-    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.0"})
+    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.1"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             payload = json.loads(response.read().decode("utf-8") or "{}")
@@ -67,7 +68,6 @@ def _sha_matches(expected: str, actual: str) -> bool:
         return False
     if expected == actual:
         return True
-    # Allow a conventional short SHA only when it is unambiguous enough to be evidence.
     if len(actual) >= 7 and expected.startswith(actual):
         return True
     if len(expected) >= 7 and actual.startswith(expected):
@@ -83,11 +83,12 @@ def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
     last: dict = {}
     while True:
         attempts += 1
-        last = _sanitize_deploy(_json_get(f"{BASE_URL}/api/deploy-info"))
+        last = _sanitize_deploy(_json_get(f"{BASE_URL}{DEPLOY_INFO_PATH}"))
         actual = str(last.get("git_sha") or "")
         match = bool(expected) and _sha_matches(expected, actual)
         print("SERVING_SHA_PROBE", json.dumps({
             "attempt": attempts,
+            "deploy_info_path": DEPLOY_INFO_PATH,
             "expected_sha": expected or None,
             "actual_sha": actual or None,
             "revision": last.get("revision"),
@@ -100,6 +101,7 @@ def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
                 "converged_at_utc": _utc_now(),
                 "attempts": attempts,
                 "expected_sha": expected,
+                "deploy_info_path": DEPLOY_INFO_PATH,
             }
         if not expected:
             return False, last, {
@@ -107,6 +109,7 @@ def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
                 "failed_at_utc": _utc_now(),
                 "attempts": attempts,
                 "expected_sha": None,
+                "deploy_info_path": DEPLOY_INFO_PATH,
                 "reason": "EXPECTED_SERVING_SHA_MISSING",
             }
         if time.monotonic() >= deadline:
@@ -115,6 +118,7 @@ def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
                 "failed_at_utc": _utc_now(),
                 "attempts": attempts,
                 "expected_sha": expected,
+                "deploy_info_path": DEPLOY_INFO_PATH,
                 "reason": "EXPECTED_SERVING_SHA_NOT_CONVERGED",
             }
         time.sleep(max(1, DEPLOY_POLL_SECONDS))
@@ -170,7 +174,7 @@ def _sanitize_live_board(payload: dict) -> dict:
 def _api_snapshot() -> dict:
     return {
         "captured_at_utc": _utc_now(),
-        "deploy": _sanitize_deploy(_json_get(f"{BASE_URL}/api/deploy-info")),
+        "deploy": _sanitize_deploy(_json_get(f"{BASE_URL}{DEPLOY_INFO_PATH}")),
         "broker": _sanitize_broker(_json_get(f"{BASE_URL}/api/broker/status")),
         "health": _sanitize_health(_json_get(f"{BASE_URL}/api/health")),
         "live_board": _sanitize_live_board(_json_get(f"{BASE_URL}/api/market/live_board")),
@@ -273,6 +277,7 @@ def main() -> int:
             "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
             "state": "NOT_CURRENT_SERVING_SHA",
             "base_url": BASE_URL,
+            "deploy_info_path": DEPLOY_INFO_PATH,
             "serving_deploy": serving_deploy,
             "serving_sha_convergence": convergence,
             "safety": {
@@ -286,7 +291,6 @@ def main() -> int:
         print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=NOT_CURRENT_SERVING_SHA", json.dumps(failure, sort_keys=True))
         return 5
 
-    # Temporal capture starts only after serving-sha convergence. The wait itself is not UI evidence.
     capture_started = _utc_now()
     api_start = _api_snapshot()
     expected_sha = str(convergence.get("expected_sha") or "")
@@ -363,6 +367,7 @@ def main() -> int:
         "captured_at_utc": capture_finished,
         "max_age_seconds": MAX_AGE_SECONDS,
         "base_url": BASE_URL,
+        "deploy_info_path": DEPLOY_INFO_PATH,
         "source_authority": "GCP_PRODUCTION_PUBLIC_URL",
         "serving_sha_convergence": convergence,
         "serving_deploy_before_capture": serving_deploy,
@@ -397,6 +402,7 @@ def main() -> int:
         },
         "interpretation": {
             "fresh_browser_is_not_enough_without_exact_serving_sha": True,
+            "canonical_deploy_info_path_matches_production_frontend": True,
             "render_pass_is_not_semantic_data_pass": True,
             "required_chain_subviews_are_semantically_checked": True,
             "stored_artifact_becomes_historical_after_capture": True,
