@@ -16,54 +16,121 @@ def _jwt(exp):
 
 class _Client:
     def __init__(self, versions):
-        self.versions = list(versions); self.calls = 0
+        self.versions = list(versions)
+        self.calls = 0
+
     def access_secret_version(self, request):
-        version, token = self.versions[min(self.calls, len(self.versions)-1)]; self.calls += 1
+        version, token = self.versions[min(self.calls, len(self.versions) - 1)]
+        self.calls += 1
         return types.SimpleNamespace(name=f"projects/p/secrets/s/versions/{version}", payload=types.SimpleNamespace(data=token.encode()))
+
     def get_secret_version(self, request):
         return types.SimpleNamespace(create_time=None)
 
 
 def _status_module(token, rest):
-    return types.SimpleNamespace(_STATUS_RESULT_CACHE=None,_STATUS_RESULT_CACHE_AT=0.0,_STATUS_RESULT_TTL_S=25.0,
-        _DHAN_SDK_OK=True,_ENV_LOADED_VIA="test",_DHAN_PROFILE_URL="https://dhan.test/profile",
-        get_dhan_credentials=lambda:{"client_id":"c","access_token":token},_auth_failure_payload=lambda d:d.get("status")=="failure",_rest_get=rest)
+    return types.SimpleNamespace(
+        _STATUS_RESULT_CACHE=None,
+        _STATUS_RESULT_CACHE_AT=0.0,
+        _STATUS_RESULT_TTL_S=25.0,
+        _DHAN_SDK_OK=True,
+        _ENV_LOADED_VIA="test",
+        _DHAN_PROFILE_URL="https://dhan.test/profile",
+        get_dhan_credentials=lambda: {"client_id": "c", "access_token": token},
+        _auth_failure_payload=lambda d: d.get("status") == "failure",
+        _rest_get=rest,
+    )
+
+
+def _http_error(status_code, text):
+    exc = RuntimeError(f"http {status_code}")
+    exc.response = types.SimpleNamespace(status_code=status_code, text=text)
+    return exc
 
 
 class BR1DhanAuthReliabilityTests(unittest.TestCase):
     def tearDown(self):
         provider._set_client_factory_for_tests(None)
-        os.environ.pop("DHAN_TOKEN_SOURCE", None); os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
+        os.environ.pop("DHAN_TOKEN_SOURCE", None)
+        os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
 
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
-        token=_jwt(time.time()+3600)
-        result=get_cloud_status(_status_module(token, lambda *a,**k:{"status":"failure"}))
+        token = _jwt(time.time() + 3600)
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
 
     def test_clock_expired_token_is_distinguished(self):
         import time
-        token=_jwt(time.time()-60)
-        result=get_cloud_status(_status_module(token, lambda *a,**k:{"status":"failure"}))
+        token = _jwt(time.time() - 60)
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
         self.assertEqual(result["auth_classification"], "TOKEN_CLOCK_EXPIRED")
 
+    def test_http_401_code_808_clock_valid_is_dhan_rejected(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(401, '{"code":808,"message":"Invalid Access Token"}')
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+
+    def test_http_400_dh906_clock_valid_is_dhan_rejected(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, "DH-906 invalid token")
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+
+    def test_non_auth_http_400_is_not_falsely_labeled_token_rejected(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, "Malformed request: unsupported profile field")
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "HTTP_400")
+        self.assertIsNone(result["auth_classification"])
+
+    def test_http_429_is_not_auth_failure(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(429, "Too Many Requests")
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "HTTP_429")
+        self.assertIsNone(result["auth_classification"])
+
     def test_same_rejected_secret_version_force_reload_is_suppressed(self):
-        client=_Client([("258","token-a"),("258","token-a"),("258","token-a")])
-        provider._set_client_factory_for_tests(lambda:client); os.environ["DHAN_TOKEN_SOURCE"]="gcp"; os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"]="60"
+        client = _Client([("258", "token-a"), ("258", "token-a"), ("258", "token-a")])
+        provider._set_client_factory_for_tests(lambda: client)
+        os.environ["DHAN_TOKEN_SOURCE"] = "gcp"
+        os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"] = "60"
         provider.get_access_token(force_refresh=True, reason="startup")
         self.assertFalse(provider.force_reload("get_status_auth_failure"))
-        calls_after_first=client.calls
+        calls_after_first = client.calls
         self.assertFalse(provider.force_reload("get_status_auth_failure"))
         self.assertEqual(client.calls, calls_after_first)
-        meta=provider.token_metadata()
+        meta = provider.token_metadata()
         self.assertEqual(meta["rejected_secret_version"], "258")
         self.assertEqual(meta["auth_reload_suppressed_count"], 1)
         self.assertFalse(meta["token_value_exposed"])
 
     def test_normal_ttl_refresh_can_discover_new_version_during_auth_backoff(self):
-        client=_Client([("258","token-a"),("258","token-a"),("259","token-b")])
-        provider._set_client_factory_for_tests(lambda:client); os.environ["DHAN_TOKEN_SOURCE"]="gcp"; os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"]="60"
+        client = _Client([("258", "token-a"), ("258", "token-a"), ("259", "token-b")])
+        provider._set_client_factory_for_tests(lambda: client)
+        os.environ["DHAN_TOKEN_SOURCE"] = "gcp"
+        os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"] = "60"
         provider.get_access_token(force_refresh=True, reason="startup")
         self.assertFalse(provider.force_reload("get_status_auth_failure"))
         with patch.object(provider, "_ttl_seconds", return_value=0.0):
@@ -72,4 +139,5 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertIsNone(provider.token_metadata()["rejected_secret_version"])
 
 
-if __name__ == "__main__": unittest.main()
+if __name__ == "__main__":
+    unittest.main()
