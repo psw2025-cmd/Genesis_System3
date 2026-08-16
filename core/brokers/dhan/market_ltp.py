@@ -135,6 +135,21 @@ def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
     return out
 
 
+def _is_rate_limit_error(error: Optional[str]) -> bool:
+    """Return true for Dhan marketfeed throttle signals.
+
+    A rate-limit response is terminal for this fetch. Retrying alternate request
+    shapes, endpoints, or SDK methods inside the same invocation amplifies a single
+    429/805 into a burst and can extend the throttle window.
+    """
+    value = str(error or "").upper()
+    return (
+        "HTTP_429" in value
+        or "DH-904" in value
+        or ("805" in value and "TOO MANY" in value)
+    )
+
+
 def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple[Optional[Any], Optional[str]]:
     try:
         import requests
@@ -154,7 +169,8 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
         "Content-Type": "application/json",
         "Accept": "application/json",
     }
-    # Try string ids first (docs), then int ids (some SDK paths).
+    # Try string ids first (docs), then int ids for compatibility only when the
+    # first attempt is not rate-limited. A 429/805 is terminal for this call.
     bodies = [
         {seg: list(ids) for seg, ids in securities.items()},
         {
@@ -168,6 +184,8 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
             resp = requests.post(url, headers=headers, json=body, timeout=8)
             if resp.status_code >= 400:
                 last_err = f"HTTP_{resp.status_code}:{(resp.text or '')[:120]}"
+                if _is_rate_limit_error(last_err):
+                    break
                 continue
             payload = resp.json()
             # Surface soft failures like DH-901 without raising.
@@ -176,6 +194,8 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
                 if status in ("failure", "error"):
                     remarks = payload.get("remarks") or payload.get("message") or payload.get("errorMessage") or ""
                     last_err = f"API_{status}:{str(remarks)[:120]}"
+                    if _is_rate_limit_error(last_err):
+                        break
                     continue
             return payload, None
         except Exception as exc:
@@ -184,27 +204,38 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
 
 
 def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
-    """
-    Batch OHLC/quote via Dhan marketfeed (REST first, SDK fallback).
+    """Batch OHLC/quote via Dhan marketfeed (REST first, SDK fallback).
 
-    Returns map keyed by security_id string -> quote fields.
+    Returns map keyed by security_id string -> quote fields. A Dhan rate-limit
+    response is fail-fast for this invocation so fallback chaining cannot amplify
+    the request burst; callers retain cached/chain fallback truth and retry on their
+    normal cadence.
     """
     cleaned = _normalize_securities(securities)
     if not cleaned:
         return {}
 
     errors: List[str] = []
+    rate_limited = False
     # Prefer REST — Cloud Run SDK marketfeed methods are inconsistent across dhanhq versions.
     for url in (_DHAN_OHLC_URL, _DHAN_QUOTE_URL, _DHAN_LTP_URL):
         payload, err = _rest_marketfeed(url, cleaned)
         if err:
             errors.append(f"{url.rsplit('/', 1)[-1]}:{err}")
             logger.info("market_ltp REST %s: %s", url.rsplit("/", 1)[-1], err)
+            if _is_rate_limit_error(err):
+                rate_limited = True
+                break
             continue
         parsed = _flatten_quotes(payload)
         if parsed:
+            fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
             return parsed
         errors.append(f"{url.rsplit('/', 1)[-1]}:unparsed")
+
+    if rate_limited:
+        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
+        return {}
 
     try:
         from core.brokers.dhan.dhan_readonly import create_dhan_client
@@ -227,6 +258,7 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
             payload = method(cleaned)
             parsed = _flatten_quotes(payload)
             if parsed:
+                fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
                 return parsed
             errors.append(f"{method_name}:unparsed")
         except Exception as exc:
