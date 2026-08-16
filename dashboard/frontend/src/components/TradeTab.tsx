@@ -58,7 +58,7 @@ function EquityRow({ row }: { row: any }) {
 export function TradeTab() {
   const { gainRank, apiStatus, setChainSymbol, marketTop } = useStore()
   const rankings: any[] = gainRank?.rankings ?? []
-  const [equity, setEquity] = useState<unknown>(null)
+  const [equity, setEquity] = useState<any>(null)
   const [equityErr, setEquityErr] = useState('')
   const [seedRows, setSeedRows] = useState<any[]>([])
 

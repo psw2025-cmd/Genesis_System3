@@ -44,9 +44,9 @@ function fmtPct(v: number | null | undefined): string {
 }
 
 export default function MLPerformance() {
-  const [state, setState] = useState<unknown>(null)
-  const [performance, setPerformance] = useState<unknown>(null)
-  const [comparison, setComparison] = useState<unknown>(null)
+  const [state, setState] = useState<Record<string, any> | null>(null)
+  const [performance, setPerformance] = useState<Record<string, any> | null>(null)
+  const [comparison, setComparison] = useState<Record<string, any> | null>(null)
   const [status, setStatus] = useState<LoadState>('loading')
   const [message, setMessage] = useState('Checking model artifacts...')
 

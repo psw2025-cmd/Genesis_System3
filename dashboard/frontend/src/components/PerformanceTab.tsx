@@ -11,8 +11,22 @@ interface PnlData {
     total_realized_pnl?: number
     total_unrealized_pnl?: number
     total_pnl?: number
+    open_positions?: number
   }
   history?: any[]
+}
+
+interface BacktestSummary {
+  status?: string
+  blockers?: unknown
+  warnings?: unknown
+  evidence?: Record<string, unknown>
+}
+
+interface BacktestData {
+  status?: string
+  costed_walkforward?: unknown
+  summary?: BacktestSummary
 }
 
 function StatCard({ label, value, color, sub }: { label: string; value: string; color?: string; sub?: string }) {
@@ -25,7 +39,7 @@ function StatCard({ label, value, color, sub }: { label: string; value: string; 
   )
 }
 
-async function fetchJSON(path: string) {
+async function fetchJSON(path: string): Promise<unknown> {
   const r = await fetch(path, { headers: { Accept: 'application/json' } })
   if (!r.ok) throw new Error(`${r.status}`)
   return r.json()
@@ -35,7 +49,7 @@ export function PerformanceTab() {
   const { gainRank, paper } = useStore()
   const [pnl, setPnl] = useState<PnlData | null>(null)
   const [pnlError, setPnlError] = useState<string | null>(null)
-  const [backtest, setBacktest] = useState<unknown>(null)
+  const [backtest, setBacktest] = useState<BacktestData | null>(null)
   const [lastChecked, setLastChecked] = useState<string>('')
 
   useEffect(() => {
@@ -47,8 +61,8 @@ export function PerformanceTab() {
           fetchJSON('/api/backtest/results').catch(() => null),
         ])
         if (mounted) {
-          setPnl(pnlData)
-          setBacktest(btData)
+          setPnl((pnlData && typeof pnlData === 'object' ? pnlData : null) as PnlData | null)
+          setBacktest((btData && typeof btData === 'object' ? btData : null) as BacktestData | null)
           setPnlError(null)
         }
       } catch (e: any) {

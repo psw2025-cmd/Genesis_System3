@@ -48,6 +48,11 @@ jobs:
         shell: bash
         run: npm ci --no-audit --no-fund
 
+      - name: Strict TypeScript contract check
+        working-directory: dashboard/frontend
+        shell: bash
+        run: npm run typecheck
+
       - name: Build production frontend
         working-directory: dashboard/frontend
         shell: bash

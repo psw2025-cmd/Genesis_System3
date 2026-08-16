@@ -184,7 +184,7 @@ export function LiveSimulation() {
           <div style={{ display: 'grid', gap: '8px' }}>
             {gateItems.map(([item, ok]) => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0,232,122,.20)', borderRadius: '10px', padding: '9px 10px', background: 'rgba(0,232,122,.06)' }}>
-                <span style={{ fontWeight: 800 }}>{item.replaceAll('_', ' ')}</span>
+                <span style={{ fontWeight: 800 }}>{item.replace(/_/g, ' ')}</span>
                 <span style={{ color: ok ? 'var(--up)' : 'var(--amber)', fontWeight: 950 }}>{ok ? '✓ SIM OK' : 'SIM ONLY'}</span>
               </div>
             ))}

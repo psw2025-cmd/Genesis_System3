@@ -36,10 +36,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const [isConnected, setIsConnected] = useState(false)
   const [usePolling, setUsePolling] = useState(false)
   const wsRef = useRef<WebSocket | null>(null)
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const pollIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const isConnectingRef = useRef(false)
-  const marketCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const marketCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const reconnectAttemptsRef = useRef(0)
 
   // Store callbacks in refs to prevent unnecessary reconnections
