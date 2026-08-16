@@ -1,6 +1,8 @@
 # SYSTEM_STATE.md — Single Source of Truth
 > **ALL AGENTS MUST READ THIS FILE FIRST before making any changes.**
-> Last updated: 2026-06-14 20:30 IST | Updated by: Claude (controller)
+> Last updated: 2026-08-16 ~20:45 IST | Updated by: Cursor (docs live cross-verify)
+> Coordination bus: GitHub Issue #188 | Final consolidator: ChatGPT
+> Production URL: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 
 ---
 
@@ -13,14 +15,28 @@
 
 ---
 
+## CURRENT LIVE PINS (request-scoped — re-read before acting)
+| Pin | Value (2026-08-16 ~15:15Z capture) |
+|-----|-------------------------------------|
+| Remote `main` | `ebd77a0efe545bedaab9fcc1de3a1a180466c263` |
+| Production serving SHA | `997daef4cfb3322e317da69b5cbb5b69950dab26` (**behind main**) |
+| Broker | `connected=false` · `TOKEN_EXPIRED_OR_INVALID` · SM gen **259** |
+| Safety | LIVE=false · order_placement_allowed=false |
+| Canonical SM secret | `dhan-access-token` (see `docs/BROKER_SETUP.md`) |
+| Open waves | SEC-1 PR #252 (CI PASS) · UI-OBS-1 PR #251 (frozen) · BR-1 PR #250 (ChatGPT) |
+| Docs cross-verify | `docs/audits/.../19_LIVE_DOCS_CROSSVERIFY_MATRIX_20260816.md` |
+
+**Do not treat Render/Codespace paragraphs below as current production authority.** Prefer GCP Cloud Run `genesis-system3-web` @ `asia-south1` + Issue #188.
+
+---
+
 ## BROKER
 - **ACTIVE:** DhanHQ ONLY
 - **Client ID:** ...3741
 - **SDK:** dhanhq 2.2.0
-- **Status (Codespace):** Token expired — TOTP strategy giving "Invalid TOTP" (2026-06-14). User must complete OAuth flow.
-- **Status (Render cloud):** TOKEN_EXPIRED_OR_INVALID — user must set fresh `DHAN_ACCESS_TOKEN` in Render dashboard.
-- **Balance:** ₹17.53 (last verified 2026-06-12)
-- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
+- **Production (GCP Cloud Run, request-scoped 2026-08-16):** `connected=false`, error=`TOKEN_EXPIRED_OR_INVALID`, Secret Manager generation identifier=`259`, LIVE=false. Earlier same-day captures showed connected=true @ v259 — treat as flapping/reject, not permanent PASS.
+- **Canonical secret:** `dhan-access-token` only. Banned/quarantined aliases: `system3-dhan-access-token`, `DHAN_BROKER_TOKEN` (policy in `docs/BROKER_SETUP.md`).
+- **Historical note (Codespace/Render, 2026-06):** older TOTP/OAuth notes below are retained for archaeology only — not current deploy authority.
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)
 | API Category | Status | Notes |

@@ -1261,3 +1261,17 @@ Verification with local `REQUIRE_API_KEY=true`:
 - Q1-Q26 evidence session: docs/audits/system3_quant_lifecycle/sessions/20260816T123000Z/
 - Verdict: broker PASS; quant lifecycle PARTIAL/NOT_PROVEN; promotion BLOCKED
 - Q27 source truncated in instruction file
+
+## [2026-08-16T15:15:00Z] [Cursor] LIVE DOCS CROSS-VERIFY + SSOT PIN REFRESH
+- Compared ChatGPT-required / multi-AI docs against GitHub `main` + open PRs + production URL.
+- Truth: NOT all docs were already live on `main`. Gaps closed in PR (docs-only):
+  - added `18_CURRENT_REMOTE_MAIN_REVALIDATION_ADDENDUM_20260816.md` (was only on PR #251)
+  - added `19_LIVE_DOCS_CROSSVERIFY_MATRIX_20260816.md`
+  - refreshed `SYSTEM_STATE.md` live pins (was stale 2026-06-14 header / Render-era)
+- Still pending on open PRs (not duplicated here to avoid path conflict):
+  - `docs/security/SEC1_NPM_AUDIT_REMEDIATION_20260816.md` → PR #252
+  - UI-OBS-1 code → PR #251
+  - BR-1 code → PR #250
+- Missing older task artifact `reports/latest/broker_secret_dup_audit_20260816/FINAL_REPORT.md` — NOT created under SEC-1 package-only ownership.
+- Live broker at capture: connected=false TOKEN_EXPIRED_OR_INVALID SM v259; serving SHA still 997daef4…; LIVE=false.
+- Bus: Issue #188; NEXT_OWNER for merges remains ChatGPT.
