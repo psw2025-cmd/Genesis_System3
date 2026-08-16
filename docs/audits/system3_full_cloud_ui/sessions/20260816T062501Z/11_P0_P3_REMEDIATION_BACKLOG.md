@@ -17,3 +17,6 @@
 | F-013 | P3 | CORRECT_BEHAVIOR | Hypothesis: source=dhan not visible | Fix proof selector if harness misses strip | Keep provenance strip mandatory |
 | F-014 | P0 | CORRECT_BEHAVIOR | Safety flags | None | Keep locks |
 | F-015 | P1 | CORRECT_BEHAVIOR | Prior handoff said disconnected; current connected | Do not mint from laptop | Keep Cloud Job sole mint |
+
+| F-016 | P1 | CONFIRMED_DEFECT | Rotate job fails: dhan-totp-secret v8 DESTROYED | Point latest to ENABLED TOTP version / recreate secret version | Secret lifecycle + rotate health alert |
+

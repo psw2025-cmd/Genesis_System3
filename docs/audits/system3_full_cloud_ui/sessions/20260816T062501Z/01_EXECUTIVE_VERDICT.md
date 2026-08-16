@@ -64,3 +64,16 @@ Waiting tabs this capture: truth, genesis, e2e-proof, overview, multibagger, sys
 | P3 | 1 (provenance OK) |
 
 See `11_P0_P3_REMEDIATION_BACKLOG.md` and `16_HANDOFF_TO_CHATGPT.md`.
+
+## Amendment A1 (Lane C closeout) — 2026-08-16T06:37Z
+
+**P1 — Token rotate job latest execution FAILED on DESTROYED TOTP secret version**
+
+- Execution: `genesis-system3-dhan-token-rotate-25szr`
+- Error: `dhan-totp-secret/versions/latest` resolves to **versions/8 DESTROYED**
+- Prior four rotate executions succeeded; access-token still at enabled **v257** and broker was **connected** during UI audit
+- Blast: next scheduled/manual mint may fail until `dhan-totp-secret` latest points at a valid ENABLED version (user/Secret Manager ops — do not paste secrets in chat)
+- Evidence: `supporting_lane_extracts/lane_c_gcp__03_jobs_summary.json`, `lane_c_gcp__FORENSIC_SUMMARY.md`
+- Status: CONFIRMED_DEFECT (ops/runtime), remediation **not** executed in audit phase
+
+Also recorded by Lane C: HTTP 429 count=8 in ~2h were mostly Cloud Run capacity aborts; ERROR=0; timeout text=0.
