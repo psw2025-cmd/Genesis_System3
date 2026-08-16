@@ -36,7 +36,7 @@ def _utc_now() -> str:
 
 
 def _json_get(url: str) -> dict:
-    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.2"})
+    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.3"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             payload = json.loads(response.read().decode("utf-8") or "{}")
@@ -210,20 +210,29 @@ def _number_after(label: str, text: str) -> int | None:
 
 
 def _chain_metadata_line(text: str, symbol: str) -> str:
-    """Return the visible metadata line for the requested chain symbol.
+    """Return the one unambiguous chain metadata line for a visible symbol.
 
-    Example:
-      status=... · symbol NIFTY · source=dhan · universe=security_id_list.csv
-
-    The universe file is provenance metadata; only source=dhan defines data-source truth.
+    The production UI renders `SYMBOL <symbol>` in the chain header and renders
+    `source=... priority=... status=...` in the following metadata row. Older proof
+    assumed both tokens were on one line and therefore returned an empty source for
+    the actual UI. Require the requested symbol somewhere in the page first, then
+    select exactly one metadata-shaped source line. Ambiguous/conflicting metadata
+    stays fail-closed.
     """
-    symbol_re = re.compile(rf"\bsymbol\s+{re.escape(symbol)}\b", flags=re.IGNORECASE)
+    if not re.search(rf"\bSYMBOL\s+{re.escape(symbol)}\b", text, flags=re.IGNORECASE):
+        return ""
+
+    candidates: list[str] = []
     source_re = re.compile(r"\bsource\s*=", flags=re.IGNORECASE)
+    priority_re = re.compile(r"\b(?:source_)?priority\s*=", flags=re.IGNORECASE)
+    status_re = re.compile(r"\bstatus\s*=", flags=re.IGNORECASE)
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw.strip())
-        if symbol_re.search(line) and source_re.search(line):
-            return line
-    return ""
+        if source_re.search(line) and priority_re.search(line) and status_re.search(line):
+            candidates.append(line)
+
+    unique = list(dict.fromkeys(candidates))
+    return unique[0] if len(unique) == 1 else ""
 
 
 def _chain_source_value(text: str, symbol: str) -> str:
@@ -312,7 +321,7 @@ def main() -> int:
     serving_ok, serving_deploy, convergence = _wait_for_expected_serving_sha()
     if not serving_ok:
         failure = {
-            "schema": "system3-live-production-ui-proof-v4.2",
+            "schema": "system3-live-production-ui-proof-v4.3",
             "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
             "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
             "state": "NOT_CURRENT_SERVING_SHA",
@@ -402,7 +411,7 @@ def main() -> int:
     }
 
     manifest = {
-        "schema": "system3-live-production-ui-proof-v4.2",
+        "schema": "system3-live-production-ui-proof-v4.3",
         "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
         "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
         "capture_started_at_utc": capture_started,
@@ -449,6 +458,8 @@ def main() -> int:
             "render_pass_is_not_semantic_data_pass": True,
             "required_chain_subviews_are_semantically_checked": True,
             "chain_source_parser_uses_explicit_source_token_only": True,
+            "chain_source_parser_matches_actual_two_line_ui_layout": True,
+            "ambiguous_chain_source_metadata_fails_closed": True,
             "universe_csv_filename_is_not_data_source": True,
             "stored_artifact_becomes_historical_after_capture": True,
             "new_current_request_requires_new_capture": True,

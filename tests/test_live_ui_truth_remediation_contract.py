@@ -84,19 +84,45 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
 
     def test_chain_source_parser_ignores_universe_csv_when_explicit_source_is_dhan(self):
         sample = (
-            "status=market_closed_dhan_snapshot · symbol NIFTY · source_priority=dhan_live>worker_push "
-            "· source=dhan · universe=security_id_list.csv · contracts=462 · strikes=231"
+            "SYMBOL NIFTY · CONTRACTS 462 · STRIKES 231\n"
+            "source=dhan · priority=dhan_live>worker_push · status=market_closed_dhan_snapshot "
+            "· universe=security_id_list.csv"
         )
         self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan")
         self.assertFalse(_is_bad_chain_source(_chain_source_value(sample, "NIFTY")))
         self.assertIn("universe=security_id_list.csv", _chain_metadata_line(sample, "NIFTY"))
 
-    def test_chain_source_parser_rejects_explicit_non_dhan_sources(self):
+    def test_chain_source_parser_supports_legacy_same_line_metadata_shape(self):
+        sample = (
+            "status=market_closed_dhan_snapshot · symbol NIFTY · source_priority=dhan_live>worker_push "
+            "· source=dhan · universe=security_id_list.csv · contracts=462 · strikes=231"
+        )
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan")
+        self.assertFalse(_is_bad_chain_source(_chain_source_value(sample, "NIFTY")))
+
+    def test_chain_source_parser_rejects_explicit_non_dhan_sources_in_two_line_layout(self):
         for source in ["csv", "synthetic", "yahoo", "mock", "fake"]:
-            sample = f"status=ok · symbol NIFTY · source={source} · contracts=100 · strikes=50"
+            sample = (
+                "SYMBOL NIFTY · CONTRACTS 100 · STRIKES 50\n"
+                f"source={source} · priority=fallback · status=ok"
+            )
             value = _chain_source_value(sample, "NIFTY")
             self.assertEqual(value, source)
             self.assertTrue(_is_bad_chain_source(value))
+
+    def test_chain_source_parser_fails_closed_on_conflicting_metadata_rows(self):
+        sample = (
+            "SYMBOL NIFTY · CONTRACTS 100 · STRIKES 50\n"
+            "source=dhan · priority=dhan_live · status=ok\n"
+            "source=csv · priority=fallback · status=stale"
+        )
+        self.assertEqual(_chain_metadata_line(sample, "NIFTY"), "")
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "")
+
+    def test_chain_source_parser_requires_requested_symbol_visibility(self):
+        sample = "source=dhan · priority=dhan_live · status=ok"
+        self.assertEqual(_chain_metadata_line(sample, "NIFTY"), "")
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "")
 
     def test_live_proof_semantic_alerts_do_not_use_naive_error_substring_scan(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
