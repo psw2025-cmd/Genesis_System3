@@ -6,6 +6,7 @@ import { formatAgeSec, formatIstStamp, shortSha } from '../../lib/formatLive'
 import { brokerIsConnected } from '../../lib/healthTruth'
 import { resolveFeedQuality } from '../../lib/feedQuality'
 import { SystemHealthDiagnostics } from '../SystemHealthDiagnostics'
+import { SystemProgressPanel } from '../SystemProgressPanel'
 
 export const DataIntegrity: React.FC = () => {
   const { health, brokerConnected, wsStatus, lastSync, brokerStatus, state, deployInfo, marketOpen } = useStore()
@@ -39,6 +40,7 @@ export const DataIntegrity: React.FC = () => {
 
       <div className="workspace-body">
         <SystemHealthDiagnostics variant="panel" />
+        <SystemProgressPanel />
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
           <MetricTile label="Reconciliation" value={recon || '—'} tone={recon === 'OK' ? 'ok' : recon ? 'warn' : 'mut'} />
