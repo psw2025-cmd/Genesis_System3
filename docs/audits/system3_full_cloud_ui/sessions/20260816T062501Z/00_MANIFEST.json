@@ -45,5 +45,17 @@
   "instruction": "docs/chatgpt_instruction_for_cursar.md",
   "live_broker_connected": true,
   "secret_version_observed": "257",
-  "market_session": "WEEKEND_CLOSED_SUNDAY"
+  "market_session": "WEEKEND_CLOSED_SUNDAY",
+  "qc_completeness_review_utc": "2026-08-16T06:45:28Z",
+  "qc_completeness_review_ist": "2026-08-16 12:15:28 IST",
+  "qc_current_main_at_review": "41f7a80cf0c31711f4c26d46fdc0e3f26fc6a311",
+  "audit_handoff_status": "READY_FOR_CHATGPT_REVIEW",
+  "accountability_coverage_pct": 100.0,
+  "requirement_counts": {
+    "DONE_AND_EVIDENCED": 263,
+    "DONE_PARTIAL": 279,
+    "NOT_DONE": 74,
+    "NOT_PROVEN": 70
+  },
+  "requirement_total": 686
 }
