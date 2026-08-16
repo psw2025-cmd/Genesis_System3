@@ -1,0 +1,26 @@
+{
+  "schema": "continuous_closure_resume_v1",
+  "updated_at_utc": "2026-08-16T20:00:08.888622Z",
+  "resume": {
+    "next_id": "C1",
+    "severity": "P0",
+    "defect": "Continuous closure system (scan/verify/watchdog/cards/resume)",
+    "state": "IN_PROGRESS",
+    "instruction": "Continue Gemini + E2E continuous closure: test-first in tests/evals/, fix root cause, PR\u2192CI\u2192merge\u2192Cloud Run, live SHA verify, update BACKLOG, post SYSTEM3_COORDINATION_V1 on Issue #188. Never invent prices/\u03c1 or weaken gates."
+  },
+  "summary": {
+    "open": 4,
+    "in_progress": 1,
+    "resolved": 9,
+    "total_cards": 14,
+    "next": "C1",
+    "serving_sha": "738d9dd2d324478e553b61c6881b26dbd380195f",
+    "gates": "6/7"
+  },
+  "how_next_session_continues": [
+    "Read reports/latest/continuous_closure/resume_state.json",
+    "Read reports/latest/autonomous_loop/BACKLOG.md",
+    "Follow agent_policy.yaml + Gemini loop + E2E issues\u2192solutions law",
+    "Execute next OPEN card test-first; never fake gate PASS"
+  ]
+}

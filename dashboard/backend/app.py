@@ -2085,6 +2085,45 @@ async def get_auto_gates(refresh: bool = False):
         }
 
 
+@app.get("/api/continuous_closure")
+async def get_continuous_closure(refresh: bool = False, live: bool = True):
+    """Blocker cards + multi-source verify + auto-resume pointer for continuous closure."""
+    cache_key = f"continuous_closure:{int(bool(live))}"
+    if not refresh:
+        _hit = _cache_get(cache_key, _TTL_AUTO_GATES)
+        if _hit is not None:
+            return _hit
+    try:
+        try:
+            from dashboard.backend.continuous_closure_service import (
+                build_continuous_closure_report,
+                write_closure_artifacts,
+            )
+        except ImportError:
+            from continuous_closure_service import (
+                build_continuous_closure_report,
+                write_closure_artifacts,
+            )
+        report = build_continuous_closure_report(
+            ROOT_DIR,
+            include_live=bool(live),
+        )
+        try:
+            write_closure_artifacts(ROOT_DIR, report)
+        except Exception:
+            pass
+        return _cache_set(cache_key, report)
+    except Exception as e:
+        return {
+            "schema": "continuous_closure_v1",
+            "status": "error",
+            "error": str(e)[:200],
+            "phases": {"blocker_cards": [], "auto_resume": None},
+            "summary": {"open": 0, "resolved": 0, "total_cards": 0},
+            "safety": {"live_trading_enabled": False},
+        }
+
+
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------

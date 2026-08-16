@@ -2,6 +2,7 @@ import { Activity, Bot, Brain, Shield, TrendingUp, Wallet } from 'lucide-react'
 import { useStore } from '../store'
 import { cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { AuthUnlock } from './AuthUnlock'
+import { ContinuousClosureBoard } from './ContinuousClosureBoard'
 
 function asPct(value: any) {
   const n = Number(value)
@@ -117,6 +118,8 @@ export function Overview() {
   return (
     <div className="workspace-shell">
       {apiAuthNeeded && <div style={{ marginBottom: 10 }}><AuthUnlock /></div>}
+
+      <ContinuousClosureBoard />
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(8, minmax(0, 1fr))' }}>
         {indexCard('NIFTY', 'NIFTY')}
