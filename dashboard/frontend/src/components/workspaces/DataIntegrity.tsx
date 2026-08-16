@@ -55,9 +55,32 @@ export const DataIntegrity: React.FC = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <StatusChip label="Dhan login" value={connected ? 'Authenticated' : 'Not connected'} status={connected ? 'ok' : 'error'} />
-              <StatusChip label="Token" value={brokerStatus?.token_status || (connected ? 'Present' : 'Unknown')} status={connected ? 'ok' : 'warn'} />
+              <StatusChip
+                label="Token"
+                value={
+                  connected
+                    ? (brokerStatus?.token_proof?.secret_version
+                        ? `SM v${brokerStatus.token_proof.secret_version}`
+                        : (brokerStatus?.token_status || 'Present'))
+                    : (brokerStatus?.error || brokerStatus?.token_status || 'Unknown')
+                }
+                status={connected ? 'ok' : 'warn'}
+              />
               <div style={{ fontSize: 12, color: 'var(--text-sec)', padding: 10, background: 'var(--surface-2)', borderRadius: 8 }}>
-                {connected ? 'Backend reports an active read-only broker session.' : (brokerStatus?.message || brokerStatus?.error || 'Backend reports broker not connected.')}
+                {connected
+                  ? `Backend reports an active read-only broker session${
+                      brokerStatus?.token_proof?.hours_remaining != null
+                        ? ` · ~${Number(brokerStatus.token_proof.hours_remaining).toFixed(1)}h nominal JWT left`
+                        : ''
+                    }.`
+                  : (
+                    <>
+                      {brokerStatus?.message || brokerStatus?.error || 'Backend reports broker not connected.'}
+                      {String(brokerStatus?.error || '').includes('TOKEN_EXPIRED') && brokerStatus?.token_proof?.expired === false
+                        ? ' (label is auth-reject; JWT clock may still be valid — check DH-906 / remint.)'
+                        : ''}
+                    </>
+                  )}
               </div>
             </div>
           </section>

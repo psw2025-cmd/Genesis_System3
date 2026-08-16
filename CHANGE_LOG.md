@@ -1248,3 +1248,9 @@ Verification with local `REQUIRE_API_KEY=true`:
 
 [2026-08-15T12:43:20Z] [Cursor] IMPLEMENT ship-now A'+B-phase1+C': remove deploy rotate execute; web/default-compute job invoker removed; recovery SA gs3-token-recovery WIF; self-heal fail-closed default 0; broker proof DEGRADED/WARN; CI contracts inverted; Rule1 PARTIAL pending project run.jobs.run scrub. Proof: reports/latest/broker_authority_6rules/
 
+
+## [2026-08-16T11:58:43Z] [Cursor] BROKER AUTH SCREENSHOT REPROOF (IST)
+- User screenshot ~17:04 IST showed Auth issue on SHA a48e7b3 **before** v259 remint (17:10 IST).
+- Live now: connected=true, dhan-access-token v259, serving 2d6a9e8 / rev 00388, Dhan profile HTTP 200, UI Broker Connected.
+- Google Storage Insights NHLVNDD marked **UNRELATED** (no broker/GCS Insights code path; asia-south1 web unaffected).
+- Docs: docs/incidents/BROKER_AUTH_20260816_IST.md + BROKER_SETUP.md update; DataIntegrity token chip shows SM version / DH-906 label trap.
