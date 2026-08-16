@@ -138,3 +138,15 @@ Also recorded by Lane C: HTTP 429 count=8 in ~2h were mostly Cloud Run capacity 
 - **AUDIT_HANDOFF_STATUS=READY_FOR_CHATGPT_REVIEW**
 - ACCOUNTABILITY_COVERAGE=100.0% over 686 requirements
 - Current main at QC (`41f7a80cf0c31711f4c26d46fdc0e3f26fc6a311`) differs from audit pin (`c763ecf048478842688373cf674eb56a7dc04aa9`); serving still `a48e7b3c7c086a21352f718355d1c12d4a48955b`
+
+---
+
+## POST-RECOVERY RCA ADDENDUM (read next for disconnect RCA)
+
+**File:** `21_POST_RECOVERY_RCA_ADDENDUM_V257_V258.md`  
+**JSON:** `supporting_lane_extracts/RCA_POST_RECOVERY_V257_V258.json`  
+**Appended:** 2026-08-16T07:45:00Z (does not alter original audit window timestamps above).
+
+**Preservation at RCA close:** secret **v258**, connected=true, LIVE=false, order_placement=false.  
+**Most likely root:** premature Dhan auth reject of clock-valid token (H7), labeled TOKEN_EXPIRED_OR_INVALID (H4); Genesis remint is secondary after remint (H1), not first-cause of v254–v257 rejects.  
+**STOP:** no implementation until ChatGPT independently reviews this RCA.

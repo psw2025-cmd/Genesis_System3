@@ -57,5 +57,18 @@
     "NOT_DONE": 74,
     "NOT_PROVEN": 70
   },
-  "requirement_total": 686
+  "requirement_total": 686,
+  "post_recovery_rca_addendum": {
+    "appended_utc": "2026-08-16T07:45:00Z",
+    "file": "21_POST_RECOVERY_RCA_ADDENDUM_V257_V258.md",
+    "json": "supporting_lane_extracts/RCA_POST_RECOVERY_V257_V258.json",
+    "preserves_original_audit_timestamps": true,
+    "secret_version_at_rca": "258",
+    "connected_at_rca": true,
+    "live_at_rca": false,
+    "main_sha_at_rca": "41f7a80cf0c31711f4c26d46fdc0e3f26fc6a311",
+    "serving_sha_unchanged": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+    "functional_code_changed": false,
+    "token_rotated_by_rca": false
+  }
 }

@@ -30,3 +30,11 @@
 ## Safety
 
 - LIVE=false, order_actions=false, secret_payload_exposed=false
+
+## POST-RECOVERY RCA ADDENDUM (v257→v258) — appended 2026-08-16T07:45:00Z
+
+- Does **not** overwrite original audit capture timestamps above.
+- Addendum: `21_POST_RECOVERY_V257_V258` → `21_POST_RECOVERY_RCA_ADDENDUM_V257_V258.md`
+- Machine pack: `supporting_lane_extracts/RCA_POST_RECOVERY_V257_V258.json`
+- Scope: root-cause of early TOKEN_EXPIRED_OR_INVALID; authorities; 429 graph; H1–H8; preserve v258 connected LIVE=false.
+- No functional code/deploy/mint/IAM mutation in this addendum.
