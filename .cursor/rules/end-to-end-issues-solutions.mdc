@@ -1,0 +1,30 @@
+---
+description: Permanent E2E issues→solutions flowchart law for all agents
+alwaysApply: true
+---
+
+# End-to-End Issues → Solutions (permanent — all agents)
+
+Authority image: `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png`  
+Full binding: `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md`  
+Also: `agent_policy.yaml` + `docs/gemini-code-1786899974029.md`
+
+Every defect cycle must follow: **Issue → Solution → Intermediate outcome**, then compound toward overall outcome (speed, risk↓, cost↓, compliance↑, satisfaction↑). Enablers always on: **People · Process · Technology · Policies · KPIs**.
+
+## Mandatory row reflexes
+
+1. **Intake** — validate schemas/APIs; no incomplete truth; no synthetic prices/metrics.
+2. **Communication** — RACI + Issue #188 `SYSTEM3_COORDINATION_V1`; no user-as-relay.
+3. **Compliance** — LIVE=false; never weaken proof gates / risk / order locks.
+4. **Review** — test-first `tests/evals/` → CI → merge → Cloud Run.
+5. **Version control** — `main` + exact serving SHA is SSOT.
+6. **Automate** — prefer GitOps / loop over manual report faking.
+7. **Visibility** — keep autonomous banner + backlog + gate counts honest.
+8. **Storage** — proof in `reports/latest/` / durable Firestore; searchable.
+9. **Authority** — human/consolidator for LIVE; do not self-approve real money.
+10. **Post-execution** — live verify SHA; update backlog; next weakness; banner only off at genuine 7/7 READY.
+
+## Do not
+- Close a red “issue” by painting the UI green without the green “solution” column.
+- Skip post-ship verify (#10) after merge.
+- Treat broker `connected=true` as full market-data / gate PASS.
