@@ -1254,3 +1254,10 @@ Verification with local `REQUIRE_API_KEY=true`:
 - Live now: connected=true, dhan-access-token v259, serving 2d6a9e8 / rev 00388, Dhan profile HTTP 200, UI Broker Connected.
 - Google Storage Insights NHLVNDD marked **UNRELATED** (no broker/GCS Insights code path; asia-south1 web unaffected).
 - Docs: docs/incidents/BROKER_AUTH_20260816_IST.md + BROKER_SETUP.md update; DataIntegrity token chip shows SM version / DH-906 label trap.
+
+## [2026-08-16T12:45:00Z] [Cursor] QUANT LIFECYCLE Q AUDIT PACKAGE
+- Instruction: docs/chatgpt_instruction_for_cursar_2.md
+- Part1 broker tasks re-verified PASS (connected v259 LIVE=false)
+- Q1-Q26 evidence session: docs/audits/system3_quant_lifecycle/sessions/20260816T123000Z/
+- Verdict: broker PASS; quant lifecycle PARTIAL/NOT_PROVEN; promotion BLOCKED
+- Q27 source truncated in instruction file

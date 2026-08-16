@@ -1,0 +1,1 @@
+{"status":"ok","trend":[{"date":"2026-06-12","rho":0.2,"hit_rate":0.6667,"status":"RETRAIN_NEEDED","predicted":["NIFTY","MIDCPNIFTY","FINNIFTY","BANKNIFTY"],"actual":["NIFTY","BANKNIFTY","FINNIFTY","MIDCPNIFTY"]}],"avg_rho":0.2,"retrain_needed":false,"days_available":1}

@@ -1,0 +1,22 @@
+{
+  "audit_id": "system3_quant_lifecycle_Q_20260816T123000Z",
+  "instruction": "docs/chatgpt_instruction_for_cursar_2.md",
+  "audit_start_utc": "2026-08-16T12:30:00Z",
+  "audit_start_ist": "2026-08-16 18:00:00 IST",
+  "operator_locale": "Mumbai/Asia/Kolkata",
+  "mode": "EVIDENCE_AUDIT_PLUS_BROKER_REPROOF",
+  "github_main_at_start": "fetch_at_worktree",
+  "serving_sha_live": "997daef4cfb3322e317da69b5cbb5b69950dab26",
+  "broker_connected": true,
+  "secret_version": "259",
+  "live_trading_enabled": false,
+  "production_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui",
+  "part1_broker_tasks": "ALREADY_IMPLEMENTED_REVERIFIED_PASS",
+  "q27_instruction_truncated": true,
+  "safety": {
+    "LIVE": false,
+    "orders": false,
+    "secret_payload_exposed": false
+  },
+  "handoff_status": "READY_FOR_CHATGPT_REVIEW"
+}
