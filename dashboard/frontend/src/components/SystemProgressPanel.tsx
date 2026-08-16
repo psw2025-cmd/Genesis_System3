@@ -191,12 +191,19 @@ export function SystemProgressPanel() {
         verifiedAt: checkedAt,
       },
       {
-        name: 'Broker reliability',
+        name: 'Broker authentication/session',
         state: brokerConnected ? 'PASS' : brokerStatus ? 'BLOCKED' : 'NOT_PROVEN',
         detail: brokerConnected
-          ? `Dhan read-only session connected${brokerStatus?.token_proof?.secret_version ? ` · SM v${brokerStatus.token_proof.secret_version}` : ''}.`
+          ? `Dhan read-only auth/session connected${brokerStatus?.token_proof?.secret_version ? ` · SM v${brokerStatus.token_proof.secret_version}` : ''}. This is not market-data reliability.`
           : String(brokerStatus?.error || 'Broker status has not loaded.'),
         source: '/api/broker/status',
+        verifiedAt: checkedAt,
+      },
+      {
+        name: 'Broker market-data reliability',
+        state: 'NOT_PROVEN',
+        detail: 'BACKEND_DEPENDENCY: no safe authoritative market-data/rate-limit health contract is wired here. connected=true must not imply OHLC/quote/LTP health (HTTP 429/805 and cache fallback remain possible).',
+        source: 'BACKEND_DEPENDENCY (await marketfeed health contract)',
         verifiedAt: checkedAt,
       },
       {

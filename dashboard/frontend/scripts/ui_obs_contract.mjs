@@ -61,6 +61,10 @@ for (const state of ['PASS', 'PARTIAL', 'BLOCKED', 'NOT_PROVEN', 'ERROR']) {
 assert.match(progress, /BACKEND_PROGRESS_CONTRACT_REQUIRED/, 'missing wave/owner contract must remain explicit')
 assert.match(progress, /costs_slippage_included_proven/, 'progress costed lane must require proven costs/slippage')
 assert.match(progress, /DATA_CONTRACT_CONFLICT/, 'progress prediction lane must surface contract conflicts')
+assert.match(progress, /Broker authentication\/session/, 'broker lane must mean auth/session, not end-to-end reliability')
+assert.match(progress, /Broker market-data reliability/, 'market-data reliability must be a separate lane')
+assert.match(progress, /BACKEND_DEPENDENCY/, 'market-data reliability must fail closed without a health contract')
+assert.doesNotMatch(progress, /name: 'Broker reliability'/, 'connected=true must not be labeled Broker reliability PASS')
 assert.doesNotMatch(progress, /CURRENT WAVE UI-OBS-1/, 'active coordination must not be hard-coded in the frontend')
 
 assert.match(prediction, /Sample size/, 'Prediction Audit must show sample size')
