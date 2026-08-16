@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "fix/gcp-dhan-token-rotation-ui-proof-*"
+      - "fix/br1-dhan-rejection-backoff"
     paths:
       - "core/brokers/dhan/**"
       - "core/utils/env_loader.py"
@@ -21,6 +22,7 @@ on:
       - "tests/test_gcp_dhan_token_rotation_contract.py"
       - "tests/test_gcp_rotator_identity_contract.py"
       - "tests/test_dhan_single_token_authority.py"
+      - "tests/test_br1_dhan_auth_reliability.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
       - ".github/workflows/gcp-dhan-token-fix-ci.yml"
@@ -42,6 +44,7 @@ on:
       - "tests/test_gcp_dhan_token_rotation_contract.py"
       - "tests/test_gcp_rotator_identity_contract.py"
       - "tests/test_dhan_single_token_authority.py"
+      - "tests/test_br1_dhan_auth_reliability.py"
       - ".github/workflows/cloud-run-auto-deploy.yml"
       - ".github/workflows/gcp-dhan-token-rotation.yml"
       - ".github/workflows/gcp-dhan-token-fix-ci.yml"
@@ -76,7 +79,8 @@ jobs:
           python -m unittest -v \
             tests.test_gcp_dhan_token_rotation_contract \
             tests.test_gcp_rotator_identity_contract \
-            tests.test_dhan_single_token_authority
+            tests.test_dhan_single_token_authority \
+            tests.test_br1_dhan_auth_reliability
 
       - uses: actions/setup-node@v4
         with:
@@ -148,69 +152,37 @@ jobs:
         run: |
           set -euo pipefail
           echo "=== CLOUD RUN JOBS ==="
-          gcloud run jobs list \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --format='table(metadata.name,status.conditions[0].status)' || true
-
+          gcloud run jobs list --project="${PROJECT_ID}" --region="${REGION}" --format='table(metadata.name,status.conditions[0].status)' || true
           echo "=== CLOUD SCHEDULERS ==="
-          gcloud scheduler jobs list \
-            --project="${PROJECT_ID}" \
-            --location="${REGION}" \
-            --format='table(name.basename(),schedule,timeZone,state)' || true
-
+          gcloud scheduler jobs list --project="${PROJECT_ID}" --location="${REGION}" --format='table(name.basename(),schedule,timeZone,state)' || true
           echo "=== DHAN TOKEN SECRET VERSION METADATA ==="
-          gcloud secrets versions list dhan-access-token \
-            --project="${PROJECT_ID}" \
-            --limit=10 \
-            --format='table(name,state,createTime)' || true
-
+          gcloud secrets versions list dhan-access-token --project="${PROJECT_ID}" --limit=10 --format='table(name,state,createTime)' || true
           echo "=== ROTATION EXECUTION METADATA ==="
-          gcloud run jobs executions list \
-            --job="${ROTATION_JOB}" \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --limit=10 \
-            --format='table(metadata.name,metadata.creationTimestamp,status.conditions[0].status,status.conditions[0].message)' || true
+          gcloud run jobs executions list --job="${ROTATION_JOB}" --project="${PROJECT_ID}" --region="${REGION}" --limit=10 --format='table(metadata.name,metadata.creationTimestamp,status.conditions[0].status,status.conditions[0].message)' || true
 
-          gcloud run services describe "${SERVICE}" \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --format=json > /tmp/service.json
+          gcloud run services describe "${SERVICE}" --project="${PROJECT_ID}" --region="${REGION}" --format=json > /tmp/service.json
           jq '{latestReadyRevision:.status.latestReadyRevisionName,serviceAccount:.spec.template.spec.serviceAccountName,safeEnv:[.spec.template.spec.containers[].env[]? | select(.name=="DHAN_TOKEN_SOURCE" or .name=="DHAN_ACCESS_TOKEN_SECRET_ID" or .name=="DHAN_TOKEN_ROTATION_JOB" or .name=="DHAN_TOKEN_ROTATION_SCHEDULE" or .name=="DHAN_STATUS_AUTO_REFRESH" or .name=="SYSTEM3_STARTUP_TOKEN_REFRESH" or .name=="BROKER_SELF_HEAL_TOKEN_REFRESH" or .name=="DHAN_CANONICAL_ROTATION_SELF_HEAL" or .name=="DHAN_CANONICAL_ROTATION_COOLDOWN_S" or .name=="LIVE_TRADING_ENABLED" or .name=="SYSTEM3_LIVE_TRADING_ALLOWED" or .name=="AUTO_EXECUTE_TRADES") | {name,value}]}' /tmp/service.json
 
           RUNTIME_SA=$(jq -r '.spec.template.spec.serviceAccountName // ""' /tmp/service.json)
           test -n "${RUNTIME_SA}"
           SCHEDULER_SA="gs3-scheduler@${PROJECT_ID}.iam.gserviceaccount.com"
           RECOVERY_SA="gs3-token-recovery@${PROJECT_ID}.iam.gserviceaccount.com"
-          gcloud run jobs get-iam-policy "${ROTATION_JOB}" \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --format=json > /tmp/rotation-job-iam.json
+          gcloud run jobs get-iam-policy "${ROTATION_JOB}" --project="${PROJECT_ID}" --region="${REGION}" --format=json > /tmp/rotation-job-iam.json
 
-          if jq -e --arg member "serviceAccount:${RUNTIME_SA}" \
-            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
-            /tmp/rotation-job-iam.json >/dev/null; then
+          if jq -e --arg member "serviceAccount:${RUNTIME_SA}" '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' /tmp/rotation-job-iam.json >/dev/null; then
             echo "WEB_RUNTIME_CAN_INVOKE_DHAN_ROTATOR=true service_account=${RUNTIME_SA}" >&2
             exit 1
           fi
           echo "WEB_RUNTIME_CANNOT_INVOKE_DHAN_ROTATOR service_account=${RUNTIME_SA}"
-
-          jq -e --arg member "serviceAccount:${SCHEDULER_SA}" \
-            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
-            /tmp/rotation-job-iam.json >/dev/null
+          jq -e --arg member "serviceAccount:${SCHEDULER_SA}" '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' /tmp/rotation-job-iam.json >/dev/null
           echo "SCHEDULER_CAN_INVOKE_DHAN_ROTATOR service_account=${SCHEDULER_SA}"
-
-          jq -e --arg member "serviceAccount:${RECOVERY_SA}" \
-            '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' \
-            /tmp/rotation-job-iam.json >/dev/null
+          jq -e --arg member "serviceAccount:${RECOVERY_SA}" '.bindings[]? | select(.role=="roles/run.invoker") | .members[]? | select(.==$member)' /tmp/rotation-job-iam.json >/dev/null
           echo "MANUAL_RECOVERY_IDENTITY_CAN_INVOKE_DHAN_ROTATOR service_account=${RECOVERY_SA}"
 
           python - <<'PY'
           import json
           import os
           from pathlib import Path
-
           project = os.environ["PROJECT_ID"]
           policy = json.loads(Path("/tmp/rotation-job-iam.json").read_text(encoding="utf-8"))
           svc = json.loads(Path("/tmp/service.json").read_text(encoding="utf-8"))
@@ -230,17 +202,11 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           set -euo pipefail
-          URL=$(gcloud run services describe "${SERVICE}" \
-            --project="${PROJECT_ID}" \
-            --region="${REGION}" \
-            --format='value(status.url)')
-
+          URL=$(gcloud run services describe "${SERVICE}" --project="${PROJECT_ID}" --region="${REGION}" --format='value(status.url)')
           curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker-status.json
           jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_id:.token_proof.secret_id,secret_version:.token_proof.secret_version,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,last_error_type:.token_proof.last_error_type,token_value_exposed:.token_proof.token_value_exposed},live_trading_enabled,order_placement_allowed}' /tmp/broker-status.json
-
           jq -e '.token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker-status.json >/dev/null
           jq -e '.token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC"' /tmp/broker-status.json >/dev/null
-
           if jq -e '.connected == true and .error == null' /tmp/broker-status.json >/dev/null; then
             echo "BROKER_RUNTIME_TRUTH=CONNECTED_READ_ONLY"
           else
