@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """Capture fresh, request-scoped, exact-revision System3 production UI truth.
 
-SYSTEM3_TEMPORAL_TRUTH_V1: a new browser session is necessary but not sufficient after
-a deploy-triggering change. Before any screenshot is accepted, the public production
-`/api/deploy/info` endpoint must prove that Cloud Run is serving the expected GitHub
-SHA. This prevents a same-push browser workflow from photographing the previous
-revision while a new deployment is still in flight.
+SYSTEM3_TEMPORAL_TRUTH_V1: a fresh browser is accepted only after the authoritative
+GCP production service proves the expected runtime-affecting Git SHA. The lifecycle
+captures all canonical tabs plus required option-chain subviews and remains read-only.
 """
 from __future__ import annotations
 
@@ -30,6 +28,7 @@ SETTLE_SECONDS = float(os.getenv("SYSTEM3_LIVE_TAB_SETTLE_SECONDS", "2.0"))
 DEPLOY_WAIT_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS", "720"))
 DEPLOY_POLL_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_POLL_SECONDS", "10"))
 REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
+BAD_CHAIN_SOURCES = {"csv", "yahoo", "synthetic", "mock", "fake"}
 
 
 def _utc_now() -> str:
@@ -37,7 +36,7 @@ def _utc_now() -> str:
 
 
 def _json_get(url: str) -> dict:
-    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.1"})
+    request = urllib.request.Request(url, method="GET", headers={"User-Agent": "System3-Live-UI-Proof/4.2"})
     try:
         with urllib.request.urlopen(request, timeout=20) as response:
             payload = json.loads(response.read().decode("utf-8") or "{}")
@@ -187,13 +186,17 @@ def _visible_text(browser: Browser) -> str:
 
 
 def _semantic_alerts(text: str) -> list[str]:
+    """Return status-like visible lines without flagging explanatory headings/prose."""
     found: list[str] = []
     for raw in text.splitlines():
         line = re.sub(r"\s+", " ", raw.strip())
         if not line:
             continue
         upper = line.upper()
-        status_start = re.match(r"^(DISCONNECTED|NO AUTH|API UNKNOWN|NOT READY|FAILED|DEGRADED|UNAVAILABLE|WAITING|LOADING|NO DATA)(\b|\s|·|:)", upper)
+        status_start = re.match(
+            r"^(DISCONNECTED|NO AUTH|API UNKNOWN|NOT READY|FAILED|DEGRADED|UNAVAILABLE|WAITING|LOADING|NO DATA)(\b|\s|·|:)",
+            upper,
+        )
         loading_sentence = " IS LOADING" in upper
         if status_start or loading_sentence:
             if upper not in found:
@@ -204,6 +207,36 @@ def _semantic_alerts(text: str) -> list[str]:
 def _number_after(label: str, text: str) -> int | None:
     match = re.search(rf"\b{re.escape(label)}\s+(\d+)\b", text, flags=re.IGNORECASE)
     return int(match.group(1)) if match else None
+
+
+def _chain_metadata_line(text: str, symbol: str) -> str:
+    """Return the visible metadata line for the requested chain symbol.
+
+    Example:
+      status=... · symbol NIFTY · source=dhan · universe=security_id_list.csv
+
+    The universe file is provenance metadata; only source=dhan defines data-source truth.
+    """
+    symbol_re = re.compile(rf"\bsymbol\s+{re.escape(symbol)}\b", flags=re.IGNORECASE)
+    source_re = re.compile(r"\bsource\s*=", flags=re.IGNORECASE)
+    for raw in text.splitlines():
+        line = re.sub(r"\s+", " ", raw.strip())
+        if symbol_re.search(line) and source_re.search(line):
+            return line
+    return ""
+
+
+def _chain_source_value(text: str, symbol: str) -> str:
+    line = _chain_metadata_line(text, symbol)
+    match = re.search(r"\bsource\s*=\s*([A-Za-z0-9_.:-]+)", line, flags=re.IGNORECASE)
+    return str(match.group(1)).strip().lower() if match else ""
+
+
+def _is_bad_chain_source(source_value: str) -> bool:
+    normalized = source_value.strip().lower()
+    if not normalized:
+        return False
+    return any(normalized == bad or normalized.startswith(f"{bad}_") or normalized.startswith(f"{bad}-") for bad in BAD_CHAIN_SOURCES)
 
 
 def _click_chain_symbol(browser: Browser, symbol: str) -> bool:
@@ -226,21 +259,26 @@ def _capture_required_chain_subviews(browser: Browser) -> dict[str, dict]:
     if not browser.activate("chain"):
         return {symbol: {"ready": False, "reason": "CHAIN_TAB_NOT_ACTIVATABLE"} for symbol in REQUIRED_CHAIN_SYMBOLS}
     _wait_tab(browser, "chain", 8)
+
     for symbol in REQUIRED_CHAIN_SYMBOLS:
         clicked = _click_chain_symbol(browser, symbol)
         if not clicked:
             result[symbol] = {"captured_at_utc": _utc_now(), "ready": False, "reason": "SYMBOL_BUTTON_MISSING"}
             continue
+
         time.sleep(max(2.5, SETTLE_SECONDS))
         text = _visible_text(browser)
         upper = text.upper()
         contracts = _number_after("CONTRACTS", text)
         strikes = _number_after("STRIKES", text)
+        metadata_line = _chain_metadata_line(text, symbol)
+        source_value = _chain_source_value(text, symbol)
         symbol_visible = bool(re.search(rf"\bSYMBOL\s+{re.escape(symbol)}\b", upper))
-        dhan_source = bool(re.search(r"SOURCE\s*=\s*DHAN|DATA\s+DHAN|DHAN\s+(?:VERIFIED|SESSION|LIVE|SNAPSHOT)", upper))
-        bad_source = bool(re.search(r"SOURCE\s*=.*\b(CSV|YAHOO|SYNTHETIC|MOCK|FAKE)\b", upper))
+        dhan_source = source_value == "dhan" or source_value.startswith("dhan_") or source_value.startswith("dhan-")
+        bad_source = _is_bad_chain_source(source_value)
         populated = (contracts or 0) > 0 and (strikes or 0) > 0
         ready = clicked and symbol_visible and dhan_source and not bad_source and populated
+
         screenshot = f"chain-{symbol.lower()}-live.png"
         text_file = f"chain-{symbol.lower()}-body.txt"
         browser.screenshot(PROOF_DIR / screenshot)
@@ -250,6 +288,8 @@ def _capture_required_chain_subviews(browser: Browser) -> dict[str, dict]:
             "ready": ready,
             "clicked": clicked,
             "symbol_visible": symbol_visible,
+            "chain_metadata_line": metadata_line[:500],
+            "source_value": source_value or None,
             "dhan_source_visible": dhan_source,
             "bad_source_visible": bad_source,
             "contracts_visible": contracts,
@@ -272,7 +312,7 @@ def main() -> int:
     serving_ok, serving_deploy, convergence = _wait_for_expected_serving_sha()
     if not serving_ok:
         failure = {
-            "schema": "system3-live-production-ui-proof-v4",
+            "schema": "system3-live-production-ui-proof-v4.2",
             "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
             "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
             "state": "NOT_CURRENT_SERVING_SHA",
@@ -301,7 +341,6 @@ def main() -> int:
 
     tabs: dict[str, dict] = {}
     render_failures: list[str] = []
-    required_chain_subviews: dict[str, dict] = {}
 
     with Browser() as browser:
         browser.navigate(f"{BASE_URL}/ui/?tab=decision-intel")
@@ -318,7 +357,6 @@ def main() -> int:
             snap = _wait_tab(browser, tab_id, 6)
             time.sleep(SETTLE_SECONDS)
             text = _visible_text(browser)
-            captured_at = _utc_now()
             screenshot = f"{tab_id}-live.png"
             text_file = f"{tab_id}-body.txt"
             browser.screenshot(PROOF_DIR / screenshot)
@@ -334,7 +372,7 @@ def main() -> int:
             if not rendered:
                 render_failures.append(f"{tab_id}:render_contract_failed")
             tabs[tab_id] = {
-                "captured_at_utc": captured_at,
+                "captured_at_utc": _utc_now(),
                 "rendered": rendered,
                 "active": snap.get("active"),
                 "ready_state": snap.get("readyState"),
@@ -357,9 +395,14 @@ def main() -> int:
     all_required_chains_ready = len(required_chain_subviews) == len(REQUIRED_CHAIN_SYMBOLS) and all(
         required_chain_subviews.get(symbol, {}).get("ready") is True for symbol in REQUIRED_CHAIN_SYMBOLS
     )
-    semantic_attention = {tab_id: item.get("semantic_alerts", []) for tab_id, item in tabs.items() if item.get("semantic_alerts")}
+    semantic_attention = {
+        tab_id: item.get("semantic_alerts", [])
+        for tab_id, item in tabs.items()
+        if item.get("semantic_alerts")
+    }
+
     manifest = {
-        "schema": "system3-live-production-ui-proof-v4",
+        "schema": "system3-live-production-ui-proof-v4.2",
         "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
         "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
         "capture_started_at_utc": capture_started,
@@ -405,6 +448,8 @@ def main() -> int:
             "canonical_deploy_info_path_matches_production_frontend": True,
             "render_pass_is_not_semantic_data_pass": True,
             "required_chain_subviews_are_semantically_checked": True,
+            "chain_source_parser_uses_explicit_source_token_only": True,
+            "universe_csv_filename_is_not_data_source": True,
             "stored_artifact_becomes_historical_after_capture": True,
             "new_current_request_requires_new_capture": True,
         },
@@ -420,7 +465,10 @@ def main() -> int:
     if not all_required_chains_ready:
         print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=REQUIRED_CHAIN_SUBVIEW_SEMANTICS")
         return 4
-    print(f"LIVE_PRODUCTION_UI_CAPTURE=PASS tabs={len(tabs)} required_chains={len(required_chain_subviews)} exact_sha={expected_sha[:12]} semantic_attention_tabs={len(semantic_attention)}")
+    print(
+        f"LIVE_PRODUCTION_UI_CAPTURE=PASS tabs={len(tabs)} required_chains={len(required_chain_subviews)} "
+        f"exact_sha={expected_sha[:12]} semantic_attention_tabs={len(semantic_attention)}"
+    )
     return 0
 
 

@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from scripts.gcp_live_ui_snapshot import _chain_metadata_line, _chain_source_value, _is_bad_chain_source
 
 
 class LiveUiTruthRemediationContractTests(unittest.TestCase):
@@ -74,6 +80,23 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("strikes_visible", text)
         self.assertIn("dhan_source_visible", text)
         self.assertIn("bad_source_visible", text)
+        self.assertIn("source_value", text)
+
+    def test_chain_source_parser_ignores_universe_csv_when_explicit_source_is_dhan(self):
+        sample = (
+            "status=market_closed_dhan_snapshot · symbol NIFTY · source_priority=dhan_live>worker_push "
+            "· source=dhan · universe=security_id_list.csv · contracts=462 · strikes=231"
+        )
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan")
+        self.assertFalse(_is_bad_chain_source(_chain_source_value(sample, "NIFTY")))
+        self.assertIn("universe=security_id_list.csv", _chain_metadata_line(sample, "NIFTY"))
+
+    def test_chain_source_parser_rejects_explicit_non_dhan_sources(self):
+        for source in ["csv", "synthetic", "yahoo", "mock", "fake"]:
+            sample = f"status=ok · symbol NIFTY · source={source} · contracts=100 · strikes=50"
+            value = _chain_source_value(sample, "NIFTY")
+            self.assertEqual(value, source)
+            self.assertTrue(_is_bad_chain_source(value))
 
     def test_live_proof_semantic_alerts_do_not_use_naive_error_substring_scan(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
