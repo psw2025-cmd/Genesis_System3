@@ -1,4 +1,16 @@
+## 2026-08-16T18:00:00Z [Cursor] PERMANENT E2E ISSUES→SOLUTIONS LAW (all agents)
+
+User locked flowchart into permanent multi-agent policy:
+- Image: `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png`
+- Binding: `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md`
+- Cursor rule: `.cursor/rules/end-to-end-issues-solutions.mdc` (`alwaysApply: true`)
+- `agent_policy.yaml` → version 2 + `end_to_end_issues_solutions` block
+- `AGENTS.md` read-first list updated
+
+Every agent must run Issue→Solution→Outcome with People/Process/Technology/Policies/KPIs enablers; no painting UI green without the matching solution row; post-ship live SHA verify mandatory.
+
 ## 2026-06-23 (Session 10 — Claude)
+
 
 ### [2026-06-23 12:15 IST] [Claude] DATA APIs ACTIVATED — Full market data unlocked
 
