@@ -1,0 +1,27 @@
+---
+description: Permanent Gemini autonomous SWE loop (crawl, test-first, no fake data)
+alwaysApply: true
+---
+
+# Gemini Autonomous Loop (permanent)
+
+Authority: `docs/gemini-code-1786899974029.md` + `agent_policy.yaml`.
+
+## Always
+- Target production URL truth: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
+- Coordinate via GitHub Issue #188 (`SYSTEM3_COORDINATION_V1`); do not ask the user to relay to ChatGPT.
+- **Zero synthetic inventions** — no fake prices/quotes/metrics to force green cards. Fallbacks = authenticated snapshot buffers only.
+- **Never weaken** risk limits, proof-gate thresholds, LIVE, or order locks. LIVE stays false.
+- **Test-first:** every self-discovered defect gets a failing spec under `tests/evals/` before the fix; ship only when it passes.
+- Prefer GitOps: PR → green CI → merge to `main` → Cloud Run Auto Deploy → verify serving SHA.
+
+## Loop shape
+1. Crawl tabs/APIs; build backlog (gates, contracts, model pipeline, UI collisions, broker fallbacks).
+2. Keep/restore live `[AUTONOMOUS LOOP]` telemetry banner until **all** proof gates are genuinely READY (do not fake READY).
+3. For each issue: eval → core fix → `pytest tests/evals/` → merge/deploy → live verify → next.
+4. Remove temporary banner only after independent verification that unhandled issues are cleared **and** gates are READY without threshold dilution.
+
+## Do not
+- Claim URL PASS from unit tests alone.
+- Mint/paste broker secrets outside the canonical rotation Job/workflow.
+- Treat `connected=true` as market-data reliability PASS.

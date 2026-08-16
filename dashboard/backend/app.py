@@ -297,6 +297,7 @@ from routers import ml as ml_router
 
 from fo_eligibility_filter import get_fo_eligibility_filter
 from option_strike_visibility_audit import OptionVisibilityAuditor, generate_sample_audit_report
+from gain_rank_spot_enrichment import enrich_gain_rank_rows_with_authenticated_spots
 
 # ── Memory guard middleware ────────────────────────────────────────────────
 from middleware.memory_guard import memory_guard_middleware, get_memory_stats
@@ -1750,6 +1751,32 @@ async def get_gain_rank(refresh: bool = False):
         latest = dict(latest)
         raw_rows = (latest.get("rankings") or latest.get("predictions") or [])
         kept, rejected = _filter_rows_fo(raw_rows if isinstance(raw_rows, list) else [])
+        # Authenticated chain/snapshot spots only — never BASE_SPOT / synthetic.
+        spot_lookup: Dict[str, Dict[str, Any]] = {}
+        for row in kept:
+            if not isinstance(row, dict):
+                continue
+            sym = str(row.get("underlying") or row.get("symbol") or "").upper()
+            if not sym or sym in spot_lookup:
+                continue
+            chain_payload = _chain_from_push_cache(sym)
+            if chain_payload is None:
+                cached = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 300.0))
+                chain_payload = cached if isinstance(cached, dict) else None
+            if not isinstance(chain_payload, dict):
+                continue
+            try:
+                spot_val = float(chain_payload.get("spot") or 0)
+            except (TypeError, ValueError):
+                spot_val = 0.0
+            if spot_val <= 0:
+                continue
+            spot_lookup[sym] = {
+                "spot": spot_val,
+                "status": chain_payload.get("status"),
+                "source": chain_payload.get("data_source") or chain_payload.get("source") or "dhan",
+            }
+        kept = enrich_gain_rank_rows_with_authenticated_spots(kept, spot_lookup)
         latest["rankings"] = kept
         latest["predictions"] = kept
         latest["fo_filtered_out"] = rejected
