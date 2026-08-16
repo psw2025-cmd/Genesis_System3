@@ -8,6 +8,8 @@ Read first:
 1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
 2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
 3. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
+4. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
+5. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 

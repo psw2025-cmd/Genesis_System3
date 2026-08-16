@@ -1,7 +1,9 @@
 # agent_policy.yaml — permanent invariants for Genesis System3 autonomous SWE loop
-# Source authority: docs/gemini-code-1786899974029.md (user: permanently follow)
+# Source authority:
+#   - docs/gemini-code-1786899974029.md (user: permanently follow)
+#   - docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md + flowchart image (user: all agents permanently follow)
 
-version: 1
+version: 2
 target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 coordination_bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
 
@@ -16,6 +18,50 @@ invariants:
   test_first_eval_specs:
     description: For every self-discovered issue, write a failing test in tests/evals/ first; only ship when it passes.
     path: tests/evals/
+
+end_to_end_issues_solutions:
+  authority_image: docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png
+  authority_doc: docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md
+  applies_to_agents: [Cursor, Claude, Codex, Gemini, ChatGPT]
+  flow: [issue_found, end_to_end_solution, intermediate_outcome, overall_outcome]
+  rows:
+    - id: 1
+      issue: incomplete_incorrect_intake
+      solution: standardize_intake_and_validation
+    - id: 2
+      issue: unclear_ownership_communication_gaps
+      solution: define_roles_and_communication_plan
+    - id: 3
+      issue: compliance_risks
+      solution: standardize_and_ensure_compliance
+    - id: 4
+      issue: inefficient_review_approval
+      solution: streamline_review_and_approval
+    - id: 5
+      issue: version_control_confusion
+      solution: centralized_document_and_version_control
+    - id: 6
+      issue: manual_repetitive_tasks
+      solution: automate_and_digitize
+    - id: 7
+      issue: lack_of_visibility_tracking
+      solution: realtime_tracking_and_dashboards
+    - id: 8
+      issue: poor_storage_retrieval
+      solution: centralized_secure_repository
+    - id: 9
+      issue: delays_in_authority_signatures
+      solution: stakeholder_enablement_and_human_gates
+    - id: 10
+      issue: poor_post_execution_management
+      solution: post_ship_verify_backlog_and_obligations
+  overall_outcomes:
+    - faster_cycle_time
+    - reduced_risk
+    - lower_costs
+    - better_compliance
+    - improved_stakeholder_satisfaction
+  key_enablers: [people, process, technology, policies, kpis]
 
 loop:
   name: AUTONOMOUS-LOOP-GEMINI
@@ -32,3 +78,5 @@ ban_list:
   - force_proof_gate_pass
   - enable_live_trading
   - paste_secrets_or_mint_tokens_outside_job
+  - paint_ui_green_without_matching_solution_row
+  - skip_post_execution_live_verify
