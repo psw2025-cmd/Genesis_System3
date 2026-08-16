@@ -17,6 +17,8 @@ Safety contract:
 """
 from __future__ import annotations
 
+import base64
+import json
 import os
 import threading
 import time
@@ -94,11 +96,12 @@ def _canonical_heal_enabled() -> bool:
 
 
 def _rotation_cooldown_s() -> float:
-    raw = os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "130").strip()
+    # Default 900s (15 min) mutex window between auto-heal Job invokes.
+    raw = os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900").strip()
     try:
         return max(120.0, min(float(raw), 3600.0))
     except ValueError:
-        return 130.0
+        return 900.0
 
 
 def _metadata_access_token() -> str:
@@ -195,6 +198,29 @@ def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
             }
         response = requests.post(run_url, headers=headers, json=request_body, timeout=30)
         response.raise_for_status()
+        # Best-effort operator signal on Pub/Sub topic (never required for mint success).
+        try:
+            topic = os.getenv("DHAN_ROTATE_PUBSUB_TOPIC", "broker-token-rotate").strip()
+            if topic:
+                pub_url = (
+                    f"https://pubsub.googleapis.com/v1/projects/{project}/topics/{topic}:publish"
+                )
+                msg = json.dumps(
+                    {
+                        "reason": reason,
+                        "expected_secret_version": before_version or None,
+                        "job": job,
+                    }
+                ).encode("utf-8")
+                requests.post(
+                    pub_url,
+                    headers=headers,
+                    json={"messages": [{"data": base64.b64encode(msg).decode("ascii")}]},
+                    timeout=10,
+                )
+                proof["pubsub_topic"] = topic
+        except Exception:
+            proof["pubsub_publish"] = "best_effort_failed"
         operation = response.json() or {}
         op_name = str(operation.get("name") or "")
         proof["job"] = job

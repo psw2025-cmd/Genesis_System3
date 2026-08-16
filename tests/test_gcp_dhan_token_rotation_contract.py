@@ -129,9 +129,11 @@ class StaticSafetyContractTests(unittest.TestCase):
         patch = Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
         deployer = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
         self.assertIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', patch)
-        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', deployer)
+        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', deployer)
+        self.assertIn('("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")', deployer)
+        self.assertIn('os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")', patch)
+        # Fail-closed default in code remains "0"; deploy turns heal ON explicitly.
         self.assertNotIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', patch)
-        self.assertNotIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', deployer)
 
     def test_legacy_token_writers_are_permanently_non_mutating(self):
         codespace = Path("scripts/codespace_startup.sh").read_text(encoding="utf-8")
