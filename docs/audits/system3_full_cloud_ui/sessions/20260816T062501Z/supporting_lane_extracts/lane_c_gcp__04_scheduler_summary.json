@@ -1,0 +1,78 @@
+{
+  "jobs": [
+    {
+      "name": "genesis-system3-forecast-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast-daily",
+      "schedule": "0 4 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast:run"
+    },
+    {
+      "name": "genesis-system3-signals-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals-schedule",
+      "schedule": "0 10 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals:run"
+    },
+    {
+      "name": "genesis-system3-validate-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate-daily",
+      "schedule": "5 10 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate:run"
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate-daily",
+      "schedule": "30 7 * * *",
+      "timeZone": "Asia/Kolkata",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate:run"
+    },
+    {
+      "name": "genesis-system3-rank-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank-daily",
+      "schedule": "45 3 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank:run"
+    },
+    {
+      "name": "genesis-system3-rank-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank-schedule",
+      "schedule": "50 3 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank:run"
+    },
+    {
+      "name": "genesis-system3-forecast-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast-schedule",
+      "schedule": "0 4,5,6,7,8,9 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast:run"
+    },
+    {
+      "name": "genesis-system3-signals-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals-daily",
+      "schedule": "15 13 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals:run"
+    },
+    {
+      "name": "genesis-system3-scheduler-collector-every-minute",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-scheduler-collector-every-minute",
+      "schedule": "* * * * *",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-scheduler-collector:run"
+    }
+  ],
+  "location": "asia-south1",
+  "other_locations_note": "See 04_scheduler_other_locations.txt — no scheduler jobs found in us-central1/us-east1/europe-west1/asia-east1; asia-south2 and global are invalid locations"
+}

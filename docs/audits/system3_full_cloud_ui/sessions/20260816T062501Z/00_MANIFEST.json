@@ -1,0 +1,49 @@
+{
+  "audit_id": "system3_full_cloud_ui_20260816T062501Z",
+  "audit_request_start_utc": "2026-08-16T06:25:01Z",
+  "audit_request_start_ist": "2026-08-16 11:55:01 IST",
+  "capture_start_utc": "2026-08-16T06:25:01Z",
+  "capture_end_utc": "2026-08-16T06:35:47Z",
+  "capture_end_ist": "2026-08-16 12:05:47 IST",
+  "github_main_sha": "c763ecf048478842688373cf674eb56a7dc04aa9",
+  "runtime_affecting_sha": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+  "serving_sha_start": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+  "serving_sha_end": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+  "serving_sha_stable": true,
+  "main_vs_serving_drift": true,
+  "gcp_project": "system3-openalgo-safe",
+  "region": "asia-south1",
+  "service": "genesis-system3-web",
+  "revision": "genesis-system3-web-00384-tuw",
+  "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a48e7b3c7c08-1786830179",
+  "browser_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui",
+  "evidence_classes": [
+    "REQUEST_SCOPED_LIVE_BROWSER",
+    "REQUEST_SCOPED_LIVE_API",
+    "LIVE_GCP_RESOURCE",
+    "LIVE_GCP_LOG",
+    "CURRENT_GITHUB_MAIN",
+    "CURRENT_DEPLOYMENT_METADATA"
+  ],
+  "github_run_ids_observed": [
+    31929124559,
+    31929124562,
+    31929124573,
+    31929124551
+  ],
+  "artifact_ids": [],
+  "safety": {
+    "LIVE": false,
+    "order_actions": false,
+    "secret_payload_exposed": false,
+    "ANALYZE_MODE": true,
+    "functional_code_changed": false,
+    "gcp_mutated": false,
+    "iam_mutated": false,
+    "token_rotated_by_audit": false
+  },
+  "instruction": "docs/chatgpt_instruction_for_cursar.md",
+  "live_broker_connected": true,
+  "secret_version_observed": "257",
+  "market_session": "WEEKEND_CLOSED_SUNDAY"
+}

@@ -1,0 +1,12 @@
+severity,category,evidence_path,defect,impact
+CRITICAL,wrong_path,dashboard/backend/app.py (no route); dashboard/frontend/src (no caller),GET /api/option_chain does not exist; live path is /api/chain/{underlying},Production probes get HTTP 404; mistaken missing-feature diagnosis
+HIGH,schema_mismatch,dashboard/frontend/src/components/workspaces/OptionsIntelligence.tsx vs dashboard/backend/chain_adapter.py,UI reads pcr_oi/pcr_vol; API emits pcr only,Options Intel PCR tiles always empty when chain healthy
+HIGH,api_without_ui,dashboard/backend/app.py @ /api/accuracy_trend; no FE call in src,Spearman accuracy_trend never rendered in SPA,ML accuracy story incomplete vs gates chip
+HIGH,ui_misnamed,dashboard/frontend/src/components/workspaces/PredictionAudit.tsx,Tab uses /api/auto_gates not prediction ledger,/api/predict* unused; audit UI is gate list
+MEDIUM,bridge_dependency,dashboard/backend/routers/chain.py + app.py install_legacy_bridge(),/api/expiries and /api/chain-expiry only via post-FastAPI bridge,Bridge failure → OptionChain EXPIRY DATA HTTP_404
+MEDIUM,orphan_ui,dashboard/frontend/src/components/{AdvancedCharts,AgentConsole,ControlPlane,ChainAnalytics,ModelBehavior,AppSelfTest,Backtest,Alerts,SignalsTab}.tsx,Components call APIs but not in App.tsx tab switch,Dead surface / duplicate API load risk if reintroduced
+MEDIUM,schema_mismatch,dashboard/frontend/src/components/ChainAnalytics.tsx,Expects data_source real|live; adapter emits dhan,False not-ready if orphan remounted
+LOW,duplicate_route,dashboard/backend/app.py ~5461 and ~9764,Duplicate /api/simulation/live/state definitions,Confusing maintenance; last definition wins
+LOW,legacy_paths,dashboard/frontend/src/components/GenesisTab.tsx,Calls non-/api genesis paths,Soft-fail optional modules; not production chain truth
+INFO,vix_ok,TopBar.tsx + /api/market/live_board + market_ltp.py INDIAVIX,VIX wired via live_board not option_chain,Missing quote is feed/token not missing route
+INFO,provenance_ok,OptionChain.tsx status strip source={data_source},Renders source=dhan from data_source,Canonical provenance UX on chain tab

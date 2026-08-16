@@ -1,0 +1,23 @@
+tab_slug,label,component,api_endpoints,backend_owner,notes
+decision-intel,Decision Intel,workspaces/DecisionIntelligence.tsx,"/api/batch/market-data;/api/state;/api/batch/positions-holdings (via store)",app.py,store-only
+truth,Truth Control,SystemTruthControl.tsx,store (health/state/broker/chain/gainRank/auto_gates/paper),app.py,store-only proof layers
+genesis,Genesis Brain,GenesisTab.tsx,"/genesis-production-brief;/autonomous-brain;/hidden-secrets-lab;/never-die-monitor;/hunger-meter;/data-truth-score;/health;/api/system_health;/final-message",app.py legacy+api,mixed /api and non-/api
+e2e-proof,E2E Proof,EndToEndProof.tsx,store only,app.py via useData,no direct fetch
+overview,Overview,Overview.tsx,store only,app.py via useData,no direct fetch
+sim-live,Sim Live,LiveSimulation.tsx,/api/simulation/live/state?scenario=,app.py (duplicate defs),simulation only
+options-intel,Options Intel,workspaces/OptionsIntelligence.tsx,"store chain/marketTop/gainRank/brokerPositions",app.py chains+scanner,PCR field mismatch pcr_oi/pcr_vol vs pcr
+chain,Option Chain,OptionChain.tsx,"/api/underlyings;/api/expiries/{sym};/api/chain-expiry/{sym}?expiry=;store /api/chain|/api/batch/chains",app.py + routers/chain.py bridge,renders source=data_source
+signals,Signals,Signals.tsx,"/api/state;/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true;/api/gain_rank;+moneycontrol via MarketTopCePeTable",app.py,
+trade,Trade,TradeTab.tsx,"/api/scanner/equity_options?top_n=8;/api/chain/{sym};store marketTop",app.py,
+paper,Paper Trades,PaperTrading.tsx,"/api/state;/api/paper;/api/pnl;/api/trades/today",app.py,
+positions,Positions,Positions.tsx,store paper+brokerPositions,app.py batch,paper ledger vs broker on Broker tab
+risk-scenarios,Risk & Scenarios,workspaces/RiskAndScenarios.tsx + RiskDashboard.tsx,/api/risk/portfolio (+ store state),app.py,
+multibagger,Multibagger,workspaces/MultibaggerResearch.tsx,/api/research/multibagger (useData),app.py,
+prediction-audit,Prediction Audit,workspaces/PredictionAudit.tsx,/api/auto_gates (+ state.signals),app.py,NOT prediction ledger API
+performance,Performance,PerformanceTab.tsx,"/api/pnl;/api/backtest/results",app.py,
+ml,ML Model,MLPerformance.tsx,"/api/state;/api/ml/performance;/api/ml/compare",app.py,does NOT call /api/accuracy_trend
+data-integrity,Data Integrity,workspaces/DataIntegrity.tsx + SystemHealthDiagnostics.tsx,"store + /api/deploy/info",app.py,
+broker,Broker,BrokerProofPanel.tsx,"/api/batch/positions-holdings;/api/broker/status",app.py,
+alerts,Alerts,AlertsTab.tsx,/api/alerts/recent (via batch/store),app.py,orphan Alerts.tsx unused
+system,System,SystemTab.tsx,store health/broker/ws,app.py,
+gates,Live Gate,LiveTradingGate.tsx,/api/live-trading/gate,app.py,

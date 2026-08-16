@@ -1,0 +1,124 @@
+[
+  {
+    "sym": "NIFTY",
+    "scalars": {
+      "underlying": "NIFTY",
+      "spot": 24366.0,
+      "pcr": 0.8836681882941296,
+      "contracts_len": 462,
+      "total_contracts": 462,
+      "broker_rows_total": 462,
+      "data_source": "dhan",
+      "source_priority": "dhan_last_verified_snapshot",
+      "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+      "stale": false,
+      "fetched_at_utc": "2026-08-16T06:31:13.257034+00:00",
+      "expiry_date": "2026-08-18",
+      "requested_expiry": null,
+      "complete_chain": true,
+      "limited_for_web": false,
+      "max_contracts": 0,
+      "live_trading_enabled": false,
+      "live": false,
+      "snapshot": true,
+      "snapshot_time": "2026-08-16 12:01 IST",
+      "message": "Market closed \u2014 showing last verified Dhan option-chain snapshot, not live ticks."
+    },
+    "hits": {
+      "has_source_eq_dhan": false,
+      "has_security_id_list": false,
+      "has_universe": false,
+      "source_field": null
+    },
+    "ce": 231,
+    "pe": 231,
+    "strikes_or_rows": 462
+  },
+  {
+    "sym": "BANKNIFTY",
+    "scalars": {
+      "underlying": "BANKNIFTY",
+      "contracts_len": 0,
+      "spot": 0,
+      "pcr": 0,
+      "total_contracts": 0,
+      "data_source": "dhan",
+      "source_priority": "dhan_only_no_rows",
+      "status": "NO_DHAN_DATA",
+      "stale": false,
+      "blocked": true,
+      "blocked_reason": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "suppressed_source": "dhan",
+      "suppressed_source_priority": null,
+      "suppressed_status": "CHAIN_FETCH_TIMEOUT",
+      "message": "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+    },
+    "hits": {
+      "has_source_eq_dhan": false,
+      "has_security_id_list": false,
+      "has_universe": false,
+      "source_field": null
+    },
+    "ce": 0,
+    "pe": 0,
+    "strikes_or_rows": null
+  },
+  {
+    "sym": "FINNIFTY",
+    "scalars": {
+      "underlying": "FINNIFTY",
+      "contracts_len": 0,
+      "spot": 0,
+      "pcr": 0,
+      "total_contracts": 0,
+      "data_source": "dhan",
+      "source_priority": "dhan_only_no_rows",
+      "status": "NO_DHAN_DATA",
+      "stale": false,
+      "blocked": true,
+      "blocked_reason": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "suppressed_source": "dhan",
+      "suppressed_source_priority": null,
+      "suppressed_status": "CHAIN_FETCH_TIMEOUT",
+      "message": "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+    },
+    "hits": {
+      "has_source_eq_dhan": false,
+      "has_security_id_list": false,
+      "has_universe": false,
+      "source_field": null
+    },
+    "ce": 0,
+    "pe": 0,
+    "strikes_or_rows": null
+  },
+  {
+    "sym": "MIDCPNIFTY",
+    "scalars": {
+      "underlying": "MIDCPNIFTY",
+      "contracts_len": 0,
+      "spot": 0,
+      "pcr": 0,
+      "total_contracts": 0,
+      "data_source": "dhan",
+      "source_priority": "dhan_only_no_rows",
+      "status": "NO_DHAN_DATA",
+      "stale": false,
+      "blocked": true,
+      "blocked_reason": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+      "suppressed_source": "dhan",
+      "suppressed_source_priority": null,
+      "suppressed_status": "CHAIN_FETCH_TIMEOUT",
+      "message": "No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-only truth guard."
+    },
+    "hits": {
+      "has_source_eq_dhan": false,
+      "has_security_id_list": false,
+      "has_universe": false,
+      "source_field": null
+    },
+    "ce": 0,
+    "pe": 0,
+    "strikes_or_rows": null
+  }
+]

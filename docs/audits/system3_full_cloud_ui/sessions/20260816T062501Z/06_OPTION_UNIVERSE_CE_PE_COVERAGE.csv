@@ -1,0 +1,6 @@
+symbol,api_path,http,contracts,ce,pe,data_source,status,source_priority,blocked,message,evidence_class,market_hours_dependency
+NIFTY,/api/chain/NIFTY,200,462,231,231,dhan,MARKET_CLOSED_DHAN_SNAPSHOT,dhan_last_verified_snapshot,,"Market closed — showing last verified Dhan option-chain snapshot, not live ticks.",REQUEST_SCOPED_LIVE_API,YES_FOR_LIVE_TICKS_WEEKEND_SNAPSHOT_ONLY
+BANKNIFTY,/api/chain/BANKNIFTY,200,0,0,0,dhan,NO_DHAN_DATA,dhan_only_no_rows,True,No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-on,REQUEST_SCOPED_LIVE_API,YES_FOR_LIVE_TICKS_WEEKEND_SNAPSHOT_ONLY
+FINNIFTY,/api/chain/FINNIFTY,200,0,0,0,dhan,NO_DHAN_DATA,dhan_only_no_rows,True,No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-on,REQUEST_SCOPED_LIVE_API,YES_FOR_LIVE_TICKS_WEEKEND_SNAPSHOT_ONLY
+MIDCPNIFTY,/api/chain/MIDCPNIFTY,200,0,0,0,dhan,NO_DHAN_DATA,dhan_only_no_rows,True,No current or verified Dhan option-chain rows are available. Non-Dhan or old local market data is blocked by the Dhan-on,REQUEST_SCOPED_LIVE_API,YES_FOR_LIVE_TICKS_WEEKEND_SNAPSHOT_ONLY
+EQUITY_OPTSTK_FULL,,NOT_PROVEN_LIVE_COUNT,,,,,,,,Issue #188 full universe not counted this session,CURRENT_GITHUB_MAIN,MARKET_HOURS_VALIDATION_REQUIRED
