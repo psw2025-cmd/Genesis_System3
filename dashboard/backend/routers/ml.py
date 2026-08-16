@@ -173,13 +173,20 @@ async def get_gain_rank(refresh: bool = False):
 
 @router.get("/api/accuracy_trend")
 async def get_accuracy_trend():
-    trend = []
-    for v in _load_validations():
-        rho = v.get("spearman_correlation")
-        if rho is not None:
-            trend.append({"date": str(v.get("date") or v.get("_file", "")).replace("market_validation_", "").replace(".json", ""), "rho": rho, "n_predictions": len(v.get("predictions", []))})
-    avg_rho = sum(float(t["rho"]) for t in trend) / len(trend) if trend else 0
-    return {"trend": trend, "days": len(trend), "avg_rho": round(avg_rho, 4), "target_rho": 0.70, "ready_for_live": False, "model_proof_ready": avg_rho >= 0.70 and len(trend) >= 10}
+    """Delegate to shared builder so trend days match auto_gates (Firestore + local)."""
+    try:
+        from dashboard.backend.accuracy_trend_service import build_accuracy_trend_payload
+    except ImportError:
+        from accuracy_trend_service import build_accuracy_trend_payload
+    payload = build_accuracy_trend_payload(ROOT, retrain_needed=False)
+    # Preserve legacy keys used by older ML clients without claiming live readiness.
+    return {
+        **payload,
+        "days": payload.get("days_available", 0),
+        "target_rho": 0.70,
+        "ready_for_live": False,
+        "model_proof_ready": False,
+    }
 
 
 @router.get("/api/ml/performance")

@@ -2041,42 +2041,20 @@ async def get_scanner_segments():
 
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
+    """Spearman ρ trend aligned with auto_gates (local + Firestore validation days)."""
     _hit = _cache_get("accuracy_trend", _TTL_ACCURACY)
     if _hit is not None:
         return _hit
-    """Spearman rho trend from market_validations/*.json (last 14 days). Handles both field names."""
     try:
-        if not VALIDATION_DIR.exists():
-            return {"status": "no_data", "trend": [], "retrain_needed": RETRAIN_FLAG.exists()}
-        files = sorted(VALIDATION_DIR.glob("market_validation_*.json"))[-14:]
-        trend = []
-        for f in files:
-            try:
-                d = json.loads(f.read_text())
-                rho = d.get("rank_correlation_spearman") or d.get("spearman_correlation")
-                trend.append(
-                    {
-                        "date": d.get("date", f.stem.replace("market_validation_", "")),
-                        "rho": round(rho, 4) if rho is not None else None,
-                        "hit_rate": d.get("hit_rate"),
-                        "status": d.get("status", "UNKNOWN"),
-                        "predicted": d.get("predicted_ranking", []),
-                        "actual": d.get("actual_ranking", []),
-                    }
-                )
-            except Exception:
-                continue
-        avg_rho = None
-        rhos = [e["rho"] for e in trend if e["rho"] is not None]
-        if rhos:
-            avg_rho = round(sum(rhos) / len(rhos), 4)
-        return {
-            "status": "ok",
-            "trend": trend,
-            "avg_rho": avg_rho,
-            "retrain_needed": RETRAIN_FLAG.exists(),
-            "days_available": len(trend),
-        }
+        try:
+            from dashboard.backend.accuracy_trend_service import build_accuracy_trend_payload
+        except ImportError:
+            from accuracy_trend_service import build_accuracy_trend_payload
+        payload = build_accuracy_trend_payload(
+            ROOT_DIR,
+            retrain_needed=RETRAIN_FLAG.exists(),
+        )
+        return _cache_set("accuracy_trend", payload)
     except Exception as e:
         return {"status": "error", "error": str(e), "trend": [], "retrain_needed": False}
 
