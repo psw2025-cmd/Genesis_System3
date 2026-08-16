@@ -72,8 +72,11 @@ SAFE_ENV = (
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
     ("SYSTEM3_STARTUP_TOKEN_REFRESH", "0"),
     ("BROKER_SELF_HEAL_TOKEN_REFRESH", "0"),
-    ("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0"),
-    ("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "130"),
+    # Permanent broker heal: on DH-906 web invokes sole Cloud Run rotate Job.
+    # Mint still never happens inside the web process. Cooldown = 15 minutes.
+    ("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1"),
+    ("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900"),
+    ("DHAN_ROTATE_PUBSUB_TOPIC", "broker-token-rotate"),
     ("DHAN_CANONICAL_ROTATION_WAIT_S", "120"),
     ("CLOUD_MODE", "1"),
     ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),

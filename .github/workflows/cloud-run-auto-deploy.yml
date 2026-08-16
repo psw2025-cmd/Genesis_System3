@@ -132,8 +132,10 @@ jobs:
               and "DHAN_ROTATION_JOB" in line
           ]
           assert not rotator_exec_lines, f"deploy must not execute rotator: {rotator_exec_lines}"
-          assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+          assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+          assert '("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
           assert 'os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
+          assert 'os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
 
           secret_accessor_marker = "secret" + "Accessor"
           secret_version_adder_marker = "secretVersion" + "Adder"

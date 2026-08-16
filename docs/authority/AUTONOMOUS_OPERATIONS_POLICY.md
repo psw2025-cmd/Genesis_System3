@@ -76,7 +76,7 @@ After the one-time autonomous authority bootstrap is proven in production, the n
 ## Broker rotation authority
 
 - Daily scheduler at 07:30 Asia/Kolkata remains the normal mint authority.
-- Web self-heal minting remains OFF (`DHAN_CANONICAL_ROTATION_SELF_HEAL=0`).
+- Web self-heal minting is ON for auth-reject only (`DHAN_CANONICAL_ROTATION_SELF_HEAL=1`): web never mints inline; it invokes Job `genesis-system3-dhan-token-rotate` with 900s cooldown. Canonical secret remains `dhan-access-token` only.
 - Deploy workflows configure the rotator/scheduler but must not execute the rotator.
 - Recovery must remain single-flight/cooldown guarded; repeated mint retries are forbidden.
 
