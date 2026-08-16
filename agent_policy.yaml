@@ -63,6 +63,22 @@ end_to_end_issues_solutions:
     - improved_stakeholder_satisfaction
   key_enablers: [people, process, technology, policies, kpis]
 
+continuous_closure:
+  doc: docs/CONTINUOUS_CLOSURE_SYSTEM.md
+  orchestrator: scripts/system3_continuous_closure_orchestrator.py
+  api: /api/continuous_closure
+  ui: Overview ContinuousClosureBoard
+  artifacts:
+    - reports/latest/continuous_closure/summary.json
+    - reports/latest/continuous_closure/resume_state.json
+  phases:
+    - repo_first_scan
+    - multi_source_verify
+    - watchdog
+    - blocker_cards
+    - auto_resume
+  auto_resume_rule: Next session/Automation reads resume_state.json and executes next OPEN card test-first
+
 loop:
   name: AUTONOMOUS-LOOP-GEMINI
   roles: [Architect, CoreEngineer, QAEvaluator]
@@ -71,6 +87,7 @@ loop:
     - deploy_progress_telemetry_banner
     - test_first_heal_and_gitops_release
     - live_verify_sha
+    - continuous_closure_orchestrator
     - remove_banner_only_when_all_gates_ready
 
 ban_list:
