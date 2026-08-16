@@ -1,0 +1,163 @@
+name: GCP Dhan Token Rotation Manual Recovery
+
+# Break-glass only. Daily mint authority remains Cloud Scheduler.
+# No GitHub schedule/cron. Keyless WIF via dedicated recovery SA.
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Bypass cooldown / 07:30 window guards (still never parallel-executes)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+concurrency:
+  group: gcp-dhan-token-rotation-manual
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  rotate-and-prove:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      PROJECT_ID: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      JOB: genesis-system3-dhan-token-rotate
+      RECOVERY_SA: gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com
+      WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+      COOLDOWN_MINUTES: "30"
+      SCHEDULER_WINDOW_MINUTES: "15"
+      CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+      FORCE_INPUT: ${{ inputs.force }}
+    steps:
+      - name: Authenticate to Google Cloud with keyless WIF (recovery SA)
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.RECOVERY_SA }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Cooldown and single-flight precheck (no Dhan invoke on SKIP)
+        id: precheck
+        run: |
+          set -euo pipefail
+          FORCE="${FORCE_INPUT:-false}"
+          SKIP_REASON=""
+          STATUS="READY"
+
+          RUNNING=$(gcloud run jobs executions list \
+            --job="${JOB}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --filter='status.runningCount>0 OR status.conditions.type=Running AND status.conditions.state=Unknown' \
+            --format='value(metadata.name)' 2>/dev/null | head -n 5 || true)
+          if [ -n "${RUNNING}" ]; then
+            STATUS="SKIPPED"
+            SKIP_REASON="ACTIVE_ROTATION_IN_FLIGHT"
+          fi
+
+          if [ "${STATUS}" = "READY" ]; then
+            NOW_EPOCH=$(date -u +%s)
+            IST_HM=$(TZ=Asia/Kolkata date +%H%M)
+            IST_EPOCH_HM=$((10#${IST_HM}))
+            # Refuse within ±15 minutes of 07:30 IST unless force=true
+            LOWER=$((730 - SCHEDULER_WINDOW_MINUTES))
+            UPPER=$((730 + SCHEDULER_WINDOW_MINUTES))
+            if [ "${FORCE}" != "true" ] && [ "${IST_EPOCH_HM}" -ge "${LOWER}" ] && [ "${IST_EPOCH_HM}" -le "${UPPER}" ]; then
+              STATUS="SKIPPED"
+              SKIP_REASON="INSIDE_SCHEDULER_WINDOW_0730_IST"
+            fi
+          fi
+
+          if [ "${STATUS}" = "READY" ] && [ "${FORCE}" != "true" ]; then
+            CREATE_TIME=$(gcloud secrets versions describe latest \
+              --secret=dhan-access-token \
+              --project="${PROJECT_ID}" \
+              --format='value(createTime)' 2>/dev/null || true)
+            export CREATE_TIME
+            URL=$(gcloud run services describe "${SERVICE}" \
+              --project="${PROJECT_ID}" \
+              --region="${REGION}" \
+              --format='value(status.url)' 2>/dev/null || true)
+            CONNECTED="false"
+            if [ -n "${URL}" ]; then
+              curl -fsS --max-time 20 "${URL}/api/broker/status" > /tmp/pre_broker.json || true
+              if jq -e '.connected == true' /tmp/pre_broker.json >/dev/null 2>&1; then
+                CONNECTED="true"
+              fi
+            fi
+            if [ -n "${CREATE_TIME}" ] && [ "${CONNECTED}" = "true" ]; then
+              CREATE_EPOCH=$(python -c 'import os,sys; from datetime import datetime
+raw=os.environ["CREATE_TIME"].replace("Z","+00:00")
+print(int(datetime.fromisoformat(raw).timestamp()))' )
+              AGE_MIN=$(( (NOW_EPOCH - CREATE_EPOCH) / 60 ))
+              if [ "${AGE_MIN}" -lt "${COOLDOWN_MINUTES}" ]; then
+                STATUS="SKIPPED"
+                SKIP_REASON="COOLDOWN_TOKEN_FRESH_AND_CONNECTED age_min=${AGE_MIN}"
+              fi
+            fi
+          fi
+
+          echo "status=${STATUS}" >> "$GITHUB_OUTPUT"
+          echo "skip_reason=${SKIP_REASON}" >> "$GITHUB_OUTPUT"
+          echo "MANUAL_ROTATION_PRECHECK status=${STATUS} skip_reason=${SKIP_REASON} force=${FORCE}"
+          if [ "${STATUS}" = "SKIPPED" ]; then
+            echo "MANUAL_ROTATION_RESULT=SKIPPED"
+            echo "DHAN_INVOKE_ATTEMPTED=NO"
+          fi
+
+      - name: Execute single-flight rotation job
+        if: steps.precheck.outputs.status == 'READY'
+        run: |
+          set -euo pipefail
+          gcloud run jobs execute "${JOB}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --wait
+          echo "DHAN_INVOKE_ATTEMPTED=YES"
+
+      - name: Prove dynamic reload or emit deterministic SKIPPED proof
+        run: |
+          set -euo pipefail
+          STATUS="${{ steps.precheck.outputs.status }}"
+          SKIP_REASON="${{ steps.precheck.outputs.skip_reason }}"
+          URL=$(gcloud run services describe "${SERVICE}" \
+            --project="${PROJECT_ID}" \
+            --region="${REGION}" \
+            --format='value(status.url)')
+
+          if [ "${STATUS}" = "SKIPPED" ]; then
+            curl -fsS --max-time 30 "${URL}/api/broker/status" > /tmp/broker.json || echo '{}' > /tmp/broker.json
+            jq -n \
+              --arg status "SKIPPED" \
+              --arg reason "${SKIP_REASON}" \
+              --argjson broker "$(cat /tmp/broker.json)" \
+              '{manual_rotation_result:$status,skip_reason:$reason,dhan_invoke_attempted:false,broker:$broker}'
+            echo "MANUAL_ROTATION_RESULT=SKIPPED"
+            exit 0
+          fi
+
+          PASS=0
+          for ATTEMPT in 1 2 3 4 5 6; do
+            curl -fsS --max-time 30 \
+              "${URL}/api/broker/status" > /tmp/broker.json || true
+            if jq -e '.connected == true and .token_proof.source == "GCP_SECRET_MANAGER_DYNAMIC" and .token_proof.token_value_exposed == false and .live_trading_enabled == false and .order_placement_allowed == false' /tmp/broker.json >/dev/null 2>&1; then
+              PASS=1
+              break
+            fi
+            sleep 10
+          done
+
+          jq '{connected,error,latency_ms,token_proof:{source:.token_proof.source,secret_version:.token_proof.secret_version,loaded_at_utc:.token_proof.loaded_at_utc,expires_at_utc:.token_proof.expires_at_utc,hours_remaining:.token_proof.hours_remaining,last_reload_reason:.token_proof.last_reload_reason,rotation_job:.token_proof.rotation_job,raw_token_exposed:.token_proof.token_value_exposed},token_reload,live_trading_enabled,order_placement_allowed}' /tmp/broker.json
+          test "${PASS}" = "1"

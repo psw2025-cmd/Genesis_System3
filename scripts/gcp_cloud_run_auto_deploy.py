@@ -1,260 +1,213 @@
 #!/usr/bin/env python3
-"""Auto-deploy Genesis System3 web service to Cloud Run (image update only).
+"""Canonical Cloud Run deployment entrypoint with immutable digest proof.
 
-Builds an immutable image tagged with the full git SHA, then patches the Cloud
-Run service container image + safe env vars. Secret mounts and other env are
-preserved (never use bare --set-env-vars).
-
-Live trading flags are always forced OFF.
+The original deployment state machine is preserved byte-for-byte in
+``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
+implementation still contains every critical PAPER/LIVE-OFF/candidate safety
+invariant, replaces only the image-provenance assertion with the fail-closed
+Artifact Registry repository+digest verifier, removes retired dashboard
+credential secret mounts before any candidate revision can be created, and
+converges the bounded business-lane Cloud Scheduler definitions before the
+workflow's scheduler-proof stage.
 """
 from __future__ import annotations
 
-import argparse
-import json
 import os
 import subprocess
-import sys
-import time
 from pathlib import Path
-from typing import Any
 
-from google.auth import default as google_auth_default
-from google.auth.transport.requests import AuthorizedSession
+import gcp_cloud_run_auto_deploy_impl as deployer
+from gcp_image_provenance import assert_same_artifact_image
 
-ROOT = Path(__file__).resolve().parents[1]
-PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
-REGION = os.environ.get("GCP_REGION", "asia-south1")
-SERVICE = os.environ.get("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
-REPO = f"{REGION}-docker.pkg.dev/{PROJECT}/system3-containers/genesis-system3"
-BUILDER_SA = f"projects/{PROJECT}/serviceAccounts/system3-builder@{PROJECT}.iam.gserviceaccount.com"
+_IMPL = Path(__file__).with_name("gcp_cloud_run_auto_deploy_impl.py")
+PROJECT = deployer.PROJECT
+REGION = os.getenv("GCP_REGION", "asia-south1")
+RUNTIME_SA = f"genesis-system3-web@{PROJECT}.iam.gserviceaccount.com"
+SCHEDULER_SA = os.getenv(
+    "DHAN_SCHEDULER_SERVICE_ACCOUNT",
+    f"gs3-scheduler@{PROJECT}.iam.gserviceaccount.com",
+)
+BUSINESS_SCHEDULES = {
+    "rank": "45 3 * * MON-FRI",
+    "forecast": "0 4 * * MON-FRI",
+    "validate": "5 10 * * MON-FRI",  # 15:35 IST post-close Spearman day
+    "signals": "15 13 * * MON-FRI",
+}
 
-SAFE_ENV = (
-    ("LIVE_TRADING_ENABLED", "0"),
-    ("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
-    ("AUTO_EXECUTE_TRADES", "0"),
-    ("DHAN_STATUS_AUTO_REFRESH", "0"),
-    ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
-    ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
-    ("SYSTEM3_STARTUP_TOKEN_REFRESH", "0"),
-    ("BROKER_SELF_HEAL_TOKEN_REFRESH", "0"),
-    ("CLOUD_MODE", "1"),
-    ("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run"),
-    ("MEM_LIMIT_MB", "960"),
-    ("MEM_WARN_MB", "700"),
-    ("MEM_GC_MB", "850"),
-    ("MARKET_TOP_MICRO_STREAM", "0"),
-    ("DHAN_STATUS_AUTO_REFRESH", "0"),
-    ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
-    (
-        "SYSTEM3_PUBLIC_BACKEND_URL",
-        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-    ),
-    (
-        "SYSTEM3_API_BASE",
-        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-    ),
+# These are executable preconditions: the wrapper refuses to deploy if the
+# preserved implementation loses any of these exact safety/provenance markers.
+_REQUIRED_IMPLEMENTATION_MARKERS = (
+    '"--no-traffic"',
+    'f"--tag={CANDIDATE_TAG}"',
+    'f"--to-revisions={candidate}=100"',
+    '("LIVE_TRADING_ENABLED", "0")',
+    '("SYSTEM3_LIVE_TRADING_ALLOWED", "0")',
+    '("AUTO_EXECUTE_TRADES", "0")',
+    '("REQUIRE_API_KEY", "false")',
+    '("DEFER_INSTRUMENT_WARMUP", "1")',
+    '("SYSTEM3_STATE_BACKEND", "firestore")',
+    '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")',
+    '--remove-secrets=API_KEY',
+    '--update-secrets=WORKER_PUSH_TOKEN=',
+    'WORKER_PUSH_TOKEN_SECRET_ID',
+    'DASHBOARD_PUBLIC_READONLY enforced',
+    '_traffic_allocations',
+    '_wait_revision_ready',
+    'gcp_failed_revision_forensic.py',
+    'PREVIOUS_TRAFFIC_RESTORED',
 )
 
-
-def _session() -> AuthorizedSession:
-    creds, _ = google_auth_default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
-    return AuthorizedSession(creds)
+_RETIRED_DASHBOARD_SECRET_ENV = "DASHBOARD_API_KEY"
+_ORIGINAL_RUN = deployer._run
 
 
-def _git_sha() -> str:
-    sha = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
-    if len(sha) != 40:
-        raise SystemExit(f"Expected full 40-char SHA, got {sha!r}")
-    return sha
+def _verify_implementation_contract() -> None:
+    text = _IMPL.read_text(encoding="utf-8")
+    missing = [marker for marker in _REQUIRED_IMPLEMENTATION_MARKERS if marker not in text]
+    if missing:
+        raise RuntimeError(f"deployment_safety_contract_missing:{missing}")
 
 
-def _archive_tarball(sha: str) -> Path:
-    """Archive committed tree (CI) or worktree overlay for local emergency deploys."""
-    # Prefer non-C: scratch when available — local C: fills up from repeated ~20MB archives.
-    scratch_root = Path(os.environ.get("SYSTEM3_DEPLOY_SCRATCH", r"E:\System3_deploy_scratch"))
-    try:
-        scratch_root.mkdir(parents=True, exist_ok=True)
-        out = scratch_root / f"deploy_{sha[:12]}.tgz"
-        # Probe writability
-        (scratch_root / ".write_test").write_text("ok", encoding="utf-8")
-        (scratch_root / ".write_test").unlink(missing_ok=True)
-    except Exception:
-        out = ROOT / ".secrets" / f"deploy_{sha[:12]}.tgz"
-        out.parent.mkdir(parents=True, exist_ok=True)
-    include_worktree = os.environ.get("SYSTEM3_DEPLOY_INCLUDE_WORKTREE", "").strip() in {
-        "1",
-        "true",
-        "YES",
-    }
-    if include_worktree:
-        env = dict(os.environ)
-        idx = ROOT / ".secrets" / "deploy_index"
-        subprocess.check_call(["git", "read-tree", "HEAD"], cwd=ROOT, env={**env, "GIT_INDEX_FILE": str(idx)})
-        subprocess.check_call(
-            ["git", "add", "-A", "--", "dashboard", "scripts", "core", "src", "config", "deploy"],
-            cwd=ROOT,
-            env={**env, "GIT_INDEX_FILE": str(idx)},
+def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
+    """Ensure every Cloud Run candidate explicitly removes retired dashboard auth.
+
+    This is deliberately applied in the canonical wrapper because the preserved
+    implementation is the PR #130 provenance state machine. It changes no LIVE,
+    order, worker-token, or broker authority; it only removes a retired secret
+    mount that must not survive on newly-created revisions.
+    """
+    if args[:3] != ["gcloud", "run", "deploy"]:
+        return list(args)
+
+    result = list(args)
+    indexes = [i for i, arg in enumerate(result) if arg.startswith("--remove-secrets=")]
+    if len(indexes) != 1:
+        raise RuntimeError(f"candidate_remove_secrets_contract_invalid:{len(indexes)}")
+
+    idx = indexes[0]
+    names = [name.strip() for name in result[idx].split("=", 1)[1].split(",") if name.strip()]
+    if "API_KEY" not in names:
+        raise RuntimeError("candidate_api_key_scrub_missing")
+    if _RETIRED_DASHBOARD_SECRET_ENV not in names:
+        names.append(_RETIRED_DASHBOARD_SECRET_ENV)
+    result[idx] = "--remove-secrets=" + ",".join(names)
+    return result
+
+
+def _run_with_retired_dashboard_secret_scrub(
+    args: list[str], *, capture: bool = False
+) -> str:
+    scrubbed = _scrub_retired_dashboard_secret_arg(args)
+    if scrubbed != args:
+        print("RETIRED_DASHBOARD_SECRET_SCRUB enforced")
+    return _ORIGINAL_RUN(scrubbed, capture=capture)
+
+
+def _assert_candidate_image(revision: dict, image: str) -> None:
+    containers = ((revision.get("spec") or {}).get("containers") or [])
+    if not containers:
+        containers = ((((revision.get("spec") or {}).get("template") or {}).get("spec") or {}).get("containers") or [])
+    deployed_image = str((containers[0] if containers else {}).get("image") or "")
+    if not deployed_image:
+        raise RuntimeError("candidate image missing from revision")
+    repository, digest = assert_same_artifact_image(image, deployed_image)
+    print("CANDIDATE_IMAGE_PROVENANCE_OK", f"{repository}@{digest}")
+
+
+def _scheduler_exists(name: str) -> bool:
+    """Return exact scheduler existence; auth/API errors fail closed."""
+    proc = subprocess.run(
+        [
+            "gcloud",
+            "scheduler",
+            "jobs",
+            "describe",
+            name,
+            f"--project={PROJECT}",
+            f"--location={REGION}",
+            "--format=value(name)",
+        ],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if proc.returncode == 0:
+        return True
+
+    detail = ((proc.stderr or "") + " " + (proc.stdout or "")).strip()
+    lowered = detail.lower()
+    if "not_found" in lowered or "not found" in lowered or "does not exist" in lowered:
+        return False
+    raise RuntimeError(
+        f"business_scheduler_describe_failed:{name}:rc={proc.returncode}:{detail[:300]}"
+    )
+
+
+def _business_scheduler_command(kind: str, *, exists: bool) -> list[str]:
+    if kind not in BUSINESS_SCHEDULES:
+        raise RuntimeError(f"unsupported_business_scheduler_kind:{kind}")
+    action = "update" if exists else "create"
+    name = f"genesis-system3-{kind}-daily"
+    uri = (
+        "https://run.googleapis.com/v2/projects/"
+        f"{PROJECT}/locations/{REGION}/jobs/genesis-system3-{kind}:run"
+    )
+    header_flag = (
+        "--update-headers=Content-Type=application/json"
+        if exists
+        else "--headers=Content-Type=application/json"
+    )
+    return [
+        "gcloud",
+        "scheduler",
+        "jobs",
+        action,
+        "http",
+        name,
+        f"--project={PROJECT}",
+        f"--location={REGION}",
+        f"--schedule={BUSINESS_SCHEDULES[kind]}",
+        "--time-zone=UTC",
+        f"--uri={uri}",
+        "--http-method=POST",
+        f"--oauth-service-account-email={SCHEDULER_SA}",
+        "--oauth-token-scope=https://www.googleapis.com/auth/cloud-platform",
+        header_flag,
+        "--message-body={}",
+    ]
+
+
+def _ensure_business_scheduler_contract() -> None:
+    """Create or fully reconcile the three bounded business schedules.
+
+    This function configures Scheduler metadata only. It never executes a Cloud
+    Run job and never changes broker, token, order, or LIVE-trading authority.
+    """
+    for kind in BUSINESS_SCHEDULES:
+        exists = _scheduler_exists(f"genesis-system3-{kind}-daily")
+        command = _business_scheduler_command(kind, exists=exists)
+        _ORIGINAL_RUN(command)
+        print(
+            "BUSINESS_SCHEDULER_CONVERGED",
+            {
+                "kind": kind,
+                "action": "update" if exists else "create",
+                "schedule": BUSINESS_SCHEDULES[kind],
+                "live_trading_enabled": False,
+                "order_action_performed": False,
+                "business_job_executed": False,
+            },
         )
-        tree = subprocess.check_output(
-            ["git", "write-tree"], cwd=ROOT, text=True, env={**env, "GIT_INDEX_FILE": str(idx)}
-        ).strip()
-        with out.open("wb") as fh:
-            subprocess.check_call(["git", "archive", "--format=tar.gz", tree], cwd=ROOT, stdout=fh)
-    else:
-        with out.open("wb") as fh:
-            subprocess.check_call(["git", "archive", "--format=tar.gz", "HEAD"], cwd=ROOT, stdout=fh)
-    return out
-
-
-def _upload_source(session: AuthorizedSession, tgz: Path, sha: str) -> tuple[str, str]:
-    bucket = f"{PROJECT}_cloudbuild"
-    object_name = f"source/genesis-auto-{sha[:12]}-{int(time.time())}.tgz"
-    session.post(
-        f"https://storage.googleapis.com/storage/v1/b?project={PROJECT}",
-        json={"name": bucket, "location": REGION},
-        timeout=60,
-    )
-    up = session.post(
-        f"https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o"
-        f"?uploadType=media&name={object_name}",
-        data=tgz.read_bytes(),
-        headers={"Content-Type": "application/gzip"},
-        timeout=600,
-    )
-    if up.status_code not in (200, 201):
-        raise SystemExit(f"Upload failed {up.status_code}: {up.text[:500]}")
-    return bucket, object_name
-
-
-def _build_image(session: AuthorizedSession, bucket: str, object_name: str, image: str) -> None:
-    create = session.post(
-        f"https://cloudbuild.googleapis.com/v1/projects/{PROJECT}/builds",
-        json={
-            "serviceAccount": BUILDER_SA,
-            "options": {"logging": "CLOUD_LOGGING_ONLY"},
-            "timeout": "3600s",
-            "source": {"storageSource": {"bucket": bucket, "object": object_name}},
-            "steps": [
-                {
-                    "name": "gcr.io/cloud-builders/docker",
-                    "args": [
-                        "build",
-                        "--file=dashboard/backend/Dockerfile",
-                        f"--tag={image}",
-                        ".",
-                    ],
-                }
-            ],
-            "images": [image],
-        },
-        timeout=120,
-    )
-    if create.status_code not in (200, 201):
-        raise SystemExit(f"Build create failed {create.status_code}: {create.text[:800]}")
-    build_id = (create.json().get("metadata") or {}).get("build", {}).get("id")
-    print(f"BUILD_ID {build_id}")
-    for i in range(240):
-        b = session.get(
-            f"https://cloudbuild.googleapis.com/v1/projects/{PROJECT}/builds/{build_id}",
-            timeout=60,
-        ).json()
-        status = b.get("status")
-        print(f"build_wait[{i}] {status}")
-        if status == "SUCCESS":
-            return
-        if status in {
-            "FAILURE",
-            "CANCELLED",
-            "EXPIRED",
-            "TIMEOUT",
-            "INTERNAL_ERROR",
-        }:
-            raise SystemExit(
-                f"Build {status}: {b.get('logUrl')} "
-                f"{b.get('failureInfo') or b.get('statusDetail')}"
-            )
-        time.sleep(15)
-    raise SystemExit("Build timed out waiting for SUCCESS")
-
-
-def _patch_service(session: AuthorizedSession, image: str, sha: str) -> dict[str, Any]:
-    svc_url = f"https://run.googleapis.com/v2/projects/{PROJECT}/locations/{REGION}/services/{SERVICE}"
-    svc = session.get(svc_url, timeout=60).json()
-    c0 = dict((svc.get("template", {}).get("containers") or [{}])[0])
-    c0["image"] = image
-    # MemGuard showed ~408/480MB on 512Mi — leave headroom for Dhan OC + pandas.
-    c0["resources"] = {
-        **(c0.get("resources") or {}),
-        "limits": {
-            **((c0.get("resources") or {}).get("limits") or {}),
-            "memory": "1Gi",
-            "cpu": ((c0.get("resources") or {}).get("limits") or {}).get("cpu") or "1",
-        },
-    }
-    env_map = {e["name"]: e for e in c0.get("env", []) if "name" in e}
-    for k, v in SAFE_ENV:
-        env_map[k] = {"name": k, "value": v}
-    env_map["DEPLOY_GIT_SHA"] = {"name": "DEPLOY_GIT_SHA", "value": sha}
-    # Never keep PIN/TOTP on Cloud Run — minting there invalidates SM-mounted tokens.
-    for drop in ("DHAN_PIN", "DHAN_TOTP_SECRET", "DHAN_TOTP"):
-        env_map.pop(drop, None)
-    c0["env"] = list(env_map.values())
-    patch = session.patch(
-        svc_url,
-        params={"updateMask": "template.containers,template.scaling"},
-        json={
-            "template": {
-                "containers": [c0],
-                "scaling": {"minInstanceCount": 1, "maxInstanceCount": 10},
-            }
-        },
-        timeout=120,
-    )
-    if patch.status_code not in (200, 201):
-        raise SystemExit(f"Cloud Run patch failed {patch.status_code}: {patch.text[:600]}")
-    for i in range(60):
-        cur = session.get(svc_url, timeout=60).json()
-        rev = (cur.get("latestReadyRevision") or "").split("/")[-1]
-        print(f"run_wait[{i}] reconciling={cur.get('reconciling')} rev={rev}")
-        if not cur.get("reconciling") and rev:
-            return cur
-        time.sleep(5)
-    raise SystemExit("Cloud Run reconcile timed out")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--include-worktree",
-        action="store_true",
-        help="Include uncommitted dashboard/core/scripts/src/config/deploy changes",
-    )
-    args = parser.parse_args()
-    if args.include_worktree:
-        os.environ["SYSTEM3_DEPLOY_INCLUDE_WORKTREE"] = "1"
-
-    sha = _git_sha()
-    # Unique tag so Cloud Run always creates a new revision (same git SHA
-    # retag alone does not force a pull when the URI string is unchanged).
-    deploy_stamp = int(time.time())
-    image = f"{REPO}:{sha[:12]}-{deploy_stamp}"
-    print("SHA", sha)
-    print("IMAGE", image)
-    print("SERVICE", SERVICE)
-    print("LIVE_OFF enforced")
-
-    session = _session()
-    tgz = _archive_tarball(sha)
-    print("ARCHIVE_BYTES", tgz.stat().st_size)
-    bucket, object_name = _upload_source(session, tgz, sha)
-    print("UPLOAD", bucket, object_name)
-    _build_image(session, bucket, object_name, image)
-    cur = _patch_service(session, image, sha)
-    rev = (cur.get("latestReadyRevision") or "").split("/")[-1]
-    print("READY", rev)
-    print("URL", cur.get("uri"))
-    print("IMAGE", image)
-    print(json.dumps({"ok": True, "revision": rev, "image": image, "sha": sha}, indent=2))
+    _verify_implementation_contract()
+    deployer._assert_candidate_image = _assert_candidate_image
+    deployer._run = _run_with_retired_dashboard_secret_scrub
+    result = deployer.main()
+    if result:
+        return result
+    _ensure_business_scheduler_contract()
     return 0
 
 

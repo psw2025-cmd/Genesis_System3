@@ -34,7 +34,7 @@ function brokerFailure(obj: any): { bad: boolean; message: string } {
   if (detail.includes('rate_limit') || code === 429 || status === 'rate_limit') {
     return { bad: false, message: 'rate_limited_transient' }
   }
-  const bad = obj?.success === false || obj?.blocked === true || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized') || detail.includes('dh-901')
+  const bad = obj?.success === false || obj?.pendingProof === true || status === 'failure' || detail.includes('invalid') || detail.includes('token') || detail.includes('unauthorized') || detail.includes('dh-901')
   return { bad, message: [code, typ, msg].filter(Boolean).join(' - ') }
 }
 
@@ -48,15 +48,15 @@ function brokerClientId(status: any, funds?: any) {
 
 function liveTradingState(state: any, brokerStatus: any) {
   const raw = state?.live_trading_enabled ?? state?.liveTradingEnabled ?? brokerStatus?.live_trading_enabled ?? brokerStatus?.liveTradingEnabled ?? brokerStatus?.live_allowed ?? '0'
-  return String(raw) === '1' || raw === true ? 'ENABLED BY BACKEND FLAG' : 'BLOCKED BY BACKEND FLAG'
+  return String(raw) === '1' || raw === true ? 'ENABLED BY BACKEND FLAG' : 'DISABLED BY BACKEND FLAG'
 }
 
 export function BrokerPanel() {
-  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen, state } = useStore()
+  const { brokerStatus, brokerFunds, brokerHoldings, brokerPositions, brokerConnected, apiStatus, marketOpen, state, liveBoard } = useStore()
 
   const funds = brokerFunds?.normalized ?? brokerFunds?.funds ?? brokerFunds ?? null
-  const authBlocked = apiStatus?.status === 'API_AUTH_REQUIRED'
-  const brokerBlocked = authBlocked || apiStatus?.status === 'API_ERROR'
+  const authNeeded = apiStatus?.status === 'API_AUTH_REQUIRED'
+  const brokerApiIssue = authNeeded || apiStatus?.status === 'API_ERROR'
   const fundsFailure = brokerFailure(brokerFunds)
   const statusFailure = brokerFailure(brokerStatus)
   const holdingsFailure = brokerFailure(brokerHoldings)
@@ -65,11 +65,11 @@ export function BrokerPanel() {
   const brokerTruthConnected = Boolean(brokerConnected === true || brokerStatus?.connected === true)
   // Do not paint TOKEN ERROR when broker truth is already connected (rate-limit false fails).
   const brokerTokenBad = (!brokerTruthConnected) && (fundsFailure.bad || statusFailure.bad)
-  const dataState = authBlocked ? 'AUTH REQUIRED' : brokerTokenBad ? 'BLOCKED / TOKEN ERROR' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerBlocked ? 'API OFFLINE' : 'WAITING'
+  const dataState = authNeeded ? 'AUTH_NEEDED' : brokerTokenBad ? 'AUTH OR TOKEN ISSUE' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerApiIssue ? 'API OFFLINE' : 'WAITING'
   const fundsError = Boolean(
     brokerFunds
     && (
-      brokerFunds.blocked === true
+      brokerFunds.pendingProof === true
       || fundsFailure.bad
       || (
         brokerFunds.success === false
@@ -81,11 +81,20 @@ export function BrokerPanel() {
 
   const holdings = pickArray(brokerHoldings, 'rows', 'holdings', 'data')
   const positions = pickArray(brokerPositions, 'rows', 'positions', 'data')
+  const portfolio = liveBoard?.portfolio
+  const investment = Number(portfolio?.investment)
+    || holdings.reduce((s: number, h: any) => s + (Number(h.avg_price || h.avgCostPrice || 0) * Number(h.quantity || h.totalQty || 0)), 0)
+  const currentValue = Number(portfolio?.current_value)
+    || holdings.reduce((s: number, h: any) => s + (Number(h.ltp || h.lastTradedPrice || 0) * Number(h.quantity || h.totalQty || 0)), 0)
+  const overallPnl = portfolio?.overall_pnl != null ? Number(portfolio.overall_pnl) : (currentValue - investment)
+  const overallPnlPct = portfolio?.overall_pnl_pct != null
+    ? Number(portfolio.overall_pnl_pct)
+    : (investment > 0 ? (overallPnl / investment) * 100 : null)
 
   const holdingsError = Boolean(
     brokerHoldings
     && (
-      brokerHoldings.blocked === true
+      brokerHoldings.pendingProof === true
       || holdingsFailure.bad
       || (
         brokerHoldings.success === false
@@ -96,7 +105,7 @@ export function BrokerPanel() {
   const positionsError = Boolean(
     brokerPositions
     && (
-      brokerPositions.blocked === true
+      brokerPositions.pendingProof === true
       || positionsFailure.bad
       || (
         brokerPositions.success === false
@@ -109,28 +118,54 @@ export function BrokerPanel() {
   const usedMargin = funds?.utilized_amount ?? funds?.utilizedAmount ?? null
   const totalBal = funds?.total_limit ?? funds?.total_balance ?? funds?.totalBalance ?? null
 
-  const getAvg = (h: any) => h.avg_price ?? h.average_price ?? 0
-  const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.entry_price ?? 0
+  const getAvg = (h: any) => h.avg_price ?? h.average_price ?? h.avgCostPrice ?? 0
+  const getEntry = (p: any) => p.avg_price ?? p.buy_avg ?? p.buyAvg ?? p.entry_price ?? 0
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
-      {authBlocked && <AuthUnlock />}
+      {authNeeded && <AuthUnlock />}
 
       <div className="card p-4">
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
           Broker Connection - Dhan
         </h3>
         <Row label="Status" value={brokerTruthConnected ? 'CONNECTED' : dataState} color={brokerTruthConnected ? 'tx-up' : brokerApiResponded && !brokerTokenBad ? 'tx-amber' : 'tx-down'} />
-        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH BLOCKED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
+        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH_NEEDED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
         <Row label="Mode" value="READ-ONLY BROKER PROOF" />
         <Row label="Client ID" value={brokerClientId(brokerStatus, brokerFunds)} color={brokerClientId(brokerStatus, brokerFunds).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
         <Row label="Token Status" value={brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
-        <Row label="Holdings API" value={holdingsError ? 'ERROR/BLOCKED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={holdingsError || authBlocked ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
-        <Row label="Funds API" value={fundsError ? 'ERROR/BLOCKED' : funds ? 'RESPONDED' : authBlocked ? 'AUTH REQUIRED' : 'CHECKING'} color={fundsError || authBlocked ? 'tx-down' : funds ? 'tx-up' : undefined} />
+        <Row label="Holdings API" value={holdingsError ? 'ERROR/AUTH_NEEDED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authNeeded ? 'AUTH_NEEDED' : 'CHECKING'} color={holdingsError || authNeeded ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
+        <Row label="Funds API" value={fundsError ? 'ERROR/AUTH_NEEDED' : funds ? 'RESPONDED' : authNeeded ? 'AUTH_NEEDED' : 'CHECKING'} color={fundsError || authNeeded ? 'tx-down' : funds ? 'tx-up' : undefined} />
         <Row label="Broker Blocker" value={brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={brokerTokenBad ? 'tx-down' : 'tx-up'} />
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
-        <Row label="Data Visibility" value={authBlocked ? 'LOCKED UNTIL API KEY IS CONFIGURED' : brokerTokenBad ? 'BLOCKED UNTIL DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authBlocked || brokerTokenBad ? 'tx-down' : undefined} />
+        <Row label="Data Visibility" value={authNeeded ? 'VISIBLE AFTER API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authNeeded || brokerTokenBad ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
+      </div>
+
+      <div className="card p-4">
+        <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
+          Portfolio Value (Dhan live)
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: 10, marginBottom: 8 }}>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Investment</div>
+            <div className="num" style={{ fontWeight: 700 }}>{fmtCr(investment)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Current Value</div>
+            <div className="num" style={{ fontWeight: 700 }}>{fmtCr(currentValue)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Overall P&L</div>
+            <div className={cn('num', signClass(overallPnl))} style={{ fontWeight: 700 }}>
+              {fmtCr(overallPnl)}{overallPnlPct == null ? '' : ` (${overallPnlPct >= 0 ? '+' : ''}${Number(overallPnlPct).toFixed(2)}%)`}
+            </div>
+          </div>
+          <div>
+            <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Open Positions</div>
+            <div className="num" style={{ fontWeight: 700 }}>{positions.length}</div>
+          </div>
+        </div>
       </div>
 
       <div className="card p-4">
@@ -146,7 +181,7 @@ export function BrokerPanel() {
           <p style={{ color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker funds API...</p>
         ) : availBal == null ? (
           <div style={{ color: 'var(--text-mut)', fontSize: '.8rem', lineHeight: 1.6 }}>
-            <div>{authBlocked ? 'Funds hidden: backend requires X-API-Key.' : brokerBlocked ? 'Funds unavailable: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
+            <div>{authNeeded ? 'Funds hidden: backend requires X-API-Key.' : brokerApiIssue ? 'Funds data pending: backend API did not respond.' : 'Funds API responded but no balance field found in response'}</div>
             <div>Read-only funds must come from current Dhan broker API response. No cached/hardcoded balance is displayed.</div>
           </div>
         ) : (
@@ -170,7 +205,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker holdings API...</p>
         ) : holdings.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Holdings hidden: backend requires X-API-Key.' : brokerBlocked ? 'Holdings unavailable: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No valid broker holdings truth available.'}
+            {authNeeded ? 'Holdings hidden: backend requires X-API-Key.' : brokerApiIssue ? 'Holdings data pending: backend API did not respond.' : brokerTruthConnected ? 'No equity holdings found in Dhan broker response' : 'No broker holdings proof visible yet.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -178,20 +213,20 @@ export function BrokerPanel() {
               <tr>{['Symbol', 'Qty', 'Avg Cost', 'LTP', 'P&L', 'P&L%'].map(h => <th key={h} className="thead" style={{ textAlign: h === 'Symbol' ? 'left' : 'right' }}>{h}</th>)}</tr>
             </thead>
             <tbody>
-              {holdings.slice(0, 15).map((h: any, i: number) => {
-                const avg = getAvg(h)
-                const ltp = h.ltp ?? 0
-                const qty = h.quantity ?? 0
-                const pnl = h.pnl ?? ((ltp - avg) * qty)
-                const pnlPct = h.pnl_pct ?? (avg > 0 ? ((ltp - avg) / avg) * 100 : 0)
+              {holdings.map((h: any, i: number) => {
+                const avg = Number(getAvg(h) || 0)
+                const ltp = Number(h.ltp ?? h.lastTradedPrice ?? 0)
+                const qty = Number(h.quantity ?? h.totalQty ?? 0)
+                const pnl = Number(h.pnl ?? ((ltp - avg) * qty))
+                const pnlPct = Number(h.pnl_pct ?? (avg > 0 ? ((ltp - avg) / avg) * 100 : 0))
                 return (
                   <tr key={i} className="trow">
-                    <td className="tcell" style={{ fontWeight: 600 }}>{h.trading_symbol ?? h.symbol ?? '--'}</td>
+                    <td className="tcell" style={{ fontWeight: 600 }}>{h.trading_symbol ?? h.tradingSymbol ?? h.symbol ?? '--'}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}>{qty || '--'}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}>{fmt(avg)}</td>
                     <td className="tcell" style={{ textAlign: 'right' }}><PriceCell value={ltp} /></td>
                     <td className={cn('tcell', signClass(pnl))} style={{ textAlign: 'right', fontWeight: 600 }}>{fmtCr(pnl)}</td>
-                    <td className={cn('tcell', signClass(pnlPct))} style={{ textAlign: 'right' }}>{pnlPct >= 0 ? '+' : ''}{(pnlPct ?? 0).toFixed(2)}%</td>
+                    <td className={cn('tcell', signClass(pnlPct))} style={{ textAlign: 'right' }}>{pnlPct >= 0 ? '+' : ''}{pnlPct.toFixed(2)}%</td>
                   </tr>
                 )
               })}
@@ -212,7 +247,7 @@ export function BrokerPanel() {
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>Checking live broker positions API...</p>
         ) : positions.length === 0 ? (
           <p style={{ padding: '20px', color: 'var(--text-mut)', fontSize: '.8rem' }}>
-            {authBlocked ? 'Positions hidden: backend requires X-API-Key.' : brokerBlocked ? 'Positions unavailable: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No valid broker positions truth available.'}
+            {authNeeded ? 'Positions hidden: backend requires X-API-Key.' : brokerApiIssue ? 'Positions data pending: backend API did not respond.' : brokerTruthConnected ? 'No open positions in Dhan account read-only response' : 'No broker positions proof visible yet.'}
           </p>
         ) : (
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -220,16 +255,24 @@ export function BrokerPanel() {
               <tr>{['Symbol', 'Side', 'Qty', 'Entry', 'LTP', 'P&L'].map(h => <th key={h} className="thead">{h}</th>)}</tr>
             </thead>
             <tbody>
-              {positions.map((p: any, i: number) => (
-                <tr key={i} className="trow">
-                  <td className="tcell" style={{ fontWeight: 600 }}>{p.trading_symbol ?? p.symbol ?? '--'}</td>
-                  <td className="tcell"><span className={cn('pill text-xs', p.position_type === 'LONG' ? 'tx-up' : 'tx-down')} style={{ fontSize: '.6rem' }}>{p.position_type ?? p.side ?? '--'}</span></td>
-                  <td className="tcell">{p.net_qty ?? p.quantity ?? '--'}</td>
-                  <td className="tcell">{fmt(getEntry(p))}</td>
-                  <td className="tcell"><PriceCell value={p.ltp ?? 0} /></td>
-                  <td className={cn('tcell', signClass(p.unrealized_pnl ?? p.pnl ?? 0))} style={{ fontWeight: 600 }}>{fmtCr(p.unrealized_pnl ?? p.pnl ?? 0)}</td>
-                </tr>
-              ))}
+              {positions.map((p: any, i: number) => {
+                const entry = Number(getEntry(p) || 0)
+                const qty = Number(p.net_qty ?? p.netQty ?? p.quantity ?? 0)
+                const upnl = Number(p.unrealized_pnl ?? p.unrealizedProfit ?? p.pnl ?? 0)
+                let ltp = Number(p.ltp ?? 0)
+                if (!(ltp > 0) && qty) ltp = entry + (upnl / qty)
+                const side = p.position_type ?? p.positionType ?? p.side ?? '--'
+                return (
+                  <tr key={i} className="trow">
+                    <td className="tcell" style={{ fontWeight: 600 }}>{p.trading_symbol ?? p.tradingSymbol ?? p.symbol ?? '--'}</td>
+                    <td className="tcell"><span className={cn('pill text-xs', side === 'LONG' ? 'tx-up' : 'tx-down')} style={{ fontSize: '.6rem' }}>{side}</span></td>
+                    <td className="tcell">{qty || '--'}</td>
+                    <td className="tcell">{fmt(entry)}</td>
+                    <td className="tcell"><PriceCell value={ltp} /></td>
+                    <td className={cn('tcell', signClass(upnl))} style={{ fontWeight: 600 }}>{fmtCr(upnl)}</td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         )}
