@@ -7,6 +7,7 @@ import { TopBar }    from './components/TopBar'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
+import { AgentRuntimeBanner } from './components/AgentRuntimeBanner'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -101,6 +102,7 @@ export default function App() {
       <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
+      <AgentRuntimeBanner />
       {/*
         Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden
         on every normal page. Visible API/SHA/ML chips live only under Data Integrity → System health.
