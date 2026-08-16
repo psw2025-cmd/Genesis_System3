@@ -17,6 +17,7 @@ type ProgressLane = {
 type RuntimeContracts = {
   instruments: any
   accuracy: any
+  autoGates: any
   backtest: any
   ml: any
   agent: any
@@ -25,6 +26,7 @@ type RuntimeContracts = {
 const EMPTY_CONTRACTS: RuntimeContracts = {
   instruments: null,
   accuracy: null,
+  autoGates: null,
   backtest: null,
   ml: null,
   agent: null,
@@ -115,6 +117,7 @@ export function SystemProgressPanel() {
       const results = await Promise.allSettled([
         fetchContract('/api/instruments/health'),
         fetchContract('/api/accuracy_trend'),
+        fetchContract('/api/auto_gates'),
         fetchContract('/api/backtest/results'),
         fetchContract('/api/ml/performance'),
         fetchContract('/api/agent/status'),
@@ -123,9 +126,10 @@ export function SystemProgressPanel() {
       setContracts({
         instruments: settledValue(results[0]),
         accuracy: settledValue(results[1]),
-        backtest: settledValue(results[2]),
-        ml: settledValue(results[3]),
-        agent: settledValue(results[4]),
+        autoGates: settledValue(results[2]),
+        backtest: settledValue(results[3]),
+        ml: settledValue(results[4]),
+        agent: settledValue(results[5]),
       })
       setErrorCount(results.filter((result) => result.status === 'rejected').length)
       setCheckedAt(new Date().toISOString())
@@ -153,11 +157,22 @@ export function SystemProgressPanel() {
     const accuracyTrend = Array.isArray(contracts.accuracy?.trend) ? contracts.accuracy.trend : []
     const latestAccuracy = accuracyTrend[accuracyTrend.length - 1]
     const hitRate = numberOrNull(latestAccuracy?.hit_rate)
+    const canonicalAccuracyGate = contracts.autoGates?.gates?.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS
+    const gateDays = numberOrNull(canonicalAccuracyGate?.days_recorded) ?? 0
+    const hasCanonicalAccuracyGate = Boolean(canonicalAccuracyGate) && typeof canonicalAccuracyGate === 'object'
+    const accuracyContractConflict = Boolean(contracts.accuracy) && hasCanonicalAccuracyGate && gateDays > 0 && gateDays !== days
+    const accuracyPass = hasCanonicalAccuracyGate
+      && !accuracyContractConflict
+      && canonicalAccuracyGate.pass === true
+      && days >= 5
+      && rho != null
+      && rho >= 0.7
     const modelReady = contracts.ml?.model_proof_ready === true
       || contracts.ml?.performance?.model_proof_ready === true
     const walk = contracts.backtest?.costed_walkforward
     const walkTrades = numberOrNull(walk?.trade_count) ?? 0
     const walkNet = numberOrNull(walk?.total_net_pnl)
+    const costsSlippageProven = walk?.costs_slippage_included_proven === true
     const paperSummary = pnl?.summary || paper?.pnl?.summary || {}
     const paperTrades = numberOrNull(paperSummary?.total_trades) ?? 0
     const closedTrades = numberOrNull(paperSummary?.closed_trades ?? paperSummary?.closed_count) ?? 0
@@ -197,11 +212,21 @@ export function SystemProgressPanel() {
       },
       {
         name: 'Prediction validation',
-        state: days >= 5 && rho != null && rho >= 0.7 ? 'PASS' : contracts.accuracy ? 'NOT_PROVEN' : 'ERROR',
-        detail: contracts.accuracy
-          ? `${days} validation day(s) · avg ρ ${rho == null ? 'N/A' : rho.toFixed(2)} · latest hit rate ${hitRate == null ? 'N/A' : `${(hitRate * 100).toFixed(1)}%`}. Target needs ≥5 days and ρ≥0.70.`
-          : 'Accuracy trend contract unavailable.',
-        source: '/api/accuracy_trend',
+        state: accuracyContractConflict
+          ? 'BLOCKED'
+          : !contracts.accuracy
+            ? 'ERROR'
+            : !hasCanonicalAccuracyGate
+              ? 'NOT_PROVEN'
+              : accuracyPass
+                ? 'PASS'
+                : 'NOT_PROVEN',
+        detail: accuracyContractConflict
+          ? `DATA_CONTRACT_CONFLICT: accuracy_trend reports ${days} day(s) while auto_gates reports ${gateDays}.`
+          : contracts.accuracy
+            ? `${days} validation day(s) · avg ρ ${rho == null ? 'N/A' : rho.toFixed(2)} · latest hit rate ${hitRate == null ? 'N/A' : `${(hitRate * 100).toFixed(1)}%`}. Canonical auto_gates required; target ≥5 days and ρ≥0.70.`
+            : 'Accuracy trend contract unavailable.',
+        source: '/api/accuracy_trend + /api/auto_gates',
         verifiedAt: latestAccuracy?.date || checkedAt,
       },
       {
@@ -215,9 +240,17 @@ export function SystemProgressPanel() {
       },
       {
         name: 'Costed walk-forward',
-        state: walkTrades > 0 ? 'PARTIAL' : contracts.backtest ? 'NOT_PROVEN' : 'ERROR',
+        state: walkTrades > 0 && costsSlippageProven
+          ? 'PARTIAL'
+          : walkTrades > 0
+            ? 'NOT_PROVEN'
+            : contracts.backtest
+              ? 'NOT_PROVEN'
+              : 'ERROR',
         detail: walkTrades > 0
-          ? `${walkTrades} proof trades; costs/slippage included; net P&L ${walkNet == null ? 'N/A' : `₹${walkNet.toLocaleString('en-IN')}`}. Pipeline proof only, not strategy promotion.`
+          ? costsSlippageProven
+            ? `${walkTrades} proof trades; costs/slippage included; net P&L ${walkNet == null ? 'N/A' : `₹${walkNet.toLocaleString('en-IN')}`}. Pipeline proof only, not strategy promotion.`
+            : `${walkTrades} proof trades present, but costs/slippage inclusion is NOT_PROVEN. Do not treat this as a costed walk-forward PASS.`
           : 'No costed walk-forward trade sample is available.',
         source: '/api/backtest/results',
         verifiedAt: walk?.completed || checkedAt,

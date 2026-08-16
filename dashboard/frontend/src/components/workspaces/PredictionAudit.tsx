@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Search } from 'lucide-react';
-import { useStore } from '../../store';
-import { MetricTile, PENDINGState, StatusChip } from './TruthUI';
-import { formatIstStamp } from '../../lib/formatLive';
-import { API_BASE, API_HEADERS } from '../../config';
+import React, { useEffect, useState } from 'react'
+import { Search } from 'lucide-react'
+import { useStore } from '../../store'
+import { MetricTile, PENDINGState, StatusChip } from './TruthUI'
+import { formatIstStamp } from '../../lib/formatLive'
+import { API_BASE, API_HEADERS } from '../../config'
 
 type AccuracyTrend = {
   status?: string
@@ -23,33 +23,65 @@ type AccuracyTrend = {
 const BASE = API_BASE || window.location.origin
 
 export const PredictionAudit: React.FC = () => {
-  const { autoGates, state, health, lastSync } = useStore()
+  const { state, health, lastSync } = useStore()
   const [accuracy, setAccuracy] = useState<AccuracyTrend | null>(null)
   const [accuracyError, setAccuracyError] = useState('')
   const [gateContract, setGateContract] = useState<any>(null)
-  const effectiveGates = gateContract || autoGates
-  const canonicalGates = effectiveGates?.gates && typeof effectiveGates.gates === 'object' ? effectiveGates.gates : {}
-  const proofRows: any[] = Array.isArray(effectiveGates?.proof_gates)
-    ? effectiveGates.proof_gates
-    : Object.entries(effectiveGates?.gates || {}).map(([gate_id, gate]: [string, any]) => ({
+  const [gatesError, setGatesError] = useState('')
+  const [gatesLoaded, setGatesLoaded] = useState(false)
+
+  // Dedicated /api/auto_gates only — never promote slim-store proof rows to PASS.
+  const hasCanonicalGates =
+    Boolean(gateContract?.gates)
+    && typeof gateContract.gates === 'object'
+    && Object.keys(gateContract.gates).length > 0
+  const canonicalGates = hasCanonicalGates ? gateContract.gates : {}
+  const proofRows: any[] = Array.isArray(gateContract?.proof_gates)
+    ? gateContract.proof_gates
+    : Object.entries(canonicalGates).map(([gate_id, gate]: [string, any]) => ({
         gate_id,
         label: gate_id,
         ...(typeof gate === 'object' ? gate : { status: gate }),
       }))
   const gates = proofRows.map((row) => {
+    if (!hasCanonicalGates) {
+      return {
+        ...row,
+        pass: false,
+        sourceConflict: false,
+        status: gatesError ? 'ERROR' : gatesLoaded ? 'NOT_PROVEN' : 'LOADING',
+        note: gatesError || 'Canonical /api/auto_gates.gates required before PASS',
+      }
+    }
     const canonical = canonicalGates[row?.gate_id]
-    if (!canonical || typeof canonical !== 'object') return row
+    if (!canonical || typeof canonical !== 'object') {
+      return {
+        ...row,
+        pass: false,
+        sourceConflict: false,
+        status: 'NOT_PROVEN',
+        note: 'Missing from canonical gates map',
+      }
+    }
     const sourceConflict = row?.pass != null && canonical?.pass != null && Boolean(row.pass) !== Boolean(canonical.pass)
     return {
       ...row,
       ...canonical,
       label: row.label || row.name || row.gate_id,
       sourceConflict,
-      status: canonical.pass === true ? 'PASS' : canonical.blocker_id ? 'BLOCKED' : 'NOT_PROVEN',
+      status: sourceConflict
+        ? 'CONFLICT'
+        : canonical.pass === true
+          ? 'PASS'
+          : canonical.blocker_id
+            ? 'BLOCKED'
+            : 'NOT_PROVEN',
     }
   })
   const signal = state?.signals || {}
-  const passCount = gates.filter((g) => g?.pass === true || String(g?.status).toUpperCase() === 'PASS').length
+  const passCount = hasCanonicalGates
+    ? gates.filter((g) => g?.pass === true && !g?.sourceConflict).length
+    : 0
   const accuracyRows = Array.isArray(accuracy?.trend) ? accuracy.trend : []
   const latest = accuracyRows[accuracyRows.length - 1]
   const validationDays = Number(accuracy?.days_available || accuracy?.trend?.length || 0)
@@ -57,11 +89,37 @@ export const PredictionAudit: React.FC = () => {
   const hitRate = Number(latest?.hit_rate)
   const canonicalAccuracyGate = canonicalGates.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || {}
   const gateDays = Number(canonicalAccuracyGate.days_recorded || 0)
-  const validationContractConflict = Boolean(accuracy) && gateDays > 0 && gateDays !== validationDays
-  const validationProven = canonicalAccuracyGate.pass === true
+  const validationContractConflict = Boolean(accuracy) && hasCanonicalGates && gateDays > 0 && gateDays !== validationDays
+  const validationProven = hasCanonicalGates
+    && !validationContractConflict
+    && canonicalAccuracyGate.pass === true
     && validationDays >= 5
     && Number.isFinite(avgRho)
     && avgRho >= 0.7
+  const validationChipValue = validationContractConflict
+    ? 'DATA_CONTRACT_CONFLICT'
+    : validationProven
+      ? 'PASS'
+      : gatesError
+        ? 'ERROR'
+        : accuracyError
+          ? 'ERROR'
+          : accuracy && gatesLoaded
+            ? 'NOT_PROVEN'
+            : 'LOADING'
+  const validationChipStatus = validationContractConflict || accuracyError || gatesError
+    ? 'error'
+    : validationProven
+      ? 'ok'
+      : 'warn'
+  const gatesHeaderValue = gatesError
+    ? 'ERROR'
+    : !gatesLoaded
+      ? 'LOADING'
+      : !hasCanonicalGates
+        ? 'NOT_PROVEN'
+        : `${passCount}/${gates.length || 0} PASS`
+  const gatesHeaderStatus = gatesError ? 'error' : hasCanonicalGates && passCount > 0 ? 'ok' : 'mut'
 
   useEffect(() => {
     let cancelled = false
@@ -88,7 +146,12 @@ export const PredictionAudit: React.FC = () => {
       }
       if (gatesResult.status === 'fulfilled') {
         setGateContract(gatesResult.value)
+        setGatesError('')
+      } else {
+        setGateContract(null)
+        setGatesError(gatesResult.reason?.message || String(gatesResult.reason))
       }
+      setGatesLoaded(true)
     }
     void loadAccuracy()
     const timer = window.setInterval(loadAccuracy, 60_000)
@@ -105,7 +168,7 @@ export const PredictionAudit: React.FC = () => {
           <Search size={20} color="var(--accent)" aria-hidden />
           <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Prediction Audit Ledger</h1>
         </div>
-        <StatusChip label="GATES" value={`${passCount}/${gates.length || 0} PASS`} status={gates.length ? 'ok' : 'mut'} />
+        <StatusChip label="GATES" value={gatesHeaderValue} status={gatesHeaderStatus} />
       </header>
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
@@ -125,8 +188,8 @@ export const PredictionAudit: React.FC = () => {
             </div>
             <StatusChip
               label="VALIDATION"
-              value={validationContractConflict ? 'DATA_CONTRACT_CONFLICT' : validationProven ? 'PASS' : accuracy ? 'NOT_PROVEN' : accuracyError ? 'ERROR' : 'LOADING'}
-              status={validationProven ? 'ok' : validationContractConflict || accuracyError ? 'error' : 'warn'}
+              value={validationChipValue}
+              status={validationChipStatus}
             />
           </div>
           {accuracy ? (
@@ -140,6 +203,10 @@ export const PredictionAudit: React.FC = () => {
               <div style={{ marginTop: 12, color: validationProven ? 'var(--up)' : 'var(--amber)', fontSize: 12, lineHeight: 1.5 }}>
                 {validationContractConflict
                   ? `/api/accuracy_trend reports ${validationDays} day(s), while /api/auto_gates reports ${gateDays}. Promotion is blocked until the backend contracts reconcile.`
+                  : gatesError
+                  ? `Canonical gates unavailable: ${gatesError}. PASS is blocked until /api/auto_gates.gates loads.`
+                  : !hasCanonicalGates
+                  ? 'Canonical /api/auto_gates.gates is missing. Summary-only proof rows cannot authorize PASS.'
                   : validationProven
                   ? 'Validation threshold is met for the currently reported sample.'
                   : `Promotion remains blocked: ${validationDays}/5 days and ρ ${Number.isFinite(avgRho) ? avgRho.toFixed(2) : 'N/A'}/0.70. An impressive percentage without sample size is not proof.`}
@@ -162,10 +229,31 @@ export const PredictionAudit: React.FC = () => {
 
         <section className="card" style={{ padding: '20px' }}>
           <h2 style={{ fontSize: '14px', margin: '0 0 10px' }}>Live proof-gate ledger</h2>
-          {gates.length > 0 ? (
+          {gatesError ? (
+            <PENDINGState
+              tone="warn"
+              title="AUTO_GATES CONTRACT ERROR"
+              reason={gatesError}
+              dataTestId="prediction-audit-gates-error"
+            />
+          ) : !gatesLoaded ? (
+            <PENDINGState
+              tone="mut"
+              title="LOADING CANONICAL GATES"
+              reason="Waiting for /api/auto_gates.gates before any PASS verdict."
+              dataTestId="prediction-audit-pending"
+            />
+          ) : !hasCanonicalGates ? (
+            <PENDINGState
+              tone="warn"
+              title="CANONICAL GATES NOT_PROVEN"
+              reason="/api/auto_gates responded without a gates map. Slim proof rows alone cannot authorize PASS."
+              dataTestId="prediction-audit-no-canonical"
+            />
+          ) : gates.length > 0 ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {gates.map((gate, i) => {
-                const ok = gate?.pass === true || String(gate?.status).toUpperCase() === 'PASS'
+                const ok = !gate.sourceConflict && (gate?.pass === true || String(gate?.status).toUpperCase() === 'PASS')
                 return (
                   <div key={gate.gate_id || gate.label || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, padding: '8px 10px', background: 'var(--surface-2)', borderRadius: 6 }}>
                     <span style={{ minWidth: 0, fontSize: 12 }}>
@@ -176,7 +264,7 @@ export const PredictionAudit: React.FC = () => {
                           : gate.note || gate.blocker_id || 'Canonical /api/auto_gates verdict'}
                       </span>
                     </span>
-                    <span className="num" style={{ flexShrink: 0, color: ok ? 'var(--up)' : gate.sourceConflict ? 'var(--down)' : 'var(--amber)', fontSize: 11, fontWeight: 800 }}>
+                    <span className="num" style={{ flexShrink: 0, color: gate.sourceConflict ? 'var(--down)' : ok ? 'var(--up)' : 'var(--amber)', fontSize: 11, fontWeight: 800 }}>
                       {gate.sourceConflict ? 'CONFLICT' : String(gate.status || (ok ? 'PASS' : 'NOT_PROVEN')).toUpperCase()}
                     </span>
                   </div>
@@ -187,7 +275,7 @@ export const PredictionAudit: React.FC = () => {
             <PENDINGState
               tone="mut"
               title="NO GATE ROWS YET"
-              reason="Waiting for /api/auto_gates. Analyzer is live; a dedicated prediction ledger is not enabled."
+              reason="Canonical gates map is empty. Analyzer is live; a dedicated prediction ledger is not enabled."
               dataTestId="prediction-audit-pending"
             />
           )}

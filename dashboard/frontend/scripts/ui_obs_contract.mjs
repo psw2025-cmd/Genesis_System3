@@ -48,6 +48,7 @@ assert.match(dataIntegrity, /<SystemProgressPanel\s*\/>/, 'Data Integrity must r
 for (const path of [
   '/api/instruments/health',
   '/api/accuracy_trend',
+  '/api/auto_gates',
   '/api/backtest/results',
   '/api/ml/performance',
   '/api/agent/status',
@@ -58,6 +59,8 @@ for (const state of ['PASS', 'PARTIAL', 'BLOCKED', 'NOT_PROVEN', 'ERROR']) {
   assert.match(progress, new RegExp(`'${state}'`), `progress panel must support ${state}`)
 }
 assert.match(progress, /BACKEND_PROGRESS_CONTRACT_REQUIRED/, 'missing wave/owner contract must remain explicit')
+assert.match(progress, /costs_slippage_included_proven/, 'progress costed lane must require proven costs/slippage')
+assert.match(progress, /DATA_CONTRACT_CONFLICT/, 'progress prediction lane must surface contract conflicts')
 assert.doesNotMatch(progress, /CURRENT WAVE UI-OBS-1/, 'active coordination must not be hard-coded in the frontend')
 
 assert.match(prediction, /Sample size/, 'Prediction Audit must show sample size')
@@ -65,8 +68,12 @@ assert.match(prediction, /Average Spearman ρ/, 'Prediction Audit must show rank
 assert.match(prediction, /Latest hit rate/, 'Prediction Audit must show latest hit rate')
 assert.match(prediction, /minimum proof gate: 5 days/, 'Prediction Audit must state the sample gate')
 assert.match(prediction, /canonicalGates/, 'Prediction Audit must prefer canonical gate verdicts')
+assert.match(prediction, /hasCanonicalGates/, 'Prediction Audit must require canonical gates before PASS')
 assert.match(prediction, /DATA_CONTRACT_CONFLICT/, 'Prediction Audit must expose cross-contract disagreement')
 assert.match(prediction, /summary row disagrees with canonical gate/, 'Prediction Audit must not silently render contradictory PASS rows')
+assert.match(prediction, /gatesError/, 'Prediction Audit must surface auto_gates fetch failure')
+assert.match(prediction, /AUTO_GATES CONTRACT ERROR/, 'Prediction Audit must fail closed when auto_gates rejects')
+assert.doesNotMatch(prediction, /gateContract \|\| autoGates/, 'Prediction Audit must not fall back to slim-store autoGates for PASS')
 
 assert.match(performance, /PIPELINE_PROOF_ONLY/, 'Performance must distinguish pipeline from strategy proof')
 assert.match(performance, /Promotion remains blocked/, 'Performance must retain the promotion block')
