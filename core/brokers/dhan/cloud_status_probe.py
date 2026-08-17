@@ -41,25 +41,6 @@ def _auth_classification(token: str) -> str:
     return "DHAN_TOKEN_REJECTED_CLOCK_UNKNOWN"
 
 
-def _http_auth_failure(status_code: Any, blob: str) -> bool:
-    """Return true only for an HTTP exception with affirmative auth evidence."""
-    if status_code == 401:
-        return True
-    auth_markers = (
-        "dh-906",
-        "code 808",
-        '"code":808',
-        '"code": 808',
-        "invalid token",
-        "invalid access token",
-        "token expired",
-        "token is expired",
-        "authentication failed",
-        "authentication error",
-    )
-    return status_code == 400 and any(marker in blob for marker in auth_markers)
-
-
 def _safe_upstream_code(blob: str) -> int | None:
     """Extract only a numeric Dhan error code; never return response text."""
     for pattern in (r'"code"\s*:\s*(\d{3,5})', r"\bcode\s+(\d{3,5})\b", r"\bdh-(\d{3,5})\b"):
@@ -70,6 +51,39 @@ def _safe_upstream_code(blob: str) -> int | None:
             except ValueError:
                 return None
     return None
+
+
+def _http_auth_failure(status_code: Any, blob: str) -> bool:
+    """Return true only for affirmative upstream authentication evidence.
+
+    Dhan DH-906 is an order/request error, not an authentication code. Dhan 805
+    is rate limiting. Neither may invalidate the token or increment the first
+    authentication-rejection latch. Dhan 808 and HTTP 401 remain affirmative
+    authentication evidence.
+    """
+    if status_code == 401:
+        return True
+    if _safe_upstream_code(blob) == 808:
+        return True
+    auth_markers = (
+        "invalid token",
+        "invalid access token",
+        "token expired",
+        "token is expired",
+        "authentication failed",
+        "authentication error",
+    )
+    return status_code == 400 and any(marker in blob for marker in auth_markers)
+
+
+def _non_auth_upstream_classification(status_code: Any, blob: str) -> tuple[str | None, str | None]:
+    """Classify known non-auth Dhan failures without changing auth state."""
+    code = _safe_upstream_code(blob)
+    if code == 805 or status_code == 429:
+        return "DHAN_RATE_LIMITED", "DHAN_RATE_LIMITED"
+    if code == 906:
+        return "DHAN_REQUEST_REJECTED_906", "DHAN_REQUEST_REJECTED_906"
+    return None, None
 
 
 def _secret_version() -> str | None:
@@ -178,12 +192,17 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             error = "TOKEN_EXPIRED_OR_INVALID"
             classification = _auth_classification(access_token)
             trace = _record_rejection(access_token, status_code, blob)
-        elif status_code == 403 or "forbidden" in blob:
-            error = "ACCESS_FORBIDDEN"
-        elif status_code:
-            error = f"HTTP_{status_code}"
         else:
-            error = f"NETWORK_ERROR:{type(exc).__name__}"
+            non_auth_error, non_auth_classification = _non_auth_upstream_classification(status_code, blob)
+            if non_auth_error:
+                error = non_auth_error
+                classification = non_auth_classification
+            elif status_code == 403 or "forbidden" in blob:
+                error = "ACCESS_FORBIDDEN"
+            elif status_code:
+                error = f"HTTP_{status_code}"
+            else:
+                error = f"NETWORK_ERROR:{type(exc).__name__}"
         return {
             **base,
             "connected": False,
