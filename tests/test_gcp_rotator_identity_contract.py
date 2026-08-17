@@ -3,6 +3,11 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
+# Imported intentionally: GCP Dhan Token Fix CI already executes this module via
+# unittest. Exposing the TestCase here makes Profile header reconciliation a
+# blocking contract without adding another workflow or weakening main-only WIF.
+from tests.test_dhan_profile_header_reconcile import DhanProfileHeaderReconcileTests
+
 
 class DhanRotatorIdentityContractTests(unittest.TestCase):
     def test_deploy_workflow_uses_dedicated_rotator_and_scheduler_identities(self):
