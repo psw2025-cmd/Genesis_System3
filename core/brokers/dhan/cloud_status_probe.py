@@ -1,12 +1,12 @@
 """Deterministic Cloud Run Dhan broker status probe.
 
 Safety: read-only profile GET only; no order APIs; no raw token output.
-Legacy ``error`` values are preserved for confirmed token/auth failures;
-``auth_classification`` adds explicit clock-vs-upstream rejection semantics.
-Known non-token-recovery upstream failures use ``upstream_classification``
-instead of polluting authentication state. The first affirmative upstream auth
-rejection is latched with safe metadata before any Secret Manager reload/recovery
-can obscure event ordering.
+The Dhan API documentation and official Python SDK currently disagree on the
+Profile request headers: the docs show ``access-token`` only while
+``DhanLogin.user_profile`` also sends ``dhanClientId``.  The probe therefore
+uses a bounded, evidence-producing two-contract strategy and caches a proven
+working contract per process.  It never retries header variants for auth or
+rate-limit failures and never mutates credentials.
 """
 from __future__ import annotations
 
@@ -19,11 +19,18 @@ from typing import Any
 
 from core.brokers.dhan.first_rejection_trace import record_auth_rejection, snapshot
 
-
 _TOKEN_AUTH_CODES = {901, 807, 808, 809}
 _RATE_LIMIT_CODES = {904, 805}
 _CLIENT_ID_INVALID_CODES = {810}
 _REQUEST_REJECTED_CODES = {906}
+
+_PROFILE_DOCS_CONTRACT = "docs-access-token-only"
+_PROFILE_SDK_CONTRACT = "sdk-dhanClientId"
+_PROFILE_FALLBACK_ERRORS = {
+    "DHAN_REQUEST_REJECTED_906",
+    "CLIENT_ID_INVALID",
+    "HTTP_400",
+}
 
 
 def _clock_expired(token: str) -> bool | None:
@@ -67,16 +74,6 @@ def _safe_upstream_code(blob: str) -> int | None:
 
 
 def _http_auth_failure(status_code: Any, blob: str) -> bool:
-    """Return true only for affirmative token/authentication evidence.
-
-    Current Dhan documentation distinguishes:
-    - trading auth: DH-901;
-    - data auth/token: 807/808/809;
-    - invalid client id: 810 (configuration, not token recovery);
-    - rate limiting: DH-904/805;
-    - request/order rejection: DH-906.
-    Numeric codes override ambiguous free text.
-    """
     code = _safe_upstream_code(blob)
     if code in _RATE_LIMIT_CODES | _REQUEST_REJECTED_CODES | _CLIENT_ID_INVALID_CODES:
         return False
@@ -95,7 +92,6 @@ def _http_auth_failure(status_code: Any, blob: str) -> bool:
 
 
 def _non_auth_upstream_classification(status_code: Any, blob: str) -> str | None:
-    """Classify failures that must not trigger token recovery."""
     code = _safe_upstream_code(blob)
     if code in _RATE_LIMIT_CODES or status_code == 429:
         return "DHAN_RATE_LIMITED"
@@ -114,11 +110,6 @@ def _payload_blob(data: Any) -> str:
 
 
 def _payload_failure(data: Any) -> tuple[str | None, str | None, int | None]:
-    """Classify a JSON payload returned with HTTP success semantics.
-
-    Returns ``(error, upstream_classification, upstream_code)``. ``None`` error
-    means no failure evidence was present.
-    """
     if not isinstance(data, dict):
         return None, None, None
     blob = _payload_blob(data)
@@ -160,112 +151,118 @@ def _secret_version() -> str | None:
 
 
 def _record_rejection(token: str, status_code: int | None, blob: str) -> dict[str, Any]:
-    classification = _auth_classification(token)
     return record_auth_rejection(
         secret_version=_secret_version(),
-        auth_classification=classification,
+        auth_classification=_auth_classification(token),
         http_status=status_code,
         upstream_code=_safe_upstream_code(blob),
     )
 
 
-def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
-    now = time.time()
-    cache = getattr(module, "_STATUS_RESULT_CACHE", None)
-    cache_at = float(getattr(module, "_STATUS_RESULT_CACHE_AT", 0.0) or 0.0)
-    ttl = float(getattr(module, "_STATUS_RESULT_TTL_S", 25.0) or 25.0)
-    if cache and (now - cache_at) < ttl and cache.get("connected") is True:
-        out = dict(cache)
-        out.update(
-            cache_hit=True,
-            cache_age_s=round(now - cache_at, 1),
-            probe_strategy="cloud_rest_profile_bounded",
-            auth_rejection_trace=snapshot(),
-        )
-        return out
+def _profile_request(
+    module: Any,
+    access_token: str,
+    client_id: str,
+    *,
+    timeout_s: float,
+    contract: str,
+) -> dict:
+    """Execute exactly one safe Profile GET under a named header contract.
 
-    creds = module.get_dhan_credentials()
-    client_id = str(creds.get("client_id") or "").strip().lstrip("\ufeff")
-    access_token = str(creds.get("access_token") or "").strip().lstrip("\ufeff")
-    base = {
-        "broker": "dhan",
-        "mode": "ANALYZER",
-        "live_trading_enabled": False,
-        "order_placement_allowed": False,
-        "client_id_present": bool(client_id),
-        "access_token_present": bool(access_token),
-        "credentials_present": bool(client_id and access_token),
-        "sdk_available": bool(getattr(module, "_DHAN_SDK_OK", False)),
-        "env_source": getattr(module, "_ENV_LOADED_VIA", "unknown"),
-        "cache_hit": False,
-        "probe_strategy": "cloud_rest_profile_bounded",
-        "probe_header_contract": "access-token-only",
-        "probe_timeout_s": float(timeout_s),
-        "auth_rejection_trace": snapshot(),
-    }
-    if not client_id or not access_token:
-        return {
-            **base,
-            "connected": False,
-            "error": "CONFIG_MISSING",
-            "auth_classification": "CONFIG_MISSING",
-            "upstream_classification": None,
-            "upstream_code": None,
-            "latency_ms": 0,
-        }
-
-    started = time.monotonic()
-    try:
-        # Dhan User Profile is documented as access-token-only. The existing
-        # client id remains available from Secret Manager for endpoints that
-        # explicitly require it (for example Option Chain / Market Quote).
-        data = module._rest_get(
-            module._DHAN_PROFILE_URL,
+    A test hook is supported so CI never needs real Dhan credentials. Production
+    uses the already-loaded token/client ID only inside request headers; neither
+    value is returned or logged.
+    """
+    test_hook = getattr(module, "_profile_probe_request", None)
+    if callable(test_hook):
+        return test_hook(
             access_token,
             client_id,
-            timeout=max(1, min(float(timeout_s), 8.0)),
-            include_client_id=False,
+            timeout_s=timeout_s,
+            contract=contract,
+        )
+
+    requests_module = getattr(module, "_requests", None)
+    requests_ok = bool(getattr(module, "_REQUESTS_OK", False))
+    if not requests_ok or requests_module is None:
+        raise RuntimeError("requests library not available")
+
+    headers = {"access-token": access_token}
+    if contract == _PROFILE_SDK_CONTRACT:
+        # Exact header shape used by Dhan's official DhanLogin.user_profile().
+        headers["dhanClientId"] = client_id
+    elif contract != _PROFILE_DOCS_CONTRACT:
+        raise RuntimeError("unsupported profile header contract")
+
+    response = requests_module.get(
+        module._DHAN_PROFILE_URL,
+        headers=headers,
+        timeout=max(1.0, min(float(timeout_s), 8.0)),
+    )
+    response.raise_for_status()
+    return response.json()
+
+
+def _safe_attempt(contract: str, *, outcome: str, status_code: Any = None, upstream_code: Any = None) -> dict[str, Any]:
+    return {
+        "contract": contract,
+        "outcome": outcome,
+        "http_status": status_code,
+        "upstream_code": upstream_code,
+        "credential_value_exposed": False,
+    }
+
+
+def _probe_contract(
+    module: Any,
+    access_token: str,
+    client_id: str,
+    *,
+    timeout_s: float,
+    contract: str,
+) -> dict[str, Any]:
+    started = time.monotonic()
+    try:
+        data = _profile_request(
+            module,
+            access_token,
+            client_id,
+            timeout_s=timeout_s,
+            contract=contract,
         )
         latency_ms = int((time.monotonic() - started) * 1000)
-        payload_error, upstream_classification, upstream_code = _payload_failure(data)
-        if payload_error == "TOKEN_EXPIRED_OR_INVALID":
-            trace = _record_rejection(access_token, None, _payload_blob(data))
+        error, upstream_classification, upstream_code = _payload_failure(data)
+        if error:
             return {
-                **base,
-                "connected": False,
-                "error": payload_error,
-                "auth_classification": _auth_classification(access_token),
-                "upstream_classification": None,
-                "upstream_code": upstream_code,
-                "auth_rejection_trace": trace,
-                "latency_ms": latency_ms,
-            }
-        if payload_error:
-            return {
-                **base,
-                "connected": False,
-                "error": payload_error,
-                "auth_classification": None,
+                "ok": False,
+                "error": error,
+                "auth_classification": (
+                    _auth_classification(access_token)
+                    if error == "TOKEN_EXPIRED_OR_INVALID"
+                    else None
+                ),
                 "upstream_classification": upstream_classification,
                 "upstream_code": upstream_code,
-                "auth_rejection_trace": snapshot(),
+                "http_status": None,
+                "blob": _payload_blob(data),
                 "latency_ms": latency_ms,
+                "attempt": _safe_attempt(
+                    contract,
+                    outcome=error,
+                    upstream_code=upstream_code,
+                ),
             }
-
-        result = {
-            **base,
-            "connected": True,
+        return {
+            "ok": True,
             "error": None,
             "auth_classification": "AUTH_OK",
             "upstream_classification": None,
             "upstream_code": None,
-            "auth_rejection_trace": snapshot(),
+            "http_status": 200,
+            "blob": "",
             "latency_ms": latency_ms,
-            "profile_source": "rest",
+            "attempt": _safe_attempt(contract, outcome="AUTH_OK", status_code=200),
         }
-        module._STATUS_RESULT_CACHE = dict(result)
-        module._STATUS_RESULT_CACHE_AT = time.time()
-        return result
     except Exception as exc:
         latency_ms = int((time.monotonic() - started) * 1000)
         response = getattr(exc, "response", None)
@@ -276,13 +273,11 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             body = ""
         blob = f"{status_code or ''} {body} {exc}".lower()
         upstream_code = _safe_upstream_code(blob)
-        classification = None
+        auth_classification = None
         upstream_classification = None
-        trace = snapshot()
         if _http_auth_failure(status_code, blob):
             error = "TOKEN_EXPIRED_OR_INVALID"
-            classification = _auth_classification(access_token)
-            trace = _record_rejection(access_token, status_code, blob)
+            auth_classification = _auth_classification(access_token)
         else:
             upstream_classification = _non_auth_upstream_classification(status_code, blob)
             if upstream_classification == "DHAN_REQUEST_REJECTED_906":
@@ -298,12 +293,147 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             else:
                 error = f"NETWORK_ERROR:{type(exc).__name__}"
         return {
-            **base,
-            "connected": False,
+            "ok": False,
             "error": error,
-            "auth_classification": classification,
+            "auth_classification": auth_classification,
             "upstream_classification": upstream_classification,
             "upstream_code": upstream_code,
-            "auth_rejection_trace": trace,
+            "http_status": status_code,
+            "blob": blob,
             "latency_ms": latency_ms,
+            "attempt": _safe_attempt(
+                contract,
+                outcome=error,
+                status_code=status_code,
+                upstream_code=upstream_code,
+            ),
         }
+
+
+def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
+    now = time.time()
+    cache = getattr(module, "_STATUS_RESULT_CACHE", None)
+    cache_at = float(getattr(module, "_STATUS_RESULT_CACHE_AT", 0.0) or 0.0)
+    ttl = float(getattr(module, "_STATUS_RESULT_TTL_S", 25.0) or 25.0)
+    if cache and (now - cache_at) < ttl and cache.get("connected") is True:
+        out = dict(cache)
+        out.update(
+            cache_hit=True,
+            cache_age_s=round(now - cache_at, 1),
+            probe_strategy="cloud_rest_profile_bounded_contract_reconcile",
+            auth_rejection_trace=snapshot(),
+        )
+        return out
+
+    creds = module.get_dhan_credentials()
+    client_id = str(creds.get("client_id") or "").strip().lstrip("\ufeff")
+    access_token = str(creds.get("access_token") or "").strip().lstrip("\ufeff")
+    cached_contract = str(
+        getattr(module, "_PROFILE_HEADER_CONTRACT_CACHE", "") or ""
+    ).strip()
+    primary_contract = (
+        cached_contract
+        if cached_contract in {_PROFILE_DOCS_CONTRACT, _PROFILE_SDK_CONTRACT}
+        else _PROFILE_DOCS_CONTRACT
+    )
+    base = {
+        "broker": "dhan",
+        "mode": "ANALYZER",
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "client_id_present": bool(client_id),
+        "access_token_present": bool(access_token),
+        "credentials_present": bool(client_id and access_token),
+        "sdk_available": bool(getattr(module, "_DHAN_SDK_OK", False)),
+        "env_source": getattr(module, "_ENV_LOADED_VIA", "unknown"),
+        "cache_hit": False,
+        "probe_strategy": "cloud_rest_profile_bounded_contract_reconcile",
+        "probe_header_contract": primary_contract,
+        "probe_contract_cached": bool(cached_contract),
+        "probe_timeout_s": float(timeout_s),
+        "auth_rejection_trace": snapshot(),
+    }
+    if not client_id or not access_token:
+        return {
+            **base,
+            "connected": False,
+            "error": "CONFIG_MISSING",
+            "auth_classification": "CONFIG_MISSING",
+            "upstream_classification": None,
+            "upstream_code": None,
+            "probe_header_attempts": [],
+            "latency_ms": 0,
+        }
+
+    total_started = time.monotonic()
+    first = _probe_contract(
+        module,
+        access_token,
+        client_id,
+        timeout_s=timeout_s,
+        contract=primary_contract,
+    )
+    attempts = [first["attempt"]]
+    chosen_contract = primary_contract
+    final = first
+
+    # Only reconcile the documented-vs-SDK header contradiction for known
+    # request/config-shape failures. Never multiply auth, rate-limit or network
+    # failures, which would worsen token churn or Dhan throttling.
+    if (
+        not first["ok"]
+        and primary_contract == _PROFILE_DOCS_CONTRACT
+        and first["error"] in _PROFILE_FALLBACK_ERRORS
+    ):
+        second = _probe_contract(
+            module,
+            access_token,
+            client_id,
+            timeout_s=timeout_s,
+            contract=_PROFILE_SDK_CONTRACT,
+        )
+        attempts.append(second["attempt"])
+        final = second
+        chosen_contract = _PROFILE_SDK_CONTRACT
+
+    latency_ms = int((time.monotonic() - total_started) * 1000)
+    if final["ok"]:
+        setattr(module, "_PROFILE_HEADER_CONTRACT_CACHE", chosen_contract)
+        result = {
+            **base,
+            "connected": True,
+            "error": None,
+            "auth_classification": "AUTH_OK",
+            "upstream_classification": None,
+            "upstream_code": None,
+            "auth_rejection_trace": snapshot(),
+            "latency_ms": latency_ms,
+            "profile_source": "rest",
+            "probe_header_contract": chosen_contract,
+            "probe_contract_cached": bool(cached_contract),
+            "probe_header_attempts": attempts,
+        }
+        module._STATUS_RESULT_CACHE = dict(result)
+        module._STATUS_RESULT_CACHE_AT = time.time()
+        return result
+
+    trace = snapshot()
+    if final["error"] == "TOKEN_EXPIRED_OR_INVALID":
+        trace = _record_rejection(
+            access_token,
+            final.get("http_status"),
+            final.get("blob") or "",
+        )
+    return {
+        **base,
+        "connected": False,
+        "error": final["error"],
+        "auth_classification": final["auth_classification"],
+        "upstream_classification": final["upstream_classification"],
+        "upstream_code": final["upstream_code"],
+        "auth_rejection_trace": trace,
+        "latency_ms": latency_ms,
+        "probe_header_contract": chosen_contract,
+        "probe_contract_cached": bool(cached_contract),
+        "probe_header_attempts": attempts,
+    }
