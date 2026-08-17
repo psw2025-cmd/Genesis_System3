@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
+from core.brokers.dhan.cloud_runtime_patch import _auth_failed, _wrap_read
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
 from core.brokers.dhan.first_rejection_trace import _reset_for_tests, snapshot
 
@@ -125,6 +126,40 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
         self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_runtime_recovery_classifier_rejects_906_and_805_even_with_auth_text(self):
+        self.assertFalse(_auth_failed({
+            "error": "DHAN_REQUEST_REJECTED_906",
+            "upstream_classification": "DHAN_REQUEST_REJECTED_906",
+            "message": "DH-906 invalid token",
+        }))
+        self.assertFalse(_auth_failed({
+            "error": "HTTP_429",
+            "upstream_classification": "DHAN_RATE_LIMITED",
+            "message": "code 805 invalid token",
+        }))
+        self.assertTrue(_auth_failed({"error": "TOKEN_EXPIRED_OR_INVALID", "auth_classification": "DHAN_TOKEN_REJECTED"}))
+        self.assertTrue(_auth_failed({"error": "HTTP_401", "message": "unauthorized"}))
+
+    def test_runtime_wrapper_does_not_reload_or_rotate_for_dh906(self):
+        module = types.SimpleNamespace(_STATUS_RESULT_CACHE=None, _STATUS_RESULT_CACHE_AT=0.0)
+        original = lambda: {
+            "connected": False,
+            "error": "DHAN_REQUEST_REJECTED_906",
+            "auth_classification": None,
+            "upstream_classification": "DHAN_REQUEST_REJECTED_906",
+            "message": "DH-906 invalid token",
+        }
+        wrapped = _wrap_read(module, "get_profile", original)
+        with patch("core.brokers.dhan.cloud_runtime_patch.get_access_token") as get_token, \
+             patch("core.brokers.dhan.cloud_runtime_patch.force_reload") as reload_token, \
+             patch("core.brokers.dhan.cloud_runtime_patch._invoke_canonical_rotation") as rotate:
+            result = wrapped()
+        get_token.assert_called_once()
+        reload_token.assert_not_called()
+        rotate.assert_not_called()
+        self.assertFalse(result["token_reload"]["attempted"])
+        self.assertFalse(result["canonical_rotation"]["attempted"])
 
     def test_same_rejected_secret_version_force_reload_is_suppressed(self):
         client = _Client([("258", "token-a"), ("258", "token-a"), ("258", "token-a")])
