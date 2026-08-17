@@ -3,7 +3,10 @@
 
 The script describes one execution, reads only execution-scoped Cloud Logging
 entries, extracts allow-listed rotator status markers, and snapshots the public
-broker status. It never reads Secret Manager payloads and never runs the job.
+broker status. When an old rotator execution has no safe status marker, the
+current runtime's process-local first-auth-rejection trace may provide a separate,
+explicitly-labelled fallback classification. It never reads Secret Manager
+payloads, never exposes token/client/request data, and never runs the job.
 """
 from __future__ import annotations
 
@@ -39,6 +42,19 @@ _STATUS_CLASS = {
     "BLOCKED_STAGGER_REVALIDATION_ERROR": "TRANSIENT_REVALIDATION_FAILURE_NO_MINT",
     "BLOCKED_MINT_NOT_AUTHORIZED": "MINT_AUTHORITY_REVOKED_NO_MINT",
 }
+
+_TRACE_FIELDS = (
+    "first_rejected_at_utc",
+    "last_rejected_at_utc",
+    "rejection_count",
+    "secret_version",
+    "auth_classification",
+    "http_status",
+    "upstream_code",
+    "runtime_instance",
+    "raw_token_exposed",
+    "client_id_exposed",
+)
 
 
 def _run(*args: str, timeout: int = 90) -> tuple[int, str]:
@@ -107,6 +123,47 @@ def _status_evidence(logs: list[Any]) -> tuple[list[str], str, str]:
     return matched, status, classification
 
 
+def _safe_auth_rejection_trace(data: Any) -> dict[str, Any]:
+    """Allow-list the non-secret runtime rejection trace; ignore every other key."""
+    trace = data if isinstance(data, dict) else {}
+    out = {key: trace.get(key) for key in _TRACE_FIELDS}
+    try:
+        out["rejection_count"] = int(out.get("rejection_count") or 0)
+    except (TypeError, ValueError):
+        out["rejection_count"] = 0
+    for key in ("http_status", "upstream_code"):
+        try:
+            value = out.get(key)
+            out[key] = int(value) if value is not None else None
+        except (TypeError, ValueError):
+            out[key] = None
+    # Defensive truth flags: a usable trace must explicitly prove it contains no raw token/client id.
+    out["raw_token_exposed"] = bool(out.get("raw_token_exposed"))
+    out["client_id_exposed"] = bool(out.get("client_id_exposed"))
+    return out
+
+
+def _runtime_trace_classification(trace: Any) -> str | None:
+    """Classify only affirmative, non-secret runtime auth-rejection evidence."""
+    safe = _safe_auth_rejection_trace(trace)
+    if safe["rejection_count"] <= 0:
+        return None
+    if safe["raw_token_exposed"] or safe["client_id_exposed"]:
+        return None
+    auth = str(safe.get("auth_classification") or "").strip()
+    http_status = safe.get("http_status")
+    upstream_code = safe.get("upstream_code")
+    affirmative = http_status == 401 or upstream_code == 808 or auth in {
+        "DHAN_TOKEN_REJECTED",
+        "DHAN_TOKEN_REJECTED_CLOCK_UNKNOWN",
+        "TOKEN_CLOCK_EXPIRED",
+    }
+    if not affirmative:
+        return None
+    suffix = auth or "AUTH_REJECTED"
+    return f"RUNTIME_FIRST_AUTH_REJECTION:{suffix}"
+
+
 def _execution_summary(raw: dict[str, Any]) -> dict[str, Any]:
     meta = raw.get("metadata") or {}
     status = raw.get("status") or {}
@@ -148,10 +205,15 @@ def _broker_snapshot() -> dict[str, Any]:
     except Exception as exc:
         return {"state": "NOT_PROVEN", "error": type(exc).__name__}
     proof = (data.get("token_proof") or {}) if isinstance(data, dict) else {}
+    trace = _safe_auth_rejection_trace(data.get("auth_rejection_trace") if isinstance(data, dict) else None)
     return {
         "http_status": response.status_code,
         "connected": bool(data.get("connected")) if isinstance(data, dict) else None,
         "error": str(data.get("error") or "")[:120] if isinstance(data, dict) else None,
+        "auth_classification": data.get("auth_classification") if isinstance(data, dict) else None,
+        "probe_strategy": data.get("probe_strategy") if isinstance(data, dict) else None,
+        "probe_timeout_s": data.get("probe_timeout_s") if isinstance(data, dict) else None,
+        "auth_rejection_trace": trace,
         "token_source": proof.get("source"),
         "secret_version": proof.get("secret_version"),
         "expires_at_utc": proof.get("expires_at_utc"),
@@ -191,10 +253,15 @@ def main() -> int:
     status_lines, safe_status, classification = _status_evidence(safe_logs)
     summary = _execution_summary(raw) if isinstance(raw, dict) else {"name": execution}
     broker = _broker_snapshot()
+    fallback = None
+    if safe_status == "STATUS_MARKER_NOT_FOUND":
+        fallback = _runtime_trace_classification(broker.get("auth_rejection_trace"))
+        if fallback:
+            classification = fallback
     failed = bool(summary.get("failedCount"))
 
     report = {
-        "schema": "genesis-system3-dhan-rotator-forensic-v2",
+        "schema": "genesis-system3-dhan-rotator-forensic-v3",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "state": "FAIL" if failed else "PASS",
         "project": PROJECT,
@@ -207,6 +274,7 @@ def main() -> int:
         "log_entry_count": len(safe_logs),
         "safe_status": safe_status,
         "failure_classification": classification,
+        "classification_authority": "runtime_first_auth_rejection_trace" if fallback else "rotator_safe_status",
         "status_evidence": status_lines,
         "broker_after_execution": broker,
         "secret_payloads_accessed": False,
@@ -221,8 +289,12 @@ def main() -> int:
         "execution": execution,
         "safe_status": safe_status,
         "classification": classification,
+        "classification_authority": report["classification_authority"],
         "broker_connected": broker.get("connected"),
         "secret_version": broker.get("secret_version"),
+        "runtime_trace_rejection_count": (broker.get("auth_rejection_trace") or {}).get("rejection_count"),
+        "runtime_trace_http_status": (broker.get("auth_rejection_trace") or {}).get("http_status"),
+        "runtime_trace_upstream_code": (broker.get("auth_rejection_trace") or {}).get("upstream_code"),
         "job_execution_triggered": False,
         "secret_payloads_accessed": False,
     }, sort_keys=True))
