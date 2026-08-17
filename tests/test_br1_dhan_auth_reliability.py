@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
+from core.brokers.dhan import dhan_readonly as ro
 from core.brokers.dhan.cloud_runtime_patch import _auth_failed, _wrap_read
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
 from core.brokers.dhan.first_rejection_trace import _reset_for_tests, snapshot
@@ -73,6 +74,62 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertTrue(result["connected"])
         self.assertFalse(seen["include_client_id"])
         self.assertEqual(result["probe_header_contract"], "access-token-only")
+
+    def test_adapter_profile_rest_omits_client_id(self):
+        captured = {}
+        response = types.SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {"dhanClientId": "c", "tokenValidity": "valid"},
+        )
+
+        def fake_get(url, *, headers, timeout):
+            captured["headers"] = dict(headers)
+            return response
+
+        with patch.object(ro, "get_dhan_credentials", return_value={"client_id": "c", "access_token": "token"}), \
+             patch.object(ro, "create_dhan_client", return_value=None), \
+             patch.object(ro, "_REQUESTS_OK", True), \
+             patch.object(ro, "_requests", types.SimpleNamespace(get=fake_get)):
+            result = ro.get_profile()
+
+        self.assertTrue(result["success"])
+        self.assertEqual(captured["headers"]["access-token"], "token")
+        self.assertNotIn("client-id", captured["headers"])
+
+    def test_adapter_fund_limit_rest_omits_client_id(self):
+        captured = {}
+        response = types.SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {"dhanClientId": "c", "availabelBalance": 1.0},
+        )
+
+        def fake_get(url, *, headers, timeout):
+            captured["headers"] = dict(headers)
+            return response
+
+        with patch.object(ro, "get_dhan_credentials", return_value={"client_id": "c", "access_token": "token"}), \
+             patch.object(ro, "create_dhan_client", return_value=None), \
+             patch.object(ro, "_REQUESTS_OK", True), \
+             patch.object(ro, "_requests", types.SimpleNamespace(get=fake_get)):
+            result = ro.get_funds()
+
+        self.assertTrue(result["success"])
+        self.assertEqual(captured["headers"]["access-token"], "token")
+        self.assertNotIn("client-id", captured["headers"])
+
+    def test_adapter_numeric_taxonomy_is_recovery_safe(self):
+        cases = (
+            ({"errorCode": "DH-901", "errorMessage": "Invalid Authentication", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
+            ({"errorCode": "DH-904", "errorMessage": "Too many requests", "status": "failure"}, "DHAN_RATE_LIMITED", False),
+            ({"errorCode": "805", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_RATE_LIMITED", False),
+            ({"errorCode": "807", "errorMessage": "Access token expired", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
+            ({"errorCode": "810", "errorMessage": "Client ID invalid", "status": "failure"}, "CLIENT_ID_INVALID", False),
+            ({"errorCode": "DH-906", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_REQUEST_REJECTED_906", False),
+        )
+        for payload, expected, is_auth in cases:
+            with self.subTest(payload=payload):
+                self.assertEqual(ro._payload_error(payload), expected)
+                self.assertEqual(ro._auth_failure_payload(payload), is_auth)
 
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
