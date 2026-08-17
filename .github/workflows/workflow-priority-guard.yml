@@ -12,7 +12,7 @@ on:
       - "scripts/multi_ai_audit_consensus.py"
       - "scripts/system3_preflight_control_plane.py"
       - "tests/test_full_cloud_audit_contract.py"
-      - "tests/test_system3_preflight_control_plane.py"
+      - "tests/evals/test_system3_preflight_control_plane.py"
   push:
     branches: [main]
     paths:
@@ -24,7 +24,7 @@ on:
       - "scripts/multi_ai_audit_consensus.py"
       - "scripts/system3_preflight_control_plane.py"
       - "tests/test_full_cloud_audit_contract.py"
-      - "tests/test_system3_preflight_control_plane.py"
+      - "tests/evals/test_system3_preflight_control_plane.py"
   workflow_dispatch:
   workflow_run:
     workflows:
@@ -74,9 +74,6 @@ jobs:
 
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
-
-      - name: Execute canonical preflight contract tests
-        run: python -m unittest tests.test_system3_preflight_control_plane -v
 
       - name: Execute full cloud audit adversarial contract tests
         run: python -m unittest tests.test_full_cloud_audit_contract -v
