@@ -61,12 +61,12 @@ def _http_auth_failure(status_code: Any, blob: str) -> bool:
     Dhan DH-906 is an order/request error and 805 is rate limiting. Their
     documented numeric codes override ambiguous free text and neither may
     invalidate the token or increment the first-authentication-rejection latch.
-    Dhan 808 and HTTP 401 remain affirmative authentication evidence.
+    Dhan 808/809 and HTTP 401 remain affirmative authentication evidence.
     """
     code = _safe_upstream_code(blob)
     if code in {805, 906}:
         return False
-    if status_code == 401 or code == 808:
+    if status_code == 401 or code in {808, 809}:
         return True
     auth_markers = (
         "invalid token",
@@ -137,6 +137,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         "env_source": getattr(module, "_ENV_LOADED_VIA", "unknown"),
         "cache_hit": False,
         "probe_strategy": "cloud_rest_profile_bounded",
+        "probe_header_contract": "access-token-only",
         "probe_timeout_s": float(timeout_s),
         "auth_rejection_trace": snapshot(),
     }
@@ -151,11 +152,14 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         }
     started = time.monotonic()
     try:
+        # Dhan's User Profile contract is an access-token-only GET. Do not add
+        # client-id here; Option Chain has a separate contract that does require it.
         data = module._rest_get(
             module._DHAN_PROFILE_URL,
             access_token,
             client_id,
             timeout=max(1, min(float(timeout_s), 8.0)),
+            include_client_id=False,
         )
         latency_ms = int((time.monotonic() - started) * 1000)
         if module._auth_failure_payload(data):
@@ -168,6 +172,18 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
                 "auth_classification": classification,
                 "upstream_classification": None,
                 "auth_rejection_trace": trace,
+                "latency_ms": latency_ms,
+            }
+        payload_error = getattr(module, "_payload_error", lambda _: None)(data)
+        if payload_error:
+            upstream = payload_error if payload_error in {"DHAN_RATE_LIMITED", "DHAN_REQUEST_REJECTED_906"} else "DHAN_UPSTREAM_FAILURE"
+            return {
+                **base,
+                "connected": False,
+                "error": payload_error,
+                "auth_classification": None,
+                "upstream_classification": upstream,
+                "auth_rejection_trace": snapshot(),
                 "latency_ms": latency_ms,
             }
         result = {
@@ -203,6 +219,8 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             upstream_classification = _non_auth_upstream_classification(status_code, blob)
             if upstream_classification == "DHAN_REQUEST_REJECTED_906":
                 error = "DHAN_REQUEST_REJECTED_906"
+            elif upstream_classification == "DHAN_RATE_LIMITED":
+                error = "DHAN_RATE_LIMITED"
             elif status_code == 403 or "forbidden" in blob:
                 error = "ACCESS_FORBIDDEN"
             elif status_code:
