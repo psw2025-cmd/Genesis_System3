@@ -3,6 +3,7 @@ import json
 import os
 import types
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
@@ -130,6 +131,18 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             with self.subTest(payload=payload):
                 self.assertEqual(ro._payload_error(payload), expected)
                 self.assertEqual(ro._auth_failure_payload(payload), is_auth)
+
+    def test_canonical_deploy_wrapper_forces_web_rotation_off(self):
+        text = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        self.assertIn("_enforce_scheduler_only_dhan_rotation()", text)
+        self.assertIn('key == "DHAN_CANONICAL_ROTATION_SELF_HEAL"', text)
+        self.assertIn('value = "0"', text)
+        self.assertIn('effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0"', text)
+        self.assertIn('effective.get("DHAN_STATUS_AUTO_REFRESH") != "0"', text)
+        self.assertIn('effective.get("SYSTEM3_STARTUP_TOKEN_REFRESH") != "0"', text)
+        self.assertIn('effective.get("BROKER_SELF_HEAL_TOKEN_REFRESH") != "0"', text)
+        self.assertIn("DHAN_WEB_ROTATION_DISABLED", text)
+        self.assertIn("gcp-scheduler-plus-guarded-manual-recovery", text)
 
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
