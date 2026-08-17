@@ -20,6 +20,7 @@ AUTOMATIC = {
     "security-audit.yml",
     "sonarqube-audit.yml",
     "full-cloud-audit.yml",
+    "system3-preflight-control-plane.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -189,6 +190,12 @@ def main() -> int:
         raise SystemExit("FULL_CLOUD_AUDIT_MAIN_TRIGGER_MISSING")
     if "workflow_dispatch:" not in full_audit_on:
         raise SystemExit("FULL_CLOUD_AUDIT_MANUAL_TRIGGER_MISSING")
+
+    preflight_on = trigger_blocks["system3-preflight-control-plane.yml"]
+    if "push:" not in preflight_on or not re.search(r"branches:\s*\[\s*main\s*\]", preflight_on):
+        raise SystemExit("PREFLIGHT_CONTROL_PLANE_MAIN_TRIGGER_MISSING")
+    if "workflow_dispatch:" not in preflight_on:
+        raise SystemExit("PREFLIGHT_CONTROL_PLANE_MANUAL_TRIGGER_MISSING")
 
     for name in (
         "gcp-stage2-ci.yml",
