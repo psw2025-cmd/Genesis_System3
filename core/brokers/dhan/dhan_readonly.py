@@ -74,6 +74,12 @@ _DHAN_POSITIONS_URL = "https://api.dhan.co/v2/positions"
 _DHAN_HOLDINGS_URL = "https://api.dhan.co/v2/holdings"
 _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 
+# Current Dhan taxonomy used consistently by payload and HTTP classifiers.
+_TOKEN_AUTH_CODES = {901, 807, 808, 809}
+_RATE_LIMIT_CODES = {904, 805}
+_CLIENT_ID_INVALID_CODES = {810}
+_REQUEST_REJECTED_CODES = {906}
+
 # Broker status endpoint is polled frequently by the dashboard. Auto-refresh must
 # therefore be rate-limited so a genuine auth failure cannot create TOTP/token
 # churn. 180s is the hard safety floor shared with the canonical Cloud rotator.
@@ -269,13 +275,24 @@ def _payload_error(data: Any) -> str | None:
         )
     ).lower()
     code = _safe_upstream_code(data)
-    if code == 805:
+
+    # Numeric Dhan codes are authoritative over ambiguous free text.
+    if code in _RATE_LIMIT_CODES:
         return "DHAN_RATE_LIMITED"
-    if code == 906:
+    if code in _REQUEST_REJECTED_CODES:
         return "DHAN_REQUEST_REJECTED_906"
-    if code in {808, 809}:
+    if code in _CLIENT_ID_INVALID_CODES:
+        return "CLIENT_ID_INVALID"
+    if code in _TOKEN_AUTH_CODES:
         return "TOKEN_EXPIRED_OR_INVALID"
-    if "invalid token" in message or "invalid access token" in message or "token expired" in message:
+
+    if (
+        "invalid token" in message
+        or "invalid access token" in message
+        or "access token is expired" in message
+        or "token expired" in message
+        or "invalid authentication" in message
+    ):
         return "TOKEN_EXPIRED_OR_INVALID"
     status = str(data.get("status") or "").strip().lower()
     if status in {"failure", "failed", "error"} and message.strip():
@@ -326,13 +343,24 @@ def _exception_error(exc: Exception) -> str:
         body = ""
     blob = f"{status_code or ''} {body} {exc}".lower()
     code = _safe_upstream_code(blob)
-    if code == 805 or status_code == 429:
+
+    # Numeric codes override free text so rate/config/request failures cannot
+    # accidentally authorize token recovery.
+    if code in _RATE_LIMIT_CODES or status_code == 429:
         return "DHAN_RATE_LIMITED"
-    if code == 906:
+    if code in _REQUEST_REJECTED_CODES:
         return "DHAN_REQUEST_REJECTED_906"
-    if status_code == 401 or code in {808, 809}:
+    if code in _CLIENT_ID_INVALID_CODES:
+        return "CLIENT_ID_INVALID"
+    if status_code == 401 or code in _TOKEN_AUTH_CODES:
         return "TOKEN_EXPIRED_OR_INVALID"
-    if "invalid token" in blob or "invalid access token" in blob or "token expired" in blob:
+    if (
+        "invalid token" in blob
+        or "invalid access token" in blob
+        or "access token is expired" in blob
+        or "token expired" in blob
+        or "invalid authentication" in blob
+    ):
         return "TOKEN_EXPIRED_OR_INVALID"
     if status_code == 403 or "forbidden" in blob:
         return "ACCESS_FORBIDDEN"
@@ -594,9 +622,9 @@ def get_status() -> dict:
     connected = profile_result.get("success", False)
     error = None if connected else profile_result.get("error", "UNKNOWN")
 
-    # Only affirmative token/auth failures may enter refresh logic. Dhan 805,
-    # DH-906, HTTP 429, generic HTTP 400 and transient network failures are not
-    # authentication evidence and must never trigger token churn.
+    # Only affirmative token/auth failures may enter refresh logic. Dhan 805/904,
+    # DH-906, client-id 810, HTTP 429, generic HTTP 400 and transient network
+    # failures are not token evidence and must never trigger token churn.
     should_refresh = (not connected) and error in (
         "TOKEN_EXPIRED_OR_INVALID",
         "CONFIG_MISSING",
