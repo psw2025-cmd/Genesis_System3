@@ -117,10 +117,10 @@ def _canonical_heal_enabled() -> bool:
 
 
 def _rotation_cooldown_s() -> float:
-    # Default 900s (15 min) mutex window between auto-heal Job invokes.
+    # Default 900s (15 min); never permit an auto-heal Job invoke under 180s.
     raw = os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900").strip()
     try:
-        return max(120.0, min(float(raw), 3600.0))
+        return max(180.0, min(float(raw), 3600.0))
     except ValueError:
         return 900.0
 
