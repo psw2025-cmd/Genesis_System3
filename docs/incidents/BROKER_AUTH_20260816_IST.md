@@ -97,3 +97,28 @@
 - RCA addendum (PR #242): `docs/audits/system3_full_cloud_ui/sessions/20260816T062501Z/21_POST_RECOVERY_RCA_ADDENDUM_V257_V258.md`
 - Local proof: `reports/latest/broker_secret_dup_audit_20260816/FINAL_REPORT.md`
 - This incident note: `docs/incidents/BROKER_AUTH_20260816_IST.md`
+
+---
+
+## 8. Request-scoped re-proof — 2026-08-17 09:35–09:48 IST
+
+The scheduled rotation produced v261 but production later returned
+`DHAN_REQUEST_REJECTED_906`. The bounded manual recovery workflow was executed
+with its force input and created canonical secret v262.
+
+Post-recovery proof:
+
+- GitHub recovery run `31993268520`: PASS.
+- `/api/broker/status`: `connected=true`, `error=null`, secret v262, dynamic
+  Secret Manager source.
+- `/api/health`: `status=ok`, broker connected, analyzer ready.
+- Live Dhan data: current gain-rank rows with spots and populated NIFTY /
+  BANKNIFTY option chains.
+- Fresh production browser: TopBar `Dhan · Connected`, Broker tab connected,
+  Option Chain populated.
+- Production SHA `4185162b2b6dd69beb034c4cf84aec4dda95900b` equals GitHub
+  `main`; Cloud Run revision `genesis-system3-web-00425-dec` serves 100%.
+- Safety unchanged: LIVE=false and order placement disabled.
+
+Scope note: broker health is confirmed. Overall strategy readiness remains
+blocked by genuine proof gates (including ML Spearman); no gate was weakened.

@@ -1,6 +1,6 @@
 # SYSTEM_STATE.md — Single Source of Truth
 > **ALL AGENTS MUST READ THIS FILE FIRST before making any changes.**
-> Last updated: 2026-08-16 ~20:45 IST | Updated by: Cursor (docs live cross-verify)
+> Last updated: 2026-08-17 09:48 IST | Updated by: Cursor (broker health closure)
 > Coordination bus: GitHub Issue #188 | Final consolidator: ChatGPT
 > Production URL: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 
@@ -16,15 +16,14 @@
 ---
 
 ## CURRENT LIVE PINS (request-scoped — re-read before acting)
-| Pin | Value (2026-08-16 ~15:15Z capture) |
+| Pin | Value (2026-08-17 04:18Z capture) |
 |-----|-------------------------------------|
-| Remote `main` | `ebd77a0efe545bedaab9fcc1de3a1a180466c263` |
-| Production serving SHA | `997daef4cfb3322e317da69b5cbb5b69950dab26` (**behind main**) |
-| Broker | `connected=false` · `TOKEN_EXPIRED_OR_INVALID` · SM gen **259** |
+| Remote `main` | `4185162b2b6dd69beb034c4cf84aec4dda95900b` |
+| Production serving SHA | `4185162b2b6dd69beb034c4cf84aec4dda95900b` (matches `main`; revision `genesis-system3-web-00425-dec`, 100% traffic) |
+| Broker | `connected=true` · `error=null` · canonical SM version **262** |
 | Safety | LIVE=false · order_placement_allowed=false |
 | Canonical SM secret | `dhan-access-token` (see `docs/BROKER_SETUP.md`) |
-| Open waves | SEC-1 PR #252 (CI PASS) · UI-OBS-1 PR #251 (frozen) · BR-1 PR #250 (ChatGPT) |
-| Docs cross-verify | `docs/audits/.../19_LIVE_DOCS_CROSSVERIFY_MATRIX_20260816.md` |
+| Broker proof | `reports/latest/broker_health_confirmed/README.md` |
 
 **Do not treat Render/Codespace paragraphs below as current production authority.** Prefer GCP Cloud Run `genesis-system3-web` @ `asia-south1` + Issue #188.
 
@@ -34,8 +33,9 @@
 - **ACTIVE:** DhanHQ ONLY
 - **Client ID:** ...3741
 - **SDK:** dhanhq 2.2.0
-- **Production (GCP Cloud Run, request-scoped 2026-08-16):** `connected=false`, error=`TOKEN_EXPIRED_OR_INVALID`, Secret Manager generation identifier=`259`, LIVE=false. Earlier same-day captures showed connected=true @ v259 — treat as flapping/reject, not permanent PASS.
+- **Production (GCP Cloud Run, request-scoped 2026-08-17 04:18Z):** `connected=true`, error=`null`, canonical Secret Manager version=`262`, live Dhan gain-rank and option-chain data populated, LIVE=false.
 - **Canonical secret:** `dhan-access-token` only. Banned/quarantined aliases: `system3-dhan-access-token`, `DHAN_BROKER_TOKEN` (policy in `docs/BROKER_SETUP.md`).
+- **Recovery proof:** bounded GitHub run `31993268520` invoked the sole Cloud Run mint authority; fresh API and browser evidence passed afterward.
 - **Historical note (Codespace/Render, 2026-06):** older TOTP/OAuth notes below are retained for archaeology only — not current deploy authority.
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)

@@ -68,6 +68,11 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("After-hours n/a", text)
         self.assertNotIn("INDIAVIX', spot:", text)
 
+    def test_topbar_never_infers_broker_connected_from_unrelated_api_success(self):
+        text = self.text("dashboard/frontend/src/components/TopBar.tsx")
+        self.assertNotIn("apiResponded && !hasError", text)
+        self.assertIn("brokerIsConnected(health, brokerConnected, brokerStatus)", text)
+
     def test_live_proof_uses_real_live_board_route_and_four_required_chain_subviews(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
         self.assertIn('/api/market/live_board', text)
