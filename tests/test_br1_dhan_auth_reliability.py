@@ -3,9 +3,11 @@ import json
 import os
 import types
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
+from core.brokers.dhan import dhan_readonly as ro
 from core.brokers.dhan.cloud_runtime_patch import _auth_failed, _wrap_read
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
 from core.brokers.dhan.first_rejection_trace import _reset_for_tests, snapshot
@@ -60,17 +62,99 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         os.environ.pop("DHAN_TOKEN_SOURCE", None)
         os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
 
+    def test_profile_probe_uses_access_token_only_contract(self):
+        import time
+        token = _jwt(time.time() + 3600)
+        seen = {}
+
+        def rest(*args, **kwargs):
+            seen.update(kwargs)
+            return {"dhanClientId": "c", "status": "success"}
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertTrue(result["connected"])
+        self.assertFalse(seen["include_client_id"])
+        self.assertEqual(result["probe_header_contract"], "access-token-only")
+
+    def test_adapter_profile_rest_omits_client_id(self):
+        captured = {}
+        response = types.SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {"dhanClientId": "c", "tokenValidity": "valid"},
+        )
+
+        def fake_get(url, *, headers, timeout):
+            captured["headers"] = dict(headers)
+            return response
+
+        with patch.object(ro, "get_dhan_credentials", return_value={"client_id": "c", "access_token": "token"}), \
+             patch.object(ro, "create_dhan_client", return_value=None), \
+             patch.object(ro, "_REQUESTS_OK", True), \
+             patch.object(ro, "_requests", types.SimpleNamespace(get=fake_get)):
+            result = ro.get_profile()
+
+        self.assertTrue(result["success"])
+        self.assertEqual(captured["headers"]["access-token"], "token")
+        self.assertNotIn("client-id", captured["headers"])
+
+    def test_adapter_fund_limit_rest_omits_client_id(self):
+        captured = {}
+        response = types.SimpleNamespace(
+            raise_for_status=lambda: None,
+            json=lambda: {"dhanClientId": "c", "availabelBalance": 1.0},
+        )
+
+        def fake_get(url, *, headers, timeout):
+            captured["headers"] = dict(headers)
+            return response
+
+        with patch.object(ro, "get_dhan_credentials", return_value={"client_id": "c", "access_token": "token"}), \
+             patch.object(ro, "create_dhan_client", return_value=None), \
+             patch.object(ro, "_REQUESTS_OK", True), \
+             patch.object(ro, "_requests", types.SimpleNamespace(get=fake_get)):
+            result = ro.get_funds()
+
+        self.assertTrue(result["success"])
+        self.assertEqual(captured["headers"]["access-token"], "token")
+        self.assertNotIn("client-id", captured["headers"])
+
+    def test_adapter_numeric_taxonomy_is_recovery_safe(self):
+        cases = (
+            ({"errorCode": "DH-901", "errorMessage": "Invalid Authentication", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
+            ({"errorCode": "DH-904", "errorMessage": "Too many requests", "status": "failure"}, "DHAN_RATE_LIMITED", False),
+            ({"errorCode": "805", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_RATE_LIMITED", False),
+            ({"errorCode": "807", "errorMessage": "Access token expired", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
+            ({"errorCode": "810", "errorMessage": "Client ID invalid", "status": "failure"}, "CLIENT_ID_INVALID", False),
+            ({"errorCode": "DH-906", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_REQUEST_REJECTED_906", False),
+        )
+        for payload, expected, is_auth in cases:
+            with self.subTest(payload=payload):
+                self.assertEqual(ro._payload_error(payload), expected)
+                self.assertEqual(ro._auth_failure_payload(payload), is_auth)
+
+    def test_canonical_deploy_wrapper_forces_web_rotation_off(self):
+        text = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        self.assertIn("_enforce_scheduler_only_dhan_rotation()", text)
+        self.assertIn('key == "DHAN_CANONICAL_ROTATION_SELF_HEAL"', text)
+        self.assertIn('value = "0"', text)
+        self.assertIn('effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0"', text)
+        self.assertIn('effective.get("DHAN_STATUS_AUTO_REFRESH") != "0"', text)
+        self.assertIn('effective.get("SYSTEM3_STARTUP_TOKEN_REFRESH") != "0"', text)
+        self.assertIn('effective.get("BROKER_SELF_HEAL_TOKEN_REFRESH") != "0"', text)
+        self.assertIn("DHAN_WEB_ROTATION_DISABLED", text)
+        self.assertIn("gcp-scheduler-plus-guarded-manual-recovery", text)
+
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
         token = _jwt(time.time() + 3600)
-        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure", "message": "invalid token"}))
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
 
     def test_clock_expired_token_is_distinguished(self):
         import time
         token = _jwt(time.time() - 60)
-        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure", "message": "token expired"}))
         self.assertEqual(result["auth_classification"], "TOKEN_CLOCK_EXPIRED")
 
     def test_http_401_code_808_clock_valid_is_dhan_rejected(self):
@@ -84,9 +168,23 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
         self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(result["upstream_code"], 808)
         trace = snapshot()
         self.assertEqual(trace["rejection_count"], 1)
         self.assertEqual(trace["upstream_code"], 808)
+
+    def test_http_400_dh901_is_auth_failure(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, '{"errorCode":"DH-901","errorMessage":"Invalid Authentication"}')
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+        self.assertEqual(result["upstream_code"], 901)
+        self.assertEqual(snapshot()["rejection_count"], 1)
 
     def test_http_400_dh906_is_non_auth_even_if_text_says_invalid_token(self):
         import time
@@ -99,7 +197,30 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(result["upstream_code"], 906)
         self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_http_400_code_810_is_client_id_config_failure_not_token_recovery(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, '{"code":810,"message":"Client ID is invalid"}')
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "CLIENT_ID_INVALID")
+        self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_CLIENT_ID_INVALID")
+        self.assertEqual(result["upstream_code"], 810)
+        self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_payload_code_807_is_token_expired(self):
+        import time
+        token = _jwt(time.time() + 3600)
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failed", "code": 807}))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["upstream_code"], 807)
+        self.assertEqual(snapshot()["rejection_count"], 1)
 
     def test_non_auth_http_400_is_not_falsely_labeled_token_rejected(self):
         import time
@@ -122,9 +243,21 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             raise _http_error(429, "Too Many Requests")
 
         result = get_cloud_status(_status_module(token, rest))
-        self.assertEqual(result["error"], "HTTP_429")
+        self.assertEqual(result["error"], "DHAN_RATE_LIMITED")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
+        self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_http_400_dh904_is_rate_limit_not_auth_failure(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, "DH-904 too many requests")
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "DHAN_RATE_LIMITED")
+        self.assertEqual(result["upstream_code"], 904)
         self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_runtime_recovery_classifier_rejects_906_and_805_even_with_auth_text(self):
@@ -134,7 +267,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             "message": "DH-906 invalid token",
         }))
         self.assertFalse(_auth_failed({
-            "error": "HTTP_429",
+            "error": "DHAN_RATE_LIMITED",
             "upstream_classification": "DHAN_RATE_LIMITED",
             "message": "code 805 invalid token",
         }))
