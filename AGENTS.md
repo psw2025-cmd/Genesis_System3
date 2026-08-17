@@ -11,8 +11,25 @@ Read first:
 4. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
 5. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
 6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
+7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
+
+## Mandatory preflight before proceeding
+
+Before any production-relevant transition, run or consume a freshly generated `scripts/system3_preflight_control_plane.py` snapshot and independently revalidate critical current claims. Do not infer the next step from a previous message or stale report.
+
+Transition law:
+- exact-head mandatory CI green → merge without unnecessary waiting;
+- merge complete → check canonical Cloud Run deployment immediately;
+- deployment active → report `STATUS=WAITING` but continue any non-conflicting safe work;
+- deployment complete → re-read current remote main, verify exact production serving SHA, then generate a NEW semantic production URL proof;
+- URL proof failure → freeze evidence, investigate, and open/continue the next remediation immediately;
+- current-main/active-PR workflow failure → inspect failed job/step/log/artifact before proceeding;
+- unrelated historical failure → context only unless fresh evidence makes it relevant;
+- stop only for a verified external dependency or genuine user approval/account-level action.
+
+Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, and `USER_ACTION`.
 
 ## Production authority
 
