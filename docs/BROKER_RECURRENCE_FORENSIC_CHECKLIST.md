@@ -16,9 +16,22 @@ The fresh current-main audit and production browser run reproduced the same oper
 
 The web runtime already maintains a process-local, non-secret first-auth-rejection trace. The forensic path must preserve an allow-listed projection of that trace instead of losing it when a historical rotator execution lacks a status marker.
 
+### Post-#266 evidence correction
+
+After the safe trace projection was merged, fresh Full Cloud Audit run `31988631903` proved that the current runtime trace being labelled `DHAN_TOKEN_REJECTED` was actually HTTP `400` with upstream Dhan code `906`, with the process-local rejection counter already amplified to `44763`. Current `cloud_status_probe.py` was then inspected and found to contain the literal `dh-906` inside its authentication marker list. That mapping caused HTTP 400/DH-906 to become `TOKEN_EXPIRED_OR_INVALID` and to increment the first-auth-rejection latch.
+
+This is a classifier defect. Dhan's documented taxonomy distinguishes DH-906 as an order/request error, code 805 as too many requests, and 808 as authentication failure / invalid client ID or token. The current DH-906 observation therefore must not be used as token-invalid evidence. Earlier independently captured HTTP 401/code 808 observations remain separate evidence and are not erased by this correction.
+
+The remediation contract is now explicit:
+
+- HTTP 401 or Dhan 808 may classify as affirmative authentication rejection and may increment the first-auth-rejection latch.
+- HTTP 429 or Dhan 805 classifies as `DHAN_RATE_LIMITED`; it must not increment the auth latch.
+- Dhan DH-906 classifies as `DHAN_REQUEST_REJECTED_906`; it must not become `TOKEN_EXPIRED_OR_INVALID` and must not increment the auth latch.
+- No token recovery is justified from a DH-906-only observation. First deploy the corrected classifier and obtain a fresh process/revision trace.
+
 ## Mail correlation reviewed
 
-Repo-related mail from the preceding two days was reviewed as a secondary signal, never as production authority. It surfaced fresh failures of `Full Cloud Audit and Forensic Consensus` and `Frontend Browser Runtime Smoke`; both were independently revalidated against current GitHub runs and live production evidence before action.
+Repo-related mail from the preceding two days was reviewed as a secondary signal, never as production authority. It surfaced fresh failures of `Full Cloud Audit and Forensic Consensus` and `Frontend Browser Runtime Smoke`; both were independently revalidated against current GitHub runs and live production evidence before action. The broader mail pass also surfaced repeated GCP uptime alert/resolved cycles and Cursor Bugbot usage-limit failures. Bugbot availability is external review-service state, not production authority; uptime mail must be correlated with live service/audit evidence before remediation.
 
 ## PRE — mandatory before any remediation
 
@@ -37,6 +50,7 @@ Repo-related mail from the preceding two days was reviewed as a secondary signal
 
 - HTTP 401 or Dhan code 808 with a positive first-rejection trace is affirmative upstream authentication rejection evidence.
 - HTTP 429 / Dhan code 805 is rate-limit evidence. It must not be relabelled as authentication rejection without separate affirmative auth evidence.
+- HTTP 400 / Dhan DH-906 is request/order-error evidence. It is not token-invalid evidence and must not increment the auth-rejection latch.
 - JWT `exp` time remaining does not prove Dhan will continue to accept a token; upstream rejection and JWT-clock validity are separate facts.
 - A missing rotator status marker is `NOT_PROVEN` for the rotator path. If the current web runtime independently has a safe first-rejection trace, classify it explicitly as `runtime_first_auth_rejection_trace`; never pretend it came from the rotator log.
 - Broker `connected=true` alone is not full E2E readiness. Required broker-backed read-only market data and UI/API parity must also pass.
@@ -48,7 +62,8 @@ Repo-related mail from the preceding two days was reviewed as a secondary signal
 3. Never add an automatic GitHub cron for token minting; canonical scheduled freshness remains a GCP scheduler concern and manual recovery remains guarded.
 4. After any token/version change, verify the new version, broker read-only profile, market-data read path, health, four required chains, and UI/API consistency.
 5. If Dhan returns 429/805, respect cooldown/backoff; do not create a retry/mint storm.
-6. A recurrence after a claimed fix invalidates the fix and reopens/escalates the incident.
+6. If the profile probe returns DH-906 after the classifier correction, investigate the profile endpoint/request contract before considering token recovery.
+7. A recurrence after a claimed fix invalidates the fix and reopens/escalates the incident.
 
 ## POST — mandatory before closure or next transition
 
@@ -56,12 +71,13 @@ Repo-related mail from the preceding two days was reviewed as a secondary signal
 2. `/api/broker/status`: source is `GCP_SECRET_MANAGER_DYNAMIC`, no secret values exposed, LIVE false, orders false.
 3. First-rejection trace is visible to forensic evidence through the strict safe allow-list and contains no raw token, client ID, authorization header, request body, cookie, PIN, TOTP, or secret payload.
 4. Rotator forensic classification identifies its authority (`rotator_safe_status` or `runtime_first_auth_rejection_trace`).
-5. `/api/health` and at least one direct broker-backed read-only market-data path are checked.
-6. NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY chain source/count/freshness semantics are proven, not merely rendered.
-7. Fresh production browser proof captures all canonical tabs and required chain subviews on exact serving SHA.
-8. Current mandatory CI/security/browser/audit workflows are re-read. Historical unrelated failures remain context only.
-9. Issue #188 receives the exact run/job/artifact/revision/SHA and the new state marker.
-10. Relevant governance/incident documentation is updated from observed evidence; no final PASS is claimed from CI/docs alone.
+5. A fresh revision proves DH-906/805 do not increment the auth latch; only affirmative 401/808 auth evidence may do so.
+6. `/api/health` and at least one direct broker-backed read-only market-data path are checked.
+7. NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY chain source/count/freshness semantics are proven, not merely rendered.
+8. Fresh production browser proof captures all canonical tabs and required chain subviews on exact serving SHA.
+9. Current mandatory CI/security/browser/audit workflows are re-read. Historical unrelated failures remain context only.
+10. Issue #188 receives the exact run/job/artifact/revision/SHA and the new state marker.
+11. Relevant governance/incident documentation is updated from observed evidence; no final PASS is claimed from CI/docs alone.
 
 ## Safety non-claims
 
