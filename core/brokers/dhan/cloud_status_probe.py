@@ -176,14 +176,7 @@ def _profile_request(
     timeout_s: float,
     contract: str,
 ) -> dict:
-    """Execute exactly one safe Profile GET under a named header contract.
-
-    CI can provide a test hook. For the documented access-token-only contract we
-    deliberately reuse the adapter's existing ``_rest_get`` helper when present;
-    this preserves the established test/runtime boundary and its timeout/error
-    behavior. The SDK contract needs the official camel-case ``dhanClientId``
-    header, so it performs one raw GET with that exact header shape.
-    """
+    """Execute exactly one safe Profile GET under a named header contract."""
     test_hook = getattr(module, "_profile_probe_request", None)
     if callable(test_hook):
         return test_hook(
@@ -213,7 +206,6 @@ def _profile_request(
 
     headers = {"access-token": access_token}
     if contract == _PROFILE_SDK_CONTRACT:
-        # Exact header shape used by Dhan's official DhanLogin.user_profile().
         headers["dhanClientId"] = client_id
 
     response = requests_module.get(
@@ -223,6 +215,16 @@ def _profile_request(
     )
     response.raise_for_status()
     return response.json()
+
+
+def _sdk_contract_transport_available(module: Any) -> bool:
+    """Whether a real second Profile transport exists without inventing one."""
+    if callable(getattr(module, "_profile_probe_request", None)):
+        return True
+    return bool(
+        getattr(module, "_REQUESTS_OK", False)
+        and getattr(module, "_requests", None) is not None
+    )
 
 
 def _safe_attempt(
@@ -407,13 +409,11 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
     chosen_contract = primary_contract
     final = first
 
-    # Reconcile the documented-vs-SDK header contradiction only for known
-    # request/config-shape failures. Never multiply auth, rate-limit or network
-    # failures, which would worsen token churn or Dhan throttling.
     if (
         not first["ok"]
         and primary_contract == _PROFILE_DOCS_CONTRACT
         and first["error"] in _PROFILE_FALLBACK_ERRORS
+        and _sdk_contract_transport_available(module)
     ):
         second = _probe_contract(
             module,
