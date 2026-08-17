@@ -54,7 +54,8 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertTrue(result["connected"])
         self.assertEqual(calls, ["docs-access-token-only"])
-        self.assertEqual(result["probe_header_contract"], "docs-access-token-only")
+        self.assertEqual(result["probe_header_contract"], "access-token-only")
+        self.assertEqual(result["probe_header_variant"], "docs-access-token-only")
         self.assertEqual(len(result["probe_header_attempts"]), 1)
         self.assertEqual(snapshot()["rejection_count"], 0)
 
@@ -64,7 +65,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         def handler(access_token, client_id, *, timeout_s, contract):
             calls.append(contract)
             if contract == "docs-access-token-only":
-                raise _http_error(400, 'DH-906 incorrect request')
+                raise _http_error(400, "DH-906 incorrect request")
             return {"dhanClientId": "safe", "status": "success"}
 
         module, _ = _module(handler)
@@ -72,7 +73,8 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertTrue(result["connected"])
         self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
-        self.assertEqual(result["probe_header_contract"], "sdk-dhanClientId")
+        self.assertEqual(result["probe_header_contract"], "access-token-plus-dhanClientId")
+        self.assertEqual(result["probe_header_variant"], "sdk-dhanClientId")
         self.assertEqual(snapshot()["rejection_count"], 0)
         self.assertTrue(all(item["credential_value_exposed"] is False for item in result["probe_header_attempts"]))
 
@@ -81,7 +83,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         def handler(access_token, client_id, *, timeout_s, contract):
             calls.append(contract)
-            raise _http_error(400, 'DH-906 incorrect request')
+            raise _http_error(400, "DH-906 incorrect request")
 
         module, _ = _module(handler)
         result = get_cloud_status(module)
@@ -138,7 +140,8 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertTrue(result["connected"])
         self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
-        self.assertEqual(result["probe_header_contract"], "sdk-dhanClientId")
+        self.assertEqual(result["probe_header_contract"], "access-token-plus-dhanClientId")
+        self.assertEqual(result["probe_header_variant"], "sdk-dhanClientId")
         self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_two_810_failures_report_configuration_not_token_failure(self):
@@ -163,7 +166,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         def handler(access_token, client_id, *, timeout_s, contract):
             calls.append(contract)
             if contract == "docs-access-token-only":
-                raise _http_error(400, 'DH-906 incorrect request')
+                raise _http_error(400, "DH-906 incorrect request")
             return {"dhanClientId": "safe", "status": "success"}
 
         module, _ = _module(handler)
@@ -178,7 +181,8 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertTrue(second["connected"])
         self.assertEqual(calls, ["sdk-dhanClientId"])
-        self.assertEqual(second["probe_header_contract"], "sdk-dhanClientId")
+        self.assertEqual(second["probe_header_contract"], "access-token-plus-dhanClientId")
+        self.assertEqual(second["probe_header_variant"], "sdk-dhanClientId")
         self.assertTrue(second["probe_contract_cached"])
 
     def test_safe_attempt_metadata_never_contains_credentials(self):
@@ -190,7 +194,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
             calls.append(contract)
             self.assertEqual(access_token, token_marker)
             self.assertEqual(client_id, client_marker)
-            raise _http_error(400, 'DH-906 incorrect request')
+            raise _http_error(400, "DH-906 incorrect request")
 
         module = types.SimpleNamespace(
             _STATUS_RESULT_CACHE=None,
