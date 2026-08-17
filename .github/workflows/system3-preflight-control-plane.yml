@@ -1,0 +1,50 @@
+name: System3 Preflight Control Plane
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  actions: read
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: system3-preflight-control-plane
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current ref
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build current workflow issue artifact snapshot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python scripts/system3_preflight_control_plane.py --print-json
+
+      - name: Publish operator summary
+        if: always()
+        run: |
+          if [ -f reports/latest/control_plane/NEXT_ACTION.md ]; then
+            cat reports/latest/control_plane/NEXT_ACTION.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload control-plane snapshot
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: system3-preflight-control-plane-${{ github.run_id }}
+          path: reports/latest/control_plane/
+          if-no-files-found: error
+          retention-days: 7
