@@ -10,7 +10,9 @@ on:
       - "scripts/gcp_full_cloud_audit.py"
       - "scripts/fetch_exact_security_audit.py"
       - "scripts/multi_ai_audit_consensus.py"
+      - "scripts/system3_preflight_control_plane.py"
       - "tests/test_full_cloud_audit_contract.py"
+      - "tests/test_system3_preflight_control_plane.py"
   push:
     branches: [main]
     paths:
@@ -20,7 +22,9 @@ on:
       - "scripts/gcp_full_cloud_audit.py"
       - "scripts/fetch_exact_security_audit.py"
       - "scripts/multi_ai_audit_consensus.py"
+      - "scripts/system3_preflight_control_plane.py"
       - "tests/test_full_cloud_audit_contract.py"
+      - "tests/test_system3_preflight_control_plane.py"
   workflow_dispatch:
   workflow_run:
     workflows:
@@ -41,6 +45,8 @@ permissions:
   contents: read
   actions: read
   deployments: read
+  issues: read
+  pull-requests: read
 
 concurrency:
   group: workflow-priority-guard-${{ github.event.workflow_run.id || github.event.deployment.id || github.event.pull_request.number || github.sha }}
@@ -69,8 +75,50 @@ jobs:
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
 
+      - name: Execute canonical preflight contract tests
+        run: python -m unittest tests.test_system3_preflight_control_plane -v
+
       - name: Execute full cloud audit adversarial contract tests
         run: python -m unittest tests.test_full_cloud_audit_contract -v
+
+  refresh-canonical-preflight:
+    if: github.event_name == 'workflow_run'
+    name: FORENSIC - refresh canonical workflow issue artifact snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          clean: true
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Refresh current workflow issue artifact snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/system3_preflight_control_plane.py --print-json
+
+      - name: Publish operator summary
+        if: always()
+        run: |
+          if [ -f reports/latest/control_plane/NEXT_ACTION.md ]; then
+            cat reports/latest/control_plane/NEXT_ACTION.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload refreshed canonical preflight snapshot
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: system3-preflight-after-${{ github.event.workflow_run.id }}-${{ github.run_id }}
+          path: reports/latest/control_plane/
+          if-no-files-found: error
+          retention-days: 30
 
   event-forensic-responder:
     if: >-
