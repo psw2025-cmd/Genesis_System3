@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from scripts.gcp_runtime_identity_safety import prove_runtime_safety, rotator_service_account
 
@@ -137,6 +138,22 @@ class RuntimeSafetyTests(unittest.TestCase):
                 expected_rotator_service_account=ROTATOR_SA,
                 expected_scheduler_service_account=SCHEDULER_SA,
             )
+
+
+class DeployWorkflowSafetyTests(unittest.TestCase):
+    def test_deploy_configures_business_lanes_but_never_executes_them(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        for lane in ("rank", "forecast", "validate", "signals"):
+            self.assertIn(f'gcloud run jobs deploy "genesis-system3-${{KIND}}"', workflow)
+            self.assertNotIn(
+                f'gcloud run jobs execute "genesis-system3-${{LANE}}"',
+                workflow,
+                "deployment must not manufacture business-lane evidence",
+            )
+        self.assertNotIn("Cloud self-bootstrap", workflow)
+        self.assertNotIn("gcloud run jobs execute genesis-system3-ml-history-bootstrap", workflow)
+        self.assertIn("gcloud run jobs execute genesis-system3-scheduler-collector", workflow)
+        self.assertIn("gcloud run jobs execute genesis-system3-control-plane-verify", workflow)
 
 
 if __name__ == "__main__":
