@@ -1,3 +1,16 @@
+## 2026-08-17T04:18:00Z [Cursor] PRODUCTION BROKER HEALTH CLOSURE
+
+- Executed canonical bounded Dhan recovery workflow run `31993268520`.
+- Confirmed dynamic Secret Manager v262, broker connected, current Dhan
+  gain-rank/option-chain data, and fresh production UI/API agreement.
+- Cross-verified production SHA `4185162b...` with GitHub `main` and Cloud Run
+  revision `genesis-system3-web-00425-dec` at 100% traffic.
+- Kept LIVE and order execution disabled.
+- Removed TopBar's unrelated-API-success fallback so it cannot falsely infer
+  broker connectivity.
+- Added request-scoped evidence:
+  `reports/latest/broker_health_confirmed/README.md`.
+
 ## 2026-08-16T20:00:00Z [Cursor] CONTINUOUS CLOSURE SYSTEM
 
 Built repo-first continuous closure control plane:

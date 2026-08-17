@@ -91,10 +91,9 @@ export function TopBar() {
         : marketOpen
           ? 'Feed warming'
           : 'After-hours n/a'
-  const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
-  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus) || (apiResponded && !hasError)
+  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
   const brokerLabel = (brokerConnected || brokerGood) ? 'Connected' : hasError ? 'Auth issue' : 'Waiting'
   const brokerTone = brokerConnected || brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
   const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
