@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following twelve GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following thirteen GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -17,10 +17,11 @@ Only the following twelve GitHub Actions workflows are allowed in `.github/workf
 9. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
 10. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
 11. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
+12. `system3-preflight-control-plane.yml` — read-only workflow/issue/artifact current-state snapshot on every `main` push plus manual dispatch. It has no schedule trigger and does not replace mandatory agent-side preflight before production transitions.
 
 ### Manual emergency workflow
 
-12. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+13. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Event workflow rules
 
@@ -33,6 +34,8 @@ No other workflow may use `workflow_run` or `deployment_status`.
 ## Scheduling authority
 
 GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security/cloud audits execute on every relevant `main` commit; code/security checks also execute on pull requests where configured and may be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
+
+The preflight control plane follows this rule: its GitHub workflow runs on `main` push and manual dispatch only. Fresh preflight before a production transition is an agent operating-contract obligation, not a GitHub cron.
 
 ## AI and external observability rule
 
