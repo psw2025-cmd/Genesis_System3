@@ -6,7 +6,9 @@ import unittest
 from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
+from core.brokers.dhan.cloud_runtime_patch import _auth_failed, _wrap_read
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
+from core.brokers.dhan.first_rejection_trace import _reset_for_tests, snapshot
 
 
 def _jwt(exp):
@@ -49,7 +51,11 @@ def _http_error(status_code, text):
 
 
 class BR1DhanAuthReliabilityTests(unittest.TestCase):
+    def setUp(self):
+        _reset_for_tests()
+
     def tearDown(self):
+        _reset_for_tests()
         provider._set_client_factory_for_tests(None)
         os.environ.pop("DHAN_TOKEN_SOURCE", None)
         os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
@@ -77,8 +83,12 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         result = get_cloud_status(_status_module(token, rest))
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+        self.assertIsNone(result["upstream_classification"])
+        trace = snapshot()
+        self.assertEqual(trace["rejection_count"], 1)
+        self.assertEqual(trace["upstream_code"], 808)
 
-    def test_http_400_dh906_clock_valid_is_dhan_rejected(self):
+    def test_http_400_dh906_is_non_auth_even_if_text_says_invalid_token(self):
         import time
         token = _jwt(time.time() + 3600)
 
@@ -86,8 +96,10 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             raise _http_error(400, "DH-906 invalid token")
 
         result = get_cloud_status(_status_module(token, rest))
-        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
-        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
+        self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_non_auth_http_400_is_not_falsely_labeled_token_rejected(self):
         import time
@@ -99,6 +111,8 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         result = get_cloud_status(_status_module(token, rest))
         self.assertEqual(result["error"], "HTTP_400")
         self.assertIsNone(result["auth_classification"])
+        self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_http_429_is_not_auth_failure(self):
         import time
@@ -110,6 +124,42 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         result = get_cloud_status(_status_module(token, rest))
         self.assertEqual(result["error"], "HTTP_429")
         self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
+        self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_runtime_recovery_classifier_rejects_906_and_805_even_with_auth_text(self):
+        self.assertFalse(_auth_failed({
+            "error": "DHAN_REQUEST_REJECTED_906",
+            "upstream_classification": "DHAN_REQUEST_REJECTED_906",
+            "message": "DH-906 invalid token",
+        }))
+        self.assertFalse(_auth_failed({
+            "error": "HTTP_429",
+            "upstream_classification": "DHAN_RATE_LIMITED",
+            "message": "code 805 invalid token",
+        }))
+        self.assertTrue(_auth_failed({"error": "TOKEN_EXPIRED_OR_INVALID", "auth_classification": "DHAN_TOKEN_REJECTED"}))
+        self.assertTrue(_auth_failed({"error": "HTTP_401", "message": "unauthorized"}))
+
+    def test_runtime_wrapper_does_not_reload_or_rotate_for_dh906(self):
+        module = types.SimpleNamespace(_STATUS_RESULT_CACHE=None, _STATUS_RESULT_CACHE_AT=0.0)
+        original = lambda: {
+            "connected": False,
+            "error": "DHAN_REQUEST_REJECTED_906",
+            "auth_classification": None,
+            "upstream_classification": "DHAN_REQUEST_REJECTED_906",
+            "message": "DH-906 invalid token",
+        }
+        wrapped = _wrap_read(module, "get_profile", original)
+        with patch("core.brokers.dhan.cloud_runtime_patch.get_access_token") as get_token, \
+             patch("core.brokers.dhan.cloud_runtime_patch.force_reload") as reload_token, \
+             patch("core.brokers.dhan.cloud_runtime_patch._invoke_canonical_rotation") as rotate:
+            result = wrapped()
+        get_token.assert_called_once()
+        reload_token.assert_not_called()
+        rotate.assert_not_called()
+        self.assertFalse(result["token_reload"]["attempted"])
+        self.assertFalse(result["canonical_rotation"]["attempted"])
 
     def test_same_rejected_secret_version_force_reload_is_suppressed(self):
         client = _Client([("258", "token-a"), ("258", "token-a"), ("258", "token-a")])

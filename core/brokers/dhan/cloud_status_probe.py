@@ -3,8 +3,10 @@
 Safety: read-only profile GET only; no order APIs; no raw token output.
 Legacy ``error`` values are preserved for confirmed auth failures;
 ``auth_classification`` adds explicit clock-vs-upstream rejection semantics.
-The first affirmative upstream auth rejection is latched with safe metadata before
-any Secret Manager reload/recovery can obscure event ordering.
+Known non-auth upstream failures use ``upstream_classification`` instead of
+polluting authentication state. The first affirmative upstream auth rejection is
+latched with safe metadata before any Secret Manager reload/recovery can obscure
+event ordering.
 """
 from __future__ import annotations
 
@@ -41,15 +43,32 @@ def _auth_classification(token: str) -> str:
     return "DHAN_TOKEN_REJECTED_CLOCK_UNKNOWN"
 
 
+def _safe_upstream_code(blob: str) -> int | None:
+    """Extract only a numeric Dhan error code; never return response text."""
+    for pattern in (r'"code"\s*:\s*(\d{3,5})', r"\bcode\s+(\d{3,5})\b", r"\bdh-(\d{3,5})\b"):
+        match = re.search(pattern, blob, flags=re.IGNORECASE)
+        if match:
+            try:
+                return int(match.group(1))
+            except ValueError:
+                return None
+    return None
+
+
 def _http_auth_failure(status_code: Any, blob: str) -> bool:
-    """Return true only for an HTTP exception with affirmative auth evidence."""
-    if status_code == 401:
+    """Return true only for affirmative upstream authentication evidence.
+
+    Dhan DH-906 is an order/request error and 805 is rate limiting. Their
+    documented numeric codes override ambiguous free text and neither may
+    invalidate the token or increment the first-authentication-rejection latch.
+    Dhan 808 and HTTP 401 remain affirmative authentication evidence.
+    """
+    code = _safe_upstream_code(blob)
+    if code in {805, 906}:
+        return False
+    if status_code == 401 or code == 808:
         return True
     auth_markers = (
-        "dh-906",
-        "code 808",
-        '"code":808',
-        '"code": 808',
         "invalid token",
         "invalid access token",
         "token expired",
@@ -60,15 +79,13 @@ def _http_auth_failure(status_code: Any, blob: str) -> bool:
     return status_code == 400 and any(marker in blob for marker in auth_markers)
 
 
-def _safe_upstream_code(blob: str) -> int | None:
-    """Extract only a numeric Dhan error code; never return response text."""
-    for pattern in (r'"code"\s*:\s*(\d{3,5})', r"\bcode\s+(\d{3,5})\b", r"\bdh-(\d{3,5})\b"):
-        match = re.search(pattern, blob, flags=re.IGNORECASE)
-        if match:
-            try:
-                return int(match.group(1))
-            except ValueError:
-                return None
+def _non_auth_upstream_classification(status_code: Any, blob: str) -> str | None:
+    """Classify known non-auth Dhan failures without changing auth state."""
+    code = _safe_upstream_code(blob)
+    if code == 805 or status_code == 429:
+        return "DHAN_RATE_LIMITED"
+    if code == 906:
+        return "DHAN_REQUEST_REJECTED_906"
     return None
 
 
@@ -129,6 +146,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             "connected": False,
             "error": "CONFIG_MISSING",
             "auth_classification": "CONFIG_MISSING",
+            "upstream_classification": None,
             "latency_ms": 0,
         }
     started = time.monotonic()
@@ -148,6 +166,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
                 "connected": False,
                 "error": "TOKEN_EXPIRED_OR_INVALID",
                 "auth_classification": classification,
+                "upstream_classification": None,
                 "auth_rejection_trace": trace,
                 "latency_ms": latency_ms,
             }
@@ -156,6 +175,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             "connected": True,
             "error": None,
             "auth_classification": "AUTH_OK",
+            "upstream_classification": None,
             "auth_rejection_trace": snapshot(),
             "latency_ms": latency_ms,
             "profile_source": "rest",
@@ -173,22 +193,28 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             body = ""
         blob = f"{status_code or ''} {body} {exc}".lower()
         classification = None
+        upstream_classification = None
         trace = snapshot()
         if _http_auth_failure(status_code, blob):
             error = "TOKEN_EXPIRED_OR_INVALID"
             classification = _auth_classification(access_token)
             trace = _record_rejection(access_token, status_code, blob)
-        elif status_code == 403 or "forbidden" in blob:
-            error = "ACCESS_FORBIDDEN"
-        elif status_code:
-            error = f"HTTP_{status_code}"
         else:
-            error = f"NETWORK_ERROR:{type(exc).__name__}"
+            upstream_classification = _non_auth_upstream_classification(status_code, blob)
+            if upstream_classification == "DHAN_REQUEST_REJECTED_906":
+                error = "DHAN_REQUEST_REJECTED_906"
+            elif status_code == 403 or "forbidden" in blob:
+                error = "ACCESS_FORBIDDEN"
+            elif status_code:
+                error = f"HTTP_{status_code}"
+            else:
+                error = f"NETWORK_ERROR:{type(exc).__name__}"
         return {
             **base,
             "connected": False,
             "error": error,
             "auth_classification": classification,
+            "upstream_classification": upstream_classification,
             "auth_rejection_trace": trace,
             "latency_ms": latency_ms,
         }

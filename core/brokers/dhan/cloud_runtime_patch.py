@@ -24,9 +24,7 @@ import threading
 import time
 from typing import Any, Callable
 
-import requests
-
-from core.brokers.dhan.cloud_status_probe import get_cloud_status
+from core.brokers.dhan.cloud_status_probe import get_cloud_status, _safe_upstream_code
 from core.brokers.dhan.cloud_token_provider import (
     force_reload,
     get_access_token,
@@ -60,16 +58,39 @@ def _text_blob(value: Any) -> str:
 
 
 def _auth_failed(result: Any) -> bool:
+    """Return true only for affirmative auth failures that justify recovery.
+
+    Dhan 805/HTTP429 and DH-906 are explicitly non-auth and must never trigger
+    Secret Manager reload or canonical rotation, even if response free text
+    contains misleading phrases such as ``invalid token``.
+    """
     blob = _text_blob(result).lower()
+    code = _safe_upstream_code(blob)
+    if code in {805, 906}:
+        return False
+    if isinstance(result, dict):
+        upstream = str(result.get("upstream_classification") or "").strip()
+        if upstream in {"DHAN_RATE_LIMITED", "DHAN_REQUEST_REJECTED_906"}:
+            return False
+        auth_classification = str(result.get("auth_classification") or "").strip()
+        if auth_classification in {
+            "DHAN_TOKEN_REJECTED",
+            "DHAN_TOKEN_REJECTED_CLOCK_UNKNOWN",
+            "TOKEN_CLOCK_EXPIRED",
+        }:
+            return True
+    if code == 808:
+        return True
     return any(
         marker in blob
         for marker in (
             "token_expired_or_invalid",
             "invalid token",
-            "dh-906",
             "unauthorized",
             "http_401",
             "status_code=401",
+            "authentication failed",
+            "authentication error",
         )
     )
 
@@ -105,6 +126,8 @@ def _rotation_cooldown_s() -> float:
 
 
 def _metadata_access_token() -> str:
+    import requests
+
     response = requests.get(
         _METADATA_TOKEN_URL,
         headers={"Metadata-Flavor": "Google"},
@@ -120,6 +143,8 @@ def _metadata_access_token() -> str:
 def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
     """Run the sole GCP token mint authority and return non-secret proof."""
     global _LAST_ROTATION_ATTEMPT_AT
+
+    import requests
 
     proof: dict[str, Any] = {
         "attempted": False,
