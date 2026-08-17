@@ -40,6 +40,7 @@ MARKERS = (
 )
 ACTIVE_STATES = {"queued", "in_progress", "waiting", "pending", "requested"}
 FAIL_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
+DEFAULT_ACTIVE_PR_MAX_AGE_H = 72.0
 
 
 @dataclass(frozen=True)
@@ -58,12 +59,53 @@ def _token() -> str:
     return os.getenv("GITHUB_TOKEN", "").strip() or os.getenv("GH_TOKEN", "").strip()
 
 
+def _active_pr_max_age_h() -> float:
+    raw = os.getenv("SYSTEM3_ACTIVE_PR_MAX_AGE_H", str(DEFAULT_ACTIVE_PR_MAX_AGE_H)).strip()
+    try:
+        return max(1.0, min(float(raw), 720.0))
+    except ValueError:
+        return DEFAULT_ACTIVE_PR_MAX_AGE_H
+
+
+def _parse_github_utc(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def pr_is_currently_active(
+    updated_at: Any,
+    *,
+    now: datetime | None = None,
+    max_age_h: float | None = None,
+) -> tuple[bool, float | None]:
+    """Return whether an open PR is current enough to participate in blocker logic.
+
+    All open PRs remain inventoried. Recency only controls whether a PR head may
+    make its old workflow failure actionable for the current production loop.
+    """
+    stamp = _parse_github_utc(updated_at)
+    if stamp is None:
+        return False, None
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    age_h = max(0.0, (current - stamp).total_seconds() / 3600.0)
+    limit = _active_pr_max_age_h() if max_age_h is None else max(1.0, float(max_age_h))
+    return age_h <= limit, round(age_h, 2)
+
+
 def api_get(repo: str, path: str, *, params: dict[str, Any] | None = None) -> Any:
     query = "?" + urllib.parse.urlencode(params) if params else ""
     url = f"https://api.github.com/repos/{repo}/{path.lstrip('/')}" + query
     headers = {
         "Accept": "application/vnd.github+json",
-        "User-Agent": "Genesis-System3-preflight-control-plane/1.1",
+        "User-Agent": "Genesis-System3-preflight-control-plane/1.2",
     }
     token = _token()
     if token:
@@ -77,7 +119,13 @@ def api_get(repo: str, path: str, *, params: dict[str, Any] | None = None) -> An
         raise RuntimeError(f"GitHub API HTTP {exc.code} for {path}: {body}") from exc
 
 
-def api_get_pages(repo: str, path: str, *, params: dict[str, Any] | None = None, max_pages: int = 10) -> list[Any]:
+def api_get_pages(
+    repo: str,
+    path: str,
+    *,
+    params: dict[str, Any] | None = None,
+    max_pages: int = 10,
+) -> list[Any]:
     base = dict(params or {})
     base["per_page"] = 100
     result: list[Any] = []
@@ -154,15 +202,25 @@ def _failed_jobs(repo: str, run_id: int | None) -> list[dict[str, Any]]:
     return failures
 
 
-def classify_failure_relevance(run: dict[str, Any], *, main_sha: str, active_pr_shas: set[str]) -> bool:
-    """Current-main/active-PR failures block; unrelated old failures stay history."""
+def classify_failure_relevance(
+    run: dict[str, Any],
+    *,
+    main_sha: str,
+    active_pr_shas: set[str],
+) -> bool:
+    """Current-main/current-active-PR failures block; old failures stay history."""
     if run.get("conclusion") not in FAIL_CONCLUSIONS:
         return False
     sha = str(run.get("head_sha") or "")
     return bool(sha and (sha == main_sha or sha in active_pr_shas))
 
 
-def choose_next_action(*, main_sha: str, workflows: list[dict[str, Any]], active_prs: list[dict[str, Any]]) -> Decision:
+def choose_next_action(
+    *,
+    main_sha: str,
+    workflows: list[dict[str, Any]],
+    active_prs: list[dict[str, Any]],
+) -> Decision:
     active = [r for r in workflows if r.get("status") in ACTIVE_STATES]
     deploy = next(
         (
@@ -190,13 +248,19 @@ def choose_next_action(*, main_sha: str, workflows: list[dict[str, Any]], active
             f"current dependency failure(s): {names}",
         )
 
-    mergeable = [p for p in active_prs if p.get("mergeable") is True and not p.get("draft")]
+    mergeable = [
+        p
+        for p in active_prs
+        if p.get("current_relevance") is True
+        and p.get("mergeable") is True
+        and not p.get("draft")
+    ]
     if mergeable:
         return Decision(
             "WORKING",
             "active PR gate verification",
             "verify exact-head mandatory gates; merge immediately when green",
-            f"{len(mergeable)} mergeable active PR(s)",
+            f"{len(mergeable)} current mergeable active PR(s)",
         )
 
     if active:
@@ -218,15 +282,20 @@ def choose_next_action(*, main_sha: str, workflows: list[dict[str, Any]], active
 
 def _open_prs(repo: str) -> tuple[list[dict[str, Any]], set[str]]:
     summaries = api_get_pages(repo, "pulls", params={"state": "open"}, max_pages=3)
-    active_prs: list[dict[str, Any]] = []
-    shas: set[str] = set()
+    all_open_prs: list[dict[str, Any]] = []
+    current_relevant_shas: set[str] = set()
+    now = datetime.now(timezone.utc)
+    max_age_h = _active_pr_max_age_h()
     for summary in summaries:
         number = int(summary.get("number") or 0)
         detail = api_get(repo, f"pulls/{number}") if number else summary
         head_sha = str(((detail.get("head") or {}).get("sha")) or "")
-        if head_sha:
-            shas.add(head_sha)
-        active_prs.append(
+        current_relevance, age_h = pr_is_currently_active(
+            detail.get("updated_at"), now=now, max_age_h=max_age_h
+        )
+        if head_sha and current_relevance:
+            current_relevant_shas.add(head_sha)
+        all_open_prs.append(
             {
                 "number": number,
                 "title": detail.get("title"),
@@ -236,14 +305,20 @@ def _open_prs(repo: str) -> tuple[list[dict[str, Any]], set[str]]:
                 "head_sha": head_sha,
                 "base_sha": ((detail.get("base") or {}).get("sha")),
                 "updated_at": detail.get("updated_at"),
+                "age_hours": age_h,
+                "current_relevance": current_relevance,
                 "html_url": detail.get("html_url"),
             }
         )
-    return active_prs, shas
+    return all_open_prs, current_relevant_shas
 
 
 def _recent_open_issues(repo: str) -> list[dict[str, Any]]:
-    payload = api_get(repo, "issues", params={"state": "open", "sort": "updated", "direction": "desc", "per_page": 30})
+    payload = api_get(
+        repo,
+        "issues",
+        params={"state": "open", "sort": "updated", "direction": "desc", "per_page": 30},
+    )
     return [
         {
             "number": item.get("number"),
@@ -257,7 +332,10 @@ def _recent_open_issues(repo: str) -> list[dict[str, Any]]:
     ]
 
 
-def _coordination(repo: str, issue_number: int) -> tuple[dict[str, Any], dict[str, dict[str, Any] | None]]:
+def _coordination(
+    repo: str,
+    issue_number: int,
+) -> tuple[dict[str, Any], dict[str, dict[str, Any] | None]]:
     issue = api_get(repo, f"issues/{issue_number}")
     comments = api_get_pages(repo, f"issues/{issue_number}/comments", max_pages=10)
     newest: dict[str, dict[str, Any] | None] = {marker: None for marker in MARKERS}
@@ -289,19 +367,23 @@ def _coordination(repo: str, issue_number: int) -> tuple[dict[str, Any], dict[st
 def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
     main = api_get(repo, "commits/main")
     main_sha = str(main.get("sha") or "")
-    active_prs, active_pr_shas = _open_prs(repo)
+    open_prs, active_pr_shas = _open_prs(repo)
 
-    workflow_defs = (api_get(repo, "actions/workflows", params={"per_page": 100}).get("workflows") or [])
-    recent_runs = (api_get(repo, "actions/runs", params={"per_page": 100}).get("workflow_runs") or [])
+    workflow_defs = (
+        api_get(repo, "actions/workflows", params={"per_page": 100}).get("workflows") or []
+    )
+    recent_runs = (
+        api_get(repo, "actions/runs", params={"per_page": 100}).get("workflow_runs") or []
+    )
 
     workflow_inventory = []
     actionable_by_id: dict[int, dict[str, Any]] = {}
 
-    # Every configured workflow gets an independently queried latest run, so a
-    # low-frequency workflow cannot disappear merely because 100 newer runs exist.
     for workflow in workflow_defs:
         wid = int(workflow.get("id") or 0)
-        latest_payload = api_get(repo, f"actions/workflows/{wid}/runs", params={"per_page": 1}) if wid else {}
+        latest_payload = (
+            api_get(repo, f"actions/workflows/{wid}/runs", params={"per_page": 1}) if wid else {}
+        )
         latest_raw = (latest_payload.get("workflow_runs") or [None])[0]
         latest = _compact_run(latest_raw) if latest_raw else None
         if latest_raw:
@@ -310,7 +392,11 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
             )
             try:
                 latest["artifacts"] = _artifact_meta(
-                    api_get(repo, f"actions/runs/{latest_raw.get('id')}/artifacts", params={"per_page": 100})
+                    api_get(
+                        repo,
+                        f"actions/runs/{latest_raw.get('id')}/artifacts",
+                        params={"per_page": 100},
+                    )
                 )
             except Exception as exc:
                 latest["artifact_query_error"] = type(exc).__name__
@@ -328,9 +414,10 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
             }
         )
 
-    # Also catch active/current-relevant runs that are not the latest run of a workflow.
     for raw in recent_runs:
-        relevant_failure = classify_failure_relevance(raw, main_sha=main_sha, active_pr_shas=active_pr_shas)
+        relevant_failure = classify_failure_relevance(
+            raw, main_sha=main_sha, active_pr_shas=active_pr_shas
+        )
         if raw.get("status") == "completed" and not relevant_failure:
             continue
         rid = int(raw.get("id") or 0)
@@ -339,7 +426,9 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         compact = _compact_run(raw)
         compact["relevant_failure"] = relevant_failure
         try:
-            compact["artifacts"] = _artifact_meta(api_get(repo, f"actions/runs/{rid}/artifacts", params={"per_page": 100}))
+            compact["artifacts"] = _artifact_meta(
+                api_get(repo, f"actions/runs/{rid}/artifacts", params={"per_page": 100})
+            )
         except Exception as exc:
             compact["artifact_query_error"] = type(exc).__name__
         if raw.get("conclusion") in FAIL_CONCLUSIONS:
@@ -347,11 +436,15 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         actionable_by_id[rid] = compact
 
     actionable_runs = sorted(
-        actionable_by_id.values(), key=lambda x: str(x.get("created_at") or ""), reverse=True
+        actionable_by_id.values(),
+        key=lambda x: str(x.get("created_at") or ""),
+        reverse=True,
     )
     issue_188, newest_markers = _coordination(repo, issue_number)
     recent_issues = _recent_open_issues(repo)
-    decision = choose_next_action(main_sha=main_sha, workflows=actionable_runs, active_prs=active_prs)
+    decision = choose_next_action(
+        main_sha=main_sha, workflows=actionable_runs, active_prs=open_prs
+    )
 
     return {
         "schema": "SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1",
@@ -366,11 +459,16 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         "workflow_count": len(workflow_defs),
         "workflow_inventory": workflow_inventory,
         "actionable_runs": actionable_runs,
-        "open_pull_requests": active_prs,
+        "open_pull_requests": open_prs,
+        "active_pr_max_age_h": _active_pr_max_age_h(),
+        "current_relevant_pr_count": sum(
+            1 for pr in open_prs if pr.get("current_relevance") is True
+        ),
         "recent_open_issues": recent_issues,
         "coordination_markers": newest_markers,
         "policy": {
-            "historical_failures": "context_only_unless_current_main_or_active_pr_dependency",
+            "historical_failures": "context_only_unless_current_main_or_current_active_pr_dependency",
+            "open_pr_history": "all_open_prs_are_inventoried_but_only_recent_current_relevant_heads_can_block",
             "before_proceed": "rerun_this_snapshot_and_revalidate_live_critical_claims",
             "green_ci": "merge_when_exact_head_mandatory_gates_green",
             "merged": "check_canonical_deploy",
@@ -401,7 +499,9 @@ def write_snapshot(snapshot: dict[str, Any], out_dir: Path) -> tuple[Path, Path]
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Genesis System3 workflow/issue/artifact preflight")
+    parser = argparse.ArgumentParser(
+        description="Genesis System3 workflow/issue/artifact preflight"
+    )
     parser.add_argument("--repo", default=DEFAULT_REPO)
     parser.add_argument("--issue", type=int, default=DEFAULT_ISSUE)
     parser.add_argument("--out-dir", default=str(OUT_DIR))
