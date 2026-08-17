@@ -172,11 +172,11 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     assert "COLLECTOR_URI=\"https://run.googleapis.com/v2/projects/${GOOGLE_CLOUD_PROJECT}/locations/${GCP_REGION}/jobs/genesis-system3-scheduler-collector:run\"" in workflow
     assert "coverage.contract_matched == true" in workflow
     assert ".coverage.total == .coverage.expected_total" in workflow
-    assert "Cloud self-bootstrap" in workflow
-    assert 'gcloud run jobs execute "genesis-system3-${LANE}"' in workflow
-    assert "genesis-system3-ml-history-bootstrap" in workflow
-    assert "SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1" in workflow
-    assert "/api/auto_gates" in workflow
+    # Deploy configures/schedules business lanes but must never manufacture their evidence.
+    assert "Cloud self-bootstrap" not in workflow
+    assert 'gcloud run jobs execute "genesis-system3-${LANE}"' not in workflow
+    assert "genesis-system3-ml-history-bootstrap" not in workflow
+    assert "SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP=1" not in workflow
     assert "genesis-system3-control-plane-verify" in workflow
     assert "for PASS in 1 2 3 4" in workflow
     assert "DEPLOY_GIT_SHA=${GITHUB_SHA}" in workflow

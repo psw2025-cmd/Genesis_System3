@@ -18,10 +18,18 @@ const ICONS: Record<string, any> = {
   INFO: CheckCircle,
 }
 
+const isLiveReadinessInfo = (alert: any) => {
+  const type = String(alert?.type ?? alert?.category ?? alert?.code ?? '').toUpperCase()
+  const severity = String(alert?.severity ?? 'INFO').toUpperCase()
+  return type === 'LIVE_GATE' && severity === 'INFO'
+}
+
 export function AlertsTab() {
   const { alerts, apiStatus, marketOpen, brokerConnected, wsStatus } = useStore()
   const authIssue = Boolean(apiStatus && /auth|401|403/i.test(String(apiStatus.status || apiStatus.message || '')))
-  const counts = alerts.reduce<Record<string, number>>((acc, alert: any) => {
+  const liveReadinessInfo = alerts.filter(isLiveReadinessInfo)
+  const activeAlerts = alerts.filter((alert: any) => !isLiveReadinessInfo(alert))
+  const counts = activeAlerts.reduce<Record<string, number>>((acc, alert: any) => {
     const severity = String(alert?.severity ?? 'INFO').toUpperCase()
     acc[severity] = (acc[severity] || 0) + 1
     return acc
@@ -38,8 +46,8 @@ export function AlertsTab() {
               <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.59rem' }}>System, broker, data-quality and model notifications</div>
             </div>
           </div>
-          <span className="pill" style={{ color: alerts.length ? 'var(--amber)' : 'var(--up)', border: `1px solid ${alerts.length ? 'rgba(245,165,36,.25)' : 'rgba(24,215,130,.22)'}`, background: alerts.length ? 'rgba(245,165,36,.06)' : 'rgba(24,215,130,.05)' }}>
-            {alerts.length ? `${alerts.length} ACTIVE` : 'NO ACTIVE ALERTS'}
+          <span className="pill" style={{ color: activeAlerts.length ? 'var(--amber)' : 'var(--up)', border: `1px solid ${activeAlerts.length ? 'rgba(245,165,36,.25)' : 'rgba(24,215,130,.22)'}`, background: activeAlerts.length ? 'rgba(245,165,36,.06)' : 'rgba(24,215,130,.05)' }}>
+            {activeAlerts.length ? `${activeAlerts.length} ACTIVE` : 'NO ACTIVE ALERTS'}
           </span>
         </div>
       </div>
@@ -67,19 +75,19 @@ export function AlertsTab() {
             <span style={{ color: 'var(--text-mut)', fontSize: '.55rem' }}>Newest evidence first</span>
           </div>
 
-          {alerts.length === 0 ? (
+          {activeAlerts.length === 0 ? (
             <div style={{ minHeight: 360, display: 'grid', placeItems: 'center', padding: 24 }}>
               <div style={{ textAlign: 'center', maxWidth: 520 }}>
                 <div style={{ width: 54, height: 54, borderRadius: 14, display: 'grid', placeItems: 'center', margin: '0 auto', color: 'var(--up)', border: '1px solid rgba(24,215,130,.24)', background: 'rgba(24,215,130,.06)' }}><CheckCircle size={25} /></div>
                 <div style={{ marginTop: 14, color: 'var(--text-pri)', fontWeight: 800, fontSize: '.84rem' }}>No active alerts</div>
                 <div style={{ marginTop: 7, color: 'var(--text-mut)', fontSize: '.65rem', lineHeight: 1.65 }}>
-                  {authIssue ? (apiStatus?.message || apiStatus?.status) : 'The alert stream is clear. New system, data, broker or model events will appear here without changing trading authority.'}
+                  {authIssue ? (apiStatus?.message || apiStatus?.status) : 'The operational alert stream is clear. Live-readiness information is tracked separately and cannot change trading authority.'}
                 </div>
               </div>
             </div>
           ) : (
             <div style={{ padding: 10, display: 'grid', gap: 7 }}>
-              {alerts.map((a: any, i: number) => {
+              {activeAlerts.map((a: any, i: number) => {
                 const sev = String(a.severity ?? 'INFO').toUpperCase()
                 const Icon = ICONS[sev] ?? Info
                 return (
@@ -105,6 +113,15 @@ export function AlertsTab() {
                 <span style={{ color: 'var(--text-sec)' }}>{label}</span><span style={{ color: 'var(--up)', fontWeight: 800 }}>MONITORED</span>
               </div>
             ))}
+          </div>
+          <div className="card" style={{ padding: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}><Shield size={14} color="var(--up)" /><div className="panel-title">Live Readiness</div></div>
+            <div style={{ marginTop: 9, color: 'var(--up)', fontWeight: 800, fontSize: '.66rem' }}>BLOCKED BY DESIGN</div>
+            <div style={{ marginTop: 6, color: 'var(--text-mut)', fontSize: '.59rem', lineHeight: 1.6 }}>
+              {liveReadinessInfo.length
+                ? `${liveReadinessInfo.length} informational live-readiness record${liveReadinessInfo.length === 1 ? '' : 's'} tracked separately; live approval is not required for PAPER/ANALYZER operation.`
+                : 'No live-readiness record is being promoted into the active operational alert count; live approval is not required for PAPER/ANALYZER operation.'}
+            </div>
           </div>
           <div className="card" style={{ padding: 12 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}><Shield size={14} color="var(--up)" /><div className="panel-title">Authority</div></div>
