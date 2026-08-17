@@ -10,8 +10,10 @@ SAFETY CONTRACT:
 
 import logging
 import os
+import re
 import sys
 import time
+from typing import Any
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 if ROOT_DIR not in sys.path:
@@ -20,10 +22,12 @@ if ROOT_DIR not in sys.path:
 # Load env (picks up .secrets/dhan.env via env_loader's path list)
 try:
     from core.utils.env_loader import get_dhan_credentials
+
     _ENV_LOADED_VIA = "core.utils.env_loader"
 except ImportError:
     # Fallback: load .secrets/dhan.env directly
     from dotenv import load_dotenv
+
     _secrets_path = os.path.join(ROOT_DIR, ".secrets", "dhan.env")
     _sys3_env = os.getenv("SYSTEM3_ENV_FILE", "")
     for _p in [_sys3_env, _secrets_path]:
@@ -36,10 +40,12 @@ except ImportError:
             "client_id": os.getenv("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff"),
             "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff"),
         }
+
     _ENV_LOADED_VIA = "dotenv-fallback"
 
 try:
     import requests as _requests
+
     _REQUESTS_OK = True
 except ImportError:
     _requests = None
@@ -52,6 +58,7 @@ try:
     import dhanhq as _pkg
     from dhanhq import dhanhq as _dhanhq_class
     from dhanhq.dhan_context import DhanContext as _DhanContext
+
     _DHAN_SDK_OK = True
 except Exception:
     pass
@@ -67,10 +74,14 @@ _DHAN_POSITIONS_URL = "https://api.dhan.co/v2/positions"
 _DHAN_HOLDINGS_URL = "https://api.dhan.co/v2/holdings"
 _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 
-# Broker status endpoint is polled every 10s by the dashboard.  Auto-refresh
-# must therefore be rate-limited so an expired/missing token does not trigger
-# repeated login attempts or TOTP churn on every UI poll.
-_STATUS_REFRESH_COOLDOWN_S = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "130") or "130")
+# Broker status endpoint is polled frequently by the dashboard. Auto-refresh must
+# therefore be rate-limited so a genuine auth failure cannot create TOTP/token
+# churn. 180s is the hard safety floor shared with the canonical Cloud rotator.
+try:
+    _configured_status_refresh = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "180") or "180")
+except ValueError:
+    _configured_status_refresh = 180
+_STATUS_REFRESH_COOLDOWN_S = max(180, _configured_status_refresh)
 _LAST_STATUS_REFRESH_ATTEMPT_AT = 0.0
 _STATUS_RESULT_CACHE: dict | None = None
 _STATUS_RESULT_CACHE_AT = 0.0
@@ -121,8 +132,8 @@ def _status_auto_refresh_enabled() -> bool:
 def _safe_refresh_token_for_status(reason: str) -> dict:
     """
     Refresh Dhan token from the web backend process when dashboard broker status
-    detects an expired/missing token.  Returns only safe metadata; never returns
-    or logs the raw access token.
+    detects a confirmed expired/missing token. Returns only safe metadata; never
+    returns or logs the raw access token.
     """
     global _LAST_STATUS_REFRESH_ATTEMPT_AT
 
@@ -151,7 +162,8 @@ def _safe_refresh_token_for_status(reason: str) -> dict:
         from core.brokers.dhan.token_manager import refresh_token
 
         # Never force-generate here. Minting a new token invalidates the Cloud Run
-        # Secret Manager mount (DH-906 churn). Renew-only; controlled mint stays local.
+        # Secret Manager mount. Renew-only; controlled mint stays with canonical
+        # scheduler/manual recovery authority.
         result = refresh_token(force_generate=False)
         meta["success"] = bool(result.get("success"))
         meta["strategy"] = result.get("strategy")
@@ -186,7 +198,6 @@ def create_dhan_client():
     Create and return a dhanhq SDK client instance.
     Uses DhanContext(client_id, access_token) → dhanhq(ctx) pattern.
     Returns None if credentials are missing or SDK unavailable.
-    Raises RuntimeError if SDK is installed but credentials are missing.
     """
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
@@ -207,24 +218,133 @@ def create_dhan_client():
         return None
 
 
-def _rest_get(url: str, access_token: str, client_id: str, timeout: int = 10) -> dict:
-    """Raw REST GET to Dhan API — returns parsed JSON or raises."""
+def _safe_upstream_code(value: Any) -> int | None:
+    """Extract a Dhan numeric error code without returning response text."""
+    if isinstance(value, dict):
+        remarks = value.get("remarks") if isinstance(value.get("remarks"), dict) else {}
+        candidates = (
+            remarks.get("error_code"),
+            remarks.get("errorCode"),
+            value.get("errorCode"),
+            value.get("error_code"),
+            value.get("code"),
+        )
+        for candidate in candidates:
+            code = _safe_upstream_code(candidate)
+            if code is not None:
+                return code
+    text = str(value or "")
+    for pattern in (
+        r"\bdh[-_ ]?(\d{3,5})\b",
+        r'"(?:error_?code|code)"\s*:\s*"?(\d{3,5})',
+        r"\bcode\s*[=: ]\s*(\d{3,5})\b",
+    ):
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            try:
+                return int(match.group(1))
+            except ValueError:
+                return None
+    if text.strip().isdigit():
+        try:
+            return int(text.strip())
+        except ValueError:
+            return None
+    return None
+
+
+def _payload_error(data: Any) -> str | None:
+    """Map Dhan response payloads to stable, non-secret error taxonomy."""
+    if not isinstance(data, dict):
+        return None
+    remarks = data.get("remarks") if isinstance(data.get("remarks"), dict) else {}
+    message = " ".join(
+        str(v or "")
+        for v in (
+            remarks.get("error_message"),
+            remarks.get("errorMessage"),
+            data.get("errorMessage"),
+            data.get("message"),
+            data.get("status"),
+        )
+    ).lower()
+    code = _safe_upstream_code(data)
+    if code == 805:
+        return "DHAN_RATE_LIMITED"
+    if code == 906:
+        return "DHAN_REQUEST_REJECTED_906"
+    if code in {808, 809}:
+        return "TOKEN_EXPIRED_OR_INVALID"
+    if "invalid token" in message or "invalid access token" in message or "token expired" in message:
+        return "TOKEN_EXPIRED_OR_INVALID"
+    status = str(data.get("status") or "").strip().lower()
+    if status in {"failure", "failed", "error"} and message.strip():
+        return "DHAN_UPSTREAM_FAILURE"
+    return None
+
+
+def _auth_failure_payload(data: Any) -> bool:
+    """True only for affirmative Dhan authentication/token rejection payloads."""
+    return _payload_error(data) == "TOKEN_EXPIRED_OR_INVALID"
+
+
+def _rest_get(
+    url: str,
+    access_token: str,
+    client_id: str,
+    timeout: int | float = 10,
+    *,
+    include_client_id: bool = True,
+) -> dict:
+    """Raw REST GET to Dhan API — returns parsed JSON or raises.
+
+    Dhan Profile and Fund Limit are documented access-token-only GETs. Data APIs
+    such as Option Chain have their own helpers and require client-id. The caller
+    therefore chooses header scope explicitly rather than forcing client-id onto
+    every endpoint.
+    """
     if not _REQUESTS_OK or _requests is None:
         raise RuntimeError("requests library not available")
     headers = {
         "access-token": access_token,
-        "client-id": client_id,
         "Content-Type": "application/json",
     }
+    if include_client_id:
+        headers["client-id"] = client_id
     resp = _requests.get(url, headers=headers, timeout=timeout)
     resp.raise_for_status()
     return resp.json()
 
 
+def _exception_error(exc: Exception) -> str:
+    """Classify an HTTP/network exception without exposing response payload."""
+    response = getattr(exc, "response", None)
+    status_code = getattr(response, "status_code", None) if response is not None else None
+    try:
+        body = str(getattr(response, "text", "") or "")[:300] if response is not None else ""
+    except Exception:
+        body = ""
+    blob = f"{status_code or ''} {body} {exc}".lower()
+    code = _safe_upstream_code(blob)
+    if code == 805 or status_code == 429:
+        return "DHAN_RATE_LIMITED"
+    if code == 906:
+        return "DHAN_REQUEST_REJECTED_906"
+    if status_code == 401 or code in {808, 809}:
+        return "TOKEN_EXPIRED_OR_INVALID"
+    if "invalid token" in blob or "invalid access token" in blob or "token expired" in blob:
+        return "TOKEN_EXPIRED_OR_INVALID"
+    if status_code == 403 or "forbidden" in blob:
+        return "ACCESS_FORBIDDEN"
+    if status_code:
+        return f"HTTP_{status_code}"
+    return f"NETWORK_ERROR:{type(exc).__name__}"
+
+
 def get_profile() -> dict:
     """
     Fetch profile from Dhan API.
-    Tries SDK first; falls back to REST.
+    Tries SDK first; falls back to the documented access-token-only REST GET.
     Returns a safe dict — never includes raw token.
     """
     creds = get_dhan_credentials()
@@ -234,44 +354,32 @@ def get_profile() -> dict:
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
 
-    # Try SDK first
+    # Try SDK first.
     client = create_dhan_client()
     if client is not None:
         try:
             result = client.get_profile() if hasattr(client, "get_profile") else None
             if result is not None:
+                payload_error = _payload_error(result)
+                if payload_error:
+                    return {"success": False, "error": payload_error, "source": "sdk", "data": _safe_profile(result)}
                 return {"success": True, "source": "sdk", "data": _safe_profile(result)}
         except Exception as exc:
             logger.debug("SDK profile fetch failed (%s), trying REST", type(exc).__name__)
 
-    # REST fallback
     try:
-        data = _rest_get(_DHAN_PROFILE_URL, access_token, client_id)
+        data = _rest_get(
+            _DHAN_PROFILE_URL,
+            access_token,
+            client_id,
+            include_client_id=False,
+        )
+        payload_error = _payload_error(data)
+        if payload_error:
+            return {"success": False, "error": payload_error, "source": "rest", "data": _safe_profile(data)}
         return {"success": True, "source": "rest", "data": _safe_profile(data)}
     except Exception as exc:
-        err = str(exc)
-        body = ""
-        resp = getattr(exc, "response", None)
-        if resp is not None:
-            try:
-                body = (getattr(resp, "text", None) or "")[:300]
-            except Exception:
-                body = ""
-            status_code = getattr(resp, "status_code", None)
-            if status_code in (400, 401) or "DH-906" in body or "Invalid Token" in body:
-                return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
-            if status_code == 403 or "Forbidden" in err.lower():
-                return {"success": False, "error": "ACCESS_FORBIDDEN", "data": None}
-            return {
-                "success": False,
-                "error": f"HTTP_{status_code}: {body[:120] or type(exc).__name__}",
-                "data": None,
-            }
-        if "401" in err or "Unauthorized" in err.lower() or "DH-906" in err or "Invalid Token" in err:
-            return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
-        if "403" in err or "Forbidden" in err.lower():
-            return {"success": False, "error": "ACCESS_FORBIDDEN", "data": None}
-        return {"success": False, "error": f"NETWORK_ERROR: {type(exc).__name__}", "data": None}
+        return {"success": False, "error": _exception_error(exc), "data": None}
 
 
 def _safe_profile(raw: dict) -> dict:
@@ -279,31 +387,29 @@ def _safe_profile(raw: dict) -> dict:
     if not isinstance(raw, dict):
         return {}
     safe_keys = {
-        "dhanClientId", "clientName", "email", "segment",
-        "exchangeSegment", "status", "message", "httpStatus",
+        "dhanClientId",
+        "clientName",
+        "dhanClientName",
+        "email",
+        "segment",
+        "activeSegment",
+        "exchangeSegment",
+        "tokenValidity",
+        "ddpi",
+        "mtf",
+        "dataPlan",
+        "dataValidity",
+        "status",
+        "message",
+        "httpStatus",
+        "errorCode",
+        "errorMessage",
     }
     return {k: v for k, v in raw.items() if k in safe_keys}
 
 
-
-def _auth_failure_payload(data) -> bool:
-    """True when Dhan returned an Invalid Token / DH-906 style payload."""
-    if not isinstance(data, dict):
-        return False
-    remarks = data.get("remarks") if isinstance(data.get("remarks"), dict) else {}
-    err = str(remarks.get("error_code") or data.get("errorCode") or "")
-    msg = str(remarks.get("error_message") or data.get("errorMessage") or "")
-    status = str(data.get("status") or "").lower()
-    blob = f"{err} {msg} {status}"
-    return (
-        "DH-906" in blob
-        or "invalid token" in blob.lower()
-        or (status == "failure" and ("token" in blob.lower() or err.startswith("DH-")))
-    )
-
-
 def get_funds() -> dict:
-    """Fetch fund limits (read-only)."""
+    """Fetch fund limits (read-only) using Dhan's canonical header contract."""
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
@@ -314,22 +420,26 @@ def get_funds() -> dict:
     if client is not None and hasattr(client, "get_fund_limits"):
         try:
             data = client.get_fund_limits()
-            if _auth_failure_payload(data):
-                return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": data, "source": "sdk"}
+            payload_error = _payload_error(data)
+            if payload_error:
+                return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
             return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
 
     try:
-        data = _rest_get(_DHAN_FUNDS_URL, access_token, client_id)
-        if _auth_failure_payload(data):
-            return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": data, "source": "rest"}
+        data = _rest_get(
+            _DHAN_FUNDS_URL,
+            access_token,
+            client_id,
+            include_client_id=False,
+        )
+        payload_error = _payload_error(data)
+        if payload_error:
+            return {"success": False, "error": payload_error, "data": data, "source": "rest"}
         return {"success": True, "source": "rest", "data": data}
     except Exception as exc:
-        err = str(exc)
-        if "DH-906" in err or "Invalid Token" in err or "401" in err:
-            return {"success": False, "error": "TOKEN_EXPIRED_OR_INVALID", "data": None}
-        return {"success": False, "error": err[:200], "data": None}
+        return {"success": False, "error": _exception_error(exc), "data": None}
 
 
 def get_positions() -> dict:
@@ -343,15 +453,22 @@ def get_positions() -> dict:
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_positions"):
         try:
-            return {"success": True, "source": "sdk", "data": client.get_positions()}
+            data = client.get_positions()
+            payload_error = _payload_error(data)
+            if payload_error:
+                return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
+            return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
 
     try:
         data = _rest_get(_DHAN_POSITIONS_URL, access_token, client_id)
+        payload_error = _payload_error(data)
+        if payload_error:
+            return {"success": False, "error": payload_error, "data": data, "source": "rest"}
         return {"success": True, "source": "rest", "data": data}
     except Exception as exc:
-        return {"success": False, "error": str(exc)[:200], "data": None}
+        return {"success": False, "error": _exception_error(exc), "data": None}
 
 
 def get_holdings() -> dict:
@@ -365,15 +482,22 @@ def get_holdings() -> dict:
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_holdings"):
         try:
-            return {"success": True, "source": "sdk", "data": client.get_holdings()}
+            data = client.get_holdings()
+            payload_error = _payload_error(data)
+            if payload_error:
+                return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
+            return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
 
     try:
         data = _rest_get(_DHAN_HOLDINGS_URL, access_token, client_id)
+        payload_error = _payload_error(data)
+        if payload_error:
+            return {"success": False, "error": payload_error, "data": data, "source": "rest"}
         return {"success": True, "source": "rest", "data": data}
     except Exception as exc:
-        return {"success": False, "error": str(exc)[:200], "data": None}
+        return {"success": False, "error": _exception_error(exc), "data": None}
 
 
 def get_orders_readonly() -> dict:
@@ -387,15 +511,22 @@ def get_orders_readonly() -> dict:
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_order_list"):
         try:
-            return {"success": True, "source": "sdk", "data": client.get_order_list()}
+            data = client.get_order_list()
+            payload_error = _payload_error(data)
+            if payload_error:
+                return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
+            return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
 
     try:
         data = _rest_get(_DHAN_ORDERS_URL, access_token, client_id)
+        payload_error = _payload_error(data)
+        if payload_error:
+            return {"success": False, "error": payload_error, "data": data, "source": "rest"}
         return {"success": True, "source": "rest", "data": data}
     except Exception as exc:
-        return {"success": False, "error": str(exc)[:200], "data": None}
+        return {"success": False, "error": _exception_error(exc), "data": None}
 
 
 def get_status() -> dict:
@@ -463,29 +594,16 @@ def get_status() -> dict:
     connected = profile_result.get("success", False)
     error = None if connected else profile_result.get("error", "UNKNOWN")
 
-    # Auto-heal on expired/invalid token AND on ambiguous HTTP failures that
-    # commonly wrap DH-906 Invalid Token when the deployed classifier is older.
-    should_refresh = (not connected) and (
-        error
-        in (
-            "TOKEN_EXPIRED_OR_INVALID",
-            "CONFIG_MISSING",
-        )
-        or (
-            isinstance(error, str)
-            and (
-                error.startswith("HTTP_400")
-                or error.startswith("NETWORK_ERROR")
-                or "DH-906" in error
-                or "Invalid Token" in error
-            )
-        )
+    # Only affirmative token/auth failures may enter refresh logic. Dhan 805,
+    # DH-906, HTTP 429, generic HTTP 400 and transient network failures are not
+    # authentication evidence and must never trigger token churn.
+    should_refresh = (not connected) and error in (
+        "TOKEN_EXPIRED_OR_INVALID",
+        "CONFIG_MISSING",
     )
     if should_refresh:
         refresh_meta = _safe_refresh_token_for_status(
-            "TOKEN_EXPIRED_OR_INVALID"
-            if error != "CONFIG_MISSING"
-            else "CONFIG_MISSING"
+            "TOKEN_EXPIRED_OR_INVALID" if error != "CONFIG_MISSING" else "CONFIG_MISSING"
         )
         if refresh_meta.get("success"):
             t0 = time.time()
