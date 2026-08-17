@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from core.brokers.dhan import cloud_token_provider as provider
 from core.brokers.dhan.cloud_status_probe import get_cloud_status
+from core.brokers.dhan.first_rejection_trace import _reset_for_tests, snapshot
 
 
 def _jwt(exp):
@@ -49,7 +50,11 @@ def _http_error(status_code, text):
 
 
 class BR1DhanAuthReliabilityTests(unittest.TestCase):
+    def setUp(self):
+        _reset_for_tests()
+
     def tearDown(self):
+        _reset_for_tests()
         provider._set_client_factory_for_tests(None)
         os.environ.pop("DHAN_TOKEN_SOURCE", None)
         os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
@@ -78,6 +83,9 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
         self.assertIsNone(result["upstream_classification"])
+        trace = snapshot()
+        self.assertEqual(trace["rejection_count"], 1)
+        self.assertEqual(trace["upstream_code"], 808)
 
     def test_http_400_dh906_is_non_auth_even_if_text_says_invalid_token(self):
         import time
@@ -90,6 +98,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_non_auth_http_400_is_not_falsely_labeled_token_rejected(self):
         import time
@@ -102,6 +111,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "HTTP_400")
         self.assertIsNone(result["auth_classification"])
         self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_http_429_is_not_auth_failure(self):
         import time
@@ -114,6 +124,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "HTTP_429")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_same_rejected_secret_version_force_reload_is_suppressed(self):
         client = _Client([("258", "token-a"), ("258", "token-a"), ("258", "token-a")])
