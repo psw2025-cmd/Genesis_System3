@@ -60,17 +60,31 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         os.environ.pop("DHAN_TOKEN_SOURCE", None)
         os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
 
+    def test_profile_probe_uses_access_token_only_contract(self):
+        import time
+        token = _jwt(time.time() + 3600)
+        seen = {}
+
+        def rest(*args, **kwargs):
+            seen.update(kwargs)
+            return {"dhanClientId": "c", "status": "success"}
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertTrue(result["connected"])
+        self.assertFalse(seen["include_client_id"])
+        self.assertEqual(result["probe_header_contract"], "access-token-only")
+
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
         token = _jwt(time.time() + 3600)
-        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure", "message": "invalid token"}))
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
 
     def test_clock_expired_token_is_distinguished(self):
         import time
         token = _jwt(time.time() - 60)
-        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure"}))
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failure", "message": "token expired"}))
         self.assertEqual(result["auth_classification"], "TOKEN_CLOCK_EXPIRED")
 
     def test_http_401_code_808_clock_valid_is_dhan_rejected(self):
@@ -84,9 +98,23 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
         self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
         self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(result["upstream_code"], 808)
         trace = snapshot()
         self.assertEqual(trace["rejection_count"], 1)
         self.assertEqual(trace["upstream_code"], 808)
+
+    def test_http_400_dh901_is_auth_failure(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, '{"errorCode":"DH-901","errorMessage":"Invalid Authentication"}')
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
+        self.assertEqual(result["upstream_code"], 901)
+        self.assertEqual(snapshot()["rejection_count"], 1)
 
     def test_http_400_dh906_is_non_auth_even_if_text_says_invalid_token(self):
         import time
@@ -99,7 +127,30 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(result["upstream_code"], 906)
         self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_http_400_code_810_is_client_id_config_failure_not_token_recovery(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, '{"code":810,"message":"Client ID is invalid"}')
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "CLIENT_ID_INVALID")
+        self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_CLIENT_ID_INVALID")
+        self.assertEqual(result["upstream_code"], 810)
+        self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_payload_code_807_is_token_expired(self):
+        import time
+        token = _jwt(time.time() + 3600)
+        result = get_cloud_status(_status_module(token, lambda *a, **k: {"status": "failed", "code": 807}))
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["upstream_code"], 807)
+        self.assertEqual(snapshot()["rejection_count"], 1)
 
     def test_non_auth_http_400_is_not_falsely_labeled_token_rejected(self):
         import time
@@ -122,9 +173,21 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             raise _http_error(429, "Too Many Requests")
 
         result = get_cloud_status(_status_module(token, rest))
-        self.assertEqual(result["error"], "HTTP_429")
+        self.assertEqual(result["error"], "DHAN_RATE_LIMITED")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
+        self.assertEqual(snapshot()["rejection_count"], 0)
+
+    def test_http_400_dh904_is_rate_limit_not_auth_failure(self):
+        import time
+        token = _jwt(time.time() + 3600)
+
+        def rest(*args, **kwargs):
+            raise _http_error(400, "DH-904 too many requests")
+
+        result = get_cloud_status(_status_module(token, rest))
+        self.assertEqual(result["error"], "DHAN_RATE_LIMITED")
+        self.assertEqual(result["upstream_code"], 904)
         self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_runtime_recovery_classifier_rejects_906_and_805_even_with_auth_text(self):
@@ -134,7 +197,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             "message": "DH-906 invalid token",
         }))
         self.assertFalse(_auth_failed({
-            "error": "HTTP_429",
+            "error": "DHAN_RATE_LIMITED",
             "upstream_classification": "DHAN_RATE_LIMITED",
             "message": "code 805 invalid token",
         }))
