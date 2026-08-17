@@ -13,7 +13,7 @@ import time
 from datetime import datetime, timezone
 from typing import Any
 
-_LOCK = threading.Lock()
+_LOCK = threading.RLock()
 _STATE: dict[str, Any] = {
     "first_rejected_at_epoch": 0.0,
     "last_rejected_at_epoch": 0.0,
