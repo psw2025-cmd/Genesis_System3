@@ -21,7 +21,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout current ref
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          clean: true
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,7 +33,7 @@ jobs:
 
       - name: Build current workflow issue artifact snapshot
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/system3_preflight_control_plane.py --print-json
 
       - name: Publish operator summary
@@ -47,4 +50,4 @@ jobs:
           name: system3-preflight-control-plane-${{ github.run_id }}
           path: reports/latest/control_plane/
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
