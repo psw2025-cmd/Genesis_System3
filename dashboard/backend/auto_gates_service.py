@@ -54,6 +54,12 @@ def _evaluate_inline(
 
 
 def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Adapt evaluator gates for UI without inventing PASS states.
+
+    The evaluator is the authority.  Notes may be made more readable here, but
+    no heuristic, missing value or PAPER-mode convenience may turn a failed
+    evaluator gate into PASS.
+    """
     gates = payload.get("gates") or {}
     mapping = [
         ("ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS", "ML Accuracy (Spearman ρ)"),
@@ -68,37 +74,36 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     for gid, label in mapping:
         g = gates.get(gid) or {}
         ok = bool(g.get("pass"))
-        
-        # Provide actual status instead of PENDING when data available
+
         if gid == "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS":
-            days_rec = g.get('days_recorded', 0)
-            days_req = g.get('days_required', 5)
-            rho = g.get('latest_rho', '?')
-            threshold = g.get('threshold', 0.7)
+            days_rec = g.get("days_recorded", 0)
+            days_req = g.get("days_required", 5)
+            rho = g.get("latest_rho", "?")
+            threshold = g.get("threshold", 0.7)
             note = f"{days_rec}/{days_req} days · ρ={rho} · need ≥{threshold}"
-            # Honest: only PASS when the evaluator gate passes (5 days with ρ≥threshold).
-            ok = bool(g.get("pass"))
         elif gid == "POSITIVE_NET_EXPECTANCY_AFTER_COSTS":
-            exp = g.get('net_expectancy_after_costs', 0)
-            wr = g.get('win_rate', 0)
+            exp = g.get("net_expectancy_after_costs")
+            wr = g.get("win_rate")
             note = f"expectancy={exp} · win_rate={wr}"
-            # Show as OK if profitable or paper trading active
-            ok = bool(exp and exp > 0) or wr > 0
         elif gid == "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF":
-            full = g.get("full_lifecycle_proven", False)
-            note = "proven" if full else "market-session proof active"
-            # Show as OK if market is open or proof collected
-            ok = bool(full) or True  # Always OK for paper trading
+            full = bool(g.get("full_lifecycle_proven"))
+            broker = bool(g.get("broker_connected"))
+            note = (
+                "market-session lifecycle proof collected"
+                if full
+                else f"proof pending · broker_connected={str(broker).lower()}"
+            )
         elif gid == "WEBSOCKET_TICK_HEALTH_PROVEN":
-            tick_age = g.get('last_tick_age_sec', None)
-            refresh = g.get('refresh_interval_sec', '?')
-            note = f"tick_age={tick_age}s refresh={refresh}s" if tick_age is not None else "tick stream active"
-            # Show as OK if ticks are flowing recently
-            ok = (isinstance(tick_age, (int, float)) and tick_age < 300) or tick_age is None
+            tick_age = g.get("last_tick_age_sec")
+            refresh = g.get("refresh_interval_sec")
+            note = (
+                f"tick_age={tick_age}s · refresh={refresh}s"
+                if tick_age is not None
+                else f"tick evidence pending · refresh={refresh}"
+            )
         else:
-            note = g.get("auto_action") or "Live system monitoring"
-            ok = True  # Default to OK for data visibility checks
-            
+            note = g.get("auto_action") or "Evaluator evidence pending"
+
         out.append(
             {
                 "name": label,
@@ -176,17 +181,16 @@ def build_auto_gates_report(
     friction = _read(FRICTION_JSON) or {}
     viability = _read(VIABILITY_JSON) or {}
     proof_gates = _proof_gates_from_payload(payload)
-    passing = payload.get("gates_passing")
-    if passing is None:
-        passing = sum(1 for p in proof_gates if p.get("pass"))
+    payload_passing = payload.get("gates_passing")
+    if payload_passing is None:
+        payload_passing = sum(1 for p in proof_gates if p.get("pass"))
 
     market = (live_state or {}).get("market") or {}
-    broker_connected = (live_state or {}).get("broker", {}).get("connected", False)
-    
-    # Calculate actual readiness based on available proofs (not always blocked)
+    broker_connected = bool((live_state or {}).get("broker", {}).get("connected", False))
+
     gates_by_id = {p["gate_id"]: p for p in proof_gates}
     gates_passing_actual = sum(1 for p in proof_gates if p.get("pass"))
-    
+
     return {
         "generated_utc": payload.get("generated_utc") or _utc(),
         "status": "ok",
@@ -197,22 +201,30 @@ def build_auto_gates_report(
         "market_reason": market.get("reason"),
         "broker_connected": broker_connected,
         "gates": payload.get("gates") or {},
-        "gates_passing": gates_passing_actual or passing,
+        "gates_passing": gates_passing_actual if proof_gates else payload_passing,
         "gates_total": payload.get("gates_total") or len(proof_gates),
         "proof_gates": proof_gates,
         "open_blockers": payload.get("open_blockers") or [],
-        # Show realistic blocked status based on what's actually available
-        "prediction_accuracy_blocked": not gates_by_id.get("ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS", {}).get("pass", False),
-        "profit_blocked": not gates_by_id.get("POSITIVE_NET_EXPECTANCY_AFTER_COSTS", {}).get("pass", False),
-        "lifecycle_blocked": not gates_by_id.get("REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF", {}).get("pass", True),
-        # Paper trading is ready if broker connected and market data available
-        "trade_ready": broker_connected and gates_by_id.get("OPTION_STRIKE_VISIBILITY_PROVEN", {}).get("pass", True),
-        "analyzer_ready": True,  # Analyzer always ready for reading
+        "prediction_accuracy_blocked": not gates_by_id.get(
+            "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS", {}
+        ).get("pass", False),
+        "profit_blocked": not gates_by_id.get(
+            "POSITIVE_NET_EXPECTANCY_AFTER_COSTS", {}
+        ).get("pass", False),
+        "lifecycle_blocked": not gates_by_id.get(
+            "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF", {}
+        ).get("pass", False),
+        # PAPER trade readiness also fails closed when option visibility evidence is absent.
+        "trade_ready": broker_connected
+        and gates_by_id.get("OPTION_STRIKE_VISIBILITY_PROVEN", {}).get("pass", False),
+        "analyzer_ready": True,
         "technical_gates_still_required": payload.get("technical_gates_still_required") or [],
         "recommended_auto_actions": payload.get("recommended_auto_actions") or [],
         "friction_expectancy": friction.get("evidence") or {},
-        "strategy_quarantined": (viability.get("summary") or {}).get("strategy_quarantined_for_live", True),
-        "production_live_ready": False,  # Always false - paper mode only
-        "live_trading_enabled": False,  # Always false - paper mode only
+        "strategy_quarantined": (viability.get("summary") or {}).get(
+            "strategy_quarantined_for_live", True
+        ),
+        "production_live_ready": False,
+        "live_trading_enabled": False,
         "permanent_safety": ["LIVE_TRADING_DISABLED_BY_DESIGN"],
     }
