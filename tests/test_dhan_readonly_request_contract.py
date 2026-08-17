@@ -90,14 +90,37 @@ def test_fund_limit_rest_uses_access_token_only(monkeypatch):
 @pytest.mark.parametrize(
     ("payload", "expected"),
     [
+        ({"remarks": {"error_code": "DH-901", "error_message": "Invalid Authentication"}, "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID"),
+        ({"remarks": {"error_code": "DH-904", "error_message": "Too many requests"}, "status": "failure"}, "DHAN_RATE_LIMITED"),
         ({"remarks": {"error_code": "DH-906", "error_message": "incorrect request"}, "status": "failure"}, "DHAN_REQUEST_REJECTED_906"),
         ({"errorCode": "805", "errorMessage": "Too many requests", "status": "failure"}, "DHAN_RATE_LIMITED"),
+        ({"errorCode": "807", "errorMessage": "Access token expired", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID"),
         ({"errorCode": "808", "errorMessage": "Authentication failed", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID"),
         ({"errorCode": "809", "errorMessage": "Access token invalid", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID"),
+        ({"errorCode": "810", "errorMessage": "Client ID is invalid", "status": "failure"}, "CLIENT_ID_INVALID"),
     ],
 )
 def test_payload_taxonomy(payload, expected):
     assert ro._payload_error(payload) == expected
+
+
+@pytest.mark.parametrize(
+    ("status_code", "text", "expected"),
+    [
+        (400, "DH-901 Invalid Authentication", "TOKEN_EXPIRED_OR_INVALID"),
+        (400, "DH-904 Too many requests", "DHAN_RATE_LIMITED"),
+        (429, "Too many requests", "DHAN_RATE_LIMITED"),
+        (400, "code 805 invalid token text", "DHAN_RATE_LIMITED"),
+        (400, "code 810 client id invalid", "CLIENT_ID_INVALID"),
+        (400, "DH-906 invalid token text", "DHAN_REQUEST_REJECTED_906"),
+    ],
+)
+def test_exception_taxonomy_numeric_codes_override_free_text(status_code, text, expected):
+    response = _Response(status_code=status_code, text=text)
+    try:
+        response.raise_for_status()
+    except Exception as exc:
+        assert ro._exception_error(exc) == expected
 
 
 def test_906_is_never_auth_failure():
@@ -113,6 +136,12 @@ def test_805_is_never_auth_failure():
     payload = {"errorCode": "805", "errorMessage": "Too many requests", "status": "failure"}
     assert ro._auth_failure_payload(payload) is False
     assert ro._payload_error(payload) == "DHAN_RATE_LIMITED"
+
+
+def test_810_is_configuration_not_token_failure():
+    payload = {"errorCode": "810", "errorMessage": "Client ID is invalid", "status": "failure"}
+    assert ro._auth_failure_payload(payload) is False
+    assert ro._payload_error(payload) == "CLIENT_ID_INVALID"
 
 
 def test_get_funds_exposes_906_truth_not_token_expired(monkeypatch):
@@ -163,6 +192,34 @@ def test_status_does_not_refresh_on_906(monkeypatch):
 
     assert result["connected"] is False
     assert result["error"] == "DHAN_REQUEST_REJECTED_906"
+    assert refresh_calls == []
+
+
+def test_status_does_not_refresh_on_client_id_invalid(monkeypatch):
+    refresh_calls = []
+    monkeypatch.setattr(ro, "get_dhan_credentials", _creds)
+    monkeypatch.setattr(
+        ro,
+        "get_dhan_credentials_masked",
+        lambda: {"client_id_present": True, "access_token_present": True},
+    )
+    monkeypatch.setattr(
+        ro,
+        "get_profile",
+        lambda: {"success": False, "error": "CLIENT_ID_INVALID", "data": None},
+    )
+    monkeypatch.setattr(
+        ro,
+        "_safe_refresh_token_for_status",
+        lambda reason: refresh_calls.append(reason) or {"attempted": True, "success": False},
+    )
+    monkeypatch.setattr(ro, "_STATUS_RESULT_CACHE", None)
+    monkeypatch.setattr(ro, "_STATUS_RESULT_CACHE_AT", 0.0)
+
+    result = ro.get_status()
+
+    assert result["connected"] is False
+    assert result["error"] == "CLIENT_ID_INVALID"
     assert refresh_calls == []
 
 
