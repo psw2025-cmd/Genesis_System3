@@ -1,0 +1,65 @@
+name: Workflow Live Truth Gate
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows:
+      - Genesis System3 Global Safety CI
+      - GCP Stage 2 Safety Checks
+      - GCP Dhan Token Fix CI
+      - Security Audit Evidence
+      - Cloud Run Auto Deploy
+      - Frontend Browser Runtime Smoke
+      - Full Cloud Audit and Forensic Consensus
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+  actions: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: workflow-live-truth-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  exact-main-workflow-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout current authority branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Generate exact-main workflow, job, artifact and issue truth
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SYSTEM3_AUTHORITY_BRANCH: main
+        run: |
+          python scripts/github_workflow_truth.py \
+            --repo "${GITHUB_REPOSITORY}" \
+            --branch main \
+            --output-dir reports/latest/workflow_control
+
+      - name: Upload workflow truth evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-live-truth-${{ github.run_number }}-${{ github.run_attempt }}
+          path: reports/latest/workflow_control/
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Enforce mandatory exact-main gate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SYSTEM3_AUTHORITY_BRANCH: main
+        run: |
+          python scripts/github_workflow_truth.py \
+            --repo "${GITHUB_REPOSITORY}" \
+            --branch main \
+            --output-dir reports/latest/workflow_control \
+            --fail-on-mandatory
