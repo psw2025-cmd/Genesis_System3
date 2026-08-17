@@ -24,8 +24,6 @@ import threading
 import time
 from typing import Any, Callable
 
-import requests
-
 from core.brokers.dhan.cloud_status_probe import get_cloud_status, _safe_upstream_code
 from core.brokers.dhan.cloud_token_provider import (
     force_reload,
@@ -128,6 +126,8 @@ def _rotation_cooldown_s() -> float:
 
 
 def _metadata_access_token() -> str:
+    import requests
+
     response = requests.get(
         _METADATA_TOKEN_URL,
         headers={"Metadata-Flavor": "Google"},
@@ -143,6 +143,8 @@ def _metadata_access_token() -> str:
 def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
     """Run the sole GCP token mint authority and return non-secret proof."""
     global _LAST_ROTATION_ATTEMPT_AT
+
+    import requests
 
     proof: dict[str, Any] = {
         "attempted": False,
