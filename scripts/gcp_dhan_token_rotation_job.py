@@ -8,9 +8,11 @@ This is the sole production token mint authority for Genesis System3. It:
    transient failures can never authorize token generation;
 3. coordinates concurrent Cloud Run Job executions using the expected Secret
    Manager version plus a bounded execution-name stagger and revalidation;
-4. generates a new token with PIN + TOTP only when Dhan explicitly rejects the
+4. enforces a caller-independent minimum interval of 180 seconds from the
+   authoritative token JWT ``iat`` before any new token may be generated;
+5. generates a new token with PIN + TOTP only when Dhan explicitly rejects the
    authoritative latest token or the JWT is genuinely near expiry;
-5. validates the generated token before writing exactly one new authoritative
+6. validates the generated token before writing exactly one new authoritative
    Secret Manager version.
 
 It never calls order endpoints and always forces LIVE execution OFF.
@@ -21,6 +23,7 @@ import base64
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from datetime import datetime, timezone
@@ -38,6 +41,9 @@ PROJECT = (
 )
 SECRET_ID = os.getenv("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token").strip() or "dhan-access-token"
 MIN_HOURS = float(os.getenv("DHAN_ROTATE_WHEN_HOURS_LEFT", "6"))
+MIN_REFRESH_INTERVAL_SECONDS = max(
+    180, int(os.getenv("DHAN_MIN_REFRESH_INTERVAL_SECONDS", "180") or "180")
+)
 AUTHORITY = "gcp-cloud-run-job"
 
 PROFILE_VALID = "VALID"
@@ -46,7 +52,6 @@ PROFILE_TRANSIENT_ERROR = "TRANSIENT_ERROR"
 PROFILE_CONFIG_ERROR = "CONFIG_ERROR"
 
 _AUTH_MARKERS = (
-    "dh-906",
     "invalid token",
     "token expired",
     "token_expired_or_invalid",
@@ -54,6 +59,8 @@ _AUTH_MARKERS = (
     "http_401",
     "status_code=401",
 )
+_NON_AUTH_UPSTREAM_CODES = {805, 906}
+_AUTH_UPSTREAM_CODES = {808}
 
 # stdout is intentionally limited to constant, allow-listed evidence lines.
 # No object that has ever contained a token, broker response, PIN, TOTP, or
@@ -68,6 +75,8 @@ _SAFE_STATUS_LINES = {
     "BLOCKED_PROFILE_CONFIG_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_PROFILE_CONFIG_ERROR"}',
     "BLOCKED_STAGGER_REVALIDATION_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_STAGGER_REVALIDATION_ERROR"}',
     "BLOCKED_MINT_NOT_AUTHORIZED": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_MINT_NOT_AUTHORIZED"}',
+    "BLOCKED_MIN_REFRESH_INTERVAL": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_MIN_REFRESH_INTERVAL"}',
+    "BLOCKED_REFRESH_INTERVAL_UNPROVEN": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_REFRESH_INTERVAL_UNPROVEN"}',
 }
 
 
@@ -77,17 +86,52 @@ def _emit_status(status: str) -> None:
     print(line)
 
 
-def _jwt_expiry(token: str) -> datetime | None:
+def _jwt_payload(token: str) -> dict[str, Any] | None:
     try:
         parts = token.split(".")
         if len(parts) < 2:
             return None
         payload_part = parts[1] + "=" * (-len(parts[1]) % 4)
         payload = json.loads(base64.urlsafe_b64decode(payload_part.encode("ascii")))
-        exp = payload.get("exp")
-        return datetime.fromtimestamp(float(exp), tz=timezone.utc) if exp else None
+        return payload if isinstance(payload, dict) else None
     except Exception:
         return None
+
+
+def _jwt_expiry(token: str) -> datetime | None:
+    payload = _jwt_payload(token)
+    try:
+        exp = (payload or {}).get("exp")
+        return datetime.fromtimestamp(float(exp), tz=timezone.utc) if exp else None
+    except (TypeError, ValueError, OSError):
+        return None
+
+
+def _jwt_issued_at(token: str) -> datetime | None:
+    payload = _jwt_payload(token)
+    try:
+        iat = (payload or {}).get("iat")
+        return datetime.fromtimestamp(float(iat), tz=timezone.utc) if iat else None
+    except (TypeError, ValueError, OSError):
+        return None
+
+
+def _token_age_seconds(token: str, *, now: datetime | None = None) -> float | None:
+    issued_at = _jwt_issued_at(token)
+    if issued_at is None:
+        return None
+    current = now or datetime.now(timezone.utc)
+    return (current - issued_at).total_seconds()
+
+
+def _refresh_interval_status(token: str, *, now: datetime | None = None) -> tuple[bool, str, float | None]:
+    """Fail closed unless the authoritative token proves it is at least 180s old."""
+    age = _token_age_seconds(token, now=now)
+    if age is None or age < 0:
+        return False, "BLOCKED_REFRESH_INTERVAL_UNPROVEN", age
+    if age < MIN_REFRESH_INTERVAL_SECONDS:
+        return False, "BLOCKED_MIN_REFRESH_INTERVAL", age
+    return True, "REFRESH_INTERVAL_SATISFIED", age
 
 
 def _hours_remaining(token: str) -> float | None:
@@ -114,9 +158,30 @@ def _safe_blob(value: Any) -> str:
         return ""
 
 
+def _safe_upstream_code(blob: str) -> int | None:
+    for pattern in (
+        r'"code"\s*:\s*(\d{3,5})',
+        r"\bcode\s*[=:]?\s*(\d{3,5})\b",
+        r"\bdh-(\d{3,5})\b",
+        r"\berrorcode\s*[=:]?\s*(\d{3,5})\b",
+    ):
+        match = re.search(pattern, blob, flags=re.IGNORECASE)
+        if match:
+            try:
+                return int(match.group(1))
+            except ValueError:
+                return None
+    return None
+
+
 def _is_auth_failure(value: Any, *, status_code: int | None = None) -> bool:
     blob = _safe_blob(value).lower()
-    return status_code == 401 or any(marker in blob for marker in _AUTH_MARKERS)
+    code = _safe_upstream_code(blob)
+    if code in _NON_AUTH_UPSTREAM_CODES:
+        return False
+    if status_code == 401 or code in _AUTH_UPSTREAM_CODES:
+        return True
+    return any(marker in blob for marker in _AUTH_MARKERS)
 
 
 def _profile_probe(client_id: str, token: str) -> dict[str, Any]:
@@ -276,6 +341,7 @@ def _skip_proof(
         "secret_after": before_secret,
         "secret_version_advanced": False,
         "rotation_threshold_hours": MIN_HOURS,
+        "min_refresh_interval_seconds": MIN_REFRESH_INTERVAL_SECONDS,
         "mint_authorized": _should_rotate(before),
         "live_trading_enabled": False,
         "order_endpoints_called": False,
@@ -344,6 +410,7 @@ def main() -> int:
             "expected_secret_version": expected_version or None,
             "cloud_run_execution_present": bool(execution),
             "rotation_threshold_hours": MIN_HOURS,
+            "min_refresh_interval_seconds": MIN_REFRESH_INTERVAL_SECONDS,
             "mint_authorized": False,
             "live_trading_enabled": False,
             "order_endpoints_called": False,
@@ -422,7 +489,6 @@ def main() -> int:
                 _emit_status(status)
                 return rc
         except Exception as exc:
-            # A transient revalidation failure must never increase authority.
             proof = _skip_proof(
                 "BLOCKED_STAGGER_REVALIDATION_ERROR",
                 started,
@@ -437,7 +503,7 @@ def main() -> int:
             _emit_status("BLOCKED_STAGGER_REVALIDATION_ERROR")
             return 2
 
-    # Last fail-closed authority check immediately before the only mint call.
+    # Last fail-closed authority checks immediately before the only mint call.
     if not _should_rotate(before):
         proof = _skip_proof(
             "BLOCKED_MINT_NOT_AUTHORIZED",
@@ -450,6 +516,24 @@ def main() -> int:
             transient_errors_authorize_mint=False,
         )
         _emit_status("BLOCKED_MINT_NOT_AUTHORIZED")
+        return 2
+
+    interval_ok, interval_status, token_age_seconds = _refresh_interval_status(token)
+    if not interval_ok:
+        proof = _skip_proof(
+            interval_status,
+            started,
+            before,
+            before_secret,
+            expected_secret_version=expected_version or None,
+            stagger_seconds=settle_s,
+            cloud_run_execution_present=bool(execution),
+            token_age_seconds=(round(token_age_seconds, 3) if token_age_seconds is not None else None),
+            min_refresh_interval_seconds=MIN_REFRESH_INTERVAL_SECONDS,
+            force_bypass_allowed=False,
+            transient_errors_authorize_mint=False,
+        )
+        _emit_status(interval_status)
         return 2
 
     try:
@@ -467,9 +551,6 @@ def main() -> int:
         before_version = str(before_secret.get("version") or "")
         after_version = str(after_secret.get("version") or new_version or "")
         version_advanced = bool(after_version and after_version != before_version)
-        # generated_check is already a successful broker validation. Avoid a
-        # redundant second profile call after persistence, which only increases
-        # rate-limit/timeout exposure without adding authority proof.
         after = dict(generated_check)
         success = bool(after.get("valid") and version_advanced)
         proof = {
@@ -489,6 +570,9 @@ def main() -> int:
             "secret_version_advanced": version_advanced,
             "secret_persisted": version_advanced,
             "rotation_threshold_hours": MIN_HOURS,
+            "min_refresh_interval_seconds": MIN_REFRESH_INTERVAL_SECONDS,
+            "token_age_seconds_before_mint": round(token_age_seconds, 3),
+            "force_bypass_allowed": False,
             "mint_authorized": True,
             "transient_errors_authorize_mint": False,
             "post_persist_profile_reprobe_performed": False,
@@ -515,6 +599,7 @@ def main() -> int:
             "stagger_seconds": settle_s,
             "cloud_run_execution_present": bool(execution),
             "rotation_threshold_hours": MIN_HOURS,
+            "min_refresh_interval_seconds": MIN_REFRESH_INTERVAL_SECONDS,
             "mint_authorized": _should_rotate(before),
             "transient_errors_authorize_mint": False,
             "live_trading_enabled": False,
