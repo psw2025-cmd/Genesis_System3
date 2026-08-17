@@ -7,9 +7,11 @@ on:
       - ".github/workflows/**"
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - "scripts/github_workflow_control_plane.py"
       - "scripts/gcp_full_cloud_audit.py"
       - "scripts/fetch_exact_security_audit.py"
       - "scripts/multi_ai_audit_consensus.py"
+      - "tests/test_workflow_control_plane_inventory.py"
       - "tests/test_full_cloud_audit_contract.py"
   push:
     branches: [main]
@@ -17,9 +19,11 @@ on:
       - ".github/workflows/**"
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - "scripts/github_workflow_control_plane.py"
       - "scripts/gcp_full_cloud_audit.py"
       - "scripts/fetch_exact_security_audit.py"
       - "scripts/multi_ai_audit_consensus.py"
+      - "tests/test_workflow_control_plane_inventory.py"
       - "tests/test_full_cloud_audit_contract.py"
   workflow_dispatch:
   workflow_run:
@@ -69,8 +73,41 @@ jobs:
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
 
+      - name: Execute workflow control-plane contract tests
+        run: |
+          python scripts/github_workflow_control_plane.py --self-test
+          python -m unittest tests.test_workflow_control_plane_inventory -v
+
       - name: Execute full cloud audit adversarial contract tests
         run: python -m unittest tests.test_full_cloud_audit_contract -v
+
+  workflow-control-plane-inventory:
+    if: github.event_name != 'pull_request'
+    name: FORENSIC - workflow, failure and artifact inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          clean: true
+          persist-credentials: false
+
+      - name: Build current-main workflow control plane
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python scripts/github_workflow_control_plane.py --self-test
+          python scripts/github_workflow_control_plane.py
+
+      - name: Upload workflow control-plane artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: workflow-control-plane-${{ github.run_number }}-${{ github.run_attempt }}
+          path: reports/latest/workflow_control_plane/
+          if-no-files-found: error
+          retention-days: 30
 
   event-forensic-responder:
     if: >-
