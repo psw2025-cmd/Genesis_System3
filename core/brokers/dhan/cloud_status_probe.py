@@ -3,9 +3,9 @@
 Safety: read-only profile GET only; no order APIs; no raw token output.
 The Dhan API documentation and official Python SDK currently disagree on the
 Profile request headers: the docs show ``access-token`` only while
-``DhanLogin.user_profile`` also sends ``dhanClientId``.  The probe therefore
+``DhanLogin.user_profile`` also sends ``dhanClientId``. The probe therefore
 uses a bounded, evidence-producing two-contract strategy and caches a proven
-working contract per process.  It never retries header variants for auth or
+working contract per process. It never retries header variants for auth or
 rate-limit failures and never mutates credentials.
 """
 from __future__ import annotations
@@ -31,6 +31,15 @@ _PROFILE_FALLBACK_ERRORS = {
     "CLIENT_ID_INVALID",
     "HTTP_400",
 }
+
+
+def _public_contract(contract: str) -> str:
+    """Stable public label; exact experimental variant is reported separately."""
+    if contract == _PROFILE_DOCS_CONTRACT:
+        return "access-token-only"
+    if contract == _PROFILE_SDK_CONTRACT:
+        return "access-token-plus-dhanClientId"
+    return "unknown"
 
 
 def _clock_expired(token: str) -> bool | None:
@@ -169,9 +178,11 @@ def _profile_request(
 ) -> dict:
     """Execute exactly one safe Profile GET under a named header contract.
 
-    A test hook is supported so CI never needs real Dhan credentials. Production
-    uses the already-loaded token/client ID only inside request headers; neither
-    value is returned or logged.
+    CI can provide a test hook. For the documented access-token-only contract we
+    deliberately reuse the adapter's existing ``_rest_get`` helper when present;
+    this preserves the established test/runtime boundary and its timeout/error
+    behavior. The SDK contract needs the official camel-case ``dhanClientId``
+    header, so it performs one raw GET with that exact header shape.
     """
     test_hook = getattr(module, "_profile_probe_request", None)
     if callable(test_hook):
@@ -182,6 +193,19 @@ def _profile_request(
             contract=contract,
         )
 
+    if contract == _PROFILE_DOCS_CONTRACT:
+        rest_get = getattr(module, "_rest_get", None)
+        if callable(rest_get):
+            return rest_get(
+                module._DHAN_PROFILE_URL,
+                access_token,
+                client_id,
+                timeout=max(1.0, min(float(timeout_s), 8.0)),
+                include_client_id=False,
+            )
+    elif contract != _PROFILE_SDK_CONTRACT:
+        raise RuntimeError("unsupported profile header contract")
+
     requests_module = getattr(module, "_requests", None)
     requests_ok = bool(getattr(module, "_REQUESTS_OK", False))
     if not requests_ok or requests_module is None:
@@ -191,8 +215,6 @@ def _profile_request(
     if contract == _PROFILE_SDK_CONTRACT:
         # Exact header shape used by Dhan's official DhanLogin.user_profile().
         headers["dhanClientId"] = client_id
-    elif contract != _PROFILE_DOCS_CONTRACT:
-        raise RuntimeError("unsupported profile header contract")
 
     response = requests_module.get(
         module._DHAN_PROFILE_URL,
@@ -203,9 +225,16 @@ def _profile_request(
     return response.json()
 
 
-def _safe_attempt(contract: str, *, outcome: str, status_code: Any = None, upstream_code: Any = None) -> dict[str, Any]:
+def _safe_attempt(
+    contract: str,
+    *,
+    outcome: str,
+    status_code: Any = None,
+    upstream_code: Any = None,
+) -> dict[str, Any]:
     return {
         "contract": contract,
+        "public_contract": _public_contract(contract),
         "outcome": outcome,
         "http_status": status_code,
         "upstream_code": upstream_code,
@@ -348,7 +377,8 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         "env_source": getattr(module, "_ENV_LOADED_VIA", "unknown"),
         "cache_hit": False,
         "probe_strategy": "cloud_rest_profile_bounded_contract_reconcile",
-        "probe_header_contract": primary_contract,
+        "probe_header_contract": _public_contract(primary_contract),
+        "probe_header_variant": primary_contract,
         "probe_contract_cached": bool(cached_contract),
         "probe_timeout_s": float(timeout_s),
         "auth_rejection_trace": snapshot(),
@@ -377,7 +407,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
     chosen_contract = primary_contract
     final = first
 
-    # Only reconcile the documented-vs-SDK header contradiction for known
+    # Reconcile the documented-vs-SDK header contradiction only for known
     # request/config-shape failures. Never multiply auth, rate-limit or network
     # failures, which would worsen token churn or Dhan throttling.
     if (
@@ -409,7 +439,8 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             "auth_rejection_trace": snapshot(),
             "latency_ms": latency_ms,
             "profile_source": "rest",
-            "probe_header_contract": chosen_contract,
+            "probe_header_contract": _public_contract(chosen_contract),
+            "probe_header_variant": chosen_contract,
             "probe_contract_cached": bool(cached_contract),
             "probe_header_attempts": attempts,
         }
@@ -433,7 +464,8 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         "upstream_code": final["upstream_code"],
         "auth_rejection_trace": trace,
         "latency_ms": latency_ms,
-        "probe_header_contract": chosen_contract,
+        "probe_header_contract": _public_contract(chosen_contract),
+        "probe_header_variant": chosen_contract,
         "probe_contract_cached": bool(cached_contract),
         "probe_header_attempts": attempts,
     }
