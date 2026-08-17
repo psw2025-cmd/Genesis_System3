@@ -63,6 +63,36 @@ end_to_end_issues_solutions:
     - improved_stakeholder_satisfaction
   key_enablers: [people, process, technology, policies, kpis]
 
+preflight_control_plane:
+  authority: SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1
+  doc: docs/PREFLIGHT_CONTROL_PLANE.md
+  script: scripts/system3_preflight_control_plane.py
+  workflow: .github/workflows/system3-preflight-control-plane.yml
+  artifacts:
+    - reports/latest/control_plane/workflow_issue_artifact_snapshot.json
+    - reports/latest/control_plane/NEXT_ACTION.md
+  mandatory_before:
+    - production_relevant_transition
+    - merge_decision
+    - deploy_acceptance
+    - url_acceptance
+    - remediation_handoff
+  inventory:
+    - current_remote_main
+    - all_workflow_latest_runs
+    - active_and_current_relevant_failed_runs
+    - workflow_artifacts
+    - failing_jobs_and_steps
+    - active_pull_requests
+    - recent_open_issues
+    - issue_188_coordination_markers
+  transition_law:
+    ci_green: merge_without_unnecessary_wait
+    merged: check_canonical_deploy
+    deploy_complete: verify_exact_serving_sha_then_new_url_proof
+    url_fail: investigate_and_open_next_remediation_immediately
+    stop_only_for: real_external_dependency_or_genuine_user_approval
+
 continuous_closure:
   doc: docs/CONTINUOUS_CLOSURE_SYSTEM.md
   orchestrator: scripts/system3_continuous_closure_orchestrator.py
@@ -83,6 +113,7 @@ loop:
   name: AUTONOMOUS-LOOP-GEMINI
   roles: [Architect, CoreEngineer, QAEvaluator]
   steps:
+    - preflight_control_plane
     - crawl_and_backlog
     - deploy_progress_telemetry_banner
     - test_first_heal_and_gitops_release
@@ -97,3 +128,4 @@ ban_list:
   - paste_secrets_or_mint_tokens_outside_job
   - paint_ui_green_without_matching_solution_row
   - skip_post_execution_live_verify
+  - skip_fresh_preflight_before_transition
