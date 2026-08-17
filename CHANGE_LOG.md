@@ -1,3 +1,15 @@
+## 2026-08-18T00:40:00Z [Cursor] INFINITE GITOPS PHASE 2 — PROOF LEDGER + INTENT LOOP
+
+Permanent fail-closed infinite GitOps loop (no user wait on routine PAPER work; LIVE stays human-gated):
+- Rule: `.cursor/rules/infinite-gitops-loop.mdc`
+- Policy: `agent_policy.yaml` v3 `infinite_gitops_loop`
+- Prompt: `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`
+- Grounding: `docs/architecture/META_SOVEREIGN_ARCHITECTURE_GROUNDING.md`
+- Ledger: `dashboard/backend/proof_ledger_service.py` + `scripts/system3_proof_ledger.py`
+- API: `GET /api/proof_ledger` (read-only, no secrets)
+- Orchestrator now appends SHA256 ledger + intent tick each closure run
+- Eval: `tests/evals/test_proof_ledger_intent.py`
+
 ## 2026-08-17T04:18:00Z [Cursor] PRODUCTION BROKER HEALTH CLOSURE
 
 - Executed canonical bounded Dhan recovery workflow run `31993268520`.

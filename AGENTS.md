@@ -12,6 +12,7 @@ Read first:
 5. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
 6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
 7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
+8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 
@@ -105,7 +106,7 @@ Other agents may work in parallel. Before editing or merging:
 
 ## User-action boundary
 
-Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation. Ask the user for manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform.
+Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation without waiting for chat approval. Ask the user for manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform: LIVE enablement, real orders, billing/org, WIF destruction, broker MFA.
 
 ## Evidence hierarchy
 

@@ -2124,6 +2124,29 @@ async def get_continuous_closure(refresh: bool = False, live: bool = True):
         }
 
 
+@app.get("/api/proof_ledger")
+async def get_proof_ledger():
+    """Read-only SHA256 proof ledger + latest autonomous intent tick. No secrets."""
+    try:
+        try:
+            from dashboard.backend.proof_ledger_service import proof_ledger_status
+        except ImportError:
+            from proof_ledger_service import proof_ledger_status
+        return proof_ledger_status(ROOT_DIR)
+    except Exception as e:
+        return {
+            "schema": "system3_proof_ledger_status_v1",
+            "status": "error",
+            "error": str(e)[:200],
+            "chain": {"ok": False, "entries": 0},
+            "tip": None,
+            "intent_tick": None,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+            "secret_payloads_present": False,
+        }
+
+
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------

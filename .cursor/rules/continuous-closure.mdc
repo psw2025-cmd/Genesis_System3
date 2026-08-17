@@ -9,9 +9,9 @@ Authority: `docs/CONTINUOUS_CLOSURE_SYSTEM.md` + `agent_policy.yaml` `continuous
 
 ## Every session / Automation tick
 1. Run or read `reports/latest/continuous_closure/resume_state.json` (or `python scripts/system3_continuous_closure_orchestrator.py`).
-2. Execute **one** `next_id` from auto-resume (test-first in `tests/evals/`).
+2. Execute **one** `next_id` from auto-resume (test-first in `tests/evals/`). Do not wait for chat approval on routine GitOps.
 3. Multi-source verify before claiming DONE: repo + reports + live URL.
-4. Update `BACKLOG.md` + re-run orchestrator; post Issue #188.
+4. Update `BACKLOG.md` + re-run orchestrator (appends proof ledger + intent tick); post Issue #188.
 5. Keep Overview blocker cards honest; never invent PASS/ρ/prices; LIVE=false.
 
 ## Do not

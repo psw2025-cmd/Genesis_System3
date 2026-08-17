@@ -8,6 +8,9 @@
 - API: `GET /api/continuous_closure`
 - UI: Overview → **Continuous Closure · Blocker Cards**
 - Resume file: `reports/latest/continuous_closure/resume_state.json`
+- Proof ledger: `reports/latest/proof_ledger/ledger.jsonl`
+- Intent tick: `reports/latest/autonomous_loop/intent_tick.json`
+- Ledger API: `GET /api/proof_ledger` (read-only)
 
 **Pipeline**
 
@@ -20,9 +23,9 @@
 ```
 
 **Next session / Automation tick**
-1. Read `resume_state.json` + `BACKLOG.md`
-2. Execute `next_id` test-first under `tests/evals/`
-3. Ship → live SHA verify → update BACKLOG → re-run orchestrator
-4. Never invent prices/ρ; never weaken gates; LIVE stays false
+1. Read `resume_state.json` + `BACKLOG.md` + latest `intent_tick.json`
+2. Execute `next_id` test-first under `tests/evals/` — do not wait for chat approval
+3. Ship → live SHA verify → update BACKLOG → re-run orchestrator (appends ledger)
+4. Never invent prices/ρ; never weaken gates; LIVE stays false until a human gate
 
 **Policy companions:** `agent_policy.yaml`, Gemini loop doc, E2E issues→solutions law.

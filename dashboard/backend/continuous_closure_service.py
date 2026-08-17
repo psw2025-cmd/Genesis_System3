@@ -315,6 +315,8 @@ def write_closure_artifacts(root: Path, report: Dict[str, Any]) -> Tuple[Path, P
             "Read reports/latest/autonomous_loop/BACKLOG.md",
             "Follow agent_policy.yaml + Gemini loop + E2E issues→solutions law",
             "Execute next OPEN card test-first; never fake gate PASS",
+            "Append proof ledger + intent tick; do not wait for user on routine GitOps",
+            "LIVE remains a human gate",
         ],
     }
     state.write_text(json.dumps(state_doc, indent=2) + "\n", encoding="utf-8")
