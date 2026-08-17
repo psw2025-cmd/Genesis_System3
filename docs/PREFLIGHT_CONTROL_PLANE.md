@@ -60,7 +60,9 @@ A green workflow proves only its own tested contract. A stored artifact is not c
 
 ## Automated refresh
 
-`.github/workflows/system3-preflight-control-plane.yml` refreshes the snapshot on every push to `main`, hourly, and on manual dispatch. Agents must still run/read a fresh preflight before a production transition; the scheduled artifact is a convenience and historical audit trail, not a substitute for current verification.
+`.github/workflows/system3-preflight-control-plane.yml` refreshes the snapshot on every push to `main` and on manual dispatch. GitHub Actions cron remains prohibited by the repository workflow-priority policy. The mandatory fresh-before-transition behavior is enforced through `AGENTS.md` and `agent_policy.yaml`: agents must run or consume a newly generated preflight immediately before each production-relevant transition.
+
+The workflow artifact is an audit convenience, not a substitute for current verification.
 
 ## Safety
 
