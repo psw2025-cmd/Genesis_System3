@@ -2124,6 +2124,16 @@ async def get_continuous_closure(refresh: bool = False, live: bool = True):
         }
 
 
+@app.get("/api/proof_ledger")
+async def get_proof_ledger():
+    """Read-only SHA256 proof ledger + latest autonomous intent tick. No secrets."""
+    try:
+        from dashboard.backend.proof_ledger_service import read_proof_ledger_public
+    except ImportError:
+        from proof_ledger_service import read_proof_ledger_public
+    return read_proof_ledger_public(ROOT_DIR)
+
+
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------

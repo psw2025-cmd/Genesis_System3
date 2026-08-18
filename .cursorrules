@@ -60,7 +60,9 @@ A green build, HTTP 200, or rendered tab is not a semantic data PASS. Data-beari
 
 ## User-action boundary
 
-Do routine code, CI, deployment, logs, IAM-drift repair, browser proof, broker investigation, and safe recovery through automation. Ask the user for manual steps only for genuine account-level/break-glass blockers that delegated automation cannot perform.
+Do routine code, CI, deployment, logs, IAM-drift repair, browser proof, broker investigation, and safe recovery through automation. Ask the user for manual steps only for genuine account-level/break-glass blockers that delegated automation cannot perform (LIVE enablement, real orders, billing/org, WIF destruction, broker MFA).
+
+See `.cursor/rules/infinite-gitops-loop.mdc` and `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`.
 
 ## Evidence hierarchy
 

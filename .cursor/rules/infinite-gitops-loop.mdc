@@ -1,0 +1,46 @@
+---
+description: Permanent infinite GitOps loop — no user wait for routine work; LIVE stays human-gated
+alwaysApply: true
+---
+
+# Infinite GitOps Loop (permanent — all agents)
+
+Authority: `agent_policy.yaml` `infinite_gitops_loop` + `docs/architecture/META_SOVEREIGN_ARCHITECTURE_GROUNDING.md` + `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`.
+
+## Do not wait for the user when
+
+Routine work is already approved by policy. Do it:
+
+- crawl, backlog, evals, code fix, CI, PR, merge-when-green (if merge authority exists)
+- IAM drift repair, logs, browser proof, canonical Dhan recovery Job
+- proof-ledger append, continuous-closure tick, Issue #188 coordination
+
+Do **not** pause the loop to ask “should I continue?” on those items.
+
+## Always wait / never self-approve
+
+- Enable LIVE trading or `AUTO_EXECUTE_TRADES`
+- Place/modify/cancel/square-off real orders
+- Weaken proof-gate thresholds, risk limits, or order locks
+- Mint/paste broker secrets outside `genesis-system3-dhan-token-rotate`
+- Billing, org IAM, WIF destruction, broker MFA/account reset
+
+## Loop (every session / automation tick)
+
+1. Read `reports/latest/continuous_closure/resume_state.json`.
+2. Compile intent tick (`LIVE=false`, GitOps only, no hot graph rewrite).
+3. Execute `next_id` test-first under `tests/evals/`.
+4. Append SHA256 proof-ledger entry (no secret payloads).
+5. Ship via PR → CI → `main` → Cloud Run → fresh live verify.
+6. Repeat. Failed invariants → new PR + evals, **not** prompt-weight mutation and **not** fake ρ/PnL.
+
+## Roles (coordination, not new runtimes)
+
+Schema drift, signal graphs, AST, patches, backtests, and governance are existing agents/CI jobs. They do not rewrite production topology in flight.
+
+## Ban
+
+- Invent prices/metrics to force profit or gate PASS
+- Call empirical tests “zero-knowledge proofs”
+- Claim 100,000x / quantum-safe / nuclear-grade completeness
+- Stall the PAPER/analyzer loop waiting for chat approval
