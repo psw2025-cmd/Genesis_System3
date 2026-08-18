@@ -3,6 +3,7 @@ import { Activity, Clock3 } from 'lucide-react'
 import { API_BASE, API_HEADERS } from '../config'
 import { useStore } from '../store'
 import { formatIstStamp, shortSha } from '../lib/formatLive'
+import { isNonAuthBrokerRejection } from '../lib/healthTruth'
 
 type SemanticState = 'PASS' | 'PARTIAL' | 'BLOCKED' | 'NOT_PROVEN' | 'ERROR'
 
@@ -150,6 +151,7 @@ export function SystemProgressPanel() {
       && brokerStatus?.order_placement_allowed === false
       && Boolean(deployInfo?.git_sha)
     const brokerConnected = brokerStatus?.connected === true
+    const requestRejected = isNonAuthBrokerRejection(brokerStatus)
     const instrumentMeta = contracts.instruments?.meta || {}
     const instrumentFresh = contracts.instruments?.status === 'ok' && contracts.instruments?.stale === false
     const days = numberOrNull(contracts.accuracy?.days_available) ?? 0
@@ -192,10 +194,12 @@ export function SystemProgressPanel() {
       },
       {
         name: 'Broker authentication/session',
-        state: brokerConnected ? 'PASS' : brokerStatus ? 'BLOCKED' : 'NOT_PROVEN',
+        state: brokerConnected ? 'PASS' : requestRejected ? 'BLOCKED' : brokerStatus ? 'BLOCKED' : 'NOT_PROVEN',
         detail: brokerConnected
           ? `Dhan read-only auth/session connected${brokerStatus?.token_proof?.secret_version ? ` · SM v${brokerStatus.token_proof.secret_version}` : ''}. This is not market-data reliability.`
-          : String(brokerStatus?.error || 'Broker status has not loaded.'),
+          : requestRejected
+            ? `${String(brokerStatus?.error || 'DHAN_REQUEST_REJECTED_906')} is a non-auth upstream rejection. Do not rotate the token. connected=true must not imply Broker reliability PASS.`
+            : String(brokerStatus?.error || 'Broker status has not loaded.'),
         source: '/api/broker/status',
         verifiedAt: checkedAt,
       },

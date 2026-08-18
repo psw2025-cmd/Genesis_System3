@@ -1,3 +1,20 @@
+## 2026-08-18T10:02:39Z [Cursor] W1 + PERMANENT 906 CORE FIX
+
+Live broker recurred to `DHAN_REQUEST_REJECTED_906` after rotation-on-906.
+JWT remained valid (secret v269, ~23h remaining). The Profile probe issued two
+GETs and both returned HTTP 400 / 906.
+
+Permanent source fix:
+- `cloud_status_probe.py` no longer falls back to `dhanClientId` on DH-906.
+- Failed second-contract attempts no longer overwrite the canonical docs contract.
+- UI W1: `connected=true` is session-only; 906/805/810 are non-auth and are not
+  token expiry; Broker reliability remains a separate lane.
+
+Docs corrected: `docs/BROKER_RECURRENCE_FORENSIC_CHECKLIST.md` and the 09:24Z
+recovery pack is marked historical, not a 906 closure.
+
+LIVE and order placement remain disabled.
+
 ## 2026-08-18T09:24:58Z [Cursor] AUDIT PROBE CORRECTION + BROKER RECOVERY PROOF
 
 - Corrected the production audit/dashboard interpretation to use `/health` and

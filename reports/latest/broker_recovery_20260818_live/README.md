@@ -9,6 +9,20 @@ Observation window UTC: `2026-08-18T09:22:10Z` to `2026-08-18T09:24:58Z`
 - Result: `success`
 - Recovery path: canonical bounded manual rotation with dynamic reload proof
 
+## Historical closure warning
+
+This pack proved a temporary connected window. It is **not** a permanent 906 fix.
+
+At `2026-08-18T10:02:39Z` the same serving SHA recurred to:
+
+- `connected=false`
+- `error=DHAN_REQUEST_REJECTED_906`
+- `auth_classification=null`
+- JWT still valid (`hours_remaining=23.28`, secret version 269)
+- probe attempts: docs access-token-only 906, then SDK dhanClientId 906
+
+Permanent correction: do not rotate on 906; do not retry Profile with `dhanClientId` after 906; UI must not paint 906 as token expiry and must not treat `connected=true` as broker-reliability PASS.
+
 ## Fresh production API proof
 
 - `GET /api/deploy/info`

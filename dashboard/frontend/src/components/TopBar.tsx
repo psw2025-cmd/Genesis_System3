@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Activity, Bell, Menu, Search, Shield } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
-import { brokerIsConnected } from '../lib/healthTruth'
+import { brokerIsConnected, isNonAuthBrokerRejection } from '../lib/healthTruth'
 import { resolveFeedQuality } from '../lib/feedQuality'
 import { DASHBOARD_TABS } from './Sidebar'
 
@@ -94,8 +94,21 @@ export function TopBar() {
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
   const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
-  const brokerLabel = (brokerConnected || brokerGood) ? 'Connected' : hasError ? 'Auth issue' : 'Waiting'
-  const brokerTone = brokerConnected || brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
+  const requestRejected = isNonAuthBrokerRejection(brokerStatus)
+  const brokerLabel = requestRejected
+    ? 'Request rejected'
+    : (brokerConnected || brokerGood)
+      ? 'Session OK'
+      : hasError
+        ? 'Auth issue'
+        : 'Waiting'
+  const brokerTone = requestRejected
+    ? 'var(--amber)'
+    : brokerConnected || brokerGood
+      ? 'var(--up)'
+      : hasError
+        ? 'var(--down)'
+        : 'var(--amber)'
   const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
   const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
   const feed = resolveFeedQuality({
