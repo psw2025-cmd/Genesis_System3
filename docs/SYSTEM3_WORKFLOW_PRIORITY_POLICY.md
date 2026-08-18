@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following thirteen GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following fourteen GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -18,10 +18,11 @@ Only the following thirteen GitHub Actions workflows are allowed in `.github/wor
 10. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
 11. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
 12. `system3-preflight-control-plane.yml` — canonical read-only workflow/issue/artifact current-state snapshot on every `main` push plus manual dispatch. The same snapshot code is reused by Workflow Priority Guard after approved workflow completions. Snapshot artifacts are retained for 30 days. It has no GitHub Actions schedule trigger and does not replace mandatory agent-side fresh preflight before production transitions.
+13. `repo-clean-forensic-toolkit.yml` — report-only repository/storage cleanup evidence. It scans every current tracked file on relevant PR/main changes or manual dispatch, inventories duplicate/reference/import evidence and Actions storage metadata, and performs full Git-history blob analysis on non-PR runs. It never deletes files/artifacts, rewrites history, or touches broker/trading/IAM state.
 
 ### Manual emergency workflow
 
-13. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+14. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Event workflow rules
 
@@ -36,6 +37,8 @@ No other workflow may use `workflow_run` or `deployment_status`.
 GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security/cloud audits execute on every relevant `main` commit; code/security checks also execute on pull requests where configured and may be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
 
 The canonical preflight workflow itself runs on `main` push and manual dispatch only. Event-driven refresh is performed inside the already-approved Workflow Priority Guard after relevant workflow completions, so no duplicate scheduled or event control-plane workflow is introduced. Fresh preflight before a production transition remains an agent operating-contract obligation.
+
+The repo-clean forensic toolkit likewise has no GitHub cron. Its persistent discoverability is governed by `AGENTS.md`; agents run it on demand for cleanup/storage work, while its own relevant PR/main changes prove the scanner itself.
 
 ## AI and external observability rule
 
