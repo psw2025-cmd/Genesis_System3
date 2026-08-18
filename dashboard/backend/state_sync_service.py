@@ -38,6 +38,74 @@ def _health_broker_update_allowed(updates: Dict[str, Any]) -> bool:
     return "broker" not in updates
 
 
+def _broker_update_from_probe(result: Any) -> Optional[Dict[str, Any]]:
+    """Convert a bounded Dhan probe result into authoritative SSOT broker truth.
+
+    A failed probe is still evidence.  The old implementation only persisted a
+    successful probe, so a real 906/disconnect could leave a stale historical
+    ``connected=true`` value visible in ``/api/state`` and the dashboard.
+    """
+    if not isinstance(result, dict):
+        return None
+    connected = bool(result.get("connected", False))
+    update: Dict[str, Any] = {
+        "connected": connected,
+        "name": "dhan",
+        "status": "connected" if connected else "disconnected",
+        "error": None if connected else (result.get("error") or "BROKER_NOT_CONNECTED"),
+        "latency_ms": result.get("latency_ms"),
+        "truth_source": "dhan_readonly_probe",
+        "observed_at_ist": datetime.now(IST).isoformat(),
+    }
+    # Preserve only safe classifications/codes; never copy arbitrary upstream
+    # payloads, credentials, headers, or token material into shared state.
+    for key in ("auth_classification", "upstream_classification", "upstream_code"):
+        if result.get(key) is not None:
+            update[key] = result.get(key)
+    return update
+
+
+def _normalize_qc_truth(qc: Any) -> Dict[str, Any]:
+    """Fail closed when QC evidence cannot prove usable contracts.
+
+    ``PASS`` is impossible when ``contracts_total`` is zero.  Missing or invalid
+    contract counts also remain NOT_READY rather than inheriting an optimistic
+    default.  An explicit FAIL remains FAIL.
+    """
+    normalized: Dict[str, Any] = dict(qc) if isinstance(qc, dict) else {}
+    status = str(normalized.get("status") or "").strip().upper()
+    raw_contracts = normalized.get("contracts_total")
+    try:
+        contracts_total = int(raw_contracts) if raw_contracts is not None else 0
+    except (TypeError, ValueError):
+        contracts_total = 0
+    normalized["contracts_total"] = max(0, contracts_total)
+
+    failures = normalized.get("failures")
+    if not isinstance(failures, list):
+        failures = []
+    reasons = normalized.get("reasons")
+    if not isinstance(reasons, list):
+        reasons = []
+
+    if contracts_total <= 0:
+        marker = "NO_VERIFIED_CONTRACTS"
+        if marker not in reasons:
+            reasons.append(marker)
+        if status != "FAIL":
+            status = "NOT_READY"
+    elif not status:
+        status = "NOT_READY"
+        marker = "QC_STATUS_NOT_PROVEN"
+        if marker not in reasons:
+            reasons.append(marker)
+
+    normalized["status"] = status or "NOT_READY"
+    normalized["reasons"] = reasons
+    normalized["failures"] = failures
+    return normalized
+
+
 class _BrokerAlertLog:
     """Adapter so process_broker_alert can log via print."""
 
@@ -68,8 +136,15 @@ class StateSyncService:
         self._consecutive_failures = 0
 
     async def start(self):
-        """Start the sync service"""
+        """Start the sync service and fail-close the initial QC snapshot."""
         self._running = True
+        # Do not expose a boot-time PASS+0-contracts window before the first
+        # asynchronous file/broker sync gets CPU time.
+        try:
+            current = self.state_store.get_state()
+            self.state_store.update_state({"qc": _normalize_qc_truth(current.get("qc", {}))})
+        except Exception:
+            pass
         asyncio.create_task(self._sync_loop())
 
     async def stop(self):
@@ -90,7 +165,8 @@ class StateSyncService:
         updates = {}
 
         # BOOTSTRAP: On first few syncs, if state_store shows broker not connected,
-        # directly probe Dhan to get real truth (health.json may not exist on cloud)
+        # directly probe Dhan to get real truth (health.json may not exist on cloud).
+        # A negative probe is authoritative too; never keep stale connected truth.
         try:
             current = self.state_store.get_state()
             if not current.get("broker", {}).get("connected", False):
@@ -106,16 +182,9 @@ class StateSyncService:
                     )
 
                     _ds = _probe_dhan()
-                    if _ds.get("connected"):
-                        updates["broker"] = {
-                            "connected": True,
-                            "name": "dhan",
-                            "status": "connected",
-                            "error": None,
-                            "latency_ms": _ds.get("latency_ms"),
-                            "truth_source": "dhan_readonly_probe",
-                            "observed_at_ist": datetime.now(IST).isoformat(),
-                        }
+                    broker_update = _broker_update_from_probe(_ds)
+                    if broker_update is not None:
+                        updates["broker"] = broker_update
                 except Exception:
                     pass
         except Exception:
@@ -182,12 +251,12 @@ class StateSyncService:
                             "observed_at_ist": datetime.now(IST).isoformat(),
                         }
 
-                    # Sync QC
-                    qc_status = health.get("qc_status", "PASS")
+                    # Sync QC. Missing QC evidence must not default to PASS.
+                    qc_status = str(health.get("qc_status", "NOT_READY") or "NOT_READY").upper()
                     qc_failures = health.get("qc_failures", [])
                     updates["qc"] = {
                         "status": qc_status,
-                        "reasons": qc_failures if qc_status == "FAIL" else [],
+                        "reasons": qc_failures if qc_status != "PASS" else [],
                         "failures": qc_failures,
                     }
 
@@ -265,6 +334,17 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing QC details: {e}")
 
+        # Normalize the merged QC snapshot after every cycle.  This also repairs
+        # old persisted Firestore state that says PASS while contracts_total=0.
+        try:
+            current_qc = (self.state_store.get_state().get("qc") or {})
+            merged_qc = dict(current_qc) if isinstance(current_qc, dict) else {}
+            if isinstance(updates.get("qc"), dict):
+                merged_qc.update(updates["qc"])
+            updates["qc"] = _normalize_qc_truth(merged_qc)
+        except Exception:
+            updates["qc"] = _normalize_qc_truth(updates.get("qc", {}))
+
         # Compute risk metrics if positions exist
         try:
             positions = updates.get("positions", [])
@@ -301,9 +381,14 @@ class StateSyncService:
             merged_broker = updates.get("broker") or current_state.get("broker", {})
             broker_actually_connected = merged_broker.get("connected", False)
 
-            # QC FAIL alert — only when we have fresh QC data saying FAIL
-            if updates.get("qc", {}).get("status") == "FAIL":
-                self.state_store.upsert_alert("WARN", "QC_FAIL", "Quality control check failed")
+            # QC alert — any fail-closed non-PASS QC state is operationally visible.
+            qc_status = str(updates.get("qc", {}).get("status") or "NOT_READY").upper()
+            if qc_status != "PASS":
+                self.state_store.upsert_alert(
+                    "WARN",
+                    "QC_FAIL",
+                    f"Quality control not ready: {qc_status}",
+                )
             else:
                 self.state_store.resolve_alert("QC_FAIL")
 
