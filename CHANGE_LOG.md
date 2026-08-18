@@ -1,3 +1,19 @@
+## 2026-08-18T09:24:58Z [Cursor] AUDIT PROBE CORRECTION + BROKER RECOVERY PROOF
+
+- Corrected the production audit/dashboard interpretation to use `/health` and
+  `/api/health` as the canonical app health probes for Cloud Run.
+- Recorded that `/healthz` is platform-intercepted on this deployment and can
+  return a Google 404 before FastAPI handles the request, so it is not
+  authoritative application-health proof.
+- Executed canonical manual Dhan recovery workflow run `32121086079`.
+- Re-verified live production after recovery:
+  - `GET /api/broker/status` -> `connected=true`, `AUTH_OK`
+  - `GET /api/health` -> `status=ok`, `broker_status=connected`
+  - `GET /api/auto_gates` -> `broker_connected=true`
+  - Production Broker tab shows `Broker Connected`, `Equity Holdings (11)`,
+    and `Dhan Live Positions (1)`.
+- Kept LIVE and order placement disabled.
+
 ## 2026-08-18T00:40:00Z [Cursor] INFINITE GITOPS PHASE 2 — PROOF LEDGER + INTENT LOOP
 
 Permanent fail-closed infinite GitOps loop (no user wait on routine PAPER work; LIVE stays human-gated):
