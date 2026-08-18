@@ -6,10 +6,12 @@ import json
 
 from dashboard.backend.proof_ledger_service import (
     FORBIDDEN_LEDGER_KEYS,
+    PROOF_LEDGER_PUBLIC_ERROR,
     append_ledger_entry,
     build_intent_tick,
     ledger_tip,
     proof_ledger_status,
+    read_proof_ledger_public,
     verify_ledger_chain,
 )
 
@@ -143,6 +145,33 @@ def test_orchestrator_and_api_are_wired():
     policy = (root / "agent_policy.yaml").read_text(encoding="utf-8")
     assert "append_ledger_entry" in orchestrator
     assert '@app.get("/api/proof_ledger")' in app
-    assert "append_ledger_entry" not in app.split('@app.get("/api/proof_ledger")', 1)[1][:1200]
+    handler = app.split('@app.get("/api/proof_ledger")', 1)[1][:1200]
+    assert "append_ledger_entry" not in handler
+    assert "str(e)" not in handler
+    assert "read_proof_ledger_public" in handler
     assert "infinite_gitops_loop:" in policy
     assert "wait_for_user_on_routine_gitops" in policy
+
+
+def test_proof_ledger_public_api_never_exposes_exception_text(monkeypatch, tmp_path):
+    marker = "INTERNAL_SECRET_MARKER_DO_NOT_EXPOSE_98765"
+
+    def boom(_root):
+        raise RuntimeError(marker)
+
+    monkeypatch.setattr(
+        "dashboard.backend.proof_ledger_service.proof_ledger_status",
+        boom,
+    )
+    payload = read_proof_ledger_public(tmp_path)
+    dumped = json.dumps(payload)
+    assert marker not in dumped
+    assert "RuntimeError" not in dumped
+    assert payload["error"] == PROOF_LEDGER_PUBLIC_ERROR
+    assert payload["status"] == "error"
+    assert payload["chain"]["ok"] is False
+    assert payload["live_trading_enabled"] is False
+    assert payload["order_placement_allowed"] is False
+    assert payload["secret_payloads_present"] is False
+    assert payload["tip"] is None
+    assert payload["intent_tick"] is None

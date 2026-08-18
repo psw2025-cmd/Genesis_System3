@@ -9,12 +9,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
 
+_LOG = logging.getLogger(__name__)
+
 LEDGER_SCHEMA = "system3_proof_ledger_v1"
 INTENT_SCHEMA = "system3_autonomous_intent_v1"
+PROOF_LEDGER_PUBLIC_ERROR = "PROOF_LEDGER_UNAVAILABLE"
 LEDGER_REL = Path("reports") / "latest" / "proof_ledger" / "ledger.jsonl"
 INTENT_REL = Path("reports") / "latest" / "autonomous_loop" / "intent_tick.json"
 
@@ -141,6 +145,30 @@ def proof_ledger_status(root: Path) -> Dict[str, Any]:
         "secret_payloads_present": False,
         "wait_for_user_routine": False,
     }
+
+
+def proof_ledger_fail_closed_payload() -> Dict[str, Any]:
+    """Stable public error body. Never includes exception text or secrets."""
+    return {
+        "schema": "system3_proof_ledger_status_v1",
+        "status": "error",
+        "error": PROOF_LEDGER_PUBLIC_ERROR,
+        "chain": {"ok": False, "entries": 0},
+        "tip": None,
+        "intent_tick": None,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+        "secret_payloads_present": False,
+    }
+
+
+def read_proof_ledger_public(root: Path) -> Dict[str, Any]:
+    """Public read path: fail closed without leaking exception contents."""
+    try:
+        return proof_ledger_status(root)
+    except Exception:
+        _LOG.exception("proof_ledger_status_failed")
+        return proof_ledger_fail_closed_payload()
 
 
 def build_intent_tick(
