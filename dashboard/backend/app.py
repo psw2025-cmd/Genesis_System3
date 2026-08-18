@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import hmac
 import json
+import math
 import os
 import re
 import sys
@@ -8585,9 +8586,9 @@ async def state_alias():
 
 
 @app.get("/healthz")
-async def healthz_alias():
-    """Alias for /api/health (kubernetes-style) - returns same data"""
-    return await get_health()
+async def healthz_probe():
+    """Lightweight kubernetes-style health probe."""
+    return {"status": "ok"}
 
 
 @app.get("/api/deploy_info")
@@ -8908,7 +8909,14 @@ def _compat_csv_records(path: Path, limit: int = 1000) -> List[Dict[str, Any]]:
     try:
         module = _get_pd()
         if module is not None:
-            return module.read_csv(path).tail(limit).to_dict("records")
+            df = module.read_csv(path).tail(limit)
+            df = df.where(df.notna(), None)
+            records = df.to_dict("records")
+            for rec in records:
+                for k, v in rec.items():
+                    if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                        rec[k] = None
+            return records
     except Exception:
         pass
     return []
