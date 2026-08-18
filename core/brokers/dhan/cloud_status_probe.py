@@ -1,11 +1,13 @@
 """Deterministic Cloud Run Dhan broker status probe.
 
 Safety: read-only profile GET only; no order APIs; no raw token output.
-Official Dhan docs document Profile as ``access-token`` only. A second
-``dhanClientId`` contract is attempted only for client-id/config or opaque
-HTTP 400 failures, and only adopted when that second request succeeds.
-DH-906 / rate-limit / auth failures never multiply Profile GETs and never
-authorize token rotation.
+Official Dhan docs document Profile as ``access-token`` only while the official
+Python SDK sends ``access-token`` plus ``dhanClientId``. A second SDK-contract
+probe is therefore attempted only for client-id/config, opaque HTTP 400, or
+DH-906 request-contract failures, and only adopted when that request succeeds.
+Rate-limit and auth failures never multiply Profile GETs and never authorize
+token rotation. Both success and failure status results are TTL-cached so the
+bounded reconcile cannot become a per-caller request-amplification loop.
 """
 from __future__ import annotations
 
@@ -25,12 +27,14 @@ _REQUEST_REJECTED_CODES = {906}
 
 _PROFILE_DOCS_CONTRACT = "docs-access-token-only"
 _PROFILE_SDK_CONTRACT = "sdk-dhanClientId"
-# Official Profile GET is access-token only. DH-906 is a request/order rejection,
-# not a missing-header signal, so it must never multiply into a second Profile GET
-# or authorize token rotation. Fallback is only for client-id/config or opaque 400.
+# Dhan's public docs and official Python SDK currently disagree on the Profile
+# header contract. A docs-contract 906 is therefore eligible for exactly one
+# SDK-contract reconciliation attempt. This remains non-auth and must never
+# authorize token rotation. Auth and rate-limit failures never fall back.
 _PROFILE_FALLBACK_ERRORS = {
     "CLIENT_ID_INVALID",
     "HTTP_400",
+    "DHAN_REQUEST_REJECTED_906",
 }
 
 
@@ -347,7 +351,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
     cache = getattr(module, "_STATUS_RESULT_CACHE", None)
     cache_at = float(getattr(module, "_STATUS_RESULT_CACHE_AT", 0.0) or 0.0)
     ttl = float(getattr(module, "_STATUS_RESULT_TTL_S", 25.0) or 25.0)
-    if cache and (now - cache_at) < ttl and cache.get("connected") is True:
+    if cache and (now - cache_at) < ttl:
         out = dict(cache)
         out.update(
             cache_hit=True,
@@ -457,7 +461,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             final.get("http_status"),
             final.get("blob") or "",
         )
-    return {
+    result = {
         **base,
         "connected": False,
         "error": final["error"],
@@ -471,3 +475,6 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         "probe_contract_cached": bool(cached_contract),
         "probe_header_attempts": attempts,
     }
+    module._STATUS_RESULT_CACHE = dict(result)
+    module._STATUS_RESULT_CACHE_AT = time.time()
+    return result
