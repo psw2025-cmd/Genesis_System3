@@ -1,4 +1,5 @@
 import { useStore } from '../store'
+import { splitAlertStream } from '../lib/alertTruth'
 import { cn } from '../lib/utils'
 import { Bell, AlertTriangle, Info, CheckCircle, Activity, Shield } from 'lucide-react'
 
@@ -18,17 +19,10 @@ const ICONS: Record<string, any> = {
   INFO: CheckCircle,
 }
 
-const isLiveReadinessInfo = (alert: any) => {
-  const type = String(alert?.type ?? alert?.category ?? alert?.code ?? '').toUpperCase()
-  const severity = String(alert?.severity ?? 'INFO').toUpperCase()
-  return type === 'LIVE_GATE' && severity === 'INFO'
-}
-
 export function AlertsTab() {
   const { alerts, apiStatus, marketOpen, brokerConnected, wsStatus } = useStore()
   const authIssue = Boolean(apiStatus && /auth|401|403/i.test(String(apiStatus.status || apiStatus.message || '')))
-  const liveReadinessInfo = alerts.filter(isLiveReadinessInfo)
-  const activeAlerts = alerts.filter((alert: any) => !isLiveReadinessInfo(alert))
+  const { liveReadinessInfo, activeAlerts } = splitAlertStream(alerts)
   const counts = activeAlerts.reduce<Record<string, number>>((acc, alert: any) => {
     const severity = String(alert?.severity ?? 'INFO').toUpperCase()
     acc[severity] = (acc[severity] || 0) + 1

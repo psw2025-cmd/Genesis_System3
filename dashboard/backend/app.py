@@ -2370,9 +2370,9 @@ async def get_live_trading_gate():
             "human_approved",
             ks.get("live_trading_approved", False),
             (
-                "Human approval given"
+                "Human LIVE approval recorded"
                 if ks.get("live_trading_approved")
-                else "NOT APPROVED — owner must set live_trading_approved=true in kill_switch.json"
+                else "live_trading_approved remains false by design; PAPER/ANALYZER does not require LIVE approval"
             ),
         )
     except Exception as e:
@@ -6675,11 +6675,13 @@ async def _synthesize_operational_alerts() -> list:
     out: list = []
 
     def _add(code: str, severity: str, title: str, message: str, data: dict | None = None):
+        alert_type = "LIVE_GATE" if str(code).upper() == "LIVE_GATE" else "system_alert"
         out.append(
             {
                 "id": f"OPS_{code}",
-                "type": "system_alert",
-                "severity": severity,
+                "type": alert_type,
+                "code": code,
+                "severity": "INFO" if alert_type == "LIVE_GATE" else severity,
                 "title": title,
                 "message": message,
                 "data": data or {},
@@ -6754,15 +6756,15 @@ async def _synthesize_operational_alerts() -> list:
                 if isinstance(g, dict) and not g.get("passed")
             ]
             if failing:
-                detail = "; ".join(
-                    f"{g.get('gate')}={g.get('detail')}" for g in failing[:4]
-                )
+                failing_names = [str(g.get("gate") or "") for g in failing if g.get("gate")]
                 _add(
                     "LIVE_GATE",
-                    "info",
+                    "INFO",
                     "Live trading correctly BLOCKED",
-                    detail[:400],
-                    {"failing_gates": [g.get("gate") for g in failing]},
+                    "Live remains blocked by design in PAPER/ANALYZER. "
+                    "Live approval is not required for paper operation. "
+                    f"Failing live-only gates: {', '.join(failing_names) or 'none'}.",
+                    {"failing_gates": failing_names},
                 )
     except Exception as exc:
         _add(
