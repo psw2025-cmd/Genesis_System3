@@ -14,6 +14,7 @@ Read first:
 7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
 8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
 9. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
+10. `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` — permanent data/feature/model/prediction benchmark authority; compare material prediction changes against current primary research, simple baselines and relevant contemporary challengers before promotion
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 
@@ -134,3 +135,18 @@ When the user asks to clean the repo, remove duplicates, reduce repository size,
 6. Only `DELETE_PROVEN_100` rows may seed an automated cleanup PR. Source/runtime duplicates remain fail-closed until their cleanup PR passes normal CI.
 7. The toolkit itself must remain report-only. No source deletion, artifact deletion, history rewrite, force push, broker/order call, LIVE change, secret read, or IAM mutation is part of the scan.
 8. If a cleanup false positive/negative is found, add a regression test and improve the canonical toolkit instead of forking another cleanup scanner.
+
+## Permanent world-class prediction rule
+
+For any request involving prediction accuracy, AI/ML models, ranking, feature engineering, market-data expansion, retraining, self-learning, strategy search or model promotion:
+
+1. Fresh-read `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` and current prediction/data ownership before changing code.
+2. Compare current System3 capability against current primary research, official provider capabilities, the existing champion and simple baselines; do not equate newer/deeper AI with better alpha.
+3. Fix data truth, historical coverage, point-in-time lineage and leakage risk before using model complexity to compensate for missing data.
+4. Maintain an explicit versioned feature/label/model/tournament matrix. New features require lineage, availability time, freshness, leakage test and OOS ablation.
+5. Every candidate must use the same-window/same-data/same-horizon/same-cost champion-challenger evaluation and include relevant statistical, economic, calibration and robustness metrics.
+6. A single raw accuracy, hit-rate, P&L or Spearman threshold can never prove promotion readiness. Use leakage-safe OOS evaluation, realistic costs, regime breakdown, calibrated uncertainty and overfitting diagnostics.
+7. Predictions require row-level lineage (`prediction_id`, data/feature/model versions, horizon, confidence/interval and realized outcome) before aggregate accuracy can become authority.
+8. Treat current foundation models, LOB transformers, alternative data and LLM features as challengers only. Promote only when System3-specific evidence proves incremental net value over simpler baselines.
+9. Self-learning is bounded retraining/recalibration/challenger testing with rollback; it never means uncontrolled code mutation, automatic LIVE enablement or automatic capital deployment.
+10. Keep ANALYZE/PAPER and all LIVE/order safety locks unchanged while accuracy/research gates are incomplete.
