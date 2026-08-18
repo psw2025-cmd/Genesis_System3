@@ -1,0 +1,88 @@
+name: Repo Clean Forensic Toolkit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/system3_repo_clean_forensic_toolkit.py"
+      - "tests/test_repo_clean_forensic_toolkit.py"
+      - "docs/project_control/CLEANUP_POLICY.md"
+      - "docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md"
+      - "AGENTS.md"
+      - ".github/workflows/repo-clean-forensic-toolkit.yml"
+  schedule:
+    - cron: "17 1 * * 0"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: repo-clean-forensic-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  audit:
+    name: REPORT ONLY - full repo deletion evidence
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      SYSTEM3_MODE: analyze
+      ANALYZE_MODE: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+      AUTO_EXECUTE_TRADES: "0"
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          clean: true
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Compile toolkit
+        run: python -m py_compile scripts/system3_repo_clean_forensic_toolkit.py
+
+      - name: Run fail-closed toolkit regression tests
+        run: python -m unittest -v tests.test_repo_clean_forensic_toolkit
+
+      - name: Scan full repository and storage layers
+        id: scan
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="$RUNNER_TEMP/system3-repo-clean-forensic"
+          python scripts/system3_repo_clean_forensic_toolkit.py \
+            --repo . \
+            --out "$OUT" \
+            --github-artifacts
+          echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          cat "$OUT/00_EXECUTIVE_DELETE_DECISION.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload compact cleanup proof pack
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: system3-repo-clean-forensic-${{ github.run_number }}
+          path: ${{ steps.scan.outputs.out }}/
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 9
+
+      - name: Safety lock
+        if: always()
+        shell: bash
+        run: |
+          test "${LIVE_TRADING_ENABLED}" = "0"
+          test "${SYSTEM3_LIVE_TRADING_ALLOWED}" = "0"
+          test "${AUTO_EXECUTE_TRADES}" = "0"
+          echo "REPORT_ONLY=PASS"
+          echo "FILES_DELETED=0"
