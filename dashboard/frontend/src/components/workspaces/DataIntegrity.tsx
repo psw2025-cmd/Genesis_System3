@@ -15,7 +15,25 @@ export const DataIntegrity: React.FC = () => {
   const qc = String(state?.qc?.status || '').toUpperCase()
   const latency = health?.broker?.latency_ms ?? brokerStatus?.latency_ms ?? state?.broker?.latency_ms
   const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
-  const blockers = Array.isArray(health?.blockers) ? health.blockers : Array.isArray(health?.live_blockers) ? health.live_blockers : []
+  const explicitBlockers = Array.isArray(health?.blockers)
+    ? health.blockers
+    : Array.isArray(health?.live_blockers)
+      ? health.live_blockers
+      : []
+  const brokerError = String(brokerStatus?.error || state?.broker?.error || '').trim()
+  const contractsRaw = state?.qc?.contracts_total
+  const contractsTotal = Number(contractsRaw ?? 0)
+  const derivedBlockers: string[] = []
+  if (!connected && (Boolean(marketOpen) || Boolean(brokerError))) {
+    derivedBlockers.push(brokerError ? `Broker not connected: ${brokerError}` : 'Broker not connected during market hours')
+  }
+  if (qc && qc !== 'PASS') {
+    derivedBlockers.push(`QC ${qc}`)
+  }
+  if (contractsRaw == null || !Number.isFinite(contractsTotal) || contractsTotal <= 0) {
+    derivedBlockers.push('No verified option contracts')
+  }
+  const blockers = Array.from(new Set([...explicitBlockers.map((b: any) => String(b)), ...derivedBlockers]))
   const errors = Array.isArray(health?.errors) ? health.errors : []
   const feed = resolveFeedQuality({
     marketOpen,
