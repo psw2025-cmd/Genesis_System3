@@ -29,7 +29,7 @@ permissions:
 
 concurrency:
   group: repo-clean-forensic-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   audit:
@@ -45,10 +45,10 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
       GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - name: Checkout full history
+      - name: Checkout current tree on PR; full history otherwise
         uses: actions/checkout@v5
         with:
-          fetch-depth: 0
+          fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 0 }}
           clean: true
           persist-credentials: false
 
@@ -63,7 +63,7 @@ jobs:
       - name: Run fail-closed toolkit regression tests
         run: python -m unittest -v tests.test_repo_clean_forensic_toolkit
 
-      - name: Scan full repository and storage layers
+      - name: Scan full current repository and storage layers
         id: scan
         shell: bash
         run: |
@@ -74,6 +74,13 @@ jobs:
             --out "$OUT" \
             --github-artifacts
           echo "out=$OUT" >> "$GITHUB_OUTPUT"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            {
+              echo
+              echo "> PR mode scans every current tracked file, but checkout is shallow for speed. Git-history blob analysis becomes authoritative only on the post-merge/main, manual, or weekly full-history run."
+              echo
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
           cat "$OUT/00_EXECUTIVE_DELETE_DECISION.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload compact cleanup proof pack
