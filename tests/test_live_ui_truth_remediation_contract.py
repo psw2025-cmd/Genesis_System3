@@ -72,6 +72,20 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         text = self.text("dashboard/frontend/src/components/TopBar.tsx")
         self.assertNotIn("apiResponded && !hasError", text)
         self.assertIn("brokerIsConnected(health, brokerConnected, brokerStatus)", text)
+        self.assertIn("isNonAuthBrokerRejection", text)
+        self.assertIn("Request rejected", text)
+        self.assertIn("Session OK", text)
+
+    def test_w1_connected_true_is_not_broker_reliability_pass(self):
+        health = self.text("dashboard/frontend/src/lib/healthTruth.ts")
+        self.assertIn("export function brokerReliabilityPass", health)
+        self.assertIn("isNonAuthBrokerRejection", health)
+        panel = self.text("dashboard/frontend/src/components/SystemProgressPanel.tsx")
+        self.assertIn("Broker market-data reliability", panel)
+        self.assertIn("connected=true must not imply", panel)
+        broker = self.text("dashboard/frontend/src/components/BrokerPanel.tsx")
+        self.assertIn("SESSION CONNECTED - RELIABILITY NOT PROVEN", broker)
+        self.assertIn("DO NOT ROTATE TOKEN FOR 906", broker)
 
     def test_live_proof_uses_real_live_board_route_and_four_required_chain_subviews(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")

@@ -45,6 +45,16 @@ The classification and recovery boundaries must use the same current taxonomy:
 
 Known numeric codes override misleading free text. In particular, 805/904/906 must never become `TOKEN_EXPIRED_OR_INVALID` and must never trigger Secret Manager reload or canonical rotation. Code 810 must not rotate the token: first verify the currently loaded client-ID metadata/pairing without exposing the value.
 
+### Recurrence correction — 2026-08-18T10:02:39Z
+
+Fresh production `/api/broker/status` after an earlier rotation-on-906 showed:
+
+- `connected=false`, `error=DHAN_REQUEST_REJECTED_906`, `auth_classification=null`;
+- JWT still valid (`hours_remaining=23.28`, `expired=false`, secret version 269);
+- **two** Profile GETs in one probe: docs `access-token-only` 906, then SDK `dhanClientId` 906.
+
+That second 906 was caused by treating DH-906 as a header-contract fallback. Official Profile GET is access-token only. DH-906 must stay a single canonical request, must not multiply Profile demand, and must not authorize token rotation. The earlier recovery-proof notes that closed 906 by rotating the token are historical and are not a permanent fix.
+
 ### Post-#266/#267 evidence correction
 
 After safe first-rejection trace projection was merged, a fresh Full Cloud Audit proved that a runtime trace previously labelled `DHAN_TOKEN_REJECTED` was actually HTTP 400 with Dhan code 906, with the process-local rejection counter already heavily amplified. Inspection found `dh-906` contaminating both status classification and recovery-trigger logic. PR #267 removed that false 906-as-auth path.

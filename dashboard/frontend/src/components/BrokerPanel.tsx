@@ -2,6 +2,7 @@ import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 import { PriceCell } from './ui/PriceCell'
 import { AuthUnlock } from './AuthUnlock'
+import { isNonAuthBrokerRejection } from '../lib/healthTruth'
 
 function Row({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
@@ -63,9 +64,23 @@ export function BrokerPanel() {
   const positionsFailure = brokerFailure(brokerPositions)
   const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
   const brokerTruthConnected = Boolean(brokerConnected === true || brokerStatus?.connected === true)
+  const requestRejected = isNonAuthBrokerRejection(brokerStatus)
   // Do not paint TOKEN ERROR when broker truth is already connected (rate-limit false fails).
-  const brokerTokenBad = (!brokerTruthConnected) && (fundsFailure.bad || statusFailure.bad)
-  const dataState = authNeeded ? 'AUTH_NEEDED' : brokerTokenBad ? 'AUTH OR TOKEN ISSUE' : brokerTruthConnected ? 'LIVE READ-ONLY' : brokerApiResponded ? 'API RESPONDED' : brokerApiIssue ? 'API OFFLINE' : 'WAITING'
+  // DH-906/805/810 are non-auth upstream rejections and must not look like token expiry.
+  const brokerTokenBad = (!brokerTruthConnected) && !requestRejected && (fundsFailure.bad || statusFailure.bad)
+  const dataState = authNeeded
+    ? 'AUTH_NEEDED'
+    : requestRejected
+      ? 'REQUEST REJECTED (NON-AUTH)'
+      : brokerTokenBad
+        ? 'AUTH OR TOKEN ISSUE'
+        : brokerTruthConnected
+          ? 'SESSION OK / RELIABILITY NOT IMPLIED'
+          : brokerApiResponded
+            ? 'API RESPONDED'
+            : brokerApiIssue
+              ? 'API OFFLINE'
+              : 'WAITING'
   const fundsError = Boolean(
     brokerFunds
     && (
@@ -129,16 +144,16 @@ export function BrokerPanel() {
         <h3 style={{ fontSize: '.8rem', fontWeight: 700, color: 'var(--text-pri)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '.05em' }}>
           Broker Connection - Dhan
         </h3>
-        <Row label="Status" value={brokerTruthConnected ? 'CONNECTED' : dataState} color={brokerTruthConnected ? 'tx-up' : brokerApiResponded && !brokerTokenBad ? 'tx-amber' : 'tx-down'} />
-        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH_NEEDED - NOT READY' : brokerTruthConnected ? 'READ-ONLY BROKER PROOF OK' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
+        <Row label="Status" value={requestRejected ? dataState : brokerTruthConnected ? 'SESSION OK' : dataState} color={brokerTruthConnected ? 'tx-up' : requestRejected || (brokerApiResponded && !brokerTokenBad) ? 'tx-amber' : 'tx-down'} />
+        <Row label="Truth" value={brokerTokenBad ? 'BROKER AUTH_NEEDED - NOT READY' : requestRejected ? 'DH-906/RATE/CONFIG REJECTION - NOT TOKEN EXPIRY' : brokerTruthConnected ? 'SESSION CONNECTED - RELIABILITY NOT PROVEN' : 'BROKER PROOF NOT READY'} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-amber'} />
         <Row label="Mode" value="READ-ONLY BROKER PROOF" />
         <Row label="Client ID" value={brokerClientId(brokerStatus, brokerFunds)} color={brokerClientId(brokerStatus, brokerFunds).startsWith('NOT PROVIDED') ? 'tx-down' : undefined} />
-        <Row label="Token Status" value={brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
+        <Row label="Token Status" value={requestRejected ? 'JWT PRESENT - UPSTREAM NON-AUTH REJECTION' : brokerTokenBad ? 'ERROR / INVALID OR EXPIRED' : brokerStatus?.token_status ?? brokerStatus?.tokenStatus ?? (brokerTruthConnected ? 'VALID' : 'UNKNOWN')} color={brokerTokenBad ? 'tx-down' : requestRejected ? 'tx-amber' : brokerTruthConnected ? 'tx-up' : 'tx-down'} />
         <Row label="Holdings API" value={holdingsError ? 'ERROR/AUTH_NEEDED' : holdings.length >= 0 && brokerHoldings ? 'RESPONDED' : authNeeded ? 'AUTH_NEEDED' : 'CHECKING'} color={holdingsError || authNeeded ? 'tx-down' : brokerHoldings ? 'tx-up' : undefined} />
         <Row label="Funds API" value={fundsError ? 'ERROR/AUTH_NEEDED' : funds ? 'RESPONDED' : authNeeded ? 'AUTH_NEEDED' : 'CHECKING'} color={fundsError || authNeeded ? 'tx-down' : funds ? 'tx-up' : undefined} />
-        <Row label="Broker Blocker" value={brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={brokerTokenBad ? 'tx-down' : 'tx-up'} />
+        <Row label="Broker Blocker" value={requestRejected ? String(brokerStatus?.error || 'DHAN_REQUEST_REJECTED_906') : brokerTokenBad ? (fundsFailure.message || statusFailure.message || 'BROKER API AUTH ERROR') : marketOpen ? 'NONE' : 'NONE - MARKET CLOSED IS OK'} color={requestRejected || brokerTokenBad ? 'tx-amber' : 'tx-up'} />
         <Row label="Market State" value={marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / READ-ONLY OK'} />
-        <Row label="Data Visibility" value={authNeeded ? 'VISIBLE AFTER API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authNeeded || brokerTokenBad ? 'tx-down' : undefined} />
+        <Row label="Data Visibility" value={authNeeded ? 'VISIBLE AFTER API KEY IS CONFIGURED' : brokerTokenBad ? 'VISIBLE AFTER DHAN TOKEN / CLIENT AUTH IS VALID' : requestRejected ? 'PROFILE REJECTED - DO NOT ROTATE TOKEN FOR 906' : 'VISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS'} color={authNeeded || brokerTokenBad || requestRejected ? 'tx-down' : undefined} />
         <Row label="Live Trading" value={liveTradingState(state, brokerStatus)} color="tx-down" />
       </div>
 

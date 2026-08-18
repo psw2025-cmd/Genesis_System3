@@ -59,7 +59,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         self.assertEqual(len(result["probe_header_attempts"]), 1)
         self.assertEqual(snapshot()["rejection_count"], 0)
 
-    def test_docs_906_then_sdk_contract_success_connects_without_auth_latch(self):
+    def test_docs_906_never_retries_sdk_contract_or_auth_latch(self):
         calls = []
 
         def handler(access_token, client_id, *, timeout_s, contract):
@@ -71,10 +71,11 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         module, _ = _module(handler)
         result = get_cloud_status(module)
 
-        self.assertTrue(result["connected"])
-        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
-        self.assertEqual(result["probe_header_contract"], "access-token-plus-dhanClientId")
-        self.assertEqual(result["probe_header_variant"], "sdk-dhanClientId")
+        self.assertFalse(result["connected"])
+        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
+        self.assertEqual(calls, ["docs-access-token-only"])
+        self.assertEqual(result["probe_header_variant"], "docs-access-token-only")
         self.assertEqual(snapshot()["rejection_count"], 0)
         self.assertTrue(all(item["credential_value_exposed"] is False for item in result["probe_header_attempts"]))
 
@@ -92,7 +93,8 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(result["upstream_code"], 906)
-        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
+        self.assertEqual(calls, ["docs-access-token-only"])
+        self.assertEqual(result["probe_header_variant"], "docs-access-token-only")
         self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_rate_limit_never_multiplies_requests(self):
@@ -166,7 +168,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         def handler(access_token, client_id, *, timeout_s, contract):
             calls.append(contract)
             if contract == "docs-access-token-only":
-                raise _http_error(400, "DH-906 incorrect request")
+                raise _http_error(400, '{"code":810,"message":"Client ID is invalid"}')
             return {"dhanClientId": "safe", "status": "success"}
 
         module, _ = _module(handler)
@@ -212,7 +214,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertNotIn(token_marker, serialized)
         self.assertNotIn(client_marker, serialized)
-        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
+        self.assertEqual(calls, ["docs-access-token-only"])
         self.assertTrue(all(item["credential_value_exposed"] is False for item in result["probe_header_attempts"]))
 
 

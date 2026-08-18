@@ -1,12 +1,11 @@
 """Deterministic Cloud Run Dhan broker status probe.
 
 Safety: read-only profile GET only; no order APIs; no raw token output.
-The Dhan API documentation and official Python SDK currently disagree on the
-Profile request headers: the docs show ``access-token`` only while
-``DhanLogin.user_profile`` also sends ``dhanClientId``. The probe therefore
-uses a bounded, evidence-producing two-contract strategy and caches a proven
-working contract per process. It never retries header variants for auth or
-rate-limit failures and never mutates credentials.
+Official Dhan docs document Profile as ``access-token`` only. A second
+``dhanClientId`` contract is attempted only for client-id/config or opaque
+HTTP 400 failures, and only adopted when that second request succeeds.
+DH-906 / rate-limit / auth failures never multiply Profile GETs and never
+authorize token rotation.
 """
 from __future__ import annotations
 
@@ -26,8 +25,10 @@ _REQUEST_REJECTED_CODES = {906}
 
 _PROFILE_DOCS_CONTRACT = "docs-access-token-only"
 _PROFILE_SDK_CONTRACT = "sdk-dhanClientId"
+# Official Profile GET is access-token only. DH-906 is a request/order rejection,
+# not a missing-header signal, so it must never multiply into a second Profile GET
+# or authorize token rotation. Fallback is only for client-id/config or opaque 400.
 _PROFILE_FALLBACK_ERRORS = {
-    "DHAN_REQUEST_REJECTED_906",
     "CLIENT_ID_INVALID",
     "HTTP_400",
 }
@@ -423,8 +424,9 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
             contract=_PROFILE_SDK_CONTRACT,
         )
         attempts.append(second["attempt"])
-        final = second
-        chosen_contract = _PROFILE_SDK_CONTRACT
+        if second["ok"]:
+            final = second
+            chosen_contract = _PROFILE_SDK_CONTRACT
 
     latency_ms = int((time.monotonic() - total_started) * 1000)
     if final["ok"]:
