@@ -8590,6 +8590,24 @@ async def healthz_alias():
     return await get_health()
 
 
+@app.get("/api/deploy_info")
+async def deploy_info_underscore_alias():
+    """Alias for /api/deploy/info (legacy audit probe compat)."""
+    return await get_deploy_info()
+
+
+@app.get("/api/instruments")
+async def api_instruments_alias(symbol: Optional[str] = None):
+    """Alias for /instruments (audit probe compat)."""
+    return await compat_instruments(symbol)
+
+
+@app.get("/api/prediction/all")
+async def api_prediction_all_alias():
+    """Alias for /prediction/all (audit probe compat)."""
+    return await compat_prediction_all()
+
+
 @app.on_event("shutdown")
 async def shutdown():
     """Cleanup on shutdown"""
@@ -9251,7 +9269,12 @@ async def compat_funds():
 @app.get("/instruments")
 async def compat_instruments(symbol: Optional[str] = None):
     path = ROOT_DIR / "storage" / "instruments" / "api-scrip-master-detailed.csv"
-    rows = _compat_csv_records(path, 50000)
+    if not path.exists():
+        return _compat_ok({"count": 0, "items": [], "message": "instruments CSV not available"})
+    try:
+        rows = _compat_csv_records(path, 50000)
+    except Exception:
+        return _compat_ok({"count": 0, "items": [], "message": "instruments CSV read failed"})
     if symbol:
         needle = symbol.upper()
         rows = [r for r in rows if needle in str(r.get("SEM_TRADING_SYMBOL") or r.get("tradingSymbol") or r.get("symbol") or "").upper()]
