@@ -9,6 +9,8 @@ on:
       - "tests/test_repo_clean_forensic_toolkit.py"
       - "docs/project_control/CLEANUP_POLICY.md"
       - "docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md"
+      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - ".github/scripts/workflow_priority_guard.py"
       - "AGENTS.md"
       - ".github/workflows/repo-clean-forensic-toolkit.yml"
   push:
@@ -18,10 +20,10 @@ on:
       - "tests/test_repo_clean_forensic_toolkit.py"
       - "docs/project_control/CLEANUP_POLICY.md"
       - "docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md"
+      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - ".github/scripts/workflow_priority_guard.py"
       - "AGENTS.md"
       - ".github/workflows/repo-clean-forensic-toolkit.yml"
-  schedule:
-    - cron: "17 1 * * 0"
 
 permissions:
   contents: read
@@ -77,7 +79,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
             {
               echo
-              echo "> PR mode scans every current tracked file, but checkout is shallow for speed. Git-history blob analysis becomes authoritative only on the post-merge/main, manual, or weekly full-history run."
+              echo "> PR mode scans every current tracked file, but checkout is shallow for speed. Git-history blob analysis becomes authoritative only on the post-merge/main or manual full-history run."
               echo
             } >> "$GITHUB_STEP_SUMMARY"
           fi
