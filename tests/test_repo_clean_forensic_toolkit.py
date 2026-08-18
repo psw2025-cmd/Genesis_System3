@@ -32,6 +32,8 @@ class RepoCleanForensicToolkitTests(unittest.TestCase):
             "archive/referenced.bin": "referenced",
             "docs/use.md": "keep archive/referenced.bin because it is referenced\n",
             "core/runtime.py": 'print("runtime")\n',
+            "markers/empty.keep": "",
+            "archive/empty.keep": "",
         }
         for name, content in files.items():
             path = root / name
@@ -59,9 +61,12 @@ class RepoCleanForensicToolkitTests(unittest.TestCase):
         self.assertEqual(by_path["archive/tool.py"]["decision"], "QUARANTINE_FIRST_SOURCE_DUPLICATE")
         self.assertNotEqual(by_path["archive/referenced.bin"]["decision"], "DELETE_PROVEN_100")
         self.assertGreaterEqual(by_path["archive/referenced.bin"]["ref_count"], 1)
+        self.assertEqual(by_path["archive/empty.keep"]["decision"], "REVIEW_ZERO_BYTE_MARKER")
+        self.assertEqual(by_path["archive/empty.keep"]["replacement"], None)
         self.assertTrue(summary["no_files_deleted"])
         self.assertTrue((out / "00_EXECUTIVE_DELETE_DECISION.md").exists())
         self.assertTrue((root / "archive/canonical.bin").exists())
+        self.assertTrue((root / "archive/empty.keep").exists())
 
     def test_delete_commands_include_only_proven_rows(self):
         tmp, root = self._repo()
@@ -73,6 +78,20 @@ class RepoCleanForensicToolkitTests(unittest.TestCase):
         self.assertIn("archive/canonical.bin", commands)
         self.assertNotIn("archive/tool.py", commands)
         self.assertNotIn("archive/referenced.bin", commands)
+        self.assertNotIn("archive/empty.keep", commands)
+
+    def test_github_storage_schema_when_unavailable(self):
+        old_token = toolkit.os.environ.pop("GITHUB_TOKEN", None)
+        old_repo = toolkit.os.environ.pop("GITHUB_REPOSITORY", None)
+        try:
+            result = toolkit.github_storage_inventory()
+            self.assertFalse(result["available"])
+            self.assertIn("unavailable", result["reason"])
+        finally:
+            if old_token is not None:
+                toolkit.os.environ["GITHUB_TOKEN"] = old_token
+            if old_repo is not None:
+                toolkit.os.environ["GITHUB_REPOSITORY"] = old_repo
 
 
 if __name__ == "__main__":
