@@ -13,6 +13,7 @@ Read first:
 6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
 7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
 8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
+9. `docs/CHATGPT_MUST_REVIEW_NOW.md` — current ChatGPT consolidator handoff (live-pinned); Cursor instructions inbound at `docs/chatgpt_to_cursar-5.md`
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 
