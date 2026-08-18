@@ -87,6 +87,16 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("SESSION CONNECTED - RELIABILITY NOT PROVEN", broker)
         self.assertIn("DO NOT ROTATE TOKEN FOR 906", broker)
 
+    def test_w4_live_gate_alert_leak_is_classified_out_of_active_stream(self):
+        helper = self.text("dashboard/frontend/src/lib/alertTruth.ts")
+        self.assertIn("export function isLiveReadinessInfo", helper)
+        self.assertIn("OPS_LIVE_GATE", helper)
+        tab = self.text("dashboard/frontend/src/components/AlertsTab.tsx")
+        self.assertIn("splitAlertStream", tab)
+        app = self.text("dashboard/backend/app.py")
+        self.assertIn('"type": alert_type', app)
+        self.assertNotIn("owner must set live_trading_approved=true in kill_switch.json", app)
+
     def test_live_proof_uses_real_live_board_route_and_four_required_chain_subviews(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
         self.assertIn('/api/market/live_board', text)

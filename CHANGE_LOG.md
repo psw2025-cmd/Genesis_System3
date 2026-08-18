@@ -1,3 +1,13 @@
+## 2026-08-18T12:15:00Z [Cursor] W4 LIVE_GATE ALERT LEAK
+
+Alerts tab counted the PAPER-by-design live-trading gate as `1 ACTIVE` and
+told the owner to set `live_trading_approved=true`. That was a classifier leak
+(`type=system_alert` vs `LIVE_GATE`), not a user LIVE-enablement task.
+
+Fix: LIVE_GATE synth uses `type=LIVE_GATE`; Alerts tab filters OPS_LIVE_GATE
+and kill-switch wording into Live Readiness; gate copy no longer instructs a
+kill-switch flip. LIVE and orders remain disabled.
+
 ## 2026-08-18T10:02:39Z [Cursor] W1 + PERMANENT 906 CORE FIX
 
 Live broker recurred to `DHAN_REQUEST_REJECTED_906` after rotation-on-906.
