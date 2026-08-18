@@ -14,6 +14,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 import urllib.request
 from pathlib import Path
 from typing import Any
@@ -27,6 +28,9 @@ SERVICE = os.getenv("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
 EXPECTED_SHA = os.getenv("GITHUB_SHA", "").strip()
 OUT = Path("reports/latest/public_dashboard_proof")
 TIMEOUT_S = 30
+READINESS_ATTEMPTS = 3
+READINESS_BACKOFF_S = 2
+TRANSIENT_HTTP_STATUS = {408, 429, 500, 502, 503, 504}
 OFF_VALUES = {"0", "false", "no", "off"}
 CANONICAL_VISUAL_TAB = "decision-intel"
 
@@ -122,13 +126,47 @@ def _is_off(value: Any) -> bool:
     return str(value or "").strip().lower() in OFF_VALUES
 
 
-def _get_json(url: str) -> tuple[int, dict[str, Any]]:
-    response = requests.get(url, timeout=TIMEOUT_S)
+def _get_with_readiness(url: str, label: str) -> tuple[requests.Response, list[dict[str, Any]]]:
+    """Retry only transient post-promotion readiness failures, anonymously.
+
+    Auth/semantic 4xx responses are never retried. Persistent transient status,
+    timeout, or connection failure still fails closed after the bounded budget.
+    Attempt evidence stores only safe labels/status/error classes, never body or URL.
+    """
+    attempts: list[dict[str, Any]] = []
+    for attempt in range(1, READINESS_ATTEMPTS + 1):
+        try:
+            response = requests.get(url, timeout=TIMEOUT_S)
+            attempts.append({
+                "attempt": attempt,
+                "label": label,
+                "http_status": int(response.status_code),
+                "error_type": None,
+            })
+            retryable = response.status_code in TRANSIENT_HTTP_STATUS
+            if not retryable or attempt == READINESS_ATTEMPTS:
+                return response, attempts
+        except (requests.Timeout, requests.ConnectionError) as exc:
+            attempts.append({
+                "attempt": attempt,
+                "label": label,
+                "http_status": None,
+                "error_type": type(exc).__name__,
+            })
+            if attempt == READINESS_ATTEMPTS:
+                raise
+        if attempt < READINESS_ATTEMPTS:
+            time.sleep(READINESS_BACKOFF_S * attempt)
+    raise RuntimeError(f"readiness_retry_exhausted:{label}")
+
+
+def _get_json(url: str, label: str) -> tuple[int, dict[str, Any], list[dict[str, Any]]]:
+    response, attempts = _get_with_readiness(url, label)
     try:
         body = response.json()
     except Exception:
         body = {}
-    return response.status_code, body if isinstance(body, dict) else {}
+    return response.status_code, body if isinstance(body, dict) else {}, attempts
 
 
 def _publish_status(state: str, description: str) -> None:
@@ -180,6 +218,11 @@ def _run_tab_matrix() -> dict[str, Any]:
     if matrix.get("expected_sha") != EXPECTED_SHA:
         raise RuntimeError("ui_tab_visual_matrix_sha_mismatch")
     return matrix
+
+
+# The delegated visual harness owns --headless browser transport plus the
+# rendered_product_marker_missing, dashboard_login_prompt_still_rendered, and
+# real_deployed_cloud_run_dashboard_ui semantic checks.
 
 
 def _safe_evidence_path(relative: str) -> Path:
@@ -243,6 +286,7 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     config_proof: dict[str, Any] = {"state": "FAIL", "expected_sha": EXPECTED_SHA}
     http_proof: dict[str, Any] = {"state": "FAIL"}
+    readiness_attempts: dict[str, list[dict[str, Any]]] = {}
     try:
         if len(EXPECTED_SHA) != 40:
             raise RuntimeError("expected_git_sha_missing")
@@ -288,7 +332,7 @@ def main() -> int:
         if failures:
             raise RuntimeError("public_dashboard_config_proof_failed")
 
-        root = requests.get(f"{url}/", timeout=TIMEOUT_S)
+        root, readiness_attempts["root"] = _get_with_readiness(f"{url}/", "root")
         try:
             root_payload = root.json() if root.status_code == 200 else {}
         except Exception:
@@ -299,11 +343,11 @@ def main() -> int:
         if not dashboard_path.startswith("/") or dashboard_path.startswith("//"):
             raise RuntimeError("unsafe_dashboard_relative_path")
         dashboard_url = urljoin(url + "/", dashboard_path.lstrip("/"))
-        dashboard = requests.get(dashboard_url, timeout=TIMEOUT_S)
+        dashboard, readiness_attempts["dashboard_ui"] = _get_with_readiness(dashboard_url, "dashboard_ui")
 
-        auth_status, auth = _get_json(f"{url}/api/auth/status")
-        state_status, _ = _get_json(f"{url}/api/state")
-        health_status, _ = _get_json(f"{url}/api/health")
+        auth_status, auth, readiness_attempts["auth_status"] = _get_json(f"{url}/api/auth/status", "auth_status")
+        state_status, _, readiness_attempts["state"] = _get_json(f"{url}/api/state", "state")
+        health_status, _, readiness_attempts["health"] = _get_json(f"{url}/api/health", "health")
         html = dashboard.text if dashboard.status_code == 200 else ""
         html_shell = '<div id="root"' in html or "<div id='root'" in html
         http_failures: list[str] = []
@@ -346,6 +390,15 @@ def main() -> int:
             "auth_authenticated": auth.get("authenticated"),
             "auth_credential_surface": auth.get("credential_surface"),
             "auth_session": auth.get("session"),
+            "readiness_retry_policy": {
+                "attempts": READINESS_ATTEMPTS,
+                "timeout_seconds_per_attempt": TIMEOUT_S,
+                "backoff_seconds": READINESS_BACKOFF_S,
+                "transient_http_status": sorted(TRANSIENT_HTTP_STATUS),
+                "anonymous_get_only": True,
+                "semantic_failures_never_downgraded": True,
+            },
+            "readiness_attempts": readiness_attempts,
             "api_key_sent_for_dashboard_reads": False,
             "cookie_sent_for_dashboard_reads": False,
             "dashboard_visible_without_login": not http_failures,
@@ -380,6 +433,17 @@ def main() -> int:
         }, sort_keys=True))
         return 0
     except Exception as exc:
+        if "readiness_retry_policy" not in http_proof:
+            http_proof["readiness_retry_policy"] = {
+                "attempts": READINESS_ATTEMPTS,
+                "timeout_seconds_per_attempt": TIMEOUT_S,
+                "backoff_seconds": READINESS_BACKOFF_S,
+                "transient_http_status": sorted(TRANSIENT_HTTP_STATUS),
+                "anonymous_get_only": True,
+                "semantic_failures_never_downgraded": True,
+            }
+        if readiness_attempts:
+            http_proof["readiness_attempts"] = readiness_attempts
         (OUT / "config.json").write_text(json.dumps(config_proof, indent=2, sort_keys=True), encoding="utf-8")
         (OUT / "http.json").write_text(json.dumps(http_proof, indent=2, sort_keys=True), encoding="utf-8")
         try:
