@@ -13,6 +13,7 @@ Read first:
 6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
 7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
 8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
+9. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 
@@ -120,3 +121,16 @@ For current runtime/UI claims, prefer:
 6. historical artifacts/reports for comparison only.
 
 Historical evidence must be labeled with its capture/observation time. Never silently promote historical evidence to current truth.
+
+## Permanent repo-clean / storage rule
+
+When the user asks to clean the repo, remove duplicates, reduce repository size, free GitHub storage, check repository “memory”, or verify files for deletion:
+
+1. Fresh-read current `main` and active cleanup PR ownership.
+2. Run `scripts/system3_repo_clean_forensic_toolkit.py` or the canonical `Repo Clean Forensic Toolkit` workflow.
+3. Read `00_EXECUTIVE_DELETE_DECISION.md` first and use the exact current-run artifact only.
+4. Distinguish **current tracked worktree**, **Git history/object database**, **GitHub Actions artifacts**, and **local ignored/untracked disk**. They are different storage layers.
+5. Never delete from filename similarity, “old/backup/archive” naming, one grep result, age, or an old report.
+6. Only `DELETE_PROVEN_100` rows may seed an automated cleanup PR. Source/runtime duplicates remain fail-closed until their cleanup PR passes normal CI.
+7. The toolkit itself must remain report-only. No source deletion, artifact deletion, history rewrite, force push, broker/order call, LIVE change, secret read, or IAM mutation is part of the scan.
+8. If a cleanup false positive/negative is found, add a regression test and improve the canonical toolkit instead of forking another cleanup scanner.
