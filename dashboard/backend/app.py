@@ -4059,7 +4059,7 @@ def _runtime_qc_anomalies(df, market_open: bool) -> Tuple[List[str], List[str]]:
 
 @app.get("/api/qc/runtime")
 async def get_qc_runtime():
-    """Read-only runtime QC over the same chain adapter used by /api/chain."""
+    """Read-only runtime QC observer over canonical push/TTL chain snapshots."""
     market_is_open = False
     if MARKET_DETECTION_AVAILABLE:
         try:
@@ -4074,10 +4074,8 @@ async def get_qc_runtime():
     data_sources: List[str] = []
 
     try:
-        from core.data.datasource_manager import DataSourceManager
-        from dashboard.backend.chain_adapter import fetch_chain_for_api
         from src.validation.qc_validator import QCValidator
-    except Exception as exc:
+    except Exception:
         return {
             "status": "ERROR",
             "overall_passed": False,
@@ -4087,7 +4085,7 @@ async def get_qc_runtime():
             "total_contracts": 0,
             "underlying_count": 0,
             "underlying_results": {},
-            "critical_failures": [f"runtime QC import failed: {exc}"],
+            "critical_failures": ["runtime QC import failed"],
             "warnings": [],
             "live_trading_enabled": False,
             "order_placement_allowed": False,
@@ -4101,23 +4099,27 @@ async def get_qc_runtime():
             "contracts": [],
             "total_contracts": 0,
             "status": "MARKET_CLOSED" if not market_is_open else "NO_DATA",
-            "data_source": "closed" if not market_is_open else "live",
+            "data_source": "closed" if not market_is_open else "no_snapshot",
         }
-        fetch_error = None
-        try:
+        snapshot_source = "none"
+        observed = _chain_from_push_cache(underlying)
+        if isinstance(observed, dict):
+            observed = dict(observed)
+            snapshot_source = "push"
+        else:
+            ttl_hit = _cache_get(f"chain_{underlying}", max(_TTL_CHAIN, 120.0))
+            if isinstance(ttl_hit, dict):
+                observed = dict(ttl_hit)
+                snapshot_source = "ttl"
+            else:
+                observed = None
 
-            def _fetch_chain():
-                return fetch_chain_for_api(DataSourceManager(), underlying)
-
-            fetched = await _run_blocking(_fetch_chain, timeout=45.0)
-            if fetched:
-                chain.update(fetched)
-                if not market_is_open and not chain.get("status"):
-                    chain["status"] = "MARKET_CLOSED"
-        except asyncio.TimeoutError:
-            fetch_error = "timeout"
-        except Exception as exc:
-            fetch_error = str(exc)
+        if observed:
+            chain.update(observed)
+            if not market_is_open and not chain.get("status"):
+                chain["status"] = "MARKET_CLOSED"
+        elif market_is_open:
+            critical_failures.append(f"{underlying}: no pushed or TTL chain snapshot")
 
         contracts_count = int(chain.get("total_contracts") or len(chain.get("contracts") or []))
         source = chain.get("data_source") or chain.get("source") or "unknown"
@@ -4144,11 +4146,6 @@ async def get_qc_runtime():
             if not qc_passed:
                 warnings.extend([f"{underlying}: {item}" for item in qc_reasons])
 
-        if fetch_error and market_is_open:
-            critical_failures.append(f"{underlying}: chain fetch failed: {fetch_error}")
-        elif fetch_error:
-            warnings.append(f"{underlying}: after-hours chain fetch skipped/failed: {fetch_error}")
-
         underlying_results[underlying] = {
             "status": result_status,
             "passed": qc_passed,
@@ -4159,7 +4156,8 @@ async def get_qc_runtime():
             "qc_reasons": qc_reasons,
             "critical_failures": underlying_critical,
             "warnings": underlying_warnings,
-            "fetch_error": fetch_error,
+            "fetch_error": None,
+            "snapshot_source": snapshot_source,
         }
 
     skipped_all = bool(not market_is_open and total_contracts == 0)
