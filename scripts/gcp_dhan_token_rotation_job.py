@@ -46,7 +46,6 @@ PROFILE_TRANSIENT_ERROR = "TRANSIENT_ERROR"
 PROFILE_CONFIG_ERROR = "CONFIG_ERROR"
 
 _AUTH_MARKERS = (
-    "dh-906",
     "invalid token",
     "token expired",
     "token_expired_or_invalid",
@@ -54,6 +53,10 @@ _AUTH_MARKERS = (
     "http_401",
     "status_code=401",
 )
+
+# DH-906 is request-rejection / rate-limit, NOT an auth failure.
+# It must never appear in _AUTH_MARKERS or trigger token minting.
+_REQUEST_REJECTED_CODES = {906, 805}
 
 # stdout is intentionally limited to constant, allow-listed evidence lines.
 # No object that has ever contained a token, broker response, PIN, TOTP, or
@@ -115,7 +118,11 @@ def _safe_blob(value: Any) -> str:
 
 
 def _is_auth_failure(value: Any, *, status_code: int | None = None) -> bool:
+    if status_code in _REQUEST_REJECTED_CODES:
+        return False
     blob = _safe_blob(value).lower()
+    if "dh-906" in blob or "dh-805" in blob:
+        return False
     return status_code == 401 or any(marker in blob for marker in _AUTH_MARKERS)
 
 
