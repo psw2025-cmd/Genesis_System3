@@ -106,6 +106,23 @@ def _normalize_qc_truth(qc: Any) -> Dict[str, Any]:
     return normalized
 
 
+def _zero_pnl_snapshot() -> Dict[str, float]:
+    """Return the fail-closed PnL snapshot used when no current file is proven."""
+    return {"unrealized": 0.0, "realized": 0.0, "total": 0.0, "day_total": 0.0}
+
+
+def _zero_risk_snapshot() -> Dict[str, Any]:
+    """Return the no-position risk snapshot so historical risk cannot linger."""
+    return {
+        "var95": 0.0,
+        "es95": 0.0,
+        "exposure": 0.0,
+        "concentration": 0.0,
+        "greeks": {"delta": 0.0, "gamma": 0.0, "theta": 0.0, "vega": 0.0},
+        "limits": {"status": "PASS", "breaches": []},
+    }
+
+
 class _BrokerAlertLog:
     """Adapter so process_broker_alert can log via print."""
 
@@ -266,7 +283,9 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing health: {e}")
 
-        # Sync positions
+        # Sync positions. Absence/malformed evidence must clear historical state,
+        # otherwise RuntimeStateStore deep-merge leaves yesterday's positions live.
+        updates["positions"] = []
         try:
             positions_file = self.outputs_dir / "positions_live.json"
             if positions_file.exists():
@@ -277,7 +296,9 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing positions: {e}")
 
-        # Sync PnL
+        # Sync PnL. No current summary is fail-closed to zero rather than keeping
+        # a historical paper-PnL snapshot indefinitely in the SSOT.
+        updates["pnl"] = _zero_pnl_snapshot()
         try:
             pnl_file = self.outputs_dir / "paper_pnl_summary.json"
             if pnl_file.exists():
@@ -345,10 +366,13 @@ class StateSyncService:
         except Exception:
             updates["qc"] = _normalize_qc_truth(updates.get("qc", {}))
 
-        # Compute risk metrics if positions exist
+        # Compute risk metrics if positions exist. When the authoritative position
+        # snapshot is empty, explicitly clear all historical metrics and breaches.
         try:
             positions = updates.get("positions", [])
-            if positions and ADVANCED_FEATURES_AVAILABLE:
+            if not positions:
+                updates["risk"] = _zero_risk_snapshot()
+            elif ADVANCED_FEATURES_AVAILABLE:
                 try:
                     from dashboard.backend.risk_management import get_risk_management
                 except ImportError:
