@@ -107,7 +107,12 @@ class Browser:
             [driver, f"--port={self.port}", f"--allowed-ips={HOST}"],
             text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
         )
-        _wait_http(f"{self.base}/status", self.proc, 15)
+        _wait_http(f"{self.base}/status", self.proc, 20)
+        # GitHub-hosted runners occasionally need >15s to cold-start headless
+        # Chrome even after chromedriver /status is ready.  The old 15s HTTP
+        # deadline produced false CI failures before any tab was exercised.
+        # Keep one session creation request, but give that bounded startup path
+        # enough time; the workflow still has an outer 180s attempt budget.
         value = self._request("POST", "/session", {
             "capabilities": {"alwaysMatch": {
                 "browserName": "chrome",
@@ -118,7 +123,7 @@ class Browser:
                     "--window-size=1600,1000",
                 ]},
             }}
-        }, timeout=15)
+        }, timeout=60)
         if not isinstance(value, dict) or not value.get("sessionId"):
             raise RuntimeError("webdriver_session_missing")
         self.session_id = str(value["sessionId"])
