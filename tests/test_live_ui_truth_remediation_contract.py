@@ -133,6 +133,8 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("live-ui/semantic-proof", text)
         self.assertIn("order_placement_allowed", text)
         self.assertIn("live_trading_enabled", text)
+        self.assertIn("SESSION_OPEN_ONLY_FORBIDDEN", text)
+        self.assertIn("_effective_forbidden", text)
 
     def test_post_deploy_semantic_workflow_targets_exact_deployed_sha_read_only(self):
         text = self.text(".github/workflows/gcp-live-ui-semantic-proof.yml")
