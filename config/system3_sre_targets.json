@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "targets_are_goals_not_current_claims": true,
+  "slo_targets": {
+    "availability_pct": 99.95,
+    "api_success_latency_p95_ms": 300.0,
+    "broker_read_success_pct": 99.9,
+    "token_rotation_success_pct": 100.0,
+    "synthetic_success_pct": 99.9
+  },
+  "minimum_evidence": {
+    "availability_observations": 1000,
+    "latency_observations": 1000,
+    "broker_read_observations": 100,
+    "token_rotation_observations": 10,
+    "synthetic_observations": 1000,
+    "trend_incidents": 5
+  },
+  "windows": {
+    "availability_days": 30,
+    "latency_days": 7,
+    "broker_read_days": 7,
+    "token_rotation_days": 30,
+    "synthetic_days": 30
+  },
+  "governance": {
+    "live_trading_enabled": false,
+    "order_probe_allowed": false,
+    "pull_request_production_mutation_allowed": false,
+    "secret_payload_inventory_allowed": false,
+    "har_redaction_required": true,
+    "candidate_initial_traffic_pct": 0,
+    "rollback_by_traffic_reassignment": true,
+    "cloud_run_revision_restart_supported": false,
+    "hidden_token_fallback_allowed": false,
+    "canonical_token_authority": "gcp-secret-manager-dynamic",
+    "incident_remediation_retry_limit": 2,
+    "unknown_state_fail_open_allowed": false
+  }
+}
