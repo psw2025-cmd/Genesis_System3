@@ -62,7 +62,7 @@ def _load_baseline() -> dict[str, Any]:
         "secret_payload_access_by_deployer": False,
         "dhan_web_self_heal_mint": False,
         "strict_scheduler_only_iam": False,
-        "deployer_run_admin_temporary": True,
+        "deployer_run_admin_temporary": False,
     }
     for key, expected in required.items():
         if policy.get(key) is not expected:

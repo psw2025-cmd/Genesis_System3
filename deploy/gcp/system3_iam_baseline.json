@@ -11,11 +11,12 @@
     "auto_execute_trades": false,
     "secret_payload_access_by_deployer": false,
     "dhan_web_self_heal_mint": false,
-    "strict_scheduler_only_iam": false,
-    "deployer_run_admin_temporary": true
+    "strict_scheduler_only_iam": true,
+    "deployer_run_admin_temporary": false
   },
   "project_bindings": [
-    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.admin"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.developer"},
+    {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/run.viewer"},
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudbuild.builds.editor"},
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/artifactregistry.reader"},
     {"member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/cloudscheduler.admin"},
@@ -42,7 +43,6 @@
     {"service_account": "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.authority/repair", "role": "roles/iam.workloadIdentityUser"},
     {"service_account": "gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com", "member": "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.authority/repair", "role": "roles/iam.workloadIdentityUser"},
     {"service_account": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
-    {"service_account": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
     {"service_account": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
     {"service_account": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},
     {"service_account": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com", "member": "serviceAccount:genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/iam.serviceAccountUser"},

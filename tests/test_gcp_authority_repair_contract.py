@@ -133,8 +133,8 @@ class GcpAuthorityRepairContractTests(unittest.TestCase):
         self.assertIs(policy["live_trading_enabled"], False)
         self.assertIs(policy["auto_execute_trades"], False)
         self.assertIs(policy["dhan_web_self_heal_mint"], False)
-        self.assertIs(policy["strict_scheduler_only_iam"], False)
-        self.assertIs(policy["deployer_run_admin_temporary"], True)
+        self.assertIs(policy["strict_scheduler_only_iam"], True)
+        self.assertIs(policy["deployer_run_admin_temporary"], False)
 
 
 if __name__ == "__main__":
