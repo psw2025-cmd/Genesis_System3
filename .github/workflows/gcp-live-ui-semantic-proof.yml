@@ -8,7 +8,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
   statuses: write
 
 concurrency:
@@ -23,28 +22,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
-      GCP_REGION: asia-south1
-      GCP_CLOUD_RUN_SERVICE: genesis-system3-web
-      GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
-      GCP_DEPLOY_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
       SYSTEM3_PRODUCTION_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
       GITHUB_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout exact deployed SHA
         uses: actions/checkout@v5
         with:
           ref: ${{ env.GITHUB_SHA }}
-
-      - name: Authenticate to Google Cloud with keyless WIF
-        uses: google-github-actions/auth@v3
-        with:
-          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
-          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
-          service_account: ${{ env.GCP_DEPLOY_SERVICE_ACCOUNT }}
-
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v3
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v6
