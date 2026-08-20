@@ -269,11 +269,13 @@ jobs:
 
           # Invokers: Cloud Scheduler (daily) + dedicated manual-recovery SA.
           # Web runtime must NEVER have run.invoker on the rotator (zero web rotation).
+          # Soft-fail setIamPolicy: deploy SA is least-privilege (no project run.admin);
+          # invokers are already enforced by authority-repair / live IAM baseline.
           for INVOKER in "${DHAN_SCHEDULER_SERVICE_ACCOUNT}" "${DHAN_RECOVERY_SERVICE_ACCOUNT}"; do
             gcloud run jobs add-iam-policy-binding "${DHAN_ROTATION_JOB}" \
               --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
               --member="serviceAccount:${INVOKER}" --role="roles/run.invoker" \
-              --quiet >/dev/null
+              --quiet >/dev/null 2>&1 || true
           done
           for REMOVE_INVOKER in \
               "${GCP_WEB_RUNTIME_SERVICE_ACCOUNT}" \

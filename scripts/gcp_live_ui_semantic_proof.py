@@ -46,6 +46,16 @@ KEY_TAB_FORBIDDEN = {
     "system": ("BROKER NOT PROVEN",),
 }
 
+# Honest after-hours UI may show these; only reject them during an expected NSE session.
+SESSION_OPEN_ONLY_FORBIDDEN = frozenset({"MARKET CLOSED", "AFTER HOURS"})
+
+
+def _effective_forbidden(forbidden: tuple[str, ...], *, expect_open: bool) -> tuple[str, ...]:
+    """Return tab forbidden markers applicable for the current session window."""
+    if expect_open:
+        return forbidden
+    return tuple(marker for marker in forbidden if marker not in SESSION_OPEN_ONLY_FORBIDDEN)
+
 
 def _expected_market_open(now: datetime | None = None) -> bool:
     now = (now or datetime.now(IST)).astimezone(IST)
@@ -192,6 +202,7 @@ def _browser_semantic_check(expect_open: bool) -> dict:
     rows: list[dict] = []
     with ChromeDriverSession(page_load_timeout_s=60) as browser:
         for tab_id, forbidden in KEY_TAB_FORBIDDEN.items():
+            effective_forbidden = _effective_forbidden(forbidden, expect_open=expect_open)
             url = f"{BASE}/ui?{urlencode({'tab': tab_id})}"
             browser.set_viewport(1600, 1000)
             browser.navigate(url)
@@ -212,7 +223,7 @@ def _browser_semantic_check(expect_open: bool) -> dict:
                     timeout=15,
                 )
                 last_text = str(value or "")
-                bad = [marker for marker in forbidden if marker in last_text]
+                bad = [marker for marker in effective_forbidden if marker in last_text]
                 global_bad = []
                 if expect_open:
                     if "MARKET CLOSED" in last_text or "AFTER HOURS" in last_text:
@@ -222,7 +233,7 @@ def _browser_semantic_check(expect_open: bool) -> dict:
                 if active and not bad and not global_bad:
                     break
                 time.sleep(1)
-            bad = [marker for marker in forbidden if marker in last_text]
+            bad = [marker for marker in effective_forbidden if marker in last_text]
             global_bad = []
             if expect_open:
                 if "MARKET CLOSED" in last_text or "AFTER HOURS" in last_text:
