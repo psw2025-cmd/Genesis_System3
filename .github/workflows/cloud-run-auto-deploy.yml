@@ -331,13 +331,13 @@ jobs:
               --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=10m \
               --set-env-vars="SYSTEM3_JOB_KIND=${KIND},SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},DHAN_TOKEN_SOURCE=gcp-secret-manager-dynamic,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
               $(if [ "${KIND}" = rank ] || [ "${KIND}" = validate ]; then printf '%s' '--set-secrets=DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest'; fi)
-            gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
+            gcloud run jobs add-iam-policy-binding "genesis-system3-${KIND}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null 2>&1 || true
           done
           gcloud run jobs deploy genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" \
             --image="${IMAGE}" --service-account="${SCHEDULER_COLLECTOR_SERVICE_ACCOUNT}" --command=python --args=scripts/gcp_worker_job.py \
             --tasks=1 --parallelism=1 --max-retries=0 --task-timeout=2m \
             --set-env-vars="SYSTEM3_JOB_KIND=scheduler-collector,SYSTEM3_JOB_PUBLISH_STATE=0,SYSTEM3_FIRESTORE_PROJECT=${GOOGLE_CLOUD_PROJECT},GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},GCP_REGION=${GCP_REGION},LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,CLOUD_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}"
-          gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null
+          gcloud run jobs add-iam-policy-binding genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --member="serviceAccount:${DHAN_SCHEDULER_SERVICE_ACCOUNT}" --role=roles/run.invoker --quiet >/dev/null 2>&1 || true
 
           # Rank morning → forecast → post-close validate (Spearman day) → signals.
           gcloud scheduler jobs update http genesis-system3-rank-daily --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --schedule="45 3 * * MON-FRI" --time-zone=UTC
