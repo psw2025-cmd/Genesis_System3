@@ -13,8 +13,6 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
-import sys
 import time
 import urllib.request
 from datetime import datetime, time as dt_time
@@ -56,6 +54,11 @@ def _expected_market_open(now: datetime | None = None) -> bool:
     return dt_time(9, 15) <= now.time().replace(tzinfo=None) <= dt_time(15, 30)
 
 
+def _unwrap(payload: dict) -> dict:
+    data = payload.get("data")
+    return data if isinstance(data, dict) else payload
+
+
 def _get(path: str, timeout: int = 20) -> dict:
     response = requests.get(BASE + path, timeout=timeout, headers={"Accept": "application/json"})
     response.raise_for_status()
@@ -66,6 +69,7 @@ def _get(path: str, timeout: int = 20) -> dict:
 
 
 def _contract_count(payload: dict) -> int:
+    payload = _unwrap(payload)
     for key in ("total_contracts", "contract_count", "count"):
         try:
             value = int(payload.get(key) or 0)
@@ -78,27 +82,34 @@ def _contract_count(payload: dict) -> int:
 
 
 def _source_is_dhan(payload: dict) -> bool:
+    payload = _unwrap(payload)
     source = str(payload.get("data_source") or payload.get("source") or "").lower()
     priority = str(payload.get("source_priority") or "").lower()
     return source == "dhan" or priority.startswith("dhan") or "dhan" in priority
 
 
 def _api_snapshot() -> dict:
-    deploy = _get("/api/deploy/info")
-    state = _get("/api/state")
-    broker = _get("/api/broker/status")
+    deploy = _unwrap(_get("/api/deploy/info"))
+    state = _unwrap(_get("/api/state"))
+    broker = _unwrap(_get("/api/broker/status"))
     chains: dict[str, dict] = {}
     for symbol in REQUIRED_CHAINS:
-        payload = _get(f"/api/chain/{symbol}", timeout=30)
+        raw = _get(f"/api/chain/{symbol}", timeout=30)
+        payload = _unwrap(raw)
+        try:
+            spot = float(payload.get("spot") or payload.get("spot_price") or payload.get("underlying_spot") or 0)
+        except (TypeError, ValueError):
+            spot = 0.0
         chains[symbol] = {
-            "contracts": _contract_count(payload),
-            "source_is_dhan": _source_is_dhan(payload),
+            "contracts": _contract_count(raw),
+            "source_is_dhan": _source_is_dhan(raw),
             "stale": bool(payload.get("stale", False)),
-            "spot": float(payload.get("spot") or 0),
+            "spot": spot,
             "status": str(payload.get("status") or ""),
         }
     return {
-        "deploy_sha": str(deploy.get("git_sha") or deploy.get("sha") or deploy.get("deploy_git_sha") or ""),
+        "deploy_sha": str(deploy.get("git_sha") or deploy.get("github_sha") or deploy.get("sha") or deploy.get("deploy_git_sha") or ""),
+        "revision": str(deploy.get("revision") or deploy.get("cloud_run_revision") or deploy.get("revision_name") or ""),
         "market_open": bool((state.get("market") or {}).get("is_open", False)),
         "market_reason": str((state.get("market") or {}).get("reason") or ""),
         "broker_connected": bool(broker.get("connected", False)),
@@ -109,9 +120,17 @@ def _api_snapshot() -> dict:
     }
 
 
+def _sha_matches(expected: str, actual: str) -> bool:
+    expected = expected.strip().lower()
+    actual = actual.strip().lower()
+    if not expected or not actual:
+        return False
+    return expected == actual or (len(actual) >= 7 and expected.startswith(actual)) or (len(expected) >= 7 and actual.startswith(expected))
+
+
 def _api_ready(snapshot: dict, expect_open: bool) -> tuple[bool, list[str]]:
     failures: list[str] = []
-    if EXPECTED_SHA and snapshot.get("deploy_sha") != EXPECTED_SHA:
+    if EXPECTED_SHA and not _sha_matches(EXPECTED_SHA, str(snapshot.get("deploy_sha") or "")):
         failures.append("exact_serving_sha_mismatch")
     if snapshot.get("live_trading_enabled"):
         failures.append("live_trading_enabled")
@@ -146,6 +165,8 @@ def _wait_api_ready(expect_open: bool) -> tuple[dict, list[dict]]:
                 "at": datetime.now(IST).isoformat(),
                 "ready": ready,
                 "failures": failures,
+                "deploy_sha": last.get("deploy_sha"),
+                "revision": last.get("revision"),
                 "market_open": last.get("market_open"),
                 "broker_connected": last.get("broker_connected"),
                 "chain_contracts": {k: v.get("contracts") for k, v in last.get("chains", {}).items()},
@@ -271,7 +292,7 @@ def main() -> int:
         return 0
 
     _publish_status("failure", "Live UI semantic proof failed; route/screenshot PASS is insufficient")
-    print("LIVE_UI_SEMANTIC_PROOF " + json.dumps({"state": "FAIL", "failures": failures[:12]}, sort_keys=True), file=sys.stderr)
+    print("LIVE_UI_SEMANTIC_PROOF " + json.dumps({"state": "FAIL", "failures": failures[:12]}, sort_keys=True))
     return 1
 
 
