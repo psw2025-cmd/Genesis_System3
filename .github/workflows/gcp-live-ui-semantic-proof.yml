@@ -25,6 +25,7 @@ jobs:
       SYSTEM3_PRODUCTION_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
       GITHUB_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       GITHUB_TOKEN: ${{ github.token }}
+      PYTHONPATH: .
     steps:
       - name: Checkout exact deployed SHA
         uses: actions/checkout@v5
