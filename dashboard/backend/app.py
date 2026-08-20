@@ -2229,6 +2229,10 @@ _PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) be
 _PUSHED_CHAIN_STALE_SERVE_S_CLOSED = 86400  # after hours: never block UI waiting on Dhan OC
 _PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
 _INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX")
+# Smoke/UI semantic proof requires these four; SENSEX is optional and must not
+# delay required-symbol cold-start readiness via the serial 20s closed-market gap.
+_REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
+_CHAIN_COLD_START_GAP_S = 3.5  # DSM OC pacing only; never the 20s closed-market sleep
 _CHAIN_LIVE_TIMEOUT_OPEN_S = 25.0
 _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 
@@ -4220,6 +4224,111 @@ def _chain_from_push_cache(sym: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def _usable_chain_snapshot(data: Any) -> bool:
+    """True only when a chain payload has proven broker rows. Empty is never valid."""
+    if not isinstance(data, dict):
+        return False
+    status = str(data.get("status") or "").upper()
+    if status in {
+        "CHAIN_CACHE_WARMING",
+        "NO_DHAN_DATA",
+        "CHAIN_FETCH_TIMEOUT",
+        "INVALID_OR_MISSING_EXPIRY",
+    }:
+        return False
+    contracts = data.get("contracts")
+    n_contracts = len(contracts) if isinstance(contracts, list) else 0
+    total = int(data.get("total_contracts") or 0)
+    spot = float(data.get("spot") or 0)
+    return (n_contracts > 0 or total > 0) and spot > 0
+
+
+def _warming_chain_placeholder(sym: str) -> Dict[str, Any]:
+    return {
+        "underlying": sym,
+        "contracts": [],
+        "spot": 0,
+        "pcr": 1.0,
+        "total_contracts": 0,
+        "data_source": "dhan",
+        "status": "CHAIN_CACHE_WARMING",
+        "live": False,
+        "snapshot": True,
+        "stale": True,
+        "message": "Index chain warming from micro-loop — UI must not wait on live Dhan OC",
+    }
+
+
+def _resolve_batch_chain_entry(sym: str) -> Dict[str, Any]:
+    """Push cache, then TTL snapshot, else an honest warming placeholder."""
+    pushed = _chain_from_push_cache(sym)
+    if _usable_chain_snapshot(pushed):
+        return pushed
+    ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
+    if _usable_chain_snapshot(ttl_hit):
+        return ttl_hit
+    return _warming_chain_placeholder(sym)
+
+
+def _required_chain_symbols_ready(chains: Dict[str, Any]) -> bool:
+    for sym in _REQUIRED_CHAIN_SYMBOLS:
+        if not _usable_chain_snapshot(chains.get(sym)):
+            return False
+    return True
+
+
+def _store_index_chain_snapshot(sym: str, result: Dict[str, Any], open_now: bool) -> Dict[str, Any]:
+    payload = dict(result)
+    payload["stream_mode"] = payload.get("stream_mode") or "index_chain_micro"
+    payload["live"] = open_now
+    payload["snapshot"] = not open_now
+    if open_now and not payload.get("status"):
+        payload["status"] = "MARKET_OPEN"
+    if not open_now and not payload.get("status"):
+        payload["status"] = "MARKET_CLOSED_DHAN_SNAPSHOT"
+    _PUSHED_CHAIN_CACHE[sym] = {
+        "data": payload,
+        "received_at": _time_module.time(),
+        "market_open": open_now,
+    }
+    _cache_set(f"chain_{sym}", payload)
+    return payload
+
+
+async def _warm_one_index_chain(sym: str) -> Optional[Dict[str, Any]]:
+    """Fetch one index chain into push/TTL cache. Serial Dhan OC owner path."""
+    open_now = bool(_market_open_from_state())
+    result = await _get_chain_uncached(sym, closed_timeout_s=28.0)
+    if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
+        payload = _store_index_chain_snapshot(sym, result, open_now)
+        print(
+            f"[index-chain-micro] {sym} spot={payload.get('spot')} "
+            f"n={payload.get('total_contracts') or len(payload.get('contracts') or [])} "
+            f"open={open_now}"
+        )
+        return payload
+    return None
+
+
+async def _warm_required_index_chains_cold_start() -> Dict[str, Any]:
+    """Warm NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY back-to-back without 20s closed gaps.
+
+    Serial OC is required (single Dhan worker). The timing race was the extra
+    closed-market sleep between required symbols, not the serial fetch itself.
+    """
+    warmed: Dict[str, Any] = {}
+    for i, sym in enumerate(_REQUIRED_CHAIN_SYMBOLS):
+        try:
+            payload = await _warm_one_index_chain(sym)
+            if payload is not None:
+                warmed[sym] = payload
+        except Exception as exc:
+            print(f"[index-chain-micro] cold-start {sym} failed: {exc}")
+        if i < len(_REQUIRED_CHAIN_SYMBOLS) - 1:
+            await asyncio.sleep(_CHAIN_COLD_START_GAP_S)
+    return warmed
+
+
 def _build_market_top_from_chain_cache(
     top_n: int = 5,
     market_top_n: int = 25,
@@ -4259,48 +4368,33 @@ def _build_market_top_from_chain_cache(
 
 @app.get("/api/batch/chains")
 async def batch_chains():
-    """Index chains for TopBar/Overview — cache/push only, never blocks on Dhan OC."""
+    """Index chains for TopBar/Overview — cache/push only, never blocks on Dhan OC.
+
+    Incomplete required-symbol payloads are not cached. Caching CHAIN_CACHE_WARMING
+    for 8s is what made FINNIFTY/MIDCPNIFTY look permanently cold during smoke.
+    """
     hit = _cache_get("batch_chains_v1", _TTL_BATCH)
     if hit is not None:
         out = dict(hit)
         out["cache_hit"] = True
         return out
 
-    chains: Dict[str, Any] = {}
-    for sym in _INDEX_STREAM_SYMBOLS:
-        pushed = _chain_from_push_cache(sym)
-        if pushed is not None:
-            chains[sym] = pushed
-            continue
-        ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
-        if isinstance(ttl_hit, dict) and (
-            float(ttl_hit.get("spot") or 0) > 0
-            or int(ttl_hit.get("total_contracts") or 0) > 0
-        ):
-            chains[sym] = ttl_hit
-            continue
-        chains[sym] = {
-            "underlying": sym,
-            "contracts": [],
-            "spot": 0,
-            "pcr": 1.0,
-            "total_contracts": 0,
-            "data_source": "dhan",
-            "status": "CHAIN_CACHE_WARMING",
-            "live": False,
-            "snapshot": True,
-            "stale": True,
-            "message": "Index chain warming from micro-loop — UI must not wait on live Dhan OC",
-        }
-
+    chains: Dict[str, Any] = {
+        sym: _resolve_batch_chain_entry(sym) for sym in _INDEX_STREAM_SYMBOLS
+    }
+    ready = _required_chain_symbols_ready(chains)
     payload = {
         "cache_hit": False,
         "generated_at": datetime.now(IST).isoformat(),
         "ttl_s": _TTL_BATCH,
         "live_trading_enabled": False,
         "symbols": list(_INDEX_STREAM_SYMBOLS),
+        "required_symbols": list(_REQUIRED_CHAIN_SYMBOLS),
+        "required_symbols_ready": ready,
         "chains": chains,
     }
+    if not ready:
+        return payload
     return _cache_set("batch_chains_v1", payload)
 
 
@@ -6019,37 +6113,21 @@ async def index_chain_micro_loop():
 
     Owns live Dhan OC for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY. WS + UI must
     read `_PUSHED_CHAIN_CACHE` only — never fan-out live OC themselves.
+
+    Cold-start warms the four required smoke symbols back-to-back (DSM gap
+    only) so batch/chains is not gated on lucky serial 20s closed-market timing.
     """
     await asyncio.sleep(2)
+    await _warm_required_index_chains_cold_start()
     idx = 0
     while True:
         sym = _INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]
         idx += 1
         open_now = bool(_market_open_from_state())
         try:
-            # Generous timeout both open/closed — DSM OC often needs >12s under load.
-            result = await _get_chain_uncached(sym, closed_timeout_s=28.0)
-            if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
-                payload = dict(result)
-                payload["stream_mode"] = "index_chain_micro"
-                payload["live"] = open_now
-                payload["snapshot"] = not open_now
-                if open_now and not payload.get("status"):
-                    payload["status"] = "MARKET_OPEN"
-                _PUSHED_CHAIN_CACHE[sym] = {
-                    "data": payload,
-                    "received_at": _time_module.time(),
-                    "market_open": open_now,
-                }
-                _cache_set(f"chain_{sym}", payload)
-                print(
-                    f"[index-chain-micro] {sym} spot={payload.get('spot')} "
-                    f"n={payload.get('total_contracts') or len(payload.get('contracts') or [])} "
-                    f"open={open_now}"
-                )
+            await _warm_one_index_chain(sym)
         except Exception as exc:
             print(f"[index-chain-micro] {sym} failed: {exc}")
-        # DSM enforces ~3.4s OC gap; pace above that so UI requests keep headroom.
         await asyncio.sleep(3.5 if open_now else 20.0)
 
 
