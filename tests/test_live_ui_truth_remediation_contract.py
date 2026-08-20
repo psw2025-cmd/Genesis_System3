@@ -97,6 +97,60 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn('"type": alert_type', app)
         self.assertNotIn("owner must set live_trading_approved=true in kill_switch.json", app)
 
+    def test_frontend_market_hours_is_explicitly_timezone_safe(self):
+        text = self.text("dashboard/frontend/src/utils/marketHours.ts")
+        self.assertIn("Asia/Kolkata", text)
+        self.assertIn("Intl.DateTimeFormat", text)
+        self.assertIn("timeZone: IST_ZONE", text)
+        self.assertIn("isMarketOpen(now: Date = new Date())", text)
+        self.assertNotIn("getTimezoneOffset", text)
+
+    def test_partial_health_cannot_clobber_market_open_to_false(self):
+        text = self.text("dashboard/frontend/src/store.ts")
+        self.assertIn("marketOpen: isMarketOpen()", text)
+        self.assertIn("marketOpenFromHealth", text)
+        self.assertIn("return previous", text)
+        self.assertNotIn("Boolean(health?.market?.is_open ?? health?.market_status === 'open')", text)
+
+    def test_post_deploy_semantic_proof_is_not_route_only(self):
+        text = self.text("scripts/gcp_live_ui_semantic_proof.py")
+        for symbol in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"):
+            self.assertIn(symbol, text)
+        for marker in (
+            "MARKET CLOSED",
+            "AFTER HOURS",
+            "WAITING · BROKER",
+            "WAITING · 4 CHAINS",
+            "WAITING FOR MARKET DATA",
+            "NO CONTRACTS RETURNED BY BACKEND",
+            "LOADING SIGNALS",
+            "LOADING MARKET TOP",
+            "TOKEN_EXPIRED_OR_INVALID",
+        ):
+            self.assertIn(marker, text)
+        self.assertIn("/api/deploy/info", text)
+        self.assertIn("/api/broker/status", text)
+        self.assertIn("live-ui/semantic-proof", text)
+        self.assertIn("order_placement_allowed", text)
+        self.assertIn("live_trading_enabled", text)
+
+    def test_post_deploy_semantic_workflow_targets_exact_deployed_sha_read_only(self):
+        text = self.text(".github/workflows/gcp-live-ui-semantic-proof.yml")
+        self.assertIn('workflows: ["Cloud Run Auto Deploy"]', text)
+        self.assertIn("github.event.workflow_run.head_sha", text)
+        self.assertIn("Checkout exact deployed SHA", text)
+        self.assertIn("persist-credentials: false", text)
+        self.assertIn("contents: read", text)
+        self.assertIn("statuses: write", text)
+        self.assertNotIn("id-token: write", text)
+        self.assertNotIn("gcloud ", text)
+        self.assertIn("python scripts/gcp_live_ui_semantic_proof.py", text)
+
+    def test_local_browser_smoke_has_bounded_chrome_cold_start_budget(self):
+        text = self.text("scripts/frontend_local_runtime_smoke.py")
+        self.assertIn('timeout=60', text)
+        self.assertIn('outer 180s attempt budget', text)
+
     def test_live_proof_uses_real_live_board_route_and_four_required_chain_subviews(self):
         text = self.text("scripts/gcp_live_ui_snapshot.py")
         self.assertIn('/api/market/live_board', text)

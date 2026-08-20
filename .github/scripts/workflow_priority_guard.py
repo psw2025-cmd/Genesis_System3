@@ -13,6 +13,7 @@ AUTOMATIC = {
     "workflow-priority-guard.yml",
     "cloud-run-auto-deploy.yml",
     "gcp-authority-repair.yml",
+    "gcp-live-ui-semantic-proof.yml",
     "gcp-stage2-ci.yml",
     "gcp-dhan-token-fix-ci.yml",
     "frontend-runtime-smoke.yml",
@@ -28,7 +29,8 @@ ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
 IAM_REPAIR_WORKFLOW = "gcp-authority-repair.yml"
-EVENT_TRIGGER_WORKFLOWS = {FORENSIC_WORKFLOW, IAM_REPAIR_WORKFLOW}
+LIVE_UI_PROOF_WORKFLOW = "gcp-live-ui-semantic-proof.yml"
+EVENT_TRIGGER_WORKFLOWS = {FORENSIC_WORKFLOW, IAM_REPAIR_WORKFLOW, LIVE_UI_PROOF_WORKFLOW}
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
     "Cloud Run Auto Deploy",
@@ -180,6 +182,28 @@ def main() -> int:
     if "gcloud run jobs execute" in repair_text:
         raise SystemExit("IAM_REPAIR_DHAN_OR_JOB_EXECUTION_FORBIDDEN")
 
+    semantic_on = trigger_blocks[LIVE_UI_PROOF_WORKFLOW]
+    semantic_text = workflow_text[LIVE_UI_PROOF_WORKFLOW]
+    if "workflow_run:" not in semantic_on or "workflow_dispatch:" not in semantic_on:
+        raise SystemExit("LIVE_UI_PROOF_REQUIRED_TRIGGERS_MISSING")
+    if 'workflows: ["Cloud Run Auto Deploy"]' not in semantic_on:
+        raise SystemExit("LIVE_UI_PROOF_WORKFLOW_RUN_SOURCE_NOT_EXACT")
+    if "head_branch == 'main'" not in semantic_text:
+        raise SystemExit("LIVE_UI_PROOF_MAIN_BRANCH_GUARD_MISSING")
+    if re.search(r"^\s*(push|pull_request|deployment_status)\s*:", semantic_on, re.MULTILINE):
+        raise SystemExit("LIVE_UI_PROOF_DIRECT_CODE_OR_DEPLOYMENT_TRIGGER_FORBIDDEN")
+    if "contents: read" not in semantic_text or "statuses: write" not in semantic_text:
+        raise SystemExit("LIVE_UI_PROOF_MINIMAL_GITHUB_PERMISSIONS_MISSING")
+    for forbidden_permission in ("actions: write", "contents: write", "deployments: write", "issues: write", "pull-requests: write"):
+        if forbidden_permission in semantic_text:
+            raise SystemExit(f"LIVE_UI_PROOF_WRITE_PERMISSION_FORBIDDEN permission={forbidden_permission}")
+    if "persist-credentials: false" not in semantic_text:
+        raise SystemExit("LIVE_UI_PROOF_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
+    if "gcloud " in semantic_text or "gcloud\t" in semantic_text:
+        raise SystemExit("LIVE_UI_PROOF_GCP_MUTATION_SURFACE_FORBIDDEN")
+    if "python scripts/gcp_live_ui_semantic_proof.py" not in semantic_text:
+        raise SystemExit("LIVE_UI_PROOF_CANONICAL_SCRIPT_MISSING")
+
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
@@ -222,9 +246,11 @@ def main() -> int:
             "scheduled_github_workflows": False,
             "event_forensic_responder": FORENSIC_WORKFLOW,
             "event_iam_repair": IAM_REPAIR_WORKFLOW,
+            "event_live_ui_semantic_proof": LIVE_UI_PROOF_WORKFLOW,
             "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
             "event_responder_write_permissions": False,
             "iam_repair_github_write_permissions": False,
+            "live_ui_proof_runtime_mutation_permissions": False,
             "live_trading": False,
         },
     )

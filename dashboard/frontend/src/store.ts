@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { isMarketOpen } from './utils/marketHours'
 
 interface DashboardState {
   // Connection
@@ -63,10 +64,26 @@ interface DashboardState {
   setCommandQuery: (q: string) => void
 }
 
+function marketOpenFromHealth(health: any, previous: boolean): boolean {
+  const explicit = health?.market?.is_open
+  if (explicit === true || explicit === false) return explicit
+
+  const status = String(health?.market_status ?? health?.market?.status ?? '').trim().toLowerCase()
+  if (status === 'open' || status === 'live' || status === 'live_market') return true
+  if (status === 'closed' || status.startsWith('closed_') || status === 'post_market') return false
+
+  // A slim/partial health payload is not evidence that the market is closed.
+  // Preserve the last known truth rather than coercing undefined -> false.
+  return previous
+}
+
 export const useStore = create<DashboardState>((set) => ({
   wsStatus: 'connecting',
   brokerConnected: false,
-  marketOpen: false,
+  // Browser-local fallback is computed in Asia/Kolkata and is replaced only by
+  // explicit backend market truth. This avoids a false CLOSED banner during
+  // Cloud Run cold-start / partial-health hydration.
+  marketOpen: isMarketOpen(),
   lastSync: '--',
   health: null,
   state: null,
@@ -104,7 +121,7 @@ export const useStore = create<DashboardState>((set) => ({
     return {
       health,
       brokerConnected,
-      marketOpen: Boolean(health?.market?.is_open ?? health?.market_status === 'open'),
+      marketOpen: marketOpenFromHealth(health, s.marketOpen),
       lastSync: new Date().toISOString(),
     }
   }),
