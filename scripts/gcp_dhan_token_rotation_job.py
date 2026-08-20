@@ -118,12 +118,17 @@ def _safe_blob(value: Any) -> str:
 
 
 def _is_auth_failure(value: Any, *, status_code: int | None = None) -> bool:
+    # HTTP 401 is authoritative transport-level evidence of an auth rejection.
+    # It must win even when a broker body also mentions DH-906/DH-805; otherwise
+    # an expired/invalid token can be misclassified as a transient request reject.
+    if status_code == 401:
+        return True
     if status_code in _REQUEST_REJECTED_CODES:
         return False
     blob = _safe_blob(value).lower()
     if "dh-906" in blob or "dh-805" in blob:
         return False
-    return status_code == 401 or any(marker in blob for marker in _AUTH_MARKERS)
+    return any(marker in blob for marker in _AUTH_MARKERS)
 
 
 def _profile_probe(client_id: str, token: str) -> dict[str, Any]:
