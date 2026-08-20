@@ -54,8 +54,10 @@ _AUTH_MARKERS = (
     "status_code=401",
 )
 
-# DH-906 is request-rejection / rate-limit, NOT an auth failure.
-# It must never appear in _AUTH_MARKERS or trigger token minting.
+# DH-906 / DH-805 are often request-rejection / rate-limit codes.
+# Live Dhan also returns DH-906 with errorMessage "Invalid Token" (proven
+# 2026-08-20 rotate job logs). That message must authorize minting.
+# Pure 906/805 without auth markers must NOT mint.
 _REQUEST_REJECTED_CODES = {906, 805}
 
 # stdout is intentionally limited to constant, allow-listed evidence lines.
@@ -119,16 +121,19 @@ def _safe_blob(value: Any) -> str:
 
 def _is_auth_failure(value: Any, *, status_code: int | None = None) -> bool:
     # HTTP 401 is authoritative transport-level evidence of an auth rejection.
-    # It must win even when a broker body also mentions DH-906/DH-805; otherwise
-    # an expired/invalid token can be misclassified as a transient request reject.
     if status_code == 401:
         return True
-    if status_code in _REQUEST_REJECTED_CODES:
-        return False
     blob = _safe_blob(value).lower()
-    if "dh-906" in blob or "dh-805" in blob:
+    auth_like = any(marker in blob for marker in _AUTH_MARKERS)
+    # Do NOT short-circuit all DH-906/DH-805 to non-auth. Live Dhan returns
+    # errorCode DH-906 with errorMessage "Invalid Token" (rotate logs
+    # 2026-08-20T17:45Z). That must mint. Rate-limit-only 906/805 bodies
+    # without auth markers remain non-auth (auth_like False).
+    if status_code in _REQUEST_REJECTED_CODES and not auth_like:
         return False
-    return any(marker in blob for marker in _AUTH_MARKERS)
+    if ("dh-906" in blob or "dh-805" in blob) and not auth_like:
+        return False
+    return auth_like
 
 
 def _profile_probe(client_id: str, token: str) -> dict[str, Any]:
