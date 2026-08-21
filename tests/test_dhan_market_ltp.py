@@ -1,9 +1,12 @@
 """Tests for Dhan marketfeed LTP helpers and position enrichment."""
 
+import threading
+
 import core.brokers.dhan.market_ltp as market_ltp
 from core.brokers.dhan.market_ltp import (
     INDEX_SECURITY_IDS,
     _parse_quote_blob,
+    _reset_marketfeed_coordination_for_tests,
     _rest_marketfeed,
     enrich_positions_with_market_ltp,
     fetch_market_quotes,
@@ -115,6 +118,7 @@ def test_rest_marketfeed_does_not_retry_alternate_body_after_429(monkeypatch):
 
 
 def test_fetch_market_quotes_stops_endpoint_and_sdk_fallbacks_after_429(monkeypatch):
+    _reset_marketfeed_coordination_for_tests()
     calls = []
 
     def fake_rest(url, securities):
@@ -128,3 +132,91 @@ def test_fetch_market_quotes_stops_endpoint_and_sdk_fallbacks_after_429(monkeypa
     assert len(calls) == 1
     assert calls[0].endswith("/marketfeed/ohlc")
     assert any("HTTP_429" in error for error in fetch_market_quotes.last_errors)
+    assert fetch_market_quotes.last_meta["rate_limited"] is True
+    assert fetch_market_quotes.last_meta["cooldown_remaining_s"] > 0
+
+
+def test_fetch_market_quotes_positive_cache_avoids_repeat_provider_call(monkeypatch):
+    _reset_marketfeed_coordination_for_tests()
+    calls = []
+
+    def fake_uncached(cleaned):
+        calls.append(cleaned)
+        return {"13": {"ltp": 24500.0}}, [], False
+
+    monkeypatch.setattr(market_ltp, "_fetch_market_quotes_uncached", fake_uncached)
+
+    first = fetch_market_quotes({"IDX_I": ["13"]})
+    second = fetch_market_quotes({"IDX_I": ["13"]})
+
+    assert first == second == {"13": {"ltp": 24500.0}}
+    assert len(calls) == 1
+    assert fetch_market_quotes.last_meta["cache_hit"] is True
+
+
+def test_fetch_market_quotes_concurrent_same_key_singleflights(monkeypatch):
+    _reset_marketfeed_coordination_for_tests()
+    calls = []
+    entered = threading.Event()
+    release = threading.Event()
+    results = []
+
+    def fake_uncached(cleaned):
+        calls.append(cleaned)
+        entered.set()
+        assert release.wait(timeout=3.0)
+        return {"13": {"ltp": 24501.0}}, [], False
+
+    monkeypatch.setattr(market_ltp, "_fetch_market_quotes_uncached", fake_uncached)
+
+    t1 = threading.Thread(target=lambda: results.append(fetch_market_quotes({"IDX_I": ["13"]})))
+    t2 = threading.Thread(target=lambda: results.append(fetch_market_quotes({"IDX_I": ["13"]})))
+    t1.start()
+    assert entered.wait(timeout=1.0)
+    t2.start()
+    release.set()
+    t1.join(timeout=3.0)
+    t2.join(timeout=3.0)
+
+    assert not t1.is_alive() and not t2.is_alive()
+    assert len(calls) == 1
+    assert len(results) == 2
+    assert all(row == {"13": {"ltp": 24501.0}} for row in results)
+
+
+def test_fetch_market_quotes_rate_limit_cooldown_suppresses_next_key(monkeypatch):
+    _reset_marketfeed_coordination_for_tests()
+    calls = []
+
+    def fake_uncached(cleaned):
+        calls.append(cleaned)
+        return {}, ['ohlc:HTTP_429:{"805":"Too many requests"}'], True
+
+    monkeypatch.setattr(market_ltp, "_fetch_market_quotes_uncached", fake_uncached)
+
+    first = fetch_market_quotes({"IDX_I": ["13"]})
+    second = fetch_market_quotes({"NSE_EQ": ["1333"]})
+
+    assert first == {}
+    assert second == {}
+    assert len(calls) == 1
+    assert fetch_market_quotes.last_errors == ["marketfeed:RATE_LIMIT_COOLDOWN"]
+    assert fetch_market_quotes.last_meta["rate_limited"] is True
+    assert fetch_market_quotes.last_meta["cooldown_remaining_s"] > 0
+
+
+def test_build_index_board_exposes_safe_coordination_metadata(monkeypatch):
+    _reset_marketfeed_coordination_for_tests()
+
+    def fake_uncached(cleaned):
+        return {"13": {"ltp": 24502.0, "close": 24400.0, "change": 102.0, "change_pct": 0.4}}, [], False
+
+    monkeypatch.setattr(market_ltp, "_fetch_market_quotes_uncached", fake_uncached)
+    board = market_ltp.build_index_board(symbols=["NIFTY"])
+
+    assert board["success"] is True
+    assert board["live_trading_enabled"] is False
+    assert board["order_placement_allowed"] is False
+    assert board["feed_coordination"]["coordination_scope"] == "process"
+    assert "cache_ttl_s" in board["feed_coordination"]
+    assert "rate_limit_cooldown_s" in board["feed_coordination"]
