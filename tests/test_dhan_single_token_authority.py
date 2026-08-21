@@ -162,6 +162,13 @@ class DhanRotationTriStateGuardTests(unittest.TestCase):
                   "token_age_minutes": 5.0, "valid": False}
         self.assertFalse(should_rotate(before))
 
+    def test_fresh_invalid_token_is_visible_failure_not_false_healthy(self):
+        status, rc = self.ns["_non_rotation_status"](
+            {"auth_state": "AUTH_INVALID"}, "SKIPPED_TOKEN_HEALTHY"
+        )
+        self.assertEqual(status, "BLOCKED_AUTH_INVALID_REMINT_COOLDOWN")
+        self.assertEqual(rc, 2)
+
     def test_proven_near_expiry_authorizes_rotation_even_when_profile_probe_is_transient(self):
         should_rotate = self.ns["_should_rotate"]
         before = {"auth_state": "TRANSIENT_ERROR", "hours_remaining": 1.0, "valid": False}
@@ -186,15 +193,16 @@ class DhanRotationTriStateGuardTests(unittest.TestCase):
         self.assertIn('"transient_errors_authorize_mint": False', self.job)
         self.assertIn("BLOCKED_STAGGER_REVALIDATION_ERROR", self.job)
         self.assertIn("BLOCKED_MINT_NOT_AUTHORIZED", self.job)
+        self.assertIn("BLOCKED_AUTH_INVALID_REMINT_COOLDOWN", self.job)
 
-    def test_generated_token_is_durably_preserved_before_bounded_validation(self):
+    def test_generated_token_is_validated_before_any_secret_persistence(self):
         candidate_index = self.job.index("candidate_version = _persist_candidate_token(new_token)")
         persist_index = self.job.index("new_version = _persist_authoritative_token(new_token)")
         generated_index = self.job.index("generated_check = _profile_probe(client_id, new_token)")
-        self.assertLess(candidate_index, generated_index)
-        self.assertLess(generated_index, persist_index)
+        self.assertLess(generated_index, candidate_index)
+        self.assertLess(candidate_index, persist_index)
         self.assertIn("for delay_s in (0, 5, 15)", self.job)
-        self.assertIn('"candidate_persisted_before_validation": True', self.job)
+        self.assertIn('"candidate_persisted_before_validation": False', self.job)
         self.assertIn('"canonical_persisted_only_after_validation": True', self.job)
 
 
