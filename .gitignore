@@ -87,3 +87,6 @@ reports/latest/manual_*
 
 # Runtime state files
 state/
+# Generated deep-scan dumps can contain expanded environment values and must
+# never be committed. Keep the canonical scanners report-only/redacted.
+/scan_output.txt
