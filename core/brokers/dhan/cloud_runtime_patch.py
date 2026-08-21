@@ -2,9 +2,13 @@
 
 The wrappers keep Google Secret Manager as the runtime token source. On a Dhan
 authentication failure they first reload ``latest``. If ``latest`` itself is
-invalid, they invoke the single canonical Cloud Run token-rotation Job, wait for
-its Secret Manager version to advance, reload that version, and retry the
-read-only broker call once.
+invalid, they may invoke the single canonical Cloud Run token-rotation Job only
+when that authority is explicitly enabled, wait for its Secret Manager version
+to advance, reload that version, and retry the read-only broker call once.
+
+Broker ``connected`` truth is stricter than token presence: the cloud status
+path must prove Profile plus Funds, Holdings, and Positions using bounded,
+read-only Dhan calls. Only sanitized success/error/count metadata is returned.
 
 Safety contract:
 - never place, modify, cancel, or route an order;
@@ -22,6 +26,7 @@ import json
 import os
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor, wait
 from typing import Any, Callable
 
 from core.brokers.dhan.cloud_status_probe import get_cloud_status, _safe_upstream_code
@@ -60,25 +65,32 @@ def _text_blob(value: Any) -> str:
 def _auth_failed(result: Any) -> bool:
     """Return true only for affirmative auth failures that justify recovery.
 
-    Dhan 805/HTTP429 and DH-906 are explicitly non-auth and must never trigger
-    Secret Manager reload or canonical rotation, even if response free text
-    contains misleading phrases such as ``invalid token``.
+    A stable normalized auth classification/error is authoritative even when
+    Dhan also reports DH-906. Bare DH-906 remains a non-auth request rejection,
+    and Dhan 805/HTTP429 remains rate-limit evidence that must never trigger
+    Secret Manager reload or rotation.
     """
     blob = _text_blob(result).lower()
     code = _safe_upstream_code(blob)
-    if code in {805, 906}:
-        return False
     if isinstance(result, dict):
-        upstream = str(result.get("upstream_classification") or "").strip()
-        if upstream in {"DHAN_RATE_LIMITED", "DHAN_REQUEST_REJECTED_906"}:
-            return False
         auth_classification = str(result.get("auth_classification") or "").strip()
+        stable_error = str(result.get("error") or "").strip()
         if auth_classification in {
             "DHAN_TOKEN_REJECTED",
             "DHAN_TOKEN_REJECTED_CLOCK_UNKNOWN",
             "TOKEN_CLOCK_EXPIRED",
-        }:
+        } or stable_error == "TOKEN_EXPIRED_OR_INVALID":
             return True
+        upstream = str(result.get("upstream_classification") or "").strip()
+        if upstream == "DHAN_RATE_LIMITED":
+            return False
+    if code == 805:
+        return False
+    if code == 906:
+        # The status/profile classifiers are responsible for upgrading the
+        # observed DH-906 + explicit Invalid Token anomaly to the stable
+        # TOKEN_EXPIRED_OR_INVALID signal above. A bare 906 cannot self-heal.
+        return False
     if code == 808:
         return True
     return any(
@@ -306,6 +318,152 @@ def _clear_status_cache(module: Any) -> None:
         pass
 
 
+def _safe_count(data: Any) -> int | None:
+    if isinstance(data, (list, tuple)):
+        return len(data)
+    if isinstance(data, dict):
+        nested = data.get("data")
+        if isinstance(nested, (list, tuple)):
+            return len(nested)
+    return None
+
+
+def _strict_account_proof(module: Any, *, timeout_s: float = 4.0) -> dict[str, Any]:
+    """Prove funds/holdings/positions without returning any account payload."""
+    creds = module.get_dhan_credentials()
+    client_id = str(creds.get("client_id") or "").strip().lstrip("\ufeff")
+    access_token = str(creds.get("access_token") or "").strip().lstrip("\ufeff")
+    rest_get = getattr(module, "_rest_get", None)
+    payload_error = getattr(module, "_payload_error", None)
+    exception_error = getattr(module, "_exception_error", None)
+    specs = {
+        "funds": (getattr(module, "_DHAN_FUNDS_URL", ""), False),
+        "holdings": (getattr(module, "_DHAN_HOLDINGS_URL", ""), True),
+        "positions": (getattr(module, "_DHAN_POSITIONS_URL", ""), True),
+    }
+    if not client_id or not access_token or not callable(rest_get) or not callable(payload_error):
+        return {
+            "ok": False,
+            "error": "ACCOUNT_PROOF_UNAVAILABLE",
+            "checks": {},
+            "raw_payload_exposed": False,
+        }
+    if any(not url for url, _include_client_id in specs.values()):
+        return {
+            "ok": False,
+            "error": "ACCOUNT_PROOF_UNAVAILABLE",
+            "checks": {},
+            "raw_payload_exposed": False,
+        }
+
+    def run_one(name: str, url: str, include_client_id: bool) -> tuple[str, dict[str, Any]]:
+        started = time.monotonic()
+        try:
+            data = rest_get(
+                url,
+                access_token,
+                client_id,
+                timeout=max(1.0, min(float(timeout_s), 5.0)),
+                include_client_id=include_client_id,
+            )
+            error = payload_error(data)
+            return name, {
+                "ok": error is None,
+                "error": error,
+                "item_count": _safe_count(data),
+                "latency_ms": int((time.monotonic() - started) * 1000),
+            }
+        except Exception as exc:
+            error = exception_error(exc) if callable(exception_error) else f"NETWORK_ERROR:{type(exc).__name__}"
+            return name, {
+                "ok": False,
+                "error": error,
+                "item_count": None,
+                "latency_ms": int((time.monotonic() - started) * 1000),
+            }
+
+    executor = ThreadPoolExecutor(max_workers=3, thread_name_prefix="dhan-proof")
+    future_to_name = {
+        executor.submit(run_one, name, url, include_client_id): name
+        for name, (url, include_client_id) in specs.items()
+    }
+    done, pending = wait(future_to_name, timeout=max(1.0, min(float(timeout_s) + 1.0, 6.0)))
+    checks: dict[str, dict[str, Any]] = {}
+    for future in done:
+        name = future_to_name[future]
+        try:
+            _returned_name, proof = future.result()
+            checks[name] = proof
+        except Exception as exc:
+            checks[name] = {
+                "ok": False,
+                "error": f"PROBE_ERROR:{type(exc).__name__}",
+                "item_count": None,
+                "latency_ms": None,
+            }
+    for future in pending:
+        name = future_to_name[future]
+        future.cancel()
+        checks[name] = {
+            "ok": False,
+            "error": "PROBE_TIMEOUT",
+            "item_count": None,
+            "latency_ms": None,
+        }
+    executor.shutdown(wait=False, cancel_futures=True)
+
+    first_error = next(
+        (checks[name].get("error") for name in ("funds", "holdings", "positions") if not checks.get(name, {}).get("ok")),
+        None,
+    )
+    return {
+        "ok": len(checks) == 3 and all(checks.get(name, {}).get("ok") for name in specs),
+        "error": first_error,
+        "checks": checks,
+        "raw_payload_exposed": False,
+    }
+
+
+def _strict_cloud_status(module: Any) -> dict[str, Any]:
+    """Require Profile + Funds + Holdings + Positions for connected=true."""
+    status = dict(get_cloud_status(module))
+    if "account_read_proof" in status:
+        return status
+
+    profile_ok = status.get("connected") is True
+    proof: dict[str, Any] = {
+        "profile": {
+            "ok": profile_ok,
+            "error": None if profile_ok else status.get("error"),
+        },
+        "raw_payload_exposed": False,
+    }
+    if profile_ok:
+        account = _strict_account_proof(module)
+        proof.update(account.get("checks") or {})
+        account_ok = bool(account.get("ok"))
+        if not account_ok:
+            status["connected"] = False
+            status["error"] = account.get("error") or "ACCOUNT_READ_PROOF_FAILED"
+            if status["error"] == "TOKEN_EXPIRED_OR_INVALID":
+                status["auth_classification"] = "DHAN_TOKEN_REJECTED"
+    else:
+        account_ok = False
+        for name in ("funds", "holdings", "positions"):
+            proof[name] = {"ok": False, "error": "SKIPPED_PROFILE_NOT_AUTHENTICATED"}
+
+    status["account_read_proof"] = proof
+    status["broker_truth_contract"] = "profile+funds+holdings+positions"
+    status["broker_truth_complete"] = bool(profile_ok and account_ok)
+    status["raw_account_payload_exposed"] = False
+    try:
+        module._STATUS_RESULT_CACHE = dict(status)
+        module._STATUS_RESULT_CACHE_AT = time.time()
+    except Exception:
+        pass
+    return status
+
+
 def _wrap_read(module: Any, name: str, original: Callable[..., Any]) -> Callable[..., Any]:
     def wrapped(*args, **kwargs):
         get_access_token(reason=f"pre_{name}")
@@ -364,11 +522,10 @@ def install() -> dict[str, Any]:
 
         from core.brokers.dhan import dhan_readonly as module
 
-        # The generic adapter's status path may attempt SDK then REST serially.
-        # That can exceed FastAPI's 12s broker-status deadline. Cloud status uses
-        # one bounded REST profile GET; the wrapper below still owns Secret
-        # Manager reload and canonical token rotation on authentication failure.
-        module.get_status = lambda: get_cloud_status(module)
+        # The cloud status path uses one bounded Profile probe followed by a
+        # parallel, bounded read-only proof for funds/holdings/positions. This
+        # avoids cosmetic connected=true while keeping dashboard polling bounded.
+        module.get_status = lambda: _strict_cloud_status(module)
 
         patched = []
         for name in (
@@ -391,7 +548,8 @@ def install() -> dict[str, Any]:
             "installed": True,
             "patched": patched,
             "token_source": token_metadata().get("source"),
-            "broker_status_probe": "cloud_rest_profile_bounded",
+            "broker_status_probe": "cloud_profile_plus_account_reads_bounded",
+            "broker_truth_contract": "profile+funds+holdings+positions",
             "canonical_rotation_authority": "gcp-cloud-run-job",
             "live_trading_enabled": False,
             "order_placement_allowed": False,
