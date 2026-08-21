@@ -1,27 +1,43 @@
-# RUHI_RULE_V2 — Genesis System3 Multi-Agent Execution Contract
+# RHUI_RULE_V2.2 — Genesis System3 Cloud-Only Multi-Agent Execution Contract
 
-Status: ACTIVE when merged. Supersedes informal/local-only coordination rules.
+Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-laptop execution or local forensic authority.
 
 ## 1. Single source of truth
 
-All agents (ChatGPT, Cursor, Claude and any future agent) must reconstruct current state from:
+All agents (ChatGPT, Cursor, Claude, Codex and any future agent) must reconstruct current state from:
 
-1. GitHub current `main` SHA.
-2. GitHub Issue #188 for live P0/UI parity status.
-3. `reports/coordination/ruhi_task_ledger.csv` for task ownership, dependencies, progress and proof.
-4. `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` for current coordination snapshot.
-5. Gmail RUHI messages only as transport/notification; durable state must be reflected back into GitHub.
+1. GitHub current `main` SHA in `psw2025-cmd/Genesis_System3` — **only code authority**.
+2. GitHub Issue #188 — canonical shared technical/progress bus.
+3. `reports/coordination/ruhi_task_ledger.csv` — task ownership, dependencies, progress and proof.
+4. `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` — coordination snapshot.
+5. Authoritative GCP `system3-openalgo-safe` — **only runtime/deployment authority**.
+6. Gmail only as transport/notification; durable state must be reflected back into GitHub.
 
-Local laptop notes, local Cursor rules, unpushed Claude patches, stale emails and old workflow results are not authoritative until mirrored into the shared ledger/handoff or landed in GitHub.
+Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
 
-## 2. No invisible work
+## 2. Cloud-only execution lock
 
-Every agent status email/update MUST contain these sections in this order:
+All implementation must start from a fresh remote GitHub `main` in a clean cloud-capable lane.
+
+Forbidden:
+
+- deploying from a laptop checkout;
+- minting/rotating broker tokens from a laptop;
+- using local `.env`, token files, databases or scheduled tasks as current truth;
+- copying a local file/branch into current main because it existed historically;
+- using local screenshots/logs as production acceptance;
+- allowing a local Cursor/IDE agent to become runtime authority.
+
+Any useful historical idea must be re-derived from current GitHub main, independently reviewed, and implemented through the normal GitHub PR → CI → merge → GCP deploy → exact-serving proof flow.
+
+## 3. No invisible work
+
+Every meaningful agent status must reconcile:
 
 - `RULE_VERSION`
 - `BATCH_ID`
 - `CURRENT_MAIN_SHA`
-- `SERVING_SHA` (if production relevant)
+- `SERVING_SHA`
 - `MARKET_PHASE`
 - `PREVIOUS_BATCH_COMMITMENT`
 - `PREVIOUS_BATCH_RESULT`
@@ -34,140 +50,154 @@ Every agent status email/update MUST contain these sections in this order:
 
 A task is not complete because code exists, CI is green, a PR merged or an API returned 200. Completion requires the proof class defined in the ledger.
 
-## 3. Twenty-task rolling batch rule
+## 4. Rolling batch rule
 
-Default batch size is 20 highest-priority executable tasks.
+Default next batch is the highest-priority executable work, normally up to 20 real tasks.
 
-Each new RUHI status message must reconcile the previous batch task-by-task before creating the next batch:
+Every new RHUI status must reconcile the previous batch task-by-task:
 
 - `DONE`: acceptance criteria met and proof recorded.
-- `PARTIAL`: some acceptance criteria met; remaining work explicit.
+- `PARTIAL`: some criteria met; remaining work explicit.
 - `BLOCKED`: exact blocker and owner/access dependency recorded.
 - `SUPERSEDED`: newer task/fix invalidated it; link replacement.
-- `NOT_STARTED`: must explain why it was skipped.
+- `NOT_STARTED`: explain why skipped.
 
-The next mail must never silently replace or forget unfinished commitments from the previous mail.
+Unfinished commitments may not silently disappear.
 
-If fewer than 20 executable tasks exist, publish the real smaller number. Never invent tasks to satisfy the count.
-
-## 4. Proof hierarchy
+## 5. Proof hierarchy
 
 For user-visible dashboard behavior, proof priority is:
 
 1. Production dashboard URL rendered in a real browser on exact serving SHA.
 2. Screenshot/video/browser artifact tied to URL + timestamp + serving SHA.
 3. UI semantic assertion/result tied to exact serving SHA.
-4. Backend/API correlation.
+4. Same-session backend/API correlation.
 5. CI/unit tests.
 6. Source/docs only.
 
 For UI tasks, levels 4–6 alone cannot yield `DONE`.
 
-Required dashboard proof should include visible source/freshness/error state where relevant. A blank/WAITING/placeholder tab is a failure even if the route renders.
+A route-render PASS is not a semantic/data-readiness PASS. Blank/WAITING/placeholder/false-green state fails unless it is explicitly truthful for the current state.
 
-## 5. Specialist ownership
+## 6. Specialist ownership
 
-- Cursor: laptop-local history, local repo archaeology, browser/UI capture, GCP/browser surfaces available to Cursor, practical reproduction, local patches and UI-facing implementation when fastest.
-- Claude: independent forensic/adversarial review, root-cause hypotheses, patch preparation when it lacks push access, independent cross-check of claims.
-- ChatGPT: controller/consolidator, Gmail/GitHub coordination, task ledger authority, acceptance criteria, PR review/merge decisions, contradiction resolution and final user-facing status.
-- Other agents: claim a bounded lane in the ledger before modifying overlapping files.
+- **ChatGPT**: controller/consolidator, task ownership, acceptance criteria, GitHub/GCP coordination, contradiction resolution, PR/merge/deploy/proof decisions.
+- **Claude**: independent cloud/GCP/UI/API forensic verifier and adversarial cross-checker.
+- **Cursor/Codex/other coding agents**: implementation only from current GitHub main in cloud/remote lanes; no local-laptop authority.
+- **Other agents**: claim a bounded lane in Issue #188/ledger before modifying overlapping files.
 
-Specialists own tasks in their strongest domain. Avoid duplicate implementations.
+Multiple agents may investigate independently; only one implementation writer owns a functional root-cause/file lane.
 
-## 6. Access-gap handoff rule
+## 7. Broker/token authority
 
-If an agent lacks access, it must not stop at `cannot access`. It must provide a micro-handoff containing:
+Broker/token operations are cloud-only.
 
-- exact task ID;
-- exact command/UI path/API endpoint;
-- expected evidence;
-- current observed evidence;
-- suspected files/functions/resources;
-- safety constraints;
-- success/failure acceptance criteria;
-- recommended next owner.
+Canonical authority:
 
-The receiving agent records the result in the same ledger row.
+- GCP Secret Manager;
+- isolated Cloud Run job `genesis-system3-dhan-token-rotate`;
+- approved Cloud Scheduler authority;
+- guarded GitHub manual-recovery workflow only when preconditions prove it is required.
 
-## 7. Local-laptop origin forensic is mandatory
+The web runtime and local machines must never mint/rotate tokens.
 
-Genesis System3 existed locally before GCP deployment. Long-lived defects (especially paper-trade absence, missing UI data, stale hard-coded/demo paths and migration gaps) must be investigated against local history, not only current cloud code.
+Never blind-mint or retry-until-green. Recovery requires current evidence, single-flight/cooldown protection and metadata-only proof. Do not expose token/PIN/TOTP values.
 
-Cursor must inventory, without exposing secrets:
+Broker acceptance requires, on exact current serving revision:
 
-- historical local repo roots/checkouts;
-- branches/commits not present on remote;
-- old databases/logs/reports proving whether paper trades ever existed;
-- old scheduler/task configuration;
-- old environment/config names (names only, no secret values);
-- old UI/backend implementations and dead code;
-- files/features lost or changed during local → GitHub → GCP migration;
-- duplicate/obsolete Render-era logic;
-- discrepancies between laptop behavior and current GCP serving behavior.
+- `/ui` visibly shows broker connected;
+- same-session `/api/broker/status` confirms usable broker state;
+- token source is canonical dynamic GCP authority, with metadata only;
+- NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY have positive contracts/strikes and truthful source/freshness;
+- no contradictory WAITING/CLOSED/stale-success state;
+- `LIVE=false` and `orders=false`.
 
-Findings must be converted into ledger tasks with evidence and remediation owner.
+`connected=true` alone is not full acceptance.
 
-## 8. Paper-trade acceptance rule
+## 8. Paper-trade acceptance
 
-Do not mark paper trading complete until a real market-session production proof demonstrates end-to-end:
+Do not mark paper trading complete until a real market-session production proof demonstrates:
 
-market data → scanner/ranker → signal decision → paper/analyzer order path → persisted paper record → dashboard paper-trade row → P&L/position update.
+market data → scanner/ranker → signal decision → paper/analyzer path → persisted paper record → dashboard row → P&L/position update.
 
-Zero live-order safety must remain proven: `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0` unless the user explicitly authorizes a separate live-trading change.
+Zero live-order safety remains mandatory:
 
-## 9. Dashboard is the user acceptance surface
+- `LIVE_TRADING_ENABLED=0`
+- `SYSTEM3_LIVE_TRADING_ALLOWED=0`
+- `AUTO_EXECUTE_TRADES=0`
 
-The user should not need to interpret logs, JSON or CI to know whether a feature works. Downstream work is accepted only when the relevant result is visible and truthful on the production dashboard URL wherever the task is user-facing.
+unless a separate explicit live-trading authorization is given later.
 
-All dashboard tabs/features must eventually have a ledger row and latest proof timestamp.
+## 9. Dashboard truth contract
 
-## 10. Progress measurement
+The user should be able to judge progress from the authoritative production URL, not from logs or agent narrative.
 
-Each status mail must publish:
+All 22 current canonical tabs must be audited region-by-region. Each visible card/badge/table/chart/status/empty-state should be classified as one of:
 
-- total known tasks;
-- DONE count;
-- PARTIAL count;
-- BLOCKED count;
-- OPEN executable count;
-- previous batch completion percentage;
-- number of tasks with fresh production-UI proof;
-- number of regressions reopened since prior mail.
+- `PASS_TRUTHFUL`
+- `PASS_DERIVED_TRANSPARENT`
+- `STALE_EXPLICIT`
+- `DEGRADED_EXPLICIT`
+- `UNKNOWN_EXPLICIT`
+- `PLACEHOLDER`
+- `HARDCODED`
+- `DEMO_OR_MOCK`
+- `FALSE_GREEN`
+- `MISLEADING`
+- `MISSING`
+- `BROKEN`
+- `NOT_APPLICABLE`
 
-Progress percentage must be calculated from task states, not estimated subjectively.
+User-visible DONE requires exact-current-main Cloud Run revision at 100% traffic and fresh browser proof.
+
+## 10. Stages and progress measurement
+
+Use:
+
+`DISCOVERED -> ROOT_CAUSE_PROVEN -> PATCHED -> TESTED -> EXACT_HEAD_GATED -> MERGED -> DEPLOYED -> UI_PROVEN -> STABILITY_PROVEN -> COMPLETE`
+
+Each meaningful report must publish task counts and reconcile:
+
+`PREVIOUS_TARGET -> ACTUAL_RESULT -> PROOF -> DELTA -> NEXT_TARGET_BATCH`.
+
+Progress percentages must come from task states, not estimates.
 
 ## 11. No stale-claim rule
 
-Before starting or reporting a task, verify current main/serving SHA and recent ledger state. A claim based on an old SHA, old revision or old email must be labeled STALE and cannot drive acceptance.
+Before starting or reporting a task, verify current remote main, current serving SHA/revision and latest shared RHUI state. Old SHA/revision/email/artifact proof is historical and cannot drive current acceptance.
 
 ## 12. Failure and regression rule
 
-Any recurrence after a claimed fix reopens the task or creates a linked regression task. Do not preserve a green historical status when current production disproves it.
+Any recurrence after a claimed fix reopens the task or creates a linked regression. Current production truth overrides historical green status.
 
-## 13. Email convention
+## 13. Human escalation boundary
 
-Subjects:
+The user is not a routine coordination relay.
 
-- `RUHI CLAIM — <agent> — <batch/task>`
-- `RUHI STATUS — <agent> — <batch> — <result>`
-- `RUHI FINDING — <agent> — <task>`
-- `RUHI HANDOFF — <from> → <to> — <task>`
-- `RUHI HUMAN-ACTION — <task>`
+Human action is allowed only for genuine external owner-only boundaries such as:
 
-Every mail must include the ledger path and task IDs changed.
+- billing/subscription/funding;
+- identity/consent;
+- official broker account/MFA/credential reset;
+- unavailable external permission with no safe cloud bridge;
+- destructive action requiring explicit approval;
+- explicit LIVE trading approval.
+
+Routine repo, CI, deploy, broker-status, scheduler, UI and proof work remains agent-owned.
 
 ## 14. Safety
 
-Do not weaken IAM/WIF, expose secret values, mint/rotate tokens unnecessarily, enable live trading or place/modify/cancel live orders merely to make a proof pass. Live-order-capable changes require explicit proof of analyzer-only isolation or explicit user authorization.
+Do not weaken IAM/WIF, expose secret values, mint/rotate tokens unnecessarily, enable live trading, place/modify/cancel live orders, dilute gates or accept retry-until-green behavior merely to make proof pass.
 
 ## 15. Definition of a useful agent cycle
 
-A cycle is useful only if it produces at least one of:
+A useful cycle produces at least one of:
 
-- a newly completed ledger task with required proof;
+- a newly completed task with required proof;
 - a materially narrowed root cause with evidence;
-- a tested code/config remediation ready for the owning agent;
-- a resolved blocker/access handoff;
-- a regression caught and converted into an owned remediation task.
+- a tested bounded remediation;
+- a resolved access/coordination blocker;
+- a regression converted into an owned task;
+- a new exact-serving browser/API truth observation.
 
 Pure restatement of old status does not count as progress.
