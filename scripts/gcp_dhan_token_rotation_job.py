@@ -10,8 +10,8 @@ This is the sole production token mint authority for Genesis System3. It:
    Manager version plus a bounded execution-name stagger and revalidation;
 4. generates a new token with PIN + TOTP only when Dhan explicitly rejects the
    authoritative latest token or the JWT is genuinely near expiry;
-5. validates the generated token before writing exactly one new authoritative
-   Secret Manager version.
+5. validates the generated token before writing any candidate/canonical secret
+   version, then promotes only the validated token to the authoritative secret.
 
 It never calls order endpoints and always forces LIVE execution OFF.
 """
@@ -74,6 +74,7 @@ _SAFE_STATUS_LINES = {
     "SKIPPED_CONCURRENT_ROTATION_WON": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_CONCURRENT_ROTATION_WON"}',
     "SKIPPED_TOKEN_HEALTHY": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_TOKEN_HEALTHY"}',
     "SKIPPED_TOKEN_HEALTHY_AFTER_STAGGER": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"SKIPPED_TOKEN_HEALTHY_AFTER_STAGGER"}',
+    "BLOCKED_AUTH_INVALID_REMINT_COOLDOWN": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_AUTH_INVALID_REMINT_COOLDOWN"}',
     "BLOCKED_TRANSIENT_PROFILE_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_TRANSIENT_PROFILE_ERROR"}',
     "BLOCKED_PROFILE_CONFIG_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_PROFILE_CONFIG_ERROR"}',
     "BLOCKED_STAGGER_REVALIDATION_ERROR": '{"authority":"gcp-cloud-run-job","live_trading_enabled":false,"order_endpoints_called":false,"raw_token_exposed":false,"status":"BLOCKED_STAGGER_REVALIDATION_ERROR"}',
@@ -166,9 +167,8 @@ def _is_auth_failure(value: Any, *, status_code: int | None = None) -> bool:
     blob = _safe_blob(value).lower()
     auth_like = any(marker in blob for marker in _AUTH_MARKERS)
     # Do NOT short-circuit all DH-906/DH-805 to non-auth. Live Dhan returns
-    # errorCode DH-906 with errorMessage "Invalid Token" (rotate logs
-    # 2026-08-20T17:45Z). That must mint. Rate-limit-only 906/805 bodies
-    # without auth markers remain non-auth (auth_like False).
+    # errorCode DH-906 with errorMessage "Invalid Token". That must mint.
+    # Rate-limit/request-only 906/805 bodies without auth markers remain non-auth.
     if status_code in _REQUEST_REJECTED_CODES and not auth_like:
         return False
     if ("dh-906" in blob or "dh-805" in blob) and not auth_like:
@@ -321,6 +321,10 @@ def _should_rotate(before: dict[str, Any]) -> bool:
 
 def _non_rotation_status(before: dict[str, Any], healthy_status: str) -> tuple[str, int]:
     state = str(before.get("auth_state") or "")
+    # An affirmatively rejected token is never healthy. If cooldown blocks a
+    # re-mint, the Job must fail non-zero so Scheduler/ops can see the incident.
+    if state == PROFILE_AUTH_INVALID:
+        return "BLOCKED_AUTH_INVALID_REMINT_COOLDOWN", 2
     if state == PROFILE_TRANSIENT_ERROR:
         return "BLOCKED_TRANSIENT_PROFILE_ERROR", 2
     if state == PROFILE_CONFIG_ERROR:
@@ -385,7 +389,7 @@ def _persist_authoritative_token(token: str) -> str:
 
 
 def _persist_candidate_token(token: str) -> str:
-    """Durably quarantine the newly minted single-active token before validation."""
+    """Durably quarantine an already broker-validated replacement token."""
     client = secretmanager.SecretManagerServiceClient()
     parent = f"projects/{PROJECT}/secrets/{CANDIDATE_SECRET_ID}"
     response = client.add_secret_version(
@@ -535,12 +539,10 @@ def main() -> int:
     failure_stage = "generate_token"
     try:
         new_token = _generate_token(client_id, pin, totp_secret)
-        # Dhan is effectively single-active-token: minting may invalidate the
-        # prior token immediately. Preserve the replacement in a quarantine
-        # secret which is never mounted by production, then validate it before
-        # promotion to the canonical secret.
-        failure_stage = "persist_candidate_version"
-        candidate_version = _persist_candidate_token(new_token)
+        # Never write an unvalidated token anywhere in Secret Manager. Dhan may
+        # invalidate the prior token at mint time, so validation happens
+        # immediately and failure is surfaced non-zero rather than preserving a
+        # bad candidate as apparent recovery evidence.
         failure_stage = "validate_generated_token"
         generated_check: dict[str, Any] = {}
         for delay_s in (0, 5, 15):
@@ -553,10 +555,14 @@ def main() -> int:
                 break
         if not generated_check.get("valid"):
             raise RuntimeError(
-                "persisted Dhan replacement failed profile validation: "
+                "generated Dhan replacement failed profile validation: "
                 f"{generated_check.get('auth_state')}:{generated_check.get('reason')}"
             )
 
+        # Candidate storage is evidence/quarantine only and is written strictly
+        # after broker validation. Production never mounts this candidate secret.
+        failure_stage = "persist_candidate_version"
+        candidate_version = _persist_candidate_token(new_token)
         failure_stage = "persist_secret_version"
         new_version = _persist_authoritative_token(new_token)
         os.environ["DHAN_ACCESS_TOKEN"] = new_token
@@ -591,7 +597,7 @@ def main() -> int:
             "rotation_threshold_hours": MIN_HOURS,
             "mint_authorized": True,
             "transient_errors_authorize_mint": False,
-            "candidate_persisted_before_validation": True,
+            "candidate_persisted_before_validation": False,
             "canonical_persisted_only_after_validation": True,
             "post_canonical_persist_profile_reprobe_performed": False,
             "live_trading_enabled": False,
