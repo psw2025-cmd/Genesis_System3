@@ -132,8 +132,12 @@ jobs:
               and "DHAN_ROTATION_JOB" in line
           ]
           assert not rotator_exec_lines, f"deploy must not execute rotator: {rotator_exec_lines}"
-          assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
-          assert '("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")' in Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+          impl = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+          assert '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in impl
+          assert '("DHAN_TOKEN_ROTATION_SCHEDULE", "*/5 * * * * Asia/Kolkata")' in impl
+          assert '("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")' in impl
+          assert '--schedule="*/5 * * * *"' in workflow
+          assert 'DHAN_REMINT_COOLDOWN_MINUTES=30' in workflow
           assert 'os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
           assert 'os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")' in Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
 
@@ -267,7 +271,7 @@ jobs:
             --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID=dhan-access-token-candidate,DHAN_ROTATE_WHEN_HOURS_LEFT=2,DHAN_REMINT_COOLDOWN_MINUTES=30,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
             --set-secrets="DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest,DHAN_PIN=dhan-pin:latest,DHAN_TOTP_SECRET=dhan-totp-secret:latest"
 
-          # Invokers: hourly fail-closed health/rotation check + manual recovery SA.
+          # Invokers: bounded 5-minute fail-closed health/rotation check + manual recovery SA.
           # Web runtime must NEVER have run.invoker on the rotator (zero web rotation).
           # Soft-fail setIamPolicy: deploy SA is least-privilege (no project run.admin);
           # invokers are already enforced by authority-repair / live IAM baseline.
@@ -292,7 +296,7 @@ jobs:
             gcloud scheduler jobs update http "${DHAN_ROTATION_SCHEDULER}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
               --location="${GCP_REGION}" \
-              --schedule="30 * * * *" \
+              --schedule="*/5 * * * *" \
               --time-zone="Asia/Kolkata" \
               --uri="${SCHEDULER_URI}" \
               --http-method=POST \
@@ -304,7 +308,7 @@ jobs:
             gcloud scheduler jobs create http "${DHAN_ROTATION_SCHEDULER}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
               --location="${GCP_REGION}" \
-              --schedule="30 * * * *" \
+              --schedule="*/5 * * * *" \
               --time-zone="Asia/Kolkata" \
               --uri="${SCHEDULER_URI}" \
               --http-method=POST \
@@ -313,6 +317,13 @@ jobs:
               --headers="Content-Type=application/json" \
               --message-body='{}'
           fi
+
+          ROTATOR_SCHEDULE=$(gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" \
+            --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='value(schedule)')
+          ROTATOR_TIME_ZONE=$(gcloud scheduler jobs describe "${DHAN_ROTATION_SCHEDULER}" \
+            --project="${GOOGLE_CLOUD_PROJECT}" --location="${GCP_REGION}" --format='value(timeZone)')
+          test "${ROTATOR_SCHEDULE}" = "*/5 * * * *"
+          test "${ROTATOR_TIME_ZONE}" = "Asia/Kolkata"
 
       # Token mint authority is Cloud Scheduler only (plus optional manual recovery).
       # Deploy configures/updates the rotator Job but must never execute it.
