@@ -262,6 +262,7 @@ jobs:
             tests/test_qc_runtime_anomaly.py \
             tests/test_scheduler_catchup.py \
             tests/test_quant_alpha_truth.py \
+            tests/test_dhan_market_ltp.py \
             -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence

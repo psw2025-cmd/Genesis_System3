@@ -9,6 +9,9 @@ Never places orders.
 from __future__ import annotations
 
 import logging
+import os
+import threading
+import time
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 logger = logging.getLogger("dhan_market_ltp")
@@ -16,6 +19,21 @@ logger = logging.getLogger("dhan_market_ltp")
 _DHAN_LTP_URL = "https://api.dhan.co/v2/marketfeed/ltp"
 _DHAN_OHLC_URL = "https://api.dhan.co/v2/marketfeed/ohlc"
 _DHAN_QUOTE_URL = "https://api.dhan.co/v2/marketfeed/quote"
+
+# Process-local demand governor for read-only Dhan marketfeed calls.
+# Cloud Run can serve many browser/proof requests concurrently; without a
+# single-flight/cache layer every caller can independently hit OHLC/quote/LTP.
+# A provider 429/805 is also shared as a short negative cooldown so the next
+# browser poll does not immediately extend the throttle window.
+_MARKETFEED_COORD_LOCK = threading.Lock()
+_MARKETFEED_INFLIGHT: Dict[Tuple[Tuple[str, Tuple[str, ...]], ...], threading.Event] = {}
+_MARKETFEED_CACHE: Dict[Tuple[Tuple[str, Tuple[str, ...]], ...], Tuple[float, Dict[str, Dict[str, Any]]]] = {}
+_MARKETFEED_CACHE_TTL_S = max(1.0, float(os.environ.get("DHAN_MARKETFEED_CACHE_TTL_S", "8")))
+_MARKETFEED_RATE_LIMIT_COOLDOWN_S = max(
+    1.0, float(os.environ.get("DHAN_MARKETFEED_RATE_LIMIT_COOLDOWN_S", "20"))
+)
+_MARKETFEED_COOLDOWN_UNTIL = 0.0
+_MARKETFEED_LAST_RATE_LIMIT_AT = 0.0
 
 # Official IDX_I security IDs (DhanHQ docs / instrument master)
 INDEX_SECURITY_IDS: Dict[str, str] = {
@@ -107,6 +125,45 @@ def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> Dict[str, 
         if bucket:
             cleaned[str(seg)] = bucket
     return cleaned
+
+
+def _marketfeed_key(cleaned: Mapping[str, Sequence[str]]) -> Tuple[Tuple[str, Tuple[str, ...]], ...]:
+    """Stable same-request identity independent of mapping/list order."""
+    return tuple(
+        sorted((str(seg), tuple(sorted(str(sid) for sid in ids))) for seg, ids in cleaned.items())
+    )
+
+
+def _set_marketfeed_meta(
+    *,
+    cache_hit: bool = False,
+    coalesced: bool = False,
+    rate_limited: bool = False,
+    cooldown_remaining_s: float = 0.0,
+) -> None:
+    fetch_market_quotes.last_meta = {  # type: ignore[attr-defined]
+        "cache_hit": bool(cache_hit),
+        "coalesced": bool(coalesced),
+        "rate_limited": bool(rate_limited),
+        "cooldown_remaining_s": round(max(0.0, float(cooldown_remaining_s)), 3),
+        "cache_ttl_s": _MARKETFEED_CACHE_TTL_S,
+        "rate_limit_cooldown_s": _MARKETFEED_RATE_LIMIT_COOLDOWN_S,
+        "coordination_scope": "process",
+    }
+
+
+def _reset_marketfeed_coordination_for_tests() -> None:
+    """Clear process-local coordination state. Tests only; production never calls this."""
+    global _MARKETFEED_COOLDOWN_UNTIL, _MARKETFEED_LAST_RATE_LIMIT_AT
+    with _MARKETFEED_COORD_LOCK:
+        for event in _MARKETFEED_INFLIGHT.values():
+            event.set()
+        _MARKETFEED_INFLIGHT.clear()
+        _MARKETFEED_CACHE.clear()
+        _MARKETFEED_COOLDOWN_UNTIL = 0.0
+        _MARKETFEED_LAST_RATE_LIMIT_AT = 0.0
+    fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
+    _set_marketfeed_meta()
 
 
 def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
@@ -203,20 +260,13 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
     return None, last_err or "empty"
 
 
-def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
-    """Batch OHLC/quote via Dhan marketfeed (REST first, SDK fallback).
-
-    Returns map keyed by security_id string -> quote fields. A Dhan rate-limit
-    response is fail-fast for this invocation so fallback chaining cannot amplify
-    the request burst; callers retain cached/chain fallback truth and retry on their
-    normal cadence.
-    """
-    cleaned = _normalize_securities(securities)
-    if not cleaned:
-        return {}
-
+def _fetch_market_quotes_uncached(
+    cleaned: Mapping[str, Sequence[str]],
+) -> Tuple[Dict[str, Dict[str, Any]], List[str], bool]:
+    """Provider acquisition only. Caller owns coalescing/cache/cooldown."""
     errors: List[str] = []
     rate_limited = False
+
     # Prefer REST — Cloud Run SDK marketfeed methods are inconsistent across dhanhq versions.
     for url in (_DHAN_OHLC_URL, _DHAN_QUOTE_URL, _DHAN_LTP_URL):
         payload, err = _rest_marketfeed(url, cleaned)
@@ -229,26 +279,22 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
             continue
         parsed = _flatten_quotes(payload)
         if parsed:
-            fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
-            return parsed
+            return parsed, errors, False
         errors.append(f"{url.rsplit('/', 1)[-1]}:unparsed")
 
     if rate_limited:
-        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
-        return {}
+        return {}, errors, True
 
     try:
         from core.brokers.dhan.dhan_readonly import create_dhan_client
     except Exception as exc:
         logger.warning("market_ltp: cannot import create_dhan_client: %s", exc)
-        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
-        return {}
+        return {}, errors, False
 
     client = create_dhan_client()
     if client is None:
         errors.append("sdk:no_client")
-        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
-        return {}
+        return {}, errors, False
 
     for method_name in ("ohlc_data", "quote_data", "ticker_data", "get_ohlc_data", "get_ltp_data"):
         method = getattr(client, method_name, None)
@@ -258,17 +304,122 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
             payload = method(cleaned)
             parsed = _flatten_quotes(payload)
             if parsed:
-                fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
-                return parsed
+                return parsed, errors, False
             errors.append(f"{method_name}:unparsed")
         except Exception as exc:
             errors.append(f"{method_name}:{type(exc).__name__}")
             logger.info("market_ltp.%s failed: %s", method_name, exc)
-    fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
-    return {}
+    return {}, errors, False
+
+
+def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
+    """Batch OHLC/quote via Dhan marketfeed with bounded demand coordination.
+
+    Same-key concurrent callers coalesce to one provider acquisition. Successful
+    results are cached for a short TTL. A Dhan 429/805 starts a short process-wide
+    cooldown, preventing subsequent browser/proof calls from immediately extending
+    the provider throttle window. The coordination scope is explicitly process-local;
+    cross-instance Cloud Run protection must be proven separately.
+    """
+    global _MARKETFEED_COOLDOWN_UNTIL, _MARKETFEED_LAST_RATE_LIMIT_AT
+
+    cleaned = _normalize_securities(securities)
+    if not cleaned:
+        _set_marketfeed_meta()
+        return {}
+
+    key = _marketfeed_key(cleaned)
+    now = time.monotonic()
+    owner = False
+    event: Optional[threading.Event] = None
+
+    with _MARKETFEED_COORD_LOCK:
+        cached = _MARKETFEED_CACHE.get(key)
+        if cached and now - cached[0] < _MARKETFEED_CACHE_TTL_S:
+            fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
+            _set_marketfeed_meta(cache_hit=True)
+            return dict(cached[1])
+
+        cooldown_remaining = _MARKETFEED_COOLDOWN_UNTIL - now
+        if cooldown_remaining > 0:
+            fetch_market_quotes.last_errors = ["marketfeed:RATE_LIMIT_COOLDOWN"]  # type: ignore[attr-defined]
+            _set_marketfeed_meta(
+                rate_limited=True,
+                cooldown_remaining_s=cooldown_remaining,
+            )
+            return {}
+
+        event = _MARKETFEED_INFLIGHT.get(key)
+        if event is None:
+            event = threading.Event()
+            _MARKETFEED_INFLIGHT[key] = event
+            owner = True
+
+    if not owner:
+        # Wait only for the current same-key acquisition; never start a parallel
+        # provider request because the leader is merely slow.
+        assert event is not None
+        event.wait(timeout=10.0)
+        now = time.monotonic()
+        with _MARKETFEED_COORD_LOCK:
+            cached = _MARKETFEED_CACHE.get(key)
+            if cached and now - cached[0] < _MARKETFEED_CACHE_TTL_S:
+                fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
+                _set_marketfeed_meta(cache_hit=True, coalesced=True)
+                return dict(cached[1])
+            cooldown_remaining = _MARKETFEED_COOLDOWN_UNTIL - now
+        fetch_market_quotes.last_errors = [
+            "marketfeed:COALESCED_NO_RESULT"
+            if cooldown_remaining <= 0
+            else "marketfeed:RATE_LIMIT_COOLDOWN"
+        ]  # type: ignore[attr-defined]
+        _set_marketfeed_meta(
+            coalesced=True,
+            rate_limited=cooldown_remaining > 0,
+            cooldown_remaining_s=cooldown_remaining,
+        )
+        return {}
+
+    result: Dict[str, Dict[str, Any]] = {}
+    errors: List[str] = []
+    rate_limited = False
+    try:
+        result, errors, rate_limited = _fetch_market_quotes_uncached(cleaned)
+        now = time.monotonic()
+        with _MARKETFEED_COORD_LOCK:
+            if result:
+                _MARKETFEED_CACHE[key] = (now, dict(result))
+            if rate_limited:
+                _MARKETFEED_LAST_RATE_LIMIT_AT = now
+                _MARKETFEED_COOLDOWN_UNTIL = max(
+                    _MARKETFEED_COOLDOWN_UNTIL,
+                    now + _MARKETFEED_RATE_LIMIT_COOLDOWN_S,
+                )
+        fetch_market_quotes.last_errors = errors  # type: ignore[attr-defined]
+        _set_marketfeed_meta(
+            rate_limited=rate_limited,
+            cooldown_remaining_s=(
+                _MARKETFEED_RATE_LIMIT_COOLDOWN_S if rate_limited else 0.0
+            ),
+        )
+        return dict(result)
+    finally:
+        with _MARKETFEED_COORD_LOCK:
+            current = _MARKETFEED_INFLIGHT.pop(key, None)
+            if current is not None:
+                current.set()
 
 
 fetch_market_quotes.last_errors = []  # type: ignore[attr-defined]
+fetch_market_quotes.last_meta = {  # type: ignore[attr-defined]
+    "cache_hit": False,
+    "coalesced": False,
+    "rate_limited": False,
+    "cooldown_remaining_s": 0.0,
+    "cache_ttl_s": _MARKETFEED_CACHE_TTL_S,
+    "rate_limit_cooldown_s": _MARKETFEED_RATE_LIMIT_COOLDOWN_S,
+    "coordination_scope": "process",
+}
 
 
 def build_index_board(
@@ -280,6 +431,7 @@ def build_index_board(
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
     quotes = fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
     feed_errors = list(getattr(fetch_market_quotes, "last_errors", []) or [])
+    feed_meta = dict(getattr(fetch_market_quotes, "last_meta", {}) or {})
     rows: List[Dict[str, Any]] = []
     for sym in wanted:
         sid = INDEX_SECURITY_IDS.get(sym)
@@ -318,6 +470,7 @@ def build_index_board(
         "live_count": live_n,
         "feed_hits": len(quotes),
         "feed_errors": feed_errors[:6],
+        "feed_coordination": feed_meta,
         "indices": rows,
     }
 
