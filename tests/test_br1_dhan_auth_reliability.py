@@ -132,17 +132,34 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
                 self.assertEqual(ro._payload_error(payload), expected)
                 self.assertEqual(ro._auth_failure_payload(payload), is_auth)
 
-    def test_canonical_deploy_wrapper_forces_web_rotation_off(self):
-        text = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
-        self.assertIn("_enforce_scheduler_only_dhan_rotation()", text)
-        self.assertIn('key == "DHAN_CANONICAL_ROTATION_SELF_HEAL"', text)
-        self.assertIn('value = "0"', text)
-        self.assertIn('effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0"', text)
-        self.assertIn('effective.get("DHAN_STATUS_AUTO_REFRESH") != "0"', text)
-        self.assertIn('effective.get("SYSTEM3_STARTUP_TOKEN_REFRESH") != "0"', text)
-        self.assertIn('effective.get("BROKER_SELF_HEAL_TOKEN_REFRESH") != "0"', text)
-        self.assertIn("DHAN_WEB_ROTATION_DISABLED", text)
-        self.assertIn("gcp-scheduler-plus-guarded-manual-recovery", text)
+    def test_canonical_deploy_has_one_scheduler_only_rotation_source_of_truth(self):
+        wrapper = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+        impl = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+
+        self.assertIn("_enforce_scheduler_only_dhan_rotation()", wrapper)
+        self.assertNotIn('value = "0"', wrapper)
+        self.assertIn('effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0"', wrapper)
+        self.assertIn('effective.get("DHAN_TOKEN_ROTATION_SCHEDULE") != "*/5 * * * * Asia/Kolkata"', wrapper)
+        self.assertIn('effective.get("DHAN_CANONICAL_ROTATION_COOLDOWN_S") != "900"', wrapper)
+        self.assertIn('effective.get("DHAN_STATUS_AUTO_REFRESH") != "0"', wrapper)
+        self.assertIn('effective.get("SYSTEM3_STARTUP_TOKEN_REFRESH") != "0"', wrapper)
+        self.assertIn('effective.get("BROKER_SELF_HEAL_TOKEN_REFRESH") != "0"', wrapper)
+        self.assertIn("DHAN_WEB_ROTATION_DISABLED", wrapper)
+        self.assertIn("gcp-scheduler-plus-guarded-manual-recovery", wrapper)
+
+        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', impl)
+        self.assertNotIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', impl)
+        self.assertIn('("DHAN_TOKEN_ROTATION_SCHEDULE", "*/5 * * * * Asia/Kolkata")', impl)
+        self.assertIn('("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")', impl)
+
+        self.assertGreaterEqual(workflow.count('--schedule="*/5 * * * *"'), 2)
+        self.assertNotIn('--schedule="30 * * * *"', workflow)
+        self.assertIn('--time-zone="Asia/Kolkata"', workflow)
+        self.assertIn("DHAN_REMINT_COOLDOWN_MINUTES=30", workflow)
+        self.assertIn("--tasks=1", workflow)
+        self.assertIn("--parallelism=1", workflow)
+        self.assertIn("--max-retries=0", workflow)
 
     def test_clock_valid_dhan_rejection_preserves_legacy_error_and_adds_explicit_class(self):
         import time
