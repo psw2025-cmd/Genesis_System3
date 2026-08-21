@@ -130,7 +130,9 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("COOLDOWN_TOKEN_FRESH_AND_CONNECTED", manual)
         self.assertIn('gcloud scheduler jobs create http', deploy)
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
-        self.assertIn('--schedule="30 * * * *"', deploy)
+        self.assertIn('--schedule="*/5 * * * *"', deploy)
+        self.assertNotIn('--schedule="30 * * * *"', deploy)
+        self.assertIn("DHAN_REMINT_COOLDOWN_MINUTES=30", deploy)
         rotation = Path("scripts/gcp_dhan_token_rotation_job.py").read_text(encoding="utf-8")
         self.assertIn('failure_stage', rotation)
         forbidden_rotator_step = "Execute token rotator once" + " and wait"
@@ -140,10 +142,12 @@ class StaticSafetyContractTests(unittest.TestCase):
         patch = Path("core/brokers/dhan/cloud_runtime_patch.py").read_text(encoding="utf-8")
         deployer = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
         self.assertIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', patch)
-        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', deployer)
+        self.assertIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")', deployer)
+        self.assertNotIn('("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', deployer)
+        self.assertIn('("DHAN_TOKEN_ROTATION_SCHEDULE", "*/5 * * * * Asia/Kolkata")', deployer)
         self.assertIn('("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")', deployer)
         self.assertIn('os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900")', patch)
-        # Fail-closed default in code remains "0"; deploy turns heal ON explicitly.
+        # Fail-closed default and deployed source-of-truth both keep web heal OFF.
         self.assertNotIn('os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1")', patch)
 
     def test_legacy_token_writers_are_permanently_non_mutating(self):
