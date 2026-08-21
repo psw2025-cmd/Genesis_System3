@@ -8,9 +8,10 @@ invariant, replaces only the image-provenance assertion with the fail-closed
 Artifact Registry repository+digest verifier, removes retired/stale dashboard
 and Dhan secret mounts before any candidate revision can be created, preserves
 only the canonical web-side Dhan client-id binding plus worker token binding,
-forces web-triggered Dhan token rotation OFF so Scheduler/manual recovery remain
-the only effective rotation authorities, and converges the bounded business-lane
-Cloud Scheduler definitions before the workflow's scheduler-proof stage.
+validates that web-triggered Dhan token rotation is OFF at the authoritative
+SAFE_ENV source so Scheduler/manual recovery remain the only effective rotation
+authorities, and converges the bounded business-lane Cloud Scheduler definitions
+before the workflow's scheduler-proof stage.
 
 Secret existence is intentionally not preflighted with Secret Manager metadata
 reads by the deploy service account. The zero-traffic Cloud Run candidate is the
@@ -54,6 +55,8 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     '("DEFER_INSTRUMENT_WARMUP", "1")',
     '("SYSTEM3_STATE_BACKEND", "firestore")',
     '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")',
+    '("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0")',
+    '("DHAN_TOKEN_ROTATION_SCHEDULE", "*/5 * * * * Asia/Kolkata")',
     '--remove-secrets=API_KEY',
     '--update-secrets=WORKER_PUSH_TOKEN=',
     'WORKER_PUSH_TOKEN_SECRET_ID',
@@ -86,33 +89,24 @@ def _verify_implementation_contract() -> None:
 
 
 def _enforce_scheduler_only_dhan_rotation() -> None:
-    """Force the Cloud Run web service to be unable to request token rotation.
+    """Validate the single authoritative web-side Dhan rotation contract.
 
-    The preserved implementation still contains a historical explicit
-    ``DHAN_CANONICAL_ROTATION_SELF_HEAL=1`` value.  The canonical wrapper is the
-    active production entrypoint, so it rewrites that value to ``0`` before the
-    implementation constructs the Cloud Run ``--set-env-vars`` argument.
+    ``gcp_cloud_run_auto_deploy_impl.py::SAFE_ENV`` is the source of truth and
+    must already declare web canonical self-heal OFF.  This wrapper intentionally
+    does not rewrite a contradictory value at runtime: source/config drift must
+    fail closed in CI/deploy instead of being masked by a second authority.
 
-    This is intentionally independent of IAM cleanup: even if a broad project
-    role is accidentally reintroduced later, the serving web process remains
-    fail-closed and cannot enter the canonical rotation path.  Rotation authority
-    stays with the GCP Scheduler identity and the guarded manual-recovery identity.
+    Rotation authority remains Cloud Scheduler plus guarded manual recovery.
+    The 5-minute Scheduler cadence is only a bounded trigger/check cadence; the
+    rotator's independent 30-minute remint cooldown remains unchanged.
     """
-    rewritten: list[tuple[str, str]] = []
-    found = False
-    for key, value in deployer.SAFE_ENV:
-        if key == "DHAN_CANONICAL_ROTATION_SELF_HEAL":
-            value = "0"
-            found = True
-        rewritten.append((key, value))
-
-    if not found:
-        raise RuntimeError("dhan_web_rotation_env_missing")
-
-    deployer.SAFE_ENV = tuple(rewritten)
     effective = dict(deployer.SAFE_ENV)
     if effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0":
-        raise RuntimeError("dhan_web_rotation_not_disabled")
+        raise RuntimeError("dhan_web_rotation_not_disabled_at_source")
+    if effective.get("DHAN_TOKEN_ROTATION_SCHEDULE") != "*/5 * * * * Asia/Kolkata":
+        raise RuntimeError("dhan_rotation_schedule_source_drift")
+    if effective.get("DHAN_CANONICAL_ROTATION_COOLDOWN_S") != "900":
+        raise RuntimeError("dhan_canonical_rotation_cooldown_drift")
     if effective.get("DHAN_STATUS_AUTO_REFRESH") != "0":
         raise RuntimeError("dhan_web_status_auto_refresh_not_disabled")
     if effective.get("SYSTEM3_STARTUP_TOKEN_REFRESH") != "0":
@@ -127,6 +121,7 @@ def _enforce_scheduler_only_dhan_rotation() -> None:
             "status_auto_refresh": False,
             "startup_token_refresh": False,
             "legacy_broker_self_heal": False,
+            "rotation_schedule": effective["DHAN_TOKEN_ROTATION_SCHEDULE"],
             "rotation_authority": "gcp-scheduler-plus-guarded-manual-recovery",
             "secret_value_exposed": False,
             "live_trading_enabled": False,
