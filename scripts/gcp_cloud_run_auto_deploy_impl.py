@@ -66,15 +66,17 @@ SAFE_ENV = (
     ("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token"),
     ("DHAN_TOKEN_CACHE_TTL_S", "30"),
     ("DHAN_TOKEN_ROTATION_JOB", os.environ.get("DHAN_ROTATION_JOB", "genesis-system3-dhan-token-rotate")),
-    ("DHAN_TOKEN_ROTATION_SCHEDULE", "hourly at :30 IST"),
+    ("DHAN_TOKEN_ROTATION_SCHEDULE", "*/5 * * * * Asia/Kolkata"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
     ("SYSTEM3_STARTUP_TOKEN_REFRESH", "0"),
     ("BROKER_SELF_HEAL_TOKEN_REFRESH", "0"),
-    # Permanent broker heal: on DH-906 web invokes sole Cloud Run rotate Job.
-    # Mint still never happens inside the web process. Cooldown = 15 minutes.
-    ("DHAN_CANONICAL_ROTATION_SELF_HEAL", "1"),
+    # Scheduler/manual-only token authority.  The web process must never invoke
+    # the canonical rotation path; normal TTL discovery can still adopt a newly
+    # published Secret Manager version.  The independent rotator remint cooldown
+    # remains 30 minutes in the Cloud Run Job configuration.
+    ("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0"),
     ("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900"),
     ("DHAN_ROTATE_PUBSUB_TOPIC", "broker-token-rotate"),
     ("DHAN_CANONICAL_ROTATION_WAIT_S", "120"),
