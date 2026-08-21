@@ -2,11 +2,12 @@
 """Read-only forensic classification for one Dhan Cloud Run Job execution.
 
 The script describes one execution, reads only execution-scoped Cloud Logging
-entries, extracts allow-listed rotator status markers, and snapshots the public
-broker status. When an old rotator execution has no safe status marker, the
-current runtime's process-local first-auth-rejection trace may provide a separate,
-explicitly-labelled fallback classification. It never reads Secret Manager
-payloads, never exposes token/client/request data, and never runs the job.
+entries, extracts allow-listed rotator status markers, snapshots safe execution
+provenance, and snapshots the public broker status. Runtime-wide broker auth
+rejection evidence is retained only as separate contextual evidence and can never
+replace or upgrade an execution-specific failure classification. It never reads
+Secret Manager payloads, never exposes token/client/request data, and never runs
+the job.
 """
 from __future__ import annotations
 
@@ -137,7 +138,6 @@ def _safe_auth_rejection_trace(data: Any) -> dict[str, Any]:
             out[key] = int(value) if value is not None else None
         except (TypeError, ValueError):
             out[key] = None
-    # Defensive truth flags: a usable trace must explicitly prove it contains no raw token/client id.
     out["raw_token_exposed"] = bool(out.get("raw_token_exposed"))
     out["client_id_exposed"] = bool(out.get("client_id_exposed"))
     return out
@@ -164,6 +164,70 @@ def _runtime_trace_classification(trace: Any) -> str | None:
     return f"RUNTIME_FIRST_AUTH_REJECTION:{suffix}"
 
 
+def _parse_utc(value: Any) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def _runtime_trace_relation(trace: Any, summary: dict[str, Any], broker_secret_version: Any) -> dict[str, Any]:
+    """Describe whether runtime-wide auth evidence can be temporally/version-related to this execution.
+
+    This is context only. It never upgrades execution-specific RCA.
+    """
+    safe = _safe_auth_rejection_trace(trace)
+    execution_start = _parse_utc(summary.get("startTime") or summary.get("creationTimestamp"))
+    execution_end = _parse_utc(summary.get("completionTime"))
+    first_rejected = _parse_utc(safe.get("first_rejected_at_utc"))
+    last_rejected = _parse_utc(safe.get("last_rejected_at_utc"))
+    trace_version = str(safe.get("secret_version") or "").strip() or None
+    broker_version = str(broker_secret_version or "").strip() or None
+
+    timing = "NOT_PROVEN"
+    if execution_start and execution_end and first_rejected and last_rejected:
+        if last_rejected < execution_start:
+            timing = "PREEXISTING_BEFORE_EXECUTION"
+        elif first_rejected > execution_end:
+            timing = "STARTED_AFTER_EXECUTION"
+        elif first_rejected <= execution_start and last_rejected >= execution_end:
+            timing = "SPANS_EXECUTION_WINDOW"
+        else:
+            timing = "OVERLAPS_EXECUTION_WINDOW"
+
+    version_relation = "NOT_PROVEN"
+    if trace_version and broker_version:
+        version_relation = "MATCH" if trace_version == broker_version else "MISMATCH"
+
+    execution_specific_usable = False
+    exclusion_reasons: list[str] = []
+    if _runtime_trace_classification(safe) is None:
+        exclusion_reasons.append("runtime_trace_not_affirmative")
+    if timing == "PREEXISTING_BEFORE_EXECUTION":
+        exclusion_reasons.append("trace_preexisted_execution")
+    if timing == "STARTED_AFTER_EXECUTION":
+        exclusion_reasons.append("trace_started_after_execution")
+    if version_relation == "MISMATCH":
+        exclusion_reasons.append("secret_version_mismatch")
+    if timing in {"NOT_PROVEN", "SPANS_EXECUTION_WINDOW", "OVERLAPS_EXECUTION_WINDOW"}:
+        exclusion_reasons.append("runtime_trace_not_execution_scoped")
+
+    return {
+        "timing_relation": timing,
+        "secret_version_relation": version_relation,
+        "trace_secret_version": trace_version,
+        "broker_secret_version": broker_version,
+        "execution_specific_usable": execution_specific_usable,
+        "exclusion_reasons": sorted(set(exclusion_reasons)),
+    }
+
+
 def _execution_summary(raw: dict[str, Any]) -> dict[str, Any]:
     meta = raw.get("metadata") or {}
     status = raw.get("status") or {}
@@ -186,6 +250,62 @@ def _execution_summary(raw: dict[str, Any]) -> dict[str, Any]:
         "succeededCount": status.get("succeededCount"),
         "conditions": conditions,
         "creator": (meta.get("annotations") or {}).get("run.googleapis.com/creator"),
+    }
+
+
+def _execution_provenance(raw: Any) -> dict[str, Any]:
+    """Allow-list safe execution provenance from the Cloud Run execution describe payload."""
+    if not isinstance(raw, dict):
+        return {"state": "NOT_PROVEN"}
+    meta = raw.get("metadata") or {}
+    annotations = meta.get("annotations") or {}
+    labels = meta.get("labels") or {}
+    spec = raw.get("spec") or {}
+    template = spec.get("template") or {}
+    task_spec = template.get("spec") or {}
+    containers = task_spec.get("containers") or []
+    image = None
+    if containers and isinstance(containers[0], dict):
+        image = containers[0].get("image")
+    creator = annotations.get("run.googleapis.com/creator")
+    creator_text = str(creator or "").lower()
+    if "gs3-scheduler@" in creator_text:
+        trigger_relation = "SCHEDULER_CREATOR"
+    elif "gs3-token-recovery@" in creator_text:
+        trigger_relation = "GUARDED_RECOVERY_CREATOR"
+    elif creator:
+        trigger_relation = "OTHER_CREATOR"
+    else:
+        trigger_relation = "NOT_PROVEN"
+    return {
+        "state": "PROVEN" if meta.get("name") else "NOT_PROVEN",
+        "creator": creator,
+        "trigger_relation": trigger_relation,
+        "job_name_label": labels.get("run.googleapis.com/job"),
+        "job_generation": labels.get("run.googleapis.com/jobGeneration"),
+        "image": _redact(image or ""),
+    }
+
+
+def _secret_version_metadata(secret_version: Any) -> dict[str, Any]:
+    """Attempt metadata-only describe of the exact token version; never access payload data."""
+    version = str(secret_version or "").strip()
+    if not version.isdigit():
+        return {"state": "NOT_PROVEN", "version": version or None, "error": "version_missing_or_invalid"}
+    data, err = _json_command(
+        "gcloud", "secrets", "versions", "describe", version,
+        "--secret=dhan-access-token", f"--project={PROJECT}", "--format=json",
+    )
+    if err or not isinstance(data, dict):
+        return {"state": "NOT_PROVEN", "version": version, "error": err}
+    return {
+        "state": "PROVEN",
+        "version": version,
+        "create_time": data.get("createTime"),
+        "destroy_time": data.get("destroyTime"),
+        "enabled": data.get("state") == "ENABLED",
+        "version_state": data.get("state"),
+        "payload_accessed": False,
     }
 
 
@@ -250,18 +370,20 @@ def main() -> int:
     )
 
     safe_logs = _redact(logs if isinstance(logs, list) else [])
-    status_lines, safe_status, classification = _status_evidence(safe_logs)
+    status_lines, safe_status, execution_classification = _status_evidence(safe_logs)
     summary = _execution_summary(raw) if isinstance(raw, dict) else {"name": execution}
+    provenance = _execution_provenance(raw)
     broker = _broker_snapshot()
-    fallback = None
-    if safe_status == "STATUS_MARKER_NOT_FOUND":
-        fallback = _runtime_trace_classification(broker.get("auth_rejection_trace"))
-        if fallback:
-            classification = fallback
+    runtime_context_classification = _runtime_trace_classification(broker.get("auth_rejection_trace"))
+    runtime_context_relation = _runtime_trace_relation(
+        broker.get("auth_rejection_trace"), summary, broker.get("secret_version")
+    )
+    secret_metadata = _secret_version_metadata(broker.get("secret_version"))
     failed = bool(summary.get("failedCount"))
+    execution_rca_state = "PROVEN" if safe_status != "STATUS_MARKER_NOT_FOUND" else "NOT_PROVEN"
 
     report = {
-        "schema": "genesis-system3-dhan-rotator-forensic-v3",
+        "schema": "genesis-system3-dhan-rotator-forensic-v4",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "state": "FAIL" if failed else "PASS",
         "project": PROJECT,
@@ -269,14 +391,20 @@ def main() -> int:
         "job": JOB,
         "execution": execution,
         "execution_summary": summary,
+        "execution_provenance": provenance,
         "describe_error": describe_error,
         "logs_error": logs_error,
         "log_entry_count": len(safe_logs),
         "safe_status": safe_status,
-        "failure_classification": classification,
-        "classification_authority": "runtime_first_auth_rejection_trace" if fallback else "rotator_safe_status",
+        "execution_failure_classification": execution_classification,
+        "execution_classification_authority": "rotator_safe_status",
+        "execution_rca_state": execution_rca_state,
+        "runtime_context_classification": runtime_context_classification,
+        "runtime_context_relation": runtime_context_relation,
+        "runtime_context_may_not_upgrade_execution_rca": True,
         "status_evidence": status_lines,
         "broker_after_execution": broker,
+        "secret_version_metadata": secret_metadata,
         "secret_payloads_accessed": False,
         "secret_values_exposed": False,
         "job_execution_triggered": False,
@@ -288,13 +416,14 @@ def main() -> int:
         "state": report["state"],
         "execution": execution,
         "safe_status": safe_status,
-        "classification": classification,
-        "classification_authority": report["classification_authority"],
+        "execution_classification": execution_classification,
+        "execution_rca_state": execution_rca_state,
+        "runtime_context_classification": runtime_context_classification,
+        "runtime_context_secret_version_relation": runtime_context_relation.get("secret_version_relation"),
+        "trigger_relation": provenance.get("trigger_relation"),
         "broker_connected": broker.get("connected"),
         "secret_version": broker.get("secret_version"),
-        "runtime_trace_rejection_count": (broker.get("auth_rejection_trace") or {}).get("rejection_count"),
-        "runtime_trace_http_status": (broker.get("auth_rejection_trace") or {}).get("http_status"),
-        "runtime_trace_upstream_code": (broker.get("auth_rejection_trace") or {}).get("upstream_code"),
+        "secret_version_metadata_state": secret_metadata.get("state"),
         "job_execution_triggered": False,
         "secret_payloads_accessed": False,
     }, sort_keys=True))

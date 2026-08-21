@@ -2,6 +2,7 @@ import unittest
 
 from scripts.gcp_dhan_rotator_forensic import (
     _runtime_trace_classification,
+    _runtime_trace_relation,
     _safe_auth_rejection_trace,
 )
 
@@ -32,7 +33,7 @@ class DhanRotatorForensicTraceTests(unittest.TestCase):
         self.assertNotIn("authorization", safe)
         self.assertNotIn("request_body", safe)
 
-    def test_affirmative_401_808_runtime_trace_classifies_when_marker_missing(self):
+    def test_affirmative_401_808_runtime_trace_classifies_as_context(self):
         trace = {
             "rejection_count": 1,
             "auth_classification": "DHAN_TOKEN_REJECTED",
@@ -74,6 +75,51 @@ class DhanRotatorForensicTraceTests(unittest.TestCase):
                 }
             )
         )
+
+    def test_preexisting_runtime_trace_is_never_execution_specific(self):
+        trace = {
+            "first_rejected_at_utc": "2026-08-21T11:43:15+00:00",
+            "last_rejected_at_utc": "2026-08-21T13:30:00+00:00",
+            "rejection_count": 9,
+            "secret_version": "284",
+            "auth_classification": "DHAN_TOKEN_REJECTED",
+            "http_status": 400,
+            "upstream_code": 906,
+            "raw_token_exposed": False,
+            "client_id_exposed": False,
+        }
+        summary = {
+            "startTime": "2026-08-21T13:34:52+00:00",
+            "completionTime": "2026-08-21T13:35:52+00:00",
+        }
+        relation = _runtime_trace_relation(trace, summary, "286")
+        self.assertEqual(relation["timing_relation"], "PREEXISTING_BEFORE_EXECUTION")
+        self.assertEqual(relation["secret_version_relation"], "MISMATCH")
+        self.assertFalse(relation["execution_specific_usable"])
+        self.assertIn("trace_preexisted_execution", relation["exclusion_reasons"])
+        self.assertIn("secret_version_mismatch", relation["exclusion_reasons"])
+
+    def test_overlapping_matching_runtime_trace_still_cannot_upgrade_execution_rca(self):
+        trace = {
+            "first_rejected_at_utc": "2026-08-21T13:35:00+00:00",
+            "last_rejected_at_utc": "2026-08-21T13:36:00+00:00",
+            "rejection_count": 2,
+            "secret_version": "286",
+            "auth_classification": "DHAN_TOKEN_REJECTED",
+            "http_status": 401,
+            "upstream_code": 808,
+            "raw_token_exposed": False,
+            "client_id_exposed": False,
+        }
+        summary = {
+            "startTime": "2026-08-21T13:34:52+00:00",
+            "completionTime": "2026-08-21T13:35:52+00:00",
+        }
+        relation = _runtime_trace_relation(trace, summary, "286")
+        self.assertEqual(relation["secret_version_relation"], "MATCH")
+        self.assertEqual(relation["timing_relation"], "OVERLAPS_EXECUTION_WINDOW")
+        self.assertFalse(relation["execution_specific_usable"])
+        self.assertIn("runtime_trace_not_execution_scoped", relation["exclusion_reasons"])
 
 
 if __name__ == "__main__":
