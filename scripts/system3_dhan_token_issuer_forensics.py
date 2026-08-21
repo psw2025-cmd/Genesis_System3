@@ -19,7 +19,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = "system3-openalgo-safe"
 REGION = "asia-south1"
-SECRET = "dhan-access-token"
+TOKEN_SECRET_ID = "dhan-access-token"
 JOB = "genesis-system3-dhan-token-rotate"
 EXPECTED_WRITER = "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com"
 
@@ -108,12 +108,12 @@ def main() -> int:
                         help="Also inspect disabled versions (enabled-only is the safe fast default)")
     args = parser.parse_args()
     gcloud = shutil.which("gcloud.cmd") or shutil.which("gcloud") or "gcloud"
-    versions = _json([gcloud, "secrets", "versions", "list", SECRET, "--project", PROJECT,
+    versions = _json([gcloud, "secrets", "versions", "list", TOKEN_SECRET_ID, "--project", PROJECT,
                       "--limit=100", "--format=json(name,state,createTime)"])
     executions = _json([gcloud, "run", "jobs", "executions", "list", "--job", JOB,
                         "--project", PROJECT, "--region", REGION, "--limit=100", "--format=json"])
     audit_filter = (f'protoPayload.methodName="google.cloud.secretmanager.v1.SecretManagerService.AddSecretVersion" '
-                    f'AND resource.labels.secret_id="{SECRET}"')
+                    f'AND resource.labels.secret_id="{TOKEN_SECRET_ID}"')
     audits = _json([gcloud, "logging", "read", audit_filter, "--project", PROJECT,
                     f"--freshness={args.lookback_days}d", "--limit=200", "--format=json"])
     safe_versions: list[dict[str, Any]] = []
@@ -124,7 +124,7 @@ def main() -> int:
     for item in selected_versions:
         version_id = str(item.get("name") or "").rstrip("/").split("/")[-1]
         rc, token = _run([gcloud, "secrets", "versions", "access", version_id,
-                          "--secret", SECRET, "--project", PROJECT])
+                          "--secret", TOKEN_SECRET_ID, "--project", PROJECT])
         times = _jwt_times(token) if rc == 0 else {"issued_at_utc": None, "expires_at_utc": None}
         token = ""  # discard payload reference before creating any report object
         safe = {"version": version_id, "state": item.get("state"),
@@ -136,7 +136,7 @@ def main() -> int:
     report = {
         "schema": "system3-dhan-token-issuer-forensics-v1",
         "captured_at_utc": datetime.now(timezone.utc).isoformat(),
-        "project": PROJECT, "secret": SECRET, "canonical_job": JOB,
+        "project": PROJECT, "secret_id": TOKEN_SECRET_ID, "canonical_job": JOB,
         "versions": safe_versions,
         "audit_log_available": isinstance(audits, list),
         "limits": [
