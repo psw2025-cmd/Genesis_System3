@@ -30,3 +30,9 @@ def test_mri_bundle_covers_all_three_truth_layers() -> None:
         '"/api/batch/chains?symbols=NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY"',
     ):
         assert required in text
+
+
+def test_mri_bundle_can_target_actual_operator_checkout() -> None:
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert '[string]$RepoPath = ""' in text
+    assert "Resolve-Path -LiteralPath $RepoPath" in text

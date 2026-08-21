@@ -1,5 +1,6 @@
 [CmdletBinding()]
 param(
+    [string]$RepoPath = "",
     [string]$OutDir = "reports/latest/dhan_issuer_mri_bundle",
     [int]$LookbackHours = 72,
     [switch]$SkipCloud,
@@ -9,7 +10,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"
-$repo = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$repo = if ($RepoPath) { (Resolve-Path -LiteralPath $RepoPath).Path } else { (Resolve-Path (Join-Path $PSScriptRoot "..")).Path }
 $stamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
 $runDir = Join-Path $repo (Join-Path $OutDir $stamp)
 New-Item -ItemType Directory -Force -Path $runDir | Out-Null
