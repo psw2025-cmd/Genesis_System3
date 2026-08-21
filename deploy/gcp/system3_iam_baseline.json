@@ -59,6 +59,7 @@
     {"secret": "dhan-pin", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
     {"secret": "dhan-totp-secret", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
     {"secret": "dhan-access-token", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretVersionAdder"},
+    {"secret": "dhan-access-token-candidate", "member": "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretVersionAdder"},
     {"secret": "system3-dhan-client-id", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"},
     {"secret": "dhan-access-token", "member": "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com", "role": "roles/secretmanager.secretAccessor"}
   ],
@@ -66,6 +67,7 @@
     "protected_secrets": [
       "system3-dhan-client-id",
       "dhan-access-token",
+      "dhan-access-token-candidate",
       "dhan-pin",
       "dhan-totp-secret",
       "system3-dashboard-worker-push-token"

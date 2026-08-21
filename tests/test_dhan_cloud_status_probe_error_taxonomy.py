@@ -55,10 +55,13 @@ class DhanCloudStatusProbeErrorTaxonomyTests(unittest.TestCase):
     def test_dhan_808_is_affirmative_auth_failure(self):
         self.assertTrue(_http_auth_failure(400, '{"code":808,"message":"authentication failed"}'))
 
-    def test_dhan_805_and_906_override_ambiguous_auth_text_as_non_auth(self):
+    def test_805_is_non_auth_and_bare_906_is_non_auth(self):
         self.assertFalse(_http_auth_failure(429, '{"code":805,"message":"too many requests"}'))
         self.assertFalse(_http_auth_failure(400, '{"errorCode":"DH-906","message":"order error"}'))
-        self.assertFalse(_http_auth_failure(400, 'DH-906 invalid token'))
+        self.assertFalse(_http_auth_failure(400, 'DH-906 incorrect request'))
+
+    def test_profile_906_with_explicit_invalid_token_is_auth(self):
+        self.assertTrue(_http_auth_failure(400, 'DH-906 invalid token'))
 
     def test_known_non_auth_codes_get_explicit_upstream_classification(self):
         self.assertEqual(_non_auth_upstream_classification(429, '{"code":805}'), "DHAN_RATE_LIMITED")
@@ -67,23 +70,22 @@ class DhanCloudStatusProbeErrorTaxonomyTests(unittest.TestCase):
             "DHAN_REQUEST_REJECTED_906",
         )
 
-    def test_dh906_does_not_become_token_invalid_or_increment_auth_latch(self):
+    def test_profile_dh906_invalid_token_becomes_auth_rejection(self):
         before = snapshot()["rejection_count"]
         result = get_cloud_status(_Module(400, 'DH-906 invalid token'))
         after = snapshot()["rejection_count"]
 
         self.assertFalse(result["connected"])
-        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
-        self.assertIsNone(result["auth_classification"])
-        self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
-        self.assertNotEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
+        self.assertIsNotNone(result["auth_classification"])
+        self.assertIsNone(result["upstream_classification"])
         self.assertEqual(before, 0)
-        self.assertEqual(after, 0)
-        self.assertEqual(result["auth_rejection_trace"]["rejection_count"], 0)
+        self.assertEqual(after, 1)
+        self.assertEqual(result["auth_rejection_trace"]["rejection_count"], 1)
 
     def test_805_rate_limit_preserves_legacy_http_error_and_does_not_increment_auth_latch(self):
         result = get_cloud_status(_Module(429, '{"code":805,"message":"too many requests"}'))
-        self.assertEqual(result["error"], "HTTP_429")
+        self.assertEqual(result["error"], "DHAN_RATE_LIMITED")
         self.assertIsNone(result["auth_classification"])
         self.assertEqual(result["upstream_classification"], "DHAN_RATE_LIMITED")
         self.assertEqual(snapshot()["rejection_count"], 0)

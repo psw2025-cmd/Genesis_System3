@@ -39,7 +39,7 @@ def _service() -> dict:
 
 def _scheduler() -> dict:
     return {
-        "schedule": "30 7 * * *",
+        "schedule": "30 * * * *",
         "timeZone": "Asia/Kolkata",
         "httpTarget": {"oauthToken": {"serviceAccountEmail": SCHEDULER_SA}},
     }

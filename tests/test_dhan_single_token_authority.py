@@ -136,7 +136,8 @@ class DhanRotationTriStateGuardTests(unittest.TestCase):
         module = ast.Module(body=decision_nodes, type_ignores=[])
         ast.fix_missing_locations(module)
         cls.ns = {
-            "MIN_HOURS": 6.0,
+            "MIN_HOURS": 2.0,
+            "REMINT_COOLDOWN_MINUTES": 30.0,
             "PROFILE_VALID": "VALID",
             "PROFILE_AUTH_INVALID": "AUTH_INVALID",
             "PROFILE_TRANSIENT_ERROR": "TRANSIENT_ERROR",
@@ -151,8 +152,15 @@ class DhanRotationTriStateGuardTests(unittest.TestCase):
 
     def test_explicit_auth_rejection_authorizes_mint(self):
         should_rotate = self.ns["_should_rotate"]
-        before = {"auth_state": "AUTH_INVALID", "hours_remaining": 12.0, "valid": False}
+        before = {"auth_state": "AUTH_INVALID", "hours_remaining": 12.0,
+                  "token_age_minutes": 31.0, "valid": False}
         self.assertTrue(should_rotate(before))
+
+    def test_fresh_invalid_candidate_cannot_trigger_destructive_remint_loop(self):
+        should_rotate = self.ns["_should_rotate"]
+        before = {"auth_state": "AUTH_INVALID", "hours_remaining": 23.9,
+                  "token_age_minutes": 5.0, "valid": False}
+        self.assertFalse(should_rotate(before))
 
     def test_proven_near_expiry_authorizes_rotation_even_when_profile_probe_is_transient(self):
         should_rotate = self.ns["_should_rotate"]
@@ -179,12 +187,15 @@ class DhanRotationTriStateGuardTests(unittest.TestCase):
         self.assertIn("BLOCKED_STAGGER_REVALIDATION_ERROR", self.job)
         self.assertIn("BLOCKED_MINT_NOT_AUTHORIZED", self.job)
 
-    def test_generated_token_is_validated_once_before_persistence(self):
-        self.assertEqual(self.job.count("generated_check = _profile_probe(client_id, new_token)"), 1)
+    def test_generated_token_is_durably_preserved_before_bounded_validation(self):
+        candidate_index = self.job.index("candidate_version = _persist_candidate_token(new_token)")
         persist_index = self.job.index("new_version = _persist_authoritative_token(new_token)")
         generated_index = self.job.index("generated_check = _profile_probe(client_id, new_token)")
+        self.assertLess(candidate_index, generated_index)
         self.assertLess(generated_index, persist_index)
-        self.assertIn('"post_persist_profile_reprobe_performed": False', self.job)
+        self.assertIn("for delay_s in (0, 5, 15)", self.job)
+        self.assertIn('"candidate_persisted_before_validation": True', self.job)
+        self.assertIn('"canonical_persisted_only_after_validation": True', self.job)
 
 
 if __name__ == "__main__":

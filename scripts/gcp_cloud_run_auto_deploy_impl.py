@@ -66,7 +66,7 @@ SAFE_ENV = (
     ("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token"),
     ("DHAN_TOKEN_CACHE_TTL_S", "30"),
     ("DHAN_TOKEN_ROTATION_JOB", os.environ.get("DHAN_ROTATION_JOB", "genesis-system3-dhan-token-rotate")),
-    ("DHAN_TOKEN_ROTATION_SCHEDULE", "07:30 IST daily"),
+    ("DHAN_TOKEN_ROTATION_SCHEDULE", "hourly at :30 IST"),
     ("DHAN_STATUS_AUTO_REFRESH", "0"),
     ("DHAN_STATUS_REFRESH_COOLDOWN_S", "3600"),
     ("DHAN_PERSIST_TOKEN_TO_SM", "0"),
@@ -386,7 +386,10 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         "gcloud", "run", "deploy", SERVICE,
         f"--project={PROJECT}", f"--region={REGION}", f"--image={image}",
         f"--service-account={RUNTIME_SA}", "--port=8080",
-        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=1", "--max=2",
+        # Dhan Quote APIs are account-limited to one request/second and the
+        # current single-flight/cache is process-local. Keep one serving
+        # instance until a tested distributed broker-data governor replaces it.
+        "--no-traffic", f"--tag={CANDIDATE_TAG}", "--min=1", "--max=1",
         "--memory=1Gi", "--cpu=1", "--concurrency=50", "--timeout=300",
         "--allow-unauthenticated", f"--update-env-vars={_env_arg(sha)}",
         "--remove-secrets=API_KEY,DHAN_PIN,DHAN_TOTP_SECRET,DHAN_TOTP",
