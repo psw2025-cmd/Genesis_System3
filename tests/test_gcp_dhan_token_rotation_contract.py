@@ -95,12 +95,21 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn('"order_endpoints_called": False', text)
         self.assertIn("secret_version_advanced", text)
         self.assertIn("_persist_authoritative_token", text)
+        self.assertIn("_persist_candidate_token", text)
+        self.assertIn('CANDIDATE_SECRET_ID', text)
         self.assertIn("DhanLogin(client_id).generate_token", text)
         self.assertNotIn("from core.brokers.dhan.token_manager", text)
         self.assertNotIn("system3-dhan-access-token", text)
         forbidden_calls = ["place" + "_order(", "modify" + "_order(", "cancel" + "_order("]
         for marker in forbidden_calls:
             self.assertNotIn(marker, text)
+
+    def test_candidate_secret_is_never_mounted_by_production_consumers(self):
+        candidate = "dhan-access-token-candidate"
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        self.assertIn(f"DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID={candidate}", workflow)
+        self.assertNotIn(f"DHAN_ACCESS_TOKEN={candidate}:latest", workflow)
+        self.assertNotIn(f"--set-secrets={candidate}", workflow)
 
     def test_ui_proof_never_requests_raw_token(self):
         text = Path("dashboard/frontend/src/components/BrokerProofPanel.tsx").read_text(encoding="utf-8")
@@ -121,7 +130,9 @@ class StaticSafetyContractTests(unittest.TestCase):
         self.assertIn("COOLDOWN_TOKEN_FRESH_AND_CONNECTED", manual)
         self.assertIn('gcloud scheduler jobs create http', deploy)
         self.assertIn('--time-zone="Asia/Kolkata"', deploy)
-        self.assertIn('--schedule="30 7 * * *"', deploy)
+        self.assertIn('--schedule="30 * * * *"', deploy)
+        rotation = Path("scripts/gcp_dhan_token_rotation_job.py").read_text(encoding="utf-8")
+        self.assertIn('failure_stage', rotation)
         forbidden_rotator_step = "Execute token rotator once" + " and wait"
         self.assertNotIn(forbidden_rotator_step, deploy)
 

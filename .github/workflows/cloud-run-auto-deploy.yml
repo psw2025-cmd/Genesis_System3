@@ -264,10 +264,10 @@ jobs:
             --parallelism=1 \
             --max-retries=0 \
             --task-timeout=10m \
-            --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ROTATE_WHEN_HOURS_LEFT=6,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
+            --set-env-vars="GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT},CLOUD_MODE=1,DHAN_PERSIST_TOKEN_TO_SM=1,DHAN_ACCESS_TOKEN_SECRET_ID=dhan-access-token,DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID=dhan-access-token-candidate,DHAN_ROTATE_WHEN_HOURS_LEFT=2,DHAN_REMINT_COOLDOWN_MINUTES=30,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,ANALYZE_MODE=1,DEPLOY_GIT_SHA=${GITHUB_SHA}" \
             --set-secrets="DHAN_CLIENT_ID=system3-dhan-client-id:latest,DHAN_ACCESS_TOKEN=dhan-access-token:latest,DHAN_PIN=dhan-pin:latest,DHAN_TOTP_SECRET=dhan-totp-secret:latest"
 
-          # Invokers: Cloud Scheduler (daily) + dedicated manual-recovery SA.
+          # Invokers: hourly fail-closed health/rotation check + manual recovery SA.
           # Web runtime must NEVER have run.invoker on the rotator (zero web rotation).
           # Soft-fail setIamPolicy: deploy SA is least-privilege (no project run.admin);
           # invokers are already enforced by authority-repair / live IAM baseline.
@@ -292,7 +292,7 @@ jobs:
             gcloud scheduler jobs update http "${DHAN_ROTATION_SCHEDULER}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
               --location="${GCP_REGION}" \
-              --schedule="30 7 * * *" \
+              --schedule="30 * * * *" \
               --time-zone="Asia/Kolkata" \
               --uri="${SCHEDULER_URI}" \
               --http-method=POST \
@@ -304,7 +304,7 @@ jobs:
             gcloud scheduler jobs create http "${DHAN_ROTATION_SCHEDULER}" \
               --project="${GOOGLE_CLOUD_PROJECT}" \
               --location="${GCP_REGION}" \
-              --schedule="30 7 * * *" \
+              --schedule="30 * * * *" \
               --time-zone="Asia/Kolkata" \
               --uri="${SCHEDULER_URI}" \
               --http-method=POST \

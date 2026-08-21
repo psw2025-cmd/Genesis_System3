@@ -159,6 +159,10 @@ done
 
 # Deployment identity may administer runtime resources but never receives broker secret payload access.
 say "Grant Dhan rotator only token-mint secrets and version-add authority"
+if ! gcloud secrets describe dhan-access-token-candidate --project="$PROJECT_ID" >/dev/null 2>&1; then
+  gcloud secrets create dhan-access-token-candidate \
+    --project="$PROJECT_ID" --replication-policy=automatic >/dev/null
+fi
 for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret; do
   gcloud secrets describe "$SECRET" --project="$PROJECT_ID" >/dev/null
   gcloud secrets add-iam-policy-binding "$SECRET" \
@@ -166,6 +170,9 @@ for SECRET in system3-dhan-client-id dhan-access-token dhan-pin dhan-totp-secret
     --role="roles/secretmanager.secretAccessor" >/dev/null
 done
 gcloud secrets add-iam-policy-binding dhan-access-token \
+  --project="$PROJECT_ID" --member="serviceAccount:${ROTATOR_SA}" \
+  --role="roles/secretmanager.secretVersionAdder" >/dev/null
+gcloud secrets add-iam-policy-binding dhan-access-token-candidate \
   --project="$PROJECT_ID" --member="serviceAccount:${ROTATOR_SA}" \
   --role="roles/secretmanager.secretVersionAdder" >/dev/null
 

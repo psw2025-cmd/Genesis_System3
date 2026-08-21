@@ -276,10 +276,13 @@ def _payload_error(data: Any) -> str | None:
     ).lower()
     code = _safe_upstream_code(data)
 
-    # Numeric Dhan codes are authoritative over ambiguous free text.
+    # Numeric Dhan codes are authoritative except for the observed Profile
+    # anomaly DH-906 + explicit Invalid Token, which is affirmative auth truth.
     if code in _RATE_LIMIT_CODES:
         return "DHAN_RATE_LIMITED"
     if code in _REQUEST_REJECTED_CODES:
+        if "invalid token" in message or "invalid access token" in message:
+            return "TOKEN_EXPIRED_OR_INVALID"
         return "DHAN_REQUEST_REJECTED_906"
     if code in _CLIENT_ID_INVALID_CODES:
         return "CLIENT_ID_INVALID"
@@ -349,6 +352,8 @@ def _exception_error(exc: Exception) -> str:
     if code in _RATE_LIMIT_CODES or status_code == 429:
         return "DHAN_RATE_LIMITED"
     if code in _REQUEST_REJECTED_CODES:
+        if "invalid token" in blob or "invalid access token" in blob:
+            return "TOKEN_EXPIRED_OR_INVALID"
         return "DHAN_REQUEST_REJECTED_906"
     if code in _CLIENT_ID_INVALID_CODES:
         return "CLIENT_ID_INVALID"

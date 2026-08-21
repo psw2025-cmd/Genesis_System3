@@ -37,7 +37,12 @@ PROJECT = (
     or "system3-openalgo-safe"
 )
 SECRET_ID = os.getenv("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token").strip() or "dhan-access-token"
-MIN_HOURS = float(os.getenv("DHAN_ROTATE_WHEN_HOURS_LEFT", "6"))
+CANDIDATE_SECRET_ID = (
+    os.getenv("DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID", "dhan-access-token-candidate").strip()
+    or "dhan-access-token-candidate"
+)
+MIN_HOURS = float(os.getenv("DHAN_ROTATE_WHEN_HOURS_LEFT", "2"))
+REMINT_COOLDOWN_MINUTES = float(os.getenv("DHAN_REMINT_COOLDOWN_MINUTES", "30"))
 AUTHORITY = "gcp-cloud-run-job"
 
 PROFILE_VALID = "VALID"
@@ -82,6 +87,28 @@ def _emit_status(status: str) -> None:
     print(line)
 
 
+def _emit_failure(stage: str, exc: BaseException) -> None:
+    """Emit safe failure provenance without exception text or broker payload."""
+    allowed_stages = {
+        "load_authority",
+        "generate_token",
+        "validate_generated_token",
+        "persist_secret_version",
+        "persist_candidate_version",
+        "verify_secret_advance",
+    }
+    safe_stage = stage if stage in allowed_stages else "unknown"
+    print(json.dumps({
+        "authority": AUTHORITY,
+        "status": "ROTATION_FAILED",
+        "failure_stage": safe_stage,
+        "error_type": type(exc).__name__,
+        "live_trading_enabled": False,
+        "order_endpoints_called": False,
+        "raw_token_exposed": False,
+    }, sort_keys=True))
+
+
 def _jwt_expiry(token: str) -> datetime | None:
     try:
         parts = token.split(".")
@@ -91,6 +118,19 @@ def _jwt_expiry(token: str) -> datetime | None:
         payload = json.loads(base64.urlsafe_b64decode(payload_part.encode("ascii")))
         exp = payload.get("exp")
         return datetime.fromtimestamp(float(exp), tz=timezone.utc) if exp else None
+    except Exception:
+        return None
+
+
+def _jwt_issued_at(token: str) -> datetime | None:
+    try:
+        parts = token.split(".")
+        if len(parts) < 2:
+            return None
+        payload_part = parts[1] + "=" * (-len(parts[1]) % 4)
+        payload = json.loads(base64.urlsafe_b64decode(payload_part.encode("ascii")))
+        issued = payload.get("iat")
+        return datetime.fromtimestamp(float(issued), tz=timezone.utc) if issued else None
     except Exception:
         return None
 
@@ -142,6 +182,9 @@ def _profile_probe(client_id: str, token: str) -> dict[str, Any]:
     hours_remaining = round(remaining, 2) if remaining is not None else None
     base = {
         "hours_remaining": hours_remaining,
+        "token_age_minutes": round(
+            (datetime.now(timezone.utc) - issued_at).total_seconds() / 60, 2
+        ) if (issued_at := _jwt_issued_at(token)) else None,
         "client_id_suffix_present": bool(client_id),
     }
     if not client_id or not token:
@@ -263,7 +306,17 @@ def _near_expiry(before: dict[str, Any]) -> bool:
 def _should_rotate(before: dict[str, Any]) -> bool:
     """Authorize minting only for explicit auth rejection or proven near-expiry."""
     state = str(before.get("auth_state") or "")
-    return state == PROFILE_AUTH_INVALID or _near_expiry(before)
+    if _near_expiry(before):
+        return True
+    if state != PROFILE_AUTH_INVALID:
+        return False
+    # Generating a Dhan token may invalidate the previous token immediately.
+    # Never destroy a freshly generated candidate through a rapid re-mint loop.
+    age = before.get("token_age_minutes")
+    try:
+        return age is None or float(age) >= REMINT_COOLDOWN_MINUTES
+    except (TypeError, ValueError):
+        return False
 
 
 def _non_rotation_status(before: dict[str, Any], healthy_status: str) -> tuple[str, int]:
@@ -325,6 +378,16 @@ def _generate_token(client_id: str, pin: str, totp_secret: str) -> str:
 def _persist_authoritative_token(token: str) -> str:
     client = secretmanager.SecretManagerServiceClient()
     parent = f"projects/{PROJECT}/secrets/{SECRET_ID}"
+    response = client.add_secret_version(
+        request={"parent": parent, "payload": {"data": token.encode("utf-8")}}
+    )
+    return str(getattr(response, "name", "") or "").rsplit("/", 1)[-1]
+
+
+def _persist_candidate_token(token: str) -> str:
+    """Durably quarantine the newly minted single-active token before validation."""
+    client = secretmanager.SecretManagerServiceClient()
+    parent = f"projects/{PROJECT}/secrets/{CANDIDATE_SECRET_ID}"
     response = client.add_secret_version(
         request={"parent": parent, "payload": {"data": token.encode("utf-8")}}
     )
@@ -469,17 +532,35 @@ def main() -> int:
         _emit_status("BLOCKED_MINT_NOT_AUTHORIZED")
         return 2
 
+    failure_stage = "generate_token"
     try:
         new_token = _generate_token(client_id, pin, totp_secret)
-        generated_check = _profile_probe(client_id, new_token)
+        # Dhan is effectively single-active-token: minting may invalidate the
+        # prior token immediately. Preserve the replacement in a quarantine
+        # secret which is never mounted by production, then validate it before
+        # promotion to the canonical secret.
+        failure_stage = "persist_candidate_version"
+        candidate_version = _persist_candidate_token(new_token)
+        failure_stage = "validate_generated_token"
+        generated_check: dict[str, Any] = {}
+        for delay_s in (0, 5, 15):
+            if delay_s:
+                time.sleep(delay_s)
+            generated_check = _profile_probe(client_id, new_token)
+            if generated_check.get("valid"):
+                break
+            if generated_check.get("auth_state") == PROFILE_AUTH_INVALID:
+                break
         if not generated_check.get("valid"):
             raise RuntimeError(
-                "new Dhan token failed profile validation: "
+                "persisted Dhan replacement failed profile validation: "
                 f"{generated_check.get('auth_state')}:{generated_check.get('reason')}"
             )
 
+        failure_stage = "persist_secret_version"
         new_version = _persist_authoritative_token(new_token)
         os.environ["DHAN_ACCESS_TOKEN"] = new_token
+        failure_stage = "verify_secret_advance"
         after_secret = _latest_version_proof()
         before_version = str(before_secret.get("version") or "")
         after_version = str(after_secret.get("version") or new_version or "")
@@ -495,6 +576,8 @@ def main() -> int:
             "generated_at_utc": started.isoformat(),
             "completed_at_utc": datetime.now(timezone.utc).isoformat(),
             "strategy": "generate_token_pin_totp",
+            "candidate_secret_id": CANDIDATE_SECRET_ID,
+            "candidate_version_present": bool(candidate_version),
             "coordination": "secret_version_expected_plus_execution_stagger",
             "expected_secret_version": expected_version or None,
             "stagger_seconds": settle_s,
@@ -508,7 +591,9 @@ def main() -> int:
             "rotation_threshold_hours": MIN_HOURS,
             "mint_authorized": True,
             "transient_errors_authorize_mint": False,
-            "post_persist_profile_reprobe_performed": False,
+            "candidate_persisted_before_validation": True,
+            "canonical_persisted_only_after_validation": True,
+            "post_canonical_persist_profile_reprobe_performed": False,
             "live_trading_enabled": False,
             "order_endpoints_called": False,
             "raw_token_exposed": False,
@@ -538,7 +623,7 @@ def main() -> int:
             "order_endpoints_called": False,
             "raw_token_exposed": False,
         }
-        _emit_status("ROTATION_FAILED")
+        _emit_failure(failure_stage, exc)
         return 2
 
 

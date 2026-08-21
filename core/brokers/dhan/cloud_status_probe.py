@@ -34,7 +34,6 @@ _PROFILE_SDK_CONTRACT = "sdk-dhanClientId"
 _PROFILE_FALLBACK_ERRORS = {
     "CLIENT_ID_INVALID",
     "HTTP_400",
-    "DHAN_REQUEST_REJECTED_906",
 }
 
 
@@ -89,7 +88,7 @@ def _safe_upstream_code(blob: str) -> int | None:
 
 def _http_auth_failure(status_code: Any, blob: str) -> bool:
     code = _safe_upstream_code(blob)
-    if code in _RATE_LIMIT_CODES | _REQUEST_REJECTED_CODES | _CLIENT_ID_INVALID_CODES:
+    if code in _RATE_LIMIT_CODES | _CLIENT_ID_INVALID_CODES:
         return False
     if status_code == 401 or code in _TOKEN_AUTH_CODES:
         return True
@@ -102,7 +101,14 @@ def _http_auth_failure(status_code: Any, blob: str) -> bool:
         "authentication failed",
         "invalid authentication",
     )
-    return status_code == 400 and any(marker in blob for marker in auth_markers)
+    auth_like = any(marker in blob for marker in auth_markers)
+    # Dhan's published taxonomy calls DH-906 an order/request error, but the
+    # read-only Profile endpoint has repeatedly returned DH-906 with the
+    # explicit message "Invalid Token".  Bare 906 remains non-auth; the
+    # Profile-specific code+message pair is affirmative broker auth evidence.
+    if code in _REQUEST_REJECTED_CODES:
+        return bool(status_code == 400 and auth_like)
+    return status_code == 400 and auth_like
 
 
 def _non_auth_upstream_classification(status_code: Any, blob: str) -> str | None:
@@ -136,9 +142,6 @@ def _payload_failure(data: Any) -> tuple[str | None, str | None, int | None]:
         return "CLIENT_ID_INVALID", "DHAN_CLIENT_ID_INVALID", code
     if code in _RATE_LIMIT_CODES:
         return "DHAN_RATE_LIMITED", "DHAN_RATE_LIMITED", code
-    if code in _REQUEST_REJECTED_CODES:
-        return "DHAN_REQUEST_REJECTED_906", "DHAN_REQUEST_REJECTED_906", code
-
     auth_markers = (
         "invalid token",
         "invalid access token",
@@ -148,7 +151,12 @@ def _payload_failure(data: Any) -> tuple[str | None, str | None, int | None]:
         "authentication failed",
         "invalid authentication",
     )
-    if any(marker in blob for marker in auth_markers):
+    auth_like = any(marker in blob for marker in auth_markers)
+    if code in _REQUEST_REJECTED_CODES:
+        if auth_like:
+            return "TOKEN_EXPIRED_OR_INVALID", None, code
+        return "DHAN_REQUEST_REJECTED_906", "DHAN_REQUEST_REJECTED_906", code
+    if auth_like:
         return "TOKEN_EXPIRED_OR_INVALID", None, code
     if status in {"failure", "failed", "error"}:
         return "DHAN_UPSTREAM_FAILURE", "DHAN_UPSTREAM_FAILURE", code
