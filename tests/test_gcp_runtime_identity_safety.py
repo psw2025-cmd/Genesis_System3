@@ -39,7 +39,7 @@ def _service() -> dict:
 
 def _scheduler() -> dict:
     return {
-        "schedule": "30 * * * *",
+        "schedule": "*/5 * * * *",
         "timeZone": "Asia/Kolkata",
         "httpTarget": {"oauthToken": {"serviceAccountEmail": SCHEDULER_SA}},
     }
@@ -135,6 +135,18 @@ class RuntimeSafetyTests(unittest.TestCase):
                 service,
                 self._v1_job(),
                 _scheduler(),
+                expected_rotator_service_account=ROTATOR_SA,
+                expected_scheduler_service_account=SCHEDULER_SA,
+            )
+
+    def test_stale_hourly_schedule_fails_closed(self):
+        scheduler = _scheduler()
+        scheduler["schedule"] = "30 * * * *"
+        with self.assertRaisesRegex(ValueError, "scheduler_config_invalid"):
+            prove_runtime_safety(
+                _service(),
+                self._v1_job(),
+                scheduler,
                 expected_rotator_service_account=ROTATOR_SA,
                 expected_scheduler_service_account=SCHEDULER_SA,
             )
