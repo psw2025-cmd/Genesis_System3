@@ -30,7 +30,13 @@ ALLOWED = AUTOMATIC | MANUAL_ONLY
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
 IAM_REPAIR_WORKFLOW = "gcp-authority-repair.yml"
 LIVE_UI_PROOF_WORKFLOW = "gcp-live-ui-semantic-proof.yml"
-EVENT_TRIGGER_WORKFLOWS = {FORENSIC_WORKFLOW, IAM_REPAIR_WORKFLOW, LIVE_UI_PROOF_WORKFLOW}
+DHAN_VERIFY_WORKFLOW = "gcp-dhan-token-fix-ci.yml"
+EVENT_TRIGGER_WORKFLOWS = {
+    FORENSIC_WORKFLOW,
+    IAM_REPAIR_WORKFLOW,
+    LIVE_UI_PROOF_WORKFLOW,
+    DHAN_VERIFY_WORKFLOW,
+}
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
     "Cloud Run Auto Deploy",
@@ -204,6 +210,36 @@ def main() -> int:
     if "python scripts/gcp_live_ui_semantic_proof.py" not in semantic_text:
         raise SystemExit("LIVE_UI_PROOF_CANONICAL_SCRIPT_MISSING")
 
+    dhan_verify_on = trigger_blocks[DHAN_VERIFY_WORKFLOW]
+    dhan_verify_text = workflow_text[DHAN_VERIFY_WORKFLOW]
+    if "workflow_run:" not in dhan_verify_on:
+        raise SystemExit("DHAN_VERIFY_WORKFLOW_RUN_TRIGGER_MISSING")
+    if "Cloud Run Auto Deploy" not in dhan_verify_on:
+        raise SystemExit("DHAN_VERIFY_WORKFLOW_RUN_SOURCE_NOT_EXACT")
+    if not re.search(r"branches:\s*\n\s*-\s*main\s*$", dhan_verify_on, re.MULTILINE):
+        raise SystemExit("DHAN_VERIFY_MAIN_BRANCH_FILTER_MISSING")
+    if "github.event.workflow_run.conclusion == 'success'" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_SUCCESS_GUARD_MISSING")
+    if "EXPECTED_RUNTIME_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_EXACT_RUNTIME_SHA_INPUT_MISSING")
+    if "ref: ${{ env.EXPECTED_RUNTIME_SHA }}" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_EXACT_SHA_CHECKOUT_MISSING")
+    if "contents: read" not in dhan_verify_text or "id-token: write" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_MINIMAL_PERMISSIONS_MISSING")
+    for forbidden_permission in ("actions: write", "contents: write", "deployments: write", "issues: write", "pull-requests: write", "checks: write", "statuses: write"):
+        if forbidden_permission in dhan_verify_text:
+            raise SystemExit(f"DHAN_VERIFY_FORBIDDEN_GITHUB_PERMISSION permission={forbidden_permission}")
+    if "persist-credentials: false" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
+    if "gcloud run jobs execute" in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_ROTATOR_EXECUTION_FORBIDDEN")
+    if "gcloud secrets versions access" in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_SECRET_PAYLOAD_ACCESS_FORBIDDEN")
+    if "SCHEDULER_ONLY_ROTATION_AUTHORITY_PASS" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_SCHEDULER_AUTHORITY_PROOF_MISSING")
+    if "STRICT_BROKER_RUNTIME_TRUTH=PASS" not in dhan_verify_text:
+        raise SystemExit("DHAN_VERIFY_STRICT_BROKER_PROOF_MISSING")
+
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
     if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
         raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
@@ -247,10 +283,12 @@ def main() -> int:
             "event_forensic_responder": FORENSIC_WORKFLOW,
             "event_iam_repair": IAM_REPAIR_WORKFLOW,
             "event_live_ui_semantic_proof": LIVE_UI_PROOF_WORKFLOW,
+            "event_dhan_post_deploy_verify": DHAN_VERIFY_WORKFLOW,
             "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
             "event_responder_write_permissions": False,
             "iam_repair_github_write_permissions": False,
             "live_ui_proof_runtime_mutation_permissions": False,
+            "dhan_verify_runtime_mutation_permissions": False,
             "live_trading": False,
         },
     )
