@@ -17,6 +17,17 @@ def test_coverage_expectations_match_contract_length():
     assert "genesis-system3-validate" in expected_job_targets()
 
 
+def test_rotate_daily_expectation_matches_live_five_minute_trigger():
+    state, target, schedule, zone, max_age_hours = EXPECTED_SCHEDULER_CONTRACT[
+        "genesis-system3-dhan-token-rotate-daily"
+    ]
+    assert state == "ENABLED"
+    assert target == "genesis-system3-dhan-token-rotate"
+    assert schedule == "*/5 * * * *"
+    assert zone == "Asia/Kolkata"
+    assert max_age_hours == 26
+
+
 def test_coverage_snapshot_contract_matched_flag():
     expected = coverage_expectations()
     resources = [{"name": name, "state": row[0]} for name, row in EXPECTED_SCHEDULER_CONTRACT.items()]
