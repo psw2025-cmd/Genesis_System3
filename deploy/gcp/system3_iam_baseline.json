@@ -11,7 +11,7 @@
     "auto_execute_trades": false,
     "secret_payload_access_by_deployer": false,
     "dhan_web_self_heal_mint": false,
-    "strict_scheduler_only_iam": true,
+    "strict_scheduler_only_iam": false,
     "deployer_run_admin_temporary": false
   },
   "project_bindings": [
