@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 OFF_VALUES = {None, "0", "false", "False"}
-EXPECTED_SCHEDULE = "30 * * * *"
+EXPECTED_SCHEDULE = "*/5 * * * *"
 EXPECTED_TIME_ZONE = "Asia/Kolkata"
 
 
