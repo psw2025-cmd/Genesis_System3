@@ -47,16 +47,16 @@ Read these files in this order before accepting or contradicting Cursor work.
 | `tests/evals/test_eval_scheduler_health_gate.py` | Workflow wiring eval |
 | `.github/workflows/cloud-run-auto-deploy.yml` | Canary/verify now call the gate; always-upload report |
 
-## ChatGPT decision still required
+## ChatGPT cadence SSOT (Issue #188 comment 5379803395)
 
-| Path | Contradiction |
+Decision: keep live Cloud Scheduler `*/5 * * * *` Asia/Kolkata. Reconcile `dashboard/backend/scheduler_contract.py` to `*/5`. Do not change live Scheduler, token, IAM, LIVE, or orders.
+
+| Path | State |
 |---|---|
-| `dashboard/backend/scheduler_contract.py` | Code SSOT expects rotate-daily `30 * * * *` Asia/Kolkata |
-| Live Cloud Scheduler `genesis-system3-dhan-token-rotate-daily` | Observed `*/5 * * * *` Asia/Kolkata again at 2026-08-22T10:33:29Z |
+| Issue #188 comment 5379803395 | Written SSOT: code follows live `*/5` |
+| `dashboard/backend/scheduler_contract.py` | RUHI-022 implementation: rotate-daily expectation `*/5 * * * *` |
+| Live Cloud Scheduler `genesis-system3-dhan-token-rotate-daily` | Unchanged `*/5 * * * *` Asia/Kolkata |
 | Named deploy artifact | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32567500703/artifacts/9474562356 |
-| Persisted recapture | `reports/coordination/ruhi_b002_recapture_20260822T103352Z.json` |
-
-Do not silently pick one. That mismatch is why `/api/scheduler/health` is `healthy=false` / `alert_severity=critical`.
 
 ## Open docs PRs Cursor did not overwrite
 
