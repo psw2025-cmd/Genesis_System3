@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
+import inspect
+import time
+from pathlib import Path
+
 from dashboard.backend.continuous_closure_service import (
+    REQUEST_PATH_LIVE_TIMEOUT_S,
     build_continuous_closure_report,
     merge_cards,
+    multi_source_verify,
     parse_backlog_cards,
     pick_resume_target,
     write_closure_artifacts,
@@ -54,3 +61,81 @@ def test_build_offline_and_write_artifacts(tmp_path):
     assert summary.exists()
     assert state.exists()
     assert "continuous_closure_resume_v1" in state.read_text(encoding="utf-8")
+
+
+def test_request_path_live_timeout_is_bounded():
+    assert REQUEST_PATH_LIVE_TIMEOUT_S <= 3.0
+
+
+def test_multi_source_verify_fail_closed_fast_on_hang(monkeypatch, tmp_path):
+    """Hanging production URLs must not wedge the closure feed (Cloud Run deadlock)."""
+
+    def _hang(*_args, **_kwargs):
+        time.sleep(1.2)
+        raise TimeoutError("simulated hung peer")
+
+    monkeypatch.setattr(
+        "dashboard.backend.continuous_closure_service.urllib.request.urlopen",
+        _hang,
+    )
+    (tmp_path / "reports" / "latest" / "autonomous_loop").mkdir(parents=True)
+    (tmp_path / "reports" / "latest" / "autonomous_loop" / "BACKLOG.md").write_text(
+        SAMPLE_BACKLOG, encoding="utf-8"
+    )
+    (tmp_path / "agent_policy.yaml").write_text("version: 2\n", encoding="utf-8")
+    started = time.monotonic()
+    result = multi_source_verify(tmp_path, timeout_s=0.2, max_budget_s=0.8)
+    elapsed = time.monotonic() - started
+    assert elapsed < 2.5
+    assert result["sources"]["live"]["ok"] is False
+    assert result.get("auto_gates") in (None, {})
+
+
+def test_http_handler_never_fans_out_self_http():
+    from dashboard.backend.app import get_continuous_closure
+
+    src = inspect.getsource(get_continuous_closure)
+    assert "include_live=False" in src
+    assert "include_live=bool(live)" not in src
+    assert "live: bool = False" in src
+
+
+def test_http_handler_calls_build_offline_even_when_live_query(monkeypatch, tmp_path):
+    from dashboard.backend import app as app_mod
+
+    seen: dict = {}
+
+    def fake_build(root, *, include_live=True, **_kwargs):
+        seen["include_live"] = include_live
+        return {
+            "schema": "continuous_closure_v1",
+            "phases": {"blocker_cards": [], "auto_resume": None},
+            "summary": {"open": 0, "resolved": 0, "total_cards": 0},
+            "safety": {"live_trading_enabled": False},
+        }
+
+    monkeypatch.setattr(
+        "dashboard.backend.continuous_closure_service.build_continuous_closure_report",
+        fake_build,
+    )
+    monkeypatch.setattr(
+        "dashboard.backend.continuous_closure_service.write_closure_artifacts",
+        lambda *_a, **_k: (tmp_path, tmp_path),
+    )
+    report = asyncio.run(app_mod.get_continuous_closure(refresh=True, live=True))
+    assert seen.get("include_live") is False
+    assert report["request_path"]["self_http_fanout"] is False
+    assert report["safety"]["live_trading_enabled"] is False
+
+
+def test_frontend_board_uses_offline_request_path():
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "dashboard"
+        / "frontend"
+        / "src"
+        / "components"
+        / "ContinuousClosureBoard.tsx"
+    ).read_text(encoding="utf-8")
+    assert "live=false" in text
+    assert "live=true" not in text
