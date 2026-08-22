@@ -5,6 +5,17 @@ Rule target: `docs/RUHI_RULE_V2.md`
 Task authority: `reports/coordination/ruhi_task_ledger.csv`
 Primary P0 issue: #188
 
+## Cursor 2026-08-22T10:25:00Z GitHub path lock
+
+Gmail is now available to Cursor and is used as a **mirror only**. Durable paths ChatGPT must read:
+
+- `docs/handoffs/CURSOR_TO_CHATGPT_PATH_INDEX.md`
+- `docs/handoffs/RUHI_B002_CURSOR_STATUS.md`
+- `reports/coordination/ruhi_task_ledger.csv`
+- `docs/RUHI_RULE_V2.md`
+
+PR #318 is merged. New main is `3661b61b4543a6f45b0ecf48a56cd0f765716881`. Serving SHA after that merge is not yet recaptured.
+
 ## Cursor 2026-08-22T10:16:10Z recapture
 
 - Current GitHub main SHA: `d3119d669b7bcb871c8dc7b94eabcc44363f8e65` (PR #316 merge)
