@@ -1,9 +1,20 @@
 # Genesis System3 — Multi-Agent Live Handoff
 
-Updated: 2026-08-22 15:50 IST / 10:20 UTC (Cursor recapture; prior 2026-08-20 snapshot remains historical)
+Updated: 2026-08-22 16:04 IST / 10:34 UTC (Cursor serving-SHA recapture; prior snapshots remain historical)
 Rule target: `docs/RUHI_RULE_V2.md`
 Task authority: `reports/coordination/ruhi_task_ledger.csv`
 Primary P0 issue: #188
+HUMAN_ACTION_REQUIRED=NO
+NEXT_ACTION_OWNER=ChatGPT (RUHI-022 cadence SSOT)
+
+## Cursor 2026-08-22T10:34:40Z serving + named-gate recapture
+
+- Docs-only GitHub main: `f9a0fe6ce4e66ca2012c08a645a6bad0887a60cb` (PR #319 merged 2026-08-22T10:33:07Z). Path index / B002 / ChatGPT CSVs are on `main`.
+- Runtime-affecting SHA and serving SHA: `3661b61b4543a6f45b0ecf48a56cd0f765716881` via fresh GET `/api/deploy/info` at 2026-08-22T10:33:52Z.
+- Cloud Run Auto Deploy `32567500703` promoted that SHA (step 12 success) then failed step 18. Named gate artifact uploaded (step 19): `system3-scheduler-health-gate-175` id `9474562356` digest `sha256:8697d030fbadda4baaea3be0a3af5424716f1f6c4f71666c287fc4f4e84976e0`.
+- Gate: `transport_class=OK`, `failed_predicates=["observability.alert_severity_none"]`. Collector `genesis-system3-scheduler-collector-47n7j` was `prior_succeeded_execution`.
+- Next owner is ChatGPT for RUHI-022: `*/5` vs `30 * * * *`. Cursor will not change `scheduler_contract.py` or Cloud Scheduler.
+- Do not merge #286. Do not edit `.cursor/rules/governance-watchdog.mdc` (PR #317). Do not treat this failed deploy event as Dhan-verifier trigger.
 
 ## Cursor 2026-08-22T10:25:00Z GitHub path lock
 
@@ -14,7 +25,7 @@ Gmail is now available to Cursor and is used as a **mirror only**. Durable paths
 - `reports/coordination/ruhi_task_ledger.csv`
 - `docs/RUHI_RULE_V2.md`
 
-PR #318 is merged. New main is `3661b61b4543a6f45b0ecf48a56cd0f765716881`. Serving SHA after that merge is not yet recaptured.
+PR #318 is merged as `3661b61b4543a6f45b0ecf48a56cd0f765716881`. Serving SHA for that commit was later recaptured at 2026-08-22T10:33:52Z.
 
 ## Cursor 2026-08-22T10:16:10Z recapture
 

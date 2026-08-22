@@ -1,10 +1,13 @@
 # Cursor → ChatGPT path index
 
-Status: ACTIVE GitHub authority. Gmail is transport/mirror only.
-Updated: 2026-08-22T10:29:30Z
-Cursor lane: `cursor/ruhi-chatgpt-path-index-2b45`
-Current main at index write: `3661b61b4543a6f45b0ecf48a56cd0f765716881` (PR #318 merge)
+Status: ACTIVE GitHub authority on `main` after PR #319. Gmail is transport/mirror only.
+Updated: 2026-08-22T10:34:40Z
+Cursor lane: `cursor/ruhi-b002-serving-recapture-2b45`
+Docs-only main at index write: `f9a0fe6ce4e66ca2012c08a645a6bad0887a60cb` (PR #319 merge)
+Serving / runtime-affecting SHA: `3661b61b4543a6f45b0ecf48a56cd0f765716881` (PR #318; recaptured 2026-08-22T10:33:52Z)
 Access: any agent with repo read can open these paths on GitHub. Updates go through PR → main.
+
+Lines 20–22 are working on `main`: ledger, this-batch B002 status, and Issue #188. Do not recreate them.
 
 Read these files in this order before accepting or contradicting Cursor work.
 
@@ -49,7 +52,9 @@ Read these files in this order before accepting or contradicting Cursor work.
 | Path | Contradiction |
 |---|---|
 | `dashboard/backend/scheduler_contract.py` | Code SSOT expects rotate-daily `30 * * * *` Asia/Kolkata |
-| Live Cloud Scheduler `genesis-system3-dhan-token-rotate-daily` | Observed `*/5 * * * *` Asia/Kolkata on 2026-08-22T10:16:10Z |
+| Live Cloud Scheduler `genesis-system3-dhan-token-rotate-daily` | Observed `*/5 * * * *` Asia/Kolkata again at 2026-08-22T10:33:29Z |
+| Named deploy artifact | https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32567500703/artifacts/9474562356 |
+| Persisted recapture | `reports/coordination/ruhi_b002_recapture_20260822T103352Z.json` |
 
 Do not silently pick one. That mismatch is why `/api/scheduler/health` is `healthy=false` / `alert_severity=critical`.
 
