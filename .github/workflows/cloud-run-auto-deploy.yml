@@ -392,26 +392,29 @@ jobs:
           test -n "${CANARY_EXEC}" && test "${CANARY_EXEC}" != "${BEFORE_EXEC}" && test "${CANARY_STATUS}" = "EXECUTION_SUCCEEDED"
           gcloud run jobs execute genesis-system3-scheduler-collector --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --wait
           SERVICE_URL=$(gcloud run services describe "${GCP_CLOUD_RUN_SERVICE}" --project="${GOOGLE_CLOUD_PROJECT}" --region="${GCP_REGION}" --format='value(status.url)')
-          curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > /tmp/scheduler-health.json
-          jq -e '
-            .coverage.contract_matched == true
-            and .coverage.total == .coverage.expected_total
-            and .coverage.workload == .coverage.expected_workload
-            and .coverage.control == .coverage.expected_control
-            and .coverage.enabled == .coverage.expected_enabled
-            and (.evidence_version > 0)
-            and (.evidence_sha256 | length == 64)
-            and (.observability.alert_severity == "none")
-            and (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED"))
-            and .live_trading_enabled != true
-          ' /tmp/scheduler-health.json >/dev/null
-          jq -e --arg execution "${CANARY_EXEC##*/}" '
-            (.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .completion_status == "EXECUTION_SUCCEEDED")
-            and (
-              (.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .execution == $execution)
-              or (.jobs[] | select(.name == "genesis-system3-scheduler-collector") | .evidence_role == "prior_succeeded_execution")
-            )
-          ' /tmp/scheduler-health.json >/dev/null
+          # Preserved scheduler-health acceptance contract (opaque jq replaced by named gate):
+          # coverage.contract_matched == true
+          # .coverage.total == .coverage.expected_total
+          # .coverage.workload == .coverage.expected_workload
+          # .coverage.control == .coverage.expected_control
+          # .coverage.enabled == .coverage.expected_enabled
+          # (.evidence_version > 0)
+          # (.evidence_sha256 | length == 64)
+          # (.observability.alert_severity == "none")
+          # (.business_readiness | IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED"))
+          # .live_trading_enabled != true
+          # collector EXECUTION_SUCCEEDED and exact canary execution or prior_succeeded_execution
+          set +e
+          HTTP_STATUS=$(curl -sS --max-time 30 -o /tmp/scheduler-health.json -w '%{http_code}' "${SERVICE_URL}/api/scheduler/health?refresh=true")
+          CURL_EXIT=$?
+          set -e
+          python scripts/scheduler_health_gate.py \
+            --mode canary \
+            --input /tmp/scheduler-health.json \
+            --expected-execution "${CANARY_EXEC##*/}" \
+            --http-status "${HTTP_STATUS}" \
+            --curl-exit "${CURL_EXIT}" \
+            --output reports/latest/scheduler_health_gate/canary.json
 
           # Business lanes are configured and scheduled above, but deployment does not
           # manufacture rank/forecast/validate/signals or ML-history evidence. Only
@@ -428,16 +431,30 @@ jobs:
               --region="${GCP_REGION}" \
               --update-env-vars="SYSTEM3_VERIFY_PASS=${PASS}" \
               --wait
-            curl -fsS --max-time 30 "${SERVICE_URL}/api/scheduler/health?refresh=true" > "/tmp/scheduler-health-pass-${PASS}.json"
-            jq -e --argjson pass "${PASS}" '
-              .healthy == true
-              and .coverage.contract_matched == true
-              and .live_trading_enabled != true
-              and (.observability.alert_severity == "none")
-            ' "/tmp/scheduler-health-pass-${PASS}.json" >/dev/null
+            # Preserved verify-loop contract: .healthy == true and coverage.contract_matched == true
+            # and live_trading_enabled != true and .observability.alert_severity == "none"
+            set +e
+            HTTP_STATUS=$(curl -sS --max-time 30 -o "/tmp/scheduler-health-pass-${PASS}.json" -w '%{http_code}' "${SERVICE_URL}/api/scheduler/health?refresh=true")
+            CURL_EXIT=$?
+            set -e
+            python scripts/scheduler_health_gate.py \
+              --mode verify \
+              --input "/tmp/scheduler-health-pass-${PASS}.json" \
+              --http-status "${HTTP_STATUS}" \
+              --curl-exit "${CURL_EXIT}" \
+              --output "reports/latest/scheduler_health_gate/verify-pass-${PASS}.json"
             sleep 8
           done
           trap - EXIT
+
+      - name: Upload scheduler-health gate report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: system3-scheduler-health-gate-${{ github.run_number }}
+          path: reports/latest/scheduler_health_gate/
+          if-no-files-found: warn
+          retention-days: 7
 
       - name: Prove service, rotator identity and scheduler safety
         run: |

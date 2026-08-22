@@ -1,14 +1,24 @@
 # Genesis System3 — Multi-Agent Live Handoff
 
-Updated: 2026-08-20 23:18 IST / 17:48 UTC
+Updated: 2026-08-22 15:50 IST / 10:20 UTC (Cursor recapture; prior 2026-08-20 snapshot remains historical)
 Rule target: `docs/RUHI_RULE_V2.md`
 Task authority: `reports/coordination/ruhi_task_ledger.csv`
 Primary P0 issue: #188
 
+## Cursor 2026-08-22T10:16:10Z recapture
+
+- Current GitHub main SHA: `d3119d669b7bcb871c8dc7b94eabcc44363f8e65` (PR #316 merge)
+- Fresh `/api/deploy/info` serving SHA matches that exact main SHA
+- Broker API this session: `connected=true`, secret version metadata `298`, LIVE=false, orders=false. This is not 4/4 chain acceptance.
+- Scheduler health this session: HTTP 200, `healthy=false`, `alert_severity=critical`, reason `scheduler contract mismatch: genesis-system3-dhan-token-rotate-daily`
+- Live rotate-daily schedule is `*/5 * * * *` Asia/Kolkata; `dashboard/backend/scheduler_contract.py` still expects `30 * * * *`. ChatGPT owns that contradiction; Cursor did not change the contract.
+- Cursor lane: PR #318 scheduler-health named gate. Do not merge stale PR #286.
+
 ## Current verified shared baseline
 
 - Repository: `psw2025-cmd/Genesis_System3`
-- Current GitHub main SHA at handoff creation: `99e36562856acce545dcf912860c389008b00306`
+- Current GitHub main SHA at this Cursor recapture: `d3119d669b7bcb871c8dc7b94eabcc44363f8e65`
+- Historical handoff-creation SHA (2026-08-20): `99e36562856acce545dcf912860c389008b00306`
 - PR #299 is merged and its code has been reported as serving by the latest Cursor Issue #188 loop.
 - Latest Cursor loop also reports broker `connected=false`; therefore production is NOT accepted even though exact-main serving is aligned.
 - LIVE trading and orders remain disabled.
