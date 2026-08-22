@@ -112,9 +112,7 @@ def test_every_existing_acceptance_dimension_stays_fail_closed():
         "observability.alert_severity_none": lambda p: p["observability"].__setitem__("alert_severity", "warning"),
         "business_readiness_allowed": lambda p: p.__setitem__("business_readiness", "UNKNOWN_VALUE"),
         "live_trading_not_true": lambda p: p.__setitem__("live_trading_enabled", True),
-        "collector.completion_succeeded": lambda p: p["jobs"][0].__setitem__(
-            "completion_status", "EXECUTION_FAILED"
-        ),
+        "collector.completion_succeeded": lambda p: p["jobs"][0].__setitem__("completion_status", "EXECUTION_FAILED"),
     }
     for expected_failure, mutate in mutations.items():
         payload = _good_payload()
