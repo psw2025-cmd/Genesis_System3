@@ -83,6 +83,8 @@ AI_AGENT_RUNS/
 # Phase reports: allow reports/latest/ (live proof artifacts), block everything else
 reports/*
 !reports/latest
+!reports/coordination
+!reports/coordination/**
 reports/latest/manual_*
 
 # Runtime state files
