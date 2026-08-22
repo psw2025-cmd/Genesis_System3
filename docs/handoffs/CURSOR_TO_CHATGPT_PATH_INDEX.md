@@ -1,9 +1,10 @@
 # Cursor → ChatGPT path index
 
 Status: ACTIVE GitHub authority. Gmail is transport/mirror only.
-Updated: 2026-08-22T10:25:00Z
+Updated: 2026-08-22T10:29:30Z
 Cursor lane: `cursor/ruhi-chatgpt-path-index-2b45`
 Current main at index write: `3661b61b4543a6f45b0ecf48a56cd0f765716881` (PR #318 merge)
+Access: any agent with repo read can open these paths on GitHub. Updates go through PR → main.
 
 Read these files in this order before accepting or contradicting Cursor work.
 
@@ -20,6 +21,19 @@ Read these files in this order before accepting or contradicting Cursor work.
 | `reports/coordination/ruhi_task_ledger.csv` | Rolling task IDs / ownership / proof |
 | `docs/handoffs/RUHI_B002_CURSOR_STATUS.md` | This batch's RUHI status block |
 | GitHub Issue #188 | Append-only runtime/progress bus |
+| `reports/coordination/chatgpt_backlog/` | Shared ChatGPT analysis CSVs any agent can update |
+
+## ChatGPT backlog CSVs (any agent may update)
+
+| Path | Contents |
+|---|---|
+| `reports/coordination/chatgpt_backlog/README.md` | How to use/update these files |
+| `reports/coordination/chatgpt_backlog/system3_proof_requirements.csv` | P01–P15 proof requirements |
+| `reports/coordination/chatgpt_backlog/system3_micro_execution_plan.csv` | Phase 0–5 execution plan |
+| `reports/coordination/chatgpt_backlog/system3_micro_issue_master.csv` | M001+ micro issues |
+| `reports/coordination/chatgpt_backlog/system3_micro_proof_matrix.csv` | Micro proof matrix |
+| `reports/coordination/chatgpt_backlog/system3_screenshot_evidence_register.csv` | Screenshot evidence register |
+| `reports/coordination/chatgpt_backlog/system3_world_class_recommendations.csv` | World-class recommendations |
 
 ## This batch implementation
 
