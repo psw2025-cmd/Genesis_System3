@@ -17,6 +17,14 @@ cd "${ROOT}"
 export LIVE_TRADING_ENABLED=0
 export SYSTEM3_LIVE_TRADING_ALLOWED=0
 export AUTO_EXECUTE_TRADES=0
+export REQUIRE_API_KEY=false
+
+# Fail closed if the canonical deployer ever loses the retired dashboard-key
+# scrub contract. This wrapper delegates mutation; it does not run gcloud itself.
+grep -F -- '--remove-secrets=API_KEY' scripts/gcp_cloud_run_auto_deploy.py >/dev/null || {
+  echo "Refusing deployment: canonical --remove-secrets=API_KEY contract missing." >&2
+  exit 3
+}
 
 if [[ $# -gt 0 ]]; then
   echo "NOTE: direct immutable-image deployment is retired; canonical deployer builds the exact checked-out git SHA." >&2

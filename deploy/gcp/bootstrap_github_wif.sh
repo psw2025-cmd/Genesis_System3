@@ -181,7 +181,6 @@ for ROLE in \
   roles/run.viewer \
   roles/logging.viewer \
   roles/monitoring.viewer \
-  roles/secretmanager.viewer \
   roles/datastore.viewer \
   roles/cloudscheduler.viewer \
   roles/artifactregistry.reader \

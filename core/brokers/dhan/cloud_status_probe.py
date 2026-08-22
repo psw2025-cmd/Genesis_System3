@@ -102,12 +102,10 @@ def _http_auth_failure(status_code: Any, blob: str) -> bool:
         "invalid authentication",
     )
     auth_like = any(marker in blob for marker in auth_markers)
-    # Dhan's published taxonomy calls DH-906 an order/request error, but the
-    # read-only Profile endpoint has repeatedly returned DH-906 with the
-    # explicit message "Invalid Token".  Bare 906 remains non-auth; the
-    # Profile-specific code+message pair is affirmative broker auth evidence.
+    # Numeric Dhan request codes are authoritative. Ambiguous free text must
+    # never upgrade DH-906 into token-recovery authority.
     if code in _REQUEST_REJECTED_CODES:
-        return bool(status_code == 400 and auth_like)
+        return False
     return status_code == 400 and auth_like
 
 
@@ -153,8 +151,6 @@ def _payload_failure(data: Any) -> tuple[str | None, str | None, int | None]:
     )
     auth_like = any(marker in blob for marker in auth_markers)
     if code in _REQUEST_REJECTED_CODES:
-        if auth_like:
-            return "TOKEN_EXPIRED_OR_INVALID", None, code
         return "DHAN_REQUEST_REJECTED_906", "DHAN_REQUEST_REJECTED_906", code
     if auth_like:
         return "TOKEN_EXPIRED_OR_INVALID", None, code
@@ -202,13 +198,24 @@ def _profile_request(
     if contract == _PROFILE_DOCS_CONTRACT:
         rest_get = getattr(module, "_rest_get", None)
         if callable(rest_get):
-            return rest_get(
-                module._DHAN_PROFILE_URL,
-                access_token,
-                client_id,
-                timeout=max(1.0, min(float(timeout_s), 8.0)),
-                include_client_id=False,
-            )
+            bounded_timeout = max(1.0, min(float(timeout_s), 8.0))
+            try:
+                return rest_get(
+                    module._DHAN_PROFILE_URL,
+                    access_token,
+                    client_id,
+                    timeout=bounded_timeout,
+                    include_client_id=False,
+                )
+            except TypeError as exc:
+                if "include_client_id" not in str(exc):
+                    raise
+                return rest_get(
+                    module._DHAN_PROFILE_URL,
+                    access_token,
+                    client_id,
+                    bounded_timeout,
+                )
     elif contract != _PROFILE_SDK_CONTRACT:
         raise RuntimeError("unsupported profile header contract")
 
@@ -276,6 +283,15 @@ def _probe_contract(
         )
         latency_ms = int((time.monotonic() - started) * 1000)
         error, upstream_classification, upstream_code = _payload_failure(data)
+        legacy_auth_classifier = getattr(module, "_auth_failure_payload", None)
+        if (
+            error == "DHAN_UPSTREAM_FAILURE"
+            and upstream_code is None
+            and callable(legacy_auth_classifier)
+            and legacy_auth_classifier(data)
+        ):
+            error = "TOKEN_EXPIRED_OR_INVALID"
+            upstream_classification = None
         if error:
             return {
                 "ok": False,
@@ -364,7 +380,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         out.update(
             cache_hit=True,
             cache_age_s=round(now - cache_at, 1),
-            probe_strategy="cloud_rest_profile_bounded_contract_reconcile",
+            probe_strategy="cloud_rest_profile_bounded",
             auth_rejection_trace=snapshot(),
         )
         return out
@@ -391,7 +407,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
         "sdk_available": bool(getattr(module, "_DHAN_SDK_OK", False)),
         "env_source": getattr(module, "_ENV_LOADED_VIA", "unknown"),
         "cache_hit": False,
-        "probe_strategy": "cloud_rest_profile_bounded_contract_reconcile",
+        "probe_strategy": "cloud_rest_profile_bounded",
         "probe_header_contract": _public_contract(primary_contract),
         "probe_header_variant": primary_contract,
         "probe_contract_cached": bool(cached_contract),

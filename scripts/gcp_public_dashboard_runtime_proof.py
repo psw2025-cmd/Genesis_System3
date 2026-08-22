@@ -235,8 +235,8 @@ def _safe_evidence_path(relative: str) -> Path:
     return candidate
 
 
-def _materialize_canonical_visual(matrix: dict[str, Any], serving_revision: str, dashboard_path: str) -> tuple[str, dict[str, Any]]:
-    tabs = matrix.get("tabs") or []
+def _materialize_canonical_visual(tab_matrix: dict[str, Any], serving_revision: str, dashboard_path: str) -> tuple[str, dict[str, Any]]:
+    tabs = tab_matrix.get("tabs") or []
     if not isinstance(tabs, list):
         raise RuntimeError("ui_tab_visual_rows_missing")
     rows = [row for row in tabs if isinstance(row, dict) and row.get("id") == CANONICAL_VISUAL_TAB]
@@ -270,7 +270,7 @@ def _materialize_canonical_visual(matrix: dict[str, Any], serving_revision: str,
         "bytes": len(raw),
         "viewport": "1600x1000",
         "source": "webdriver_tab_matrix",
-        "browser_transport": matrix.get("browser_transport"),
+        "browser_transport": tab_matrix.get("browser_transport"),
         "canonical_visual_tab": CANONICAL_VISUAL_TAB,
         "serving_revision": serving_revision,
         "dashboard_path": dashboard_path,

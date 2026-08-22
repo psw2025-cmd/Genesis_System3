@@ -125,7 +125,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             ({"errorCode": "805", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_RATE_LIMITED", False),
             ({"errorCode": "807", "errorMessage": "Access token expired", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
             ({"errorCode": "810", "errorMessage": "Client ID invalid", "status": "failure"}, "CLIENT_ID_INVALID", False),
-            ({"errorCode": "DH-906", "errorMessage": "invalid token wording", "status": "failure"}, "TOKEN_EXPIRED_OR_INVALID", True),
+            ({"errorCode": "DH-906", "errorMessage": "invalid token wording", "status": "failure"}, "DHAN_REQUEST_REJECTED_906", False),
         )
         for payload, expected, is_auth in cases:
             with self.subTest(payload=payload):
@@ -203,7 +203,7 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
         self.assertEqual(result["upstream_code"], 901)
         self.assertEqual(snapshot()["rejection_count"], 1)
 
-    def test_http_400_profile_dh906_invalid_token_is_auth(self):
+    def test_http_400_profile_dh906_remains_request_rejection(self):
         import time
         token = _jwt(time.time() + 3600)
 
@@ -211,11 +211,11 @@ class BR1DhanAuthReliabilityTests(unittest.TestCase):
             raise _http_error(400, "DH-906 invalid token")
 
         result = get_cloud_status(_status_module(token, rest))
-        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
-        self.assertEqual(result["auth_classification"], "DHAN_TOKEN_REJECTED")
-        self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
+        self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(result["upstream_code"], 906)
-        self.assertEqual(snapshot()["rejection_count"], 1)
+        self.assertEqual(snapshot()["rejection_count"], 0)
 
     def test_http_400_code_810_is_client_id_config_failure_not_token_recovery(self):
         import time
