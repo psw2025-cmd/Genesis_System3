@@ -15,7 +15,11 @@ from pathlib import Path
 from typing import Any
 
 OFF_VALUES = {None, "0", "false", "False"}
-EXPECTED_SCHEDULE = "30 * * * *"
+# Live Cloud Scheduler rotate-daily is */5 Asia/Kolkata (Issue #188 5379803395;
+# dashboard/backend/scheduler_contract.py). Stale hourly :30 was a leftover
+# identity-safety check that failed deploy after RUHI-022 already aligned the
+# health contract. Do not change the live Scheduler job here.
+EXPECTED_SCHEDULE = "*/5 * * * *"
 EXPECTED_TIME_ZONE = "Asia/Kolkata"
 
 
