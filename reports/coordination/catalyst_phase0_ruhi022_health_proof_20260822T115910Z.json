@@ -1,0 +1,25 @@
+{
+  "investigation_utc": "2026-08-22T11:59:07Z",
+  "deploy_info_utc": "2026-08-22T11:59:07Z",
+  "scheduler_health_utc": "2026-08-22T11:59:10Z",
+  "serving_sha": "431bbccac48e5536b8c5bc5eb09863e0a9419b16",
+  "main_sha": "431bbccac48e5536b8c5bc5eb09863e0a9419b16",
+  "deploy_run": "32571338431",
+  "deploy_step12": "SUCCESS",
+  "api": {
+    "deploy_info_git_sha": "431bbccac48e5536b8c5bc5eb09863e0a9419b16",
+    "live_trading_enabled": false,
+    "scheduler_healthy": true,
+    "alert_severity": "none",
+    "contract_matched": true,
+    "rotate_daily_schedule": "*/5 * * * *",
+    "business_readiness": "PARTIAL",
+    "business_readiness_reasons": [
+      "business artifact wrong date: rank",
+      "business artifact wrong date: forecast",
+      "business artifact wrong date: signals"
+    ]
+  },
+  "market_phase": "CLOSED",
+  "note": "Weekend PARTIAL business artifacts are closed-market honesty, not a RUHI-022 schedule mismatch. unhealthy_reasons=[]. Dhan REST/chain/WS were not re-probed this session."
+}
