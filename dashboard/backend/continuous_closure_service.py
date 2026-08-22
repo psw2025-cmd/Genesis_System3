@@ -8,13 +8,24 @@ from __future__ import annotations
 
 import json
 import re
+import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 DEFAULT_PROD = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+REQUEST_PATH_LIVE_TIMEOUT_S = 2.5
+ORCHESTRATOR_LIVE_TIMEOUT_S = 4.0
+ORCHESTRATOR_LIVE_BUDGET_S = 8.0
+LIVE_VERIFY_PATHS = (
+    "/api/deploy/info",
+    "/api/auto_gates",
+    "/api/accuracy_trend",
+    "/api/broker/status",
+)
 
 
 def _utc() -> str:
@@ -134,13 +145,26 @@ def merge_cards(*groups: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return cards
 
 
+def _fetch_json(url: str, timeout_s: float) -> Tuple[Any, int]:
+    req = urllib.request.Request(url, headers={"Accept": "application/json"})
+    with urllib.request.urlopen(req, timeout=timeout_s) as resp:
+        body = json.loads(resp.read().decode("utf-8"))
+        return body, int(getattr(resp, "status", 200) or 200)
+
+
 def multi_source_verify(
     root: Path,
     *,
     prod_base: str = DEFAULT_PROD,
-    timeout_s: float = 20.0,
+    timeout_s: float = ORCHESTRATOR_LIVE_TIMEOUT_S,
+    max_budget_s: float = ORCHESTRATOR_LIVE_BUDGET_S,
 ) -> Dict[str, Any]:
-    """Fan-in verify: local reports + optional live production APIs."""
+    """Fan-in verify: local reports + optional live production APIs.
+
+    Timeouts stay short and fail-closed so a hung peer/self URL cannot wedge
+    the Cloud Run request path. The HTTP handler must not call this with
+    include_live=True against its own public origin.
+    """
     sources: Dict[str, Any] = {
         "repo": {"ok": True, "checks": {}},
         "reports": {"ok": True, "checks": {}},
@@ -160,16 +184,35 @@ def multi_source_verify(
     sources["reports"]["ok"] = True  # absence is informational, not hard fail
 
     live_payload: Dict[str, Any] = {}
-    for path in ("/api/deploy/info", "/api/auto_gates", "/api/accuracy_trend", "/api/broker/status"):
-        url = prod_base.rstrip("/") + path
+    remaining = max(0.1, float(max_budget_s))
+    deadline = time.monotonic() + remaining
+    pool = ThreadPoolExecutor(max_workers=len(LIVE_VERIFY_PATHS))
+    try:
+        futures = {
+            pool.submit(
+                _fetch_json,
+                prod_base.rstrip("/") + path,
+                min(float(timeout_s), max(0.1, deadline - time.monotonic())),
+            ): path
+            for path in LIVE_VERIFY_PATHS
+        }
         try:
-            req = urllib.request.Request(url, headers={"Accept": "application/json"})
-            with urllib.request.urlopen(req, timeout=timeout_s) as resp:
-                body = json.loads(resp.read().decode("utf-8"))
-            live_payload[path] = body
-            sources["live"]["checks"][path] = {"ok": True, "status": getattr(resp, "status", 200)}
+            for fut in as_completed(futures, timeout=max(0.1, deadline - time.monotonic())):
+                path = futures[fut]
+                try:
+                    body, status = fut.result(timeout=0)
+                    live_payload[path] = body
+                    sources["live"]["checks"][path] = {"ok": True, "status": status}
+                except Exception as exc:
+                    sources["live"]["checks"][path] = {"ok": False, "error": str(exc)[:160]}
         except Exception as exc:
-            sources["live"]["checks"][path] = {"ok": False, "error": str(exc)[:160]}
+            for path in LIVE_VERIFY_PATHS:
+                sources["live"]["checks"].setdefault(
+                    path,
+                    {"ok": False, "error": f"budget_exceeded:{str(exc)[:80]}"},
+                )
+    finally:
+        pool.shutdown(wait=False, cancel_futures=True)
 
     sources["live"]["ok"] = all(
         bool((sources["live"]["checks"].get(p) or {}).get("ok"))
@@ -294,6 +337,10 @@ def build_continuous_closure_report(
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "zero_synthetic_inventions": True,
+        },
+        "request_path": {
+            "self_http_fanout": bool(include_live),
+            "include_live": bool(include_live),
         },
     }
 

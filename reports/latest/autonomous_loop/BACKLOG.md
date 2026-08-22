@@ -12,7 +12,7 @@ Closure: `python scripts/system3_continuous_closure_orchestrator.py` → `report
 | A3 | P1 | Model pipeline NO_TRADE / confidence 0 / no directional bias | `/api/signal/top` MARKET_CLOSED | OPEN — honesty UX; real signals NOT_PROVEN |
 | A4 | P1 | connected≠market-data reliability | prior URL proof 429/cache | OPEN — UI lane split already on main |
 | A5 | P2 | Auton telemetrics banner while loop active | live bundle contains `[AUTONOMOUS LOOP]` | VERIFIED LIVE |
-| C1 | P0 | Continuous closure system (scan/verify/watchdog/cards/resume) | `/api/continuous_closure` + Overview board | IN_PROGRESS |
+| C1 | P0 | Continuous closure system (scan/verify/watchdog/cards/resume) | `/api/continuous_closure` timed out on self-HTTP fan-out; request path now offline-first | IN_PROGRESS — patched pending live SHA verify |
 
 Resolved count updates only after live SHA verifies the fix.
 Never remove banner until all proof gates genuinely READY.

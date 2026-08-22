@@ -2087,14 +2087,22 @@ async def get_auto_gates(refresh: bool = False):
 
 
 @app.get("/api/continuous_closure")
-async def get_continuous_closure(refresh: bool = False, live: bool = True):
-    """Blocker cards + multi-source verify + auto-resume pointer for continuous closure."""
+async def get_continuous_closure(refresh: bool = False, live: bool = False):
+    """Blocker cards + auto-resume pointer.
+
+    The request path never HTTP-fans-out to this same Cloud Run origin.
+    Self-calls deadlock when the instance is busy serving the parent request
+    (fresh 2026-08-22 production `/api/continuous_closure` timed out at 25s).
+    Live URL verify stays on the offline orchestrator CLI, not this handler.
+    The `live` query flag is accepted for compat and recorded, but ignored.
+    """
     cache_key = f"continuous_closure:{int(bool(live))}"
     if not refresh:
         _hit = _cache_get(cache_key, _TTL_AUTO_GATES)
         if _hit is not None:
             return _hit
-    try:
+
+    def _build_offline_report() -> Dict[str, Any]:
         try:
             from dashboard.backend.continuous_closure_service import (
                 build_continuous_closure_report,
@@ -2107,12 +2115,21 @@ async def get_continuous_closure(refresh: bool = False, live: bool = True):
             )
         report = build_continuous_closure_report(
             ROOT_DIR,
-            include_live=bool(live),
+            include_live=False,
         )
+        request_path = dict(report.get("request_path") or {})
+        request_path["self_http_fanout"] = False
+        request_path["live_query"] = bool(live)
+        request_path["live_http_skipped_reason"] = "cloud_run_self_call_deadlock_prevention"
+        report["request_path"] = request_path
         try:
             write_closure_artifacts(ROOT_DIR, report)
         except Exception:
             pass
+        return report
+
+    try:
+        report = await _run_blocking(_build_offline_report, timeout=8.0)
         return _cache_set(cache_key, report)
     except Exception as e:
         return {
@@ -2122,6 +2139,10 @@ async def get_continuous_closure(refresh: bool = False, live: bool = True):
             "phases": {"blocker_cards": [], "auto_resume": None},
             "summary": {"open": 0, "resolved": 0, "total_cards": 0},
             "safety": {"live_trading_enabled": False},
+            "request_path": {
+                "self_http_fanout": False,
+                "live_http_skipped_reason": "cloud_run_self_call_deadlock_prevention",
+            },
         }
 
 

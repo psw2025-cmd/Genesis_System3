@@ -5,7 +5,7 @@
 **Entry points**
 - CLI: `python scripts/system3_continuous_closure_orchestrator.py`
 - Offline: `python scripts/system3_continuous_closure_orchestrator.py --offline`
-- API: `GET /api/continuous_closure`
+- API: `GET /api/continuous_closure` (offline-first request path; no Cloud Run self-HTTP)
 - UI: Overview → **Continuous Closure · Blocker Cards**
 - Resume file: `reports/latest/continuous_closure/resume_state.json`
 - Proof ledger: `reports/latest/proof_ledger/ledger.jsonl`

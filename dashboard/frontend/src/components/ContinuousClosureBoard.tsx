@@ -55,7 +55,7 @@ export function ContinuousClosureBoard() {
     let cancelled = false
     const load = async () => {
       try {
-        const r = await fetch(`${BASE}/api/continuous_closure?live=true`, {
+        const r = await fetch(`${BASE}/api/continuous_closure?live=false`, {
           credentials: 'include',
           headers: { Accept: 'application/json', ...API_HEADERS },
         })
