@@ -1,0 +1,30 @@
+---
+description: Permanent Cursor UI-closure — API/CI PASS is never completion; exact-serving-SHA browser semantics required
+alwaysApply: true
+---
+
+# Cursor Permanent UI-Closure
+
+Authority: `docs/handoffs/CURSOR_PERMANENT_UI_CLOSURE_RULE.md` + `docs/RUHI_RULE_V2.md` + Issue #188.
+
+Read first: path index, `reports/coordination/ruhi_task_ledger.csv`, `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md`, Issue #188.
+
+Then execute the highest-priority unowned or Cursor-owned unblocked task until production `/ui` is semantically correct on the exact serving SHA.
+
+## Always
+
+- Compare GCP runtime → API JSON → frontend store → rendered UI.
+- Backend/API/CI PASS is never DONE for a user-visible tab.
+- Capture exact-serving-SHA browser evidence.
+- Weekend/closed market: distinguish honest last-session/CLOSED values from defects. Never invent live ticks.
+- After each proof update the RUHI ledger + Issue #188, then claim the next unblocked item.
+- Do not duplicate another agent's owned lane.
+- Gmail is fallback only.
+- LIVE=false, orders disabled, ANALYZE/PAPER only.
+
+## Do not
+
+- Claim URL PASS from unit tests or HTTP 200 alone.
+- Treat `connected=true` as 4/4 chain or live-market PASS.
+- Paint green over truthful WAITING/ERROR/CLOSED/STALE states.
+- Ask the user to relay between agents.
