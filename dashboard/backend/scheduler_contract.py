@@ -17,7 +17,7 @@ EXPECTED_SCHEDULER_CONTRACT: Dict[str, SchedulerContractRow] = {
     "genesis-system3-rank-daily": ("ENABLED", "genesis-system3-rank", "45 3 * * MON-FRI", "UTC", 98),
     "genesis-system3-validate-daily": ("ENABLED", "genesis-system3-validate", "5 10 * * MON-FRI", "UTC", 98),
     "genesis-system3-signals-daily": ("ENABLED", "genesis-system3-signals", "15 13 * * MON-FRI", "UTC", 98),
-    "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "30 * * * *", "Asia/Kolkata", 26),
+    "genesis-system3-dhan-token-rotate-daily": ("ENABLED", "genesis-system3-dhan-token-rotate", "*/5 * * * *", "Asia/Kolkata", 26),
     "genesis-system3-forecast-schedule": ("PAUSED", None, "0 4,5,6,7,8,9 * * 1-5", "UTC", None),
     "genesis-system3-rank-schedule": ("PAUSED", None, "50 3 * * 1-5", "UTC", None),
     "genesis-system3-signals-schedule": ("PAUSED", None, "0 10 * * 1-5", "UTC", None),
