@@ -50,6 +50,10 @@ jobs:
         if: always()
         env:
           SYSTEM3_LIVE_UI_READY_WAIT_S: "240"
+          # Diagnostic/full-product proof must not overwrite the established
+          # live-ui/semantic-proof commit-status context emitted by the canonical
+          # proof above. The step result still gates this workflow and its artifact.
+          GITHUB_TOKEN: ""
         run: python scripts/gcp_full_dashboard_acceptance.py
 
       - name: Upload semantic and visual proof
