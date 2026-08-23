@@ -42,6 +42,8 @@ const store = read('src/store.ts')
 const useData = read('src/hooks/useData.ts')
 const styles = read('src/index.css')
 const mobileHub = read('src/components/MobileTradingHub.tsx')
+const riskDashboard = read('src/components/RiskDashboard.tsx')
+const riskWorkspace = read('src/components/workspaces/RiskAndScenarios.tsx')
 
 for (const tab of expectedTabs) {
   assert.match(sidebar, new RegExp(`id:\\s*'${tab}'`), `Sidebar must expose ${tab}`)
@@ -102,6 +104,22 @@ assert.match(styles, /\.alerts-metrics-grid/, 'Alerts metrics must have responsi
 assert.match(styles, /@media \(max-width: 600px\)[\s\S]*?\.alerts-metrics-grid \{ grid-template-columns: repeat\(2/, 'Phone metrics must reflow to two columns')
 assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.alerts-content-grid \{ grid-template-columns: minmax\(0, 1fr\)/, 'Phone/tablet alert content must become one column')
 assert.match(styles, /overflow-wrap: anywhere/, 'Long alert content must wrap intentionally')
+
+assert.match(riskDashboard, /axios\.get\(\x60\$\{API_BASE\}\/api\/risk\/portfolio/, 'Risk dashboard must use authoritative read-only GET portfolio risk')
+assert.doesNotMatch(riskDashboard, /axios\.post|\/api\/risk\/check-limits/, 'Public risk dashboard must require no mutation-shaped POST')
+for (const state of ['loading', 'ready', 'degraded', 'no-data', 'error']) {
+  assert.match(riskDashboard, new RegExp(`'${state}'`), `Risk dashboard must support finite ${state} state`)
+}
+assert.match(riskDashboard, /timeout: 15000/, 'Risk read must be bounded by a timeout')
+assert.match(riskDashboard, /error\?\.name === 'NO_DATA'/, 'Successful empty risk payloads must become explicit no-data truth')
+assert.match(riskDashboard, /loadState !== 'ready' && fallback/, 'Late state snapshot must recover a failed or empty API read')
+assert.match(riskDashboard, /raw\.var_95 \?\? raw\.var/, 'Empty-book VaR aliases must normalize')
+assert.match(riskDashboard, /raw\.expected_shortfall_95 \?\? raw\.expected_shortfall/, 'Empty-book ES aliases must normalize')
+assert.match(riskDashboard, /emptyBook \? 0/, 'Verified empty books must render truthful zeroes instead of dashes')
+for (const fixed of ['Delta 0.35', 'Vega 0.12', 'Theta -0.08', 'Beta 1.02', 'Bullish +15%', 'Bearish -12%']) {
+  assert.doesNotMatch(riskWorkspace, new RegExp(fixed.replace(/[+]/g, '\\+')), `Risk workspace must not hard-code ${fixed}`)
+}
+assert.match(riskWorkspace, /NO VERIFIED SCENARIO MODEL OUTPUT AVAILABLE/, 'Missing scenario proof must remain explicit')
 
 for (const label of ['Options Chain', 'Equity Feed', 'Prediction Charts', 'Backtest', 'Portfolio']) {
   assert.match(mobileHub, new RegExp(label), `Mobile hub must expose ${label}`)
