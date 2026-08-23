@@ -95,19 +95,21 @@ export function TopBar() {
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
   const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
   const requestRejected = isNonAuthBrokerRejection(brokerStatus)
+  // A verified non-auth request rejection is shown separately. Otherwise any
+  // account-read auth failure must override a stale Session OK boolean.
   const brokerLabel = requestRejected
     ? 'Request rejected'
-    : (brokerConnected || brokerGood)
-      ? 'Session OK'
-      : hasError
-        ? 'Auth issue'
+    : hasError
+      ? 'Auth issue'
+      : brokerGood
+        ? 'Session OK'
         : 'Waiting'
   const brokerTone = requestRejected
     ? 'var(--amber)'
-    : brokerConnected || brokerGood
-      ? 'var(--up)'
-      : hasError
-        ? 'var(--down)'
+    : hasError
+      ? 'var(--down)'
+      : brokerGood
+        ? 'var(--up)'
         : 'var(--amber)'
   const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
   const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
@@ -116,7 +118,7 @@ export function TopBar() {
     wsStatus,
     tickAgeSec: tickAge,
     dataSource: state?.data_source || health?.data_source,
-    brokerConnected: brokerConnected || brokerGood,
+    brokerConnected: brokerGood,
   })
   const alertCount = Array.isArray(alerts) ? alerts.length : 0
   const matches = useMemo(() => {
