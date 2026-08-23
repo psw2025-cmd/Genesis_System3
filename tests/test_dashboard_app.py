@@ -95,6 +95,13 @@ def test_health_endpoint_returns_200(app):
     assert "broker_status" in data
 
 
+def test_dependency_free_liveness_aliases(app):
+    for path in ("/healthz", "/api/healthz"):
+        status, _, body = call(app, "GET", path)
+        assert status == 200
+        assert json.loads(body) == {"status": "ok"}
+
+
 def test_multibagger_contract_is_truthful_pending_without_evidence(app):
     status, _, body = call(app, "GET", "/api/research/multibagger")
     assert status == 200

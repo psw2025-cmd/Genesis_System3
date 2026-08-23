@@ -8729,6 +8729,7 @@ async def state_alias():
 
 
 @app.get("/healthz")
+@app.get("/api/healthz")
 async def healthz_probe():
     """Lightweight kubernetes-style health probe."""
     return {"status": "ok"}
