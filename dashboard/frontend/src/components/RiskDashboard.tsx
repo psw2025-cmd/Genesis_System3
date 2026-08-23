@@ -18,7 +18,7 @@ interface RiskMetrics {
   underlying_exposures?: NumericMap
 }
 
-type LoadState = 'loading' | 'ready' | 'partial' | 'unavailable'
+type LoadState = 'loading' | 'ready' | 'degraded' | 'no-data' | 'error'
 
 const numberOrUndefined = (value: unknown): number | undefined => {
   const parsed = Number(value)
@@ -50,11 +50,35 @@ function stateRiskFallback(state: any): RiskMetrics | null {
   }
 }
 
+function normalizeRiskPayload(payload: any): RiskMetrics | null {
+  const raw = payload?.risk_metrics
+  if (!raw || typeof raw !== 'object') return null
+  const positionCount = numberOrUndefined(raw.position_count ?? payload?.position_count)
+  const emptyBook = positionCount === 0
+  const zeroWhenEmpty = (value: unknown) => numberOrUndefined(value) ?? (emptyBook ? 0 : undefined)
+  const normalized: RiskMetrics = {
+    ...raw,
+    var_95: zeroWhenEmpty(raw.var_95 ?? raw.var),
+    expected_shortfall_95: zeroWhenEmpty(raw.expected_shortfall_95 ?? raw.expected_shortfall),
+    total_exposure: zeroWhenEmpty(raw.total_exposure ?? raw.exposure),
+    concentration_risk: zeroWhenEmpty(raw.concentration_risk ?? raw.concentration),
+    total_pnl: zeroWhenEmpty(raw.total_pnl ?? payload?.total_pnl),
+    position_count: positionCount,
+  }
+  const hasAuthoritativeField = [
+    normalized.var_95,
+    normalized.expected_shortfall_95,
+    normalized.total_exposure,
+    normalized.position_count,
+  ].some((value) => value !== undefined)
+  return hasAuthoritativeField ? normalized : null
+}
+
 export default function RiskDashboard() {
   const state = useStore((store) => store.state)
   const fallback = useMemo(() => stateRiskFallback(state), [state])
   const [riskMetrics, setRiskMetrics] = useState<RiskMetrics | null>(fallback)
-  const [loadState, setLoadState] = useState<LoadState>(fallback ? 'partial' : 'loading')
+  const [loadState, setLoadState] = useState<LoadState>(fallback ? 'degraded' : 'loading')
   const [message, setMessage] = useState('Loading read-only portfolio risk…')
 
   useEffect(() => {
@@ -67,23 +91,34 @@ export default function RiskDashboard() {
           timeout: 15000,
         })
         const payload = response.data
-        if (payload?.status !== 'ok' || !payload?.risk_metrics) {
+        if (payload?.status !== 'ok') {
           throw new Error(payload?.message || 'Portfolio risk is not available')
         }
-        setRiskMetrics(payload.risk_metrics)
+        const normalized = normalizeRiskPayload(payload)
+        if (!normalized) {
+          const noData = new Error('No verified portfolio risk data')
+          noData.name = 'NO_DATA'
+          throw noData
+        }
+        setRiskMetrics(normalized)
         setLoadState('ready')
         setMessage('Read-only portfolio risk loaded')
       } catch (error: any) {
         if (error?.code === 'ERR_CANCELED') return
         if (fallback) {
           setRiskMetrics(fallback)
-          setLoadState('partial')
+          setLoadState('degraded')
           setMessage('Showing partial risk fields from the system state snapshot')
         } else {
           setRiskMetrics(null)
-          setLoadState('unavailable')
           const status = error?.response?.status
-          setMessage(status ? `Risk service unavailable (HTTP ${status})` : 'Risk service unavailable')
+          if (error?.name === 'NO_DATA') {
+            setLoadState('no-data')
+            setMessage('No verified portfolio risk data')
+          } else {
+            setLoadState('error')
+            setMessage(status ? `Risk service unavailable (HTTP ${status})` : 'Risk service unavailable')
+          }
         }
       }
     }
@@ -95,7 +130,7 @@ export default function RiskDashboard() {
   useEffect(() => {
     if (loadState !== 'ready' && fallback) {
       setRiskMetrics(fallback)
-      setLoadState('partial')
+      setLoadState('degraded')
       setMessage('Showing partial risk fields from the system state snapshot')
     }
   }, [fallback, loadState])
