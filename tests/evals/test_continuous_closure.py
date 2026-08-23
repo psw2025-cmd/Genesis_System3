@@ -194,3 +194,17 @@ def test_status_tone_source_does_not_paint_disconnected_green():
     assert "s === 'CONNECTED'" in text
     assert "s.includes('CONNECTED')" not in text
     assert "s.includes('LIVE')" not in text
+
+
+def test_topbar_board_status_is_not_the_word_live():
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "dashboard"
+        / "frontend"
+        / "src"
+        / "components"
+        / "TopBar.tsx"
+    ).read_text(encoding="utf-8")
+    assert "? 'Live'" not in text
+    assert "Snapshot" in text
+    assert "Feed OK" in text
