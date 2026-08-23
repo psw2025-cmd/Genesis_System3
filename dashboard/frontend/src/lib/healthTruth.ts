@@ -12,8 +12,13 @@ export function brokerFromHealth(health: any): boolean | undefined {
 }
 
 export function brokerIsConnected(health: any, storeConnected: boolean, brokerStatus?: any): boolean {
-  if (storeConnected === true || brokerStatus?.connected === true) return true
-  return brokerFromHealth(health) === true
+  // Prefer the freshest explicit broker-status truth. A stale store boolean must never
+  // override an explicit negative broker observation.
+  if (brokerStatus?.connected === true) return true
+  if (brokerStatus?.connected === false) return false
+  const healthTruth = brokerFromHealth(health)
+  if (healthTruth !== undefined) return healthTruth
+  return storeConnected === true
 }
 
 function brokerStatusBlob(brokerStatus?: any): string {
@@ -41,8 +46,9 @@ export function brokerReliabilityPass(brokerStatus?: any, marketDataProven?: boo
 }
 
 export function systemRuntimeOk(health: any): boolean {
+  // Mode presence proves configuration only; it is not runtime health.
   const status = String(health?.status || '').toLowerCase()
-  return status === 'ok' || status === 'healthy' || Boolean(health?.mode)
+  return status === 'ok' || status === 'healthy' || status === 'ready'
 }
 
 export function paperModeActive(health: any): boolean {
@@ -51,7 +57,10 @@ export function paperModeActive(health: any): boolean {
 }
 
 export function apiObservedOk(health: any, apiStatus?: any): boolean {
-  if (String(health?.status || '').toLowerCase() === 'ok') return true
-  if (String(apiStatus?.status || '').toLowerCase() === 'ok') return true
-  return Boolean(health && !apiStatus?.status)
+  // Missing status is UNKNOWN, never an implicit success merely because an object exists.
+  const healthStatus = String(health?.status || '').toLowerCase()
+  const observedStatus = String(apiStatus?.status || '').toLowerCase()
+  if (healthStatus === 'ok' || healthStatus === 'healthy' || healthStatus === 'ready') return true
+  if (observedStatus === 'ok' || observedStatus === 'healthy' || observedStatus === 'ready') return true
+  return false
 }
