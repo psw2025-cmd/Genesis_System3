@@ -2,15 +2,15 @@ import React from 'react';
 import { Activity, AlertTriangle, Database, Shield, Zap } from 'lucide-react';
 import { useStore } from '../../store';
 import { MetricTile, StatusChip } from './TruthUI';
-import { brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
+import { apiObservedOk, brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
 import { formatAgeSec, formatInr, formatIstStamp, shortSha } from '../../lib/formatLive';
 
 export const DecisionIntelligence: React.FC = () => {
   const {
-    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper,
+    health, state, brokerConnected, brokerStatus, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper,
   } = useStore();
-  const dhanOk = brokerIsConnected(health, brokerConnected)
-  const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok' || Boolean(health?.mode)
+  const dhanOk = brokerIsConnected(health, brokerConnected, brokerStatus)
+  const apiOk = apiObservedOk(health, apiStatus)
   const predictorRaw = String(health?.predictor?.status || '').toLowerCase()
   const predictorValue = predictorRaw || (paperModeActive(health) ? 'ANALYZER' : 'N/A')
   const predictorTone = predictorRaw === 'ready' || predictorRaw === 'ok' ? 'ok' : 'mut'
@@ -107,7 +107,7 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Service Availability</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="API" value={apiOk ? 'OK' : (apiStatus?.status || 'UNKNOWN')} status={apiOk ? 'ok' : 'warn'} />
+              <StatusChip label="API" value={apiOk ? 'OK' : (apiStatus?.status || health?.status || 'UNKNOWN')} status={apiOk ? 'ok' : 'warn'} />
               <StatusChip label="SCANNER" value={scannerValue.toUpperCase()} status={scannerTone} />
               <StatusChip label="PREDICTOR" value={predictorValue.toUpperCase()} status={predictorTone} />
             </div>
