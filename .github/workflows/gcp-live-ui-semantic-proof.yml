@@ -20,7 +20,7 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main')
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 30
     env:
       SYSTEM3_PRODUCTION_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
       GITHUB_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
@@ -46,11 +46,23 @@ jobs:
           SYSTEM3_LIVE_UI_READY_WAIT_S: "240"
         run: python scripts/gcp_live_ui_semantic_proof.py
 
-      - name: Upload semantic proof
+      - name: Prove full exact-SHA 22-tab visual semantics and four required chains
+        if: always()
+        env:
+          SYSTEM3_LIVE_UI_READY_WAIT_S: "240"
+          # Diagnostic/full-product proof must not overwrite the established
+          # live-ui/semantic-proof commit-status context emitted by the canonical
+          # proof above. The step result still gates this workflow and its artifact.
+          GITHUB_TOKEN: ""
+        run: python scripts/gcp_full_dashboard_acceptance.py
+
+      - name: Upload semantic and visual proof
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gcp-live-ui-semantic-proof-${{ github.run_number }}
-          path: reports/latest/live_ui_semantic_proof/
+          path: |
+            reports/latest/live_ui_semantic_proof/
+            reports/latest/full_dashboard_acceptance/
           if-no-files-found: warn
           retention-days: 14
