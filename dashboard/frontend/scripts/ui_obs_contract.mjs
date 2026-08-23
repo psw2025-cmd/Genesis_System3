@@ -41,6 +41,7 @@ const alerts = read('src/components/AlertsTab.tsx')
 const store = read('src/store.ts')
 const useData = read('src/hooks/useData.ts')
 const styles = read('src/index.css')
+const mobileHub = read('src/components/MobileTradingHub.tsx')
 
 for (const tab of expectedTabs) {
   assert.match(sidebar, new RegExp(`id:\\s*'${tab}'`), `Sidebar must expose ${tab}`)
@@ -101,5 +102,19 @@ assert.match(styles, /\.alerts-metrics-grid/, 'Alerts metrics must have responsi
 assert.match(styles, /@media \(max-width: 600px\)[\s\S]*?\.alerts-metrics-grid \{ grid-template-columns: repeat\(2/, 'Phone metrics must reflow to two columns')
 assert.match(styles, /@media \(max-width: 900px\)[\s\S]*?\.alerts-content-grid \{ grid-template-columns: minmax\(0, 1fr\)/, 'Phone/tablet alert content must become one column')
 assert.match(styles, /overflow-wrap: anywhere/, 'Long alert content must wrap intentionally')
+
+for (const label of ['Options Chain', 'Equity Feed', 'Prediction Charts', 'Backtest', 'Portfolio']) {
+  assert.match(mobileHub, new RegExp(label), `Mobile hub must expose ${label}`)
+}
+for (const reused of ['OptionChain', 'Signals', 'PredictionAudit', 'Backtest', 'Positions']) {
+  assert.match(mobileHub, new RegExp(`<${reused} \/>`), `Mobile hub must reuse ${reused}`)
+}
+assert.match(app, /view.*mobile-trader/, 'App must expose the explicit mobile-trader route')
+assert.match(mobileHub, /max-width: 820px/, 'Mobile hub must render feature content only at phone widths')
+assert.match(mobileHub, /SYSTEM3_STREAM_PROOF/, 'Mobile hub must publish F12 streaming proof')
+assert.match(mobileHub, /PAPER · LIVE OFF/, 'Mobile hub must retain the safe trading authority label')
+assert.doesNotMatch(mobileHub, /fetch\(|axios|POST|placeOrder|executeOrder/, 'Mobile orchestration must add no duplicate API or mutation logic')
+assert.match(styles, /\.mobile-hub-tabs/, 'Mobile hub tabs require production CSS')
+assert.match(styles, /@media \(min-width: 821px\)[\s\S]*?\.mobile-hub-shell \{ display: none; \}/, 'Mobile feature shell must not render on desktop')
 
 console.log(`UI-OBS contract PASS: ${expectedTabs.length} tabs and truth semantics verified`)
