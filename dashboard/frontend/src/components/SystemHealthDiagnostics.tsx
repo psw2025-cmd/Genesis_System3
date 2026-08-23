@@ -8,7 +8,7 @@ export function SystemHealthDiagnostics({
 }: {
   variant?: 'panel' | 'sr-only'
 }) {
-  const { autoGates, brokerConnected, health, wsStatus, deployInfo } = useStore()
+  const { autoGates, brokerConnected, brokerStatus, health, wsStatus, deployInfo } = useStore()
 
   const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
   const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
@@ -17,8 +17,8 @@ export function SystemHealthDiagnostics({
 
   const mlOk = Boolean(mlGate?.pass)
   const paperGateOk = Boolean(paperGate?.pass ?? paperGate?.ok)
-  const paperOk = paperGateOk || paperModeActive(health)
-  const dhanOk = brokerIsConnected(health, brokerConnected)
+  const paperMode = paperModeActive(health)
+  const dhanOk = brokerIsConnected(health, brokerConnected, brokerStatus)
   const runtimeOk = systemRuntimeOk(health)
   const wsTone: 'ok' | 'warn' | 'error' = wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'
   const daysRec = Number(mlGate?.days_recorded)
@@ -29,14 +29,16 @@ export function SystemHealthDiagnostics({
       ? `${daysRec}/${Number.isFinite(daysReq) ? daysReq : 5}d`
       : `${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
   const wsLabel = wsStatus === 'live' ? 'Live' : String(wsStatus)
+  const paperLabel = paperGateOk ? 'Gate ok' : paperMode ? 'Mode on · gate pending' : 'Pending'
+  const paperTone: 'ok' | 'warn' | 'error' = paperGateOk ? 'ok' : paperMode ? 'warn' : 'error'
 
   const proofItems: Array<[string, string, 'ok' | 'warn' | 'error']> = [
-    ['System', runtimeOk ? String(health?.mode || health?.status || 'OK') : 'Pending', runtimeOk ? 'ok' : 'error'],
+    ['System', runtimeOk ? String(health?.status || 'OK') : String(health?.status || 'Pending'), runtimeOk ? 'ok' : 'error'],
     ['API', runtimeOk ? 'Responding' : 'Check', runtimeOk ? 'ok' : 'warn'],
     ['WebSocket', wsLabel, wsTone],
     ['Data', dhanOk ? 'Dhan' : 'Dhan required', dhanOk ? 'ok' : 'error'],
     ['ML', mlLabel, mlOk ? 'ok' : 'warn'],
-    ['Paper', paperOk ? (paperGateOk ? 'Gate ok' : 'Mode on') : 'Pending', paperOk ? 'ok' : 'warn'],
+    ['Paper', paperLabel, paperTone],
     ['UI', 'Rendered', 'ok'],
     ['SHA', shortSha(deployInfo?.git_sha), deployInfo?.git_sha ? 'ok' : 'warn'],
   ]
