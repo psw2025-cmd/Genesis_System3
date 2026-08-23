@@ -1,15 +1,9 @@
 import { Activity, Bot, Brain, Shield, TrendingUp, Wallet } from 'lucide-react'
 import { useStore } from '../store'
-import { cn, fmt, fmtCr, signClass } from '../lib/utils'
+import { asPct, cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { statusToneCss } from '../lib/statusTone'
 import { AuthUnlock } from './AuthUnlock'
 import { ContinuousClosureBoard } from './ContinuousClosureBoard'
-
-function asPct(value: any) {
-  const n = Number(value)
-  if (!Number.isFinite(n)) return null
-  return Math.abs(n) <= 1 ? n * 100 : n
-}
 
 function Metric({ label, value, sub, tone, icon }: {
   label: string; value: string; sub?: string; tone?: 'up' | 'down' | 'warn' | 'accent'; icon?: React.ReactNode
