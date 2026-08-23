@@ -22,6 +22,7 @@ import { PerformanceTab }  from './components/PerformanceTab'
 import { EndToEndProof }   from './components/EndToEndProof'
 import { SystemTruthControl } from './components/SystemTruthControl'
 import { LiveSimulation } from './components/LiveSimulation'
+import { MobileTradingHub } from './components/MobileTradingHub'
 
 // ── V5 Workspaces ─────────────────────────────────────────────────────
 import { DecisionIntelligence } from './components/workspaces/DecisionIntelligence'
@@ -96,6 +97,9 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
+  if (mobileTradingRoute) return <MobileTradingHub />
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
                   background: 'var(--surface)', overflow: 'hidden' }}>
