@@ -117,7 +117,7 @@ assert.match(riskDashboard, /raw\.var_95 \?\? raw\.var/, 'Empty-book VaR aliases
 assert.match(riskDashboard, /raw\.expected_shortfall_95 \?\? raw\.expected_shortfall/, 'Empty-book ES aliases must normalize')
 assert.match(riskDashboard, /emptyBook \? 0/, 'Verified empty books must render truthful zeroes instead of dashes')
 for (const fixed of ['Delta 0.35', 'Vega 0.12', 'Theta -0.08', 'Beta 1.02', 'Bullish +15%', 'Bearish -12%']) {
-  assert.doesNotMatch(riskWorkspace, new RegExp(fixed.replace(/[+]/g, '\\+')), `Risk workspace must not hard-code ${fixed}`)
+  assert.equal(riskWorkspace.includes(fixed), false, `Risk workspace must not hard-code ${fixed}`)
 }
 assert.match(riskWorkspace, /NO VERIFIED SCENARIO MODEL OUTPUT AVAILABLE/, 'Missing scenario proof must remain explicit')
 
