@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, BarChart3, BriefcaseBusiness, Database, Layers3, Radio } from 'lucide-react'
+import { Activity, BarChart3, Briefcase, Database, Layers3, Radio } from 'lucide-react'
 import { useStore } from '../store'
 import { OptionChain } from './OptionChain'
 import Signals from './Signals'
@@ -14,7 +14,7 @@ const PANELS: Array<{ id: MobilePanel; label: string; icon: typeof Layers3 }> = 
   { id: 'equities', label: 'Equity Feed', icon: Activity },
   { id: 'predictions', label: 'Prediction Charts', icon: BarChart3 },
   { id: 'backtest', label: 'Backtest', icon: Database },
-  { id: 'portfolio', label: 'Portfolio', icon: BriefcaseBusiness },
+  { id: 'portfolio', label: 'Portfolio', icon: Briefcase },
 ]
 
 function usePhoneLayout() {
@@ -133,4 +133,3 @@ export function MobileTradingHub() {
     </main>
   )
 }
-
