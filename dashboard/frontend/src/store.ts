@@ -16,6 +16,7 @@ interface DashboardState {
   gainRank: any
   marketTop: any
   alerts: any[]
+  alertFeedStatus: { state: 'loading' | 'ready' | 'degraded'; message?: string; source?: string; updatedAt?: string }
   autoGates: any
   apiStatus: any
 
@@ -48,6 +49,7 @@ interface DashboardState {
   setGainRank: (d: any) => void
   setMarketTop: (d: any) => void
   setAlerts: (d: any[]) => void
+  setAlertFeedStatus: (d: DashboardState['alertFeedStatus']) => void
   setAutoGates: (d: any) => void
   setPnl: (d: any) => void
   setApiStatus: (d: any) => void
@@ -92,6 +94,7 @@ export const useStore = create<DashboardState>((set) => ({
   gainRank: null,
   marketTop: null,
   alerts: [],
+  alertFeedStatus: { state: 'loading' },
   autoGates: null,
   apiStatus: null,
   pnl: null,
@@ -137,6 +140,7 @@ export const useStore = create<DashboardState>((set) => ({
   setGainRank: (gainRank) => set({ gainRank }),
   setMarketTop: (marketTop) => set({ marketTop, lastSync: new Date().toISOString() }),
   setAlerts: (alerts) => set({ alerts }),
+  setAlertFeedStatus: (alertFeedStatus) => set({ alertFeedStatus }),
   setAutoGates: (autoGates) => set({ autoGates }),
   setPnl: (pnl) => set({ pnl }),
   setApiStatus: (apiStatus) => set({ apiStatus }),
