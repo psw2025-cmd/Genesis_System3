@@ -7,7 +7,17 @@ from __future__ import annotations
 
 import inspect
 import json
+import re
 from pathlib import Path
+from urllib.parse import urlparse
+
+from dashboard.backend import app as app_mod
+from tools._render_hosting_retired import render_yaml_exists, write_retired_report
+
+_URL_RE = re.compile(r"https?://[^\s\"'`<>]+", re.IGNORECASE)
+_BARE_HOST_RE = re.compile(
+    r"(?i)(?<![A-Za-z0-9-./?&=])((?:[A-Za-z0-9-]+\.)*onrender\.com)(?![A-Za-z0-9-])"
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 GCP_UI = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
@@ -24,6 +34,30 @@ AUTHORITY_FILES = [
 ]
 
 
+def is_retired_render_hostname(host: str) -> bool:
+    name = (host or "").strip(".").lower()
+    return name == "onrender.com" or name.endswith(".onrender.com")
+
+
+def text_has_retired_render_host(text: str) -> bool:
+    """True only when a parsed hostname is onrender.com or a subdomain of it.
+
+    Query/path embeddings such as https://evil.example/?q=onrender.com are not hits.
+    """
+    consumed: list[tuple[int, int]] = []
+    for match in _URL_RE.finditer(text):
+        consumed.append((match.start(), match.end()))
+        if is_retired_render_hostname(urlparse(match.group(0)).hostname or ""):
+            return True
+    for match in _BARE_HOST_RE.finditer(text):
+        start = match.start()
+        if any(left <= start < right for left, right in consumed):
+            continue
+        if is_retired_render_hostname(match.group(1)):
+            return True
+    return False
+
+
 def test_render_yaml_must_not_exist():
     assert not (ROOT / "render.yaml").exists()
 
@@ -33,11 +67,11 @@ def test_authority_docs_do_not_keep_render_as_runtime():
         "Authoritative Render runtime",
         "Active Render runtime map",
         "| Render config | `render.yaml` | KEEP",
-        "genesis-system3-backend-staging.onrender.com",
         "Secrets must live only in GitHub Actions secrets, Render environment secrets",
     )
     for path in AUTHORITY_FILES:
         text = path.read_text(encoding="utf-8")
+        assert not text_has_retired_render_host(text), f"{path.name} still contains a Render hostname"
         for needle in banned:
             assert needle not in text, f"{path.name} still treats Render as current: {needle}"
         lowered = text.lower()
@@ -56,8 +90,6 @@ def test_visual_proof_rules_are_gcp_not_render_host():
 
 
 def test_deploy_info_does_not_use_render_env_as_sha():
-    from dashboard.backend import app as app_mod
-
     src = inspect.getsource(app_mod.get_deploy_info)
     assert "RENDER_GIT_COMMIT" not in src
     assert "RENDER_SERVICE_NAME" not in src
@@ -95,7 +127,7 @@ def test_leftover_render_tools_are_retired_stubs():
         text = path.read_text(encoding="utf-8")
         assert "retired" in text.lower(), f"{path.name} is not marked retired"
         assert "Cloud Run" in text or "gcp-cloud-run" in text or "genesis-system3-web" in text
-        assert "onrender.com" not in text
+        assert not text_has_retired_render_host(text), f"{path.name} still contains a Render hostname"
 
 
 def test_sync_render_secrets_must_not_exist():
@@ -150,14 +182,21 @@ def test_source_tree_has_no_onrender_authority_urls():
             text = path.read_text(encoding="utf-8", errors="replace")
         except OSError:
             continue
-        if "onrender.com" in text:
+        if text_has_retired_render_host(text):
             hits.append(rel)
-    assert hits == [], f"onrender.com still in source authority paths: {hits}"
+    assert hits == [], f"retired Render hostname still in source authority paths: {hits}"
+
+
+def test_retired_host_check_uses_parsed_hostname_not_substring():
+    assert text_has_retired_render_host("https://foo.onrender.com/ui")
+    assert text_has_retired_render_host("genesis-system3-backend.onrender.com")
+    assert not text_has_retired_render_host("https://evil.example/?q=onrender.com")
+    assert not text_has_retired_render_host("https://evil.example/onrender.com")
+    assert not text_has_retired_render_host("https://onrender.com.evil.example/")
+    assert not text_has_retired_render_host("not-onrender.com")
 
 
 def test_retired_helper_writes_cloud_run_pass(tmp_path):
-    from tools._render_hosting_retired import render_yaml_exists, write_retired_report
-
     assert not render_yaml_exists()
     code = write_retired_report(tmp_path)
     assert code == 0
