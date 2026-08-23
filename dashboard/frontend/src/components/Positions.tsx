@@ -1,6 +1,6 @@
 import { useStore } from '../store'
 import { PriceCell } from './ui/PriceCell'
-import { fmtCr, fmt, signClass, cn } from '../lib/utils'
+import { asPct, fmtCr, fmt, signClass, cn } from '../lib/utils'
 
 function rowsOf(value: any): any[] {
   if (Array.isArray(value)) return value
@@ -34,7 +34,7 @@ export function Positions() {
     summary.total_pnl
     ?? ((Number(summary.total_unrealized_pnl ?? 0) + Number(summary.total_realized_pnl ?? 0)) || 0)
   )
-  const winRate = Number(summary.win_rate ?? 0)
+  const winRate = asPct(summary.win_rate)
   const totalTrades = Number(summary.total_trades ?? closed.length ?? 0)
 
   return (
@@ -48,8 +48,8 @@ export function Positions() {
         </div>
         <div>
           <span className="text-xs text-text-muted">PAPER WIN RATE</span>
-          <div className={cn('num text-xl font-bold', winRate >= 50 ? 'text-up' : 'text-down')}>
-            {summaryAvailable ? `${winRate.toFixed(1)}%` : '--'}
+          <div className={cn('num text-xl font-bold', winRate != null && winRate >= 50 ? 'text-up' : 'text-down')}>
+            {summaryAvailable && winRate != null ? `${winRate.toFixed(1)}%` : '--'}
           </div>
         </div>
         <div>

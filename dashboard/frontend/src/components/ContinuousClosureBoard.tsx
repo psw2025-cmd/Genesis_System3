@@ -38,6 +38,13 @@ type ClosureReport = {
     watchdog?: { status?: string; banner_required?: boolean }
   }
   generated_at_utc?: string
+  served_at_utc?: string
+  request_path?: {
+    evidence_class?: string
+    cache_hit?: boolean
+    cache_age_s?: number
+    self_http_fanout?: boolean
+  }
 }
 
 function toneFor(state?: string) {
@@ -92,8 +99,16 @@ export function ContinuousClosureBoard() {
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 10 }}>
         <div>
           <div className="panel-title">Continuous Closure · Blocker Cards</div>
-          <div style={{ fontSize: 11, color: 'var(--text-mut)', marginTop: 4 }}>
-            Repo-first scan · multi-source verify · watchdog · auto-resume
+          <div
+            style={{ fontSize: 11, color: 'var(--text-mut)', marginTop: 4 }}
+            data-testid="closure-evidence-class"
+          >
+            {report?.request_path?.evidence_class || 'HISTORICAL_STORED'}
+            {' · '}
+            generated {report?.generated_at_utc || '—'}
+            {report?.request_path?.cache_hit
+              ? ` · cache ${Number(report.request_path.cache_age_s || 0).toFixed(1)}s`
+              : ' · cache miss'}
             {summary?.gates ? ` · Gates ${summary.gates}` : ''}
             {summary?.serving_sha ? ` · SHA ${String(summary.serving_sha).slice(0, 12)}` : ''}
           </div>

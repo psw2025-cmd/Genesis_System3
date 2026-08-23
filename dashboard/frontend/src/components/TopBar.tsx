@@ -181,7 +181,7 @@ export function TopBar() {
           <div className="hide-phone" style={{ minWidth: 54, padding: '0 8px', borderLeft: '1px solid var(--border)' }}>
             <div style={{ fontSize: 10, color: 'var(--text-mut)' }}>Board</div>
             <div className="num" style={{ marginTop: 2, fontSize: 11, fontWeight: 700, color: liveBoardOk ? 'var(--up)' : 'var(--amber)' }}>
-              {liveBoardOk ? 'Live' : marketOpen ? 'Warming' : 'Idle'}
+              {liveBoardOk ? (marketOpen ? 'Feed OK' : 'Snapshot') : marketOpen ? 'Warming' : 'Idle'}
             </div>
           </div>
         </div>

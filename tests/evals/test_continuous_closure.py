@@ -8,14 +8,18 @@ import time
 from pathlib import Path
 
 from dashboard.backend.continuous_closure_service import (
+    REQUEST_PATH_CACHE_TTL_S,
+    REQUEST_PATH_EVIDENCE_CLASS,
     REQUEST_PATH_LIVE_TIMEOUT_S,
     build_continuous_closure_report,
     merge_cards,
     multi_source_verify,
     parse_backlog_cards,
     pick_resume_target,
+    stamp_closure_request_path,
     write_closure_artifacts,
 )
+from dashboard.backend.dashboard_truth import classify_overview_data_source
 
 
 SAMPLE_BACKLOG = """
@@ -65,6 +69,44 @@ def test_build_offline_and_write_artifacts(tmp_path):
 
 def test_request_path_live_timeout_is_bounded():
     assert REQUEST_PATH_LIVE_TIMEOUT_S <= 3.0
+    assert REQUEST_PATH_CACHE_TTL_S <= 5.0
+
+
+def test_cached_closure_report_stays_historical():
+    generated = "2026-08-23T08:00:00Z"
+    stamped = stamp_closure_request_path(
+        {
+            "schema": "continuous_closure_v1",
+            "generated_at_utc": generated,
+            "safety": {"live_trading_enabled": False},
+            "request_path": {"self_http_fanout": False},
+        },
+        cache_hit=True,
+        cache_age_s=4.2,
+        live_query=True,
+    )
+    assert stamped["generated_at_utc"] == generated
+    assert stamped["request_path"]["cache_hit"] is True
+    assert stamped["request_path"]["cache_age_s"] == 4.2
+    assert stamped["request_path"]["evidence_class"] == REQUEST_PATH_EVIDENCE_CLASS
+    assert stamped["request_path"]["self_http_fanout"] is False
+    assert stamped["served_at_utc"]
+
+
+def test_app_not_ready_paths_do_not_label_disconnected_as_live():
+    src = (
+        Path(__file__).resolve().parents[2] / "dashboard" / "backend" / "app.py"
+    ).read_text(encoding="utf-8")
+    assert '"data_source": "live"' not in src
+
+
+def test_overview_data_source_is_not_bare_live_when_closed():
+    closed = classify_overview_data_source(market_open=False, broker_connected=True)
+    assert closed == "broker_connected_market_closed"
+    assert closed != "live"
+    assert classify_overview_data_source(market_open=True, broker_connected=True) == (
+        "broker_connected_market_open"
+    )
 
 
 def test_multi_source_verify_fail_closed_fast_on_hang(monkeypatch, tmp_path):
@@ -98,6 +140,9 @@ def test_http_handler_never_fans_out_self_http():
     assert "include_live=False" in src
     assert "include_live=bool(live)" not in src
     assert "live: bool = False" in src
+    assert "_TTL_AUTO_GATES" not in src
+    assert "REQUEST_PATH_CACHE_TTL_S" in src
+    assert "stamp_closure_request_path" in src
 
 
 def test_http_handler_calls_build_offline_even_when_live_query(monkeypatch, tmp_path):
@@ -139,3 +184,34 @@ def test_frontend_board_uses_offline_request_path():
     ).read_text(encoding="utf-8")
     assert "live=false" in text
     assert "live=true" not in text
+    assert "closure-evidence-class" in text
+    assert "HISTORICAL_STORED" in text
+
+
+def test_status_tone_source_does_not_paint_disconnected_green():
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "dashboard"
+        / "frontend"
+        / "src"
+        / "lib"
+        / "statusTone.ts"
+    ).read_text(encoding="utf-8")
+    assert "s === 'DISCONNECTED'" in text
+    assert "s === 'CONNECTED'" in text
+    assert "s.includes('CONNECTED')" not in text
+    assert "s.includes('LIVE')" not in text
+
+
+def test_topbar_board_status_is_not_the_word_live():
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "dashboard"
+        / "frontend"
+        / "src"
+        / "components"
+        / "TopBar.tsx"
+    ).read_text(encoding="utf-8")
+    assert "? 'Live'" not in text
+    assert "Snapshot" in text
+    assert "Feed OK" in text

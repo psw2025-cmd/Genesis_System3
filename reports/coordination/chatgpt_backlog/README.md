@@ -14,6 +14,11 @@ Revalidate any `now/current/live` claim against GCP + current `main`.
 | `system3_micro_proof_matrix.csv` | Micro proof matrix |
 | `system3_screenshot_evidence_register.csv` | Screenshot evidence register |
 | `system3_world_class_recommendations.csv` | World-class recommendations |
+| `system3_pending_actions.csv` | P01–P15 pending actions (Gmail 2026-08-22 extraction) |
+| `system3_agent_queries.csv` | P01–P15 agent queries |
+| `system3_micro_agent_queries.csv` | M001+ agent queries |
+| `system3_signal_candidates.csv` | Historical Dhan scanner snapshot (not live quotes) |
+| `system3_signal_candidates_annotated.csv` | Same snapshot with NO_TRADE / SCANNER_EVIDENCE_ONLY |
 
 Canonical coordination still lives in:
 
@@ -21,3 +26,4 @@ Canonical coordination still lives in:
 - `reports/coordination/ruhi_task_ledger.csv`
 - `docs/handoffs/RUHI_B002_CURSOR_STATUS.md`
 - GitHub Issue #188
+

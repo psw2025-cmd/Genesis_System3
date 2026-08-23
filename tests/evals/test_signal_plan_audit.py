@@ -16,6 +16,7 @@ from dashboard.backend.signal_plan_audit import (
 FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures"
 TRADE_CSV = FIXTURE_DIR / "system3_signal_candidates_sample.csv"
 REC_CSV = FIXTURE_DIR / "system3_plan_recommendations_sample.csv"
+SCANNER_CSV = FIXTURE_DIR / "system3_scanner_gainers_sample.csv"
 
 
 def test_required_trade_columns_match_gmail_preview():
@@ -48,6 +49,28 @@ def test_audit_missing_file_fail_closed(tmp_path):
     assert report["ok"] is False
     assert report["error"] == "FILE_NOT_FOUND"
     assert report["invented_prices"] is False
+
+
+def test_scanner_csv_flags_tiny_premium_extreme_gain():
+    report = audit_signal_plan_csv(SCANNER_CSV)
+    assert report["ok"] is True
+    assert report["invented_prices"] is False
+    codes = {f["code"] for f in report["findings"]}
+    assert "TINY_PREMIUM_EXTREME_GAIN" in codes
+    assert "MISSING_COLUMNS" not in codes
+    sensex_tiny = next(r for r in report["rows"] if r["symbol"] == "SENSEX" and r["ltp"] == 2.25)
+    assert sensex_tiny["gain_pct"] == 4400.0
+
+
+def test_plan_issue_schema_is_not_a_trade_sheet():
+    report = audit_signal_plan_texts(
+        [
+            "issue_id,priority,observed_evidence,recommendation",
+            "M032,P0,SENSEX 4400% on 2.25 LTP,Keep NO_TRADE until quality filters exist",
+        ]
+    )
+    assert report["ok"] is True
+    assert "MISSING_COLUMNS" not in {f["code"] for f in report["findings"]}
 
 
 def test_audit_texts_do_not_synthesize_missing_pnl():

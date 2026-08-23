@@ -106,6 +106,19 @@ from fastapi import (
     WebSocket,
     WebSocketDisconnect,
 )
+
+try:
+    from dashboard.backend.continuous_closure_service import (
+        REQUEST_PATH_CACHE_TTL_S,
+        stamp_closure_request_path,
+    )
+    from dashboard.backend.dashboard_truth import classify_overview_data_source
+except ImportError:
+    from continuous_closure_service import (  # type: ignore
+        REQUEST_PATH_CACHE_TTL_S,
+        stamp_closure_request_path,
+    )
+    from dashboard_truth import classify_overview_data_source  # type: ignore
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel
@@ -2096,11 +2109,16 @@ async def get_continuous_closure(refresh: bool = False, live: bool = False):
     Live URL verify stays on the offline orchestrator CLI, not this handler.
     The `live` query flag is accepted for compat and recorded, but ignored.
     """
-    cache_key = f"continuous_closure:{int(bool(live))}"
+    cache_key = "continuous_closure:offline"
     if not refresh:
-        _hit = _cache_get(cache_key, _TTL_AUTO_GATES)
+        _hit = _cache_get(cache_key, REQUEST_PATH_CACHE_TTL_S)
         if _hit is not None:
-            return _hit
+            return stamp_closure_request_path(
+                _hit,
+                cache_hit=True,
+                cache_age_s=_cache_age_s(cache_key) or 0.0,
+                live_query=bool(live),
+            )
 
     def _build_offline_report() -> Dict[str, Any]:
         try:
@@ -2117,11 +2135,6 @@ async def get_continuous_closure(refresh: bool = False, live: bool = False):
             ROOT_DIR,
             include_live=False,
         )
-        request_path = dict(report.get("request_path") or {})
-        request_path["self_http_fanout"] = False
-        request_path["live_query"] = bool(live)
-        request_path["live_http_skipped_reason"] = "cloud_run_self_call_deadlock_prevention"
-        report["request_path"] = request_path
         try:
             write_closure_artifacts(ROOT_DIR, report)
         except Exception:
@@ -2130,7 +2143,13 @@ async def get_continuous_closure(refresh: bool = False, live: bool = False):
 
     try:
         report = await _run_blocking(_build_offline_report, timeout=8.0)
-        return _cache_set(cache_key, report)
+        _cache_set(cache_key, report)
+        return stamp_closure_request_path(
+            report,
+            cache_hit=False,
+            cache_age_s=0.0,
+            live_query=bool(live),
+        )
     except Exception as e:
         return {
             "schema": "continuous_closure_v1",
@@ -3071,6 +3090,14 @@ def _cache_get(key: str, ttl_s: float):
     return None
 
 
+def _cache_age_s(key: str) -> float | None:
+    """Age of a cache entry in seconds, or None if missing."""
+    entry = _API_CACHE.get(key)
+    if not entry:
+        return None
+    return max(0.0, _time_module.time() - entry[0])
+
+
 def _cache_set(key: str, value):
     """Store value with current timestamp."""
     _API_CACHE[key] = (_time_module.time(), value)
@@ -3706,7 +3733,9 @@ async def get_health():
                     "mode": mode_effective,
                     "broker_status": broker_status_str,
                     "market_status": market_status_str,
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=market_is_open, broker_connected=False
+                    ),
                     "live_allowed": False,
                     "live_blockers": live_blockers,
                     "broker": {"connected": False, "status": broker_status_str, "error": "Broker not connected"},
@@ -3736,7 +3765,9 @@ async def get_health():
                 "mode": "PAPER",
                 "broker_status": "connected",
                 "market_status": market_status_str,
-                "data_source": "live",
+                "data_source": classify_overview_data_source(
+                    market_open=market_is_open, broker_connected=True
+                ),
                 "live_allowed": False,
                 "live_blockers": ["Live trading permanently disabled in analyzer mode"],
                 "broker": {
@@ -3778,7 +3809,10 @@ async def get_health():
             broker_connected = ssot_state.get("broker", {}).get("connected", False)
             broker_status = "connected" if broker_connected else "disconnected"
             mode = ssot_state.get("mode", health.get("mode", "PAPER"))
-            data_source = ssot_state.get("data_source", "live")
+            data_source = classify_overview_data_source(
+                market_open=market_is_open,
+                broker_connected=bool(broker_connected),
+            )
         else:
             # Fallback to health.json
             broker_connected = health.get("is_connected", False)
@@ -3954,7 +3988,9 @@ async def get_qc():
                     "qc_passed": False,
                     "overall_passed": False,
                     "message": "BROKER_NOT_READY - Real QC data unavailable",
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "total_contracts": 0,
                     "underlying_count": 0,
                     "failures": ["Broker not connected"],
@@ -4702,7 +4738,9 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     "spot": 0,
                     "pcr": 1.0,
                     "total_contracts": 0,
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "status": "NOT_READY",
                     "message": "BROKER_NOT_READY - Real chain data unavailable",
                 }
@@ -5117,7 +5155,9 @@ async def get_top_signal():
                 return {
                     "action": "NO_TRADE",
                     "reason": "BROKER_NOT_READY - Real signal data unavailable",
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "confidence": 0,
                 }
 
@@ -5373,7 +5413,9 @@ async def get_performance():
                     "reason": "BROKER_NOT_READY - Real performance data unavailable",
                     "current": {},
                     "history": [],
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                 }
 
         # Market is open - use real data

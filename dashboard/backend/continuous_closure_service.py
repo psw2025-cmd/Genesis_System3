@@ -18,8 +18,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 DEFAULT_PROD = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 REQUEST_PATH_LIVE_TIMEOUT_S = 2.5
+REQUEST_PATH_CACHE_TTL_S = 5.0
 ORCHESTRATOR_LIVE_TIMEOUT_S = 4.0
 ORCHESTRATOR_LIVE_BUDGET_S = 8.0
+REQUEST_PATH_EVIDENCE_CLASS = "HISTORICAL_STORED"
 LIVE_VERIFY_PATHS = (
     "/api/deploy/info",
     "/api/auto_gates",
@@ -343,6 +345,28 @@ def build_continuous_closure_report(
             "include_live": bool(include_live),
         },
     }
+
+
+def stamp_closure_request_path(
+    report: Dict[str, Any],
+    *,
+    cache_hit: bool,
+    cache_age_s: float = 0.0,
+    live_query: bool = False,
+) -> Dict[str, Any]:
+    """Label a request-path closure payload so cache cannot impersonate live truth."""
+    out = dict(report)
+    request_path = dict(out.get("request_path") or {})
+    request_path["self_http_fanout"] = False
+    request_path["include_live"] = False
+    request_path["live_query"] = bool(live_query)
+    request_path["live_http_skipped_reason"] = "cloud_run_self_call_deadlock_prevention"
+    request_path["cache_hit"] = bool(cache_hit)
+    request_path["cache_age_s"] = round(max(0.0, float(cache_age_s)), 3)
+    request_path["evidence_class"] = REQUEST_PATH_EVIDENCE_CLASS
+    out["request_path"] = request_path
+    out["served_at_utc"] = _utc()
+    return out
 
 
 def write_closure_artifacts(root: Path, report: Dict[str, Any]) -> Tuple[Path, Path]:

@@ -13,6 +13,18 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 
 REQUIRED_TRADE_COLUMNS = {"symbol", "entry", "stoploss", "target"}
+SCANNER_COLUMNS = {"symbol", "ltp", "gain_pct"}
+PLAN_SCHEMA_COLUMNS = {
+    "issue_id",
+    "proof_id",
+    "query_id",
+    "phase",
+    "pending_action",
+    "screenshot_reference",
+    "category",
+}
+TINY_PREMIUM_MAX_LTP = 5.0
+EXTREME_GAIN_PCT = 200.0
 LIVE_OR_ORDER_RE = re.compile(
     r"\b(enable\s+live|live_trading|auto_execute|square[- ]off|place\s+order|"
     r"modify\s+order|cancel\s+order|buy\s+more\s+lots)\b",
@@ -27,7 +39,7 @@ def _f(value: Any) -> Optional[float]:
     if text == "" or text.lower() in {"nan", "none", "null", "--"}:
         return None
     try:
-        return float(text.replace(",", ""))
+        return float(text.replace(",", "").replace("%", ""))
     except ValueError:
         return None
 
@@ -70,12 +82,11 @@ def audit_signal_plan_texts(lines: Sequence[str]) -> Dict[str, Any]:
     header_set = {h.lower() for h in headers}
     findings: List[Dict[str, Any]] = []
     parsed: List[Dict[str, Any]] = []
+    is_trade = bool(headers) and REQUIRED_TRADE_COLUMNS.issubset(header_set)
+    is_scanner = bool(headers) and SCANNER_COLUMNS.issubset(header_set)
+    is_plan = bool(headers) and bool(header_set & PLAN_SCHEMA_COLUMNS)
 
-    if headers and REQUIRED_TRADE_COLUMNS.issubset(header_set):
-        missing = []
-    elif headers and "recommendation" in header_set:
-        missing = []
-    else:
+    if headers and not (is_trade or is_scanner or is_plan or "recommendation" in header_set):
         missing = sorted(REQUIRED_TRADE_COLUMNS - header_set)
         if missing:
             findings.append(
@@ -97,9 +108,25 @@ def audit_signal_plan_texts(lines: Sequence[str]) -> Dict[str, Any]:
         pnl = _f(lowered.get("pnl") or lowered.get("entry_pnl"))
         change = _f(lowered.get("change"))
         rec = lowered.get("recommendation") or ""
+        ltp = _f(lowered.get("ltp"))
+        gain_pct = _f(lowered.get("gain_pct"))
         side = _geometry(entry, sl, target)
         rr = _rr(entry, sl, target, side)
         row_ok = True
+        if is_scanner and ltp is not None and gain_pct is not None:
+            if 0 < ltp < TINY_PREMIUM_MAX_LTP and gain_pct > EXTREME_GAIN_PCT:
+                findings.append(
+                    {
+                        "code": "TINY_PREMIUM_EXTREME_GAIN",
+                        "severity": "P0",
+                        "row": idx,
+                        "symbol": symbol,
+                        "detail": (
+                            f"ltp={ltp} gain_pct={gain_pct} is scanner-outlier quality, "
+                            "not a trade signal"
+                        ),
+                    }
+                )
         if "entry" in lowered or "stoploss" in lowered or "target" in lowered:
             if entry is not None and entry <= 0:
                 row_ok = False
@@ -161,6 +188,8 @@ def audit_signal_plan_texts(lines: Sequence[str]) -> Dict[str, Any]:
                 "side": side,
                 "reward_risk": rr,
                 "recommendation": rec or None,
+                "ltp": ltp,
+                "gain_pct": gain_pct,
             }
         )
 
