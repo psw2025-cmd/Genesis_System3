@@ -36,4 +36,4 @@ Canonical current worker/token proof is Cloud Run + the dedicated Dhan rotation 
 
 ## GitHub failure storm containment
 
-`tools/system3_github_render_failure_tracker.py` is retired. It writes a Cloud Run-only retired report and no longer probes onrender.com.
+`tools/system3_github_render_failure_tracker.py` is retired. It writes a Cloud Run-only retired report and no longer probes Render public hostnames.

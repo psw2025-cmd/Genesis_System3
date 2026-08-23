@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """RETIRED — GitHub + Render.com failure tracker.
 
-Render.com hosting is retired. This script no longer probes onrender.com.
-It writes a retired PASS report unless render.yaml has been recreated.
+Render.com hosting is retired. This script no longer probes Render public hostnames.
+It writes a retired Cloud Run PASS report unless render.yaml has been recreated.
 """
 
 from __future__ import annotations
