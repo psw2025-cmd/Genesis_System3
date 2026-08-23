@@ -38,7 +38,6 @@ on:
       - "scripts/codespace_startup.sh"
       - "scripts/cloud_worker.py"
       - "scripts/system3_self_healing_watchdog.py"
-      - "tools/sync_render_secrets.py"
       - "dashboard/backend/**"
       - "dashboard/frontend/**"
       - "deploy/gcp/bootstrap_github_wif.sh"

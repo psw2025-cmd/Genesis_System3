@@ -146,7 +146,7 @@ def main() -> int:
     if visible.get("status") != "PASS":
         payload["blocked_reasons"].append("automated dashboard visual proof is not PASS")
     if gh_render.get("status") != "PASS":
-        payload["blocked_reasons"].append("GitHub plus Render failure tracker is not PASS")
+        payload["blocked_reasons"].append("GitHub failure tracker is not PASS")
     if board.get("status") != "PASS":
         payload["blocked_reasons"].append("autopilot proof board is not PASS")
 
