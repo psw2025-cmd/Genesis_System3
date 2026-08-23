@@ -179,3 +179,18 @@ def test_frontend_board_uses_offline_request_path():
     assert "live=true" not in text
     assert "closure-evidence-class" in text
     assert "HISTORICAL_STORED" in text
+
+
+def test_status_tone_source_does_not_paint_disconnected_green():
+    text = (
+        Path(__file__).resolve().parents[2]
+        / "dashboard"
+        / "frontend"
+        / "src"
+        / "lib"
+        / "statusTone.ts"
+    ).read_text(encoding="utf-8")
+    assert "s === 'DISCONNECTED'" in text
+    assert "s === 'CONNECTED'" in text
+    assert "s.includes('CONNECTED')" not in text
+    assert "s.includes('LIVE')" not in text
