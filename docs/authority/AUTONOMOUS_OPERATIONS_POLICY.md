@@ -67,11 +67,11 @@ When Cloud Run Auto Deploy fails due to missing declared IAM:
 
 The two repair identities reduce single-identity IAM drift risk. They do not claim immunity from project-owner removal, WIF-provider deletion, organization-level policy changes, account suspension, or other failures above the delegated project control plane.
 
-## Temporary deploy-authority debt
+## Deploy-authority least-privilege state
 
-`genesis-system3-automation` temporarily retains project `roles/run.admin` because the current production deployment workflow configures and directly executes several non-Dhan Cloud Run business/control jobs. Therefore **strict scheduler-only `run.jobs.run` authority is not yet PASS**. The machine baseline explicitly records `strict_scheduler_only_iam=false` and `deployer_run_admin_temporary=true`.
+`genesis-system3-automation` and `github-actions-deploy` do not hold project `roles/run.admin`. Deployment automation operates with Cloud Run developer authority under the repository-declared least-privilege baseline. The machine baseline records `strict_scheduler_only_iam=false` and `deployer_run_admin_temporary=false`.
 
-After the one-time autonomous authority bootstrap is proven in production, the next least-privilege migration is to replace deployer `run.admin` with a custom deployment role that excludes `run.jobs.run`, delegate only required non-Dhan job execution narrowly, remove project-level excess execution authorities, and re-run the project/job authority inventory. This migration must be proven before changing the baseline to strict scheduler-only PASS.
+`strict_scheduler_only_iam=false` remains fail-closed until the project/job authority inventory independently proves that only the intended scheduler and bounded control identities can execute Cloud Run jobs. That separate proof is required before changing strict scheduler-only authority to PASS; it does not justify restoring project-level `roles/run.admin` to deployment identities.
 
 ## Broker rotation authority
 

@@ -60,8 +60,8 @@ class DhanCloudStatusProbeErrorTaxonomyTests(unittest.TestCase):
         self.assertFalse(_http_auth_failure(400, '{"errorCode":"DH-906","message":"order error"}'))
         self.assertFalse(_http_auth_failure(400, 'DH-906 incorrect request'))
 
-    def test_profile_906_with_explicit_invalid_token_is_auth(self):
-        self.assertTrue(_http_auth_failure(400, 'DH-906 invalid token'))
+    def test_profile_906_with_explicit_invalid_token_is_non_auth(self):
+        self.assertFalse(_http_auth_failure(400, 'DH-906 invalid token'))
 
     def test_known_non_auth_codes_get_explicit_upstream_classification(self):
         self.assertEqual(_non_auth_upstream_classification(429, '{"code":805}'), "DHAN_RATE_LIMITED")
@@ -70,18 +70,18 @@ class DhanCloudStatusProbeErrorTaxonomyTests(unittest.TestCase):
             "DHAN_REQUEST_REJECTED_906",
         )
 
-    def test_profile_dh906_invalid_token_becomes_auth_rejection(self):
+    def test_profile_dh906_invalid_token_remains_request_rejection(self):
         before = snapshot()["rejection_count"]
         result = get_cloud_status(_Module(400, 'DH-906 invalid token'))
         after = snapshot()["rejection_count"]
 
         self.assertFalse(result["connected"])
-        self.assertEqual(result["error"], "TOKEN_EXPIRED_OR_INVALID")
-        self.assertIsNotNone(result["auth_classification"])
-        self.assertIsNone(result["upstream_classification"])
+        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
+        self.assertIsNone(result["auth_classification"])
+        self.assertEqual(result["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(before, 0)
-        self.assertEqual(after, 1)
-        self.assertEqual(result["auth_rejection_trace"]["rejection_count"], 1)
+        self.assertEqual(after, 0)
+        self.assertEqual(result["auth_rejection_trace"]["rejection_count"], 0)
 
     def test_805_rate_limit_preserves_legacy_http_error_and_does_not_increment_auth_latch(self):
         result = get_cloud_status(_Module(429, '{"code":805,"message":"too many requests"}'))

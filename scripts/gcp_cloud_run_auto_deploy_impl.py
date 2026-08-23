@@ -336,8 +336,10 @@ def _build_image(session: AuthorizedSession, bucket: str, object_name: str, imag
 
 
 def _env_arg(sha: str) -> str:
-    pairs = list(SAFE_ENV) + [("DEPLOY_GIT_SHA", sha)]
-    return ",".join(f"{k}={v}" for k, v in pairs)
+    env_map = dict(SAFE_ENV)
+    env_map.pop("API_KEY", None)
+    env_map["DEPLOY_GIT_SHA"] = sha
+    return ",".join(f"{key}={value}" for key, value in env_map.items())
 
 
 def _candidate_url(service: dict[str, Any], candidate: str) -> str:
@@ -374,6 +376,19 @@ def _assert_candidate_image(revision: dict[str, Any], image: str) -> None:
     deployed_image = str((containers[0] if containers else {}).get("image") or "")
     if image not in deployed_image and deployed_image != image:
         raise RuntimeError(f"candidate image mismatch: expected={image} actual={deployed_image}")
+
+
+def _preserve_previous_ready(previous_ready: dict[str, int]) -> None:
+    """Fail closed unless the exact pre-candidate traffic map is preserved."""
+    still_ready = _traffic_allocations(_service_json())
+    if still_ready != previous_ready:
+        _restore_traffic(previous_ready)
+        still_ready = _traffic_allocations(_service_json())
+    if still_ready != previous_ready:
+        raise RuntimeError(
+            f"previous traffic preservation failed: expected={previous_ready} actual={still_ready}"
+        )
+    print("PREVIOUS_TRAFFIC_RESTORED", json.dumps(still_ready, sort_keys=True))
 
 
 def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
@@ -428,9 +443,9 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         revision = _wait_revision_ready(candidate)
         _assert_candidate_image(revision, image)
     except Exception:
+        print("CANDIDATE_DEPLOY_FAILED", candidate)
         _run_failed_revision_forensic(candidate)
-        if _traffic_allocations(_service_json()) != previous_traffic:
-            _restore_traffic(previous_traffic)
+        _preserve_previous_ready(previous_traffic)
         raise
 
     # A nonzero gcloud exit can race with revision reconciliation. The exact
@@ -463,9 +478,9 @@ def _deploy_candidate(image: str, sha: str) -> tuple[str, str, dict[str, int]]:
         if broker.get("live_trading_enabled") is not False or broker.get("order_placement_allowed") is not False:
             raise RuntimeError("candidate broker safety proof failed")
     except Exception:
+        print("CANDIDATE_DEPLOY_FAILED", candidate)
         _run_failed_revision_forensic(candidate)
-        if _traffic_allocations(_service_json()) != previous_traffic:
-            _restore_traffic(previous_traffic)
+        _preserve_previous_ready(previous_traffic)
         raise
 
     print("CANDIDATE_HTTP_PROOF_OK", candidate)

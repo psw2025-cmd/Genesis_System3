@@ -64,7 +64,10 @@ _REQUIRED_IMPLEMENTATION_MARKERS = (
     '_traffic_allocations',
     '_wait_revision_ready',
     'gcp_failed_revision_forensic.py',
+    'CANDIDATE_DEPLOY_FAILED',
+    'if still_ready != previous_ready',
     'PREVIOUS_TRAFFIC_RESTORED',
+    'env_map.pop("API_KEY", None)',
 )
 
 _RETIRED_DASHBOARD_SECRET_ENV = "DASHBOARD_API_KEY"
@@ -100,7 +103,9 @@ def _enforce_scheduler_only_dhan_rotation() -> None:
     The 5-minute Scheduler cadence is only a bounded trigger/check cadence; the
     rotator's independent 30-minute remint cooldown remains unchanged.
     """
-    effective = dict(deployer.SAFE_ENV)
+    env_map = dict(deployer.SAFE_ENV)
+    env_map.pop("API_KEY", None)
+    effective = env_map
     if effective.get("DHAN_CANONICAL_ROTATION_SELF_HEAL") != "0":
         raise RuntimeError("dhan_web_rotation_not_disabled_at_source")
     if effective.get("DHAN_TOKEN_ROTATION_SCHEDULE") != "*/5 * * * * Asia/Kolkata":

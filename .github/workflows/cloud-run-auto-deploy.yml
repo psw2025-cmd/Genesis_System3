@@ -43,6 +43,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
+      # Canonical runtime contract: REQUIRE_API_KEY=false.
+      REQUIRE_API_KEY: "false"
       GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
       GCP_REGION: asia-south1
       GCP_CLOUD_RUN_SERVICE: genesis-system3-web
