@@ -177,7 +177,7 @@ def repo_authority(all_files):
         for f in all_files
         if f
         in [
-            "render.yaml",
+            "dashboard/backend/Dockerfile",
             "dashboard/backend/app.py",
             "dashboard/frontend/package.json",
             "scripts/system3_master_proof_orchestrator.py",

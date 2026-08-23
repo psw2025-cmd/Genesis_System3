@@ -2178,13 +2178,11 @@ async def get_proof_ledger():
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------
-# CRITICAL ARCHITECTURE NOTE: Render's `web` and `worker` services
-# (render.yaml) run as two SEPARATE containers with separate ephemeral
-# filesystems — no shared disk is configured. The job scheduler daemon
-# (core/engine/system3_phase82_job_scheduler.py) runs inside the WORKER
-# service via scripts/cloud_worker.py. A web-service endpoint that reads
-# local files for scheduler state will ALWAYS see nothing, because those
-# files only ever exist on the worker container.
+# CRITICAL ARCHITECTURE NOTE: Cloud Run `genesis-system3-web` and the
+# worker/rotator Jobs are separate services with separate filesystems.
+# The job scheduler daemon (core/engine/system3_phase82_job_scheduler.py)
+# does not share disk with the web service. A web-service endpoint that
+# reads local files for scheduler state will not see worker-only files.
 #
 # Fix: the worker actively PUSHES its heartbeat/job-status to the web
 # service over HTTP every scheduler tick (~60s, see job scheduler daemon
@@ -2323,7 +2321,7 @@ async def get_deploy_info():
     """Expose deployed commit / host facts for Cloud Run (GCP) proofs.
 
     Prefers Cloud Run env (DEPLOY_GIT_SHA, K_SERVICE, SYSTEM3_DEPLOY_TARGET).
-    Falls back to legacy RENDER_* vars only if present on old hosts.
+    Render.com env vars are retired and are not used as SHA or service identity.
     """
     cfg: Dict[str, Any] = {}
     try:
@@ -2335,14 +2333,9 @@ async def get_deploy_info():
     except Exception:
         cfg = {}
 
-    git_sha = (
-        os.environ.get("DEPLOY_GIT_SHA")
-        or os.environ.get("RENDER_GIT_COMMIT")
-        or ""
-    ).strip()
+    git_sha = (os.environ.get("DEPLOY_GIT_SHA") or "").strip()
     service_name = (
         os.environ.get("K_SERVICE")
-        or os.environ.get("RENDER_SERVICE_NAME")
         or str(cfg.get("service_name") or "genesis-system3-web")
     )
     target = (
@@ -2356,7 +2349,7 @@ async def get_deploy_info():
     ).rstrip("/")
     return {
         "git_sha": git_sha,
-        "git_branch": os.environ.get("RENDER_GIT_BRANCH") or os.environ.get("GITHUB_REF_NAME") or "",
+        "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
         "service_name": service_name,
         "deploy_target": target,
         "cloud_provider": "google_cloud" if ("gcp" in target or "cloud-run" in target) else "unknown",
@@ -2367,7 +2360,7 @@ async def get_deploy_info():
         "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
         "live_trading_enabled": False,
         "deployed_at_known": bool(git_sha),
-        "render_git_commit_legacy": os.environ.get("RENDER_GIT_COMMIT", ""),
+        "render_git_commit_legacy": "",
     }
 
 
