@@ -3988,7 +3988,9 @@ async def get_qc():
                     "qc_passed": False,
                     "overall_passed": False,
                     "message": "BROKER_NOT_READY - Real QC data unavailable",
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "total_contracts": 0,
                     "underlying_count": 0,
                     "failures": ["Broker not connected"],
@@ -4736,7 +4738,9 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     "spot": 0,
                     "pcr": 1.0,
                     "total_contracts": 0,
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "status": "NOT_READY",
                     "message": "BROKER_NOT_READY - Real chain data unavailable",
                 }
@@ -5151,7 +5155,9 @@ async def get_top_signal():
                 return {
                     "action": "NO_TRADE",
                     "reason": "BROKER_NOT_READY - Real signal data unavailable",
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                     "confidence": 0,
                 }
 
@@ -5407,7 +5413,9 @@ async def get_performance():
                     "reason": "BROKER_NOT_READY - Real performance data unavailable",
                     "current": {},
                     "history": [],
-                    "data_source": "live",
+                    "data_source": classify_overview_data_source(
+                        market_open=True, broker_connected=False
+                    ),
                 }
 
         # Market is open - use real data

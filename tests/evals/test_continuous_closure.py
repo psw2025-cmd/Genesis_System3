@@ -93,6 +93,13 @@ def test_cached_closure_report_stays_historical():
     assert stamped["served_at_utc"]
 
 
+def test_app_not_ready_paths_do_not_label_disconnected_as_live():
+    src = (
+        Path(__file__).resolve().parents[2] / "dashboard" / "backend" / "app.py"
+    ).read_text(encoding="utf-8")
+    assert '"data_source": "live"' not in src
+
+
 def test_overview_data_source_is_not_bare_live_when_closed():
     closed = classify_overview_data_source(market_open=False, broker_connected=True)
     assert closed == "broker_connected_market_closed"
