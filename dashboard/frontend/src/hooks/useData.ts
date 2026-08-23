@@ -225,7 +225,7 @@ function delay(ms: number) {
 export function useData() {
   const {
     setHealth, setState, setPaper, setGainRank, setMarketTop,
-    setAlerts, setAutoGates, setWsStatus, chainSymbol, setChain,
+    setAlerts, setAlertFeedStatus, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
     setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch,
   } = useStore()
@@ -349,7 +349,12 @@ export function useData() {
       if (batch?.pnl) setPnl(batch.pnl)
       else setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: 'NO_DATA', pendingProof: true })
       // Secondary alerts/gates also arrive in market-data batch (one round-trip).
-      if (Array.isArray(batch?.alerts?.alerts)) setAlerts(batch.alerts.alerts)
+      if (Array.isArray(batch?.alerts?.alerts)) {
+        setAlerts(batch.alerts.alerts)
+        setAlertFeedStatus({ state: 'ready', source: '/api/batch/market-data', updatedAt: new Date().toISOString() })
+      } else {
+        setAlertFeedStatus({ state: 'degraded', source: '/api/batch/market-data', message: 'Market-data batch did not include an authoritative alert feed.' })
+      }
       if (batch?.auto_gates) setAutoGates(batch.auto_gates)
     } catch (err: any) {
       const apiStatus = err instanceof ApiRequestError
@@ -358,6 +363,7 @@ export function useData() {
       const prev = useStore.getState()
       const retainTransient = isTransient(apiStatus.code)
       markFailure('core', apiStatus)
+      setAlertFeedStatus({ state: 'degraded', source: '/api/batch/market-data', message: apiStatus.message })
       if (!retainTransient || !prev.health) setHealth(fallbackHealth(apiStatus))
       if (!retainTransient || !prev.paper) setPaper(pendingPaper(apiStatus))
       if (!retainTransient || !prev.gainRank) setGainRank(pendingGainRank(apiStatus))
@@ -365,7 +371,7 @@ export function useData() {
         setPnl({ history: [], summary: { total_pnl: 0, total_trades: 0 }, status: apiStatus.status, message: apiStatus.message, pendingProof: true })
       }
     }
-  }, [setHealth, setState, setPaper, setGainRank, setPnl, setAlerts, setAutoGates, markFailure, markSuccess])
+  }, [setHealth, setState, setPaper, setGainRank, setPnl, setAlerts, setAlertFeedStatus, setAutoGates, markFailure, markSuccess])
 
   const applyChainPayload = useCallback((sym: string, data: any) => {
     if (!isRealDhanChainPayload(data)) {
@@ -492,12 +498,16 @@ export function useData() {
     if (err) markFailure('secondary', err)
     else markSuccess('secondary')
 
-    if (alerts.status === 'fulfilled') setAlerts(Array.isArray(alerts.value?.alerts) ? alerts.value.alerts : [])
-    else if (!retainTransient || !prev.alerts?.length) setAlerts([])
+    if (alerts.status === 'fulfilled') {
+      setAlerts(Array.isArray(alerts.value?.alerts) ? alerts.value.alerts : [])
+      setAlertFeedStatus({ state: 'ready', source: '/api/alerts/recent', updatedAt: new Date().toISOString() })
+    } else {
+      setAlertFeedStatus({ state: 'degraded', source: '/api/alerts/recent', message: apiError(alerts, '/api/alerts/recent')?.message || 'Alert feed request failed.' })
+    }
 
     if (gates.status === 'fulfilled') setAutoGates(gates.value)
     else if (!retainTransient || !prev.autoGates) setAutoGates(pendingGates(err))
-  }, [setAlerts, setAutoGates, markFailure, markSuccess])
+  }, [setAlerts, setAlertFeedStatus, setAutoGates, markFailure, markSuccess])
 
   const wsConnect = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState <= 1) return
