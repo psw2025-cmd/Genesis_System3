@@ -110,6 +110,7 @@ class DataSourceManager:
         "FINNIFTY": 27,
         "MIDCPNIFTY": 442,
         "SENSEX": 51,
+        "BANKEX": 12,
     }
 
     # Dhan option-chain UnderlyingSeg for index underlyings (NSE + BSE Sensex)
@@ -121,6 +122,7 @@ class DataSourceManager:
         "FINNIFTY": "IDX_I",
         "MIDCPNIFTY": "IDX_I",
         "SENSEX": "IDX_I",
+        "BANKEX": "IDX_I",
     }
 
     def __init__(self):
