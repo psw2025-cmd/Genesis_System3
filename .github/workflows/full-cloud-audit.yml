@@ -69,12 +69,17 @@ jobs:
           python -m py_compile scripts/fetch_exact_security_audit.py
           python -m py_compile scripts/evaluate_rotator_reliability.py
           python -m py_compile scripts/multi_ai_audit_consensus.py
+          python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
+          python -m py_compile scripts/gcp_wait_for_expected_runtime_sha.py
+
+      - name: Wait read-only for exact expected runtime SHA
+        run: python scripts/gcp_wait_for_expected_runtime_sha.py
 
       - name: Collect Google Cloud runtime, logging, TLS and latency evidence
         shell: bash
         run: |
           set +e
-          python scripts/gcp_full_cloud_audit.py
+          GITHUB_SHA="${SYSTEM3_EXPECTED_SERVING_SHA}" python scripts/gcp_full_cloud_audit.py
           rc=$?
           echo "CLOUD_AUDIT_RC=${rc}" >> "$GITHUB_ENV"
           exit 0
@@ -154,8 +159,10 @@ jobs:
               'schema':'genesis-system3-unified-cloud-audit-v2',
               'state':overall,
               'github_sha':os.environ.get('GITHUB_SHA'),
+              'expected_runtime_sha':os.environ.get('SYSTEM3_EXPECTED_SERVING_SHA'),
               'conditions':conditions,
               'cloud_state':cloud.get('state'),
+              'cloud_runtime_sha':cloud.get('serving_deploy_git_sha'),
               'rotator_reliability_state':rotator.get('state'),
               'security_state':security.get('state'),
               'ai_state':ai.get('state'),
@@ -172,12 +179,13 @@ jobs:
           md=[
               '# Unified Cloud Audit Verdict','',f"Overall: **{overall}**",'',
               f"- Cloud runtime audit: `{cloud.get('state')}`",
+              f"- Expected runtime SHA: `{os.environ.get('SYSTEM3_EXPECTED_SERVING_SHA')}`",
               f"- Dhan rotator reliability: `{rotator.get('state')}`",
               f"- Exact security audit: `{security.get('state')}`",
               f"- AI consensus: `{ai.get('state')}`",
               f"- Exact-SHA security artifact: `{conditions['exact_security_evidence']}`",
               '- LIVE trading: **OFF/LOCKED**','- Order actions performed: **false**','',
-              'Healthy broker state cannot override rotator reliability failure.',
+              'Healthy broker state cannot override attributable rotator reliability failure.',
               'A deterministic FAIL/BLOCKED state cannot be overridden by AI.',''
           ]
           (out/'unified_verdict.md').write_text('\n'.join(md), encoding='utf-8')
