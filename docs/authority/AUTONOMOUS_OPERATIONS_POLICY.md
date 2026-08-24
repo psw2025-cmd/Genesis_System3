@@ -4,6 +4,8 @@
 
 Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
 
+Canonical user-action/autonomy-speed policy: `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` (`SYSTEM3_USER_ACTION_AUTONOMY_SPEED_V1`).
+
 ## Authority
 
 - Google Cloud project `system3-openalgo-safe` is the authoritative production/runtime platform.
@@ -14,6 +16,14 @@ Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLI
 ## Operating objective
 
 Routine production engineering must not depend on the user running technical commands. The control plane should investigate, patch, test, deploy, roll back, repair declared IAM drift, collect logs/evidence, and verify runtime/UI truth through GitHub Actions and Google Cloud.
+
+The control plane must also proactively identify any account/settings/access step that the user can perform to materially accelerate safe autonomy. `HUMAN_ACTION_REQUIRED=NO` must never be used as shorthand for `there is nothing useful the user can do`. Before claiming `USER_ACTION=NONE`, agents must complete the 19-point self-MRI in `USER_ACTION_AUTONOMY_SPEED_POLICY.md` and separately report `MANDATORY_USER_ACTION` and `OPTIONAL_ACCELERATION_ACTION`.
+
+## User-action acceleration contract
+
+For any useful user-side action, agents must provide kid-level instructions containing `WHY`, `WHERE`, `CLICK`, `SET`, `DO NOT`, `RESULT`, `PROOF`, and `URGENCY`. Agents must continue all safe autonomous work in parallel and may not make the user run technical commands the connected control plane can execute itself.
+
+A useful optional acceleration step must be surfaced early, before hours of retries or coordination delay. Examples include repository ruleset/review configuration, connector authorization, environment protection, external account approval, billing/org settings, or any other account-level control the agent cannot set itself. Faster operation must come from removing avoidable coordination/access friction, never from weakening safety, skipping failed checks, exposing secrets, or enabling LIVE trading.
 
 ## Temporal truth override
 
@@ -89,3 +99,5 @@ A green deployment or 22/22 render-only smoke does not prove semantic data readi
 ## Human-only break-glass boundary
 
 Human intervention can still be required for external account/billing suspension, organization-level policy outside this project, revoked GitHub/GCP account ownership, WIF-provider destruction when neither delegated repair identity can authenticate, external broker identity/MFA reset, or intentionally destructive actions. These are not normal System3 operational tasks.
+
+Even when none of these mandatory human-only blockers exists, agents must still report any optional user-side acceleration action found by the 19-point self-MRI instead of writing a misleading blanket `no action required` statement.
