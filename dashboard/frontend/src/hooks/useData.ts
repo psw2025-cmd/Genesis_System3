@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
+import { mergeAuthoritativeBrokerStatus } from '../lib/brokerStatus'
 
 const BASE = API_BASE || window.location.origin
 
@@ -257,23 +258,12 @@ export function useData() {
       const batch = await fetchJSON('/api/batch/positions-holdings')
       markSuccess('broker')
       let brokerStatus = batch?.broker_status || pendingBrokerStatus({ message: 'batch missing broker_status' })
-      // System tab needs token_proof; older slim batches omitted it — enrich from full status.
-      if (brokerStatus && !(brokerStatus as any).token_proof) {
-        try {
-          const full = await fetchJSON('/api/broker/status', 12000)
-          if (full && typeof full === 'object' && (full as any).token_proof) {
-            brokerStatus = {
-              ...brokerStatus,
-              token_proof: (full as any).token_proof,
-              token_reload: (full as any).token_reload ?? (brokerStatus as any).token_reload,
-              canonical_rotation: (full as any).canonical_rotation ?? (brokerStatus as any).canonical_rotation,
-              latency_ms: (full as any).latency_ms ?? (brokerStatus as any).latency_ms,
-              connected: (full as any).connected ?? (brokerStatus as any).connected,
-            }
-          }
-        } catch {
-          // Keep batch status; System tab stays last-good / pending.
-        }
+      // Batch broker state can lag; always converge it with the authoritative endpoint.
+      try {
+        const full = await fetchJSON('/api/broker/status', 12000)
+        brokerStatus = mergeAuthoritativeBrokerStatus(brokerStatus, full)
+      } catch {
+        // Keep batch status and its last-known-safe metadata when full status is unavailable.
       }
       setBrokerStatus(brokerStatus)
       setBrokerHoldings(batch?.holdings || pendingRows({ message: 'batch missing holdings' }, 'Holdings'))
