@@ -2268,8 +2268,8 @@ _PUSHED_CHAIN_FRESH_S = 45
 _PUSHED_CHAIN_STALE_SERVE_S = 180  # still show last good rows (marked stale) before live fetch
 _PUSHED_CHAIN_STALE_SERVE_S_CLOSED = 86400  # after hours: never block UI waiting on Dhan OC
 _PUSHED_CHAIN_FRESH_S_CLOSED = 3600  # worker/micro-loop off-hours window
-_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX")
-# Smoke/UI semantic proof requires these four; SENSEX is optional and must not
+_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX")
+# Smoke/UI semantic proof requires these four; SENSEX and BANKEX are optional and must not
 # delay required-symbol cold-start readiness via the serial 20s closed-market gap.
 _REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
 _CHAIN_COLD_START_GAP_S = 3.5  # DSM OC pacing only; never the 20s closed-market sleep
@@ -6174,7 +6174,7 @@ async def websocket_endpoint(websocket: WebSocket):
 async def index_chain_micro_loop():
     """Paced index option-chain warmer for market-hours streaming.
 
-    Owns live Dhan OC for NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY. WS + UI must
+    Owns live Dhan OC for the configured NSE/BSE index stream symbols. WS + UI must
     read `_PUSHED_CHAIN_CACHE` only — never fan-out live OC themselves.
 
     Cold-start warms the four required smoke symbols back-to-back (DSM gap
