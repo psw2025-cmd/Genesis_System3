@@ -19,6 +19,7 @@ secret, LIVE, IAM, deploy, or order mutation.
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import os
 import urllib.error
@@ -41,6 +42,16 @@ MARKERS = (
 ACTIVE_STATES = {"queued", "in_progress", "waiting", "pending", "requested"}
 FAIL_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
 DEFAULT_ACTIVE_PR_MAX_AGE_H = 72.0
+GITHUB_MONITOR_CSV = ROOT / "audit" / "live_agent_issue_ledger" / "SYSTEM3_GITHUB_ISSUES_PRS_ACTIONS.csv"
+MONITOR_COLUMNS = (
+    "Tab (Issues / PullRequests / Actions)",
+    "ItemID / Title",
+    "Status (Open / Closed / Failed / Passed)",
+    "RootCause",
+    "ResolutionStep",
+    "VerificationProof",
+    "ImprovementPotential",
+)
 
 
 @dataclass(frozen=True)
@@ -313,16 +324,20 @@ def _open_prs(repo: str) -> tuple[list[dict[str, Any]], set[str]]:
     return all_open_prs, current_relevant_shas
 
 
-def _recent_open_issues(repo: str) -> list[dict[str, Any]]:
-    payload = api_get(
+def _issues_inventory(repo: str) -> list[dict[str, Any]]:
+    payload = api_get_pages(
         repo,
         "issues",
-        params={"state": "open", "sort": "updated", "direction": "desc", "per_page": 30},
+        params={"state": "all", "sort": "updated", "direction": "desc"},
+        max_pages=10,
     )
     return [
         {
             "number": item.get("number"),
             "title": item.get("title"),
+            "state": item.get("state"),
+            "created_at": item.get("created_at"),
+            "closed_at": item.get("closed_at"),
             "updated_at": item.get("updated_at"),
             "labels": [label.get("name") for label in (item.get("labels") or [])],
             "html_url": item.get("html_url"),
@@ -330,6 +345,183 @@ def _recent_open_issues(repo: str) -> list[dict[str, Any]]:
         for item in payload
         if not item.get("pull_request")
     ]
+
+
+def _age_days(value: Any, *, now: datetime | None = None) -> float | None:
+    stamp = _parse_github_utc(value)
+    if stamp is None:
+        return None
+    current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    return round(max(0.0, (current - stamp).total_seconds() / 86400.0), 2)
+
+
+def _failed_step_summary(run: dict[str, Any]) -> str:
+    parts: list[str] = []
+    for job in run.get("failed_jobs") or []:
+        steps = ", ".join(
+            str(step.get("name")) for step in (job.get("failed_steps") or []) if step.get("name")
+        )
+        parts.append(f"{job.get('name')}: {steps or job.get('conclusion') or 'failed'}")
+    return " | ".join(parts) or "Failed job/log inspection required; no failed-step metadata returned"
+
+
+def build_monitor_rows(snapshot: dict[str, Any]) -> list[dict[str, str]]:
+    """Project one GitHub Issues/PRs/Actions inventory into the user CSV contract."""
+    captured = str(snapshot.get("captured_at_utc") or "UNKNOWN")
+    main_sha = str(snapshot.get("main_sha") or "UNKNOWN")
+    rows: list[dict[str, str]] = []
+    failed_pr_heads = {
+        str(run.get("head_sha") or "")
+        for run in (snapshot.get("actionable_runs") or [])
+        if run.get("conclusion") in FAIL_CONCLUSIONS
+    }
+
+    for issue in snapshot.get("issues_inventory") or []:
+        state = str(issue.get("state") or "open").lower()
+        age = _age_days(issue.get("updated_at"))
+        stale = state == "open" and age is not None and age > 30
+        labels = ",".join(str(label) for label in (issue.get("labels") or [])) or "none"
+        root = (
+            f"STALE_OPEN_{age}_DAYS; labels={labels}; detailed product RCA remains issue-owned"
+            if stale
+            else f"labels={labels}; issue narrative requires authoritative boundary verification"
+        )
+        rows.append(
+            {
+                MONITOR_COLUMNS[0]: "Issues",
+                MONITOR_COLUMNS[1]: f"#{issue.get('number')} / {issue.get('title')}",
+                MONITOR_COLUMNS[2]: "Closed" if state == "closed" else "Open",
+                MONITOR_COLUMNS[3]: root,
+                MONITOR_COLUMNS[4]: (
+                    "Preserve closure proof and watch for recurrence"
+                    if state == "closed"
+                    else "Reproduce from current authority, claim ownership, remediate, verify CI and runtime/UI, then close"
+                ),
+                MONITOR_COLUMNS[5]: f"captured={captured}; updated={issue.get('updated_at')}; {issue.get('html_url')}",
+                MONITOR_COLUMNS[6]: "Convert repeated cause into regression, sentinel predicate and deduplicated blocker",
+            }
+        )
+
+    for pr in snapshot.get("open_pull_requests") or []:
+        merge_state = str(pr.get("mergeable_state") or "unknown").lower()
+        conflict = pr.get("mergeable") is False or merge_state in {"dirty", "conflicting"}
+        check_failure = str(pr.get("head_sha") or "") in failed_pr_heads
+        failed = conflict or check_failure
+        status = "Failed" if failed else "Open"
+        if conflict:
+            root = f"Merge conflict at head={pr.get('head_sha')} base={pr.get('base_sha')}"
+            resolution = "Rebuild/rebase from current main without overwriting newer ownership; rerun exact-head checks"
+        elif check_failure:
+            root = f"At least one current actionable workflow failed on exact PR head={pr.get('head_sha')}"
+            resolution = "Inspect the exact failed job/step/log/artifact, fix root cause, and rerun mandatory checks"
+        elif pr.get("draft"):
+            root = f"Draft PR; mergeable_state={merge_state}; exact-head readiness not asserted"
+            resolution = "Finish bounded scope, update tests/evidence, mark ready, then verify mandatory checks"
+        elif merge_state == "blocked":
+            root = "Repository review/protection gate blocks merge; do not bypass required review"
+            resolution = "Obtain independent review and recheck exact-head mandatory checks before merge"
+        else:
+            root = f"Open PR awaiting controlled gate; mergeable_state={merge_state}; age_hours={pr.get('age_hours')}"
+            resolution = "Inspect exact-head checks and ownership; merge only when policy-authorized and green"
+        rows.append(
+            {
+                MONITOR_COLUMNS[0]: "PullRequests",
+                MONITOR_COLUMNS[1]: f"#{pr.get('number')} / {pr.get('title')}",
+                MONITOR_COLUMNS[2]: status,
+                MONITOR_COLUMNS[3]: root,
+                MONITOR_COLUMNS[4]: resolution,
+                MONITOR_COLUMNS[5]: f"captured={captured}; head={pr.get('head_sha')}; updated={pr.get('updated_at')}; {pr.get('html_url')}",
+                MONITOR_COLUMNS[6]: "Keep one defect/owner per PR; retire stale branches after proven supersession",
+            }
+        )
+
+    represented_run_ids: set[int] = set()
+    for workflow in snapshot.get("workflow_inventory") or []:
+        run = workflow.get("latest_run") or {}
+        if run.get("id"):
+            represented_run_ids.add(int(run["id"]))
+        workflow_state = str(workflow.get("state") or "unknown")
+        if workflow_state != "active":
+            status = "Closed"
+            root = (
+                f"RETIRED_OR_DISABLED_WORKFLOW; state={workflow_state}; "
+                f"historical_latest_conclusion={run.get('conclusion')}"
+            )
+            resolution = "Keep disabled; do not rerun or restore outside the approved workflow allow-list"
+        elif not run:
+            status = "Open"
+            root = "Workflow has no run evidence"
+            resolution = "Dispatch only when policy permits and inspect the first result"
+        elif run.get("status") in ACTIVE_STATES:
+            status = "Open"
+            root = f"Workflow run is {run.get('status')}"
+            resolution = "Wait boundedly, poll exact run to completion, then inspect any failed job/log/artifact"
+        elif run.get("conclusion") in FAIL_CONCLUSIONS:
+            status = "Failed"
+            if run.get("relevant_failure"):
+                root = _failed_step_summary(run)
+                resolution = "Inspect actual failed job logs/artifacts; fix root cause; rerun through normal trigger"
+            else:
+                root = f"HISTORICAL_HEAD_FAILURE; {_failed_step_summary(run)}"
+                resolution = "Keep as historical context unless fresh main/active-PR/runtime evidence makes it actionable"
+        else:
+            status = "Passed"
+            root = f"Latest run conclusion={run.get('conclusion')}; proves only this workflow contract"
+            resolution = "Retain immutable run identity; continue runtime/UI proof where applicable"
+        rows.append(
+            {
+                MONITOR_COLUMNS[0]: "Actions",
+                MONITOR_COLUMNS[1]: f"{workflow.get('id')} / {workflow.get('name')}",
+                MONITOR_COLUMNS[2]: status,
+                MONITOR_COLUMNS[3]: root,
+                MONITOR_COLUMNS[4]: resolution,
+                MONITOR_COLUMNS[5]: f"captured={captured}; main={main_sha}; run={run.get('id')}; head={run.get('head_sha')}; updated={run.get('updated_at')}; {run.get('html_url')}",
+                MONITOR_COLUMNS[6]: "Add a focused regression and failure fingerprint when a cause repeats",
+            }
+        )
+
+    for run in snapshot.get("actionable_runs") or []:
+        run_id = int(run.get("id") or 0)
+        if not run_id or run_id in represented_run_ids:
+            continue
+        if run.get("status") in ACTIVE_STATES:
+            status = "Open"
+            root = f"Actionable run is {run.get('status')} on head={run.get('head_sha')}"
+            resolution = "Poll this exact run to completion and inspect its jobs/artifacts"
+        else:
+            status = "Failed"
+            root = _failed_step_summary(run)
+            resolution = "Inspect this exact current-main/current-PR failure; remediate root cause through a controlled PR"
+        rows.append(
+            {
+                MONITOR_COLUMNS[0]: "Actions",
+                MONITOR_COLUMNS[1]: f"run-{run_id} / {run.get('name')} (actionable run)",
+                MONITOR_COLUMNS[2]: status,
+                MONITOR_COLUMNS[3]: root,
+                MONITOR_COLUMNS[4]: resolution,
+                MONITOR_COLUMNS[5]: f"captured={captured}; main={main_sha}; run={run_id}; head={run.get('head_sha')}; updated={run.get('updated_at')}; {run.get('html_url')}",
+                MONITOR_COLUMNS[6]: "Bind remediation and regression to exact run/head rather than latest-workflow label",
+            }
+        )
+    return rows
+
+
+def monitor_alerts(rows: list[dict[str, str]]) -> list[str]:
+    return [
+        row[MONITOR_COLUMNS[1]]
+        for row in rows
+        if row[MONITOR_COLUMNS[2]] == "Failed"
+        and not row[MONITOR_COLUMNS[3]].startswith("HISTORICAL_HEAD_FAILURE")
+    ]
+
+
+def write_monitor_csv(rows: list[dict[str, str]], path: Path) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=MONITOR_COLUMNS, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        writer.writerows(rows)
+    return path
 
 
 def _coordination(
@@ -400,9 +592,9 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
                 )
             except Exception as exc:
                 latest["artifact_query_error"] = type(exc).__name__
+            if latest_raw.get("conclusion") in FAIL_CONCLUSIONS:
+                latest["failed_jobs"] = _failed_jobs(repo, latest_raw.get("id"))
             if latest_raw.get("status") != "completed" or latest["relevant_failure"]:
-                if latest_raw.get("conclusion") in FAIL_CONCLUSIONS:
-                    latest["failed_jobs"] = _failed_jobs(repo, latest_raw.get("id"))
                 actionable_by_id[int(latest_raw.get("id") or 0)] = latest
         workflow_inventory.append(
             {
@@ -441,7 +633,7 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         reverse=True,
     )
     issue_188, newest_markers = _coordination(repo, issue_number)
-    recent_issues = _recent_open_issues(repo)
+    issues_inventory = _issues_inventory(repo)
     decision = choose_next_action(
         main_sha=main_sha, workflows=actionable_runs, active_prs=open_prs
     )
@@ -464,7 +656,8 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         "current_relevant_pr_count": sum(
             1 for pr in open_prs if pr.get("current_relevance") is True
         ),
-        "recent_open_issues": recent_issues,
+        "issues_inventory": issues_inventory,
+        "recent_open_issues": [issue for issue in issues_inventory if issue.get("state") == "open"][:30],
         "coordination_markers": newest_markers,
         "policy": {
             "historical_failures": "context_only_unless_current_main_or_current_active_pr_dependency",
@@ -479,7 +672,7 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
     }
 
 
-def write_snapshot(snapshot: dict[str, Any], out_dir: Path) -> tuple[Path, Path]:
+def write_snapshot(snapshot: dict[str, Any], out_dir: Path) -> tuple[Path, Path, Path]:
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "workflow_issue_artifact_snapshot.json"
     md_path = out_dir / "NEXT_ACTION.md"
@@ -495,7 +688,17 @@ def write_snapshot(snapshot: dict[str, Any], out_dir: Path) -> tuple[Path, Path]
         "> Generated snapshot only. Re-run before every production-relevant transition; never use this stored file as live truth.\n"
     )
     md_path.write_text(md, encoding="utf-8")
-    return json_path, md_path
+    rows = build_monitor_rows(snapshot)
+    csv_path = write_monitor_csv(rows, out_dir / "SYSTEM3_GITHUB_ISSUES_PRS_ACTIONS.csv")
+    snapshot["github_monitor"] = {
+        "schema": "SYSTEM3_GITHUB_MONITOR_CSV_V1",
+        "row_count": len(rows),
+        "alert_count": len(monitor_alerts(rows)),
+        "columns": list(MONITOR_COLUMNS),
+        "csv_path": str(csv_path),
+    }
+    json_path.write_text(json.dumps(snapshot, indent=2, sort_keys=True), encoding="utf-8")
+    return json_path, md_path, csv_path
 
 
 def main() -> int:
@@ -505,19 +708,27 @@ def main() -> int:
     parser.add_argument("--repo", default=DEFAULT_REPO)
     parser.add_argument("--issue", type=int, default=DEFAULT_ISSUE)
     parser.add_argument("--out-dir", default=str(OUT_DIR))
+    parser.add_argument("--monitor-csv", default=str(GITHUB_MONITOR_CSV))
+    parser.add_argument("--fail-on-monitor-alert", action="store_true")
     parser.add_argument("--print-json", action="store_true")
     args = parser.parse_args()
 
     snapshot = build_snapshot(args.repo, args.issue)
-    json_path, md_path = write_snapshot(snapshot, Path(args.out_dir))
+    json_path, md_path, snapshot_csv = write_snapshot(snapshot, Path(args.out_dir))
+    rows = build_monitor_rows(snapshot)
+    live_csv = write_monitor_csv(rows, Path(args.monitor_csv))
+    alerts = monitor_alerts(rows)
     print(f"STATUS={snapshot['status']}")
     print(f"CURRENT_STEP={snapshot['current_step']}")
     print(f"NEXT_ACTION={snapshot['next_action']}")
     print(f"SNAPSHOT={json_path}")
     print(f"NEXT_ACTION_FILE={md_path}")
+    print(f"MONITOR_SNAPSHOT_CSV={snapshot_csv}")
+    print(f"MONITOR_LIVE_CSV={live_csv}")
+    print(f"MONITOR_ALERTS={len(alerts)}")
     if args.print_json:
         print(json.dumps(snapshot, indent=2, sort_keys=True))
-    return 0
+    return 3 if args.fail_on_monitor_alert and alerts else 0
 
 
 if __name__ == "__main__":
