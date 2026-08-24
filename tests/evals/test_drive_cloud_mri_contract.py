@@ -29,6 +29,24 @@ def test_secret_and_noise_exclusions_are_fail_closed():
     assert "node_modules" in MODULE.SKIP_DIRS
     assert ".git" in MODULE.SKIP_DIRS
     assert "__pycache__" in MODULE.SKIP_DIRS
+    assert MODULE.secret_like_path(Path("C:/safe/api_key/private/report.csv"))
+    assert MODULE.secret_like_path(Path("D:/credentials/ordinary-name.csv"))
+
+
+def test_public_rows_never_emit_private_absolute_prefixes():
+    laptop = {
+        "path": Path("C:/Users/ADMIN/private/project/report.csv"),
+        "name": "report.csv",
+        "size": 10,
+        "mtime": 0,
+        "hash": None,
+    }
+    cloud = dict(laptop, rel="reports/report.csv")
+    laptop_row = MODULE.row(laptop, "Laptop", "Missing in Cloud", "test")
+    cloud_row = MODULE.row(cloud, "Cloud", "Already Synced", "test")
+    assert laptop_row[MODULE.COLUMNS[1]] == "<C_DRIVE>/[REDACTED]/report.csv"
+    assert "Users" not in laptop_row[MODULE.COLUMNS[1]]
+    assert cloud_row[MODULE.COLUMNS[1]] == "reports/report.csv"
 
 
 def test_recommendations_route_by_asset_role():
@@ -43,3 +61,5 @@ def test_runbook_locks_cloud_authority_and_large_report_handling():
     assert "Laptop drives are read-only discovery/input surfaces" in text
     assert "Large inventories" in text and "GitHub release asset" in text
     assert "never bulk-copy laptop history" in text
+    assert "RUHI/RHUI execution and dashboard truth law" in text
+    assert "docs/RUHI_RULE_V2.md" in text

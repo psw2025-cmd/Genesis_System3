@@ -1413,6 +1413,32 @@ not usefulness or import readiness. The immutable CSV asset URI and SHA-256 are
 recorded in the associated controlled PR/release; reruns supersede this snapshot
 only when linked to a newer exact cloud-main SHA.
 
+## RUHI/RHUI execution and dashboard truth law
+
+`docs/RUHI_RULE_V2.md` is the canonical rolling-batch coordination contract and
+must be read with this runbook, the temporal-truth policy, Issue #188 and
+`reports/coordination/ruhi_task_ledger.csv`. Historical RUHI handoffs and ledger
+rows retain their observation time; they do not override freshly fetched GitHub
+main, current PR ownership, current GCP revision or new production-browser/API
+evidence.
+
+Each material transition records `RULE_VERSION`, `BATCH_ID`, current main and
+serving SHA, market phase, previous commitment/result, completed proof,
+unfinished work, blocker/owner, next commitment, `AGENT_OWNED_ACTION`,
+`MANDATORY_USER_ACTION`, `OPTIONAL_ACCELERATION_ACTION`,
+`LIVE_DASHBOARD_PROOF` and `HIGHEST_GAIN_NEXT_ACTION`. Unfinished tasks remain
+`PARTIAL`, `BLOCKED`, `SUPERSEDED` or `NOT_STARTED`; they never disappear from a
+new batch merely because code exists, CI is green or an old proof passed.
+
+For user-visible work the final authority is a new exact-serving production
+browser session plus same-session read-only APIs. A 22/22 render result is not
+semantic closure when a required card/table/chart is blank, waiting, stale,
+degraded, misleading or contradicted by the API. Repeat unchanged concerns only
+at material transitions; do not spam them on a timer. Continue safe agent-owned
+work while independent review, market-open evidence or an external account gate
+is pending. Neither RUHI nor multi-agent coordination may weaken PAPER/ANALYZE,
+secret, WIF/IAM, deployment, broker-rotation or real-order safety boundaries.
+
 The append-only proof ledger is authoritative:
 
 ```text

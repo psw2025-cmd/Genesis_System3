@@ -30,7 +30,7 @@ SKIP_DIRS = {
     "__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", ".tox", "dist", "build", "target",
     "packages", "cache", "caches", "temp", "tmp",
 }
-SECRET_RE = re.compile(r"(^|[._-])(secret|credential|token|apikey|api_key|private[_-]?key|password|passwd)([._-]|$)", re.I)
+SECRET_RE = re.compile(r"(^|[._-])(secrets?|credentials?|tokens?|apikey|api_key|private[_-]?keys?|passwords?|passwd)([._-]|$)", re.I)
 RELEVANT_RE = re.compile(
     r"genesis|system3|trading|market|dhan|option|equity|model|predict|feature|backtest|dashboard|broker|portfolio|catalyst|audit",
     re.I,
@@ -41,6 +41,19 @@ EXTENSIONS = {
     ".ps1", ".bat", ".sh", ".png", ".jpg", ".jpeg", ".svg", ".webp", ".pkl", ".joblib",
 }
 MAX_HASH_BYTES = 512 * 1024 * 1024
+
+
+def secret_like_path(path: Path) -> bool:
+    """Reject a candidate when any parent or filename is secret-like."""
+    return any(SECRET_RE.search(part) for part in path.parts)
+
+
+def public_path(item: dict, repo_kind: str) -> str:
+    """Return useful evidence without publishing workstation/user prefixes."""
+    if repo_kind == "Cloud" and item.get("rel"):
+        return str(item["rel"])
+    drive = str(item["path"].drive or "ROOT").rstrip(":/\\").upper() or "ROOT"
+    return f"<{drive}_DRIVE>/[REDACTED]/{item['name']}"
 
 
 def git(repo: Path, *args: str) -> str:
@@ -125,7 +138,7 @@ def local_candidates(roots: list[Path], canonical_repo: Path):
             relevant_dir = bool(RELEVANT_RE.search(current))
             for name in files:
                 path = Path(current) / name
-                if SECRET_RE.search(name) or path.suffix.lower() not in EXTENSIONS:
+                if secret_like_path(path) or path.suffix.lower() not in EXTENSIONS:
                     continue
                 if not relevant_dir and not RELEVANT_RE.search(name):
                     continue
@@ -147,7 +160,7 @@ def listed_candidates(lists: list[Path], canonical_repo: Path):
                     continue
                 seen.add(value.lower())
                 path = Path(value)
-                if SECRET_RE.search(path.name):
+                if secret_like_path(path):
                     continue
                 try:
                     stat = path.stat()
@@ -161,7 +174,7 @@ def row(item, repo_kind: str, status: str, reason: str):
     modified = datetime.fromtimestamp(item["mtime"], timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     digest_note = f"h={item['hash']}" if item["hash"] else "h=NOT_COMPUTED"
     return {
-        COLUMNS[0]: item["name"], COLUMNS[1]: str(item["path"]), COLUMNS[2]: item["path"].drive or "/",
+        COLUMNS[0]: item["name"], COLUMNS[1]: public_path(item, repo_kind), COLUMNS[2]: item["path"].drive or "/",
         COLUMNS[3]: repo_kind, COLUMNS[4]: status,
         COLUMNS[5]: f"{reason};s={item['size']};m={modified};{digest_note}",
         COLUMNS[6]: potential, COLUMNS[7]: practice, COLUMNS[8]: reference,
