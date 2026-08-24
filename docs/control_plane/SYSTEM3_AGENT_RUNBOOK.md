@@ -279,6 +279,43 @@ not constants; refresh from Dhan's official master before every current claim.
 | Continuous learning/RL | BLOCKED | immutable challenger retraining/recalibration from reconciled PAPER outcomes; governed promotion and rollback | scheduled feature ablation/recalibration only | no in-place champion mutation, uncontrolled RL, LIVE enablement or capital deployment; BigQuery outcome evidence is not yet proven |
 | Issue #188 full closure | PARTIAL | exact-serving one-document 22-tab desktop/mobile API/UI proof plus 60 uninterrupted market minutes | bounded repeated proof windows only when the exchange session cannot supply 60 minutes; never relabel shorter evidence | PR #335 owns the proof harness; Overview/Genesis/time-series/model evidence and full current-master live coverage remain unresolved |
 
+##### Live unresolved-issue CSV and user-input contract
+
+The canonical Excel-readable projection of Continuous Closure issues is:
+
+`audit/live_agent_issue_ledger/SYSTEM3_LIVE_UNRESOLVED_ISSUES.csv`
+
+Use `scripts/system3_live_issue_ledger.py` to record or scan evidence. This CSV
+extends the canonical blocker cards/proof ledger; it does not replace GitHub
+Issue #188, `BACKLOG.md`, the JSONL proof ledger, or exact-serving UI evidence.
+
+- Detect terminal/log keywords such as ERROR, FAIL, WARNING, BLOCKED, WAITING,
+  DEGRADED, storage exhaustion and browser/ChromeDriver failures, but never
+  promote a keyword match into a root-cause or product-failure claim without
+  current authoritative reproduction.
+- Attempt the smallest safe resolution first. If unresolved, upsert the row with
+  evidence, attempted fixes, owner, next action and explicit
+  `user_input_required`. When that field is `YES`, `user_input_question` is
+  mandatory. Never use the CSV to request routine work the agent can perform.
+- Preserve resolved rows with resolution UTC/evidence. Never delete history to
+  make the ledger green. Repeated events increment `occurrence_count`.
+- Sanitize secret-like values before persistence. Do not capture response bodies,
+  Dhan token values, credentials, authorization headers or service-account keys.
+- The writer uses a same-directory temporary file and atomic replace. If Excel
+  holds an exclusive lock, append metadata to `.csv.pending.jsonl`; the next
+  successful invocation must merge the spool without loss. Users may therefore
+  keep the CSV open read-only; an Excel lock is visible, not silently ignored.
+- Storage pressure is HIGH when it blocks evidence/test/browser work. Report it
+  immediately, preserve user files, use the forensic cleanup authority, and
+  record free-space evidence plus the safe recovery action.
+- Chrome GCM messages such as `PHONE_REGISTRATION_ERROR` and
+  `DEPRECATED_ENDPOINT` are normally background registration diagnostics. Mark
+  them INFORMATIONAL/safe-to-ignore only after proving the required browser
+  session, production URL, UI/API capture and exit result were unaffected.
+- Every production fix still requires new desktop/mobile UI content and visual
+  quality review from a trader's perspective. A rendered tab, CSV row, HTTP 200,
+  CI green state or backend response alone is not final user proof.
+
 #### GitHub protection and single-deployer enforcement
 
 - Protect `main` with pull-request review, required exact-head checks, stale
