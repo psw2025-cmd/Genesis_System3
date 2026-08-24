@@ -119,15 +119,20 @@ class FullCloudAuditContractTests(unittest.TestCase):
         self.assertIn("`full-cloud-audit.yml`", self.policy)
         self.assertNotIn("schedule:", self.wf)
 
-    def test_unified_verdict_requires_all_deterministic_and_ai_gates(self):
+    def test_unified_verdict_requires_all_deterministic_gates_and_classifies_ai(self):
         for marker in (
             "cloud_audit_pass",
             "cloud_safety_pass",
             "rotator_reliability_pass",
             "exact_security_evidence",
             "security_audit_pass",
-            "ai_consensus_pass",
-            "all(conditions.values())",
+            "deterministic_pass=all(deterministic_conditions.values())",
+            "ai_consensus_pass=ai_state == 'PASS'",
+            "ai_external_unavailable=ai_state == 'BLOCKED_EXTERNAL_AI'",
+            "ai_adverse_or_invalid=not ai_consensus_pass and not ai_external_unavailable",
+            "if not deterministic_pass or ai_adverse_or_invalid:",
+            "evidence_grade='DETERMINISTIC_PASS_EXTERNAL_AI_UNAVAILABLE'",
+            "external_ai_required_for_deterministic_runtime_pass':False",
         ):
             self.assertIn(marker, self.wf)
 
