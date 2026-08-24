@@ -210,7 +210,7 @@ def _number_after(label: str, text: str) -> int | None:
 
 
 def _chain_metadata_line(text: str, symbol: str) -> str:
-    """Return the visible metadata line for the requested chain symbol.
+    """Return visible source metadata associated with the requested symbol.
 
     Example:
       status=... · symbol NIFTY · source=dhan · universe=security_id_list.csv
@@ -219,10 +219,21 @@ def _chain_metadata_line(text: str, symbol: str) -> str:
     """
     symbol_re = re.compile(rf"\bsymbol\s+{re.escape(symbol)}\b", flags=re.IGNORECASE)
     source_re = re.compile(r"\bsource\s*=", flags=re.IGNORECASE)
-    for raw in text.splitlines():
-        line = re.sub(r"\s+", " ", raw.strip())
-        if symbol_re.search(line) and source_re.search(line):
+    lines = [re.sub(r"\s+", " ", raw.strip()) for raw in text.splitlines() if raw.strip()]
+    for index, line in enumerate(lines):
+        if not symbol_re.search(line):
+            continue
+        if source_re.search(line):
             return line
+        # The production OptionChain header renders `SYMBOL ...` and its
+        # provenance on adjacent rows. Keep the search bounded to this symbol
+        # block so another chain or unrelated card cannot satisfy the proof.
+        for candidate in lines[index + 1 : index + 13]:
+            if re.search(r"\bsymbol\s+", candidate, flags=re.IGNORECASE):
+                break
+            if source_re.search(candidate):
+                return candidate
+        return ""
     return ""
 
 

@@ -9,7 +9,7 @@ SCRIPTS = ROOT / "scripts"
 if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
-from scripts.gcp_live_ui_snapshot import _chain_metadata_line, _chain_source_value, _is_bad_chain_source
+from scripts.gcp_live_ui_snapshot import _chain_metadata_line, _chain_source_value, _is_bad_chain_source  # noqa: E402
 
 
 class LiveUiTruthRemediationContractTests(unittest.TestCase):
@@ -175,6 +175,21 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan")
         self.assertFalse(_is_bad_chain_source(_chain_source_value(sample, "NIFTY")))
         self.assertIn("universe=security_id_list.csv", _chain_metadata_line(sample, "NIFTY"))
+
+    def test_chain_source_parser_accepts_current_two_line_production_layout(self):
+        sample = "\n".join(
+            [
+                "SYMBOL NIFTY",
+                "CONTRACTS 488",
+                "STRIKES 244",
+                "source=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT",
+                "SYMBOL BANKNIFTY",
+                "source=csv status=stale",
+            ]
+        )
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan")
+        self.assertIn("source=dhan", _chain_metadata_line(sample, "NIFTY"))
+        self.assertEqual(_chain_source_value(sample, "BANKNIFTY"), "csv")
 
     def test_chain_source_parser_rejects_explicit_non_dhan_sources(self):
         for source in ["csv", "synthetic", "yahoo", "mock", "fake"]:
