@@ -65,6 +65,21 @@ def test_global_contract_keeps_live_ui_semantic_truth_and_paper_safety():
     assert "AUTO_EXECUTE_TRADES=0" in text
 
 
+def test_speed_policy_requires_exact_user_run_and_cross_verify_loop():
+    text = _text(POLICY)
+    for marker in [
+        "USER_RUN_FILE_OR_COMMAND=",
+        "RETURN_THIS_EVIDENCE=",
+        "CROSS_VERIFY_RESULT=",
+        "ONLY_REMAINING_USER_CORRECTION=",
+        "AGENT_CONTINUES_WITH=",
+        "Repeat this verify-correct-reverify loop",
+        "do not make the user rerun already-PASS checks",
+        "#RUHI #RUHI2",
+    ]:
+        assert marker in text
+
+
 def test_speed_policy_does_not_weaken_safety_or_allow_failed_check_bypass():
     text = _text(POLICY)
     for forbidden_safety in [
