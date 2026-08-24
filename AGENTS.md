@@ -5,6 +5,7 @@
 **Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
 Read first:
+0. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
 1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
 2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
 3. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`

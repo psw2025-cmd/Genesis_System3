@@ -95,6 +95,16 @@ def test_runbook_declares_persistent_reread_and_safety_contract():
     assert "artifact digest/revision mapping" in text
     assert "Data-integrity and PAPER lifecycle acceptance" in text
     assert "missing fill, rewrite an execution record or force balance" in text
+    assert "Master production-closure contract" in text
+    assert "G01 Repository SHA" in text and "G19 Issue #188 coordination" in text
+    assert "Safe API and log-correlation law" in text
+    assert "Repository deep-MRI and duplication law" in text
+    assert "STATE_A_VERIFIED" in text
+    assert "STATE_B_EXTERNAL_BLOCKER" in text
+    assert "STATE_C_OWNERSHIP_BLOCKER" in text
+    assert "RHUI_PROGRESS_V2" in text
+    assert "Production Score = freshly PASS applicable gates" in text
+    assert "Remaining Top 20" in text
 
 
 def test_agent_entrypoints_reference_runbook_authority():
@@ -133,6 +143,10 @@ def test_agent_entrypoints_reference_runbook_authority():
     assert "self_reported_serving_sha_alone_sufficient: false" in policy
     assert "web_runtime_may_invoke_dhan_rotator: false" in policy
     assert "infer_missing_fills_or_rewrite_records: forbidden" in policy
+    assert "mission: maximum_safely_achievable_production_pass" in policy
+    assert "format: RHUI_PROGRESS_V2" in policy
+    assert "duplicate_root_cause_lane: forbidden" in policy
+    assert "unproven_stale_fail_or_blocked_counts_green: false" in policy
 
 
 def test_solution_matrix_rejects_visual_hype_and_keeps_user_choices():

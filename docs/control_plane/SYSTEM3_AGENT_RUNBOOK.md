@@ -276,6 +276,103 @@ documented source/target migration, idempotent migration test, rejection of
 unknown future major versions, and a bounded backward-compatibility window.
 Validators fail closed; they never silently discard unknown safety fields.
 
+### Master production-closure contract
+
+**Mission:** Move Genesis System3 toward the maximum safely achievable
+production PASS. Do not stop at reporting when a safe, non-overlapping,
+authorized remediation remains. Never manufacture a PASS, weaken a gate, or
+cross the LIVE/order/secret/account boundary to increase the score.
+
+For each run, maintain one deduplicated gate ledger with `PASS`, `FAIL`,
+`UNPROVEN`, `NOT_APPLICABLE`, or `BLOCKED_EXTERNAL`, current evidence UTC,
+evidence source, owner, defect/root cause, fix/PR/deployment, acceptance test and
+next action. Re-evaluate a downstream gate whenever its upstream SHA, revision,
+data source, credential version, contract or evidence window changes.
+
+| Gate | Required current proof |
+|---|---|
+| G01 Repository SHA | current GitHub `main` and canonical serving SHA equality or explicit deployment-in-progress state |
+| G02 Cloud Run MRI | project/region/service, ready revision, traffic, digest, runtime identity, scaling, safety env names/values and Secret Manager references without payloads |
+| G03 Broker MRI | read-only Dhan auth/profile/funds/holdings/positions status; rotate only through bounded authority when fresh evidence proves recovery is required |
+| G04 Market-data MRI | NIFTY, BANKNIFTY, FINNIFTY and MIDCPNIFTY source, as-of/age, contracts, expiries and strikes; additional supported underlyings reported separately |
+| G05 API MRI | allowlisted read-only routes with status, content type, bounded payload semantics, source timestamps and latency |
+| G06 UI MRI | all 22 canonical tabs: `OPENS`, `DATA`, `API`, `FRESH`, `ERRORS`, `VERDICT` from one new production browser lifecycle |
+| G07 API/UI parity | broker, funds, holdings, positions, indices and option-chain values/source/as-of/units agree or contradiction is explicit |
+| G08 Frontend forensics | console, page, hydration, failed fetch/XHR/WebSocket, timeout and infinite-loading evidence |
+| G09 Cloud-log correlation | browser trace/request ID and UTC window map to Cloud Run revision/request/backend outcome without secret payloads |
+| G10 Repository deep MRI | current remote-main scan of TODO/FIXME, mock/demo/synthetic truth, dead/duplicate endpoints, stale workflows, missing tests and ownership overlap |
+| G11 Root-cause engine | reproduce -> trace system cause -> search siblings -> smallest systemic fix -> regression proof; never cosmetic string suppression |
+| G12 Test pyramid | static/schema, unit, integration, regression, browser and safety-lock tests proportionate to risk |
+| G13 PR quality | exact defect, root cause, owned files, tests, before/after evidence, known limits and rollback |
+| G14 Merge authority | current-base/exact-head required checks, reviews/rulesets and no conflicting ownership |
+| G15 Deployment verification | intended source SHA, workflow/run, image digest, ready revision and 100% intended traffic |
+| G16 Post-deploy proof | new broker, market, API, UI, parity and log proof after the verified revision became ready |
+| G17 Continuous repair | repeat MRI -> root cause -> fix -> test -> PR -> deploy -> fresh proof while safe independent work remains |
+| G18 Safety | `ANALYZE_MODE=1`; LIVE/order locks `0`; no real order or secret exposure |
+| G19 Issue #188 coordination | current ownership/progress record using the required `RHUI_PROGRESS_V2` fields and evidence links |
+
+#### Safe API and log-correlation law
+
+Build the API MRI allowlist from current remote source and route metadata; do
+not run an inherited bulk endpoint list blindly. Deny or require special review
+for secret/audit-secret, mutation, order, rotation, runner, export or unknown
+compatibility routes. Use GET/HEAD only where source proves read-only behavior,
+with timeout, concurrency/rate, response-size and evidence-retention bounds plus
+recursive secret redaction. Record status, content type, latency, byte count,
+schema/semantic verdict, source/as-of time and sanitized request/correlation ID.
+
+Correlate browser failures by request/correlation ID when available; otherwise
+use a narrow UTC window, exact URL/method/status and revision. Absence of a log
+match is `UNPROVEN`, not proof that the backend was never called.
+
+#### Repository deep-MRI and duplication law
+
+Run the deep scan against freshly fetched remote `main`, then compare active PR
+heads and Issue #188 ownership before using local findings. Classify mock/demo
+references by test fixture, documentation, safe simulator or production-truth
+risk; filename/string matches alone are not defects. Confirm route reachability
+from registration and consumers before declaring an endpoint dead. Route each
+verified defect to one smallest non-overlapping lane and transfer evidence when
+another current owner exists.
+
+#### Stop conditions
+
+- `STATE_A_VERIFIED`: every applicable required gate has fresh PASS evidence;
+  remaining items are explicitly not applicable.
+- `STATE_B_EXTERNAL_BLOCKER`: only verified account, entitlement, billing, MFA,
+  destructive, LIVE/order or other non-delegable authority prevents progress;
+  publish the smallest secret-safe NAP and continue any independent lane.
+- `STATE_C_OWNERSHIP_BLOCKER`: a current agent/PR owns the exact files/root-cause
+  lane; post evidence to the coordination record and do not create a duplicate.
+
+Do not use a stop state because work is lengthy, CI is running, evidence is
+yellow, or one lane is blocked while another safe lane remains executable.
+
+#### Issue #188 `RHUI_PROGRESS_V2` contract
+
+At task start, after each material state change, and at handoff, post one
+deduplicated update containing: capture UTC/IST; agent/lane and owned files;
+current main/PR-head/serving SHA; workflow/run/attempt; image digest/revision/
+traffic; safety state; broker state without secrets; four-index chain counts and
+freshness; 22-tab/API/UI verdicts; defect/root cause/fix/tests; PR/deployment/
+proof links; blockers/owner; next action; and `HUMAN_ACTION_REQUIRED`. Update
+only when evidence or state changes; do not spam unchanged concerns.
+
+#### User result and production score
+
+Report `Production Score = freshly PASS applicable gates / applicable required
+gates * 100`, with numerator, denominator, capture window and excluded
+`NOT_APPLICABLE` gates. `UNPROVEN`, stale, FAIL and blocked gates are never
+counted green. Present:
+
+- `GREEN - WORKING`: freshly proven items and evidence time;
+- `RED - BROKEN`: symptom, root cause, fix/owner and current status;
+- `YELLOW - UNPROVEN`: exact missing or stale evidence;
+- `FIXED DURING RUN`: before/after SHA, PR, deployment and proof;
+- `Remaining Top 20`: evidence-ranked P0/P1/P2, owner and next action (fewer
+  rows when fewer verified items exist; never invent filler);
+- `Human Action`: YES/NO and the smallest exact action when YES.
+
 ### Data-integrity and PAPER lifecycle acceptance
 
 The `data-integrity` tab must expose evidence-backed summaries, not merely links
