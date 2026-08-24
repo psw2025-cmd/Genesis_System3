@@ -77,6 +77,48 @@ Rules:
 - Prefer visual/kid-level guidance for account settings, permissions, connectors, billing, organization settings, and external provider setup.
 - Give an expected speed benefit in plain language, for example: `This removes repeated manual merge blocks and lets green PRs move automatically after required review.`
 
+## Exact user-run command/file + cross-verification loop
+
+When the fastest safe path requires the user or the user's laptop agent to perform an action that this agent cannot execute directly, the agent must not respond with vague prose such as `run some checks`, `open settings`, or `ask your agent to verify`.
+
+The agent must provide the smallest exact runnable artifact available:
+
+1. Prefer one ready-to-run file (`.bat`, `.ps1`, `.sh`, or repository script) when several commands are needed.
+2. Otherwise provide one exact copy/paste command.
+3. State the exact directory/context from which to run it.
+4. State what output/evidence must be returned.
+5. Never request secret values; commands must redact token/secret payloads by default.
+6. After the user returns the output, the agent must independently cross-check every relevant capability/settings item it can verify from GitHub/GCP/current remote evidence.
+7. If anything remains missing, ambiguous, or misconfigured, report **only the smallest remaining correction** the user must make, using `WHY / WHERE / CLICK or RUN / SET / DO NOT / RESULT / PROOF / URGENCY`.
+8. Repeat this verify-correct-reverify loop until the required capability is proven or a genuine external blocker is reached.
+9. Do not make the user rerun already-PASS checks unless fresh evidence shows they may have changed.
+10. Once the required access/capability is proven, immediately continue the agent-owned implementation work; do not stop at the access audit.
+
+Required output fields for this loop:
+
+- `USER_RUN_FILE_OR_COMMAND=` exact artifact or `NONE`
+- `RETURN_THIS_EVIDENCE=` exact output needed
+- `CROSS_VERIFY_RESULT=` `PASS / PARTIAL / FAIL / UNPROVEN`
+- `ONLY_REMAINING_USER_CORRECTION=` exact smallest correction or `NONE`
+- `AGENT_CONTINUES_WITH=` next agent-owned executable action
+
+This rule applies especially to GitHub permissions/rulesets/actions, GCP/WIF/deploy visibility, canonical URL reachability, broker-cloud recovery authority, and any other setup that materially affects autonomous delivery speed.
+
+## RUHI start-of-work recall marker
+
+For Genesis System3 material work, `#RUHI #RUHI2` is a visible execution marker, not decoration. When used at task start or transition, it requires the agent to recall and apply this policy before acting or reporting.
+
+At minimum it means:
+
+- use already-verified access first;
+- do not forget or re-ask settled capability facts without cause;
+- surface the fastest safe user leverage immediately;
+- provide exact runnable commands/files instead of vague instructions when user execution is needed;
+- cross-verify returned evidence;
+- correct only what is still missing;
+- continue until the practical product result is proven;
+- treat live dashboard/UI + backend/API/data/model/paper-trade truth as the acceptance surface, not chat, plans, code existence, or render-only success.
+
 ## False-NO prevention
 
 The following statements are prohibited unless the 19-point self-MRI has been completed for the current material task:
