@@ -5,6 +5,7 @@ NSE scraping, Yahoo Finance, bhavcopy removed to save RAM.
 fetch_option_chain() preserved for chain_adapter.py compatibility.
 """
 from __future__ import annotations
+import csv
 import json
 import logging
 import os
@@ -253,6 +254,34 @@ class DataSourceManager:
             break
         return []
 
+    @staticmethod
+    def _nearest_master_expiry(sym: str) -> str:
+        """Return the nearest non-expired option expiry from Dhan's master."""
+        master = ROOT / "security_id_list.csv"
+        if not master.exists():
+            return ""
+        wanted = sym.strip().upper()
+        aliases = {"BSXOPT": "SENSEX", "BKXOPT": "BANKEX"}
+        today = date.today().isoformat()
+        found = set()
+        try:
+            with master.open(encoding="utf-8", errors="replace") as handle:
+                for row in csv.DictReader(handle):
+                    inst = str(row.get("SEM_INSTRUMENT_NAME") or row.get("INSTRUMENT") or "").upper()
+                    if inst not in {"OPTIDX", "OPTSTK"}:
+                        continue
+                    trading = str(row.get("SEM_TRADING_SYMBOL") or "").strip().upper()
+                    name = trading.split("-", 1)[0] if "-" in trading else str(
+                        row.get("SM_SYMBOL_NAME") or row.get("SYMBOL_NAME") or ""
+                    ).strip().upper()
+                    name = aliases.get(name, name)
+                    expiry_value = str(row.get("SEM_EXPIRY_DATE") or row.get("EXPIRY_DATE") or "").strip()[:10]
+                    if name == wanted and len(expiry_value) == 10 and expiry_value >= today:
+                        found.add(expiry_value)
+        except (OSError, csv.Error):
+            return ""
+        return min(found) if found else ""
+
     def _option_chain_expiry(self, dhan: Any, sec_id: int, segment: str, sym: str, expiry: str = "") -> str:
         """Resolve expiry via env override, then Dhan expiry_list, then calendar fallback."""
         explicit = (
@@ -273,6 +302,9 @@ class DataSourceManager:
                     return dates[0]
         except Exception as exc:
             logger.warning(f"[DSM] expiry_list failed for {sym}: {exc}")
+        master_expiry = self._nearest_master_expiry(sym)
+        if master_expiry:
+            return master_expiry
         return self._nearest_expiry()
 
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
