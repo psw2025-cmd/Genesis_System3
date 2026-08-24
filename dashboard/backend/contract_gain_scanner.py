@@ -280,7 +280,39 @@ def scan_all_segments_from_chains(
     }
 
 
-_SHARD_STATE: Dict[str, Any] = {"cursor": 0, "last_syms": []}
+def _new_shard_state() -> Dict[str, Any]:
+    return {
+        "cursor": 0,
+        "last_syms": [],
+        "universe": [],
+        "visited": set(),
+        "cycle": 1,
+        "cycle_complete": False,
+    }
+
+
+_SHARD_STATE: Dict[str, Any] = _new_shard_state()
+
+
+def equity_shard_coverage() -> Dict[str, Any]:
+    """Return bounded, JSON-safe accounting for the current OPTSTK scan cycle."""
+    universe = list(_SHARD_STATE.get("universe") or [])
+    visited = set(_SHARD_STATE.get("visited") or set()) & set(universe)
+    missing = sorted(set(universe) - visited)
+    total = len(universe)
+    return {
+        "schema_version": "system3.equity-option-shard-coverage.v1",
+        "cycle": int(_SHARD_STATE.get("cycle") or 1),
+        "universe_count": total,
+        "visited_count": len(visited),
+        "coverage_pct": round((len(visited) / total) * 100.0, 4) if total else 0.0,
+        "cycle_complete": bool(total and not missing),
+        "missing_symbols": missing,
+        "last_symbols": list(_SHARD_STATE.get("last_syms") or []),
+        "reliance_only": set(universe) == {"RELIANCE"},
+        "read_only": True,
+        "live_trading_enabled": False,
+    }
 
 
 def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
@@ -301,6 +333,9 @@ def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
         if not priority:
             priority = [s for s in (HIGH_MOMENTUM_EQUITY_FO + PRIORITY_EQUITY_FO) if True]
         all_names = list(universe.get("underlyings") or [])
+        if list(_SHARD_STATE.get("universe") or []) != all_names:
+            _SHARD_STATE.update(_new_shard_state())
+            _SHARD_STATE["universe"] = list(all_names)
         limit = max(3, min(int(limit or 12), 40))
 
         selected: List[str] = []
@@ -311,21 +346,22 @@ def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
                 break
 
         if rotate and all_names:
-            cursor = int(_SHARD_STATE.get("cursor") or 0) % max(1, len(all_names))
-            shard = []
-            for i in range(len(all_names)):
-                name = all_names[(cursor + i) % len(all_names)]
-                if name in selected:
-                    continue
-                shard.append(name)
-                if len(selected) + len(shard) >= limit:
-                    break
+            rotating_pool = [name for name in all_names if name not in selected]
+            cursor = int(_SHARD_STATE.get("cursor") or 0) % max(1, len(rotating_pool))
+            capacity = max(0, limit - len(selected))
+            shard = [
+                rotating_pool[(cursor + i) % len(rotating_pool)]
+                for i in range(min(capacity, len(rotating_pool)))
+            ] if rotating_pool else []
             selected.extend(shard)
-            _SHARD_STATE["cursor"] = (cursor + max(1, limit // 2)) % max(1, len(all_names))
+            _SHARD_STATE["cursor"] = (cursor + max(1, len(shard))) % max(1, len(rotating_pool))
         else:
             selected = selected[:limit]
 
         _SHARD_STATE["last_syms"] = selected[:limit]
+        visited = _SHARD_STATE.setdefault("visited", set())
+        visited.update(name for name in selected[:limit] if name in set(all_names))
+        _SHARD_STATE["cycle_complete"] = bool(all_names and set(all_names).issubset(visited))
         return selected[:limit]
     except Exception:
         return ["DIVISLAB", "LTM", "PAYTM", "JUBLFOOD", "RELIANCE", "HDFCBANK", "TCS", "INFY"][: max(3, min(limit, 20))]
@@ -473,6 +509,7 @@ def build_top_contract_gainers_report(
     report["equity_only_board"] = equity_only_board
     report["shard_cursor"] = _SHARD_STATE.get("cursor")
     report["shard_last_syms"] = list(_SHARD_STATE.get("last_syms") or [])
+    report["equity_shard_coverage"] = equity_shard_coverage()
     report["status"] = "ok" if report.get("contracts_scored_total", 0) > 0 else "no_data"
     report["diagnose"] = {
         "why_not_moneycontrol_parity": (
@@ -482,6 +519,7 @@ def build_top_contract_gainers_report(
         ),
         "equity_limit": eq_limit,
         "shard_last_syms": list(_SHARD_STATE.get("last_syms") or []),
+        "equity_shard_coverage": equity_shard_coverage(),
         "live_trading_enabled": False,
     }
     return report
