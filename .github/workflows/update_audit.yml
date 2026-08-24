@@ -1,0 +1,59 @@
+name: Auto-Update Endpoint Audit Proof
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 */6 * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  update-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Run Endpoint Scan & Generate Proof
+        run: |
+          mkdir -p audit
+          OUTPUT_FILE="audit/endpoint_scan_results.txt"
+          
+          echo "Scan Started: $(date -u)" > "$OUTPUT_FILE"
+          
+          ENDPOINTS=(
+            "/" "/api/health" "/api/healthz" "/healthz" "/api/state"
+            "/api/state/history" "/api/status" "/api/deploy/info" "/api/system_health"
+            "/api/memory" "/api/orch/ready" "/api/qc" "/api/qc/runtime"
+            "/api/broker/status" "/api/broker/dhan/status" "/api/broker/truth"
+            "/api/broker/holdings" "/api/broker/funds" "/api/broker/diagnose"
+            "/api/broker/positions/live" "/api/broker/positions" "/api/broker/deps" "/dhan-health"
+            "/api/market/live_board" "/api/market/top-gainers" "/api/market/top-losers"
+            "/api/portfolio/unified" "/api/positions" "/api/pnl" "/api/perf"
+            "/api/overview" "/api/risk" "/api/risk/portfolio"
+            "/api/signals" "/api/signals/enhanced" "/api/signal/top" "/api/paper"
+            "/api/orders" "/api/orders/history" "/api/trades/today" "/api/trades/history"
+            "/api/agent/status" "/api/agent/memory" "/api/agent/issues"
+            "/api/agent/upgrade-plan" "/api/learning/status" "/api/learning/insights"
+            "/api/forensic/report" "/api/validation/status" "/api/runner/status"
+          )
+          
+          BASE_URL="https://genesis-system3-web-doq2wplepa-el.a.run.app"
+          
+          for endpoint in "${ENDPOINTS[@]}"; do
+            echo "----------------------------------------" >> "$OUTPUT_FILE"
+            echo "GET: $BASE_URL$endpoint" >> "$OUTPUT_FILE"
+            curl -s "$BASE_URL$endpoint" >> "$OUTPUT_FILE" || echo "ERROR" >> "$OUTPUT_FILE"
+            echo "" >> "$OUTPUT_FILE"
+          done
+          
+          echo "----------------------------------------" >> "$OUTPUT_FILE"
+          echo "Scan completed: $(date -u)" >> "$OUTPUT_FILE"
+
+      - name: Commit and Push to GitHub (Source of Truth)
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add audit/endpoint_scan_results.txt
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(audit): automated cloud-native endpoint scan proof update" && git push)
