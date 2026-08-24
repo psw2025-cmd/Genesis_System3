@@ -1,0 +1,132 @@
+# Genesis System3 User-Action, Autonomy, and Speed Policy
+
+**Authority marker:** `SYSTEM3_USER_ACTION_AUTONOMY_SPEED_V1`
+
+This policy exists because agents previously made a harmful reasoning error: they treated `HUMAN_ACTION_REQUIRED=NO` as if it also meant `USER_ACTION=NONE` and as if no user-side setup could materially accelerate safe autonomous execution. For a non-coder owner, that behavior is misleading. It hides leverage that the agent is responsible for discovering and explaining.
+
+## Core law
+
+Every agent must distinguish three different questions on every material System3 task:
+
+1. **Can the agent continue safely without the user?**
+2. **Is there any user-side account/settings/access action that would materially speed up, unblock, or improve the quality of autonomous work?**
+3. **Is a true human-only/break-glass action mandatory before progress can continue?**
+
+These answers are independent.
+
+Therefore:
+
+- `HUMAN_ACTION_REQUIRED=NO` does **not** permit `USER_ACTION=NONE` unless the agent has actively checked for useful user-side setup actions.
+- If a safe user-side setting would materially reduce delays, retries, stale PRs, merge blocks, connector limitations, or proof gaps, the agent must surface it immediately in kid-level instructions.
+- The agent must continue all safe autonomous work in parallel while the user performs any optional acceleration step.
+- The user must never be asked to run technical commands that the connected agent can safely execute itself.
+
+## Mandatory 19-point self-MRI before saying USER_ACTION=NONE
+
+Before any agent reports `USER_ACTION=NONE`, `HUMAN_ACTION_REQUIRED=NO`, or equivalent, it must check all 19 items below and record the result in the active task ledger or Issue #188 when material:
+
+1. GitHub repository access is connected and current.
+2. Current `main` can be read remotely.
+3. Agent can create/update a branch when implementation is needed.
+4. Agent can create/update PRs.
+5. Agent can read exact-head CI checks and failed logs.
+6. Agent can review/comment on PRs.
+7. Merge is permitted by current repository governance after checks/review.
+8. Branch/ruleset protection does not accidentally block intended safe automation.
+9. Bypass permissions are no broader than necessary and do not weaken safety.
+10. Required status checks are correctly configured and actually emitted by relevant PRs.
+11. Required review settings are compatible with the available independent reviewer model.
+12. GitHub environment/deployment protection is configured so approved autonomous deployment is not silently blocked.
+13. GCP WIF/deploy identity is usable without service-account keys.
+14. GCP runtime/proof access is available to the responsible cloud agent.
+15. Browser/URL proof tooling can reach the canonical production URL.
+16. Broker recovery authority, if ever needed, is cloud-only and separately delegated.
+17. External account/provider actions that cannot be delegated are identified early.
+18. Another active agent/PR does not already own the same write surface.
+19. The fastest safe primary path and at least one safe alternative have been compared, with expected time/benefit explained to the user.
+
+If any item is `NO`, `PARTIAL`, or `UNKNOWN`, the agent must not hide it behind `USER_ACTION=NONE`.
+
+## Kid-level user guidance contract
+
+When a user action is useful or required, every agent must provide:
+
+- **WHY:** one sentence describing the concrete blocker or speed benefit.
+- **WHERE:** exact product/page path, for example `GitHub > Repository > Settings > Rules > Rulesets`.
+- **CLICK:** the exact control to click or toggle.
+- **SET:** the exact value to select.
+- **DO NOT:** the nearby setting that must remain unchanged for safety.
+- **RESULT:** what becomes faster or unblocked after the change.
+- **PROOF:** what screenshot, URL, or fresh API evidence the agent will verify afterwards.
+- **URGENCY:** `NOW`, `TODAY`, or `OPTIONAL`.
+
+Do not dump raw logs or assume coding knowledge when a graphical click path can be given.
+
+## Speed-first autonomous execution law
+
+For every open blocker, the agent must choose the fastest safe path that preserves production truth and safety. The operating order is:
+
+`fresh authority -> ownership -> user/setup leverage check -> parallel safe work -> root cause -> smallest systemic fix -> tests -> PR -> exact-head CI -> review -> merge -> deploy -> exact-serving URL/UI proof -> next blocker`
+
+Rules:
+
+- Never remain in chat/reporting mode when a safe executable repo/cloud action exists.
+- Never wait for the user on routine engineering that the agent can perform.
+- Never hide a useful user setup action merely because work can technically continue without it.
+- Never ask the user to weaken safety, enable LIVE, expose secrets, create service-account JSON keys, or bypass failed checks.
+- Prefer visual/kid-level guidance for account settings, permissions, connectors, billing, organization settings, and external provider setup.
+- Give an expected speed benefit in plain language, for example: `This removes repeated manual merge blocks and lets green PRs move automatically after required review.`
+
+## False-NO prevention
+
+The following statements are prohibited unless the 19-point self-MRI has been completed for the current material task:
+
+- `No action required from user.`
+- `HUMAN_ACTION_REQUIRED=NO` when a useful account/settings action exists but is merely optional.
+- `Everything is autonomous` when merge/review/deploy/account configuration is actually preventing autonomy.
+- `Waiting` when another safe non-overlapping lane is executable.
+
+Instead use two explicit fields:
+
+- `MANDATORY_USER_ACTION=` `NONE` or the true blocker.
+- `OPTIONAL_ACCELERATION_ACTION=` `NONE` or the fastest safe user-side setup improvement.
+
+A task may correctly have `MANDATORY_USER_ACTION=NONE` and simultaneously have a non-empty `OPTIONAL_ACCELERATION_ACTION`.
+
+## User-behavior adaptation
+
+System3 agents must assume the owner may be non-technical unless the current task proves otherwise. The agent must therefore:
+
+- explain settings visually and sequentially;
+- use screenshots as confirmation when available;
+- avoid jargon without a plain-language translation;
+- tell the user before an account-level setup becomes a blocker, not after hours of failed automation;
+- present the shortest safe path first and alternatives second;
+- explicitly state what the agent will do automatically after the user's click;
+- never make the user repeatedly rediscover the same setup requirement across agents.
+
+## Multi-agent propagation
+
+Every agent must read this policy before:
+
+- saying no user action is needed;
+- asking for user action;
+- recommending GitHub/GCP/account settings;
+- merge/deploy governance changes;
+- final status that claims autonomous progress.
+
+Issue #188 remains the coordination bus. A material autonomy/access/settings discovery must be posted once as a deduplicated transition so all agents inherit it.
+
+## Safety invariants remain unchanged
+
+This speed policy never authorizes:
+
+- LIVE trading;
+- real order placement/modification/cancellation;
+- secret/token/PIN/TOTP exposure;
+- service-account JSON keys;
+- bypassing failed mandatory checks;
+- destructive data deletion;
+- privilege expansion without governed approval.
+
+Faster means fewer avoidable coordination and permissions delays, not weaker safety.
