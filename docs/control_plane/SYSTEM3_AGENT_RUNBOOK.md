@@ -1361,6 +1361,52 @@ PAPER audit records.
 
 ## Completion ledger
 
+## Agent evidence discovery catalog
+
+Use `config/system3_agent_evidence_catalog.v1.json` as the canonical discovery
+**index**, not as a second runtime SSOT. Its schema is
+`schemas/system3_agent_evidence_catalog.v1.schema.json`; every normal
+`scripts/system3_preflight_control_plane.py` run embeds the catalog path,
+SHA-256, entry statuses and any missing required authority in the timestamped
+snapshot. This gives every agent one stable place to discover which existing
+authority, runner or ledger answers a question while preserving the evidence
+hierarchy in this runbook.
+
+Catalog states are `PRESENT`, `MISSING_REQUIRED`, `ABSENT_NOT_REQUIRED`, and
+`UNVERIFIED_CONDITIONAL`. A possible service such as BigQuery, Vertex AI,
+Dataflow, Kubernetes/Chaos Mesh, OPA, Redis, Prometheus or a separate inference
+endpoint is never mandatory merely because an external design proposes it.
+Discover the current architecture and need first. Promote a conditional entry
+only through policy/schema migration, least-privilege design, tests and normal
+PR review.
+
+External generated tables and “self-healing” plans are requirements input. Do
+not commit copied advertising, malformed encoding, invented URLs, example
+resource IDs, secret-name inventories or unverified PASS claims. In particular:
+
+- never enumerate or publish secret payloads; record sanitized presence and
+  metadata only when authorized;
+- never make a missing optional CLI, GCP product, signing key or dashboard a
+  global stop condition;
+- never infer that bare `DH-906` proves token expiry; use the bounded Dhan
+  authority and current request classification;
+- never let a detector repair IAM, blindly grant roles, enable APIs, create
+  infrastructure, publish artifacts, or open repetitive issues without the
+  governed remediation and approval boundary;
+- never write a competing root `CSV_GATE.csv`. Use the existing live issue
+  ledger, proof ledger and control-plane snapshot, with a stable blocker ID,
+  evidence time, owner, next action and genuine user action;
+- never poll or alert on a fixed timer solely to repeat unchanged concerns.
+  Re-run at request start and every material transition; scheduled automation
+  may run at a governed cadence with concurrency, cost and rate-limit controls.
+
+When an indexed required file is missing, fail closed before a production
+transition, update the existing blocker/concern ledger, and repair the canonical
+mechanism. When a conditional capability is absent, report
+`ABSENT_NOT_REQUIRED` or `UNVERIFIED_CONDITIONAL`; do not fabricate a resource
+or label the system failed. User-visible completion still requires new exact-
+serving production browser/API evidence, never a catalog or stored snapshot.
+
 ## Drive-to-cloud MRI and single-authority import law
 
 GitHub `psw2025-cmd/Genesis_System3` current `main` is the source authority.

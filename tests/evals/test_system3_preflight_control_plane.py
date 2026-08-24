@@ -4,7 +4,23 @@ from scripts.system3_preflight_control_plane import (
     classify_failure_relevance,
     choose_next_action,
     pr_is_currently_active,
+    load_evidence_catalog,
 )
+
+
+def test_agent_evidence_catalog_has_no_missing_required_repo_authority():
+    catalog = load_evidence_catalog()
+    assert catalog["schema"] == "SYSTEM3_AGENT_EVIDENCE_CATALOG_V1"
+    assert catalog["role"] == "discovery_index_not_live_truth"
+    assert catalog["missing_required"] == []
+    assert all(
+        item["status"] in {
+            "PRESENT",
+            "ABSENT_NOT_REQUIRED",
+            "UNVERIFIED_CONDITIONAL",
+        }
+        for item in catalog["entries"]
+    )
 
 
 def test_current_main_failure_is_actionable_but_old_failure_is_history():

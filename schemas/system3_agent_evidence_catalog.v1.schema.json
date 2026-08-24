@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/psw2025-cmd/Genesis_System3/schemas/system3_agent_evidence_catalog.v1.schema.json",
+  "title": "Genesis System3 Agent Evidence Discovery Catalog v1",
+  "type": "object",
+  "required": ["schema", "purpose", "entries"],
+  "properties": {
+    "schema": {"const": "SYSTEM3_AGENT_EVIDENCE_CATALOG_V1"},
+    "purpose": {"type": "string", "minLength": 20},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "requirement", "path", "runner"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9_]+$"},
+          "requirement": {"enum": ["required", "conditional"]},
+          "path": {"type": ["string", "null"]},
+          "runner": {"type": ["string", "null"]},
+          "activation": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

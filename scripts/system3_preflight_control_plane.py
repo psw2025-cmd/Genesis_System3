@@ -19,6 +19,7 @@ secret, LIVE, IAM, deploy, or order mutation.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import urllib.error
@@ -41,6 +42,7 @@ MARKERS = (
 ACTIVE_STATES = {"queued", "in_progress", "waiting", "pending", "requested"}
 FAIL_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
 DEFAULT_ACTIVE_PR_MAX_AGE_H = 72.0
+EVIDENCE_CATALOG = ROOT / "config" / "system3_agent_evidence_catalog.v1.json"
 
 
 @dataclass(frozen=True)
@@ -53,6 +55,36 @@ class Decision:
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def load_evidence_catalog(path: Path = EVIDENCE_CATALOG) -> dict[str, Any]:
+    """Return a bounded discovery index without promoting it to live truth."""
+    raw = path.read_bytes()
+    catalog = json.loads(raw.decode("utf-8"))
+    entries = []
+    missing_required = []
+    for item in catalog.get("entries", []):
+        repo_path = item.get("path")
+        exists = bool(repo_path and (ROOT / repo_path).is_file())
+        requirement = item.get("requirement")
+        if exists:
+            status = "PRESENT"
+        elif requirement == "required":
+            status = "MISSING_REQUIRED"
+            missing_required.append(item.get("id"))
+        elif repo_path:
+            status = "ABSENT_NOT_REQUIRED"
+        else:
+            status = "UNVERIFIED_CONDITIONAL"
+        entries.append({**item, "status": status})
+    return {
+        "schema": catalog.get("schema"),
+        "catalog_path": path.relative_to(ROOT).as_posix(),
+        "catalog_sha256": hashlib.sha256(raw).hexdigest(),
+        "role": "discovery_index_not_live_truth",
+        "missing_required": missing_required,
+        "entries": entries,
+    }
 
 
 def _token() -> str:
@@ -446,6 +478,7 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         main_sha=main_sha, workflows=actionable_runs, active_prs=open_prs
     )
 
+    evidence_catalog = load_evidence_catalog()
     return {
         "schema": "SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1",
         "captured_at_utc": utc_now(),
@@ -466,6 +499,7 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
         ),
         "recent_open_issues": recent_issues,
         "coordination_markers": newest_markers,
+        "agent_evidence_catalog": evidence_catalog,
         "policy": {
             "historical_failures": "context_only_unless_current_main_or_current_active_pr_dependency",
             "open_pr_history": "all_open_prs_are_inventoried_but_only_recent_current_relevant_heads_can_block",
