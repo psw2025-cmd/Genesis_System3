@@ -123,7 +123,7 @@ class DataSourceManager:
         "FINNIFTY": "IDX_I",
         "MIDCPNIFTY": "IDX_I",
         "SENSEX": "IDX_I",
-        "BANKEX": "IDX_I",
+        "BANKEX": "BSE_FNO",
     }
 
     def __init__(self):
