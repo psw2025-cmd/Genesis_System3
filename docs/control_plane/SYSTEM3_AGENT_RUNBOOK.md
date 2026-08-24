@@ -1361,6 +1361,58 @@ PAPER audit records.
 
 ## Completion ledger
 
+## Drive-to-cloud MRI and single-authority import law
+
+GitHub `psw2025-cmd/Genesis_System3` current `main` is the source authority.
+Laptop drives are read-only discovery/input surfaces and never become a second
+runtime, training, deployment or truth authority.
+
+For a drive-to-cloud investigation:
+
+1. fresh-fetch cloud `main`, active PR ownership and the repo-clean/prediction
+   policies before scanning;
+2. auto-discover mounted filesystem drives; record unavailable network mounts as
+   absent rather than inventing them;
+3. exclude operating-system/package/cache trees, links, credential/secret-like
+   paths and secret contents; collect only necessary metadata and bounded hashes;
+4. compare against the exact cloud-main tracked manifest and classify only as
+   `Missing in Cloud`, `Duplicate`, `Outdated`, or `Already Synced`;
+5. SHA-256 equality proves byte identity; filename, size, timestamp or an old
+   report alone never proves duplication or safe deletion;
+6. collapse exact clone occurrences while retaining an occurrence count and a
+   representative sanitized path; never upload raw private path prefixes to a
+   public repository;
+7. emit one RFC 4180 CSV with the user-required nine columns. Large inventories
+   belong in a GitHub release asset or governed versioned object, referenced by
+   SHA-256 from the repo, not committed into Git history;
+8. every `Missing in Cloud` or `Outdated` row is a review candidate, not approval
+   to import it. Promote only the smallest useful subset through isolated
+   branch/PR, licensing, secret, lineage, test and ownership gates;
+9. prediction/data candidates require point-in-time lineage, availability time,
+   leakage checks, baselines, costed OOS evidence and immutable storage before
+   adoption; UI candidates require API/UI parity, accessibility and fresh
+   Playwright proof; orchestration candidates require one authority, provenance,
+   idempotency, least privilege and rollback;
+10. never bulk-copy laptop history, datasets, models, screenshots or scripts into
+    cloud merely because the scanner found them.
+
+This inventory law complements, and must not replace or fork,
+`scripts/system3_drive_archive_control.py`. The MRI scanner is report-only and
+has no archive upload, receipt, cleanup or deletion authority. If an identified
+artifact is later selected for private archival, use the archive controller's
+bounded parts and verified receipt gates. If selected for product integration,
+use the normal cloud-main branch/PR/data-lineage gates instead.
+
+The 2026-08-24 MRI used `scripts/system3_drive_cloud_mri.py` against cloud main
+`9dbf1911d016bcd3611651390cfca28658d96d41`. It discovered C:, D:, E: and F:
+(no network mount), evaluated 491,646 laptop candidates and 2,680 cloud files,
+and produced 296,395 sanitized, hash-collapsed rows after excluding secret-like
+laptop paths. Counts were: 245,145 `Missing in Cloud`, 40,041 `Duplicate`, 5,908
+`Outdated`, and 5,301 `Already Synced`. These counts measure inventory states,
+not usefulness or import readiness. The immutable CSV asset URI and SHA-256 are
+recorded in the associated controlled PR/release; reruns supersede this snapshot
+only when linked to a newer exact cloud-main SHA.
+
 The append-only proof ledger is authoritative:
 
 ```text
