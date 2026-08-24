@@ -1286,6 +1286,69 @@ Use primary research and official provider documentation for technical
 decisions. Search again for current evidence; this list is not a frozen claim
 that these are the best future choices.
 
+## Private Google Drive archive and low-space cleanup control
+
+Google Drive is an **archive/recovery surface only**. GitHub `main` remains the
+code/configuration source of truth, and the canonical Google Cloud Run revision
+remains runtime truth. Never run a Git worktree, database, Python environment,
+`node_modules`, browser profile, GitHub Actions runner, or production process
+from a synchronized Drive folder. Never allow a Drive copy to overwrite newer
+GitHub/cloud state.
+
+Canonical controller:
+
+```powershell
+python scripts/system3_drive_archive_control.py --help
+```
+
+The controlled paths are:
+
+1. **Repository autosnapshot:** snapshot only a clean worktree whose `HEAD`
+   equals freshly fetched `origin/main`. Use `git archive`; never copy `.git`,
+   local branches, stashes, untracked work, ignored caches or a dirty worktree.
+   A stale/local SHA must fail as `NOT_EXACT_ORIGIN_MAIN`.
+2. **Heavy-log trigger:** when a declared disk-free threshold is breached,
+   scan only explicitly supplied log/report roots, minimum size and minimum age.
+   Stage allowlisted inactive `.log`, `.txt`, `.json`, `.jsonl` or `.csv` files
+   into bounded chunks. Databases, models, datasets outside those roots,
+   symlinks, secret-like paths and active runner files are not logs.
+3. **Drive upload:** a Drive-authorized agent uploads every part to the private
+   owner-only archive. Google Drive Desktop local-sync state alone is never
+   remote proof. Consumer Drive OAuth must not be replaced by a service-account
+   JSON key, and no Drive credential/token may enter Git, logs or chat.
+4. **SHA and metadata receipt:** download/hash every bounded remote part and
+   record `drive_file_id`, exact parent ID, byte size, SHA-256, owner, sharing
+   state and verification UTC in `SYSTEM3_DRIVE_RECEIPT_V1`. Filename or an
+   uploaded manifest that merely claims a hash is not verification.
+5. **Cleanup gate:** source deletion is forbidden until every part matches the
+   `SYSTEM3_DRIVE_ARCHIVE_V1` manifest, the receipt is owner-only (`shared=false`),
+   and the source still has the staged size/SHA. Deletion additionally requires
+   the explicit `--delete-source` switch. Any missing, stale, shared, ambiguous,
+   size-mismatched or hash-mismatched receipt fails closed and leaves the source.
+6. **Evidence:** append the manifest path, Drive folder/file IDs and URLs,
+   hashes, sizes, upload/verification/deletion UTC, result and remaining local
+   free space to the live issue ledger without secret payloads.
+
+Example low-space staging (staging is non-destructive):
+
+```powershell
+python scripts/system3_drive_archive_control.py trigger `
+  --log-root C:\Genesis_System3\logs `
+  --queue E:\System3_Drive_Archive_Queue `
+  --free-threshold-gib 20 --min-bytes 10485760 --min-age-hours 24
+```
+
+Primary path: the authenticated Google Drive connector uploads bounded archive
+parts and performs metadata plus downloaded-content hash readback. Alternative
+path: a separately authenticated user-OAuth Drive client may upload the same
+queue, but cleanup still requires the same API-derived receipt. A mounted
+DriveFS directory by itself may stage/synchronize bytes but may never authorize
+source deletion.
+
+This archive mechanism does not replace governed immutable Cloud Storage or
+BigQuery for production data integrity, market data, prediction lineage or
+PAPER audit records.
+
 ## Terminal and browser lifecycle
 
 - Track every agent-created process by purpose, PID/session ID, start time, and
