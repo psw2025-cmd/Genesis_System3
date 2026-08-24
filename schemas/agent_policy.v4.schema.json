@@ -10,7 +10,7 @@
     "schema_path": {"const": "schemas/agent_policy.v4.schema.json"},
     "autonomous_end_to_end_runbook": {
       "type": "object",
-      "required": ["authority", "production_sentinel", "deployment_supply_chain", "recommendation_ledger", "data_integrity_audit", "dhan_rotation_governance", "iam_recovery", "policy_schema_lifecycle", "paper_lifecycle_reconciliation", "paper_telemetry", "dag_resilience_testing"],
+      "required": ["authority", "production_sentinel", "deployment_supply_chain", "recommendation_ledger", "data_integrity_audit", "dhan_rotation_governance", "iam_recovery", "policy_schema_lifecycle", "paper_lifecycle_reconciliation", "paper_telemetry", "dag_resilience_testing", "mri_autonomous_scan"],
       "properties": {
         "authority": {"const": "SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1"},
         "production_sentinel": {
@@ -51,7 +51,77 @@
         "policy_schema_lifecycle": {"type": "object", "required": ["canonical_schema", "validate_before_merge", "breaking_change_requires_new_major_schema", "migration_and_backward_compatibility_tests", "unknown_future_major", "silently_drop_unknown_safety_fields"], "properties": {"canonical_schema": {"const": "schemas/agent_policy.v4.schema.json"}, "validate_before_merge": {"const": true}, "silently_drop_unknown_safety_fields": {"const": false}}},
         "paper_lifecycle_reconciliation": {"type": "object", "required": ["mode", "timestamps", "paper_equals_real_execution", "infer_missing_fills_or_rewrite_records", "material_mismatch_gate"], "properties": {"mode": {"const": "read_only"}, "paper_equals_real_execution": {"const": false}}},
         "paper_telemetry": {"type": "object", "required": ["latency_metrics", "reliability_metrics"]},
-        "dag_resilience_testing": {"type": "object", "required": ["fail_closed", "primary", "locust_role", "chaos_mesh"], "properties": {"fail_closed": {"const": true}, "chaos_mesh": {"const": "only_if_governed_kubernetes_environment_exists"}}}
+        "dag_resilience_testing": {"type": "object", "required": ["fail_closed", "primary", "locust_role", "chaos_mesh"], "properties": {"fail_closed": {"const": true}, "chaos_mesh": {"const": "only_if_governed_kubernetes_environment_exists"}}},
+        "mri_autonomous_scan": {
+          "type": "object",
+          "required": ["concern_list_markdown", "concern_list_json", "market_data_authority", "compute", "paper_latency", "continuous_concern_reporting", "catalyst_intelligence", "paid_ai_connector_control_plane"],
+          "properties": {
+            "concern_list_markdown": {"const": "reports/latest/mri/Concern_List.md"},
+            "concern_list_json": {"const": "reports/latest/mri/Concern_List.json"},
+            "market_data_authority": {
+              "type": "object",
+              "required": ["primary_live_indian_broker", "alternative_sources_never_masquerade_as_dhan"],
+              "properties": {
+                "primary_live_indian_broker": {"const": "dhan"},
+                "alternative_sources_never_masquerade_as_dhan": {"const": true}
+              }
+            },
+            "compute": {
+              "type": "object",
+              "required": ["primary_execution", "fallback_order", "laptop_production_or_paper_serving", "immutable_artifact_sync_only"],
+              "properties": {
+                "primary_execution": {"const": "google_cloud"},
+                "fallback_order": {"const": ["alternate_cloud_node", "smaller_cloud_cpu", "bounded_laptop_cpu_last_resort"]},
+                "laptop_production_or_paper_serving": {"const": false},
+                "immutable_artifact_sync_only": {"const": true}
+              }
+            },
+            "paper_latency": {
+              "type": "object",
+              "required": ["websocket_tick_to_observation_p95_target_ms", "target_is_slo_not_guarantee", "option_chain_rest_is_separate_cadence", "live_or_hft_authority_granted"],
+              "properties": {
+                "websocket_tick_to_observation_p95_target_ms": {"const": 1000},
+                "target_is_slo_not_guarantee": {"const": true},
+                "option_chain_rest_is_separate_cadence": {"const": true},
+                "live_or_hft_authority_granted": {"const": false}
+              }
+            },
+            "continuous_concern_reporting": {
+              "type": "object",
+              "required": ["scan_each_stage_before_and_after", "immediate_new_or_changed_concern_report", "unresolved_visible_at_transitions_and_final", "repeat_identical_unchanged_messages"],
+              "properties": {
+                "scan_each_stage_before_and_after": {"const": true},
+                "immediate_new_or_changed_concern_report": {"const": true},
+                "unresolved_visible_at_transitions_and_final": {"const": true},
+                "repeat_identical_unchanged_messages": {"const": false}
+              }
+            },
+            "catalyst_intelligence": {
+              "type": "object",
+              "required": ["market_and_broker_truth", "official_event_sources", "point_in_time_and_revision_lineage_required", "price_only_vs_catalyst_ablation_required"],
+              "properties": {
+                "market_and_broker_truth": {"const": "dhan_only"},
+                "official_event_sources": {"const": ["nse", "bse", "sebi", "rbi", "government_releases"]},
+                "point_in_time_and_revision_lineage_required": {"const": true},
+                "price_only_vs_catalyst_ablation_required": {"const": true}
+              }
+            },
+            "paid_ai_connector_control_plane": {
+              "type": "object",
+              "required": ["public_dashboard_raw_secret_input", "public_dashboard_mode", "secret_store", "browser_may_read_secret_payload", "connector_not_proven_when_official_api_missing", "api_key_provider_setup", "activation_can_enable_live_or_orders", "hot_patch_serving_app_during_market_hours"],
+              "properties": {
+                "public_dashboard_raw_secret_input": {"const": "forbidden"},
+                "public_dashboard_mode": {"const": "read_only_connector_status"},
+                "secret_store": {"const": "google_secret_manager"},
+                "browser_may_read_secret_payload": {"const": false},
+                "connector_not_proven_when_official_api_missing": {"const": true},
+                "api_key_provider_setup": {"const": "authenticated_admin_to_secret_manager_only"},
+                "activation_can_enable_live_or_orders": {"const": false},
+                "hot_patch_serving_app_during_market_hours": {"const": "forbidden"}
+              }
+            }
+          }
+        }
       }
     },
     "invariants": {"type": "object"}
