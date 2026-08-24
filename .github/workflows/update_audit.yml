@@ -3,7 +3,7 @@ name: Auto-Update Endpoint Audit Proof
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: '*/30 * * * *'
 
 permissions:
   contents: write
