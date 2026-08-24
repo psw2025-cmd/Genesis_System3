@@ -32,6 +32,19 @@ def test_required_chain_symbols_are_explicit_and_exclude_sensex_from_smoke_gate(
     assert "required_symbols_ready" in src
 
 
+def test_bankex_is_optional_but_owned_by_the_paced_chain_warmer():
+    src = _src()
+    assert (
+        '_INDEX_STREAM_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", '
+        '"MIDCPNIFTY", "SENSEX", "BANKEX")'
+    ) in src
+    assert '_REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")' in src
+    loop = src.split("async def index_chain_micro_loop():", 1)[1].split(
+        "async def market_top_micro_loop():", 1
+    )[0]
+    assert "_INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]" in loop
+
+
 def test_batch_chains_does_not_cache_warming_placeholders():
     src = _src()
     batch = src.split("async def batch_chains():", 1)[1].split("async def get_chain(", 1)[0]
