@@ -16,8 +16,9 @@ from fastapi import APIRouter
 
 from core.brokers.dhan.equity_fo_universe import (
     INDEX_FO_SYMBOLS,
-    SECURITY_MASTER,
     load_equity_fo_universe,
+    load_equity_market_coverage,
+    resolve_equity_security_master,
 )
 
 router = APIRouter(tags=["chain"])
@@ -31,8 +32,9 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
     BSE index options store SM_SYMBOL_NAME as BSXOPT/BKXOPT while the
     trading symbol is SENSEX-... / BANKEX-.... Prefer the trading prefix.
     """
-    trading = str(row.get("SEM_TRADING_SYMBOL") or "").strip().upper()
-    custom = str(row.get("SEM_CUSTOM_SYMBOL") or "").strip().upper()
+    trading = str(row.get("SEM_TRADING_SYMBOL") or row.get("TRADING_SYMBOL") or "").strip().upper()
+    custom = str(row.get("SEM_CUSTOM_SYMBOL") or row.get("DISPLAY_NAME") or "").strip().upper()
+    explicit = str(row.get("UNDERLYING_SYMBOL") or "").strip().upper()
     sm = str(row.get("SM_SYMBOL_NAME") or row.get("SYMBOL_NAME") or "").strip().upper()
     if "-" in trading:
         prefix = trading.split("-", 1)[0].strip()
@@ -42,6 +44,8 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
         first = custom.split()[0].strip()
         if first and first not in {"CE", "PE"}:
             return first
+    if explicit:
+        return explicit
     if sm in _MASTER_SYMBOL_ALIASES:
         return _MASTER_SYMBOL_ALIASES[sm]
     return sm
@@ -49,12 +53,15 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
 
 def build_underlyings_payload() -> Dict[str, Any]:
     universe = load_equity_fo_universe()
+    coverage = load_equity_market_coverage()
     equity = [str(s).upper() for s in (universe.get("underlyings") or []) if s]
     index_set = {str(s).upper() for s in INDEX_FO_SYMBOLS if s}
     indices = [s for s in _INDEX_PRIORITY if s in index_set]
     indices.extend(sorted(index_set.difference(indices)))
     equity_unique = sorted(set(equity).difference(index_set))
     underlyings = indices + equity_unique
+    cash = coverage.get("cash") or {}
+    stock_options = coverage.get("stock_options") or {}
     return {
         "underlyings": underlyings,
         "indices": indices,
@@ -64,12 +71,24 @@ def build_underlyings_payload() -> Dict[str, Any]:
             "indices": len(indices),
             "equity_options": len(equity_unique),
             "option_contracts": int(universe.get("contract_count") or 0),
+            "nse_cash": int((cash.get("NSE") or {}).get("instrument_count") or 0),
+            "bse_cash": int((cash.get("BSE") or {}).get("instrument_count") or 0),
+            "nse_equity_option_underlyings": int((stock_options.get("NSE") or {}).get("underlying_count") or 0),
+            "bse_equity_option_underlyings": int((stock_options.get("BSE") or {}).get("underlying_count") or 0),
+            "nse_option_contracts": int((stock_options.get("NSE") or {}).get("contract_count") or 0),
+            "bse_option_contracts": int((stock_options.get("BSE") or {}).get("contract_count") or 0),
         },
         "default": "NIFTY",
         "chain_endpoint": "/api/chain/{underlying}",
         "expiry_endpoint": "/api/expiries/{underlying}",
         "explicit_expiry_chain_endpoint": "/api/chain-expiry/{underlying}?expiry=YYYY-MM-DD",
         "source": universe.get("source") or "dhan_security_master",
+        "source_mode": coverage.get("source_mode") or universe.get("source_mode"),
+        "source_sha256": coverage.get("source_sha256"),
+        "reliance_only": bool(coverage.get("reliance_only")),
+        "scan_plan": coverage.get("scan_plan") or {},
+        "prediction_horizons": coverage.get("prediction_horizons") or [],
+        "learning_contract": coverage.get("learning_contract") or {},
         "instrument_type": "OPTIDX+OPTSTK",
         "broker": "DHAN",
         "read_only": True,
@@ -81,15 +100,22 @@ def build_underlyings_payload() -> Dict[str, Any]:
 def _expiry_map() -> Dict[str, List[str]]:
     """Build all broker-master option expiries per underlying once per process."""
     result: Dict[str, set[str]] = {}
-    if not SECURITY_MASTER.exists():
+    master_path = resolve_equity_security_master()
+    if not master_path.exists():
         return {}
-    with SECURITY_MASTER.open(encoding="utf-8", errors="replace") as handle:
+    with master_path.open(encoding="utf-8", errors="replace") as handle:
         for row in csv.DictReader(handle):
             inst = str(row.get("SEM_INSTRUMENT_NAME") or row.get("INSTRUMENT") or "").strip().upper()
             if inst not in {"OPTIDX", "OPTSTK"}:
                 continue
             name = underlying_from_master_row(row)
-            expiry = str(row.get("SEM_EXPIRY_DATE") or row.get("EXPIRY_DATE") or row.get("XpryDt") or "").strip()[:10]
+            expiry = str(
+                row.get("SEM_EXPIRY_DATE")
+                or row.get("SM_EXPIRY_DATE")
+                or row.get("EXPIRY_DATE")
+                or row.get("XpryDt")
+                or ""
+            ).strip()[:10]
             if name and expiry:
                 result.setdefault(name, set()).add(expiry)
     return {name: sorted(values) for name, values in result.items()}

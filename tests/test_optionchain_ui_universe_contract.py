@@ -17,10 +17,34 @@ def test_underlyings_are_derived_from_broker_security_master(monkeypatch):
             "source": "dhan_security_master",
         },
     )
+    monkeypatch.setattr(
+        chain_router,
+        "load_equity_market_coverage",
+        lambda: {
+            "source_mode": "OFFICIAL_SYNC",
+            "source_sha256": "a" * 64,
+            "reliance_only": False,
+            "cash": {"NSE": {"instrument_count": 9000}, "BSE": {"instrument_count": 13000}},
+            "stock_options": {
+                "NSE": {"underlying_count": 208, "contract_count": 67000},
+                "BSE": {"underlying_count": 206, "contract_count": 35000},
+            },
+            "scan_plan": {"unbounded_simultaneous_chain_fetch": False},
+            "prediction_horizons": [{"id": "1_week"}],
+            "learning_contract": {"automatic_live_promotion": False},
+        },
+    )
     payload = asyncio.run(chain_router.get_underlyings())
     assert "ZZZTEST" in payload["underlyings"]
     assert payload["counts"]["equity_options"] == 3
     assert payload["counts"]["option_contracts"] == 4321
+    assert payload["counts"]["nse_cash"] == 9000
+    assert payload["counts"]["bse_cash"] == 13000
+    assert payload["source_mode"] == "OFFICIAL_SYNC"
+    assert payload["source_sha256"] == "a" * 64
+    assert payload["reliance_only"] is False
+    assert payload["scan_plan"]["unbounded_simultaneous_chain_fetch"] is False
+    assert payload["learning_contract"]["automatic_live_promotion"] is False
     assert payload["source"] == "dhan_security_master"
     assert payload["broker"] == "DHAN"
     assert payload["read_only"] is True
@@ -57,6 +81,15 @@ def test_sensex_expiries_resolve_from_trading_symbol_not_bsxopt():
     assert payload["count"] >= 1
     assert payload["status"] == "OK"
     assert any(str(x).startswith("2026-") for x in payload["expiries"])
+
+
+def test_detailed_master_underlying_and_expiry_columns_are_supported():
+    row = {
+        "TRADING_SYMBOL": "RELIANCE-Aug2026-1500-CE",
+        "UNDERLYING_SYMBOL": "RELIANCE",
+        "SM_EXPIRY_DATE": "2026-08-27",
+    }
+    assert chain_router.underlying_from_master_row(row) == "RELIANCE"
 
 
 def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):

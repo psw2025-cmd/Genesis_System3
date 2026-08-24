@@ -234,6 +234,51 @@ an alternative is never permission to bypass the primary path's safety gates.
 | R11 | IAM recovery separation | read-only sentinel freezes evidence and queues a guarded remediation workflow | audit-log Cloud Function detects/queues only | allowlisted plan, lock, before/after, rollback and immutable audit |
 | R12 | Workflow supply-chain hardening | reviewed actions pinned to immutable commit SHAs and minimum permissions | first-party scripts with pinned runtime/toolchain | workflow scan, permission inventory and exact reviewed digests |
 
+##### Request-scoped reconfirmation — 2026-08-24T09:20:29Z
+
+The twelve governance *contracts* remain implemented (`PASS`) at current source
+`9dbf1911d016bcd3611651390cfca28658d96d41`. A contract PASS is not an
+operational PASS. The operational column below is intentionally fail-closed and
+must not be rewritten green merely because the recommendation exists in this
+runbook. Primary and alternative paths remain the paths in R01-R12 above.
+
+| ID | Contract verdict | Current operational verdict | Evidence time UTC | Current evidence / unresolved concern | Next action |
+|---|---|---|---|---|---|
+| R01 | PASS | PASS | 2026-08-24T09:20:55Z | GitHub main freshly fetched; serving `a764f990...` maps through deploy run `32707463170`, image digest `sha256:120036a3...`, revision `00584-faq`, 100% traffic | repeat after next deploy; self-reported API SHA alone remains insufficient |
+| R02 | PASS | PASS | 2026-08-24T09:20:29Z | versioned ledger, fixed verdict enum, evidence time and both paths are present | append only on material evidence change |
+| R03 | PASS | PARTIAL | 2026-08-24T09:20:55Z | canonical GitHub Actions deploy is proven; exhaustive current Cloud Build/direct-writer inventory is not yet attached to this request | run single-writer inventory; emit `SPLIT_BRAIN_DEPLOYMENT_RISK` on any second writer |
+| R04 | PASS | FAIL | 2026-08-24T09:27:49Z | GitHub API returned `404 Branch not protected`; repository rulesets list is empty; environments have no protection rules. WIF provider is ACTIVE and restricted to repository/owner IDs plus `refs/heads/main` | account owner enables main/environment protection, or retain the documented WIF-restricted alternative and explicit blocker |
+| R05 | PASS | PARTIAL | 2026-08-24T09:20:29Z | schema/read-only/immutable-storage contract exists; full production data-integrity cards and append-only BigQuery evidence are not freshly proven | deploy and prove the versioned dashboard/API plus immutable object and BigQuery rows |
+| R06 | PASS | PASS | 2026-08-24T08:52:17Z | deploy workflow proved isolated rotator/scheduler safety; web rotation switches remain disabled | retain metadata-only attempt/result logging and bounded recovery authority |
+| R07 | PASS | PARTIAL | 2026-08-24T09:20:29Z | timestamp/join/fail-closed PAPER contract exists; full current lifecycle mismatch report is not attached | run exchange/source/receive/simulation reconciliation and publish mismatch counts |
+| R08 | PASS | PARTIAL | 2026-08-24T09:20:29Z | percentile/drop/reconnect/stale contract exists; request-scoped 60-minute samples are pending | capture p50/p95/p99/max/drop/reconnect/stale/out-of-order during the 60-minute proof |
+| R09 | PASS | PASS | 2026-08-24T09:20:29Z | pytest/property/state-machine/fault-injection-first and governed Locust/Chaos-Mesh alternatives are locked | retain fail-closed tests for every new dependency edge |
+| R10 | PASS | PASS | 2026-08-24T09:20:29Z | `agent_policy.v4` schema, migration and compatibility rules are canonical | reject unknown future major versions and test each migration |
+| R11 | PASS | PASS | 2026-08-24T09:20:29Z | sentinel has no repair authority; separate WIF-authenticated repair workflow requires plan/allowlist/lock/before-after/rollback/audit | keep destructive, privilege-expanding, WIF-destroying and ambiguous drift human-gated |
+| R12 | PASS | PASS | 2026-08-24T09:20:29Z | immutable-action/minimum-permission contract and exact-head workflow policy checks are active | rescan every workflow change; first-party pinned-runtime path remains the alternative |
+
+##### Dhan equity, CE/PE and prediction coverage ledger
+
+`RELIANCE` was a production-browser sample, never the configured universe. The
+fresh preferred detailed Dhan master synchronized at 2026-08-24T09:26:59Z
+(SHA-256 `9CB5172AC21BD5936DB8CA83E02A40C1CF65E0FDD162BB5CABF2B8D7A224A27F`)
+contained 208 stock-option underlyings (208 NSE, 206 BSE, 206 overlapping),
+67,172 NSE stock-option contracts, 35,180 BSE stock-option contracts, 9,874 NSE
+cash security IDs and 13,554 BSE cash security IDs. Counts are temporal evidence,
+not constants; refresh from Dhan's official master before every current claim.
+
+| Coverage surface | Verdict | Primary path | Safe alternative | Acceptance/blocker |
+|---|---|---|---|---|
+| Current NSE/BSE master ingestion | PARTIAL | daily official detailed/compact Dhan sync with checksum/as-of metadata; all consumers resolve the synced master first | bundled master only as explicit stale/degraded emergency fallback | production currently exposes the bundled 211-underlying snapshot; redeploy and prove official-sync source/count/digest |
+| NSE/BSE cash catalog | PASS_SOURCE / UNPROVEN_LIVE | bounded Dhan quote batches of at most 1,000 security IDs at the documented quote cadence | Dhan WebSocket shards up to the documented connection entitlement | source enumeration is implemented; fresh quotes for every cash ID and UI coverage are not yet proven |
+| NSE/BSE CE/PE master coverage | PASS_SOURCE / UNPROVEN_LIVE | quote-batch all option security IDs for ranking, then paced/on-demand full-chain detail | WebSocket quote shards plus option-chain detail for promoted candidates | every master underlying must have CE and PE; missing-side list fails closed; all-contract fresh live coverage is pending |
+| Equity option rotation | PARTIAL | bounded rotating shards with explicit visited/missing/coverage/cycle fields | distributed lease-backed shards when Cloud Run horizontal scale is governed | in-memory full-cycle accounting is implemented; durable cross-instance coverage ledger is pending |
+| Top CE/PE benchmark | PARTIAL | Dhan quote/chain ranking with same-time Moneycontrol reference comparison | licensed independent exchange/vendor validation | Moneycontrol/Chartink remain reference/catalyst inputs, never broker truth; discrepancy reasons must be visible |
+| Multibagger research | BLOCKED | survivorship-safe point-in-time cash universe, fundamentals/corporate actions, price/volume/catalyst features and leakage-safe long-horizon tournament | transparent factor baseline while advanced challengers remain research-only | no candidate may be displayed as guaranteed; current verified model/outcome lineage is insufficient |
+| Seven PAPER horizons | PARTIAL | `1_week`, `3_weeks`, `1_month`, `3_months`, `6_months`, `1_year`, `2_years` with immutable prediction IDs and realized outcomes | abstaining baseline when coverage/calibration is insufficient | horizon schema is implemented; forward outcomes necessarily remain pending until each horizon matures |
+| Continuous learning/RL | BLOCKED | immutable challenger retraining/recalibration from reconciled PAPER outcomes; governed promotion and rollback | scheduled feature ablation/recalibration only | no in-place champion mutation, uncontrolled RL, LIVE enablement or capital deployment; BigQuery outcome evidence is not yet proven |
+| Issue #188 full closure | PARTIAL | exact-serving one-document 22-tab desktop/mobile API/UI proof plus 60 uninterrupted market minutes | bounded repeated proof windows only when the exchange session cannot supply 60 minutes; never relabel shorter evidence | PR #335 owns the proof harness; Overview/Genesis/time-series/model evidence and full current-master live coverage remain unresolved |
+
 #### GitHub protection and single-deployer enforcement
 
 - Protect `main` with pull-request review, required exact-head checks, stale
