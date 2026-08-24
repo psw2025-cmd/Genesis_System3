@@ -8,14 +8,15 @@ Read first:
 0. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
 1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
 2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
-3. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
-4. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
-5. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
-6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
-7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
-8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
-9. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
-10. `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` — permanent data/feature/model/prediction benchmark authority; compare material prediction changes against current primary research, simple baselines and relevant contemporary challengers before promotion
+3. `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` — permanent user-action/autonomy-speed law; complete its 19-point self-MRI before saying `USER_ACTION=NONE` or `HUMAN_ACTION_REQUIRED=NO`
+4. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
+5. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
+6. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
+7. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
+8. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
+9. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
+10. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
+11. `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` — permanent data/feature/model/prediction benchmark authority; compare material prediction changes against current primary research, simple baselines and relevant contemporary challengers before promotion
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 
@@ -33,7 +34,7 @@ Transition law:
 - unrelated historical failure → context only unless fresh evidence makes it relevant;
 - stop only for a verified external dependency or genuine user approval/account-level action.
 
-Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, and `USER_ACTION`.
+Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, `MANDATORY_USER_ACTION`, and `OPTIONAL_ACCELERATION_ACTION`.
 
 ## Production authority
 
@@ -91,11 +92,12 @@ When an issue is found:
 3. Reproduce/read logs/code only as required.
 4. Identify root cause and affected surfaces.
 5. Compare multiple safe solution paths when useful.
-6. Implement the smallest production-grade fix on a branch.
-7. Run focused tests + mandatory current CI gates.
-8. Merge only when the exact head is proven safe.
-9. Verify the resulting production state with **new** live evidence.
-10. Do not stop at “workflow green” if the user-visible/runtime end state is still wrong.
+6. Check the 19-point user-action/autonomy-speed MRI and surface any safe setup action that materially accelerates progress.
+7. Implement the smallest production-grade fix on a branch.
+8. Run focused tests + mandatory current CI gates.
+9. Merge only when the exact head is proven safe.
+10. Verify the resulting production state with **new** live evidence.
+11. Do not stop at “workflow green” if the user-visible/runtime end state is still wrong.
 
 ## Multi-agent concurrency
 
@@ -109,7 +111,14 @@ Other agents may work in parallel. Before editing or merging:
 
 ## User-action boundary
 
-Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation without waiting for chat approval. Ask the user for manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform: LIVE enablement, real orders, billing/org, WIF destruction, broker MFA.
+Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation without waiting for chat approval. Ask the user for mandatory manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform: LIVE enablement, real orders, billing/org, WIF destruction, broker MFA.
+
+However, a lack of mandatory human action does **not** mean the user has no useful acceleration step. Before saying `USER_ACTION=NONE`, `HUMAN_ACTION_REQUIRED=NO`, or equivalent, read `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`, complete its 19-point self-MRI, and report two separate fields:
+
+- `MANDATORY_USER_ACTION=` true blocker or `NONE`;
+- `OPTIONAL_ACCELERATION_ACTION=` fastest safe user-side setup improvement or `NONE`.
+
+If a user-side setting, connector authorization, ruleset/review configuration, environment protection, billing/org control, or external account action would materially reduce delay or improve autonomous execution, surface it immediately with kid-level `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF / URGENCY` instructions while continuing all safe agent work in parallel.
 
 ## Evidence hierarchy
 
