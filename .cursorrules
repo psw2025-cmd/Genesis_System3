@@ -66,6 +66,8 @@ See `.cursor/rules/infinite-gitops-loop.mdc` and `docs/architecture/INFINITE_GIT
 
 ## Dashboard-impact blocker and owner escalation
 
+**Authority:** `SYSTEM3_USER_ACTION_ESCALATION_V2`
+
 Read `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` before reporting
 user action. If a safe owner account/access/settings action can directly or
 indirectly accelerate dashboard content, market data, API↔UI parity, broker
