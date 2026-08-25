@@ -81,6 +81,43 @@ def test_non_numeric_contract_count_is_not_a_pass(classify):
     assert failures == ["NO_VERIFIED_CONTRACTS"]
 
 
+@pytest.mark.parametrize(
+    "qc_passed",
+    [
+        "false",  # JSON string: truthy, would read as success on truthiness
+        "true",
+        "",
+        1,  # ints are not QC verdicts, even when they look like one
+        0,
+        None,
+        [],
+        {},
+    ],
+)
+def test_non_boolean_qc_result_is_never_a_pass(classify, qc_passed):
+    status, failures = classify({"qc_passed": qc_passed, "total_contracts": 412})
+
+    assert status == "NOT_READY"
+    assert failures == ["QC_RESULT_NOT_BOOLEAN"]
+
+
+def test_boolean_verdicts_are_still_honoured(classify):
+    # Guards the isinstance check against over-tightening.
+    assert classify({"qc_passed": True, "total_contracts": 412}) == ("PASS", [])
+    assert classify({"qc_passed": False, "total_contracts": 412}) == ("FAIL", [])
+
+
+def test_explicit_failure_outranks_no_data(classify):
+    # Documents precedence: both are non-PASS, and FAIL is the more actionable
+    # verdict, so an explicit failure is reported even alongside NO_DATA.
+    status, failures = classify(
+        {"qc_passed": False, "status": "NO_DATA", "qc_failures": ["stale chain"]}
+    )
+
+    assert status == "FAIL"
+    assert failures == ["stale chain"]
+
+
 def test_explicit_failure_is_preserved_and_capped(classify):
     status, failures = classify(
         {"qc_passed": False, "qc_failures": [f"f{i}" for i in range(9)]}

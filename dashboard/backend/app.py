@@ -3642,7 +3642,18 @@ def classify_qc_status(qc_data: dict) -> tuple:
     if "qc_passed" not in qc_data:
         return "NOT_READY", ["QC_RESULT_MISSING"]
 
-    if not qc_data.get("qc_passed"):
+    # `qc_passed` must be a real boolean, as SystemHealthSchema already
+    # requires. This endpoint reads outputs/qc_report.json directly without
+    # running that validator, so truthiness alone is unsafe: the JSON string
+    # "false" is truthy and would otherwise be read as success. A non-boolean
+    # is a malformed result, not a verdict, so it fails closed.
+    qc_passed = qc_data.get("qc_passed")
+    if not isinstance(qc_passed, bool):
+        return "NOT_READY", ["QC_RESULT_NOT_BOOLEAN"]
+
+    # An explicit failure outranks NO_DATA: it is the more actionable verdict,
+    # and both are non-PASS, so precedence here cannot open the gate.
+    if not qc_passed:
         failures = qc_data.get("qc_failures") or []
         return "FAIL", list(failures)[:5]
 
