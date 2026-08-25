@@ -172,3 +172,95 @@ This speed policy never authorizes:
 - privilege expansion without governed approval.
 
 Faster means fewer avoidable coordination and permissions delays, not weaker safety.
+
+## Dashboard-impact priority and dual-channel owner escalation
+
+**Authority extension:** `SYSTEM3_USER_ACTION_ESCALATION_V2`
+
+A blocker is owner-escalation priority when a safe user-side action can directly
+or indirectly accelerate, unblock, or improve any of these surfaces:
+
+- production dashboard content, cards, tables, charts, tabs, or status truth;
+- market-data coverage, instrument master, broker/option-chain/quote/candle
+  freshness, source labeling, or API↔UI parity;
+- scanner, prediction, ML, PAPER lifecycle, P&L, risk, or proof visibility;
+- CI, review, merge, deployment, GCP evidence, browser capture, or agent access;
+- multi-agent ownership, handoff, or any dependency feeding the dashboard.
+
+The agent must prioritize the least-privilege action that unlocks the greatest
+number of downstream tasks. It must not pause unblocked work while escalation is
+pending.
+
+### Required option matrix
+
+For every useful owner action, list all materially different **safe** options.
+Put the fastest safe option first and label it
+`FASTEST_SAFE_RECOMMENDED`. For each option state:
+
+- expected time to enable;
+- tasks/surfaces unblocked;
+- permission or account scope;
+- risk and rollback;
+- evidence that will prove it worked.
+
+Do not pad the list with cosmetic variants, and never offer an unsafe option
+such as bypassing failed checks, sharing secrets, weakening IAM/WIF, or enabling
+LIVE/orders.
+
+### Immediate chat and mail action card
+
+Create one stable `USER_ACTION_ID` and deliver the same concise action card:
+
+1. immediately in the active ChatGPT/Work chat;
+2. immediately through the verified connected owner mail identity;
+3. once in Issue #188 when material, so every agent inherits the state.
+
+The action card must contain:
+
+- `USER_ACTION_ID`, detection time, owner, blocked task IDs, and dashboard
+  impact;
+- `MANDATORY_USER_ACTION` and `OPTIONAL_ACCELERATION_ACTION` as separate
+  fields;
+- `FASTEST_SAFE_RECOMMENDED` plus alternatives;
+- `WHY / WHERE / CLICK or RUN / SET / DO NOT / RESULT / PROOF / URGENCY`;
+- `AGENT_CONTINUES_WITH` for parallel autonomous work;
+- `STATUS` and `NEXT_REMINDER_AT`.
+
+Recipient identity must be resolved from the connected provider. Never guess or
+commit the owner's private address. If mail access or sending fails, notify in
+chat, record `MAIL_DELIVERY_BLOCKED`, give the smallest connection correction,
+and continue chat/Issue delivery.
+
+### Repeat-until-proven tracker
+
+Statuses are:
+
+`DISCOVERED -> NOTIFIED -> ACKNOWLEDGED -> IN_PROGRESS -> PROVEN_COMPLETE`
+
+or `SUPERSEDED` with a replacement ID.
+
+Acknowledgement or a claimed click is not completion. Close only after fresh
+screenshot, provider/API state, repository setting, workflow result, or other
+appropriate practical proof verifies the intended capability.
+
+Reminder rules:
+
+- notify immediately on discovery or material change;
+- while owner-blocking and unresolved, repeat the smallest remaining action at
+  least every 6 hours;
+- for an active P0 market-session/dashboard incident, a one-hour reminder is
+  allowed when the user can still act and the reminder contains new status or
+  the exact outstanding step;
+- do not send identical mail every automation tick; deduplicate by
+  `USER_ACTION_ID + action revision`;
+- stop reminders immediately when `PROVEN_COMPLETE` or `SUPERSEDED`;
+- never remove an unresolved action from the ledger because another task moved.
+
+Each reminder must show
+`PREVIOUS_REMINDER -> USER_EVIDENCE_RECEIVED -> CROSS_VERIFY_RESULT ->
+ONLY_REMAINING_USER_CORRECTION -> AGENT_CONTINUES_WITH`.
+
+This delivery rule complements ChatGPT task notifications. Account-level task
+notification channels are controlled by the owner's ChatGPT notification
+settings; direct connected-mail delivery must be reported as successful only
+when the mail action itself confirms success.
