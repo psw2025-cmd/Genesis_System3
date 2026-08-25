@@ -67,17 +67,6 @@ class RuntimeStateStore:
         safety["live_trading_enabled"] = False
         safety["execution_mode"] = "ANALYZER"
 
-    def _enforce_safety_invariants(self, state: Dict[str, Any]) -> None:
-        """Cloud persistence must never re-enable live execution."""
-        state["mode"] = "PAPER"
-        state["live_trading_enabled"] = False
-        safety = state.setdefault("safety", {})
-        if not isinstance(safety, dict):
-            safety = {}
-            state["safety"] = safety
-        safety["live_trading_enabled"] = False
-        safety["execution_mode"] = "ANALYZER"
-
     def _check_broker_connectivity(self) -> Dict[str, Any]:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
@@ -213,29 +202,6 @@ class RuntimeStateStore:
         with open(tmp_path, "w") as f:
             json.dump(data, f, indent=2)
         os.replace(tmp_path, path)
-
-    def _save_local_state(self, include_snapshots: bool = True) -> None:
-        self.outputs_dir.mkdir(parents=True, exist_ok=True)
-        state_file = self.outputs_dir / "runtime_state.json"
-        self._atomic_write_json(state_file, self._state)
-
-        if not include_snapshots:
-            return
-        snapshots_dir = self.outputs_dir / "state_snapshots"
-        snapshots_dir.mkdir(exist_ok=True)
-        snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-        self._atomic_write_json(snapshot_file, self._state)
-
-        snapshot_files = sorted(
-            snapshots_dir.glob("state_*.json"),
-            key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
-        )
-        if len(snapshot_files) > 1000:
-            for old_file in snapshot_files[:-1000]:
-                try:
-                    old_file.unlink()
-                except Exception:
-                    pass
 
     def _save_local_state(self, include_snapshots: bool = True) -> None:
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
