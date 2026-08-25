@@ -226,29 +226,6 @@ class RuntimeStateStore:
                 except Exception:
                     pass
 
-    def _save_local_state(self, include_snapshots: bool = True) -> None:
-        self.outputs_dir.mkdir(parents=True, exist_ok=True)
-        state_file = self.outputs_dir / "runtime_state.json"
-        self._atomic_write_json(state_file, self._state)
-
-        if not include_snapshots:
-            return
-        snapshots_dir = self.outputs_dir / "state_snapshots"
-        snapshots_dir.mkdir(exist_ok=True)
-        snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-        self._atomic_write_json(snapshot_file, self._state)
-
-        snapshot_files = sorted(
-            snapshots_dir.glob("state_*.json"),
-            key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
-        )
-        if len(snapshot_files) > 1000:
-            for old_file in snapshot_files[:-1000]:
-                try:
-                    old_file.unlink()
-                except Exception:
-                    pass
-
     def _save_state(self):
         """Persist to Firestore in cloud mode, otherwise use atomic local files."""
         if self._remote_backend is not None:
