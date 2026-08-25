@@ -3753,6 +3753,23 @@ async def get_health():
 
             # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
             # live_allowed=False always: LIVE trading is permanently disabled
+            # QC status must reflect real qc_report_live.json even when market is
+            # closed — do not hardcode PASS, or /api/health can contradict a live
+            # QC_FAIL surfaced by /api/state.
+            qc_status_analyzer = "PASS"
+            qc_failures_analyzer: list = []
+            try:
+                qc_file_analyzer = OUTPUTS_DIR / "qc_report_live.json"
+                if qc_file_analyzer.exists():
+                    qc_data_analyzer = json.loads(qc_file_analyzer.read_text())
+                    if not qc_data_analyzer.get("qc_passed", True):
+                        qc_status_analyzer = "FAIL"
+                        qc_failures_analyzer = qc_data_analyzer.get("qc_failures", [])[:5]
+                    elif qc_data_analyzer.get("status") == "NO_DATA":
+                        qc_status_analyzer = "NO_DATA"
+            except Exception:
+                pass
+
             return {
                 "status": "ok",
                 "mode": "PAPER",
@@ -3773,8 +3790,8 @@ async def get_health():
                 "cycle_count": 0,
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(IST).isoformat(),
-                "qc_status": "PASS",
-                "qc_failures": [],
+                "qc_status": qc_status_analyzer,
+                "qc_failures": qc_failures_analyzer,
                 "trades_executed": 0,
                 "open_positions": 0,
                 "total_pnl": 0.0,
