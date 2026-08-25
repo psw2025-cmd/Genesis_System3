@@ -3625,6 +3625,41 @@ async def orch_cloud_ready():
     }
 
 
+def classify_qc_status(qc_data: dict) -> tuple:
+    """Classify QC truth for /api/health, failing closed.
+
+    Only positive evidence that QC ran and verified contracts yields PASS.
+    This previously defaulted to PASS whenever the QC file was absent or
+    lacked a result, which made /api/health report ``qc_status: PASS`` while
+    /api/state simultaneously reported ``NOT_READY`` with
+    ``NO_VERIFIED_CONTRACTS`` and raised a QC_FAIL alert.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    if not isinstance(qc_data, dict) or not qc_data:
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    if "qc_passed" not in qc_data:
+        return "NOT_READY", ["QC_RESULT_MISSING"]
+
+    if not qc_data.get("qc_passed"):
+        failures = qc_data.get("qc_failures") or []
+        return "FAIL", list(failures)[:5]
+
+    if qc_data.get("status") == "NO_DATA":
+        return "NO_DATA", []
+
+    try:
+        verified_contracts = int(qc_data.get("total_contracts") or 0)
+    except (TypeError, ValueError):
+        verified_contracts = 0
+
+    if verified_contracts <= 0:
+        return "NOT_READY", ["NO_VERIFIED_CONTRACTS"]
+
+    return "PASS", []
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -3865,14 +3900,7 @@ async def get_health():
             except Exception:
                 pass
 
-        # Determine QC status
-        qc_status = "PASS"
-        qc_failures = []
-        if not qc_data.get("qc_passed", True):
-            qc_status = "FAIL"
-            qc_failures = qc_data.get("qc_failures", [])[:5]
-        elif qc_data.get("status") == "NO_DATA":
-            qc_status = "NO_DATA"
+        qc_status, qc_failures = classify_qc_status(qc_data)
 
         # PRODUCTION GATE: live_allowed only when broker connected + real data + market open
         ds = (data_source if SSOT_AVAILABLE and state_store else "real").lower()
