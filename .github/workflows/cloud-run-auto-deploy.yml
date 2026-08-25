@@ -64,7 +64,7 @@ jobs:
       WORKER_PUSH_TOKEN_SECRET_ID: ${{ vars.WORKER_PUSH_TOKEN_SECRET_ID || 'system3-dashboard-worker-push-token' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Authenticate to Google Cloud with keyless WIF
         uses: google-github-actions/auth@v3

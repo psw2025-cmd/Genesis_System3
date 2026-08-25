@@ -75,7 +75,7 @@ jobs:
       DEPLOY_SA: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
       EXPECTED_RUNTIME_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           ref: ${{ env.EXPECTED_RUNTIME_SHA }}
