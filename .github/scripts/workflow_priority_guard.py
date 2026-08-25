@@ -23,6 +23,7 @@ AUTOMATIC = {
     "full-cloud-audit.yml",
     "system3-preflight-control-plane.yml",
     "repo-clean-forensic-toolkit.yml",
+    "command-center-access.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -266,6 +267,7 @@ def main() -> int:
         "security-audit.yml",
         "sonarqube-audit.yml",
         "repo-clean-forensic-toolkit.yml",
+        "command-center-access.yml",
     ):
         if "pull_request:" not in trigger_blocks[name]:
             raise SystemExit(f"FOCUSED_PRIORITY_PR_TRIGGER_MISSING file={name}")
