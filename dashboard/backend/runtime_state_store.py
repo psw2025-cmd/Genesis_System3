@@ -67,17 +67,6 @@ class RuntimeStateStore:
         safety["live_trading_enabled"] = False
         safety["execution_mode"] = "ANALYZER"
 
-    def _enforce_safety_invariants(self, state: Dict[str, Any]) -> None:
-        """Cloud persistence must never re-enable live execution."""
-        state["mode"] = "PAPER"
-        state["live_trading_enabled"] = False
-        safety = state.setdefault("safety", {})
-        if not isinstance(safety, dict):
-            safety = {}
-            state["safety"] = safety
-        safety["live_trading_enabled"] = False
-        safety["execution_mode"] = "ANALYZER"
-
     def _check_broker_connectivity(self) -> Dict[str, Any]:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
@@ -118,7 +107,7 @@ class RuntimeStateStore:
                 "current_time_ist": datetime.now(IST).isoformat(),
             },
             "broker": broker_status,
-            "qc": {"status": "PASS", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
+            "qc": {"status": "NOT_READY", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
             "signals": {
                 "status": "NO_TRADE",
                 "underlying": None,
@@ -378,7 +367,7 @@ class RuntimeStateStore:
                 else:
                     updates["data_source"] = health_data_source
                 updates["qc"] = {
-                    "status": health.get("qc_status", "PASS"),
+                    "status": str(health.get("qc_status") or "NOT_READY").upper(),
                     "reasons": health.get("qc_failures", []),
                     "contracts_total": health.get("contracts_total", 0),
                     "underlyings": health.get("underlyings", 0),
