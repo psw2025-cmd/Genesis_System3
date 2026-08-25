@@ -50,6 +50,24 @@ For each problem:
 
 If another agent's current-state claim is based on an older screenshot/report, reject the current-state conclusion and request/generate new live evidence.
 
+## Dashboard-impact blocker and owner escalation
+
+Gemini must apply `SYSTEM3_USER_ACTION_ESCALATION_V2` from
+`docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`. For any safe owner-side
+access/settings/account action that can directly or indirectly accelerate
+dashboard content, data truth, API↔UI parity, broker/chain state, predictions,
+PAPER records, deployment, proof, or agent throughput:
+
+- keep all unblocked verification work moving;
+- create and retain one stable `USER_ACTION_ID`;
+- put the fastest safe least-privilege option first and compare all materially
+  distinct safe alternatives;
+- give kid-level click/run steps and expected proof;
+- notify immediately in chat, verified connected mail, and Issue #188;
+- repeat only the unresolved delta until practical evidence proves completion;
+- never guess recipient identity, request secrets, weaken gates/IAM/WIF, or
+  enable LIVE/orders.
+
 ## Safety
 
 - PAPER/ANALYZER only.
