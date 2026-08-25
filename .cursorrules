@@ -64,6 +64,25 @@ Do routine code, CI, deployment, logs, IAM-drift repair, browser proof, broker i
 
 See `.cursor/rules/infinite-gitops-loop.mdc` and `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`.
 
+## Dashboard-impact blocker and owner escalation
+
+Read `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` before reporting
+user action. If a safe owner account/access/settings action can directly or
+indirectly accelerate dashboard content, market data, API↔UI parity, broker
+truth, predictions, PAPER records, deployment, proof, or agent throughput:
+
+- continue every safe unblocked task;
+- create a stable `USER_ACTION_ID`;
+- surface the fastest safe least-privilege option first and all materially
+  different safe alternatives;
+- give kid-level `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF /
+  URGENCY`;
+- notify immediately in chat and verified connected mail;
+- track and repeat the smallest unresolved correction until fresh proof closes
+  the action;
+- never guess the recipient, expose secrets, weaken safety, or overlap another
+  write lane.
+
 ## Evidence hierarchy
 
 For current production truth:
