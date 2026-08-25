@@ -2,25 +2,27 @@
 
 Status note from owner: **Dhan token has been updated**.
 
-## Evidence context from Render screenshot
+## Historical context (Render.com — retired)
 
-The Render worker logs before this note showed Dhan authentication failures such as:
+Older worker screenshots from the retired Render.com host showed Dhan authentication failures such as:
 
 - `Dhan expiry-list HTTP 401`
 - `Authentication Failed - Client ID or Token invalid`
 - `DHAN_EMPTY_OPTION_CHAIN_ROWS`
 - backend web service `502 Bad Gateway`
-- `WORKER_PUSH_TOKEN missing or different between Render web and worker`
+- `WORKER_PUSH_TOKEN` mismatch between web and worker
 - Render deploy/build blocked because the workspace had run out of pipeline minutes
+
+Those Render.com services are **not** current authority. Production is GCP Cloud Run only.
 
 ## Current interpretation
 
-The token update is noted, but it is **not yet proven resolved** until the latest backend and worker processes reload the updated environment and proof reports show Dhan read-only endpoints passing.
+The token update is noted, but it is **not yet proven resolved** until the latest Cloud Run revision and worker Job reload the updated environment and proof reports show Dhan read-only endpoints passing.
 
 ## Required verification after token update
 
-- Render backend redeployed or restarted with updated environment.
-- Render worker redeployed or restarted with the same updated Dhan credentials.
+- Cloud Run service `genesis-system3-web` serving the exact expected SHA.
+- Worker Job using the same Dhan credentials from Secret Manager (never paste tokens).
 - `/api/broker/dhan/status` no longer reports auth failure.
 - `/api/broker/funds` responds without 401/auth error.
 - Dhan expiry list returns without HTTP 401.
@@ -28,35 +30,10 @@ The token update is noted, but it is **not yet proven resolved** until the lates
 - Dashboard Broker tab shows token valid / funds responded / holdings responded.
 - Dashboard visible issue tracker passes after latest deploy.
 
-## Render worker preflight added
+## Worker preflight
 
-A worker-specific preflight is now tracked by:
-
-- `tools/system3_render_worker_preflight.py`
-- `.github/workflows/system3-render-worker-preflight.yml`
-- `reports/latest/render_worker_preflight/summary.json`
-- `reports/latest/render_worker_preflight/summary.md`
-
-This preflight checks only safe metadata:
-
-- backend `/api/health` reachability
-- backend `/api/state` reachability
-- worker push-token rejection symptoms
-- safe secret presence/length checks, without printing values
-- live-trading safety flags
+Canonical current worker/token proof is Cloud Run + the dedicated Dhan rotation Job. Leftover `tools/system3_render_worker_preflight.py` is a retired stub and must not be treated as a Render deploy step.
 
 ## GitHub failure storm containment
 
-`System3 GitHub Render Failure Tracker` is now report-only. It still writes the GitHub/Render TODO report, but it no longer fails itself just because it found Render or workflow blockers. This prevents one Render/worker issue from creating a continuous GitHub failure loop.
-
-## Still separate blockers
-
-This token update does not automatically resolve:
-
-- Render pipeline minutes exhausted.
-- Backend `502 Bad Gateway`.
-- Worker push token mismatch.
-- ML validation/profit/paper lifecycle gates.
-- Real live trading readiness.
-
-Live trading remains OFF until all real proof gates pass.
+`tools/system3_github_render_failure_tracker.py` is retired. It writes a Cloud Run-only retired report and no longer probes Render public hostnames.

@@ -10,7 +10,7 @@ Canonical user-action/autonomy-speed policy: `docs/authority/USER_ACTION_AUTONOM
 
 - Google Cloud project `system3-openalgo-safe` is the authoritative production/runtime platform.
 - GitHub repository `psw2025-cmd/Genesis_System3` is the authoritative code/configuration source.
-- Render is retired/non-authoritative for production.
+- Render.com hosting is retired/non-authoritative for production. `render.yaml` must not exist. Google Cloud Run is the only production deploy.
 - GitHub Actions authenticates to Google Cloud only through keyless Workload Identity Federation (WIF). User-managed Google service-account JSON keys are forbidden.
 
 ## Operating objective

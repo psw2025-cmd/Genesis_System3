@@ -32,7 +32,7 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 SCAN_DIRS = ["core", "scripts", "tools", "src"]
 SKIP_DIR_PARTS = {"node_modules", "__pycache__", ".git", "dist", "build", "venv", ".venv"}
 
-# Known authoritative entrypoints (from CHANGE_LOG / docs / render.yaml /
+# Known authoritative entrypoints (from CHANGE_LOG / docs / Cloud Run /
 # job scheduler config). Any file matching a conflict topic that is NOT
 # one of these is flagged for review, not auto-deleted.
 KNOWN_AUTHORITATIVE = {

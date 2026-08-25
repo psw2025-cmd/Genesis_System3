@@ -7,27 +7,30 @@ Updated by ChatGPT automation on 2026-06-07.
 - Live trading remains disabled until a separate final human approval and broker-readiness gate pass.
 - Analyzer/Paper mode remains the only approved runtime mode.
 - No broker credentials, API keys, OTP, TOTP, MPIN, private keys, or env files may be committed.
-- Secrets must live only in GitHub Actions secrets, Render environment secrets, or local private secret storage.
+- Secrets must live only in GitHub Actions secrets, GCP Secret Manager, or local private secret storage. Render.com secrets are retired/non-authoritative.
 
-## Authoritative Render runtime
+## Authoritative GCP Cloud Run runtime
 
-- Render config: `render.yaml`
+- Deploy workflow: `.github/workflows/cloud-run-auto-deploy.yml`
 - Dockerfile: `dashboard/backend/Dockerfile`
 - Backend entry: `dashboard/backend/app.py`
 - Runtime command: `uvicorn dashboard.backend.app:app --host 0.0.0.0 --port 8000`
-- Current public backend:
+- Production: `https://genesis-system3-web-doq2wplepa-el.a.run.app`
+- UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`
+- Local backend:
   - Root: `http://127.0.0.1:8000/`
   - Docs: `http://127.0.0.1:8000/docs`
   - Health: `http://127.0.0.1:8000/api/health`
   - State: `http://127.0.0.1:8000/api/state`
+- `render.yaml` is retired and must not exist.
 
 ## Completed repo-side actions
 
-1. Render Blueprint added.
+1. Render.com hosting retired. GCP Cloud Run is the only production deploy.
 2. Backend Dockerfile patched to run FastAPI/Uvicorn instead of raw directory listing.
 3. Backend dependency `pytz` added.
-4. GitHub Actions Render API deploy workflow added.
-5. Render deploy workflow upgraded to poll final deploy status.
+4. GitHub Actions Cloud Run Auto Deploy (keyless WIF) is the deploy path.
+5. Render API deploy workflows are historical/non-authoritative.
 6. Full repo read-only audit workflow added.
 7. Tracked root `.env` removed from current `main`.
 8. Tracked `config/.env` removed from current `main`.

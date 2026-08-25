@@ -97,38 +97,31 @@ def check_required_files(result: Dict[str, Any]) -> None:
             add(result, "PASS", f"required_file_{item}", "present", item)
         else:
             add(result, "CRITICAL", f"missing_required_file_{item}", "required safety/proof file missing", item)
-    # Cloud Run is the production target; render.yaml is optional legacy.
     if (ROOT / "render.yaml").exists():
-        add(result, "PASS", "required_file_render.yaml", "present", "render.yaml")
+        add(result, "CRITICAL", "render_yaml_present_retired_host", "render.yaml is retired; Cloud Run only", "render.yaml")
     elif (ROOT / "dashboard" / "backend" / "Dockerfile").exists():
         add(
             result,
             "PASS",
-            "required_file_render.yaml_optional_cloud_run",
+            "render_yaml_absent_cloud_run",
             "render.yaml absent; Cloud Run Dockerfile present",
             "dashboard/backend/Dockerfile",
         )
     else:
-        add(result, "CRITICAL", "missing_required_file_render.yaml", "required safety/proof file missing", "render.yaml")
+        add(result, "CRITICAL", "missing_cloud_run_dockerfile", "Cloud Run Dockerfile missing", "dashboard/backend/Dockerfile")
 
 
 def check_render_yaml(result: Dict[str, Any]) -> None:
     p = ROOT / "render.yaml"
     text = read(p)
     if not text.strip():
-        if (ROOT / "dashboard" / "backend" / "Dockerfile").exists():
-            add(
-                result,
-                "PASS",
-                "render_yaml_optional_cloud_run",
-                "render.yaml not required under Cloud Run deployment",
-                "dashboard/backend/Dockerfile",
-            )
-            return
-        add(result, "CRITICAL", "render_yaml_missing", "render.yaml missing or unreadable", "render.yaml")
-        return
-    if not text:
-        add(result, "CRITICAL", "render_yaml_missing", "render.yaml missing or unreadable", "render.yaml")
+        add(
+            result,
+            "PASS",
+            "render_yaml_absent_retired",
+            "render.yaml absent; Cloud Run is the only deploy authority",
+            "dashboard/backend/Dockerfile",
+        )
         return
     required_pairs = [
         "SYSTEM3_MODE", "analyzer",

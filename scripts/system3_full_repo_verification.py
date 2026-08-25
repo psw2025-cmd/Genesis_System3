@@ -59,7 +59,7 @@ SAFE_ENV = {
 }
 
 CRITICAL_PATHS = [
-    "render.yaml",
+    "dashboard/backend/Dockerfile",
     "Run-FullQA.ps1",
     "dashboard/backend/app.py",
     "dashboard/backend/Dockerfile",
