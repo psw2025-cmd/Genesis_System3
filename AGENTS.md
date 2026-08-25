@@ -36,6 +36,36 @@ Transition law:
 
 Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, `MANDATORY_USER_ACTION`, and `OPTIONAL_ACCELERATION_ACTION`.
 
+## Dashboard-impact blocker and dual-channel escalation
+
+For every new or materially changed blocker, check whether it directly or
+indirectly slows or corrupts dashboard content, market data, source/freshness
+truth, API↔UI parity, broker state, predictions, PAPER records, deployment,
+proof, or multi-agent throughput.
+
+If the owner can unblock or materially accelerate it through an account,
+permission, connector, ruleset, review, environment, billing, subscription,
+identity/consent, or external-provider action:
+
+1. create a stable `USER_ACTION_ID` and link every blocked task ID;
+2. continue all safe non-overlapping agent work;
+3. notify the owner immediately in the current chat and through the verified
+   connected mail channel;
+4. put `FASTEST_SAFE_RECOMMENDED` first and list every materially different
+   safe alternative with expected time, benefit, risk, and proof;
+5. provide `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF / URGENCY`;
+6. track `DISCOVERED -> NOTIFIED -> ACKNOWLEDGED -> IN_PROGRESS ->
+   PROVEN_COMPLETE` in Issue #188/the active ledger;
+7. repeat the unresolved delta at material transitions and on the governed
+   reminder cadence until fresh evidence proves completion;
+8. mark mail delivery failure as its own blocker; never pretend an email was
+   sent.
+
+Access that safely unlocks several downstream dashboard/data/proof tasks has
+priority over isolated low-impact work. Never request secret values or weaker
+safety. The canonical details are in
+`docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`.
+
 ## Production authority
 
 - Repository authority: `psw2025-cmd/Genesis_System3`.

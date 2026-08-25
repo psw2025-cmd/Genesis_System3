@@ -1545,3 +1545,33 @@ Immediately before the final response, re-read this file again and report:
 
 If any required evidence is missing, use `PARTIAL`, `BLOCKED`, `FAIL`, or
 `NOT_PROVEN`. Never substitute confidence language for proof.
+
+## User-action escalation ledger
+
+Apply `SYSTEM3_USER_ACTION_ESCALATION_V2` from
+`docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` on every material
+transition.
+
+The completion ledger must carry:
+
+| Field | Required value |
+|---|---|
+| user_action_id | stable ID or `NONE` |
+| dashboard_impact | direct/indirect surfaces and blocked task IDs |
+| mandatory_user_action | true external blocker or `NONE` |
+| optional_acceleration_action | fastest safe owner leverage or `NONE` |
+| fastest_safe_recommended | exact least-privilege action |
+| safe_alternatives | time, benefit, risk, rollback, proof |
+| chat_delivery | timestamp/result |
+| mail_delivery | verified-recipient timestamp/result or `MAIL_DELIVERY_BLOCKED` |
+| user_evidence | received artifact/state or `NONE` |
+| cross_verify_result | `PASS / PARTIAL / FAIL / UNPROVEN` |
+| next_reminder_at | timestamp or `NONE` |
+| agent_continues_with | next non-blocked executable task |
+
+Notify immediately in chat and verified connected mail on discovery/material
+change. Keep unresolved actions in the ledger and repeat only the smallest
+remaining correction at the canonical cadence until practical proof closes the
+ID. Prioritize safe access/setup that unlocks multiple dashboard/data/proof
+dependencies. Do not stall agent-owned work and do not expose secrets, weaken
+IAM/WIF/checks, or enable LIVE/orders.

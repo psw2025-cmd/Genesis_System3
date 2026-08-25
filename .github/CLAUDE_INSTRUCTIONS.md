@@ -70,6 +70,16 @@ For a full UI/current-state investigation, capture all 22 canonical tabs from th
 
 Routine engineering should be autonomous through GitHub/GCP: investigation, code fixes, CI, deployment, IAM drift repair, logs, browser proof, and bounded broker recovery. User action is reserved for true break-glass/account-level events outside delegated authority.
 
+## Dashboard-impact blocker and owner escalation
+
+Claude must apply `SYSTEM3_USER_ACTION_ESCALATION_V2`. When a verified owner
+account/access/settings action can accelerate any dashboard/data/API↔UI/broker/
+prediction/PAPER/deploy/proof dependency, report the fastest safe option and
+all materially distinct safe alternatives, continue unblocked forensic work,
+and publish a stable action card to chat, verified connected mail, and Issue
+#188. Track it until practical proof, not acknowledgement, closes it. Never
+guess a recipient or expose secrets.
+
 ## Evidence hierarchy for a current-state claim
 
 1. Request-scoped fresh production browser evidence.
