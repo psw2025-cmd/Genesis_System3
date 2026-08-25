@@ -14,9 +14,16 @@ key, or a pass recorded over zero verified contracts all reported
 which is the health/state contradiction observed on the serving revision.
 
 `classify_qc_status` now requires positive evidence before reporting PASS.
+
+Separately, the REAL_ONLY analyzer-ready branch of `/api/health` returned a
+hardcoded ``qc_status: PASS`` without consulting QC at all. That branch serves
+production whenever the broker is connected, so it — not the classifier path —
+produced the contradiction seen on the serving revision. It now reports real QC
+truth via `read_qc_status`, covered at the end of this module.
 """
 
 import importlib.util
+import json
 import os
 import sys
 from pathlib import Path
@@ -26,6 +33,25 @@ import pytest
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+
+
+@pytest.fixture(scope="module")
+def app_module():
+    old_val = os.environ.get("REQUIRE_API_KEY")
+    os.environ["REQUIRE_API_KEY"] = "false"
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "dashboard_backend_app_qc_module_under_test",
+            ROOT_DIR / "dashboard" / "backend" / "app.py",
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod
+    finally:
+        if old_val is not None:
+            os.environ["REQUIRE_API_KEY"] = old_val
+        else:
+            os.environ.pop("REQUIRE_API_KEY", None)
 
 
 @pytest.fixture(scope="module")
@@ -147,3 +173,51 @@ def test_genuine_verified_pass_is_still_reported(classify):
 
     assert status == "PASS"
     assert failures == []
+
+
+# --- read_qc_status: the REAL_ONLY analyzer-ready branch that serves production ---
+#
+# This branch returned a hardcoded `"qc_status": "PASS"` alongside
+# `ANALYZER_READY - Broker connected, paper mode active`, without reading QC at
+# all. It is the path that actually served the observed
+# `/api/health: PASS` vs `/api/state: NOT_READY` contradiction, because broker
+# connectivity was being reported as if it were QC truth.
+
+
+def _point_qc_file_at(app_module, monkeypatch, tmp_path, payload):
+    monkeypatch.setattr(app_module, "OUTPUTS_DIR", tmp_path)
+    if payload is not None:
+        (tmp_path / "qc_report_live.json").write_text(payload)
+    return app_module.read_qc_status()
+
+
+def test_missing_qc_report_is_not_a_pass(app_module, monkeypatch, tmp_path):
+    assert _point_qc_file_at(app_module, monkeypatch, tmp_path, None) == (
+        "NOT_READY",
+        ["NO_QC_DATA"],
+    )
+
+
+def test_unreadable_qc_report_is_not_a_pass(app_module, monkeypatch, tmp_path):
+    assert _point_qc_file_at(app_module, monkeypatch, tmp_path, "{not json") == (
+        "NOT_READY",
+        ["QC_REPORT_UNREADABLE"],
+    )
+
+
+def test_broker_connected_with_zero_contracts_is_not_a_pass(
+    app_module, monkeypatch, tmp_path
+):
+    # The live case: broker connected, QC has verified nothing.
+    payload = json.dumps({"qc_passed": True, "total_contracts": 0})
+
+    assert _point_qc_file_at(app_module, monkeypatch, tmp_path, payload) == (
+        "NOT_READY",
+        ["NO_VERIFIED_CONTRACTS"],
+    )
+
+
+def test_verified_qc_report_still_passes(app_module, monkeypatch, tmp_path):
+    payload = json.dumps({"qc_passed": True, "total_contracts": 412})
+
+    assert _point_qc_file_at(app_module, monkeypatch, tmp_path, payload) == ("PASS", [])

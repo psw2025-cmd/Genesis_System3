@@ -3671,6 +3671,28 @@ def classify_qc_status(qc_data: dict) -> tuple:
     return "PASS", []
 
 
+def read_qc_status() -> tuple:
+    """Read the live QC report and classify it, failing closed.
+
+    Used by the REAL_ONLY analyzer-ready branch of /api/health, which
+    previously returned a hardcoded ``qc_status: PASS`` without consulting QC
+    at all. That branch serves production whenever the broker is connected, so
+    it reported PASS while /api/state reported NOT_READY from the same runtime.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    qc_file = OUTPUTS_DIR / "qc_report_live.json"
+    if not qc_file.exists():
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    try:
+        qc_data = json.loads(qc_file.read_text())
+    except (OSError, ValueError):
+        return "NOT_READY", ["QC_REPORT_UNREADABLE"]
+
+    return classify_qc_status(qc_data)
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -3799,6 +3821,10 @@ async def get_health():
 
             # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
             # live_allowed=False always: LIVE trading is permanently disabled
+            # Broker readiness is not QC truth: report the real QC verdict here
+            # rather than a hardcoded PASS, so this branch cannot contradict
+            # /api/state.
+            analyzer_qc_status, analyzer_qc_failures = read_qc_status()
             return {
                 "status": "ok",
                 "mode": "PAPER",
@@ -3819,8 +3845,8 @@ async def get_health():
                 "cycle_count": 0,
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(IST).isoformat(),
-                "qc_status": "PASS",
-                "qc_failures": [],
+                "qc_status": analyzer_qc_status,
+                "qc_failures": analyzer_qc_failures,
                 "trades_executed": 0,
                 "open_positions": 0,
                 "total_pnl": 0.0,
