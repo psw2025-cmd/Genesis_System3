@@ -948,6 +948,18 @@ async def get_broker_funds():
         }
 
 
+@app.get("/api/holdings")
+async def api_holdings_alias():
+    """Canonical dashboard alias → read-only broker holdings (PEND-011)."""
+    return await get_broker_holdings()
+
+
+@app.get("/api/funds")
+async def api_funds_alias():
+    """Canonical dashboard alias → read-only broker funds (PEND-011)."""
+    return await get_broker_funds()
+
+
 @app.get("/api/broker/diagnose")
 async def get_broker_diagnose():
     """Diagnose exactly WHY broker is disconnected. Key for Cloud Run / Secret Manager setup."""

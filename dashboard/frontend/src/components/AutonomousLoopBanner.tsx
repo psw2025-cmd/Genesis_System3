@@ -79,7 +79,7 @@ export function AutonomousLoopBanner() {
       }}
     >
       <span style={{ fontWeight: 800, color: gatesOk ? 'var(--up)' : 'var(--amber)', letterSpacing: '.03em' }}>
-        [AUTONOMOUS LOOP] | Active Task: {task} | Progress: {resolved}/{total} | Gates: {passCount}/{proof.length || 7} | Build: {shortSha(deployInfo?.git_sha) || 'SHA_PENDING'}
+        [LIVE TRUTH] | Task: {task} | Progress: {resolved}/{total} | Gates: {passCount}/{proof.length || 7} | Serving: {shortSha(deployInfo?.git_sha) || 'pending'} | QC: {String(state?.qc?.status || '—')} | Broker: {brokerOk ? 'OK' : '—'} | LIVE OFF
       </span>
       <span>IST {ist}</span>
     </div>
