@@ -267,6 +267,18 @@ jobs:
             tests/test_dhan_market_ltp.py \
             -v --tb=short
 
+      - name: QC fail-closed targeted proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          # pyproject sets addopts="-q", which suppresses per-test names in the
+          # step above. Clear it here so the exact-head log names every case,
+          # including the parametrised non-boolean type-safety cases.
+          python -m pytest \
+            tests/test_runtime_state_qc_fail_closed.py \
+            tests/test_health_qc_fail_closed.py \
+            -o addopts="" -v --tb=short
+
       - name: Classify quantitative AlphaTruth evidence
         shell: bash
         run: |
