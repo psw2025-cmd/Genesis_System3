@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { isMarketOpen } from './utils/marketHours'
+import type { TruthHydrationMeta } from './lib/hydration'
 
 interface DashboardState {
   // Connection
@@ -33,6 +34,7 @@ interface DashboardState {
   // Runtime facts (deploy SHA, research contract)
   deployInfo: any
   research: any
+  truthMeta: TruthHydrationMeta | null
 
   // UI
   activeTab: string
@@ -62,6 +64,7 @@ interface DashboardState {
   setChainSymbol: (s: string) => void
   setDeployInfo: (d: any) => void
   setResearch: (d: any) => void
+  setTruthMeta: (d: TruthHydrationMeta) => void
   setSidebarOpen: (open: boolean) => void
   setCommandQuery: (q: string) => void
 }
@@ -105,6 +108,7 @@ export const useStore = create<DashboardState>((set) => ({
   liveBoard: null,
   deployInfo: null,
   research: null,
+  truthMeta: null,
   activeTab: 'decision-intel',
   chainSymbol: 'NIFTY',
   sidebarOpen: false,
@@ -162,6 +166,7 @@ export const useStore = create<DashboardState>((set) => ({
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
   setDeployInfo: (deployInfo) => set({ deployInfo }),
   setResearch: (research) => set({ research }),
+  setTruthMeta: (truthMeta) => set({ truthMeta }),
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   setCommandQuery: (commandQuery) => set({ commandQuery }),
 }))

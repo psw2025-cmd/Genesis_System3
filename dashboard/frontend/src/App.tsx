@@ -8,6 +8,7 @@ import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
 import { AutonomousLoopBanner } from './components/AutonomousLoopBanner'
+import { DeploymentTruthFooter } from './components/DeploymentTruthFooter'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -121,6 +122,7 @@ export default function App() {
           </ErrorBoundary>
         </main>
       </div>
+      <DeploymentTruthFooter />
     </div>
   )
 }

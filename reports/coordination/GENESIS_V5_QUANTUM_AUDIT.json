@@ -1,0 +1,30 @@
+{
+  "project": "GENESIS_SYSTEM3",
+  "version": "5.0",
+  "updated_at": "2026-08-26T04:55:00+05:30",
+  "github_main_sha": "49f2c07d3",
+  "live_serving_sha_before_v5": "1036af8c96c719f0394b8e9015783439e1ffde74",
+  "pr363": { "status": "MERGED", "merge_sha": "49f2c07d3" },
+  "v5_pr": { "branch": "feat/quantum-truth-v5", "status": "OPEN_PENDING" },
+  "tasks": {
+    "T1": { "status": "IN_PROGRESS", "note": "hydration.ts + TruthStrip + Zustand bind — PR feat/quantum-truth-v5" },
+    "T2": { "status": "PARTIAL", "note": "/api/funds /api/holdings aliases merged #363; circuit breaker in hydration.ts" },
+    "T3": { "status": "PLANNED", "note": "PredictionAudit workspace exists; adaptive learner not yet wired" },
+    "T4": { "status": "PLANNED", "note": "No three.js; recharts only — IV 3D tensor is Phase 3" },
+    "T5": { "status": "PLANNED", "note": "MLPerformance tab exists; live node activations not built" },
+    "T6": { "status": "PARTIAL", "note": "dark-neon tokens in index.css; TruthStrip neon HUD added" },
+    "T7": { "status": "IN_PROGRESS", "note": "DeploymentTruthFooter + SHA sync validation" },
+    "T8": { "status": "PLANNED", "note": "OptionChain 2D live #363; 3D holographic Phase 3" },
+    "T9": { "status": "DONE", "note": "PR #363 merged CI green 2026-08-26" }
+  },
+  "duplication_lanes": {
+    "claude": "QC fix #361 only — no duplicate app.py QC PR",
+    "cursor": "UI truth layer + deploy MRI",
+    "truth_sha_allowlist": ["TruthStrip", "DeploymentTruthFooter", "AutonomousLoopBanner", "DataIntegrity"]
+  },
+  "proof_attachments_pending": [
+    "live banner screenshot after v5 deploy",
+    "API funds/holdings response log",
+    "CI green for feat/quantum-truth-v5"
+  ]
+}

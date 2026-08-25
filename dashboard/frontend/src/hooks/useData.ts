@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react'
 import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
 import { mergeAuthoritativeBrokerStatus } from '../lib/brokerStatus'
+import { applyTruthBundle, fetchTruthBundle } from '../lib/hydration'
 
 const BASE = API_BASE || window.location.origin
 
@@ -228,7 +229,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank, setMarketTop,
     setAlerts, setAlertFeedStatus, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
-    setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch,
+    setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch, setTruthMeta,
   } = useStore()
 
   const wsRef = useRef<WebSocket | null>(null)
@@ -468,13 +469,19 @@ export function useData() {
   }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
   const pollRuntimeFacts = useCallback(async () => {
-    const [deploy, research] = await Promise.allSettled([
-      fetchJSON('/api/deploy/info', 12000),
-      fetchJSON('/api/research/multibagger', 15000),
-    ])
-    if (deploy.status === 'fulfilled') setDeployInfo(deploy.value)
-    if (research.status === 'fulfilled') setResearch(research.value)
-  }, [setDeployInfo, setResearch])
+    const bundle = await fetchTruthBundle(BASE)
+    applyTruthBundle(bundle, {
+      setDeployInfo,
+      setHealth,
+      setState,
+      setBrokerStatus,
+      setBrokerFunds,
+      setBrokerHoldings,
+      setTruthMeta,
+    })
+    const research = await Promise.allSettled([fetchJSON('/api/research/multibagger', 15000)])
+    if (research[0].status === 'fulfilled') setResearch(research[0].value)
+  }, [setDeployInfo, setHealth, setState, setBrokerStatus, setBrokerFunds, setBrokerHoldings, setTruthMeta, setResearch])
 
   const pollSecondary = useCallback(async () => {
     const [alerts, gates] = await Promise.allSettled([

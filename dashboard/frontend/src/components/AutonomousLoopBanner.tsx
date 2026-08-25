@@ -1,31 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useStore } from '../store'
-import { shortSha } from '../lib/formatLive'
-
-const IST_FMT = new Intl.DateTimeFormat('en-CA', {
-  timeZone: 'Asia/Kolkata',
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit',
-  hour: '2-digit',
-  minute: '2-digit',
-  second: '2-digit',
-  hour12: false,
-})
+import { TruthStrip } from './TruthStrip'
 
 /** Temporary until all proof gates are genuinely READY (never faked). */
 export const AUTONOMOUS_LOOP_BANNER_ENABLED = true
 
 export function AutonomousLoopBanner() {
-  const { deployInfo, brokerStatus, gainRank, chain, state, autoGates } = useStore()
-  const [ist, setIst] = useState(() => `${IST_FMT.format(new Date()).replace(', ', ' ')} IST`)
-
-  useEffect(() => {
-    const t = window.setInterval(() => {
-      setIst(`${IST_FMT.format(new Date()).replace(', ', ' ')} IST`)
-    }, 1000)
-    return () => window.clearInterval(t)
-  }, [])
+  const { gainRank, chain, state, autoGates, brokerStatus } = useStore()
 
   const proof = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const passCount = proof.filter((g: any) => g?.pass === true || String(g?.status).toUpperCase() === 'PASS').length
@@ -62,26 +43,25 @@ export function AutonomousLoopBanner() {
   return (
     <div
       data-testid="autonomous-loop-banner"
-      role="status"
-      aria-live="polite"
+      className="autonomous-loop-banner truth-strip-neon"
       style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '8px 16px',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '8px 14px',
         borderBottom: '1px solid rgba(120,180,255,.3)',
         background: 'linear-gradient(90deg, rgba(10,36,64,.96), rgba(6,20,38,.98))',
-        fontFamily: 'var(--font-mono, ui-monospace, monospace)',
-        fontSize: 11,
-        color: 'var(--text-sec)',
       }}
     >
-      <span style={{ fontWeight: 800, color: gatesOk ? 'var(--up)' : 'var(--amber)', letterSpacing: '.03em' }}>
-        [LIVE TRUTH] | Task: {task} | Progress: {resolved}/{total} | Gates: {passCount}/{proof.length || 7} | Serving: {shortSha(deployInfo?.git_sha) || 'pending'} | QC: {String(state?.qc?.status || '—')} | Broker: {brokerOk ? 'OK' : '—'} | LIVE OFF
-      </span>
-      <span>IST {ist}</span>
+      <TruthStrip />
+      <div
+        style={{
+          padding: '4px 14px 8px',
+          fontFamily: 'var(--font-mono)',
+          fontSize: 11,
+          color: gatesOk ? 'var(--up)' : 'var(--amber)',
+          fontWeight: 700,
+          letterSpacing: '.03em',
+        }}
+      >
+        Task: {task} | Progress: {resolved}/{total} | Gates: {passCount}/{proof.length || 7}
+      </div>
     </div>
   )
 }
