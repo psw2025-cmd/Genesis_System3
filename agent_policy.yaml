@@ -396,3 +396,52 @@ ban_list:
   - claim_zk_or_quantum_proof
   - enable_live_without_human_gate
   - skip_fresh_preflight_before_transition
+
+user_action_escalation:
+  authority: SYSTEM3_USER_ACTION_ESCALATION_V2
+  policy: docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md
+  applies_to_agents: [ChatGPT, Codex, Cursor, Claude, Gemini, generic]
+  dashboard_impact_priority:
+    - dashboard_content_and_status_truth
+    - market_data_source_freshness_and_api_ui_parity
+    - broker_option_chain_quote_candle_and_instrument_coverage
+    - predictions_ml_paper_pnl_risk_and_proof_visibility
+    - ci_review_merge_deploy_gcp_browser_and_agent_access
+  execution:
+    continue_unblocked_agent_work: true
+    prioritize_multi_dependency_least_privilege_access: true
+    fastest_safe_option_first: true
+    list_all_materially_distinct_safe_alternatives: true
+  delivery:
+    chat_on_discovery_or_material_change: true
+    verified_connected_mail_on_discovery_or_material_change: true
+    canonical_bus: github_issue_188
+    never_guess_or_commit_private_recipient: true
+    mail_failure_state: MAIL_DELIVERY_BLOCKED
+  tracking:
+    states: [DISCOVERED, NOTIFIED, ACKNOWLEDGED, IN_PROGRESS, PROVEN_COMPLETE, SUPERSEDED]
+    unresolved_actions_never_disappear: true
+    acknowledgement_is_not_completion: true
+    practical_proof_required_to_close: true
+    default_reminder_hours: 6
+    p0_market_session_minimum_reminder_hours: 1
+    deduplicate_key: user_action_id_plus_action_revision
+  required_card_fields:
+    - user_action_id
+    - detected_at
+    - owner
+    - blocked_task_ids
+    - dashboard_impact
+    - mandatory_user_action
+    - optional_acceleration_action
+    - fastest_safe_recommended
+    - safe_alternatives
+    - why_where_click_set_do_not_result_proof_urgency
+    - agent_continues_with
+    - status
+    - next_reminder_at
+  safety:
+    live_trading_enabled: false
+    order_placement_allowed: false
+    secret_values_in_chat_mail_repo: false
+    iam_wif_or_gate_weakening: false
