@@ -158,13 +158,22 @@ def gcloud_bin() -> str:
 
 
 def run_gcloud(args: list[str], timeout: int = 90) -> tuple[Any, str | None]:
+    """Run gcloud with argv only — never enable shell mode (Bandit B602 fail-closed)."""
+    import shutil
+
     exe = gcloud_bin()
-    shell = exe.lower().endswith(".cmd")
+    # Prefer PATH shim so Windows SDK .cmd wrappers are not required with shell mode.
+    which = shutil.which("gcloud")
+    if which:
+        exe = which
+    elif exe.lower().endswith(".cmd"):
+        # Last resort on Windows without PATH: invoke via explicit executable list, no shell.
+        pass
     try:
         p = subprocess.run(
             [exe, *args],
             capture_output=True,
-            shell=shell,
+            shell=False,
             timeout=timeout,
             check=False,
         )

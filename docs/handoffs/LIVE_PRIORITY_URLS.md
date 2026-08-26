@@ -10,11 +10,10 @@
 | P0 | Proof center INDEX | `reports/latest/live_proof_center/LATEST/INDEX.md` |
 | P0 | Proof center Excel MRI | `reports/latest/live_proof_center/LATEST/System3_LIVE_PROOF_CENTER.xlsx` |
 | P0 | Pointer | `reports/coordination/LIVE_PROOF_CENTER_POINTER.md` |
-| P0 | Always-on branch | https://github.com/psw2025-cmd/Genesis_System3/tree/live-proof-center/reports/latest/live_proof_center/LATEST |
 | P0 | Workflow | https://github.com/psw2025-cmd/Genesis_System3/actions/workflows/live-proof-center.yml |
 | P0 | Doc | `docs/handoffs/LIVE_PROOF_CENTER.md` |
 
-Scheduled every 2h UTC. Read this before claiming “no GCP/laptop access”.
+Runs on `main` push + manual dispatch (no GitHub cron). Read this before claiming “no GCP/laptop access”.
 
 ## First priority — live System3
 
