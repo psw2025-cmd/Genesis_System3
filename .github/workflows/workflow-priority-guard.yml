@@ -1,18 +1,10 @@
 name: Workflow Priority Guard
 
 on:
+  # Emit the required check for every PR. Path-filtering a required workflow
+  # leaves unrelated PRs permanently pending and tempts ruleset dilution.
   pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/**"
-      - ".github/scripts/workflow_priority_guard.py"
-      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
-      - "scripts/gcp_full_cloud_audit.py"
-      - "scripts/fetch_exact_security_audit.py"
-      - "scripts/multi_ai_audit_consensus.py"
-      - "scripts/system3_preflight_control_plane.py"
-      - "tests/test_full_cloud_audit_contract.py"
-      - "tests/evals/test_system3_preflight_control_plane.py"
   push:
     branches: [main]
     paths:
