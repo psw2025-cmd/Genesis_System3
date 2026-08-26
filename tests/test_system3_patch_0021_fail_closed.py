@@ -55,7 +55,7 @@ LIVE_CANONICAL_ROTATION = {
 }
 
 
-# ── T9: profit/expectancy gate must refuse the bundled fixture ───────────────────────────────
+# ── T9: profit/expectancy gate must refuse the bundled fixture ───────────────
 
 
 def test_t9_fixture_is_not_a_default_trade_source():
@@ -421,7 +421,7 @@ def test_r2r3_warming_placeholder_is_not_usable():
     assert batch.index("if not ready:") < batch.rindex("_cache_set")
 
 
-# ── Combined fail-closed contract ────────────────────────────────────
+# ── Combined fail-closed contract ────────────────────────────────────────────
 
 
 def test_0021_does_not_enable_live_trading():
