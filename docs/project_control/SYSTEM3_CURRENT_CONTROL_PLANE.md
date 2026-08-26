@@ -26,7 +26,7 @@ Updated by ChatGPT automation on 2026-06-07.
 
 ## Completed repo-side actions
 
-1. Render.com hosting retired. GCP Cloud Run is the only production deploy.
+1. Render.com hosting is forbidden. GCP Cloud Run is the only production deploy. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`.
 2. Backend Dockerfile patched to run FastAPI/Uvicorn instead of raw directory listing.
 3. Backend dependency `pytz` added.
 4. GitHub Actions Cloud Run Auto Deploy (keyless WIF) is the deploy path.
@@ -67,7 +67,7 @@ Manual action should be requested only for:
 
 - Creating/revoking private API keys or broker credentials.
 - Uploading a GitHub Actions artifact ZIP if the connector cannot download it.
-- UI screenshots when GitHub/Render state is not exposed through connector tools.
+- UI screenshots when GitHub/Cloud Run state is not exposed through connector tools.
 - Any broker/OTP/TOTP/private credential action.
 
 ## Next recommended sequence

@@ -1,4 +1,4 @@
-"""Eval: Render.com hosting is retired. GCP Cloud Run is the only deploy authority.
+"""Eval: Render.com hosting is forbidden. GCP Cloud Run is the only deploy authority.
 
 Does not ban the English verb 'render' or UI visual-proof docs.
 """
@@ -6,13 +6,11 @@ Does not ban the English verb 'render' or UI visual-proof docs.
 from __future__ import annotations
 
 import inspect
-import json
 import re
 from pathlib import Path
 from urllib.parse import urlparse
 
 from dashboard.backend import app as app_mod
-from tools._render_hosting_retired import render_yaml_exists, write_retired_report
 
 _URL_RE = re.compile(r"https?://[^\s\"'`<>]+", re.IGNORECASE)
 _BARE_HOST_RE = re.compile(
@@ -24,7 +22,9 @@ GCP_UI = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 AUTHORITY_FILES = [
     ROOT / "AGENTS.md",
     ROOT / "GOVERNANCE.md",
+    ROOT / ".github" / "CLAUDE_INSTRUCTIONS.md",
     ROOT / "docs" / "authority" / "AUTONOMOUS_OPERATIONS_POLICY.md",
+    ROOT / "docs" / "authority" / "RENDER_HOSTING_FORBIDDEN.md",
     ROOT / "docs" / "project_control" / "SYSTEM3_MASTER_GOAL_LOCK.md",
     ROOT / "docs" / "project_control" / "SYSTEM3_CURRENT_CONTROL_PLANE.md",
     ROOT / "docs" / "project_control" / "GLOBAL_CONTROL_PLANE_STRUCTURE_20260616.md",
@@ -62,6 +62,18 @@ def test_render_yaml_must_not_exist():
     assert not (ROOT / "render.yaml").exists()
 
 
+def test_forbidden_policy_doc_exists():
+    path = ROOT / "docs" / "authority" / "RENDER_HOSTING_FORBIDDEN.md"
+    text = path.read_text(encoding="utf-8")
+    lowered = text.lower()
+    assert "forbidden" in lowered
+    assert "Cloud Run" in text
+    assert GCP_UI in text
+    assert "render.yaml" in text
+    assert "never" in lowered
+    assert not text_has_retired_render_host(text)
+
+
 def test_authority_docs_do_not_keep_render_as_runtime():
     banned = (
         "Authoritative Render runtime",
@@ -77,16 +89,17 @@ def test_authority_docs_do_not_keep_render_as_runtime():
         lowered = text.lower()
         assert (
             "retired" in lowered
+            or "forbidden" in lowered
             or "google cloud" in lowered
             or "cloud run" in lowered
             or "gcp project" in lowered
-        ), f"{path.name} missing GCP/retired deploy authority"
+        ), f"{path.name} missing GCP/forbidden deploy authority"
 
 
 def test_visual_proof_rules_are_gcp_not_render_host():
     text = (ROOT / "docs" / "SYSTEM3_VISUAL_PROOF_AND_RENDER_RULES.md").read_text(encoding="utf-8")
     assert GCP_UI in text
-    assert "Render is retired" in text
+    assert "Render is retired" in text or "Render is forbidden" in text
 
 
 def test_deploy_info_does_not_use_render_env_as_sha():
@@ -109,7 +122,8 @@ def test_master_proof_treats_render_yaml_as_retired_blocker_if_present():
     assert "render_yaml_present_retired_host" in text
 
 
-RETIRED_TOOLS = [
+FORBIDDEN_LEFTOVER_PATHS = [
+    ROOT / "tools" / "_render_hosting_retired.py",
     ROOT / "tools" / "system3_github_render_failure_tracker.py",
     ROOT / "tools" / "write_github_render_tracker_fallback.py",
     ROOT / "tools" / "render_deploy_commit_proof.py",
@@ -118,20 +132,59 @@ RETIRED_TOOLS = [
     ROOT / "tools" / "system3_render_worker_preflight.py",
     ROOT / "tools" / "system3_render_worker_env_audit.py",
     ROOT / "tools" / "system3_render_100_agent_swarm.py",
+    ROOT / "tools" / "dedupe_failure_tracker_report.py",
     ROOT / "scripts" / "render_worker_mobile_check.sh",
+    ROOT / "docs" / "render" / "RENDER_MEMORY_OOM_RUNBOOK.md",
+    ROOT / "docs" / "SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md",
+    ROOT / "docs" / "render_trading_bot_deployment_blueprint.md",
 ]
 
 
-def test_leftover_render_tools_are_retired_stubs():
-    for path in RETIRED_TOOLS:
-        text = path.read_text(encoding="utf-8")
-        assert "retired" in text.lower(), f"{path.name} is not marked retired"
-        assert "Cloud Run" in text or "gcp-cloud-run" in text or "genesis-system3-web" in text
-        assert not text_has_retired_render_host(text), f"{path.name} still contains a Render hostname"
+def test_leftover_render_hosting_files_must_not_exist():
+    present = [path.relative_to(ROOT).as_posix() for path in FORBIDDEN_LEFTOVER_PATHS if path.exists()]
+    assert present == [], f"Render hosting leftovers must be deleted: {present}"
 
 
 def test_sync_render_secrets_must_not_exist():
     assert not (ROOT / "tools" / "sync_render_secrets.py").exists()
+
+
+def test_no_render_service_ids_in_source():
+    ids = ("srv-d8ib83vlk1mc73801i1g", "srv-d92iqfnaqgkc739g226g")
+    hits: list[str] = []
+    for path in ROOT.rglob("*"):
+        if not path.is_file():
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if rel.split("/", 1)[0] in {"reports", ".git", "node_modules", ".venv", "tests"}:
+            continue
+        if path.suffix.lower() not in {".py", ".md", ".yml", ".yaml", ".ts", ".tsx", ".json", ".sh"}:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if any(item in text for item in ids):
+            hits.append(rel)
+    assert hits == [], f"legacy Render service IDs still in source: {hits}"
+
+
+def test_workflows_must_not_deploy_to_render():
+    needles = (
+        "render deploy",
+        "render blueprint",
+        "RENDER_DEPLOY_HOOK",
+        "api.render.com",
+        "RENDER_API_KEY",
+    )
+    hits: list[str] = []
+    wf_dir = ROOT / ".github" / "workflows"
+    for path in list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for needle in needles:
+            if needle.lower() in text.lower():
+                hits.append(f"{path.name}:{needle}")
+    assert hits == [], f"workflows must not deploy to Render: {hits}"
 
 
 def test_proof_board_does_not_require_render_host():
@@ -194,13 +247,3 @@ def test_retired_host_check_uses_parsed_hostname_not_substring():
     assert not text_has_retired_render_host("https://evil.example/onrender.com")
     assert not text_has_retired_render_host("https://onrender.com.evil.example/")
     assert not text_has_retired_render_host("not-onrender.com")
-
-
-def test_retired_helper_writes_cloud_run_pass(tmp_path):
-    assert not render_yaml_exists()
-    code = write_retired_report(tmp_path)
-    assert code == 0
-    payload = json.loads((tmp_path / "summary.json").read_text(encoding="utf-8"))
-    assert payload["status"] == "PASS"
-    assert payload["hosting_authority"] == "gcp-cloud-run"
-    assert payload["render_yaml_exists"] is False

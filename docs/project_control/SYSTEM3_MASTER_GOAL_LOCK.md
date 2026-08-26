@@ -25,7 +25,7 @@ Until separately and explicitly proven/authorized:
 - PAPER/analyzer only
 - no real broker order placement/modification/cancellation/square-off
 
-Broker authority is Dhan. Render.com hosting is retired. Angel-era operating instructions are historical/non-authoritative.
+Broker authority is Dhan. Render.com hosting is forbidden (retired host). Never recreate `render.yaml`. Angel-era operating instructions are historical/non-authoritative.
 
 ## Result-oriented execution rule
 

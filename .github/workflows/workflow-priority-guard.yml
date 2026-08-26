@@ -179,7 +179,7 @@ jobs:
               ref = deployment.get("ref")
               evidence_url = deployment_status.get("target_url") or deployment_status.get("log_url")
               deployment_app = str(app.get("slug") or "") or None
-              retired_runtime = deployment_app == "render"
+              retired_runtime = deployment_app == "render"  # Render hosting is forbidden; flag any leftover deploy events
 
           fingerprint = hashlib.sha256(
               "|".join([event_name, source, state, str(deployment_app or "none")]).lower().encode("utf-8")

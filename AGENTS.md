@@ -72,7 +72,8 @@ safety. The canonical details are in
 - Runtime/deployment authority: Google Cloud project `system3-openalgo-safe`, region `asia-south1`.
 - Production service: `genesis-system3-web`.
 - Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
-- Broker authority: **Dhan**. Legacy Angel/Render instructions are retired/non-authoritative.
+- Broker authority: **Dhan**.
+- Hosting lock: GCP Cloud Run only. Render.com is forbidden. Never recreate `render.yaml`, never add Render as production, never deploy workers to Render. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`. Legacy Angel instructions are retired/non-authoritative.
 - GitHub Actions -> Google Cloud uses keyless WIF. Do not create/export service-account JSON keys.
 
 ## Absolute current/live truth rule

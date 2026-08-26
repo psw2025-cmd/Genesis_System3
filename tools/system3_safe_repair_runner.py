@@ -41,7 +41,6 @@ COMMANDS = [
     [sys.executable, "scripts/system3_friction_expectancy_proof.py"],
     [sys.executable, "scripts/websocket_tick_health_proof.py"],
     [sys.executable, "scripts/system3_blocker_finder.py", "--api-base", API_BASE],
-    [sys.executable, "tools/system3_github_render_failure_tracker.py"],
 ]
 
 

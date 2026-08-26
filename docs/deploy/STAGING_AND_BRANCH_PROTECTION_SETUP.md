@@ -1,6 +1,6 @@
 # Staging Environment + Branch Protection
 
-Render.com staging is retired and non-authoritative. Production deploy authority is GCP Cloud Run only.
+Render.com staging is forbidden (retired host) and non-authoritative. Production deploy authority is GCP Cloud Run only. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`.
 
 ## 1. Staging / production runtime (GCP)
 
