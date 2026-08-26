@@ -1,0 +1,17 @@
+{
+  "connected": true,
+  "auto_refresh": {
+    "success": false,
+    "skipped": "AUTO_REFRESH_DISABLED_OR_LIVE_GATE",
+    "attempted": false,
+    "message": "Refresh not run (AUTO_REFRESH_DISABLED_OR_LIVE_GATE)",
+    "strategy": "not_attempted"
+  },
+  "canonical_rotation": {
+    "operation_started": false,
+    "success": false,
+    "skipped": "CANONICAL_SELF_HEAL_DISABLED",
+    "attempted": false,
+    "message": "Refresh not run (CANONICAL_SELF_HEAL_DISABLED)"
+  }
+}
