@@ -1,9 +1,9 @@
 {
   "captured_at_utc": "2026-08-26T18:35:30Z",
   "captured_ist": "2026-08-27T00:05:30+05:30",
-  "github_origin_main": "6cda50c3f00457baba897fcf7e9732693a8f1e3e",
-  "github_main_subject": "fix(security): suppress false-positive CodeQL alerts #144/#145 (dhan rotator forensic) (#369)",
-  "github_main_class": "TEST_ONLY",
+  "github_origin_main": "b33685e0f52280cfce3444568b0ae0fc5282b4f5",
+  "github_main_subject": "fix(ci): keep Workflow Priority Guard universally requireable (#370)",
+  "github_main_class": "CI_ONLY",
   "pr_merged": 369,
   "merge_commit": "6cda50c3f00457baba897fcf7e9732693a8f1e3e",
   "gcp_serving_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
@@ -30,5 +30,8 @@
   "qc_health": "NOT_READY",
   "rhui_status": "NOT_ACCEPTED",
   "human_action_required": false,
-  "evidence_dir": "reports/latest/post369_live_proof_20260827_000506"
+  "evidence_dir": "reports/latest/post369_live_proof_20260827_000506",
+  "pr_merged_369": 369,
+  "merge_commit_369": "6cda50c3f00457baba897fcf7e9732693a8f1e3e",
+  "note_lag": "Main tip is #370 (CI). #369 is test-only ancestor. Serving remains #367. DOCS/TEST/CI_ONLY_LAG \u2014 no blind redeploy."
 }

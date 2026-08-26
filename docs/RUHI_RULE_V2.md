@@ -8,7 +8,7 @@ Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-
 
 Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` Â· revision `genesis-system3-web-00617-vif` @ 100%.
 
-GitHub `main` tip after **#369** squash (`6cda50c3f00457baba897fcf7e9732693a8f1e3e`) is **test-only** (`tests/test_dhan_rotator_forensic_redaction.py`). That is **DOCS/TEST_ONLY_LAG** vs serving â€” not a failed Cloud Run promotion. Do not redeploy solely to equalize.
+GitHub `main` tip `b33685e0f52280cfce3444568b0ae0fc5282b4f5` (#370) includes **#369** squash (`6cda50c3f00457baba897fcf7e9732693a8f1e3e`) is **test-only** (`tests/test_dhan_rotator_forensic_redaction.py`). That is **DOCS/TEST_ONLY_LAG** vs serving â€” not a failed Cloud Run promotion. Do not redeploy solely to equalize.
 
 Live proof snapshot (2026-08-27 00:05 IST): broker `AUTH_OK` / LIVE OFF; scheduler **HEALTHY** (`alert_severity=none`); signals `92lf5` EXECUTION_SUCCEEDED. HUMAN_ACTION_REQUIRED=**NO**.
 
