@@ -51,6 +51,10 @@ def test_batch_chains_does_not_cache_warming_placeholders():
     assert "if not ready:" in batch
     assert "return payload" in batch
     assert batch.index("if not ready:") < batch.rindex("_cache_set")
+    assert "_fill_warming_required_chains" in batch
+    assert "wait_for" in src.split("async def _fill_warming_required_chains", 1)[1].split(
+        "async def batch_chains():", 1
+    )[0]
 
 
 def test_missing_expiry_fail_closed_contract_intact():
@@ -129,8 +133,13 @@ def _seed_push(mod, symbols=REQUIRED, **kwargs) -> None:
         }
 
 
-def test_empty_cache_is_warming_not_valid(isolated_chain_warm):
+def test_empty_cache_is_warming_not_valid(isolated_chain_warm, monkeypatch):
     mod = isolated_chain_warm
+
+    async def _no_dhan(sym):
+        return None
+
+    monkeypatch.setattr(mod, "_warm_one_index_chain", _no_dhan)
     payload = asyncio.run(mod.batch_chains())
     assert payload["required_symbols_ready"] is False
     assert payload["cache_hit"] is False
@@ -143,8 +152,13 @@ def test_empty_cache_is_warming_not_valid(isolated_chain_warm):
     assert "batch_chains_v1" not in mod._API_CACHE
 
 
-def test_partial_warm_is_not_cached_as_valid(isolated_chain_warm):
+def test_partial_warm_is_not_cached_as_valid(isolated_chain_warm, monkeypatch):
     mod = isolated_chain_warm
+
+    async def _no_dhan(sym):
+        return None
+
+    monkeypatch.setattr(mod, "_warm_one_index_chain", _no_dhan)
     _seed_push(mod, symbols=("NIFTY", "BANKNIFTY"))
     payload = asyncio.run(mod.batch_chains())
     assert payload["required_symbols_ready"] is False
@@ -214,8 +228,13 @@ def test_empty_ok_payload_is_not_treated_as_valid(isolated_chain_warm):
     assert entry["contracts"] == []
 
 
-def test_stale_empty_cache_stays_fail_closed(isolated_chain_warm):
+def test_stale_empty_cache_stays_fail_closed(isolated_chain_warm, monkeypatch):
     mod = isolated_chain_warm
+
+    async def _no_dhan(sym):
+        return None
+
+    monkeypatch.setattr(mod, "_warm_one_index_chain", _no_dhan)
     mod._cache_set(
         "chain_NIFTY",
         {
@@ -244,3 +263,39 @@ def test_missing_expiry_endpoint_fail_closed():
 def test_smoke_required_symbols_match_batch_gate():
     snap = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
     assert 'REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")' in snap
+
+
+def test_batch_chains_on_demand_fills_required_when_dhan_answers(isolated_chain_warm, monkeypatch):
+    """R2/R3: empty cache is not stuck on warming if Dhan can answer now."""
+    mod = isolated_chain_warm
+
+    async def _fake_warm(sym):
+        return _snapshot(str(sym).upper())
+
+    monkeypatch.setattr(mod, "_warm_one_index_chain", _fake_warm)
+    monkeypatch.setattr(mod, "_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S", 1.0)
+
+    payload = asyncio.run(mod.batch_chains())
+    assert payload["required_symbols_ready"] is True
+    for sym in REQUIRED:
+        entry = payload["chains"][sym]
+        assert entry["status"] == "MARKET_CLOSED_DHAN_SNAPSHOT"
+        assert len(entry["contracts"]) == 2
+        assert entry["spot"] > 0
+    assert "batch_chains_v1" in mod._API_CACHE
+
+
+def test_batch_chains_on_demand_timeout_stays_warming_uncached(isolated_chain_warm, monkeypatch):
+    mod = isolated_chain_warm
+
+    async def _hang(_sym):
+        await asyncio.sleep(30)
+        return _snapshot("NIFTY")
+
+    monkeypatch.setattr(mod, "_warm_one_index_chain", _hang)
+    monkeypatch.setattr(mod, "_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S", 0.01)
+
+    payload = asyncio.run(mod.batch_chains())
+    assert payload["required_symbols_ready"] is False
+    assert payload["chains"]["NIFTY"]["status"] == "CHAIN_CACHE_WARMING"
+    assert "batch_chains_v1" not in mod._API_CACHE
