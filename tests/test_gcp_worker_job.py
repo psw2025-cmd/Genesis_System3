@@ -188,3 +188,64 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     trigger = workflow.index("scheduler jobs run genesis-system3-scheduler-collector-every-minute", resume)
     assert pause < resume < trigger
     assert 'IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")' in workflow
+
+
+def test_signals_lane_retries_bhavcopy_before_giving_up(monkeypatch, tmp_path):
+    """NSE has not always published today's bhavcopy at the exact scheduled
+    run time (observed: same URL 404s at run time, 200 minutes later). The
+    signals lane must retry a bounded number of times instead of failing the
+    whole day's lane on a single early miss."""
+    import scripts.bhavcopy_downloader as bhavcopy_downloader
+    import scripts.run_signal_engine_from_bhavcopy as signal_engine
+
+    monkeypatch.setattr(gcp_worker_job, "_business_context", lambda lane: ("2026-08-25", True, "OPEN"))
+    monkeypatch.setattr(
+        gcp_worker_job,
+        "_artifact",
+        lambda lane, payload, source_bytes, output_bytes: {"lane": lane, "payload": payload},
+    )
+
+    calls = {"n": 0}
+
+    def fake_download(ref_date, session):
+        calls["n"] += 1
+        return "downloaded" if calls["n"] >= 3 else "failed"
+
+    monkeypatch.setattr(bhavcopy_downloader, "download_bhavcopy", fake_download)
+    monkeypatch.setattr(bhavcopy_downloader, "_get_session", lambda: object())
+    monkeypatch.setattr(signal_engine, "run", lambda: True)
+
+    fake_signals_csv = tmp_path / "signals.csv"
+    fake_signals_csv.write_text("signals")
+    fake_bhavcopy = tmp_path / "bhav.csv"
+    fake_bhavcopy.write_text("bhavcopy")
+    monkeypatch.setattr(signal_engine, "SIGNALS_CSV", fake_signals_csv)
+    monkeypatch.setattr(signal_engine, "_latest_bhavcopy", lambda: fake_bhavcopy)
+
+    sleeps = []
+    monkeypatch.setattr(gcp_worker_job.time, "sleep", lambda s: sleeps.append(s))
+
+    result = gcp_worker_job._run_signals_lane()
+
+    assert calls["n"] == 3  # failed, failed, then succeeded on the 3rd attempt
+    assert sleeps == [90, 90]  # retried twice, no sleep after the eventual success
+    assert result["lane"] == "signals"
+
+
+def test_signals_lane_gives_up_after_max_attempts(monkeypatch):
+    """If NSE genuinely never publishes (not just a timing race), the lane
+    must still fail loudly rather than retry forever inside the job's
+    bounded execution window."""
+    import scripts.bhavcopy_downloader as bhavcopy_downloader
+
+    monkeypatch.setattr(gcp_worker_job, "_business_context", lambda lane: ("2026-08-25", True, "OPEN"))
+    monkeypatch.setattr(bhavcopy_downloader, "download_bhavcopy", lambda ref_date, session: "failed")
+    monkeypatch.setattr(bhavcopy_downloader, "_get_session", lambda: object())
+
+    sleeps = []
+    monkeypatch.setattr(gcp_worker_job.time, "sleep", lambda s: sleeps.append(s))
+
+    with pytest.raises(RuntimeError, match="session-bound bhavcopy signal lane failed"):
+        gcp_worker_job._run_signals_lane()
+
+    assert len(sleeps) == 4  # 5 attempts total, sleeps between each but not after the last

@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import time
 import urllib.parse
 import hashlib
 import base64
@@ -382,7 +383,25 @@ def _run_signals_lane() -> Dict[str, Any]:
         raw = json.dumps({"status": status, "reason_code": reason, "business_date": business_date}, sort_keys=True).encode()
         return _artifact("signals", {"status": status, "reason_code": reason}, b"exchange-calendar", raw)
     today = date.fromisoformat(business_date)
-    if download_bhavcopy(today, _get_session()) == "failed" or not run():
+    # NSE does not always have today's bhavcopy published at the exact
+    # scheduled run time — observed the same URL 404 at run time and 200 a
+    # short while later. Retry with a bounded wait instead of failing the
+    # whole day's signal lane on a single early miss (job timeout is 600s).
+    session = _get_session()
+    download_status = "failed"
+    max_attempts = 5
+    retry_delay_s = 90
+    for attempt in range(1, max_attempts + 1):
+        download_status = download_bhavcopy(today, session)
+        if download_status != "failed":
+            break
+        if attempt < max_attempts:
+            print(
+                f"[signals] bhavcopy not yet available (attempt {attempt}/{max_attempts}); "
+                f"retrying in {retry_delay_s}s"
+            )
+            time.sleep(retry_delay_s)
+    if download_status == "failed" or not run():
         raise RuntimeError("session-bound bhavcopy signal lane failed")
     payload = {"artifact": "storage/live/dhan_index_ai_signals.csv", "bytes": SIGNALS_CSV.stat().st_size}
     source_path = _latest_bhavcopy()
