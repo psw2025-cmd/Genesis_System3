@@ -749,7 +749,7 @@ class DhanReadOnly:
     def get_dhan_credentials_masked(self) -> dict:
         return get_dhan_credentials_masked()
 
-    # ── BLOCKED ──────────────────────────────────────────────────────
+    # ── BLOCKED ──────────────────────────────────────────────────────────────
 
     def place_order(self, *args, **kwargs):
         raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
