@@ -71,8 +71,9 @@ class RuntimeStateStore:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            from core.brokers.dhan.dhan_readonly import sanitize_status_payload
 
-            return _dhan_status()
+            return sanitize_status_payload(_dhan_status())
         except Exception as e:
             return {
                 "connected": False,
@@ -196,7 +197,7 @@ class RuntimeStateStore:
     def _atomic_write_json(self, path: Path, data: Any) -> None:
         """Write-temp-then-rename so a crash mid-write can never leave a
         truncated/corrupt file at `path` - os.replace is atomic on both
-        POSIX and Windows (unlike a direct open(path, "w") write, which a
+        POSIX and Windows (unlike a direct open(path, \"w\") write, which a
         crash partway through leaves as a partial, unparseable file)."""
         tmp_path = path.with_suffix(path.suffix + f".tmp{os.getpid()}")
         with open(tmp_path, "w") as f:
@@ -355,7 +356,7 @@ class RuntimeStateStore:
                     updates["performance"] = health["performance_sla"]
         except Exception as e:
             print(f"Warning: Failed to sync health: {e}")
-
+ mar
         try:
             from dashboard.backend.position_reconciliation import PositionReconciliation
 

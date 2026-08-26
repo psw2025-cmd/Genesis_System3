@@ -491,15 +491,24 @@ def _wrap_read(module: Any, name: str, original: Callable[..., Any]) -> Callable
 
         if isinstance(result, dict):
             result = dict(result)
+            sanitizer = getattr(module, "sanitize_attempt_block", None)
             result["token_reload"] = {
                 "attempted": reload_attempted,
                 "success": reload_success,
                 "raw_token_exposed": False,
             }
-            result["canonical_rotation"] = canonical_rotation
+            if callable(sanitizer):
+                result["canonical_rotation"] = sanitizer(canonical_rotation)
+                if isinstance(result.get("auto_refresh"), dict):
+                    result["auto_refresh"] = sanitizer(result.get("auto_refresh"))
+            else:
+                result["canonical_rotation"] = canonical_rotation
             if name == "get_status":
                 result["token_proof"] = token_metadata()
                 result["cloud_runtime_patch"] = True
+                status_sanitizer = getattr(module, "sanitize_status_payload", None)
+                if callable(status_sanitizer):
+                    result = status_sanitizer(result)
         return result
 
     wrapped.__name__ = getattr(original, "__name__", name)
