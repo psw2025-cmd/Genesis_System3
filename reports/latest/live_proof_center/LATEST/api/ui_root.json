@@ -1,0 +1,14 @@
+{
+  "path": "/ui/",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 156,
+  "content_type": "text/html",
+  "data": {
+    "_html": true,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "preview": "<!doctype html> <html lang=\"en\" class=\"dark\"> <head>   <meta charset=\"UTF-8\" />   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" />   <title>System3 \u2014 Genesis AI Trading</title>   <link rel=\"icon\" href=\"data:image/svg"
+  }
+}

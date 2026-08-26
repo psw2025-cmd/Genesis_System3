@@ -11,9 +11,10 @@ All agents (ChatGPT, Cursor, Claude, Codex and any future agent) must reconstruc
 3. `reports/coordination/ruhi_task_ledger.csv` — task ownership, dependencies, progress and proof.
 4. `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` — coordination snapshot.
 5. Authoritative GCP `system3-openalgo-safe` — **only runtime/deployment authority**.
-6. Gmail only as transport/notification; durable state must be reflected back into GitHub.
+6. **Live Proof Center** — `reports/latest/live_proof_center/LATEST/` (+ `reports/coordination/LIVE_PROOF_CENTER_POINTER.md`, branch `live-proof-center`, workflow `live-proof-center.yml`) — sanitized continuous MRI for agents without laptop/gcloud access.
+7. Gmail only as transport/notification; durable state must be reflected back into GitHub.
 
-Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
+Before claiming “no GCP / laptop / access”, agents MUST read the Live Proof Center pointer and INDEX. Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
 
 ## 2. Cloud-only execution lock
 

@@ -6,6 +6,7 @@
 
 Read first:
 0. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
+0b. `reports/coordination/LIVE_PROOF_CENTER_POINTER.md` + `reports/latest/live_proof_center/LATEST/INDEX.md` — **scheduled live GCP/dashboard MRI for agents without laptop/gcloud** (`docs/handoffs/LIVE_PROOF_CENTER.md`)
 1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
 2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
 3. `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` — permanent user-action/autonomy-speed law; complete its 19-point self-MRI before saying `USER_ACTION=NONE` or `HUMAN_ACTION_REQUIRED=NO`
