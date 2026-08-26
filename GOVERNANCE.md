@@ -9,7 +9,7 @@ Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLI
 - Code/config authority: `psw2025-cmd/Genesis_System3`.
 - Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`.
 - Broker authority: Dhan.
-- Render.com hosting is retired. Angel-era deployment/broker material is historical/non-authoritative.
+- Render.com hosting is forbidden (retired host). Angel-era deployment/broker material is historical/non-authoritative. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`.
 - PAPER/ANALYZER is the production safety posture until separately and explicitly proven/authorized otherwise.
 
 ## No permanent “Production Ready” sentence
