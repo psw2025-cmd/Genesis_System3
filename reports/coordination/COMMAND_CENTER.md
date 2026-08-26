@@ -1,64 +1,35 @@
-# COMMAND CENTER (overwrite — single source)
+# COMMAND CENTER â€” post-#369 live proof
 
-**Do not re-run ad-hoc curl/probe spam.** Refresh this file instead.
+**Updated:** 2026-08-27 00:05 IST  
+**Authority:** GitHub `main` + live `/api/deploy_info` (not laptop)
 
-```powershell
-# After ANY edit OR anytime (idempotent):
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_command_center_refresh.ps1
-```
+## Same-session truth
 
-## Access / token metadata
-
-| Field | Value |
+| Plane | Value |
 |---|---|
-| policy_id | `ACC-POL-CC-20260825` |
-| policy_version | `1.0.0` |
-| signature_status | `UNSIGNED_PENDING_VAULT` |
-| signed_by | `agent-id:cursor-composer` |
-| last_run_id | `local-pr-prep-20260825T132915Z` |
-| token_id | `dryrun-local-pr-prep-20260825T132915Z` |
-| token_ttl | `0s-mint-denied` |
-| mint_status | `DENIED until signature_status=VERIFIED` |
-| smoke_passed | `True` |
-| last_audit_entry_id | `aud-496c70ff722b` |
-| notify_channel | `issue:#188` |
-| approver_email | `warghade2012@gmail.com` |
+| GitHub main tip | `6cda50c3f00457baba897fcf7e9732693a8f1e3e` (#369 squash â€” **test-only**) |
+| Serving | `fb4772f9d52b67a31b55ee85aab8604e525bbad6` (#367) Â· `genesis-system3-web-00617-vif` @ 100% |
+| Class | **DOCS/TEST_ONLY_LAG** â€” do **not** blind-redeploy |
+| Protection | `main.protected=true` Â· ruleset `21581518` active |
+| Broker | `AUTH_OK` Â· connected Â· LIVE **OFF** Â· orders **OFF** |
+| Scheduler | **HEALTHY** Â· `alert_severity=none` Â· signals `92lf5` SUCCEEDED |
+| RHUI | **NOT_ACCEPTED** Â· HUMAN_ACTION=**NO** |
 
-## Live snapshot
+## Proof pack
 
-| Field | Value |
-|---|---|
-| UTC | 2026-08-25T13:30:03.383223+00:00 |
-| Serving | `719566d23fd9aeb783a72fcec9493557f783781f` |
-| Gates | 2/7 trade_ready=False |
-| Broker | AUTH_OK v319 |
-| Scheduler healthy | False |
-| LIVE | False |
-| OPEN / IN_PROGRESS / DONE | 24 / 6 / 0 |
-| P0 active | 19 |
+- Live JSON: `reports/latest/post369_live_proof_20260827_000506/`
+- Cross-verify SSOT: `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
+- Runbook Â§0A: `docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md`
+- PR #369: https://github.com/psw2025-cmd/Genesis_System3/pull/369 (MERGED)
+- Coord bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
 
-## Open these artifacts (always same paths)
+## Do not
 
-| Artifact | Path |
-|---|---|
-| Issues only | `reports/coordination/ISSUES_ONLY.md` |
-| Mermaid network | `reports/coordination/ISSUES_MERMAID.md` |
-| Full checklist | `reports/coordination/TRACKING_CHECKLIST.md` |
-| Options Excel | `reports/coordination/AGENT_OPERATING_OPTIONS.xlsx` |
-| Access policy | `reports/coordination/ACCESS_POLICY.yaml` |
-| Audit log | `reports/coordination/AUDIT_LOG.jsonl` |
-| Smoke last | `reports/coordination/SMOKE_TEST_LAST.json` |
-| Catalog | `docs/handoffs/SESSION_ISSUES_MASTER.md` |
-| Runbook | `docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md` |
+- Claim ACCEPTED from this merge
+- Blind redeploy / token mint / IAM weaken / LIVE / orders
+- Work in `C:\System3\Genesis_System3`
 
-## First priority for any agent
+## Agent next
 
-1. Read `ISSUES_ONLY.md`  
-2. Open Excel sheet `2_Options_Priority` → **OPT-A1**  
-3. If local fixes pending → get user **commit+PR** then deploy proof  
-4. After edit finish → **run this command_center immediately** (do not wait for hourly schedule)  
-5. Re-snap UI; flip DONE only on serving SHA  
-
-## User minimal involvement
-
-Primary path + approve PR + LIVE OFF + optional Dhan confirm. Everything else agent-automated.
+1. Merge docs PR `docs/post-369-live-proof-20260827` when CI green  
+2. Continue RHUI gates / semantic UI â€” redeploy only on **runtime** path merges  

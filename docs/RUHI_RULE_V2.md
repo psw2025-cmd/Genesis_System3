@@ -2,6 +2,32 @@
 
 Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-laptop execution or local forensic authority.
 
+## 0. Current acceptance lock (material change â€” 2026-08-27 post-#369)
+
+**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria. Do **not** falsely claim ACCEPTED after a test-only merge.
+
+Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` Â· revision `genesis-system3-web-00617-vif` @ 100%.
+
+GitHub `main` tip after **#369** squash (`6cda50c3f00457baba897fcf7e9732693a8f1e3e`) is **test-only** (`tests/test_dhan_rotator_forensic_redaction.py`). That is **DOCS/TEST_ONLY_LAG** vs serving â€” not a failed Cloud Run promotion. Do not redeploy solely to equalize.
+
+Live proof snapshot (2026-08-27 00:05 IST): broker `AUTH_OK` / LIVE OFF; scheduler **HEALTHY** (`alert_severity=none`); signals `92lf5` EXECUTION_SUCCEEDED. HUMAN_ACTION_REQUIRED=**NO**.
+
+Mandatory multi-verify artifacts:
+
+- `docs/handoffs/RHUI_V2.2_MATERIAL_CHANGE.md`
+- `reports/coordination/RHUI_V2.2_Verification_Checklist.json`
+- `reports/latest/post369_live_proof_20260827_000506/` (+ prior `rhui_v22_verify/`)
+- `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
+- Issue #188 `SYSTEM3_COORDINATION_V1` comments
+
+Fail-closed distinctions agents must keep:
+
+1. Cloud Run deploy PASS â‰  scheduler-health PASS â‰  RHUI ACCEPTED.  
+2. 22/22 visual tab mounts â‰  semantic APIâ†”UI acceptance.  
+3. Pre-market 4/4 NOT READY â‰  broker/token failure (recheck after open).  
+4. Docs/test-only `main` tip ahead of serving â‰  failed deploy (check Auto Deploy path filters before workflow_dispatch).  
+5. #369 merge â‰  runtime change (test-only).
+
 ## 1. Single source of truth
 
 All agents (ChatGPT, Cursor, Claude, Codex and any future agent) must reconstruct current state from:
