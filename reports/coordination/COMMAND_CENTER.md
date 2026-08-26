@@ -7,7 +7,7 @@
 
 | Plane | Value |
 |---|---|
-| GitHub main tip | `6cda50c3f00457baba897fcf7e9732693a8f1e3e` (#369 squash â€” **test-only**) |
+| GitHub main tip | `b33685e0f52280cfce3444568b0ae0fc5282b4f5 (tip; #369 merge 6cda50c3f004)` (#369 squash â€” **test-only**) |
 | Serving | `fb4772f9d52b67a31b55ee85aab8604e525bbad6` (#367) Â· `genesis-system3-web-00617-vif` @ 100% |
 | Class | **DOCS/TEST_ONLY_LAG** â€” do **not** blind-redeploy |
 | Protection | `main.protected=true` Â· ruleset `21581518` active |

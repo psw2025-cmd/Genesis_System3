@@ -22,9 +22,9 @@
 
 | Item | Value |
 |---|---|
-| GitHub `origin/main` | `6cda50c3f00457baba897fcf7e9732693a8f1e3e` â€” **#369** squash (**test-only** CodeQL forensic redaction) |
+| GitHub `origin/main` | `b33685e0f52280cfce3444568b0ae0fc5282b4f5` — **#370** tip (includes merged **#369** `6cda50c3f004` test-only) |
 | Serving (runtime) | `fb4772f9d52b67a31b55ee85aab8604e525bbad6` â€” **#367** Â· `genesis-system3-web-00617-vif` @ **100%** |
-| Main vs serving | **DOCS/TEST_ONLY_LAG** â€” #369 adds only `tests/test_dhan_rotator_forensic_redaction.py`. **Do not redeploy** to equalize. |
+| Main vs serving | **DOCS/TEST/CI_ONLY_LAG** — tip includes #370 (CI) + #369 (test-only). Serving remains #367. **Do not redeploy** to equalize. |
 | Laptop HEAD (NON-AUTH) | dirty primary clone â€” **ignore for PASS**; docs from clean worktree |
 | Broker | `connected=true` Â· `AUTH_OK` Â· LIVE **OFF** Â· orders **OFF** Â· token secret v320 |
 | `/api/health` | `status=ok` Â· PAPER Â· qc **NOT_READY** (`NO_QC_DATA`) |
