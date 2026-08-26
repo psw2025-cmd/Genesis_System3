@@ -15,7 +15,7 @@ Stored proof under `reports/latest/`, GitHub artifacts, prior screenshots, or pr
 - Runtime/UI authority: GCP project `system3-openalgo-safe`, region `asia-south1`.
 - Cloud Run service: `genesis-system3-web`.
 - Public UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
-- Render is retired/non-authoritative and must not be used for current production proof.
+- Render is retired, forbidden, and must not be used for current production proof. Never recreate `render.yaml` or treat Render as a host. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`.
 
 ## Assistant/agent-owned UI verification
 

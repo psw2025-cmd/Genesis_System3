@@ -11,7 +11,7 @@ Do **not** claim full system working, production-ready, money-ready, or world-be
 | Layer | Required proof | Status rule |
 |---|---|---|
 | GitHub workflows | `reports/latest/windows_self_hosted_workflows/summary.json` | All workflows migrated or manual-review listed |
-| Cloud Run / backend health | GCP `/api/health` + `/api/deploy/info` on `genesis-system3-web` | Fresh Cloud Run proof only; Render.com is retired |
+| Cloud Run / backend health | GCP `/api/health` + `/api/deploy/info` on `genesis-system3-web` | Fresh Cloud Run proof only; Render.com is forbidden |
 | Dashboard visual | `reports/latest/dashboard_visible_issue_tracker/summary.json` | PASS only |
 | Autopilot board | `reports/latest/system3_autopilot_proof_board/summary.json` | PASS only |
 | Safe repair runner | `reports/latest/safe_repair_runner/summary.json` | PASS only |
