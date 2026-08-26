@@ -14,7 +14,7 @@ This guide is for a non-coder, a junior coder, or an automation agent. Follow it
 | Never share secrets | Do not paste Dhan token, GCP secrets, GitHub tokens, or worker push token in chat. |
 | GitHub repo is source of truth | Code changes should end in `psw2025-cmd/Genesis_System3`. |
 | Windows self-hosted runner is proof machine | Use the laptop runner for local proof. Production truth is GCP Cloud Run. |
-| Render.com is retired | Do not deploy to Render. Production URL is Cloud Run only. |
+| Render.com is forbidden | Do not deploy to Render. Production URL is Cloud Run only. |
 | No green claim without proof | Final status is PASS only when reports and dashboard visual proof are PASS. |
 
 ---
