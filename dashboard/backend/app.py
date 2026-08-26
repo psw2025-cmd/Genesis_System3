@@ -3637,6 +3637,74 @@ async def orch_cloud_ready():
     }
 
 
+def classify_qc_status(qc_data: dict) -> tuple:
+    """Classify QC truth for /api/health, failing closed.
+
+    Only positive evidence that QC ran and verified contracts yields PASS.
+    This previously defaulted to PASS whenever the QC file was absent or
+    lacked a result, which made /api/health report ``qc_status: PASS`` while
+    /api/state simultaneously reported ``NOT_READY`` with
+    ``NO_VERIFIED_CONTRACTS`` and raised a QC_FAIL alert.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    if not isinstance(qc_data, dict) or not qc_data:
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    if "qc_passed" not in qc_data:
+        return "NOT_READY", ["QC_RESULT_MISSING"]
+
+    # `qc_passed` must be a real boolean, as SystemHealthSchema already
+    # requires. This endpoint reads outputs/qc_report.json directly without
+    # running that validator, so truthiness alone is unsafe: the JSON string
+    # "false" is truthy and would otherwise be read as success. A non-boolean
+    # is a malformed result, not a verdict, so it fails closed.
+    qc_passed = qc_data.get("qc_passed")
+    if not isinstance(qc_passed, bool):
+        return "NOT_READY", ["QC_RESULT_NOT_BOOLEAN"]
+
+    # An explicit failure outranks NO_DATA: it is the more actionable verdict,
+    # and both are non-PASS, so precedence here cannot open the gate.
+    if not qc_passed:
+        failures = qc_data.get("qc_failures") or []
+        return "FAIL", list(failures)[:5]
+
+    if qc_data.get("status") == "NO_DATA":
+        return "NO_DATA", []
+
+    try:
+        verified_contracts = int(qc_data.get("total_contracts") or 0)
+    except (TypeError, ValueError):
+        verified_contracts = 0
+
+    if verified_contracts <= 0:
+        return "NOT_READY", ["NO_VERIFIED_CONTRACTS"]
+
+    return "PASS", []
+
+
+def read_qc_status() -> tuple:
+    """Read the live QC report and classify it, failing closed.
+
+    Used by the REAL_ONLY analyzer-ready branch of /api/health, which
+    previously returned a hardcoded ``qc_status: PASS`` without consulting QC
+    at all. That branch serves production whenever the broker is connected, so
+    it reported PASS while /api/state reported NOT_READY from the same runtime.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    qc_file = OUTPUTS_DIR / "qc_report_live.json"
+    if not qc_file.exists():
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    try:
+        qc_data = json.loads(qc_file.read_text())
+    except (OSError, ValueError):
+        return "NOT_READY", ["QC_REPORT_UNREADABLE"]
+
+    return classify_qc_status(qc_data)
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -3765,23 +3833,10 @@ async def get_health():
 
             # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
             # live_allowed=False always: LIVE trading is permanently disabled
-            # QC status must reflect real qc_report_live.json even when market is
-            # closed — do not hardcode PASS, or /api/health can contradict a live
-            # QC_FAIL surfaced by /api/state.
-            qc_status_analyzer = "PASS"
-            qc_failures_analyzer: list = []
-            try:
-                qc_file_analyzer = OUTPUTS_DIR / "qc_report_live.json"
-                if qc_file_analyzer.exists():
-                    qc_data_analyzer = json.loads(qc_file_analyzer.read_text())
-                    if not qc_data_analyzer.get("qc_passed", True):
-                        qc_status_analyzer = "FAIL"
-                        qc_failures_analyzer = qc_data_analyzer.get("qc_failures", [])[:5]
-                    elif qc_data_analyzer.get("status") == "NO_DATA":
-                        qc_status_analyzer = "NO_DATA"
-            except Exception:
-                pass
-
+            # Broker readiness is not QC truth: report the real QC verdict here
+            # rather than a hardcoded PASS, so this branch cannot contradict
+            # /api/state.
+            analyzer_qc_status, analyzer_qc_failures = read_qc_status()
             return {
                 "status": "ok",
                 "mode": "PAPER",
@@ -3802,8 +3857,8 @@ async def get_health():
                 "cycle_count": 0,
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(IST).isoformat(),
-                "qc_status": qc_status_analyzer,
-                "qc_failures": qc_failures_analyzer,
+                "qc_status": analyzer_qc_status,
+                "qc_failures": analyzer_qc_failures,
                 "trades_executed": 0,
                 "open_positions": 0,
                 "total_pnl": 0.0,
@@ -3894,14 +3949,7 @@ async def get_health():
             except Exception:
                 pass
 
-        # Determine QC status
-        qc_status = "PASS"
-        qc_failures = []
-        if not qc_data.get("qc_passed", True):
-            qc_status = "FAIL"
-            qc_failures = qc_data.get("qc_failures", [])[:5]
-        elif qc_data.get("status") == "NO_DATA":
-            qc_status = "NO_DATA"
+        qc_status, qc_failures = classify_qc_status(qc_data)
 
         # PRODUCTION GATE: live_allowed only when broker connected + real data + market open
         ds = (data_source if SSOT_AVAILABLE and state_store else "real").lower()

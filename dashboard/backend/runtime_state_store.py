@@ -107,7 +107,7 @@ class RuntimeStateStore:
                 "current_time_ist": datetime.now(IST).isoformat(),
             },
             "broker": broker_status,
-            "qc": {"status": "PASS", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
+            "qc": {"status": "NOT_READY", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
             "signals": {
                 "status": "NO_TRADE",
                 "underlying": None,
@@ -344,7 +344,7 @@ class RuntimeStateStore:
                 else:
                     updates["data_source"] = health_data_source
                 updates["qc"] = {
-                    "status": health.get("qc_status", "PASS"),
+                    "status": str(health.get("qc_status") or "NOT_READY").upper(),
                     "reasons": health.get("qc_failures", []),
                     "contracts_total": health.get("contracts_total", 0),
                     "underlyings": health.get("underlyings", 0),
