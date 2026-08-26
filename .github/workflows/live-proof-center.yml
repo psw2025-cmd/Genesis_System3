@@ -1,0 +1,85 @@
+name: Live Proof Center (GCP + Dashboard MRI)
+
+# Read-only continuous forensic pack for agents without laptop/gcloud access.
+# Policy: no GitHub Actions schedule (GCP / manual workflow_dispatch for recurrence).
+# No GitHub write permissions, no repository write-back, no order/LIVE mutation.
+# Publishes Actions artifacts only (agents download LATEST pack from the run).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: live-proof-center
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+
+env:
+  GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
+  GCP_REGION: asia-south1
+  GCP_CLOUD_RUN_SERVICE: genesis-system3-web
+  SYSTEM3_PUBLIC_BASE_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
+  GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+  GCP_PROOF_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
+  LIVE_TRADING_ENABLED: "0"
+  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+  AUTO_EXECUTE_TRADES: "0"
+  CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+
+jobs:
+  proof-center:
+    name: Collect live proof center (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Authenticate to Google Cloud (keyless WIF)
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_PROOF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --disable-pip-version-check "openpyxl>=3.1.0"
+          python -m py_compile scripts/system3_live_proof_center.py
+
+      - name: Fetch origin/main tip for cross-verify
+        run: git fetch --no-tags --depth=1 origin main
+
+      - name: Run Live Proof Center collector
+        run: |
+          python scripts/system3_live_proof_center.py
+          test -f reports/latest/live_proof_center/LATEST/MANIFEST.json
+
+      - name: Upload proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-proof-center-${{ github.run_id }}
+          path: |
+            reports/latest/live_proof_center/LATEST/
+            reports/coordination/System3_LIVE_PROOF_CENTER.xlsx
+            reports/coordination/LIVE_PROOF_CENTER_POINTER.md
+          if-no-files-found: warn
+          retention-days: 30

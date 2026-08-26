@@ -1,0 +1,131 @@
+{
+  "available": true,
+  "errors": [],
+  "cloud_run": {
+    "latestReadyRevisionName": "genesis-system3-web-00617-vif",
+    "latestCreatedRevisionName": "genesis-system3-web-00617-vif",
+    "traffic": [
+      {
+        "revision": "genesis-system3-web-00617-vif",
+        "percent": 100
+      }
+    ],
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+  },
+  "jobs": [
+    {
+      "name": "genesis-system3-control-plane-verify",
+      "creationTimestamp": "2026-08-14T01:14:10.675764Z"
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate",
+      "creationTimestamp": "2026-08-06T14:15:48.467764Z"
+    },
+    {
+      "name": "genesis-system3-forecast",
+      "creationTimestamp": "2026-08-04T15:46:26.635998Z"
+    },
+    {
+      "name": "genesis-system3-ml-history-bootstrap",
+      "creationTimestamp": "2026-08-14T00:34:50.340224Z"
+    },
+    {
+      "name": "genesis-system3-rank",
+      "creationTimestamp": "2026-08-04T16:08:22.636334Z"
+    },
+    {
+      "name": "genesis-system3-scheduler-collector",
+      "creationTimestamp": "2026-08-13T21:40:38.999425Z"
+    },
+    {
+      "name": "genesis-system3-signals",
+      "creationTimestamp": "2026-08-04T16:08:29.234352Z"
+    },
+    {
+      "name": "genesis-system3-smoke",
+      "creationTimestamp": "2026-08-02T21:08:16.617036Z"
+    },
+    {
+      "name": "genesis-system3-validate",
+      "creationTimestamp": "2026-08-13T22:49:39.911798Z"
+    }
+  ],
+  "scheduler_jobs": [
+    {
+      "name": "genesis-system3-forecast-daily",
+      "schedule": "0 4 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-signals-schedule",
+      "schedule": "0 10 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-validate-daily",
+      "schedule": "5 10 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-daily",
+      "schedule": "*/5 * * * *",
+      "timeZone": "Asia/Kolkata",
+      "state": "ENABLED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-rank-daily",
+      "schedule": "45 3 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-rank-schedule",
+      "schedule": "50 3 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-forecast-schedule",
+      "schedule": "0 4,5,6,7,8,9 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-signals-daily",
+      "schedule": "15 13 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "httpTarget": true
+    },
+    {
+      "name": "genesis-system3-scheduler-collector-every-minute",
+      "schedule": "* * * * *",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "httpTarget": true
+    }
+  ],
+  "secret_names": [
+    "dhan-access-token",
+    "dhan-access-token-candidate",
+    "dhan-app-id",
+    "dhan-app-secret",
+    "dhan-pin",
+    "dhan-totp-secret",
+    "gemini_api_key",
+    "github-actions-deploy-sa-key",
+    "system3-dashboard-api-key",
+    "system3-dashboard-worker-push-token",
+    "system3-dhan-client-id"
+  ]
+}
