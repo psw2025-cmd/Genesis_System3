@@ -135,6 +135,61 @@ def _status_auto_refresh_enabled() -> bool:
     return True
 
 
+_SUCCESS_SOUNDING = (
+    "fully automated",
+    "token generated",
+    "pin + totp",
+)
+
+
+def sanitize_attempt_block(block: dict | None) -> dict:
+    """Strip success-sounding copy from a refresh/rotation block that did not succeed.
+
+    Live /api/state showed: attempted=false, success=false, skipped=...,
+    message="Token generated via PIN + TOTP (fully automated)". That combination
+    is a lie and must never reach the UI. The same payload also kept a stale
+    403 on canonical_rotation while skipped=CANONICAL_SELF_HEAL_DISABLED.
+    """
+    if not isinstance(block, dict):
+        return {"attempted": False, "success": False}
+    out = dict(block)
+    attempted = bool(out.get("attempted"))
+    success = bool(out.get("success"))
+    skipped = out.get("skipped")
+    if skipped or (not attempted) or (not success):
+        msg = str(out.get("message") or "")
+        lowered = msg.lower()
+        stale_http = "403" in msg or "forbidden" in lowered
+        if any(marker in lowered for marker in _SUCCESS_SOUNDING) or (skipped and stale_http):
+            if skipped:
+                out["message"] = f"Refresh not run ({skipped})"
+            else:
+                out["message"] = "Refresh did not succeed"
+        if skipped and not attempted:
+            if out.get("operation_started"):
+                out["operation_started"] = False
+            if stale_http:
+                out.pop("error_type", None)
+        if not attempted and str(out.get("strategy") or "").lower() in {
+            "generate_token",
+            "generate_token_pin_totp",
+        }:
+            out["strategy"] = "not_attempted"
+    return out
+
+
+def sanitize_status_payload(status: dict | None) -> dict:
+    """Sanitize auto_refresh / canonical_rotation on any broker status dict."""
+    if not isinstance(status, dict):
+        return {"connected": False, "error": "INVALID_STATUS_PAYLOAD"}
+    out = dict(status)
+    if "auto_refresh" in out:
+        out["auto_refresh"] = sanitize_attempt_block(out.get("auto_refresh"))
+    if "canonical_rotation" in out:
+        out["canonical_rotation"] = sanitize_attempt_block(out.get("canonical_rotation"))
+    return out
+
+
 def _safe_refresh_token_for_status(reason: str) -> dict:
     """
     Refresh Dhan token from the web backend process when dashboard broker status
@@ -152,14 +207,14 @@ def _safe_refresh_token_for_status(reason: str) -> dict:
 
     if not _status_auto_refresh_enabled():
         meta["skipped"] = "AUTO_REFRESH_DISABLED_OR_LIVE_GATE"
-        return meta
+        return sanitize_attempt_block(meta)
 
     now = time.time()
     elapsed = now - _LAST_STATUS_REFRESH_ATTEMPT_AT
     if _LAST_STATUS_REFRESH_ATTEMPT_AT and elapsed < _STATUS_REFRESH_COOLDOWN_S:
         meta["skipped"] = "COOLDOWN"
         meta["cooldown_remaining_s"] = int(_STATUS_REFRESH_COOLDOWN_S - elapsed)
-        return meta
+        return sanitize_attempt_block(meta)
 
     _LAST_STATUS_REFRESH_ATTEMPT_AT = now
     meta["attempted"] = True
@@ -175,12 +230,12 @@ def _safe_refresh_token_for_status(reason: str) -> dict:
         meta["strategy"] = result.get("strategy")
         meta["message"] = str(result.get("message", ""))[:160]
         meta["token_value_printed"] = False
-        return meta
+        return sanitize_attempt_block(meta)
     except Exception as exc:
         meta["error_type"] = type(exc).__name__
         meta["message"] = str(exc)[:160]
         meta["token_value_printed"] = False
-        return meta
+        return sanitize_attempt_block(meta)
 
 
 def get_dhan_credentials_masked() -> dict:
@@ -576,13 +631,13 @@ def get_status() -> dict:
         out = dict(_STATUS_RESULT_CACHE)
         out["cache_hit"] = True
         out["cache_age_s"] = round(now - _STATUS_RESULT_CACHE_AT, 1)
-        return out
+        return sanitize_status_payload(out)
 
     refresh_meta = {"attempted": False, "success": False}
     masked = get_dhan_credentials_masked()
 
     if not masked["client_id_present"]:
-        return {
+        return sanitize_status_payload({
             "broker": "dhan",
             "mode": "ANALYZER",
             "connected": False,
@@ -595,13 +650,13 @@ def get_status() -> dict:
             "auto_refresh": refresh_meta,
             "sdk_available": _DHAN_SDK_OK,
             "env_source": _ENV_LOADED_VIA,
-        }
+        })
 
     if not masked["access_token_present"]:
         refresh_meta = _safe_refresh_token_for_status("CONFIG_MISSING")
         masked = get_dhan_credentials_masked()
         if not masked["access_token_present"]:
-            return {
+            return sanitize_status_payload({
                 "broker": "dhan",
                 "mode": "ANALYZER",
                 "connected": False,
@@ -614,7 +669,7 @@ def get_status() -> dict:
                 "auto_refresh": refresh_meta,
                 "sdk_available": _DHAN_SDK_OK,
                 "env_source": _ENV_LOADED_VIA,
-            }
+            })
 
     t0 = time.time()
     profile_result = get_profile()
@@ -652,11 +707,12 @@ def get_status() -> dict:
         "access_token_present": masked["access_token_present"],
         "latency_ms": latency_ms,
         "error": error,
-        "auto_refresh": refresh_meta,
+        "auto_refresh": sanitize_attempt_block(refresh_meta),
         "sdk_available": _DHAN_SDK_OK,
         "env_source": _ENV_LOADED_VIA,
         "cache_hit": False,
     }
+    result = sanitize_status_payload(result)
     if connected:
         _STATUS_RESULT_CACHE = dict(result)
         _STATUS_RESULT_CACHE_AT = time.time()
@@ -693,7 +749,7 @@ class DhanReadOnly:
     def get_dhan_credentials_masked(self) -> dict:
         return get_dhan_credentials_masked()
 
-    # ── BLOCKED ──────────────────────────────────────────────────────────────
+    # ── BLOCKED ──────────────────────────────────────────────────────
 
     def place_order(self, *args, **kwargs):
         raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
