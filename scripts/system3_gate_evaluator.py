@@ -140,15 +140,29 @@ def eval_expectancy_gate(root: Path) -> Dict[str, Any]:
         net_f = float(net) if net is not None else None
     except (TypeError, ValueError):
         net_f = None
-    ok = data.get("pass") is True and net_f is not None and net_f > 0
+    source = str(data.get("source") or "").replace("\\", "/")
+    is_fixture = (
+        data.get("is_fixture") is True
+        or "tests/fixtures" in source
+        or "paper_closed_trades_feb2026" in source
+    )
+    ok = (
+        (not is_fixture)
+        and data.get("pass") is True
+        and net_f is not None
+        and net_f > 0
+    )
+    blocker = None if ok else ("INSUFFICIENT_REAL_TRADES" if is_fixture else "PROFIT_BLOCKER")
     return {
         "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
         "pass": ok,
+        "is_fixture": is_fixture,
         "report_exists": path.exists(),
         "net_expectancy_after_costs": net_f,
         "win_rate": ev.get("win_rate"),
         "trade_count": ev.get("trade_count"),
-        "blocker_id": None if ok else "PROFIT_BLOCKER",
+        "source": source or None,
+        "blocker_id": blocker,
         "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
     }
 
