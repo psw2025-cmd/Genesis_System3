@@ -28,6 +28,13 @@ Severity scale:
 | SYS3-BLK-008 | HIGH | Paper lifecycle | Full-session paper lifecycle proof is not complete | UI/readiness shows paper lifecycle pending | One full market session PAPER proof with signal, mapping, paper entry/exit, ledger, PnL, reconciliation | OPEN |
 | SYS3-BLK-009 | HIGH | Data source | Option-chain live data source and fallbacks not fully proven | UI indicated Dhan option-chain data may require API plan while fallback sources are active | Data source report shows current source, fallback, freshness, latency, and whether each field is live/inferred/EOD | OPEN |
 | SYS3-BLK-010 | MEDIUM | Deployment/source control | GitHub billing/workflow issue limits normal PR workflow; Replit subscription active | User reported GitHub workflow unavailable due billing | Replit/GitLab/no-GitHub fallback runbook established with safe ZIP, secrets, staging, and proof export | OPEN |
+| SYS3-BLK-011 | HIGH | Profit gate | T9: expectancy gate could PASS on bundled Feb 2026 9-trade fixture | `scripts/system3_friction_expectancy_proof.py` listed fixture first | Fixture not in default sources; evaluator refuses `is_fixture` / fixture path; tests pass | PATCHED |
+| SYS3-BLK-012 | HIGH | Broker UI truth | T11: `/api/state` showed “Token generated via PIN + TOTP (fully automated)” and a stale 403 while refresh was skipped | `reports/latest/live_proof_center/LATEST/api/state.json` | Sanitizer on status, cloud wrap, SSOT store; live payload tests pass | PATCHED |
+| SYS3-BLK-013 | HIGH | Proof pack | T12: prediction analytics hardcoded PASS while register is `NO_PREDICTION_FOUND` | `scripts/generate_proof_pack.py` + `reports/latest/model_accuracy_report.md` | Status computed from report; FAIL while unproven | PATCHED |
+| SYS3-BLK-014 | CRITICAL | Live-trading safety | T14: live-trading guardrails were a bare PASS string | `scripts/generate_proof_pack.py` | Reads `LIVE_TRADING_ENABLED` / `USE_LIVE_EXECUTION_ENGINE`; FAIL if either truthy | PATCHED |
+| SYS3-BLK-015 | HIGH | Option chains | R2/R3: `/api/batch/chains` stayed `CHAIN_CACHE_WARMING` even when Dhan could answer | `dashboard/backend/app.py` `batch_chains()` cache/push only | Bounded on-demand fill; warming still not cached | PATCHED |
+
+PATCHED means verified in this branch, not closed on `origin/main` until the PR merges. Do not close SYS3-BLK-005: T12 only stopped the fake PASS; predictions are still unproven.
 
 ## Close Rules
 

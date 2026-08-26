@@ -18,6 +18,7 @@ System3's locked goal is to identify valid option-tradable Indian market opportu
 | Options scope | Index and equity options must pass tradability before any paper trade | OPEN |
 | Model proof | Needs multi-day prediction-vs-actual validation | OPEN |
 | Dashboard proof | Must become runtime-driven, not hard-coded pass badges | OPEN |
+| Patch 0021 (T9/T11/T12/R2-R3/T14) | Fail-closed reconstruction verified locally; waiting on merge | PATCHED |
 
 ## Active Control Documents
 
@@ -47,19 +48,21 @@ System3's locked goal is to identify valid option-tradable Indian market opportu
 
 | Date | Done item | Proof |
 |---|---|---|
+| 2026-08-26 | Reconstructed Claude gift 0021 on `0d69559` after live Gmail/GitHub/cloud cross-check. T9 fixture refuse, T11 sanitizer, T12/T14 computed proof-pack status, R2/R3 on-demand chain fill. 43 pytest passed. Live trading left OFF. | `reports/coordination/SYSTEM3_PATCH_0021_CURSOR_VERIFICATION.md` |
 | 2026-06-15 | Confirmed current runtime safety from user `/api/state`: PAPER, Dhan ANALYZER, live false, order false, positions empty, PnL zero | User-provided `/api/state` JSON |
 | 2026-06-15 | Identified false broker alert loop as current critical workflow contradiction | User `/api/state` plus code inspection |
 | 2026-06-15 | Created active documentation control plane files | This commit |
 
 ## Next Safe Actions
 
-1. Generate complete markdown inventory and classify every `.md` file.
+1. Review and merge the Cursor 0021 PR (`cursor/apply-system3-0021-93e4`) — runtime path, not docs-only.
 2. Fix false `BROKER_DISCONNECTED` alert loop.
 3. Add PE/CE option visibility audit.
 4. Add F&O eligibility filter proof.
-5. Add model accuracy daily register output.
-6. Replace hard-coded dashboard proof gates with backend proof.
+5. Keep model accuracy FAIL until real prediction-vs-actual rows exist (T12 now fails closed).
+6. Replace remaining hard-coded dashboard proof gates with backend proof.
 7. Run full-session PAPER proof before any live-readiness claim.
+8. Human: enable GitHub `main` branch protection if Settings still shows it off.
 
 ## Non-Negotiable Rules
 

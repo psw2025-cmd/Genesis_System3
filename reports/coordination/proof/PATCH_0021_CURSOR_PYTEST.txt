@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.0.2, pluggy-1.6.0
+rootdir: /tmp/genesis
+configfile: pyproject.toml
+plugins: anyio-4.14.2
+collected 43 items
+
+tests/test_system3_patch_0021_fail_closed.py ........................... [ 62%]
+..                                                                       [ 67%]
+tests/evals/test_eval_chain_warm_batch_readiness.py ..............       [100%]
+
+======================== 43 passed, 9 warnings in 1.51s ========================
