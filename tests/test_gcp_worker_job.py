@@ -1,3 +1,6 @@
+import sys
+import types
+
 import pytest
 
 from scripts import gcp_worker_job
@@ -188,3 +191,96 @@ def test_cloud_workflow_has_exact_lane_identity_and_secret_boundaries():
     trigger = workflow.index("scheduler jobs run genesis-system3-scheduler-collector-every-minute", resume)
     assert pause < resume < trigger
     assert 'IN("READY", "PARTIAL", "PENDING", "NOT_APPLICABLE", "BLOCKED")' in workflow
+
+
+def _install_fake_module(monkeypatch, name, **attrs):
+    """Inject a stub module into sys.modules so `_run_signals_lane`'s internal
+    `from scripts.X import Y` picks up the stub instead of importing the real
+    module — the real `bhavcopy_downloader`/`run_signal_engine_from_bhavcopy`
+    modules import pandas at module scope, which some lightweight CI test
+    jobs (e.g. the fast "safety-tests" job) do not install, matching how the
+    existing parametrized lane test avoids this by stubbing the whole lane
+    function instead."""
+    fake = types.ModuleType(name)
+    for key, value in attrs.items():
+        setattr(fake, key, value)
+    monkeypatch.setitem(sys.modules, name, fake)
+    return fake
+
+
+def test_signals_lane_retries_bhavcopy_before_giving_up(monkeypatch, tmp_path):
+    """NSE has not always published today's bhavcopy at the exact scheduled
+    run time (observed: same URL 404s at run time, 200 minutes later). The
+    signals lane must retry a bounded number of times instead of failing the
+    whole day's lane on a single early miss."""
+    monkeypatch.setattr(gcp_worker_job, "_business_context", lambda lane: ("2026-08-25", True, "OPEN"))
+    monkeypatch.setattr(
+        gcp_worker_job,
+        "_artifact",
+        lambda lane, payload, source_bytes, output_bytes: {"lane": lane, "payload": payload},
+    )
+
+    calls = {"n": 0}
+
+    def fake_download(ref_date, session):
+        calls["n"] += 1
+        return "downloaded" if calls["n"] >= 3 else "failed"
+
+    _install_fake_module(
+        monkeypatch,
+        "scripts.bhavcopy_downloader",
+        download_bhavcopy=fake_download,
+        _get_session=lambda: object(),
+    )
+
+    fake_signals_csv = tmp_path / "signals.csv"
+    fake_signals_csv.write_text("signals")
+    fake_bhavcopy = tmp_path / "bhav.csv"
+    fake_bhavcopy.write_text("bhavcopy")
+    _install_fake_module(
+        monkeypatch,
+        "scripts.run_signal_engine_from_bhavcopy",
+        run=lambda: True,
+        SIGNALS_CSV=fake_signals_csv,
+        _latest_bhavcopy=lambda: fake_bhavcopy,
+    )
+
+    sleeps = []
+    monkeypatch.setattr(gcp_worker_job.time, "sleep", lambda s: sleeps.append(s))
+
+    result = gcp_worker_job._run_signals_lane()
+
+    assert calls["n"] == 3  # failed, failed, then succeeded on the 3rd attempt
+    assert sleeps == [90, 90]  # retried twice, no sleep after the eventual success
+    assert result["lane"] == "signals"
+
+
+def test_signals_lane_gives_up_after_max_attempts(monkeypatch):
+    """If NSE genuinely never publishes (not just a timing race), the lane
+    must still fail loudly rather than retry forever inside the job's
+    bounded execution window."""
+    monkeypatch.setattr(gcp_worker_job, "_business_context", lambda lane: ("2026-08-25", True, "OPEN"))
+    _install_fake_module(
+        monkeypatch,
+        "scripts.bhavcopy_downloader",
+        download_bhavcopy=lambda ref_date, session: "failed",
+        _get_session=lambda: object(),
+    )
+    # _run_signals_lane imports both modules unconditionally before the
+    # retry loop starts, so this must be stubbed here too even though the
+    # retry never reaches the point of using it.
+    _install_fake_module(
+        monkeypatch,
+        "scripts.run_signal_engine_from_bhavcopy",
+        run=lambda: True,
+        SIGNALS_CSV=None,
+        _latest_bhavcopy=lambda: None,
+    )
+
+    sleeps = []
+    monkeypatch.setattr(gcp_worker_job.time, "sleep", lambda s: sleeps.append(s))
+
+    with pytest.raises(RuntimeError, match="session-bound bhavcopy signal lane failed"):
+        gcp_worker_job._run_signals_lane()
+
+    assert len(sleeps) == 4  # 5 attempts total, sleeps between each but not after the last
