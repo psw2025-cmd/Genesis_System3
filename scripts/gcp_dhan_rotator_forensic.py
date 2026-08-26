@@ -411,18 +411,8 @@ def main() -> int:
         "order_actions_performed": False,
         "live_trading_enabled": False,
     }
-    # CodeQL py/clear-text-storage-sensitive-data: false positive. `report` only
-    # carries the Secret Manager *version identifier* (e.g. "320"), which
-    # `_redact()` above explicitly allow-lists as non-sensitive (see the
-    # `secret_version`/`secret_id`/`token_source` carve-out); the actual token
-    # payload is never read (`secret_payloads_accessed`/`secret_values_exposed`
-    # are hard-coded False) and never reaches this dict. Proven by
-    # test_dhan_rotator_forensic_redaction.py.
-    (OUT / "rotator_forensic.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")  # lgtm[py/clear-text-storage-sensitive-data]
-    # CodeQL py/clear-text-logging-sensitive-data: same false positive as above
-    # applied to stdout instead of the report file - only the non-secret
-    # version identifier is printed, never the token value.
-    print("DHAN_ROTATOR_FORENSIC", json.dumps({  # lgtm[py/clear-text-logging-sensitive-data]
+    (OUT / "rotator_forensic.json").write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
+    print("DHAN_ROTATOR_FORENSIC", json.dumps({
         "state": report["state"],
         "execution": execution,
         "safe_status": safe_status,
