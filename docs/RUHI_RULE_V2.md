@@ -202,3 +202,14 @@ A useful cycle produces at least one of:
 - a new exact-serving browser/API truth observation.
 
 Pure restatement of old status does not count as progress.
+
+## 16. #RUHI user-reference intake
+
+Before frontend, backend, data, model, orchestration, cloud-proof or UI/UX work,
+agents must inspect the applicable material in
+`audit/USER_RECOMMDATION_FOR _AGENT_UPDATE_RUNBOOK/README_RUHI.md` and use the
+`SYSTEM3_RUHI_USER_REFERENCE_V1` practical-thinking questions. The reference
+pack communicates user intent and design purpose; it is advisory until verified
+against current main, current GCP and fresh production UI/API evidence. Generated
+images, percentages and historical narratives never become implementation or
+live truth merely because they carry `#RUHI`.
