@@ -7,7 +7,7 @@ import { formatAgeSec, formatInr, formatIstStamp, shortSha } from '../../lib/for
 
 export const DecisionIntelligence: React.FC = () => {
   const {
-    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper,
+    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper, setActiveTab,
   } = useStore();
   const dhanOk = brokerIsConnected(health, brokerConnected)
   const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok' || Boolean(health?.mode)
@@ -70,6 +70,58 @@ export const DecisionIntelligence: React.FC = () => {
       </header>
 
       <div style={sectionStyle}>
+        {!marketOpen && (
+          <div
+            data-testid="closed-market-ops-board"
+            style={{
+              padding: 14,
+              borderRadius: 10,
+              border: '1px solid rgba(245,165,36,.4)',
+              background: 'linear-gradient(135deg, rgba(48,28,8,.55), rgba(8,19,33,.9))',
+            }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--amber)', marginBottom: 6 }}>
+              AFTER-HOURS OPS BOARD
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 10, lineHeight: 1.45 }}>
+              Market closed — UI stays read-only/poll. QC may show NOT_READY ({String((state?.qc?.reasons || []).join(', ') || 'NO_VERIFIED_CONTRACTS')})
+              until live contracts re-verify after next open ({String(nextOpen || '09:15 IST')}).
+              Use the tabs below — not only Decision + Chain.
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {[
+                ['chain', 'Option Chain'],
+                ['options-intel', 'Options Intel'],
+                ['broker', 'Broker'],
+                ['data-integrity', 'Data Integrity'],
+                ['truth', 'Truth Control'],
+                ['prediction-audit', 'Prediction Audit'],
+                ['performance', 'Performance'],
+                ['ml', 'ML Model'],
+              ].map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setActiveTab(id)}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    border: '1px solid var(--border-hi)',
+                    background: 'rgba(59,140,255,.14)',
+                    color: 'var(--accent-2)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
           Live operations
         </h2>
