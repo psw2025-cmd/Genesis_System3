@@ -1,26 +1,18 @@
 item_id,priority,category,title,status,done_utc,owner,proof_or_link,reason_if_pending,solution_next,user_needed
-PR-369,P0,PR,#369 CodeQL forensic redaction test merge,DONE,2026-08-26T18:34:00Z,cursor,https://github.com/psw2025-cmd/Genesis_System3/pull/369,,Docs PR post-369,NO
-LIVE-369,P0,DEPLOY,main vs serving after #369,DOCS_TEST_ONLY_LAG,2026-08-26T18:35:30Z,cursor,reports/latest/post369_live_proof_20260827_000506,Test-only tip ahead of serving,No blind redeploy,NO
-SCHED-369,P0,SCHEDULER,scheduler HEALTHY + signals 92lf5 SUCCEEDED,DONE,2026-08-26T18:35:30Z,cursor,reports/latest/post369_live_proof_20260827_000506/api_scheduler_health.json,,Monitor next cadence,NO
-RHUI-V22,P0,RHUI,RHUI V2.2 material change â€” NOT_ACCEPTED,OPEN,2026-08-26T18:35:30Z,shared,RHUI_V2.2_GATE_BOARD.csv,Gates incomplete; QC NOT_READY,Semantic UI + QC path,NO
-XV-001,P0,DEPLOY,Cross-verify main vs serving vs laptop,DONE,2026-08-26T08:09:42Z,cursor,reports/latest/repo_path_audit/cloud_github_vs_laptop.json,main tip #365 docs-only; serving still #367 runtime,No blind redeploy; wait 18:45 signals,NO
-XV-002,P0,DEPLOY,main afd28722 (#365) not on Cloud Run,CLASSIFIED_OK,2026-08-26T08:09:42Z,cursor,No Auto Deploy run for afd28722 — path filter docs/tools,Not runtime drift,Keep serving fb4772f9/00617-vif,NO
-LIVE-001,P0,DEPLOY,main vs serving,DOCS_ONLY_LAG,2026-08-26T08:09:42Z,Auto Deploy,main=afd2872 serving=fb4772f rev=genesis-system3-web-00617-vif,Docs/tools tip ahead of runtime SHA,Redeploy only on next runtime merge,NO
-RHUI-V22-G7,P0,SCHEDULER,alert_severity=warning attributed to genesis-system3-signals stale,OPEN,2026-08-26T06:27:50Z,cursor,api_scheduler_health.json,Cadence stale blocks observability.alert_severity_none,Post-#367 run then re-GET scheduler/health,NO
-RHUI-V22-G8,P0,SIGNALS,#367 BhavCopy retry effectiveness,PENDING,2026-08-26T06:27:50Z,cursor,serving SHA has #367; schedule 18:45 IST,Code deployed not proven,Capture genuine Cloud Run signals execution,NO
-RHUI-V22-G4,P0,BROKER,Same-session broker AUTH_OK re-proven market open,DONE,2026-08-26T06:27:50Z,cursor,/api/broker/status v320 connected=true,Was NOT RE-PROVEN after deploy skip,Keep LIVE OFF; no mint,NO
-RHUI-V22-G5,P0,CHAINS,4/4 required_symbols_ready=true market open,DONE,2026-08-26T06:27:50Z,cursor,/api/batch/chains,Earlier pre-market NOT READY cleared,UI semantic still open,NO
-LIVE-002,P0,QC,health vs state QC,WATCH,2026-08-26T06:27:50Z,shared,both NOT_READY (NO_QC_DATA / NO_VERIFIED_CONTRACTS),Converged; not false-green PASS,Verified contracts path still needed,NO
-COORD-01,P0,COORD,Claude terminal active - no QC dup,LOCKED,2026-08-26T04:18:00Z,cursor-composer,AGENT_LANE_LOCK.md; Claude in gs3-claude-qc-fix overlaps #361,Claude must NOT open 2nd QC PR,Use #361 only; Claude reviews or stops,YES_CLAUDE_STOP
-COORD-02,P0,COORD,Cursor owns UI live PR,IN_PROGRESS,2026-08-26T04:19:00Z,cursor-composer,PR #363 opened from origin/main,Merge after CI → deploy → user sees live,Merge #363 when green,NO
-P0-A,P0,ISSUE,#188 Broker/UI parity,OPEN,2026-08-26T04:00:00Z,shared,#188 OPEN; PR #363 targets chain columns,Do not close until serving proof,Merge #363 + deploy + re-snap,APPROVE_PR
-P0-B,P0,ISSUE,#179 Render OFF,DONE_USER,2026-08-26T04:00:00Z,user,User confirmed Render auto-deploy OFF,Verify no Render deploy on next push,Monitor,NO
-P0-C,P0,ISSUE,#228 IAM,DONE_LIKELY,2026-08-26T04:00:00Z,gcloud,run.developer incl run.services.update bound,Auto Deploy FAIL separate issue,MRI deploy workflow,NO
-P0-D,P0,PR,#361 QC fail-closed DRAFT,WAIT_USER,2026-08-26T04:00:00Z,user+claude,#361 DRAFT CI green canonical QC fix,Keep draft until user merge order,User merge #361 then deploy,YES
-P0-E,P0,ACCESS,Cursor GitHub App,PENDING_USER,,user,Cloud Agent needs repo selected,Agent cannot click dashboard,Cursor Integrations → Genesis_System3,YES
-LIVE-003,P0,BROKER,Token v320 ~2h,WATCH,2026-08-26T04:00:00Z,cloud,AUTH_OK; cloud rotate only,Do not loop Dhan,Scheduler rotator,NO
-PR-363,P0,PR,UI OptionChain + banner + aliases,OPEN_CI,2026-08-26T04:19:00Z,cursor-composer,https://github.com/psw2025-cmd/Genesis_System3/pull/363,Waiting CI,Merge for live dashboard visibility,APPROVE_AFTER_CI
-PR-261,P1,PR,Dependabot upload-artifact,BLOCKED,,dependabot,CodeQL python fail,,Fix or skip,NO
-ACCESS-01,P0,ACCESS,GitHub PAT + agent push,PENDING_USER,,user,Claude push blocked 20th+,See AGENT_ACCESS_REQUESTS.md,Re-auth gh + settings mail,YES
-ACCESS-02,P1,ACCESS,Cursor billing/quota,PENDING_USER,,user,May block Cloud Agent,Check Cursor dashboard,YES,
-GMAIL-01,INFO,COORD,Gmail tracking in RUHI,ACTIVE,2026-08-26T04:20:00Z,cursor-composer,GMAIL_AGENT_DIGEST.md + broadcast sent,Mail mirror only; #188+CSV truth,Read mail each run before claiming work,NO
+XV-001,P0,DEPLOY,Cross-verify main vs serving vs laptop,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/repo_path_audit/cloud_github_vs_laptop.json,DOCS_TEST_CI_ONLY_LAG after #371,No blind redeploy,NO
+XV-002,P0,DEPLOY,main tip not on Cloud Run,CLASSIFIED_OK,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/deploy_info.json,docs/test/CI tip ahead of #367 runtime,Redeploy only on runtime path merge,NO
+LIVE-001,P0,DEPLOY,main vs serving,DOCS_TEST_CI_ONLY_LAG,2026-08-26T19:35:00Z,Auto Deploy,main=0d69559 serving=fb4772f rev=genesis-system3-web-00617-vif,Path filter skip expected,Keep serving pin,NO
+RULE-01,P0,GITHUB,Ruleset 21581518 Priority Guard 6th check,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/ruleset_21581518.json,Was missing after #369 deadlock fix,Monitor PR required contexts,NO
+GMAIL-01,P0,COORD,Gmail System3 intake 14d,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/gmail_system3_threads.json,25 threads; ruleset mail closed by RULE-01,Mirror durable state to #188,NO
+RHUI-V22,P0,RHUI,RHUI V2.2 material change — NOT_ACCEPTED,OPEN,2026-08-26T19:35:00Z,shared,RHUI_V2.2_GATE_BOARD.csv,Semantic+business dates+gates,Market session + ML,NO
+RHUI-V22-G7,P0,SCHEDULER,Scheduler transport HEALTHY,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/scheduler_health.json,,Watch business PARTIAL,NO
+RHUI-V22-G7b,P0,SCHEDULER,Business artifact wrong-date rank/forecast/signals,OPEN,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/scheduler_health.json,PARTIAL readiness,Next weekday jobs,NO
+RHUI-V22-G8,P0,SIGNALS,#367 on serving observed,DONE,2026-08-26T19:35:00Z,cursor,signals-daily 13:15Z + 92lf5,,Continue observe,NO
+RHUI-V22-G4,P0,BROKER,Broker AUTH_OK,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/broker_status.json,,Keep LIVE OFF,NO
+CI-PG,P0,CI,Priority Guard FORENSIC rate-limit fail on main,BLOCKED,2026-08-26T19:35:00Z,github,actions/runs/33005422907,API 403 installation rate limit,Cool-down; not ruleset rollback,NO
+P0-A,P0,ISSUE,#188 Broker/UI parity,OPEN,2026-08-26T19:35:00Z,shared,https://github.com/psw2025-cmd/Genesis_System3/issues/188,Serving lacks local OptionChain WIP,Runtime PR + deploy + re-snap,NO
+P0-B,P0,ISSUE,#179 Render hosting,DONE_HARDENED,2026-08-26T19:35:00Z,shared,PR #365,Render tools deleted on main,Monitor,NO
+P0-C,P0,ISSUE,#228 deploy authority,WATCH,2026-08-26T19:35:00Z,shared,serving lag classified docs/test,Not failed promotion,MRI only on runtime merges,NO
+PEND-001,P0,DEPLOY,Serving lag,CLASSIFIED_OK,2026-08-26T19:35:00Z,cursor,reports/latest/repo_path_audit/cloud_github_vs_laptop.json,Not runtime drift,No redeploy,NO
+ACCESS-PROBE,P0,ACCESS,Access capability probe,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/access_capability/ACCESS_PROBE_RESULT.md,,Re-run if unsure,NO
+TODO-01,P0,COORD,TODO_CHECKLIST_FULL_VERIFY,DONE,2026-08-26T19:35:00Z,cursor,reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md,,Execute remaining PENDING,NO
