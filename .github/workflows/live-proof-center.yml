@@ -25,7 +25,7 @@ env:
   GCP_CLOUD_RUN_SERVICE: genesis-system3-web
   SYSTEM3_PUBLIC_BASE_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
   GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
-  GCP_PROOF_SERVICE_ACCOUNT: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
+  GCP_PROOF_SERVICE_ACCOUNT: system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com
   SYSTEM3_ULTRA_MRI_OUT: reports/latest/system3_ultra_mri
   LIVE_TRADING_ENABLED: "0"
   SYSTEM3_LIVE_TRADING_ALLOWED: "0"
@@ -42,10 +42,10 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: main
-          fetch-depth: 1
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Authenticate to Google Cloud (keyless WIF)
+      - name: Authenticate to Google Cloud evidence reader (keyless WIF)
         uses: google-github-actions/auth@v3
         with:
           project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
@@ -63,10 +63,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --disable-pip-version-check "openpyxl>=3.1.0" "requests>=2.31.0" "selenium>=4.20.0"
-          python -m py_compile scripts/system3_live_proof_center.py scripts/system3_ultra_mri.py
+          python -m py_compile scripts/system3_live_proof_center.py scripts/system3_ultra_mri.py scripts/system3_ultra_mri_reconcile.py
 
       - name: Fetch origin/main tip for cross-verify
-        run: git fetch --no-tags --depth=1 origin main
+        run: git fetch --no-tags origin main
 
       - name: Run Live Proof Center collector
         run: |
@@ -76,6 +76,10 @@ jobs:
       - name: Run System3 Ultra MRI capability certification
         id: ultra_mri
         run: python scripts/system3_ultra_mri.py
+
+      - name: Reconcile serving-SHA browser proof without hiding runtime drift
+        if: always()
+        run: python scripts/system3_ultra_mri_reconcile.py
 
       - name: Upload proof artifacts
         if: always()
