@@ -1,0 +1,597 @@
+{
+  "captured_at_utc": "2026-08-27T08:17:13Z",
+  "local": {
+    "head_sha": "146eb69b697f86559d50519f8eaee3c8fbb8a82c",
+    "head_branch": "fix/p0-188-bankex-paced-cache-20260824"
+  },
+  "github": {
+    "main_sha": "e44fb454bde3431da479bb4ecf48b094e49ae69d",
+    "open_prs": [
+      {
+        "headRefName": "feat/data-lake-ingestion-376",
+        "number": 377,
+        "title": "feat(data-lake): scaffold GCS ingestion/storage module",
+        "updatedAt": "2026-08-27T07:52:43Z"
+      },
+      {
+        "headRefName": "docs/ruhi-user-reference-20260824",
+        "number": 353,
+        "title": "docs(ruhi): publish user recommendation reference pack",
+        "updatedAt": "2026-08-26T19:26:10Z"
+      },
+      {
+        "headRefName": "feat/github-control-monitor-20260824",
+        "number": 348,
+        "title": "feat(control-plane): add GitHub closure monitor ledger",
+        "updatedAt": "2026-08-24T15:21:54Z"
+      },
+      {
+        "headRefName": "docs/perplexity-independent-forensic-controller-20260824",
+        "number": 336,
+        "title": "docs(coordination): add Perplexity independent forensic controller handoff",
+        "updatedAt": "2026-08-25T14:02:02Z"
+      },
+      {
+        "headRefName": "chatgpt/same-document-ui-semantic-proof-20260824",
+        "number": 335,
+        "title": "test(ui): preserve one hydrated document across semantic tab proof",
+        "updatedAt": "2026-08-24T12:03:23Z"
+      },
+      {
+        "headRefName": "docs/catalyst-early-warning-plan-20260822",
+        "number": 324,
+        "title": "docs(catalyst): add Catalyst Early Warning Intelligence implementation authority",
+        "updatedAt": "2026-08-22T11:42:27Z"
+      },
+      {
+        "headRefName": "cursor/ui-closure-rule-2b45",
+        "number": 323,
+        "title": "docs(ruhi): lock Cursor permanent UI-closure rule",
+        "updatedAt": "2026-08-22T11:01:51Z"
+      },
+      {
+        "headRefName": "docs/cursor-coordination-contract-20260822",
+        "number": 317,
+        "title": "docs(cursor): enforce multi-agent coordination and proof contract",
+        "updatedAt": "2026-08-22T13:34:51Z"
+      },
+      {
+        "headRefName": "docs/central-agent-coordination-20260822",
+        "number": 315,
+        "title": "docs: add permanent central multi-agent coordination ledger",
+        "updatedAt": "2026-08-22T00:54:38Z"
+      },
+      {
+        "headRefName": "cursor/cloud-agent-env-setup-9d91",
+        "number": 314,
+        "title": "chore(env): Cloud Agent dev environment setup for the System3 dashboard",
+        "updatedAt": "2026-08-22T00:05:51Z"
+      },
+      {
+        "headRefName": "docs/codex-ruhi-execution",
+        "number": 304,
+        "title": "docs: add Codex CLI RUHI execution guide",
+        "updatedAt": "2026-08-21T08:48:27Z"
+      },
+      {
+        "headRefName": "feat/repo-clean-forensic-toolkit-v1-2-actions-storage-20260819",
+        "number": 291,
+        "title": "feat(cleanup): exact-digest GitHub Actions storage evidence",
+        "updatedAt": "2026-08-18T22:11:58Z"
+      },
+      {
+        "headRefName": "fix/20260819-scheduler-health-verifier-diagnostics",
+        "number": 286,
+        "title": "test(control-plane): add fail-closed scheduler-health diagnostic gate",
+        "updatedAt": "2026-08-19T04:28:05Z"
+      },
+      {
+        "headRefName": "docs/chatgpt-current-handoff-20260818",
+        "number": 279,
+        "title": "docs(chatgpt): current live handoff + Cursor instruction slot",
+        "updatedAt": "2026-08-18T05:01:01Z"
+      },
+      {
+        "headRefName": "dependabot/github_actions/actions/upload-artifact-7",
+        "number": 261,
+        "title": "chore(deps): bump actions/upload-artifact from 4 to 7",
+        "updatedAt": "2026-08-26T18:49:23Z"
+      },
+      {
+        "headRefName": "audit/cursor-full-cloud-ui-forensic-20260816T062501Z",
+        "number": 242,
+        "title": "docs(audit): full cloud+UI forensic package 20260816T062501Z",
+        "updatedAt": "2026-08-16T08:06:09Z"
+      },
+      {
+        "headRefName": "fix/dependabot-vite-safe-major",
+        "number": 217,
+        "title": "security: keep Vite Dependabot updates on compatible remediation major",
+        "updatedAt": "2026-08-14T17:36:59Z"
+      },
+      {
+        "headRefName": "dependabot/pip/statsmodels-gte-0.14.6",
+        "number": 215,
+        "title": "build(deps): update statsmodels requirement from >=0.14.2 to >=0.14.6",
+        "updatedAt": "2026-08-14T17:20:41Z"
+      },
+      {
+        "headRefName": "dependabot/pip/pyotp-2.10.0",
+        "number": 214,
+        "title": "build(deps): bump pyotp from 2.9.0 to 2.10.0",
+        "updatedAt": "2026-08-14T17:20:37Z"
+      },
+      {
+        "headRefName": "dependabot/pip/yamllint-1.38.0",
+        "number": 213,
+        "title": "build(deps): bump yamllint from 1.35.1 to 1.38.0",
+        "updatedAt": "2026-08-14T17:20:33Z"
+      },
+      {
+        "headRefName": "dependabot/pip/jugaad-data-gte-0.35.2",
+        "number": 212,
+        "title": "build(deps): update jugaad-data requirement from >=0.31.1 to >=0.35.2",
+        "updatedAt": "2026-08-14T17:15:44Z"
+      },
+      {
+        "headRefName": "dependabot/pip/yfinance-gte-1.5.2",
+        "number": 211,
+        "title": "build(deps): update yfinance requirement from >=0.2.38 to >=1.5.2",
+        "updatedAt": "2026-08-14T17:14:54Z"
+      },
+      {
+        "headRefName": "dependabot/github_actions/SonarSource/sonarqube-scan-action-8",
+        "number": 209,
+        "title": "chore(deps): bump SonarSource/sonarqube-scan-action from 7 to 8",
+        "updatedAt": "2026-08-26T18:49:34Z"
+      },
+      {
+        "headRefName": "dependabot/github_actions/actions/setup-python-7",
+        "number": 208,
+        "title": "chore(deps): bump actions/setup-python from 5 to 7",
+        "updatedAt": "2026-08-26T18:50:25Z"
+      },
+      {
+        "headRefName": "dependabot/pip/dashboard/backend/numpy-2.5.2",
+        "number": 207,
+        "title": "build(deps): bump numpy from 2.2.6 to 2.5.2 in /dashboard/backend",
+        "updatedAt": "2026-08-14T16:49:12Z"
+      },
+      {
+        "headRefName": "dependabot/pip/dashboard/backend/uvicorn-0.52.1",
+        "number": 206,
+        "title": "build(deps): bump uvicorn from 0.49.0 to 0.52.1 in /dashboard/backend",
+        "updatedAt": "2026-08-14T16:49:06Z"
+      },
+      {
+        "headRefName": "dependabot/pip/dashboard/backend/google-cloud-secret-manager-gte-2.30.0-and-lt-3.0.0",
+        "number": 205,
+        "title": "build(deps): update google-cloud-secret-manager requirement from <3.0.0,>=2.20.0 to >=2.30.0,<3.0.0 in /dashboard/backend",
+        "updatedAt": "2026-08-14T16:49:01Z"
+      },
+      {
+        "headRefName": "dependabot/npm_and_yarn/dashboard/frontend/recharts-3.10.1",
+        "number": 203,
+        "title": "build(deps): bump recharts from 2.15.4 to 3.10.1 in /dashboard/frontend",
+        "updatedAt": "2026-08-14T16:48:32Z"
+      },
+      {
+        "headRefName": "dependabot/npm_and_yarn/dashboard/frontend/tailwind-merge-3.6.0",
+        "number": 202,
+        "title": "build(deps): bump tailwind-merge from 2.6.1 to 3.6.0 in /dashboard/frontend",
+        "updatedAt": "2026-08-14T16:48:24Z"
+      },
+      {
+        "headRefName": "dependabot/npm_and_yarn/dashboard/frontend/lucide-react-1.31.0",
+        "number": 201,
+        "title": "build(deps): bump lucide-react from 0.294.0 to 1.31.0 in /dashboard/frontend",
+        "updatedAt": "2026-08-14T16:48:19Z"
+      },
+      {
+        "headRefName": "dependabot/npm_and_yarn/dashboard/frontend/typescript-7.0.2",
+        "number": 200,
+        "title": "chore(deps-dev): bump typescript from 5.9.3 to 7.0.2 in /dashboard/frontend",
+        "updatedAt": "2026-08-16T15:36:55Z"
+      },
+      {
+        "headRefName": "dependabot/pip/dashboard/backend/pandas-3.0.5",
+        "number": 199,
+        "title": "build(deps): bump pandas from 2.3.3 to 3.0.5 in /dashboard/backend",
+        "updatedAt": "2026-08-14T16:48:09Z"
+      },
+      {
+        "headRefName": "dependabot/pip/dashboard/backend/fastapi-0.141.1",
+        "number": 197,
+        "title": "build(deps): bump fastapi from 0.138.0 to 0.141.1 in /dashboard/backend",
+        "updatedAt": "2026-08-14T16:48:04Z"
+      },
+      {
+        "headRefName": "dependabot/github_actions/actions/setup-node-7",
+        "number": 196,
+        "title": "chore(deps): bump actions/setup-node from 4 to 7",
+        "updatedAt": "2026-08-26T18:49:29Z"
+      },
+      {
+        "headRefName": "dependabot/docker/python-3.14-slim",
+        "number": 195,
+        "title": "build(deps): bump python from 3.10-slim to 3.14-slim",
+        "updatedAt": "2026-08-14T16:48:00Z"
+      },
+      {
+        "headRefName": "fix/20260814-paper-url-truth-gate",
+        "number": 192,
+        "title": "fix(paper): durable Cloud Run paper ledger + semantic URL truth gates",
+        "updatedAt": "2026-08-14T08:53:43Z"
+      },
+      {
+        "headRefName": "fix/ui-option-parity-proof-20260814",
+        "number": 191,
+        "title": "test(gcp): make production option-chain UI parity a post-deploy gate",
+        "updatedAt": "2026-08-14T04:43:23Z"
+      },
+      {
+        "headRefName": "feat/market-data-readonly-failover-20260814",
+        "number": 189,
+        "title": "feat(data): read-only broker market-data failover core",
+        "updatedAt": "2026-08-14T04:01:45Z"
+      },
+      {
+        "headRefName": "fix/frontend-typecheck-gate-20260814",
+        "number": 182,
+        "title": "test(frontend): strict TypeScript gate \u2014 repair pass 2",
+        "updatedAt": "2026-08-13T21:24:51Z"
+      },
+      {
+        "headRefName": "fix/ui-semantic-hydration-typecheck-20260813",
+        "number": 165,
+        "title": "Harden production UI semantic hydration proof",
+        "updatedAt": "2026-08-13T14:38:07Z"
+      },
+      {
+        "headRefName": "feat/ui-mobile-shell-review",
+        "number": 139,
+        "title": "feat(ui): reclaim mobile workspace with compact navigation",
+        "updatedAt": "2026-08-12T08:52:28Z"
+      },
+      {
+        "headRefName": "fix/public-readonly-runtime-slice",
+        "number": 131,
+        "title": "security: current-main public-readonly runtime boundary",
+        "updatedAt": "2026-08-12T07:34:47Z"
+      },
+      {
+        "headRefName": "fix/permanent-public-dashboard-no-key",
+        "number": 129,
+        "title": "security: permanently remove dashboard credential and session authority",
+        "updatedAt": "2026-08-12T04:53:59Z"
+      },
+      {
+        "headRefName": "feat/sre-operations-truth-v1",
+        "number": 125,
+        "title": "feat(sre): add fail-closed OperationsTruth inventory and SLO scorecard",
+        "updatedAt": "2026-08-12T00:44:49Z"
+      },
+      {
+        "headRefName": "feat/gcp-observability-phase1",
+        "number": 121,
+        "title": "feat(observability): add traced read-only 24x7 monitoring foundation",
+        "updatedAt": "2026-08-11T23:40:13Z"
+      },
+      {
+        "headRefName": "fix/no-key-deploy-proof-contract-20260812",
+        "number": 115,
+        "title": "fix(gcp): make Cloud Run static proof command-aware",
+        "updatedAt": "2026-08-11T21:57:31Z"
+      },
+      {
+        "headRefName": "fix/gcp-atomic-runtime-spec-20260811",
+        "number": 110,
+        "title": "fix(gcp): deploy one canonical Cloud Run runtime revision",
+        "updatedAt": "2026-08-11T16:25:16Z"
+      },
+      {
+        "headRefName": "fix/dashboard-vcloak-css-issue-44",
+        "number": 98,
+        "title": "fix(dashboard): add missing [v-cloak] CSS rule to hide raw template t\u2026",
+        "updatedAt": "2026-08-11T11:18:26Z"
+      },
+      {
+        "headRefName": "fix/paper-pnl-synthetic-data-guard-20260811",
+        "number": 97,
+        "title": "fix(dashboard): guard live P&L sync against synthetic/paper-simulatio\u2026",
+        "updatedAt": "2026-08-10T23:55:29Z"
+      },
+      {
+        "headRefName": "copilot/fix-negative-holdout-issues",
+        "number": 84,
+        "title": "Harden analyzer-only frozen evaluation and ML proof gating for unreliable holdout/UI states",
+        "updatedAt": "2026-08-10T17:12:29Z"
+      },
+      {
+        "headRefName": "copilot/implement-p0-stabilization-patch",
+        "number": 83,
+        "title": "[WIP] Implement P0 stabilization patch for trading reliability and GCP migration",
+        "updatedAt": "2026-08-04T21:01:24Z"
+      },
+      {
+        "headRefName": "feat/nonlive-equity-options-bigdata-pipeline",
+        "number": 81,
+        "title": "feat(research): resumable all-equity options big-data and leakage-safe backtest",
+        "updatedAt": "2026-08-05T13:30:13Z"
+      },
+      {
+        "headRefName": "fix-paper-console-truth-mobile",
+        "number": 80,
+        "title": "fix(ui): paper console status and mobile layout",
+        "updatedAt": "2026-07-07T06:14:01Z"
+      },
+      {
+        "headRefName": "fix/core-pipeline-v8-paper-ledger",
+        "number": 78,
+        "title": "feat(paper): add core pipeline v8 paper ledger and proof",
+        "updatedAt": "2026-07-06T18:49:42Z"
+      },
+      {
+        "headRefName": "copilot/verify-remediate-github-actions",
+        "number": 76,
+        "title": "Normalize cloud runtime check output for dashboard-auth-protected endpoints",
+        "updatedAt": "2026-07-06T10:44:48Z"
+      },
+      {
+        "headRefName": "copilot/fix-blocking-workflow-policy-issue",
+        "number": 67,
+        "title": "Fix blocking workflow-policy guard by restoring single-workflow layout",
+        "updatedAt": "2026-07-03T18:23:18Z"
+      },
+      {
+        "headRefName": "fix-render-api-502-readonly-stability",
+        "number": 65,
+        "title": "Stabilize dashboard API polling",
+        "updatedAt": "2026-07-05T08:21:18Z"
+      },
+      {
+        "headRefName": "chatgpt/cloud-forensic-gates-20260701",
+        "number": 51,
+        "title": "docs: add cloud CI failure triage proof",
+        "updatedAt": "2026-07-01T08:54:24Z"
+      },
+      {
+        "headRefName": "cloud-live-ui-paper-prediction-proof",
+        "number": 43,
+        "title": "Add corrected cloud dashboard proof workflow",
+        "updatedAt": "2026-06-24T07:18:04Z"
+      },
+      {
+        "headRefName": "copilot/complete-dashboard-enhancement",
+        "number": 42,
+        "title": "[WIP] Implement all recommended features for dashboard enhancement",
+        "updatedAt": "2026-06-24T13:51:02Z"
+      },
+      {
+        "headRefName": "copilot/complete-trader-audit-phase-1",
+        "number": 41,
+        "title": "[WIP] Add comprehensive audit endpoints for trading system",
+        "updatedAt": "2026-06-23T17:17:38Z"
+      },
+      {
+        "headRefName": "copilot/phase-1-backend-api-expansion",
+        "number": 40,
+        "title": "[WIP] Expand backend API for portfolio overview and details",
+        "updatedAt": "2026-06-23T17:12:30Z"
+      },
+      {
+        "headRefName": "copilot/full-production-readiness-audit",
+        "number": 39,
+        "title": "[WIP] Conduct dashboard production readiness audit",
+        "updatedAt": "2026-06-23T17:06:49Z"
+      },
+      {
+        "headRefName": "copilot/activate-dhan-data-api",
+        "number": 38,
+        "title": "[WIP] Activate Dhan Data API as P0 source with token safety measures",
+        "updatedAt": "2026-06-23T17:02:46Z"
+      }
+    ],
+    "workflows_latest": {
+      "Frontend Browser Runtime Smoke": [
+        {
+          "conclusion": "success",
+          "databaseId": 33051543238,
+          "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33051543238"
+        }
+      ]
+    }
+  },
+  "production": {
+    "health": {
+      "qc_status": "NOT_READY"
+    },
+    "deploy": {
+      "git_sha": "e44fb454bde3431da479bb4ecf48b094e49ae69d"
+    },
+    "broker": {
+      "connected": true,
+      "auth_classification": "AUTH_OK",
+      "secret_version": "321"
+    },
+    "agent_status": {
+      "has_memory": false,
+      "has_plan": false
+    },
+    "auto_gates": {
+      "gates": {
+        "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
+          "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+          "pass": false,
+          "days_recorded": 10,
+          "days_passing_threshold": 3,
+          "days_required": 5,
+          "threshold": 0.7,
+          "latest_rho": 0.6,
+          "consecutive_pass_days": 0,
+          "blocker_id": "SYS3-BLK-005",
+          "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+          "days": [
+            {
+              "date": "2026-08-07",
+              "rho": 0.51,
+              "hit_rate": 0.33,
+              "status": "C",
+              "pass": false
+            },
+            {
+              "date": "2026-08-08",
+              "rho": 0.42,
+              "hit_rate": 0.33,
+              "status": "C",
+              "pass": false
+            },
+            {
+              "date": "2026-08-11",
+              "rho": 0.58,
+              "hit_rate": 0.66,
+              "status": "B",
+              "pass": false
+            },
+            {
+              "date": "2026-08-12",
+              "rho": 0.71,
+              "hit_rate": 0.66,
+              "status": "A",
+              "pass": true
+            },
+            {
+              "date": "2026-08-13",
+              "rho": 0.63,
+              "hit_rate": 0.33,
+              "status": "B",
+              "pass": false
+            },
+            {
+              "date": "2026-08-14",
+              "rho": 0.55,
+              "hit_rate": 0.33,
+              "status": "C",
+              "pass": false
+            },
+            {
+              "date": "2026-08-20",
+              "rho": 0.9,
+              "hit_rate": 0.6666666666666666,
+              "status": "A+",
+              "pass": true
+            },
+            {
+              "date": "2026-08-24",
+              "rho": 0.3,
+              "hit_rate": 0.6666666666666666,
+              "status": "D",
+              "pass": false
+            },
+            {
+              "date": "2026-08-25",
+              "rho": 0.7,
+              "hit_rate": 1.0,
+              "status": "A",
+              "pass": true
+            },
+            {
+              "date": "2026-08-26",
+              "rho": 0.6,
+              "hit_rate": 0.6666666666666666,
+              "status": "B",
+              "pass": false
+            }
+          ]
+        },
+        "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
+          "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+          "pass": false,
+          "is_fixture": true,
+          "report_exists": true,
+          "net_expectancy_after_costs": -196.14,
+          "win_rate": 0.3333,
+          "trade_count": 9,
+          "source": "tests/fixtures/paper_closed_trades_feb2026.json",
+          "blocker_id": "INSUFFICIENT_REAL_TRADES",
+          "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate"
+        },
+        "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
+          "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+          "pass": false,
+          "report_exists": true,
+          "full_lifecycle_proven": false,
+          "broker_connected": true,
+          "market_open": true,
+          "blocker_id": "SYS3-BLK-008",
+          "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+        },
+        "WEBSOCKET_TICK_HEALTH_PROVEN": {
+          "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+          "pass": false,
+          "report_exists": true,
+          "last_tick_age_sec": 16.07,
+          "refresh_interval_sec": 60,
+          "blocker_id": "TICK_HEALTH_BLOCKER",
+          "auto_action": "REST poll \u226410s counts for analyzer; WebSocket stream for live execution"
+        },
+        "MODEL_ACCURACY_REPORT_PRESENT": {
+          "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+          "pass": true,
+          "report_exists": true,
+          "rows": 1,
+          "validation_days": 10,
+          "spearman_days_passing": 3,
+          "blocker_id": null,
+          "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
+        },
+        "OPTION_STRIKE_VISIBILITY_PROVEN": {
+          "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+          "pass": false,
+          "rows": 4,
+          "paper_trade_allowed_count": 0,
+          "blocker_id": "SYS3-BLK-003",
+          "auto_action": "Run scripts/system3_option_visibility_audit.py"
+        },
+        "EQUITY_FO_ELIGIBILITY_PROVEN": {
+          "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+          "pass": true,
+          "underlying_count": 211,
+          "blocker_id": null,
+          "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+        }
+      }
+    },
+    "batch_chains": {
+      "summary": {
+        "NIFTY": {
+          "contracts": 462
+        },
+        "BANKNIFTY": {
+          "contracts": 714
+        },
+        "FINNIFTY": {
+          "contracts": 478
+        },
+        "MIDCPNIFTY": {
+          "contracts": 506
+        },
+        "SENSEX": {
+          "contracts": 392
+        },
+        "BANKEX": {
+          "contracts": 398
+        }
+      }
+    }
+  },
+  "coordination": {
+    "smoke394_manifest": {},
+    "continuous_closure_resume": {
+      "summary": {
+        "serving_sha": null
+      }
+    }
+  },
+  "scan_note": "Built live 2026-08-27 via GitHub API + production /api/* endpoints by Claude Code. Fields not covered by a live check above are intentionally omitted rather than guessed; the Dependency_Checklist tab will show NOT_PROVEN for those."
+}
