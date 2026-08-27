@@ -15,12 +15,20 @@ def test_runtime_affecting_paths_never_receive_sha_exception():
     assert "if runtime:" in SCRIPT
 
 
-def test_non_runtime_reconciliation_reruns_canonical_browser_proof_against_serving_sha():
-    assert 'env["GITHUB_SHA"] = serving' in SCRIPT
-    assert "gcp_public_dashboard_runtime_proof.py" in SCRIPT
+def test_non_runtime_reconciliation_runs_canonical_browser_proof_in_process():
+    assert "import scripts.gcp_public_dashboard_runtime_proof as proof_module" in SCRIPT
+    assert "proof_module.EXPECTED_SHA = serving_sha" in SCRIPT
+    assert "proof_module.main()" in SCRIPT
     assert "serving_sha_proof=" in SCRIPT
+    assert 'subprocess.run([sys.executable' not in SCRIPT
+
+
+def test_runtime_sha_is_strictly_validated_before_reconciliation():
+    assert 're.compile(r"^[0-9a-f]{40}$")' in SCRIPT
+    assert '"git", "cat-file", "-e"' in SCRIPT
+    assert "_valid_commit_sha(serving)" in SCRIPT
 
 
 def test_reconciliation_does_not_turn_failed_browser_proof_green_without_real_retry_success():
-    assert "if proof.returncode == 0:" in SCRIPT
+    assert "if proof_rc == 0:" in SCRIPT
     assert 'browser["status"] = "PASS"' in SCRIPT
