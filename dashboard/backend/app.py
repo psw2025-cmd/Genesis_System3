@@ -1682,13 +1682,11 @@ async def get_multibagger_research():
 
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
-    """Latest gain rank predictions — file history, or live scanner fallback."""
+    """Latest durable gain rank predictions, with local-only dev fallback."""
     try:
-        history = []
-        if GAIN_RANK_FILE.exists():
-            history = json.loads(GAIN_RANK_FILE.read_text())
-            if not isinstance(history, list):
-                history = []
+        from dashboard.backend.ml_evidence_store import load_rank_history
+
+        history, history_source, durable_required = load_rank_history(ROOT_DIR)
         today = datetime.now(IST).strftime("%Y-%m-%d")
         today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
         latest = today_entry or (history[-1] if history else None)
@@ -1697,7 +1695,7 @@ async def get_gain_rank(refresh: bool = False):
         # Live fallback: build today's rankings from contract-gain scanner so
         # Signals/Trade tabs are not permanently empty when history file is missing.
         # Bound tightly — never block /api/batch/market-data for 60s+ on equity fan-out.
-        if stale or latest is None:
+        if (stale or latest is None) and not durable_required:
             try:
                 scan = await asyncio.wait_for(
                     get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False),
@@ -1772,7 +1770,14 @@ async def get_gain_rank(refresh: bool = False):
                 print(f"[gain_rank] live scanner fallback failed: {scan_err}")
 
         if latest is None:
-            return {"status": "no_data", "latest": None, "history": history[-14:], "is_today": False, "stale": True}
+            return {
+                "status": "no_data",
+                "latest": None,
+                "history": history[-14:],
+                "is_today": False,
+                "stale": True,
+                "source": history_source,
+            }
 
         latest = dict(latest)
         raw_rows = (latest.get("rankings") or latest.get("predictions") or [])
@@ -1821,7 +1826,7 @@ async def get_gain_rank(refresh: bool = False):
             "is_today": (latest or {}).get("date") == today,
             "stale": stale,
             "latest_date": (latest or {}).get("date"),
-            "source": (latest or {}).get("source") or "gain_rank_history",
+            "source": (latest or {}).get("source") or history_source,
         }
     except Exception as e:
         return {"status": "error", "error": str(e), "latest": None, "history": [], "is_today": False, "stale": True}
@@ -2427,22 +2432,14 @@ async def get_live_trading_gate():
     except Exception as e:
         gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
 
-    # Gate 3: ML accuracy — Spearman rho >= 0.70 over 10+ days
+    # Gate 3: ML accuracy — durable Firestore validation days in cloud mode.
     try:
-        history = (
-            json.loads((_VAL_DIR.parent / "gain_rank_history.json").read_text())
-            if (_VAL_DIR.parent / "gain_rank_history.json").exists()
-            else []
-        )
-        val_files = list(_VAL_DIR.glob("market_validation_*.json")) if _VAL_DIR.exists() else []
-        rhos = []
-        for vf in val_files:
-            v = json.loads(vf.read_text())
-            rho = v.get("spearman_correlation")
-            if rho is not None:
-                rhos.append(rho)
+        from scripts.system3_gate_evaluator import load_spearman_days
+
+        validation_rows, _, _ = load_spearman_days(ROOT_DIR)
+        rhos = [float(v["rho"]) for v in validation_rows if v.get("rho") is not None]
         avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
-        gate("validation_days", len(val_files) >= 10, f"{len(val_files)} validation days (need ≥10)")
+        gate("validation_days", len(validation_rows) >= 10, f"{len(validation_rows)} validation days (need ≥10)")
         gate("ml_accuracy_rho", avg_rho >= 0.70, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
     except Exception as e:
         gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")

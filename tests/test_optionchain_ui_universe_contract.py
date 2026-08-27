@@ -96,8 +96,8 @@ def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     monkeypatch.delenv("CHAIN_MAX_CONTRACTS", raising=False)
     rows = []
     for strike in range(1, 121):
-        rows.append({"strike": strike, "option_type": "CE", "oi": 1, "ltp": 1, "expiry_date": "2026-08-27", "source": "dhan"})
-        rows.append({"strike": strike, "option_type": "PE", "oi": 1, "ltp": 1, "expiry_date": "2026-08-27", "source": "dhan"})
+        rows.append({"strike": strike, "option_type": "CE", "oi": 1, "volume": 1, "ltp": 1, "expiry_date": "2026-08-27", "source": "dhan"})
+        rows.append({"strike": strike, "option_type": "PE", "oi": 1, "volume": 1, "ltp": 1, "expiry_date": "2026-08-27", "source": "dhan"})
     df = pd.DataFrame(rows)
 
     class DSM:
@@ -113,6 +113,8 @@ def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     assert dsm.expiry == "2026-08-27"
     assert result["total_contracts"] == 240
     assert result["broker_rows_total"] == 240
+    assert result["liquidity_eligible_rows_total"] == 240
+    assert result["liquidity_filtered_rows"] == 0
     assert result["complete_chain"] is True
     assert result["limited_for_web"] is False
     assert result["max_contracts"] == 0

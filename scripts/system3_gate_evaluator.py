@@ -91,15 +91,17 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
                 continue
             _ingest(data, fallback_date=path.stem.replace("market_validation_", ""))
 
-    # Durable production path wins on same date (Firestore validation_day_* docs).
-    try:
-        from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+    # Durable production path is authoritative in cloud mode. Avoid contacting
+    # Firestore from explicitly local/offline runs, where state/ is scratch.
+    if cloud_backend:
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
 
-        for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
-            if isinstance(row, dict):
-                _ingest(row)
-    except Exception:
-        pass
+            for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
+                if isinstance(row, dict):
+                    _ingest(row)
+        except Exception:
+            pass
 
     days = [by_date[k] for k in sorted(by_date)]
     passing = sum(1 for d in days if d["pass"])
