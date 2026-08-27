@@ -10,11 +10,13 @@ this exception.
 """
 from __future__ import annotations
 
+import contextlib
 import csv
+import io
 import json
 import os
+import re
 import subprocess
-import sys
 from pathlib import Path
 
 OUT = Path(os.getenv("SYSTEM3_ULTRA_MRI_OUT", "reports/latest/system3_ultra_mri"))
@@ -23,6 +25,7 @@ VERDICT = OUT / "FINAL_VERDICT.json"
 DEPLOY = OUT / "api_deploy_info.txt"
 PROOF_LOG = OUT / "canonical_browser_proof.txt"
 RECON = OUT / "BROWSER_SHA_RECONCILIATION.json"
+SHA40 = re.compile(r"^[0-9a-f]{40}$")
 
 RUNTIME_EXACT = {
     "scripts/gcp_worker_job.py",
@@ -53,7 +56,8 @@ def _deploy_json() -> dict:
     lines = raw.splitlines()
     if lines and lines[0].startswith("HTTP "):
         raw = "\n".join(lines[1:])
-    return json.loads(raw)
+    value = json.loads(raw)
+    return value if isinstance(value, dict) else {}
 
 
 def _rows() -> list[dict[str, str]]:
@@ -64,7 +68,8 @@ def _rows() -> list[dict[str, str]]:
 def _write_rows(rows: list[dict[str, str]]) -> None:
     with MATRIX.open("w", newline="", encoding="utf-8") as fh:
         w = csv.DictWriter(fh, fieldnames=["capability", "status", "critical", "detail"])
-        w.writeheader(); w.writerows(rows)
+        w.writeheader()
+        w.writerows(rows)
 
 
 def _recompute(rows: list[dict[str, str]]) -> None:
@@ -89,41 +94,88 @@ def _recompute(rows: list[dict[str, str]]) -> None:
     (OUT / "FINAL_VERDICT.md").write_text("\n".join(md), encoding="utf-8")
 
 
+def _valid_commit_sha(value: str) -> bool:
+    """Accept only canonical full lowercase Git SHAs that exist in this checkout."""
+    if not SHA40.fullmatch(value):
+        return False
+    proc = subprocess.run(
+        ["git", "cat-file", "-e", f"{value}^{{commit}}"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    return proc.returncode == 0
+
+
+def _run_canonical_proof_in_process(serving_sha: str) -> tuple[int, str, str]:
+    """Run the existing proof module in-process; never spawn a command from runtime data."""
+    import scripts.gcp_public_dashboard_runtime_proof as proof_module
+
+    stdout = io.StringIO()
+    stderr = io.StringIO()
+    original = proof_module.EXPECTED_SHA
+    try:
+        proof_module.EXPECTED_SHA = serving_sha
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            rc = int(proof_module.main())
+    except Exception as exc:  # canonical proof remains fail-closed
+        print(f"canonical_proof_exception:{type(exc).__name__}", file=stderr)
+        rc = 1
+    finally:
+        proof_module.EXPECTED_SHA = original
+    return rc, stdout.getvalue(), stderr.getvalue()
+
+
 def main() -> int:
     if not (MATRIX.exists() and VERDICT.exists() and DEPLOY.exists()):
         return 0
     rows = _rows()
     browser = next((r for r in rows if r.get("capability") == "canonical_browser_proof"), None)
     if not browser or browser.get("status") == "PASS":
-        _recompute(rows); return 0
+        _recompute(rows)
+        return 0
 
     deploy = _deploy_json()
-    serving = str(deploy.get("git_sha") or "").strip()
-    head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+    serving = str(deploy.get("git_sha") or "").strip().lower()
+    head = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip().lower()
     report = {"head_sha": head, "serving_sha": serving, "eligible": False, "changed_files": [], "runtime_affecting": []}
-    if not serving or serving == head:
-        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8"); _recompute(rows); return 0
+    if not _valid_commit_sha(serving) or not _valid_commit_sha(head) or serving == head:
+        report["sha_validation"] = "failed_or_no_reconciliation_needed"
+        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _recompute(rows)
+        return 0
 
-    proc = subprocess.run(["git", "diff", "--name-only", f"{serving}..{head}"], text=True, capture_output=True, check=False)
+    proc = subprocess.run(
+        ["git", "diff", "--name-only", f"{serving}..{head}"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
     if proc.returncode:
         report["git_diff_error"] = proc.stderr[-2000:]
-        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8"); _recompute(rows); return 0
+        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _recompute(rows)
+        return 0
     changed = [x.strip() for x in proc.stdout.splitlines() if x.strip()]
     runtime = [x for x in changed if _runtime_affecting(x)]
     report.update({"changed_files": changed, "runtime_affecting": runtime, "eligible": not runtime})
     if runtime:
-        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8"); _recompute(rows); return 0
+        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        _recompute(rows)
+        return 0
 
-    env = os.environ.copy(); env["GITHUB_SHA"] = serving
-    proof = subprocess.run([sys.executable, "scripts/gcp_public_dashboard_runtime_proof.py"], text=True, capture_output=True, env=env, check=False, timeout=300)
-    report["retry_exit"] = proof.returncode
-    report["retry_stdout_tail"] = proof.stdout[-4000:]
-    report["retry_stderr_tail"] = proof.stderr[-4000:]
+    proof_rc, proof_out, proof_err = _run_canonical_proof_in_process(serving)
+    report["retry_exit"] = proof_rc
+    report["retry_stdout_tail"] = proof_out[-4000:]
+    report["retry_stderr_tail"] = proof_err[-4000:]
     RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
     with PROOF_LOG.open("a", encoding="utf-8") as fh:
         fh.write("\nRECONCILED_NON_RUNTIME_HEAD_AGAINST_SERVING_SHA\n")
-        fh.write(proof.stdout[-10000:]); fh.write("\n"); fh.write(proof.stderr[-10000:]); fh.write("\n")
-    if proof.returncode == 0:
+        fh.write(proof_out[-10000:])
+        fh.write("\n")
+        fh.write(proof_err[-10000:])
+        fh.write("\n")
+    if proof_rc == 0:
         browser["status"] = "PASS"
         browser["detail"] = f"serving_sha_proof={serving};head_control_plane_only={head}"
         _write_rows(rows)
