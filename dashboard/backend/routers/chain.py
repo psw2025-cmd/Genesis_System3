@@ -293,16 +293,84 @@ def _install_legacy_bridge() -> None:
             }
 
     _apply()
+    wrap_batch_chains_ondemand(parent)
+
+    @parent.app.middleware("http")
+    async def _ensure_batch_chains_ondemand(request, call_next):
+        wrap_batch_chains_ondemand(parent)
+        return await call_next(request)
 
     @parent.app.on_event("startup")
     async def _refresh_supported_underlyings_from_dhan_master() -> None:
         _apply()
+        wrap_batch_chains_ondemand(parent)
 
 
 # Do NOT call at import time — app.py imports this module before
 # ``app = FastAPI(...)`` exists, so the bridge would no-op and leave
 # /api/expiries/{underlying} unregistered (UI shows EXPIRY DATA HTTP_404).
 # app.py must call install_legacy_bridge() after the FastAPI app is created.
+
+
+_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S = 6.0
+
+
+def wrap_batch_chains_ondemand(parent: Any) -> None:
+    """R2/R3: fill CHAIN_CACHE_WARMING required symbols from Dhan when possible.
+
+    ``app.py`` still owns ``/api/batch/chains``. This wraps that callable so a
+    cache miss is not stuck on warming if Dhan can already answer. Incomplete
+    payloads are still never cached.
+    """
+    original = getattr(parent, "batch_chains", None)
+    if not callable(original) or getattr(original, "_system3_ondemand_wrapped", False):
+        return
+
+    timeout_s = float(
+        getattr(parent, "_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S", _BATCH_CHAIN_ON_DEMAND_TIMEOUT_S)
+        or _BATCH_CHAIN_ON_DEMAND_TIMEOUT_S
+    )
+    usable = getattr(parent, "_usable_chain_snapshot", None)
+    warm_one = getattr(parent, "_warm_one_index_chain", None)
+    required = tuple(getattr(parent, "_REQUIRED_CHAIN_SYMBOLS", ()) or ())
+    cache_set = getattr(parent, "_cache_set", None)
+    if not callable(usable) or not callable(warm_one) or not required:
+        return
+
+    async def batch_chains_with_ondemand():
+        payload = await original()
+        if not isinstance(payload, dict) or payload.get("cache_hit") is True:
+            return payload
+        chains = payload.get("chains")
+        if not isinstance(chains, dict):
+            return payload
+        missing = [sym for sym in required if not usable(chains.get(sym))]
+        for sym in missing:
+            try:
+                filled = await asyncio.wait_for(warm_one(sym), timeout=timeout_s)
+            except Exception:
+                continue
+            if filled is not None and usable(filled):
+                chains[sym] = filled
+        ready = all(usable(chains.get(sym)) for sym in required)
+        payload["chains"] = chains
+        payload["required_symbols_ready"] = bool(ready)
+        if ready and callable(cache_set) and payload.get("cache_hit") is False:
+            payload = cache_set("batch_chains_v1", payload)
+        return payload
+
+    batch_chains_with_ondemand._system3_ondemand_wrapped = True  # type: ignore[attr-defined]
+    parent.batch_chains = batch_chains_with_ondemand
+    app = getattr(parent, "app", None)
+    if app is None:
+        return
+    for route in getattr(app, "routes", []) or []:
+        if getattr(route, "path", None) == "/api/batch/chains":
+            route.endpoint = batch_chains_with_ondemand
+            dependant = getattr(route, "dependant", None)
+            if dependant is not None:
+                dependant.call = batch_chains_with_ondemand
+            break
 
 
 def install_legacy_bridge() -> None:

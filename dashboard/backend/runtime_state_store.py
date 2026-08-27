@@ -71,8 +71,9 @@ class RuntimeStateStore:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            from core.brokers.dhan.dhan_readonly import sanitize_status_payload
 
-            return _dhan_status()
+            return sanitize_status_payload(_dhan_status())
         except Exception as e:
             return {
                 "connected": False,
