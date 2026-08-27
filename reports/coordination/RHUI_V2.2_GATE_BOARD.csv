@@ -1,0 +1,13 @@
+gate_id,priority,gate,status,proof,next_action,owner,updated_utc
+G0,P0,main vs serving classification,DOCS_TEST_CI_ONLY_LAG,main=0d6955987115 serving=fb4772f9d52b #371/#370/#369 tip vs #367,Do not redeploy for docs/test tip; keep 00617-vif,cursor,2026-08-26T19:35:00Z
+G1,P0,Runtime serving SHA pin,PASS,fb4772f9d52b67a31b55ee85aab8604e525bbad6 @ genesis-system3-web-00617-vif 100%,Preserve until runtime merge needs deploy,cursor,2026-08-26T19:35:00Z
+G2,P0,Ruleset 21581518 six required contexts,PASS,Priority Guard restored; see ruleset_21581518.json,Keep Priority Guard required,cursor,2026-08-26T19:35:00Z
+G4,P0,Broker AUTH_OK same-session,PASS,connected=true AUTH_OK LIVE=false orders=false v320,Keep LIVE OFF,cursor,2026-08-26T19:35:00Z
+G5,P0,4/4 chains batch API reachable,PASS_PREMARKET,batch/chains 200; market closed before 09:15,Re-prove required_symbols_ready after open,cursor,2026-08-26T19:35:00Z
+G6,P0,health↔state QC,PASS_BOTH_NOT_READY,NO_QC_DATA / QC_FAIL NOT_READY,Verified contracts path,cursor,2026-08-26T19:35:00Z
+G7,P0,Scheduler transport health,PASS,status=HEALTHY healthy=true,Clear business wrong-date artifacts,cursor,2026-08-26T19:35:00Z
+G7b,P0,Scheduler business readiness,PARTIAL,wrong date: rank/forecast/signals,Next IST business runs,cursor,2026-08-26T19:35:00Z
+G8,P0,#367 signals effectiveness,PASS_OBSERVED,signals-daily last 2026-08-26T13:15Z; prior 92lf5 SUCCEEDED,Continue weekday observe,cursor,2026-08-26T19:35:00Z
+G10,P0,22-tab semantic API↔UI,NOT_PROVEN,Live Proof Center mounts only,Market-hours semantic session,cursor,2026-08-26T19:35:00Z
+G12,P0,Overall RHUI V2.2,NOT_ACCEPTED,cross-verify 2026-08-26T19:35:00Z,Close G7b G10 G14,shared,2026-08-26T19:35:00Z
+G14,P0,Auto gates 7/7,FAIL_2_of_7,MODEL_ACCURACY+EQUITY_FO only,Do not weaken thresholds,cursor,2026-08-26T19:35:00Z

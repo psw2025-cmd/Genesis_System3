@@ -1,0 +1,330 @@
+{
+  "ok": true,
+  "query": "(System3 OR Genesis_System3 OR genesis-system3 OR RHUI OR \"issue #188\" OR \"Cloud Run\" OR \"Workflow Priority Guard\" OR psw2025-cmd) newer_than:14d",
+  "count": 25,
+  "messages": [
+    {
+      "id": "1a03f900221d8df9",
+      "threadId": "1a03f900221d8df9",
+      "snippet": "RHUI V2.2 \u2014 Material change + governance regression PREVIOUS_COMMITMENTS \u2192 Keep production acceptance fail-closed, treat GitHub main as sole code authority and GCP as sole runtime authority, require",
+      "from": "ChatGPT <noreply@tm.openai.com>",
+      "subject": "[Task Update] RHUI V2 Claude Coordination: GitHub ruleset fix required for RHUI acceptance",
+      "date": "Wed, 26 Aug 2026 19:33:16 +0000 (UTC)",
+      "labelIds": [
+        "UNREAD",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ]
+    },
+    {
+      "id": "1a03f8f92a041729",
+      "threadId": "1a03f8f92a041729",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: f45570878654c4529d83a7c84db124ca40dc95f1 https://github.com/psw2025-cmd/Genesis_System3/",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] f45570: docs(control-plane): note T11 live lie and 0021 ve...",
+      "date": "Wed, 26 Aug 2026 12:32:48 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f8f121937ce9",
+      "threadId": "1a03f8f121937ce9",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 744b396e3a6ad0e7a364ec735f6f6bf2ae31241f https://github.com/psw2025-cmd/Genesis_System3/",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 744b39: docs(coord): record Cursor 0021 live verification ...",
+      "date": "Wed, 26 Aug 2026 12:32:15 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f8e29735049d",
+      "threadId": "1a0396b8787d27bf",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 To unsubscribe from these emails, change your notification settings at https://github.com/psw2025-",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3]",
+      "date": "Wed, 26 Aug 2026 12:31:15 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f8dbb9b4355f",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:30:47 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f8cd37964570",
+      "threadId": "1a03f8cd37964570",
+      "snippet": "[psw2025-cmd/Genesis_System3] CodeQL Security Audit workflow run CodeQL Security Audit: All jobs have failed View workflow run Status Job Annotations CodeQL Security Audit / CodeQL - javascript-",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: CodeQL Security Audit - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:29:47 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f8afeb83e8ef",
+      "threadId": "1a03f8afeb83e8ef",
+      "snippet": "Material contradiction found Current authority advanced to main=0d695598\u2026 (https://github.com/psw2025-cmd/Genesis_System3/commit/0d6955987115f88b710aca0f0f0dec68d23fa6bc) through merged PR #371 (https:",
+      "from": "ChatGPT <noreply@tm.openai.com>",
+      "subject": "[Task Update] RHUI V2 Genesis Controller: Urgent GitHub ruleset fix blocks production proof",
+      "date": "Wed, 26 Aug 2026 19:27:48 +0000 (UTC)",
+      "labelIds": [
+        "UNREAD",
+        "CATEGORY_UPDATES",
+        "INBOX"
+      ]
+    },
+    {
+      "id": "1a03f8a94a122798",
+      "threadId": "1a03f8a94a122798",
+      "snippet": "Material correction: merged PR #371 says HUMAN_ACTION_REQUIRED=NO, but fresh GitHub provider evidence still shows ruleset 21581518 has only five required checks. The Priority Guard remains omitted. PR",
+      "from": "Pritam Warghade <warghade2012@gmail.com>",
+      "subject": "Correction required: Priority Guard still missing",
+      "date": "Wed, 26 Aug 2026 15:27:22 -0400",
+      "labelIds": [
+        "SENT",
+        "INBOX"
+      ]
+    },
+    {
+      "id": "1a03f8a539a28016",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:27:03 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f88dc2f0d265",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:25:28 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f88bafcbc444",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:25:19 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f8869d8bed63",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:24:58 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f87cccbf864a",
+      "threadId": "1a03f87cccbf864a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Full Cloud Audit and Forensic Consensus workflow run Full Cloud Audit and Forensic Consensus: All jobs have failed View workflow run Status Job Annotations Full Cloud",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Full Cloud Audit and Forensic Consensus - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:24:18 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f87606398dc2",
+      "threadId": "1a03f87606398dc2",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:23:51 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f8721db09858",
+      "threadId": "1a03f8721db09858",
+      "snippet": "[psw2025-cmd/Genesis_System3] System3 Preflight Control Plane workflow run System3 Preflight Control Plane: All jobs have failed View workflow run Status Job Annotations System3 Preflight Control Plane",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: System3 Preflight Control Plane - main (0d69559)",
+      "date": "Wed, 26 Aug 2026 12:23:34 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f86a83df6646",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:23:03 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f85dff468663",
+      "threadId": "1a03f85dff468663",
+      "snippet": "Branch: refs/heads/main Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 0d6955987115f88b710aca0f0f0dec68d23fa6bc https://github.com/psw2025-cmd/Genesis_System3/commit/",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 0d6955: docs(coord): post-#369 live proof + runbook/RHUI/c...",
+      "date": "Wed, 26 Aug 2026 12:22:12 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f85df28af81e",
+      "threadId": "1a0396b8787d27bf",
+      "snippet": "Branch: refs/heads/docs/post-369-live-proof-20260827 Home: https://github.com/psw2025-cmd/Genesis_System3 To unsubscribe from these emails, change your notification settings at https://github.com/",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3]",
+      "date": "Wed, 26 Aug 2026 12:22:12 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f812a4128af9",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:17:03 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f7f61aeb2c6c",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:15:06 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f7a69595be5d",
+      "threadId": "1a03f7a69595be5d",
+      "snippet": "THE GIFT IS OUT OF THE LOCKER. Cursor was right: the patches were stuck on my side. Fixed now. There is ONE patch file with all five fixes, and you can get it two ways: 1. In the Claude conversation -",
+      "from": "Pritam Warghade <warghade2012@gmail.com>",
+      "subject": "[System3] READY FOR CURSOR: one patch, all 5 fixes, verified on newest main (b33685e0f)",
+      "date": "Wed, 26 Aug 2026 12:09:41 -0700",
+      "labelIds": [
+        "SENT",
+        "INBOX"
+      ]
+    },
+    {
+      "id": "1a03f78a0258b390",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:07:44 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f76037a09151",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:04:52 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_FORUMS"
+      ]
+    },
+    {
+      "id": "1a03f75e18bfb68d",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:04:43 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    },
+    {
+      "id": "1a03f75dff6fc01a",
+      "threadId": "1a03f75dff6fc01a",
+      "snippet": "[psw2025-cmd/Genesis_System3] Workflow Priority Guard workflow run Workflow Priority Guard: Some jobs were not successful View workflow run Status Job Annotations Workflow Priority Guard / FORENSIC -",
+      "from": "psw2025-cmd <notifications@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] Run failed: Workflow Priority Guard - main (b33685e)",
+      "date": "Wed, 26 Aug 2026 12:04:43 -0700",
+      "labelIds": [
+        "UNREAD",
+        "Label_1986214543004607637",
+        "CATEGORY_UPDATES"
+      ]
+    }
+  ]
+}

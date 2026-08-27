@@ -2,31 +2,33 @@
 
 Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-laptop execution or local forensic authority.
 
-## 0. Current acceptance lock (material change â€” 2026-08-27 post-#369)
+## 0. Current acceptance lock (material change — 2026-08-27 full cross-verify)
 
-**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria. Do **not** falsely claim ACCEPTED after a test-only merge.
+**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria. Do **not** falsely claim ACCEPTED after a docs/test-only merge.
 
-Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` Â· revision `genesis-system3-web-00617-vif` @ 100%.
+Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` · revision `genesis-system3-web-00617-vif` @ 100%.
 
-GitHub `main` tip `b33685e0f52280cfce3444568b0ae0fc5282b4f5` (#370) includes **#369** squash (`6cda50c3f00457baba897fcf7e9732693a8f1e3e`) is **test-only** (`tests/test_dhan_rotator_forensic_redaction.py`). That is **DOCS/TEST_ONLY_LAG** vs serving â€” not a failed Cloud Run promotion. Do not redeploy solely to equalize.
+GitHub `main` tip `0d6955987115f88b710aca0f0f0dec68d23fa6bc` (#371 docs; includes #370/#369) vs serving is **DOCS/TEST/CI_ONLY_LAG** — not a failed Cloud Run promotion. Do not redeploy solely to equalize.
 
-Live proof snapshot (2026-08-27 00:05 IST): broker `AUTH_OK` / LIVE OFF; scheduler **HEALTHY** (`alert_severity=none`); signals `92lf5` EXECUTION_SUCCEEDED. HUMAN_ACTION_REQUIRED=**NO**.
+Live proof snapshot (2026-08-27 ~01:05 IST / evidence `reports/latest/full_cross_verify_20260826_193000/`): broker `AUTH_OK` / LIVE OFF / orders OFF; scheduler transport **HEALTHY**; business readiness **PARTIAL** (wrong-date rank/forecast/signals); auto_gates **2/7**. Ruleset `21581518` now has **six** required contexts including `BLOCKING - priority workflows only` (restored this cycle after Gmail/#188 correction). HUMAN_ACTION_REQUIRED=**NO** for ruleset (agent fixed). Continuous 5-min Gmail/scheduler MRI control plan is **owned by sibling agent** → `docs/handoffs/MRI_GMAIL_SCHEDULER_5MIN_CONTROL_PLAN.md` (do not invent a competing plan here).
 
 Mandatory multi-verify artifacts:
 
 - `docs/handoffs/RHUI_V2.2_MATERIAL_CHANGE.md`
 - `reports/coordination/RHUI_V2.2_Verification_Checklist.json`
-- `reports/latest/post369_live_proof_20260827_000506/` (+ prior `rhui_v22_verify/`)
+- `reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md`
+- `reports/latest/full_cross_verify_20260826_193000/` (+ prior `post369_live_proof_20260827_000506/`)
 - `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
 - Issue #188 `SYSTEM3_COORDINATION_V1` comments
 
 Fail-closed distinctions agents must keep:
 
-1. Cloud Run deploy PASS â‰  scheduler-health PASS â‰  RHUI ACCEPTED.  
-2. 22/22 visual tab mounts â‰  semantic APIâ†”UI acceptance.  
-3. Pre-market 4/4 NOT READY â‰  broker/token failure (recheck after open).  
-4. Docs/test-only `main` tip ahead of serving â‰  failed deploy (check Auto Deploy path filters before workflow_dispatch).  
-5. #369 merge â‰  runtime change (test-only).
+1. Cloud Run deploy PASS ≠ scheduler-health PASS ≠ RHUI ACCEPTED.
+2. 22/22 visual tab mounts ≠ semantic API↔UI acceptance.
+3. Pre-market 4/4 NOT READY ≠ broker/token failure (recheck after open).
+4. Docs/test-only `main` tip ahead of serving ≠ failed deploy (check Auto Deploy path filters before workflow_dispatch).
+5. #369/#371 merge ≠ runtime change (test/docs-only).
+6. Claiming `HUMAN_ACTION_REQUIRED=NO` while a required provider context is still omitted from ruleset `21581518` is a governance false-green — re-verify contexts before asserting no human action.
 
 ## 1. Single source of truth
 
