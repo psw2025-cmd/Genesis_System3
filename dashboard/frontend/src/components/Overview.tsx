@@ -22,11 +22,14 @@ function Metric({ label, value, sub, tone, icon }: {
 }
 
 function ChartPlaceholder({ title, value }: { title: string; value?: string; tone?: 'accent' | 'up' | 'down' }) {
+  const hasSnapshot = Boolean(value && value !== '--')
   return (
     <div className="chart-shell" style={{ minHeight: 145, padding: 12 }}>
       <div className="panel-title">{title}</div>
       {value && <div className="num" style={{ marginTop: 6, color: 'var(--text-pri)', fontSize: '1rem', fontWeight: 750 }}>{value}</div>}
-      <div style={{ marginTop: 28, color: 'var(--text-mut)', fontSize: '.64rem', borderTop: '1px dashed var(--border)', paddingTop: 12 }}>NO TIME-SERIES DATA · SNAPSHOT ONLY</div>
+      <div style={{ marginTop: 28, color: 'var(--text-mut)', fontSize: '.64rem', borderTop: '1px dashed var(--border)', paddingTop: 12 }}>
+        {hasSnapshot ? 'CURRENT SNAPSHOT AVAILABLE · INTRADAY HISTORY NOT WIRED' : 'SNAPSHOT UNAVAILABLE · INTRADAY HISTORY NOT WIRED'}
+      </div>
     </div>
   )
 }
@@ -104,7 +107,12 @@ export function Overview() {
   const indexCard = (label: string, symbol: string) => {
     const p = spot(symbol)
     const c = change(symbol)
-    return <Metric label={label} value={p > 0 ? fmt(p, 2) : '--'} sub={c == null ? 'Waiting for market data' : `${c >= 0 ? '+' : ''}${c.toFixed(2)}%`} tone={c == null ? undefined : c >= 0 ? 'up' : 'down'} icon={<TrendingUp size={14} />} />
+    const sub = c != null
+      ? `${c >= 0 ? '+' : ''}${c.toFixed(2)}%`
+      : p > 0
+        ? 'Spot snapshot available · change unavailable'
+        : 'Market snapshot unavailable'
+    return <Metric label={label} value={p > 0 ? fmt(p, 2) : '--'} sub={sub} tone={c == null ? undefined : c >= 0 ? 'up' : 'down'} icon={<TrendingUp size={14} />} />
   }
 
   return (
