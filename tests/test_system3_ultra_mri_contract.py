@@ -2,7 +2,7 @@ from pathlib import Path
 
 
 SCRIPT = Path("scripts/system3_ultra_mri.py").read_text(encoding="utf-8")
-WORKFLOW = Path(".github/workflows/system3-ultra-mri.yml").read_text(encoding="utf-8")
+WORKFLOW = Path(".github/workflows/live-proof-center.yml").read_text(encoding="utf-8")
 DOC = Path("docs/authority/SYSTEM3_ULTRA_MRI_CONTROL_PLANE.md").read_text(encoding="utf-8")
 
 
@@ -36,8 +36,9 @@ def test_ultra_mri_covers_runtime_and_ui_proof():
 
 def test_ultra_mri_is_manually_runnable_and_artifacted():
     assert "workflow_dispatch:" in WORKFLOW
-    assert "actions/upload-artifact@v6" in WORKFLOW
-    assert "system3-ultra-mri-" in WORKFLOW
+    assert "actions/upload-artifact@v4" in WORKFLOW
+    assert "reports/latest/system3_ultra_mri/" in WORKFLOW
+    assert "python scripts/system3_ultra_mri.py" in WORKFLOW
 
 
 def test_access_failure_is_fail_closed():
