@@ -150,6 +150,17 @@ def extract_prediction_candidates(obj: Any) -> List[Dict[str, Any]]:
 def load_prediction_sources(root: Path, api_base: Optional[str]) -> tuple[List[Dict[str, Any]], List[str]]:
     sources: List[str] = []
     all_rows: List[Dict[str, Any]] = []
+    from dashboard.backend.ml_evidence_store import load_rank_history
+
+    rank_history, rank_source, durable_required = load_rank_history(root)
+    durable_rows = extract_prediction_candidates(rank_history)
+    if durable_rows:
+        # Production authority is singular: do not mix durable predictions with
+        # ephemeral/API fallbacks and accidentally double-count a prediction day.
+        return durable_rows[:300], [rank_source]
+    if durable_required:
+        return [], [rank_source]
+
     if api_base:
         for endpoint in ["/api/state", "/api/gain_rank", "/api/accuracy_trend"]:
             data = fetch_json(api_base.rstrip("/") + endpoint)
@@ -159,7 +170,6 @@ def load_prediction_sources(root: Path, api_base: Optional[str]) -> tuple[List[D
                     all_rows.extend(rows)
                     sources.append(f"api:{endpoint}")
     candidates = [
-        root / "state" / "gain_rank_history.json",
         root / "state" / "market_validations" / "market_validation_2026-06-12.json",
         root / "reports" / "latest" / "option_strike_visibility.json",
         root / "outputs" / "signals.json",
