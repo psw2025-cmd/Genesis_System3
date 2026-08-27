@@ -11,12 +11,12 @@ The user provides the goal. Agents own the technical preflight, implementation, 
 ## Canonical run paths
 
 ### GitHub UI
-Actions -> **System3 Ultra MRI** -> **Run workflow**.
+Actions -> **Live Proof Center (GCP + Dashboard MRI)** -> **Run workflow**.
 
 ### GitHub CLI
 
 ```bash
-gh workflow run system3-ultra-mri.yml --repo psw2025-cmd/Genesis_System3
+gh workflow run live-proof-center.yml --repo psw2025-cmd/Genesis_System3
 ```
 
 ### Any authenticated clone / Cloud Shell
@@ -25,7 +25,7 @@ gh workflow run system3-ultra-mri.yml --repo psw2025-cmd/Genesis_System3
 python scripts/system3_ultra_mri.py
 ```
 
-For the complete delegated GCP path, prefer the GitHub workflow because it uses the canonical keyless WIF identity.
+For the complete delegated GCP path, prefer the GitHub Live Proof Center workflow because it uses the canonical keyless WIF identity and is already the approved central proof workflow.
 
 ## What it captures
 
