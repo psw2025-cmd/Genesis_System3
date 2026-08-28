@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "project": "system3-openalgo-safe",
+  "member": "serviceAccount:system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com",
+  "purpose": "Least-privilege read-only inventory coverage for the permanent System3 Ultra MRI control plane.",
+  "roles": [
+    "roles/iam.serviceAccountViewer",
+    "roles/iam.workloadIdentityPoolViewer",
+    "roles/storage.viewer",
+    "roles/cloudsql.viewer",
+    "roles/cloudfunctions.viewer",
+    "roles/pubsub.viewer"
+  ],
+  "forbidden_roles": [
+    "roles/owner",
+    "roles/editor",
+    "roles/iam.admin",
+    "roles/run.admin",
+    "roles/secretmanager.secretAccessor",
+    "roles/secretmanager.secretVersionAdder"
+  ]
+}
