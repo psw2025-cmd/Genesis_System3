@@ -82,6 +82,8 @@ jobs:
 
       - name: Reconcile serving-SHA browser proof without hiding runtime drift
         if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/system3_ultra_mri_reconcile.py
 
       - name: Upload proof artifacts

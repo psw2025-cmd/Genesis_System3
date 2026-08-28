@@ -39,7 +39,11 @@ def test_ultra_mri_is_manually_runnable_and_artifacted():
     assert "actions/upload-artifact@v4" in WORKFLOW
     assert "reports/latest/system3_ultra_mri/" in WORKFLOW
     assert "python scripts/system3_ultra_mri.py" in WORKFLOW
-    assert "GITHUB_TOKEN: ${{ github.token }}" in WORKFLOW
+    assert WORKFLOW.count("GITHUB_TOKEN: ${{ github.token }}") == 2
+    reconcile = WORKFLOW.split(
+        "- name: Reconcile serving-SHA browser proof without hiding runtime drift", 1
+    )[1].split("- name: Upload proof artifacts", 1)[0]
+    assert "GITHUB_TOKEN: ${{ github.token }}" in reconcile
     assert "  statuses: write" in WORKFLOW
     assert "  contents: write" not in WORKFLOW
 
