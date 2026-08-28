@@ -97,7 +97,7 @@ jobs:
             tests.test_br1_dhan_auth_reliability \
             tests.test_broker_auth_permanent_fix
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "20"
           cache: npm
