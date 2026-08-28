@@ -75,6 +75,8 @@ jobs:
 
       - name: Run System3 Ultra MRI capability certification
         id: ultra_mri
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: python scripts/system3_ultra_mri.py
 
       - name: Reconcile serving-SHA browser proof without hiding runtime drift
