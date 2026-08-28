@@ -17,7 +17,12 @@ import json
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 OUT = Path(os.getenv("SYSTEM3_ULTRA_MRI_OUT", "reports/latest/system3_ultra_mri"))
 MATRIX = OUT / "CAPABILITY_MATRIX.csv"
@@ -118,7 +123,7 @@ def _run_canonical_proof_in_process(serving_sha: str) -> tuple[int, str, str]:
         proof_module.EXPECTED_SHA = serving_sha
         with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             rc = int(proof_module.main())
-    except Exception as exc:  # canonical proof remains fail-closed
+    except Exception as exc:
         print(f"canonical_proof_exception:{type(exc).__name__}", file=stderr)
         rc = 1
     finally:
