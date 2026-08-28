@@ -15,7 +15,7 @@ def test_ultra_mri_never_reads_secret_payloads():
 def test_ultra_mri_uses_canonical_wif():
     assert "google-github-actions/auth@v3" in WORKFLOW
     assert "github-genesis-system3/providers/github" in WORKFLOW
-    assert "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com" in WORKFLOW
+    assert "system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com" in WORKFLOW
 
 
 def test_ultra_mri_covers_runtime_and_ui_proof():
@@ -25,7 +25,7 @@ def test_ultra_mri_covers_runtime_and_ui_proof():
         "api_state",
         "canonical_browser_proof",
         "firestore_databases",
-        "scheduler_list",
+        '"scheduler"',
         "secrets_list",
         "recent_cloud_run_logs",
         "CAPABILITY_MATRIX.csv",

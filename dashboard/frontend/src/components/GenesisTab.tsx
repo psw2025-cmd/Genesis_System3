@@ -119,7 +119,13 @@ export function GenesisTab() {
   const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown)
   const profitFactor = Number(data.brain?.profit_factor ?? effectiveSystem?.profit_factor)
   const drift = Number(data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi)
-  const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? data.final?.bias ?? 'WAITING FOR MODEL EVIDENCE').toUpperCase()
+  const rankingRows = useMemo(() => {
+    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []
+    return Array.isArray(rankings) ? rankings : []
+  }, [gainRank])
+  const topRankedUnderlying = String(rankingRows[0]?.underlying ?? rankingRows[0]?.symbol ?? '').toUpperCase()
+  const neutralRankEvidence = topRankedUnderlying ? `RANK EVIDENCE · ${topRankedUnderlying}` : 'WAITING FOR MODEL EVIDENCE'
+  const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? data.final?.bias ?? neutralRankEvidence).toUpperCase()
   const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
   const biasTone = /bull|up|long/i.test(bias) ? 'var(--up)' : /bear|down|short/i.test(bias) ? 'var(--down)' : 'var(--amber)'
   const researchSources = Array.isArray(research?.sources) ? research.sources : []
@@ -130,10 +136,7 @@ export function GenesisTab() {
   const decisions = Array.isArray(data.brain?.decision_audit) ? data.brain.decision_audit
     : Array.isArray(data.final?.audit) ? data.final.audit
     : []
-  const candidateCount = useMemo(() => {
-    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []
-    return Array.isArray(rankings) ? rankings.length : 0
-  }, [gainRank])
+  const candidateCount = rankingRows.length
 
   const modules = [
     ['Shared GCP Truth', sharedHealth || sharedState ? 'ACTIVE' : 'WAITING', sharedHealth || sharedState ? 100 : null],
@@ -194,7 +197,7 @@ export function GenesisTab() {
       <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(280px, 1.05fr) minmax(250px, .8fr) minmax(0, 1.75fr) minmax(265px, 1fr)', alignItems: 'stretch' }}>
         <Panel title="Why the Model / Evidence" icon={<Sparkles size={14} />}>
           <div style={{ color: biasTone, fontSize: '1.2rem', fontWeight: 850 }}>{bias}</div>
-          <div style={{ marginTop: 5, color: 'var(--text-mut)', fontSize: '.62rem' }}>Bias is displayed only when returned by current Genesis evidence.</div>
+          <div style={{ marginTop: 5, color: 'var(--text-mut)', fontSize: '.62rem' }}>Directional bias is displayed only when supplied; otherwise current durable rank evidence is shown neutrally.</div>
           <div style={{ display: 'grid', gap: 7, marginTop: 12 }}>
             {(reasons.length ? reasons.slice(0, 6) : ['No verified reason list supplied by the current model response.']).map((reason: any, index: number) => (
               <div key={index} style={{ display: 'flex', gap: 8, color: 'var(--text-sec)', fontSize: '.64rem', lineHeight: 1.45 }}><span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{String(reason?.reason ?? reason)}</span></div>
