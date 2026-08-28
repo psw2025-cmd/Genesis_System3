@@ -40,6 +40,8 @@ def test_ultra_mri_is_manually_runnable_and_artifacted():
     assert "reports/latest/system3_ultra_mri/" in WORKFLOW
     assert "python scripts/system3_ultra_mri.py" in WORKFLOW
     assert "GITHUB_TOKEN: ${{ github.token }}" in WORKFLOW
+    assert "  statuses: write" in WORKFLOW
+    assert "  contents: write" not in WORKFLOW
 
 
 def test_access_failure_is_fail_closed():
