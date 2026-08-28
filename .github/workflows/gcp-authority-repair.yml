@@ -53,11 +53,14 @@ jobs:
 
       - name: Static authority safety contract
         run: |
-          python -m compileall -q scripts/gcp_authority_repair.py
-          python -m unittest -q tests.test_gcp_authority_repair_contract
+          python -m compileall -q scripts/gcp_authority_repair.py scripts/gcp_evidence_reader_access_repair.py
+          python -m unittest -q tests.test_gcp_authority_repair_contract tests.test_gcp_evidence_reader_access_repair
 
       - name: Reconcile declared System3 IAM baseline
         run: python scripts/gcp_authority_repair.py --apply
+
+      - name: Reconcile Ultra MRI evidence-reader viewer baseline
+        run: python scripts/gcp_evidence_reader_access_repair.py --apply
 
       - name: Publish repair result
         id: result
@@ -65,20 +68,28 @@ jobs:
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json
           from pathlib import Path
-          p = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
-          assert p["secret_payloads_accessed"] is False
-          assert p["service_account_keys_created"] is False
-          assert p["dhan_rotation_job_executed"] is False
-          assert p["live_trading_changed"] is False
-          assert p["order_action_performed"] is False
-          print(f"changed={'true' if p['change_count'] > 0 else 'false'}")
+          a = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
+          e = json.loads(Path("reports/latest/gcp_evidence_reader_access_repair/summary.json").read_text())
+          assert a["secret_payloads_accessed"] is False
+          assert a["service_account_keys_created"] is False
+          assert a["dhan_rotation_job_executed"] is False
+          assert a["live_trading_changed"] is False
+          assert a["order_action_performed"] is False
+          assert e["secret_payloads_accessed"] is False
+          assert e["service_account_keys_created"] is False
+          assert e["live_trading_changed"] is False
+          assert e["order_action_performed"] is False
+          changed = a["change_count"] > 0 or bool(e["changed_roles"])
+          print(f"changed={'true' if changed else 'false'}")
           PY
 
       - name: Upload sanitized authority repair proof
         uses: actions/upload-artifact@v6
         with:
           name: gcp-authority-repair-primary-${{ github.run_number }}
-          path: reports/latest/gcp_authority_repair/summary.json
+          path: |
+            reports/latest/gcp_authority_repair/summary.json
+            reports/latest/gcp_evidence_reader_access_repair/summary.json
           if-no-files-found: error
           retention-days: 14
 
@@ -115,11 +126,14 @@ jobs:
 
       - name: Static authority safety contract
         run: |
-          python -m compileall -q scripts/gcp_authority_repair.py
-          python -m unittest -q tests.test_gcp_authority_repair_contract
+          python -m compileall -q scripts/gcp_authority_repair.py scripts/gcp_evidence_reader_access_repair.py
+          python -m unittest -q tests.test_gcp_authority_repair_contract tests.test_gcp_evidence_reader_access_repair
 
       - name: Reconcile declared System3 IAM baseline
         run: python scripts/gcp_authority_repair.py --apply
+
+      - name: Reconcile Ultra MRI evidence-reader viewer baseline
+        run: python scripts/gcp_evidence_reader_access_repair.py --apply
 
       - name: Publish repair result
         id: result
@@ -127,20 +141,28 @@ jobs:
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json
           from pathlib import Path
-          p = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
-          assert p["secret_payloads_accessed"] is False
-          assert p["service_account_keys_created"] is False
-          assert p["dhan_rotation_job_executed"] is False
-          assert p["live_trading_changed"] is False
-          assert p["order_action_performed"] is False
-          print(f"changed={'true' if p['change_count'] > 0 else 'false'}")
+          a = json.loads(Path("reports/latest/gcp_authority_repair/summary.json").read_text())
+          e = json.loads(Path("reports/latest/gcp_evidence_reader_access_repair/summary.json").read_text())
+          assert a["secret_payloads_accessed"] is False
+          assert a["service_account_keys_created"] is False
+          assert a["dhan_rotation_job_executed"] is False
+          assert a["live_trading_changed"] is False
+          assert a["order_action_performed"] is False
+          assert e["secret_payloads_accessed"] is False
+          assert e["service_account_keys_created"] is False
+          assert e["live_trading_changed"] is False
+          assert e["order_action_performed"] is False
+          changed = a["change_count"] > 0 or bool(e["changed_roles"])
+          print(f"changed={'true' if changed else 'false'}")
           PY
 
       - name: Upload sanitized authority repair proof
         uses: actions/upload-artifact@v6
         with:
           name: gcp-authority-repair-fallback-${{ github.run_number }}
-          path: reports/latest/gcp_authority_repair/summary.json
+          path: |
+            reports/latest/gcp_authority_repair/summary.json
+            reports/latest/gcp_evidence_reader_access_repair/summary.json
           if-no-files-found: error
           retention-days: 14
 
