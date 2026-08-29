@@ -32,7 +32,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           clean: true
           persist-credentials: false
@@ -91,7 +91,7 @@ jobs:
           exit "$rc"
 
       - name: Upload 22-tab local visual proof
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: frontend-ui-proof-${{ github.run_number }}
@@ -111,7 +111,7 @@ jobs:
 
       - name: Upload live production UI lifecycle proof
         if: always() && github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: live-production-ui-proof-${{ github.run_number }}
           path: live-production-ui-proof/

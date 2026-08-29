@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           clean: true
 
@@ -129,7 +129,7 @@ jobs:
     needs: workflow-policy-guard
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -149,7 +149,7 @@ jobs:
     needs: workflow-policy-guard
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Compile critical scripts
         shell: bash
@@ -178,7 +178,7 @@ jobs:
       DEFER_INSTRUMENT_WARMUP: "1"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
           clean: true
@@ -326,7 +326,7 @@ jobs:
           echo "proof_pack_closure_gate=PASS"
 
       - name: Upload proof pack artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: system3-proof-pack-${{ github.run_number }}
@@ -344,7 +344,7 @@ jobs:
         working-directory: dashboard/frontend
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
 
       - name: Setup Node 20 for reproducible frontend CI
         uses: actions/setup-node@v4
