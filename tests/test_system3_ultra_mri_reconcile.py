@@ -32,3 +32,14 @@ def test_runtime_sha_is_strictly_validated_before_reconciliation():
 def test_reconciliation_does_not_turn_failed_browser_proof_green_without_real_retry_success():
     assert "if proof_rc == 0:" in SCRIPT
     assert 'browser["status"] = "PASS"' in SCRIPT
+
+
+def test_reconciled_non_runtime_head_replaces_initial_status_failure_only_after_retry_passes():
+    publish = SCRIPT.index("_publish_reconciled_head_status(head, serving)")
+    retry_gate = SCRIPT.index("if proof_rc == 0:")
+    matrix_pass = SCRIPT.index('browser["status"] = "PASS"')
+    assert retry_gate < publish < matrix_pass
+    assert '"context": "public-dashboard/runtime-proof"' in SCRIPT
+    assert '"state": "success"' in SCRIPT
+    assert "head_status_publish_error" in SCRIPT
+    assert "return 0" in SCRIPT
