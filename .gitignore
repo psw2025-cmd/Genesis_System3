@@ -35,6 +35,13 @@ id_ed25519
 __pycache__/
 *.py[cod]
 
+# Backup and temporary files
+*.backup
+*.bak
+*.old
+*~
+*.tmp
+
 # Generated state snapshots and runtime outputs (not source)
 outputs/
 
