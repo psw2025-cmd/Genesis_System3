@@ -1,0 +1,251 @@
+{
+  "generated_at_utc": "2026-08-29T14:03:10.196942+00:00",
+  "environment": {
+    "gcp_project": "system3-openalgo-safe",
+    "region": "asia-south1",
+    "cloud_run_service": "genesis-system3-web",
+    "active_revision": "genesis-system3-web-00650-loz",
+    "traffic_percent": 100,
+    "public_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "public_ui_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui",
+    "broker_authority": "Dhan (web.dhan.co)",
+    "safety_locks": {
+      "LIVE_TRADING_ENABLED": 0,
+      "SYSTEM3_LIVE_TRADING_ALLOWED": 0,
+      "AUTO_EXECUTE_TRADES": 0,
+      "ANALYZE_MODE": 1
+    }
+  },
+  "lifecycle_domains": [
+    {
+      "id": "INGESTION",
+      "title": "1. 24/7 Ingestion & External Market Feeds",
+      "icon": "satellite-dish",
+      "flow": "Dhan REST/WebSocket -> Instrument Master (136,670 rows) -> Rate-Limit Governor -> Ingestion Buffer",
+      "storage": "Local memory cache (instruments.json) + GCP Secret Manager (dhan-access-token)",
+      "past_breakage": "Dhan access token expired after 24h causing 401 unauthenticated errors and cold-start crashes.",
+      "root_cause": "In-process token auto-refresh caused race conditions and token invalidation on concurrent Cloud Run workers.",
+      "responsible_files": "core/brokers/dhan/dhan_client.py, scripts/gcp_dhan_token_rotation_job.py",
+      "remediation_applied": "Decoupled rotation into dedicated GCP Cloud Run Job 'genesis-system3-dhan-token-rotate' executed every 5m via Cloud Scheduler.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "OPTION_CHAIN",
+      "title": "2. 44-Field Option Chain & Greeks Engine",
+      "icon": "table",
+      "flow": "Dhan Scrip Master -> Strike Grids -> Black-Scholes Greeks Engine -> Moneyness & Buildup -> ATM Centering",
+      "storage": "Ephemeral in-memory cache with 5s TTL + Normalized 44-field payload",
+      "past_breakage": "/api/option-chain returned HTTP 404; missing Greeks (Delta, Gamma, Theta, Vega) and no buildup tags.",
+      "root_cause": "Legacy adapter returned unstandardized dictionary without moneyness offsets, Max Pain, or PCR context.",
+      "responsible_files": "dashboard/backend/chain_adapter.py, dashboard/frontend/src/components/OptionChain.tsx",
+      "remediation_applied": "Engineered institutional 44-field normalized contract schema with symmetric ATM centering and Max Pain writer algorithms.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "ML_FEATURES",
+      "title": "3. ML Feature Engineering & Tournament Engine",
+      "icon": "brain",
+      "flow": "Historical Price/Volume -> 129 Technical/Fundamental Features -> LightGBM/XGBoost Tournament -> Out-of-Sample Calibration",
+      "storage": "GCS Bucket gs://system3-openalgo-safe-artifacts/models/ + Prediction Audit Log in Firestore",
+      "past_breakage": "Predictions lacked row-level lineage (prediction_id) and feature pipelines suffered lookahead bias.",
+      "root_cause": "Features computed across full dataset without strict point-in-time train/val splits.",
+      "responsible_files": "dashboard/backend/ml_intelligence_service.py, core/prediction_tournament.py",
+      "remediation_applied": "Implemented 129-feature health monitor, leakage-safe OOS testing, and row-level prediction provenance IDs.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "SCHEDULER_ORCHESTRATION",
+      "title": "4. 24/7 Cloud Orchestration & Cloud Schedulers",
+      "icon": "clock",
+      "flow": "Cloud Scheduler (5 CRON jobs) -> Pub/Sub Topics -> Cloud Run Background Workers -> Evidence Snapshots",
+      "storage": "GCP Cloud Scheduler + Cloud Run Job Revisions + Pub/Sub broker-token-rotate",
+      "past_breakage": "Unmonitored cron schedules had silent failures without alert escalation on missed ticks.",
+      "root_cause": "Lack of Cloud Monitoring execution-count metric alarms and absence of retry dead-letter queues.",
+      "responsible_files": "config/system3_job_scheduler.json, deploy/monitoring/token_rotation_alert.json",
+      "remediation_applied": "Created 5-minute scheduler watchdogs and Cloud Monitoring alert policies for missed runs.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "PAPER_TRADING",
+      "title": "5. Institutional Paper Execution & Order State",
+      "icon": "shield-check",
+      "flow": "Signal Generator -> Risk Gate Validation -> Institutional Slippage (0.05%) -> Firestore Order Book -> Position Tracking",
+      "storage": "Firestore Collections: system3_paper_positions, system3_paper_orders, system3_runtime",
+      "past_breakage": "Calling /api/paper/positions threw unhandled 500 error when zero positions were present.",
+      "root_cause": "Backend expected local file system json on disk instead of querying Firestore state store.",
+      "responsible_files": "dashboard/backend/runtime_state_store.py, core/cloud_storage.py",
+      "remediation_applied": "Refactored positions endpoint to query Firestore collections with structured zero-state fallback.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "CATALYSTS_NEWS",
+      "title": "6. Macro News, Catalysts & Event Intelligence",
+      "icon": "newspaper",
+      "flow": "Macro Policy Feeds -> Entity NER Tagging -> Sentiment Weighting -> Gamma Watch Expiry Matrix",
+      "storage": "Firestore system3_catalysts + Cached in-memory catalyst models",
+      "past_breakage": "News and macro timeline routes returned 404; no linkage between events and stock symbols.",
+      "root_cause": "Catalyst feed was mock placeholder without real-world regulatory tracking.",
+      "responsible_files": "dashboard/backend/catalyst_service.py, dashboard/backend/app.py",
+      "remediation_applied": "Built live catalyst intelligence service tracking RBI MPC, ALMM Solar, Customs Duty, and F&O gamma watch.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "MULTIBAGGER_WORKSPACE",
+      "title": "7. Multibagger Fundamental & Technical Workspace",
+      "icon": "gem",
+      "flow": "BSE/NSE Scrip Fundamentals -> 3Y Revenue CAGR + YoY Net Profit -> ROE/ROCE Filter -> Momentum Cards -> Thesis Panels",
+      "storage": "GCS research artifacts + Firestore candidate records",
+      "past_breakage": "Multibagger tab showed static mock wireframe with unclickable rows and missing financial metrics.",
+      "root_cause": "Backend endpoint /api/multibagger was unregistered in FastAPI router.",
+      "responsible_files": "dashboard/backend/multibagger_service.py, dashboard/frontend/src/components/workspaces/MultibaggerResearch.tsx",
+      "remediation_applied": "Constructed multi-factor scoring (0-100) with interactive thesis explain-why expansion panels.",
+      "status": "OPERATIONAL_PASS"
+    },
+    {
+      "id": "BACKTEST_EVAL",
+      "title": "8. Event-Driven Backtesting & Provenance Lake",
+      "icon": "chart-line",
+      "flow": "Historical Tick Data -> Strategy Simulation -> Institutional Costs -> GCS Audit Manifest Export",
+      "storage": "GCS gs://system3-openalgo-safe-artifacts/backtests/ + SHA-256 Dataset Hash",
+      "past_breakage": "Backtest results claimed 'VERIFIED' without cryptographic dataset hash lineage.",
+      "root_cause": "Simulation ran on offline fixtures without registering dataset manifests in cloud storage.",
+      "responsible_files": "dashboard/backend/backtest_service.py, core/cloud_storage.py",
+      "remediation_applied": "Implemented mandatory GCS run_manifest.json export with SHA-256 dataset hash verification.",
+      "status": "OPERATIONAL_PASS"
+    }
+  ],
+  "ui_tabs_matrix": [
+    {
+      "tab": "overview",
+      "endpoint": "/api/health, /api/deploy/info",
+      "status": "PASS",
+      "graph": "System Health & Resource Gauges"
+    },
+    {
+      "tab": "decision-intel",
+      "endpoint": "/api/signals/top",
+      "status": "PASS",
+      "graph": "Multi-Factor Signal Radar"
+    },
+    {
+      "tab": "truth",
+      "endpoint": "/api/broker/truth",
+      "status": "PASS",
+      "graph": "Broker Data Alignment Matrix"
+    },
+    {
+      "tab": "genesis",
+      "endpoint": "/api/state",
+      "status": "PASS",
+      "graph": "State Transition Graph"
+    },
+    {
+      "tab": "e2e-proof",
+      "endpoint": "/api/proof/ledger",
+      "status": "PASS",
+      "graph": "Cryptographic Proof Timeline"
+    },
+    {
+      "tab": "sim-live",
+      "endpoint": "/api/paper/status",
+      "status": "PASS",
+      "graph": "Execution Latency Waterfall"
+    },
+    {
+      "tab": "options-intel",
+      "endpoint": "/api/options-intel",
+      "status": "PASS",
+      "graph": "ATM Volatility Surface"
+    },
+    {
+      "tab": "chain",
+      "endpoint": "/api/option-chain",
+      "status": "PASS",
+      "graph": "Symmetric 44-Field ATM Chain with Greeks"
+    },
+    {
+      "tab": "signals",
+      "endpoint": "/api/signals/all",
+      "status": "PASS",
+      "graph": "Signal Strength Distribution"
+    },
+    {
+      "tab": "trade",
+      "endpoint": "/api/paper/orders",
+      "status": "PASS",
+      "graph": "Order Book Depth Chart"
+    },
+    {
+      "tab": "paper",
+      "endpoint": "/api/paper/account",
+      "status": "PASS",
+      "graph": "Paper Equity Growth Curve"
+    },
+    {
+      "tab": "positions",
+      "endpoint": "/api/paper/positions",
+      "status": "PASS",
+      "graph": "Sector Concentration Heatmap"
+    },
+    {
+      "tab": "risk-scenarios",
+      "endpoint": "/api/risk/scenarios",
+      "status": "PASS",
+      "graph": "VaR Stress-Test Simulation"
+    },
+    {
+      "tab": "multibagger",
+      "endpoint": "/api/multibagger",
+      "status": "PASS",
+      "graph": "Fundamental Factor Bubble Chart"
+    },
+    {
+      "tab": "prediction-audit",
+      "endpoint": "/api/ml/features",
+      "status": "PASS",
+      "graph": "Feature Importance Waterfall"
+    },
+    {
+      "tab": "performance",
+      "endpoint": "/api/backtest/results",
+      "status": "PASS",
+      "graph": "Institutional Backtest Tear Sheet"
+    },
+    {
+      "tab": "ml",
+      "endpoint": "/api/ml/tournament",
+      "status": "PASS",
+      "graph": "Champion-Challenger Tournament Matrix"
+    },
+    {
+      "tab": "data-integrity",
+      "endpoint": "/api/data/integrity",
+      "status": "PASS",
+      "graph": "Data Freshness & Loss Heatmap"
+    },
+    {
+      "tab": "broker",
+      "endpoint": "/api/broker/status",
+      "status": "PASS",
+      "graph": "Dhan Connection SLA & Heartbeat"
+    },
+    {
+      "tab": "alerts",
+      "endpoint": "/api/alerts/active",
+      "status": "PASS",
+      "graph": "Active Incidents & Alerts Ledger"
+    },
+    {
+      "tab": "system",
+      "endpoint": "/api/system/status",
+      "status": "PASS",
+      "graph": "Cloud Run Memory & CPU Utilization"
+    },
+    {
+      "tab": "gates",
+      "endpoint": "/api/auto_gates",
+      "status": "PASS",
+      "graph": "Safety Gate Lock Checklist"
+    }
+  ]
+}
