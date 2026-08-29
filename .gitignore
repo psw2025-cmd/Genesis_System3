@@ -93,6 +93,10 @@ reports/latest/manual_*
 
 # Runtime state files
 state/
+chrome_profile/
+chrome_profile*/
+**/chrome_profile*
+live-production-ui-proof/**/chrome_profile*
 # Generated deep-scan dumps can contain expanded environment values and must
 # never be committed. Keep the canonical scanners report-only/redacted.
 /scan_output.txt

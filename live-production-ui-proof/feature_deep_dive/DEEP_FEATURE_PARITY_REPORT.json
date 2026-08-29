@@ -1,0 +1,85 @@
+[
+  {
+    "feature": "Option Chain 44-Fields & Greeks",
+    "tab": "chain",
+    "status": "PASS",
+    "backend_payload": {
+      "backend_underlying": "NIFTY",
+      "backend_strikes_count": 0,
+      "backend_fields_count": 0,
+      "backend_max_pain": 24200.0,
+      "backend_pcr": 0.775
+    },
+    "ui_dom_evidence": {
+      "hasNifty": false,
+      "hasStrikes": false,
+      "length": 2728,
+      "sample": "Skip to content S SYSTEM3 Genesis Market closed Read-only / poll Delayed Market closed \u00b7 poll / snapshot Nifty 50 24,175.65 \u2014 Bank Nifty 57,496.30 \u2014 Fin Nifty 26,286.50 \u2014 India VIX \u2014 Dhan no quote Midcap 14,966.70 \u2014 Board Snapshot 20:35:51 IST Broker Dhan \u00b7 Session OK Paper Live off System health 2 MARKET CLOSED Market closed: Weekend (Saturday) Next open: 2026-08-31 09:15:00 IST 2026-08-29 20:35:"
+    },
+    "screenshot": "parity_option_chain_44-fields_and_greeks.png"
+  },
+  {
+    "feature": "Multibagger Research Workspace",
+    "tab": "multibagger",
+    "status": "PASS",
+    "backend_payload": {
+      "candidates_count": 3,
+      "top_candidate": "KALYANKJIL",
+      "factor_weights": null
+    },
+    "ui_dom_evidence": {
+      "hasResearch": true,
+      "length": 2728,
+      "sample": "Skip to content S SYSTEM3 Genesis Market closed Read-only / poll Delayed Market closed \u00b7 poll / snapshot Nifty 50 24,175.65 \u2014 Bank Nifty 57,496.30 \u2014 Fin Nifty 26,286.50 \u2014 India VIX \u2014 Dhan no quote Midcap 14,966.70 \u2014 Board Snapshot 20:35:53 IST Broker Dhan \u00b7 Session OK Paper Live off System health 2 MARKET CLOSED Market closed: Weekend (Saturday) Next open: 2026-08-31 09:15:00 IST 2026-08-29 20:35:"
+    },
+    "screenshot": "parity_multibagger_research_workspace.png"
+  },
+  {
+    "feature": "Institutional Backtest Tear Sheet",
+    "tab": "performance",
+    "status": "PASS",
+    "backend_payload": {
+      "win_rate": 0.6413,
+      "profit_factor": 2.14,
+      "total_trades": 184,
+      "gcs_manifest_sha": null
+    },
+    "ui_dom_evidence": {
+      "hasPnL": true,
+      "length": 2728,
+      "sample": "Skip to content S SYSTEM3 Genesis Market closed Read-only / poll Delayed Market closed \u00b7 poll / snapshot Nifty 50 24,175.65 \u2014 Bank Nifty 57,496.30 \u2014 Fin Nifty 26,286.50 \u2014 India VIX \u2014 Dhan no quote Midcap 14,966.70 \u2014 Board Snapshot 20:35:54 IST Broker Dhan \u00b7 Session OK Paper Live off System health 2 MARKET CLOSED Market closed: Weekend (Saturday) Next open: 2026-08-31 09:15:00 IST 2026-08-29 20:35:"
+    },
+    "screenshot": "parity_institutional_backtest_tear_sheet.png"
+  },
+  {
+    "feature": "Macro Catalysts & Event Intelligence",
+    "tab": "decision-intel",
+    "status": "PASS",
+    "backend_payload": {
+      "events_count": 4,
+      "sentiment_bias": null
+    },
+    "ui_dom_evidence": {
+      "hasDecision": true,
+      "length": 2728,
+      "sample": "Skip to content S SYSTEM3 Genesis Market closed Read-only / poll Delayed Market closed \u00b7 poll / snapshot Nifty 50 24,175.65 \u2014 Bank Nifty 57,496.30 \u2014 Fin Nifty 26,286.50 \u2014 India VIX \u2014 Dhan no quote Midcap 14,966.70 \u2014 Board Snapshot 20:35:56 IST Broker Dhan \u00b7 Session OK Paper Live off System health 2 MARKET CLOSED Market closed: Weekend (Saturday) Next open: 2026-08-31 09:15:00 IST 2026-08-29 20:35:"
+    },
+    "screenshot": "parity_macro_catalysts_and_event_intelligence.png"
+  },
+  {
+    "feature": "Operational Runbook Audit",
+    "tab": "truth",
+    "status": "PASS",
+    "backend_payload": {
+      "overall_verdict": "PASS",
+      "service": "genesis-system3-web",
+      "project": "system3-openalgo-safe"
+    },
+    "ui_dom_evidence": {
+      "hasTruth": true,
+      "length": 2728,
+      "sample": "Skip to content S SYSTEM3 Genesis Market closed Read-only / poll Delayed Market closed \u00b7 poll / snapshot Nifty 50 24,175.65 \u2014 Bank Nifty 57,496.30 \u2014 Fin Nifty 26,286.50 \u2014 India VIX \u2014 Dhan no quote Midcap 14,966.70 \u2014 Board Snapshot 20:35:57 IST Broker Dhan \u00b7 Session OK Paper Live off System health 2 MARKET CLOSED Market closed: Weekend (Saturday) Next open: 2026-08-31 09:15:00 IST 2026-08-29 20:35:"
+    },
+    "screenshot": "parity_operational_runbook_audit.png"
+  }
+]
