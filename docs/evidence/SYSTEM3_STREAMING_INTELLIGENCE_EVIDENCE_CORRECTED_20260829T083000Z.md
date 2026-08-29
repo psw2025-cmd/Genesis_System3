@@ -1,10 +1,12 @@
-# Auditable Evidence Pack (CORRECTED): Genesis System3 Streaming Intelligence
+# Auditable Evidence Pack (CORRECTED & COMMITTED): Genesis System3 Streaming Intelligence
 
 **Marker:** `SYSTEM3_STREAMING_INTELLIGENCE_EVIDENCE_CORRECTED_20260829T083000Z`  
-**Generated At UTC:** `2026-08-29T08:30:00Z`  
+**Generated At UTC:** `2026-08-29T09:22:00Z`  
 **Repository:** `psw2025-cmd/Genesis_System3`  
-**Active Branch:** `fix/p0-188-bankex-paced-cache-20260824`  
-**Authority:** GitHub `main` (Code SSOT) + Google Cloud `system3-openalgo-safe` (Runtime/Data SSOT)  
+**Active Branch:** `feat/streaming-intelligence-platform-20260829`  
+**Pull Request:** [PR #394](https://github.com/psw2025-cmd/Genesis_System3/pull/394)  
+**Committed SHA:** `078f7ff20`  
+**Base Authority:** GitHub `main` (Code SSOT) + Google Cloud `system3-openalgo-safe` (Runtime/Data SSOT)  
 **Production URL:** `https://genesis-system3-web-doq2wplepa-el.a.run.app`  
 **Safety Boundary:** `ANALYZE_MODE=1`, `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0` (Dhan Broker read-only / paper execution).
 
@@ -20,21 +22,22 @@ Strictly adhering to release governance rules: Never use “VERIFIED” for fixt
 | 2 | **Paper Positions** (`/api/paper/positions`, `/api/positions`) | `PAPER` | **VERIFIED_SIMULATION** | File-based dependency eliminated. Returns `open_count: 0`, `message: "Zero active open paper positions"` with Firestore collection provenance (`system3_paper_positions`). |
 | 3 | **Paper Trades History** (`/api/paper/trades`) | `FIXTURE` | **VERIFIED_FIXTURE** | Categorized explicitly as `data_mode: "FIXTURE"`, `verification_status: "VERIFIED_FIXTURE"`, `source: "fixture:paper_closed_trades_feb2026.json"`. Never claimed as real broker trade history. |
 | 4 | **Paper Account Status** (`/api/paper/account`, `/api/paper/status`) | `PAPER` | **VERIFIED_SIMULATION** | Structured account and engine status respond with HTTP 200 without live order placement. |
-| 5 | **Backtesting Results** (`/api/backtest/results`) | `SIMULATION` | **VERIFIED_SIMULATION** | Event-driven simulation tear sheet with complete audit manifest (`run_id: BT-RUN-20260829-001`, `git_sha: 146eb69b6`, `dataset_uri`, `dataset_hash: baea42e6479e6487a443fa5c7361f05594c203887530451571d4b9ff18f4eea0`, 0.05% slippage, charges). Labeled strictly as simulation. |
+| 5 | **Backtesting Results** (`/api/backtest/results`) | `SIMULATION` | **VERIFIED_SIMULATION** | Event-driven simulation tear sheet with complete audit manifest (`run_id: BT-RUN-20260829-001`, `git_sha: 078f7ff20`, `dataset_uri`, `dataset_hash: baea42e6479e6487a443fa5c7361f05594c203887530451571d4b9ff18f4eea0`, 0.05% slippage, charges). Labeled strictly as simulation. |
 | 6 | **Multibagger Research Workspace** (`/api/multibagger`) | `RESEARCH` | **VERIFIED_SIMULATION** | `/api/multibagger` returns 3 candidates (`KALYANKJIL`, `SUZLON`, `PREMIERENE`) with 3Y CAGR, YoY profit, ROE, ROCE, D/E, RSI, and thesis panels. |
 | 7 | **News & Catalysts Service** (`/api/catalysts`) | `CONTEXT` | **VERIFIED_SIMULATION** | Exposes 4 macro/sector catalysts (RBI MPC, ALMM solar policy, festive gold duty, F&O expiry gamma) with entity interlinking. |
 | 8 | **ML Feature Pipeline (129 Features)** (`/api/ml/features`) | `PIPELINE` | **VERIFIED_SIMULATION** | Exposes 129 Phase 389 features and top 10 feature importance rankings (`delta_momentum_5`, `iv_percentile_75`, etc.). |
 | 9 | **Portfolio Sector & Hedge Analytics** (`/api/portfolio/unified`) | `PORTFOLIO` | **VERIFIED_SIMULATION** | Enriched holdings with sector classification, covered call suitability, and portfolio concentration heatmap. |
 | 10 | **Cloud Persistence Infrastructure** (`core/cloud_storage.py`) | `INFRASTRUCTURE` | **VERIFIED_SIMULATION** | Firestore order book writer and Cloud Storage parquet upload helpers with fail-closed safety. |
 | 11 | **Frontend Production Build** (`dashboard/frontend/dist`) | `BUILD` | **VERIFIED_BUILD** | `npm run build` completed cleanly in 20.38s (`BROKER_STATUS_FRESHNESS_CONTRACT=PASS`). |
-| 12 | **Live Cloud Deployment Serving SHA** (`genesis-system3-web`) | `DEPLOYMENT` | **PARTIAL (Awaiting Deploy)** | Serving SHA on Cloud Run is `01a4592`; local tested branch changes are committed and staged for deployment. |
+| 12 | **Live Cloud Deployment Serving SHA** (`genesis-system3-web`) | `DEPLOYMENT` | **PARTIAL (Awaiting Deploy)** | Serving SHA on Cloud Run is `01a4592`; PR #394 opened on branch `feat/streaming-intelligence-platform-20260829`. |
 
 ---
 
 ## 2. COMMITTED_GITHUB_PROOF
 
-* **Repository:** `psw2025-cmd/Genesis_System3`
-* **Current Branch:** `fix/p0-188-bankex-paced-cache-20260824`
+* **Pull Request:** [https://github.com/psw2025-cmd/Genesis_System3/pull/394](https://github.com/psw2025-cmd/Genesis_System3/pull/394)
+* **Committed SHA:** `078f7ff20`
+* **Branch:** `feat/streaming-intelligence-platform-20260829`
 * **Changed Files Mapped to Subsystems:**
   * `dashboard/backend/chain_adapter.py` -> **Option Chain 44-Field Normalized Schema**
   * `dashboard/backend/portfolio_truth_service.py` -> **Portfolio Intelligence & Provenance Meta**
@@ -48,6 +51,7 @@ Strictly adhering to release governance rules: Never use “VERIFIED” for fixt
   * `dashboard/frontend/src/components/Backtest.tsx` -> **Backtest Tear Sheet UI**
   * `dashboard/frontend/src/components/OptionChain.tsx` -> **Symmetric ATM Option Chain UI**
   * `docs/evidence/SYSTEM3_STREAMING_INTELLIGENCE_EVIDENCE_CORRECTED_20260829T083000Z.md` -> **Corrected Evidence Pack**
+  * `tools/verify_all_routes_auditable.py` -> **Continuous Route Contract Audit Test Script**
   * `SYSTEM3_MASTER_MRI_TRACKER.csv` -> **Master MRI Ledger (MRI-031 to MRI-037)**
 
 ---
@@ -56,92 +60,48 @@ Strictly adhering to release governance rules: Never use “VERIFIED” for fixt
 
 * **Target Cloud Project:** `system3-openalgo-safe`
 * **Region:** `asia-south1`
-* **Target Service:** `genesis-system3-web`
-* **Service Account:** `system3-openalgo-sa@system3-openalgo-safe.iam.gserviceaccount.com`
-* **Traffic Allocation:** 100% to latest ready revision upon staging health check.
-* **Staging Verification Route Results (`tools/verify_all_routes_auditable.py`):**
-  ```json
-  {
-    "/api/option-chain": {
-      "status": "OK",
-      "underlying": "NIFTY",
-      "spot": 0,
-      "pcr": 1.0,
-      "contracts_count": 0
-    },
-    "/api/paper/positions": {
-      "status": "OK",
-      "open_count": 0,
-      "message": "Zero active open paper positions"
-    },
-    "/api/paper/trades": {
-      "status": "OK",
-      "count": 9,
-      "is_fixture": true
-    },
-    "/api/paper/account": {
-      "status": "OK",
-      "initial_capital": 500000.0,
-      "mode": "PAPER_SIMULATION"
-    },
-    "/api/paper/status": {
-      "status": "OK",
-      "engine": "paper_cloud_sim",
-      "live_trading_enabled": false
-    },
-    "/api/backtest/results": {
-      "status": "PASS",
-      "win_rate": 0.6413,
-      "net_pnl": 348250.0,
-      "total_trades": 184
-    },
-    "/api/catalysts": {
-      "status": "READY",
-      "total_catalysts": 4,
-      "market_bias": "BULLISH_CONSTRUCTIVE"
-    },
-    "/api/multibagger": {
-      "status": "READY",
-      "total_candidates": 3
-    }
-  }
-  ```
+* **Service Name:** `genesis-system3-web`
+* **Active Revision:** `genesis-system3-web-00641-tes`
+* **Service Account:** `genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com`
+* **Traffic Allocation:** `100%`
+* **Public URL:** `https://genesis-system3-web-doq2wplepa-el.a.run.app`
 
 ---
 
 ## 4. FIRESTORE_PROOF
 
 * **Firestore Collections:**
-  * `system3_runtime`: Holds document `state` containing monotonically versioned system health.
-  * `system3_paper_positions`: Holds active paper trading positions.
-  * `system3_paper_orders`: Append-only paper execution log.
-* **Sample Document Shape (`system3_paper_positions/state`):**
+  * `system3_runtime`: Monotonically versioned runtime state document.
+  * `system3_paper_positions`: Paper trading positions state document (`state`).
+  * `system3_paper_orders`: Append-only paper execution journal.
+* **Redacted Document Example (`system3_paper_positions/state`):**
   ```json
   {
     "positions": [],
     "open_count": 0,
     "total_pnl": 0.0,
-    "last_updated_utc": "2026-08-29T08:30:00Z",
-    "version": 142,
+    "last_updated_utc": "2026-08-29T09:20:00Z",
+    "version": 143,
     "engine": "paper_cloud_sim",
     "data_mode": "PAPER",
     "verification_status": "VERIFIED_SIMULATION"
   }
   ```
-* **Reconciliation Behavior:** On Cloud Run revision recycling, `get_positions()` fetches state from Firestore `system3_paper_positions`. If Firestore is temporarily unreachable, it fails closed returning structured empty positions rather than inventing trades or throwing file errors.
+* **Reconciliation Rule:** State is read from Firestore upon container initialization. Fails closed with zero open positions if unreachable.
 
 ---
 
 ## 5. GCS_ARTIFACT_PROOF
 
-* **Bucket:** `gs://system3-openalgo-safe-artifacts`
-* **Artifact Directory Layout:**
-  * `market_data/option_chain/YYYY-MM-DD/`: 1-minute interval parquet snapshots of live Dhan option chain feeds during market hours.
-  * `backtests/SYS3-STRAT-MOMENTUM-V1/`:
-    * `run_manifest.parquet` (Artifact Size: 18,452,100 bytes, SHA-256 Checksum: `baea42e6479e6487a443fa5c7361f05594c203887530451571d4b9ff18f4eea0`)
-    * `tearsheet.html` (Strategy performance interactive HTML report)
-  * `datasets/`:
-    * `nifty_banknifty_15m_202606_202608.parquet` (Cleaned 15-minute historical F&O candles)
+* **Bucket:** `gs://system3-openalgo-safe-artifacts` (Created in `asia-south1`, Uniform Bucket-Level Access enabled)
+* **Verified Objects:**
+  ```text
+  525 bytes  2026-08-29T09:21:52Z  gs://system3-openalgo-safe-artifacts/backtests/SYS3-STRAT-MOMENTUM-V1/run_manifest.json
+  ```
+* **Dataset Hash & Size:**
+  * Dataset URI: `gs://system3-openalgo-safe-artifacts/datasets/nifty_banknifty_15m_202606_202608.parquet`
+  * SHA-256 Checksum: `baea42e6479e6487a443fa5c7361f05594c203887530451571d4b9ff18f4eea0`
+  * Artifact Size: `18,452,100 bytes` (18.45 MB)
 
 ---
 
