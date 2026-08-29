@@ -6,7 +6,9 @@ on:
     branches: [main]
     paths:
       - "scripts/system3_repo_clean_forensic_toolkit.py"
+      - "scripts/system3_actions_storage_forensic.py"
       - "tests/test_repo_clean_forensic_toolkit.py"
+      - "tests/test_actions_storage_forensic.py"
       - "docs/project_control/CLEANUP_POLICY.md"
       - "docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
@@ -17,7 +19,9 @@ on:
     branches: [main]
     paths:
       - "scripts/system3_repo_clean_forensic_toolkit.py"
+      - "scripts/system3_actions_storage_forensic.py"
       - "tests/test_repo_clean_forensic_toolkit.py"
+      - "tests/test_actions_storage_forensic.py"
       - "docs/project_control/CLEANUP_POLICY.md"
       - "docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
@@ -60,10 +64,15 @@ jobs:
           python-version: "3.12"
 
       - name: Compile toolkit
-        run: python -m py_compile scripts/system3_repo_clean_forensic_toolkit.py
+        run: |
+          python -m py_compile scripts/system3_repo_clean_forensic_toolkit.py
+          python -m py_compile scripts/system3_actions_storage_forensic.py
 
       - name: Run fail-closed toolkit regression tests
-        run: python -m unittest -v tests.test_repo_clean_forensic_toolkit
+        run: |
+          python -m unittest -v \
+            tests.test_repo_clean_forensic_toolkit \
+            tests.test_actions_storage_forensic
 
       - name: Scan full current repository and storage layers
         id: scan
@@ -85,6 +94,22 @@ jobs:
           fi
           cat "$OUT/00_EXECUTIVE_DELETE_DECISION.md" >> "$GITHUB_STEP_SUMMARY"
 
+      - name: Prove exact-digest Actions artifact redundancy
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT="${{ steps.scan.outputs.out }}/actions-storage"
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            MAX_PAGES=25
+          else
+            MAX_PAGES=1200
+          fi
+          python scripts/system3_actions_storage_forensic.py \
+            --out "$OUT" \
+            --max-pages "$MAX_PAGES" \
+            --min-age-days 7
+          cat "$OUT/ACTIONS_STORAGE_EXECUTIVE.md" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload compact cleanup proof pack
         if: always()
         uses: actions/upload-artifact@v6
@@ -104,3 +129,5 @@ jobs:
           test "${AUTO_EXECUTE_TRADES}" = "0"
           echo "REPORT_ONLY=PASS"
           echo "FILES_DELETED=0"
+          echo "ARTIFACTS_DELETED=0"
+          echo "CACHES_DELETED=0"
