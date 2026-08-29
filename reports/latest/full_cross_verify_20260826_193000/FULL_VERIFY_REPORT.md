@@ -139,10 +139,3 @@ This verify agent did **not** invent a competing 5-min plan. One-shot Gmail inta
 7. This FULL_VERIFY_REPORT  
 8. Docs PR → CI → merge (see PR URL in #188 comment when landed)  
 9. No Cloud Run redeploy (correct for docs/test lag)
-
-## 8) Post-merge proof
-
-- PR: https://github.com/psw2025-cmd/Genesis_System3/pull/372 **MERGED**
-- New origin/main: `1114ba3ab5afd29202482a151b654382e14de76c`
-- Serving unchanged: `fb4772f9d52b67a31b55ee85aab8604e525bbad6` (expected docs lag)
-- Required CI on #372: all 6 BLOCKING contexts **pass** (incl. Priority Guard)

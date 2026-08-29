@@ -59,8 +59,8 @@ def main() -> int:
 
     print("\n=== Diagnosis ===")
     if not (ROOT / ".secrets" / "dhan.env").exists():
-        print("  .secrets/dhan.env not on laptop — Render/GitHub secrets do NOT sync here.")
-        print("  Copy DHAN_* from Render dashboard -> Genesis_System3\\.secrets\\dhan.env")
+        print("  .secrets/dhan.env not on laptop — Cloud Run / Secret Manager values do NOT sync here.")
+        print("  Copy DHAN_* from the local secret store template -> Genesis_System3\\.secrets\\dhan.env")
         print("  Template: config\\.env.example")
 
     if missing:

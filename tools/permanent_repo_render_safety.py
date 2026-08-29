@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Permanent repo + Render safety audit for System3.
+"""Permanent repo + GCP safety audit for System3.
 
 Read-only repo/config audit. It checks safety invariants, workflow coverage,
-frontend no-fake posture, Render analyzer-only settings, and key docs/reports.
-It does not call broker order endpoints and does not mutate runtime state.
+frontend no-fake posture, Cloud Run-only hosting (Render forbidden), and key
+docs/reports. It does not call broker order endpoints and does not mutate
+runtime state.
 """
 from __future__ import annotations
 
@@ -97,56 +98,38 @@ def check_required_files(result: Dict[str, Any]) -> None:
             add(result, "PASS", f"required_file_{item}", "present", item)
         else:
             add(result, "CRITICAL", f"missing_required_file_{item}", "required safety/proof file missing", item)
-    # Cloud Run is the production target; render.yaml is optional legacy.
     if (ROOT / "render.yaml").exists():
-        add(result, "PASS", "required_file_render.yaml", "present", "render.yaml")
+        add(result, "CRITICAL", "render_yaml_present_retired_host", "render.yaml is retired; Cloud Run only", "render.yaml")
     elif (ROOT / "dashboard" / "backend" / "Dockerfile").exists():
         add(
             result,
             "PASS",
-            "required_file_render.yaml_optional_cloud_run",
+            "render_yaml_absent_cloud_run",
             "render.yaml absent; Cloud Run Dockerfile present",
             "dashboard/backend/Dockerfile",
         )
     else:
-        add(result, "CRITICAL", "missing_required_file_render.yaml", "required safety/proof file missing", "render.yaml")
+        add(result, "CRITICAL", "missing_cloud_run_dockerfile", "Cloud Run Dockerfile missing", "dashboard/backend/Dockerfile")
 
 
 def check_render_yaml(result: Dict[str, Any]) -> None:
     p = ROOT / "render.yaml"
-    text = read(p)
-    if not text.strip():
-        if (ROOT / "dashboard" / "backend" / "Dockerfile").exists():
-            add(
-                result,
-                "PASS",
-                "render_yaml_optional_cloud_run",
-                "render.yaml not required under Cloud Run deployment",
-                "dashboard/backend/Dockerfile",
-            )
-            return
-        add(result, "CRITICAL", "render_yaml_missing", "render.yaml missing or unreadable", "render.yaml")
+    if p.exists():
+        add(
+            result,
+            "CRITICAL",
+            "render_yaml_present_retired_host",
+            "render.yaml is forbidden; Cloud Run is the only deploy authority. Delete it.",
+            "render.yaml",
+        )
         return
-    if not text:
-        add(result, "CRITICAL", "render_yaml_missing", "render.yaml missing or unreadable", "render.yaml")
-        return
-    required_pairs = [
-        "SYSTEM3_MODE", "analyzer",
-        "ANALYZE_MODE", "1",
-        "LIVE_TRADING_ENABLED", "0",
-        "SYSTEM3_LIVE_TRADING_ALLOWED", "0",
-        "SYSTEM3_REAL_ONLY", "1",
-        "DHAN_CLIENT_ID", "sync: false",
-        "DHAN_ACCESS_TOKEN", "sync: false",
-    ]
-    for i in range(0, len(required_pairs), 2):
-        key, value = required_pairs[i], required_pairs[i + 1]
-        if key in text and value in text:
-            add(result, "PASS", f"render_{key}", f"{key} includes {value}", "render.yaml")
-        else:
-            add(result, "CRITICAL", f"render_{key}_bad", f"{key} / {value} not proven in render.yaml", "render.yaml")
-    if LIVE_BAD_RE.search(text):
-        add(result, "CRITICAL", "render_live_flag_enabled", "render.yaml appears to enable live trading", "render.yaml")
+    add(
+        result,
+        "PASS",
+        "render_yaml_absent_retired",
+        "render.yaml absent; Cloud Run is the only deploy authority",
+        "dashboard/backend/Dockerfile",
+    )
 
 
 def check_procfile(result: Dict[str, Any]) -> None:
@@ -273,7 +256,7 @@ def write_report(result: Dict[str, Any]) -> None:
     result["verdict"] = final_verdict(result)
     (REPORT_DIR / "summary.json").write_text(json.dumps(result, indent=2, sort_keys=True), encoding="utf-8")
     lines = [
-        "# Permanent Repo + Render Safety",
+        "# Permanent Repo + GCP Hosting Safety",
         "",
         f"- Generated UTC: `{result['generated_utc']}`",
         f"- Verdict: **{result['verdict']}**",

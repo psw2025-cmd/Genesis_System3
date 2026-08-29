@@ -73,6 +73,8 @@ class FullCloudAuditContractTests(unittest.TestCase):
         self.assertIn('SYSTEM3_LIVE_TRADING_ALLOWED: "0"', self.wf)
         self.assertIn('AUTO_EXECUTE_TRADES: "0"', self.wf)
         self.assertIn("persist-credentials: false", self.wf)
+        self.assertIn("Wait read-only for exact expected runtime SHA", self.wf)
+        self.assertIn("SYSTEM3_EXPECTED_SERVING_SHA", self.wf)
 
     def test_exact_security_fetch_rejects_stale_evidence(self):
         self.assertIn("head_sha", self.exact)
@@ -89,11 +91,14 @@ class FullCloudAuditContractTests(unittest.TestCase):
         self.assertNotIn("_API_HEADERS", blob_section.split("with urllib.request.urlopen", 1)[0])
 
     def test_rotator_reliability_is_not_overridden_by_broker_health(self):
+        # A current failed execution must remain a hard blocker regardless of
+        # broker health. Audit-wide log strings are intentionally diagnostic
+        # only until they are attributable to the same bounded execution window.
         self.assertIn("recent_failed_executions", self.rotator)
         self.assertIn("broker_health_is_not_rotator_reliability", self.rotator)
-        self.assertIn("timeout_signatures", self.rotator)
-        self.assertIn("dhan_auth_signatures", self.rotator)
-        self.assertIn("error_or_crash_signatures", self.rotator)
+        self.assertIn("audit_wide_log_diagnostics", self.rotator)
+        self.assertIn("audit_wide_unattributed_to_recent_execution_window", self.rotator)
+        self.assertIn('"log_signatures_block_reliability": False', self.rotator)
         self.assertIn('"order_actions_performed": False', self.rotator)
         self.assertIn('"live_trading_enabled": False', self.rotator)
 
@@ -114,15 +119,20 @@ class FullCloudAuditContractTests(unittest.TestCase):
         self.assertIn("`full-cloud-audit.yml`", self.policy)
         self.assertNotIn("schedule:", self.wf)
 
-    def test_unified_verdict_requires_all_deterministic_and_ai_gates(self):
+    def test_unified_verdict_requires_all_deterministic_gates_and_classifies_ai(self):
         for marker in (
             "cloud_audit_pass",
             "cloud_safety_pass",
             "rotator_reliability_pass",
             "exact_security_evidence",
             "security_audit_pass",
-            "ai_consensus_pass",
-            "all(conditions.values())",
+            "deterministic_pass=all(deterministic_conditions.values())",
+            "ai_consensus_pass=ai_state == 'PASS'",
+            "ai_external_unavailable=ai_state == 'BLOCKED_EXTERNAL_AI'",
+            "ai_adverse_or_invalid=not ai_consensus_pass and not ai_external_unavailable",
+            "if not deterministic_pass or ai_adverse_or_invalid:",
+            "evidence_grade='DETERMINISTIC_PASS_EXTERNAL_AI_UNAVAILABLE'",
+            "external_ai_required_for_deterministic_runtime_pass':False",
         ):
             self.assertIn(marker, self.wf)
 

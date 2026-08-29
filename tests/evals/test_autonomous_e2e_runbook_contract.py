@@ -95,6 +95,16 @@ def test_runbook_declares_persistent_reread_and_safety_contract():
     assert "artifact digest/revision mapping" in text
     assert "Data-integrity and PAPER lifecycle acceptance" in text
     assert "missing fill, rewrite an execution record or force balance" in text
+    assert "Master production-closure contract" in text
+    assert "G01 Repository SHA" in text and "G19 Issue #188 coordination" in text
+    assert "Safe API and log-correlation law" in text
+    assert "Repository deep-MRI and duplication law" in text
+    assert "STATE_A_VERIFIED" in text
+    assert "STATE_B_EXTERNAL_BLOCKER" in text
+    assert "STATE_C_OWNERSHIP_BLOCKER" in text
+    assert "RHUI_PROGRESS_V2" in text
+    assert "Production Score = freshly PASS applicable gates" in text
+    assert "Remaining Top 20" in text
 
 
 def test_agent_entrypoints_reference_runbook_authority():
@@ -133,6 +143,10 @@ def test_agent_entrypoints_reference_runbook_authority():
     assert "self_reported_serving_sha_alone_sufficient: false" in policy
     assert "web_runtime_may_invoke_dhan_rotator: false" in policy
     assert "infer_missing_fills_or_rewrite_records: forbidden" in policy
+    assert "mission: maximum_safely_achievable_production_pass" in policy
+    assert "format: RHUI_PROGRESS_V2" in policy
+    assert "duplicate_root_cause_lane: forbidden" in policy
+    assert "unproven_stale_fail_or_blocked_counts_green: false" in policy
 
 
 def test_solution_matrix_rejects_visual_hype_and_keeps_user_choices():
@@ -186,6 +200,28 @@ def test_agent_policy_validates_against_canonical_versioned_schema():
     validator = jsonschema.Draft202012Validator(schema)
     assert list(validator.iter_errors(prior_major)), "v3 requires an explicit migration/compatibility reader"
     assert list(validator.iter_errors(future_major)), "unknown future major versions must fail closed"
+
+
+def test_mri_connector_and_compute_safety_are_schema_enforced():
+    policy = yaml.safe_load((ROOT / "agent_policy.yaml").read_text(encoding="utf-8"))
+    schema = json.loads((ROOT / policy["schema_path"]).read_text(encoding="utf-8"))
+    validator = jsonschema.Draft202012Validator(schema)
+
+    unsafe_mutations = (
+        ("market_data_authority", "primary_live_indian_broker", "another_feed"),
+        ("compute", "laptop_production_or_paper_serving", True),
+        ("paper_latency", "target_is_slo_not_guarantee", False),
+        ("paper_latency", "live_or_hft_authority_granted", True),
+        ("continuous_concern_reporting", "repeat_identical_unchanged_messages", True),
+        ("catalyst_intelligence", "market_and_broker_truth", "news_feed"),
+        ("paid_ai_connector_control_plane", "public_dashboard_raw_secret_input", "allowed"),
+        ("paid_ai_connector_control_plane", "browser_may_read_secret_payload", True),
+        ("paid_ai_connector_control_plane", "activation_can_enable_live_or_orders", True),
+    )
+    for section, key, unsafe_value in unsafe_mutations:
+        candidate = deepcopy(policy)
+        candidate["autonomous_end_to_end_runbook"]["mri_autonomous_scan"][section][key] = unsafe_value
+        assert list(validator.iter_errors(candidate)), f"schema accepted unsafe {section}.{key}"
 
 
 def test_resilience_and_supply_chain_alternatives_are_fail_closed():

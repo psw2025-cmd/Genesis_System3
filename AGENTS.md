@@ -5,10 +5,11 @@
 **Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
 Read first:
-0. `reports/coordination/COMMAND_CENTER.md` + `ISSUES_ONLY.md` + Excel `AGENT_OPERATING_OPTIONS.xlsx` (overwrite-only live boards — refresh via `scripts/run_command_center_refresh.ps1` after every edit)
-1. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
-2. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
-3. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
+0. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
+0b. `reports/coordination/LIVE_PROOF_CENTER_POINTER.md` + `reports/latest/live_proof_center/LATEST/INDEX.md` — **scheduled live GCP/dashboard MRI for agents without laptop/gcloud** (`docs/handoffs/LIVE_PROOF_CENTER.md`)
+1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
+3. `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` — permanent user-action/autonomy-speed law; complete its 19-point self-MRI before saying `USER_ACTION=NONE` or `HUMAN_ACTION_REQUIRED=NO`
 4. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
 5. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
 6. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
@@ -34,7 +35,37 @@ Transition law:
 - unrelated historical failure → context only unless fresh evidence makes it relevant;
 - stop only for a verified external dependency or genuine user approval/account-level action.
 
-Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, and `USER_ACTION`.
+Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, `MANDATORY_USER_ACTION`, and `OPTIONAL_ACCELERATION_ACTION`.
+
+## Dashboard-impact blocker and dual-channel escalation
+
+For every new or materially changed blocker, check whether it directly or
+indirectly slows or corrupts dashboard content, market data, source/freshness
+truth, API↔UI parity, broker state, predictions, PAPER records, deployment,
+proof, or multi-agent throughput.
+
+If the owner can unblock or materially accelerate it through an account,
+permission, connector, ruleset, review, environment, billing, subscription,
+identity/consent, or external-provider action:
+
+1. create a stable `USER_ACTION_ID` and link every blocked task ID;
+2. continue all safe non-overlapping agent work;
+3. notify the owner immediately in the current chat and through the verified
+   connected mail channel;
+4. put `FASTEST_SAFE_RECOMMENDED` first and list every materially different
+   safe alternative with expected time, benefit, risk, and proof;
+5. provide `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF / URGENCY`;
+6. track `DISCOVERED -> NOTIFIED -> ACKNOWLEDGED -> IN_PROGRESS ->
+   PROVEN_COMPLETE` in Issue #188/the active ledger;
+7. repeat the unresolved delta at material transitions and on the governed
+   reminder cadence until fresh evidence proves completion;
+8. mark mail delivery failure as its own blocker; never pretend an email was
+   sent.
+
+Access that safely unlocks several downstream dashboard/data/proof tasks has
+priority over isolated low-impact work. Never request secret values or weaker
+safety. The canonical details are in
+`docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`.
 
 ## Production authority
 
@@ -42,7 +73,8 @@ Every active remediation update should state `STATUS`, `IN_PROGRESS`, `CURRENT_S
 - Runtime/deployment authority: Google Cloud project `system3-openalgo-safe`, region `asia-south1`.
 - Production service: `genesis-system3-web`.
 - Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
-- Broker authority: **Dhan**. Legacy Angel/Render instructions are retired/non-authoritative.
+- Broker authority: **Dhan**.
+- Hosting lock: GCP Cloud Run only. Render.com is forbidden. Never recreate `render.yaml`, never add Render as production, never deploy workers to Render. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`. Legacy Angel instructions are retired/non-authoritative.
 - GitHub Actions -> Google Cloud uses keyless WIF. Do not create/export service-account JSON keys.
 
 ## Absolute current/live truth rule
@@ -92,11 +124,12 @@ When an issue is found:
 3. Reproduce/read logs/code only as required.
 4. Identify root cause and affected surfaces.
 5. Compare multiple safe solution paths when useful.
-6. Implement the smallest production-grade fix on a branch.
-7. Run focused tests + mandatory current CI gates.
-8. Merge only when the exact head is proven safe.
-9. Verify the resulting production state with **new** live evidence.
-10. Do not stop at “workflow green” if the user-visible/runtime end state is still wrong.
+6. Check the 19-point user-action/autonomy-speed MRI and surface any safe setup action that materially accelerates progress.
+7. Implement the smallest production-grade fix on a branch.
+8. Run focused tests + mandatory current CI gates.
+9. Merge only when the exact head is proven safe.
+10. Verify the resulting production state with **new** live evidence.
+11. Do not stop at “workflow green” if the user-visible/runtime end state is still wrong.
 
 ## Multi-agent concurrency
 
@@ -110,7 +143,14 @@ Other agents may work in parallel. Before editing or merging:
 
 ## User-action boundary
 
-Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation without waiting for chat approval. Ask the user for manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform: LIVE enablement, real orders, billing/org, WIF destruction, broker MFA.
+Routine code, CI, deployment, IAM-drift repair, logs, browser proof, broker investigation, and safe recovery should be handled through repository/GCP automation without waiting for chat approval. Ask the user for mandatory manual action only for genuine break-glass/account-level conditions that delegated automation cannot perform: LIVE enablement, real orders, billing/org, WIF destruction, broker MFA.
+
+However, a lack of mandatory human action does **not** mean the user has no useful acceleration step. Before saying `USER_ACTION=NONE`, `HUMAN_ACTION_REQUIRED=NO`, or equivalent, read `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`, complete its 19-point self-MRI, and report two separate fields:
+
+- `MANDATORY_USER_ACTION=` true blocker or `NONE`;
+- `OPTIONAL_ACCELERATION_ACTION=` fastest safe user-side setup improvement or `NONE`.
+
+If a user-side setting, connector authorization, ruleset/review configuration, environment protection, billing/org control, or external account action would materially reduce delay or improve autonomous execution, surface it immediately with kid-level `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF / URGENCY` instructions while continuing all safe agent work in parallel.
 
 ## Evidence hierarchy
 

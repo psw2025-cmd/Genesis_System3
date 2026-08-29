@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "captured_at_utc": "2026-08-24T14:03:00Z",
+  "evidence_class": "REQUEST_SCOPED_REPOSITORY_GITHUB_AND_RECENT_PRODUCTION_UI",
+  "concerns": [
+    {"id":"MRI-20260824-001","category":"DATA","severity":"P0","status":"OPEN","reason":"BANKNIFTY chain cache warm timeout produced 0 contracts and 0 strikes","owner":"backend_chain_cache_lane","next_action":"diagnose paced warm asymmetry, test, deploy, and repeat exact-serving UI/API proof"},
+    {"id":"MRI-20260824-002","category":"UI_PROOF","severity":"P1","status":"OPEN","reason":"proof parser requires symbol and source on one line while UI renders them separately","owner":"pr_335_owner","next_action":"rebase and reconcile parser with current UI layout"},
+    {"id":"MRI-20260824-003","category":"GOVERNANCE","severity":"P1","status":"BLOCKED_REVIEW","reason":"PRs 347 and 348 require independent review; PR 347 owns the runbook","owner":"independent_reviewer","next_action":"approve after review, merge, then reconcile current main"},
+    {"id":"MRI-20260824-004","category":"LICENSE_AND_CONNECTORS","severity":"P1","status":"BLOCKED_EXTERNAL","reason":"requested paid/editorial/AI connectors lack current entitlement, rights, secret-onboarding, quota and health proof","owner":"connector_owner","next_action":"verify exact official product and server-side governed onboarding before implementation"},
+    {"id":"MRI-20260824-005","category":"COMPUTE_MLOPS","severity":"P1","status":"UNPROVEN","reason":"no request-scoped GCP accelerator quota, cost, job or immutable registry proof","owner":"mlops_lane","next_action":"profile workload and quota read-only, then benchmark CPU versus accelerator"},
+    {"id":"MRI-20260824-006","category":"POLICY_SCHEMA","severity":"P1","status":"OPEN","reason":"v4 schema did not require existing MRI catalyst connector compute safety blocks","owner":"feat_mri_connectors_policy_20260824","next_action":"strengthen canonical schema and mutation tests"}
+  ],
+  "safety": {"analyze_mode": true, "live_trading_enabled": false, "system3_live_trading_allowed": false, "auto_execute_trades": false}
+}

@@ -1,0 +1,129 @@
+name: Live Proof Center (GCP + Dashboard MRI)
+
+# Read-only continuous forensic pack for agents without laptop/gcloud access.
+# Policy: no GitHub Actions schedule (GCP / manual workflow_dispatch for recurrence).
+# Least-privilege commit-status publication only; no repository write-back, no order/LIVE mutation.
+# Publishes Actions artifacts only (agents download LATEST pack from the run).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: live-proof-center
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+  actions: read
+  statuses: write
+
+env:
+  GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
+  GCP_REGION: asia-south1
+  GCP_CLOUD_RUN_SERVICE: genesis-system3-web
+  SYSTEM3_PUBLIC_BASE_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app
+  GCP_WIF_PROVIDER: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+  GCP_PROOF_SERVICE_ACCOUNT: system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com
+  SYSTEM3_ULTRA_MRI_OUT: reports/latest/system3_ultra_mri
+  LIVE_TRADING_ENABLED: "0"
+  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+  AUTO_EXECUTE_TRADES: "0"
+  CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+
+jobs:
+  proof-center:
+    name: Collect live proof center + Ultra MRI (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Authenticate to Google Cloud evidence reader (keyless WIF)
+        uses: google-github-actions/auth@v3
+        with:
+          project_id: ${{ env.GOOGLE_CLOUD_PROJECT }}
+          workload_identity_provider: ${{ env.GCP_WIF_PROVIDER }}
+          service_account: ${{ env.GCP_PROOF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --disable-pip-version-check "openpyxl>=3.1.0" "requests>=2.31.0" "selenium>=4.20.0"
+          python -m py_compile scripts/system3_live_proof_center.py scripts/system3_ultra_mri.py scripts/system3_ultra_mri_reconcile.py
+
+      - name: Fetch origin/main tip for cross-verify
+        run: git fetch --no-tags origin main
+
+      - name: Run Live Proof Center collector
+        run: |
+          python scripts/system3_live_proof_center.py
+          test -f reports/latest/live_proof_center/LATEST/MANIFEST.json
+
+      - name: Run System3 Ultra MRI capability certification
+        id: ultra_mri
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/system3_ultra_mri.py
+
+      - name: Reconcile serving-SHA browser proof without hiding runtime drift
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/system3_ultra_mri_reconcile.py
+
+      - name: Upload proof artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-proof-center-${{ github.run_id }}
+          path: |
+            reports/latest/live_proof_center/LATEST/
+            reports/latest/system3_ultra_mri/
+            reports/latest/public_dashboard_proof/
+            reports/coordination/System3_LIVE_PROOF_CENTER.xlsx
+            reports/coordination/LIVE_PROOF_CENTER_POINTER.md
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Publish Ultra MRI verdict
+        if: always()
+        shell: bash
+        run: |
+          echo "# System3 Live Proof Center + Ultra MRI" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f "${SYSTEM3_ULTRA_MRI_OUT}/FINAL_VERDICT.md" ]; then
+            cat "${SYSTEM3_ULTRA_MRI_OUT}/FINAL_VERDICT.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Ultra MRI verdict missing; inspect workflow evidence." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Fail closed when critical access is not certified
+        if: always()
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("reports/latest/system3_ultra_mri/FINAL_VERDICT.json")
+          if not p.exists():
+              raise SystemExit("ULTRA_MRI_VERDICT_MISSING")
+          data = json.loads(p.read_text(encoding="utf-8"))
+          if not data.get("access_certified"):
+              raise SystemExit("ULTRA_MRI_ACCESS_NOT_CERTIFIED")
+          print("ULTRA_MRI_ACCESS_CERTIFIED")
+          PY

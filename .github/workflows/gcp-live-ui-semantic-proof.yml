@@ -28,7 +28,7 @@ jobs:
       PYTHONPATH: .
     steps:
       - name: Checkout exact deployed SHA
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.GITHUB_SHA }}
           persist-credentials: false

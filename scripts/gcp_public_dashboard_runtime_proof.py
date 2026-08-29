@@ -201,9 +201,11 @@ def _publish_status(state: str, description: str) -> None:
 
 
 def _run_tab_matrix() -> dict[str, Any]:
+    child_env = os.environ.copy()
+    child_env["GITHUB_SHA"] = EXPECTED_SHA
     proc = subprocess.run(
         [sys.executable, "scripts/gcp_ui_tab_visual_proof.py"],
-        text=True, capture_output=True, timeout=1200, check=False,
+        text=True, capture_output=True, timeout=1200, check=False, env=child_env,
     )
     if proc.stdout:
         print(proc.stdout.rstrip())

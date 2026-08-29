@@ -1,12 +1,13 @@
 # ISSUES MERMAID (overwrite)
 
-Serving `01a4592f4c68c120a26b4fd955d1aff655b82e33` · gates 3/7
+Serving `719566d23fd9aeb783a72fcec9493557f783781f` · gates 2/7
 
 ## P0 dependency micro-network
 
 ```mermaid
 flowchart LR
     PEND_001["PEND-001"]
+    PEND_002["PEND-002"]
     PEND_004["PEND-004"]
     PEND_005["PEND-005"]
     PEND_006["PEND-006"]
@@ -17,10 +18,10 @@ flowchart LR
     PEND_015["PEND-015"]
     PEND_016["PEND-016"]
     PEND_017["PEND-017"]
-    PEND_018["PEND-018"]
     PEND_001 --> PEND_004
+    PEND_002 --> PEND_014
+    PEND_002 --> PEND_017
     PEND_014 --> PEND_017
-    PEND_014 --> PEND_018
 ```
 
 ## Full control loop

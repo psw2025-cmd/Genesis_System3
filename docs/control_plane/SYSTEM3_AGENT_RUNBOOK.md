@@ -234,6 +234,88 @@ an alternative is never permission to bypass the primary path's safety gates.
 | R11 | IAM recovery separation | read-only sentinel freezes evidence and queues a guarded remediation workflow | audit-log Cloud Function detects/queues only | allowlisted plan, lock, before/after, rollback and immutable audit |
 | R12 | Workflow supply-chain hardening | reviewed actions pinned to immutable commit SHAs and minimum permissions | first-party scripts with pinned runtime/toolchain | workflow scan, permission inventory and exact reviewed digests |
 
+##### Request-scoped reconfirmation — 2026-08-24T09:20:29Z
+
+The twelve governance *contracts* remain implemented (`PASS`) at current source
+`9dbf1911d016bcd3611651390cfca28658d96d41`. A contract PASS is not an
+operational PASS. The operational column below is intentionally fail-closed and
+must not be rewritten green merely because the recommendation exists in this
+runbook. Primary and alternative paths remain the paths in R01-R12 above.
+
+| ID | Contract verdict | Current operational verdict | Evidence time UTC | Current evidence / unresolved concern | Next action |
+|---|---|---|---|---|---|
+| R01 | PASS | PASS | 2026-08-24T09:20:55Z | GitHub main freshly fetched; serving `a764f990...` maps through deploy run `32707463170`, image digest `sha256:120036a3...`, revision `00584-faq`, 100% traffic | repeat after next deploy; self-reported API SHA alone remains insufficient |
+| R02 | PASS | PASS | 2026-08-24T09:20:29Z | versioned ledger, fixed verdict enum, evidence time and both paths are present | append only on material evidence change |
+| R03 | PASS | PARTIAL | 2026-08-24T09:20:55Z | canonical GitHub Actions deploy is proven; exhaustive current Cloud Build/direct-writer inventory is not yet attached to this request | run single-writer inventory; emit `SPLIT_BRAIN_DEPLOYMENT_RISK` on any second writer |
+| R04 | PASS | FAIL | 2026-08-24T09:27:49Z | GitHub API returned `404 Branch not protected`; repository rulesets list is empty; environments have no protection rules. WIF provider is ACTIVE and restricted to repository/owner IDs plus `refs/heads/main` | account owner enables main/environment protection, or retain the documented WIF-restricted alternative and explicit blocker |
+| R05 | PASS | PARTIAL | 2026-08-24T09:20:29Z | schema/read-only/immutable-storage contract exists; full production data-integrity cards and append-only BigQuery evidence are not freshly proven | deploy and prove the versioned dashboard/API plus immutable object and BigQuery rows |
+| R06 | PASS | PASS | 2026-08-24T08:52:17Z | deploy workflow proved isolated rotator/scheduler safety; web rotation switches remain disabled | retain metadata-only attempt/result logging and bounded recovery authority |
+| R07 | PASS | PARTIAL | 2026-08-24T09:20:29Z | timestamp/join/fail-closed PAPER contract exists; full current lifecycle mismatch report is not attached | run exchange/source/receive/simulation reconciliation and publish mismatch counts |
+| R08 | PASS | PARTIAL | 2026-08-24T09:20:29Z | percentile/drop/reconnect/stale contract exists; request-scoped 60-minute samples are pending | capture p50/p95/p99/max/drop/reconnect/stale/out-of-order during the 60-minute proof |
+| R09 | PASS | PASS | 2026-08-24T09:20:29Z | pytest/property/state-machine/fault-injection-first and governed Locust/Chaos-Mesh alternatives are locked | retain fail-closed tests for every new dependency edge |
+| R10 | PASS | PASS | 2026-08-24T09:20:29Z | `agent_policy.v4` schema, migration and compatibility rules are canonical | reject unknown future major versions and test each migration |
+| R11 | PASS | PASS | 2026-08-24T09:20:29Z | sentinel has no repair authority; separate WIF-authenticated repair workflow requires plan/allowlist/lock/before-after/rollback/audit | keep destructive, privilege-expanding, WIF-destroying and ambiguous drift human-gated |
+| R12 | PASS | PASS | 2026-08-24T09:20:29Z | immutable-action/minimum-permission contract and exact-head workflow policy checks are active | rescan every workflow change; first-party pinned-runtime path remains the alternative |
+
+##### Dhan equity, CE/PE and prediction coverage ledger
+
+`RELIANCE` was a production-browser sample, never the configured universe. The
+fresh preferred detailed Dhan master synchronized at 2026-08-24T09:26:59Z
+(SHA-256 `9CB5172AC21BD5936DB8CA83E02A40C1CF65E0FDD162BB5CABF2B8D7A224A27F`)
+contained 208 stock-option underlyings (208 NSE, 206 BSE, 206 overlapping),
+67,172 NSE stock-option contracts, 35,180 BSE stock-option contracts, 9,874 NSE
+cash security IDs and 13,554 BSE cash security IDs. Counts are temporal evidence,
+not constants; refresh from Dhan's official master before every current claim.
+
+| Coverage surface | Verdict | Primary path | Safe alternative | Acceptance/blocker |
+|---|---|---|---|---|
+| Current NSE/BSE master ingestion | PARTIAL | daily official detailed/compact Dhan sync with checksum/as-of metadata; all consumers resolve the synced master first | bundled master only as explicit stale/degraded emergency fallback | production currently exposes the bundled 211-underlying snapshot; redeploy and prove official-sync source/count/digest |
+| NSE/BSE cash catalog | PASS_SOURCE / UNPROVEN_LIVE | bounded Dhan quote batches of at most 1,000 security IDs at the documented quote cadence | Dhan WebSocket shards up to the documented connection entitlement | source enumeration is implemented; fresh quotes for every cash ID and UI coverage are not yet proven |
+| NSE/BSE CE/PE master coverage | PASS_SOURCE / UNPROVEN_LIVE | quote-batch all option security IDs for ranking, then paced/on-demand full-chain detail | WebSocket quote shards plus option-chain detail for promoted candidates | every master underlying must have CE and PE; missing-side list fails closed; all-contract fresh live coverage is pending |
+| Equity option rotation | PARTIAL | bounded rotating shards with explicit visited/missing/coverage/cycle fields | distributed lease-backed shards when Cloud Run horizontal scale is governed | in-memory full-cycle accounting is implemented; durable cross-instance coverage ledger is pending |
+| Top CE/PE benchmark | PARTIAL | Dhan quote/chain ranking with same-time Moneycontrol reference comparison | licensed independent exchange/vendor validation | Moneycontrol/Chartink remain reference/catalyst inputs, never broker truth; discrepancy reasons must be visible |
+| Multibagger research | BLOCKED | survivorship-safe point-in-time cash universe, fundamentals/corporate actions, price/volume/catalyst features and leakage-safe long-horizon tournament | transparent factor baseline while advanced challengers remain research-only | no candidate may be displayed as guaranteed; current verified model/outcome lineage is insufficient |
+| Seven PAPER horizons | PARTIAL | `1_week`, `3_weeks`, `1_month`, `3_months`, `6_months`, `1_year`, `2_years` with immutable prediction IDs and realized outcomes | abstaining baseline when coverage/calibration is insufficient | horizon schema is implemented; forward outcomes necessarily remain pending until each horizon matures |
+| Continuous learning/RL | BLOCKED | immutable challenger retraining/recalibration from reconciled PAPER outcomes; governed promotion and rollback | scheduled feature ablation/recalibration only | no in-place champion mutation, uncontrolled RL, LIVE enablement or capital deployment; BigQuery outcome evidence is not yet proven |
+| Issue #188 full closure | PARTIAL | exact-serving one-document 22-tab desktop/mobile API/UI proof plus 60 uninterrupted market minutes | bounded repeated proof windows only when the exchange session cannot supply 60 minutes; never relabel shorter evidence | PR #335 owns the proof harness; Overview/Genesis/time-series/model evidence and full current-master live coverage remain unresolved |
+
+##### Live unresolved-issue CSV and user-input contract
+
+The canonical Excel-readable projection of Continuous Closure issues is:
+
+`audit/live_agent_issue_ledger/SYSTEM3_LIVE_UNRESOLVED_ISSUES.csv`
+
+Use `scripts/system3_live_issue_ledger.py` to record or scan evidence. This CSV
+extends the canonical blocker cards/proof ledger; it does not replace GitHub
+Issue #188, `BACKLOG.md`, the JSONL proof ledger, or exact-serving UI evidence.
+
+- Detect terminal/log keywords such as ERROR, FAIL, WARNING, BLOCKED, WAITING,
+  DEGRADED, storage exhaustion and browser/ChromeDriver failures, but never
+  promote a keyword match into a root-cause or product-failure claim without
+  current authoritative reproduction.
+- Attempt the smallest safe resolution first. If unresolved, upsert the row with
+  evidence, attempted fixes, owner, next action and explicit
+  `user_input_required`. When that field is `YES`, `user_input_question` is
+  mandatory. Never use the CSV to request routine work the agent can perform.
+- Preserve resolved rows with resolution UTC/evidence. Never delete history to
+  make the ledger green. Repeated events increment `occurrence_count`.
+- Sanitize secret-like values before persistence. Do not capture response bodies,
+  Dhan token values, credentials, authorization headers or service-account keys.
+- The writer uses a same-directory temporary file and atomic replace. If Excel
+  holds an exclusive lock, append metadata to `.csv.pending.jsonl`; the next
+  successful invocation must merge the spool without loss. Users may therefore
+  keep the CSV open read-only; an Excel lock is visible, not silently ignored.
+- Storage pressure is HIGH when it blocks evidence/test/browser work. Report it
+  immediately, preserve user files, use the forensic cleanup authority, and
+  record free-space evidence plus the safe recovery action.
+- Chrome GCM messages such as `PHONE_REGISTRATION_ERROR` and
+  `DEPRECATED_ENDPOINT` are normally background registration diagnostics. Mark
+  them INFORMATIONAL/safe-to-ignore only after proving the required browser
+  session, production URL, UI/API capture and exit result were unaffected.
+- Every production fix still requires new desktop/mobile UI content and visual
+  quality review from a trader's perspective. A rendered tab, CSV row, HTTP 200,
+  CI green state or backend response alone is not final user proof.
+
 #### GitHub protection and single-deployer enforcement
 
 - Protect `main` with pull-request review, required exact-head checks, stale
@@ -275,6 +357,103 @@ canonical versioned JSON Schema. A breaking change requires a new schema version
 documented source/target migration, idempotent migration test, rejection of
 unknown future major versions, and a bounded backward-compatibility window.
 Validators fail closed; they never silently discard unknown safety fields.
+
+### Master production-closure contract
+
+**Mission:** Move Genesis System3 toward the maximum safely achievable
+production PASS. Do not stop at reporting when a safe, non-overlapping,
+authorized remediation remains. Never manufacture a PASS, weaken a gate, or
+cross the LIVE/order/secret/account boundary to increase the score.
+
+For each run, maintain one deduplicated gate ledger with `PASS`, `FAIL`,
+`UNPROVEN`, `NOT_APPLICABLE`, or `BLOCKED_EXTERNAL`, current evidence UTC,
+evidence source, owner, defect/root cause, fix/PR/deployment, acceptance test and
+next action. Re-evaluate a downstream gate whenever its upstream SHA, revision,
+data source, credential version, contract or evidence window changes.
+
+| Gate | Required current proof |
+|---|---|
+| G01 Repository SHA | current GitHub `main` and canonical serving SHA equality or explicit deployment-in-progress state |
+| G02 Cloud Run MRI | project/region/service, ready revision, traffic, digest, runtime identity, scaling, safety env names/values and Secret Manager references without payloads |
+| G03 Broker MRI | read-only Dhan auth/profile/funds/holdings/positions status; rotate only through bounded authority when fresh evidence proves recovery is required |
+| G04 Market-data MRI | NIFTY, BANKNIFTY, FINNIFTY and MIDCPNIFTY source, as-of/age, contracts, expiries and strikes; additional supported underlyings reported separately |
+| G05 API MRI | allowlisted read-only routes with status, content type, bounded payload semantics, source timestamps and latency |
+| G06 UI MRI | all 22 canonical tabs: `OPENS`, `DATA`, `API`, `FRESH`, `ERRORS`, `VERDICT` from one new production browser lifecycle |
+| G07 API/UI parity | broker, funds, holdings, positions, indices and option-chain values/source/as-of/units agree or contradiction is explicit |
+| G08 Frontend forensics | console, page, hydration, failed fetch/XHR/WebSocket, timeout and infinite-loading evidence |
+| G09 Cloud-log correlation | browser trace/request ID and UTC window map to Cloud Run revision/request/backend outcome without secret payloads |
+| G10 Repository deep MRI | current remote-main scan of TODO/FIXME, mock/demo/synthetic truth, dead/duplicate endpoints, stale workflows, missing tests and ownership overlap |
+| G11 Root-cause engine | reproduce -> trace system cause -> search siblings -> smallest systemic fix -> regression proof; never cosmetic string suppression |
+| G12 Test pyramid | static/schema, unit, integration, regression, browser and safety-lock tests proportionate to risk |
+| G13 PR quality | exact defect, root cause, owned files, tests, before/after evidence, known limits and rollback |
+| G14 Merge authority | current-base/exact-head required checks, reviews/rulesets and no conflicting ownership |
+| G15 Deployment verification | intended source SHA, workflow/run, image digest, ready revision and 100% intended traffic |
+| G16 Post-deploy proof | new broker, market, API, UI, parity and log proof after the verified revision became ready |
+| G17 Continuous repair | repeat MRI -> root cause -> fix -> test -> PR -> deploy -> fresh proof while safe independent work remains |
+| G18 Safety | `ANALYZE_MODE=1`; LIVE/order locks `0`; no real order or secret exposure |
+| G19 Issue #188 coordination | current ownership/progress record using the required `RHUI_PROGRESS_V2` fields and evidence links |
+
+#### Safe API and log-correlation law
+
+Build the API MRI allowlist from current remote source and route metadata; do
+not run an inherited bulk endpoint list blindly. Deny or require special review
+for secret/audit-secret, mutation, order, rotation, runner, export or unknown
+compatibility routes. Use GET/HEAD only where source proves read-only behavior,
+with timeout, concurrency/rate, response-size and evidence-retention bounds plus
+recursive secret redaction. Record status, content type, latency, byte count,
+schema/semantic verdict, source/as-of time and sanitized request/correlation ID.
+
+Correlate browser failures by request/correlation ID when available; otherwise
+use a narrow UTC window, exact URL/method/status and revision. Absence of a log
+match is `UNPROVEN`, not proof that the backend was never called.
+
+#### Repository deep-MRI and duplication law
+
+Run the deep scan against freshly fetched remote `main`, then compare active PR
+heads and Issue #188 ownership before using local findings. Classify mock/demo
+references by test fixture, documentation, safe simulator or production-truth
+risk; filename/string matches alone are not defects. Confirm route reachability
+from registration and consumers before declaring an endpoint dead. Route each
+verified defect to one smallest non-overlapping lane and transfer evidence when
+another current owner exists.
+
+#### Stop conditions
+
+- `STATE_A_VERIFIED`: every applicable required gate has fresh PASS evidence;
+  remaining items are explicitly not applicable.
+- `STATE_B_EXTERNAL_BLOCKER`: only verified account, entitlement, billing, MFA,
+  destructive, LIVE/order or other non-delegable authority prevents progress;
+  publish the smallest secret-safe NAP and continue any independent lane.
+- `STATE_C_OWNERSHIP_BLOCKER`: a current agent/PR owns the exact files/root-cause
+  lane; post evidence to the coordination record and do not create a duplicate.
+
+Do not use a stop state because work is lengthy, CI is running, evidence is
+yellow, or one lane is blocked while another safe lane remains executable.
+
+#### Issue #188 `RHUI_PROGRESS_V2` contract
+
+At task start, after each material state change, and at handoff, post one
+deduplicated update containing: capture UTC/IST; agent/lane and owned files;
+current main/PR-head/serving SHA; workflow/run/attempt; image digest/revision/
+traffic; safety state; broker state without secrets; four-index chain counts and
+freshness; 22-tab/API/UI verdicts; defect/root cause/fix/tests; PR/deployment/
+proof links; blockers/owner; next action; and `HUMAN_ACTION_REQUIRED`. Update
+only when evidence or state changes; do not spam unchanged concerns.
+
+#### User result and production score
+
+Report `Production Score = freshly PASS applicable gates / applicable required
+gates * 100`, with numerator, denominator, capture window and excluded
+`NOT_APPLICABLE` gates. `UNPROVEN`, stale, FAIL and blocked gates are never
+counted green. Present:
+
+- `GREEN - WORKING`: freshly proven items and evidence time;
+- `RED - BROKEN`: symptom, root cause, fix/owner and current status;
+- `YELLOW - UNPROVEN`: exact missing or stale evidence;
+- `FIXED DURING RUN`: before/after SHA, PR, deployment and proof;
+- `Remaining Top 20`: evidence-ranked P0/P1/P2, owner and next action (fewer
+  rows when fewer verified items exist; never invent filler);
+- `Human Action`: YES/NO and the smallest exact action when YES.
 
 ### Data-integrity and PAPER lifecycle acceptance
 
@@ -1107,6 +1286,69 @@ Use primary research and official provider documentation for technical
 decisions. Search again for current evidence; this list is not a frozen claim
 that these are the best future choices.
 
+## Private Google Drive archive and low-space cleanup control
+
+Google Drive is an **archive/recovery surface only**. GitHub `main` remains the
+code/configuration source of truth, and the canonical Google Cloud Run revision
+remains runtime truth. Never run a Git worktree, database, Python environment,
+`node_modules`, browser profile, GitHub Actions runner, or production process
+from a synchronized Drive folder. Never allow a Drive copy to overwrite newer
+GitHub/cloud state.
+
+Canonical controller:
+
+```powershell
+python scripts/system3_drive_archive_control.py --help
+```
+
+The controlled paths are:
+
+1. **Repository autosnapshot:** snapshot only a clean worktree whose `HEAD`
+   equals freshly fetched `origin/main`. Use `git archive`; never copy `.git`,
+   local branches, stashes, untracked work, ignored caches or a dirty worktree.
+   A stale/local SHA must fail as `NOT_EXACT_ORIGIN_MAIN`.
+2. **Heavy-log trigger:** when a declared disk-free threshold is breached,
+   scan only explicitly supplied log/report roots, minimum size and minimum age.
+   Stage allowlisted inactive `.log`, `.txt`, `.json`, `.jsonl` or `.csv` files
+   into bounded chunks. Databases, models, datasets outside those roots,
+   symlinks, secret-like paths and active runner files are not logs.
+3. **Drive upload:** a Drive-authorized agent uploads every part to the private
+   owner-only archive. Google Drive Desktop local-sync state alone is never
+   remote proof. Consumer Drive OAuth must not be replaced by a service-account
+   JSON key, and no Drive credential/token may enter Git, logs or chat.
+4. **SHA and metadata receipt:** download/hash every bounded remote part and
+   record `drive_file_id`, exact parent ID, byte size, SHA-256, owner, sharing
+   state and verification UTC in `SYSTEM3_DRIVE_RECEIPT_V1`. Filename or an
+   uploaded manifest that merely claims a hash is not verification.
+5. **Cleanup gate:** source deletion is forbidden until every part matches the
+   `SYSTEM3_DRIVE_ARCHIVE_V1` manifest, the receipt is owner-only (`shared=false`),
+   and the source still has the staged size/SHA. Deletion additionally requires
+   the explicit `--delete-source` switch. Any missing, stale, shared, ambiguous,
+   size-mismatched or hash-mismatched receipt fails closed and leaves the source.
+6. **Evidence:** append the manifest path, Drive folder/file IDs and URLs,
+   hashes, sizes, upload/verification/deletion UTC, result and remaining local
+   free space to the live issue ledger without secret payloads.
+
+Example low-space staging (staging is non-destructive):
+
+```powershell
+python scripts/system3_drive_archive_control.py trigger `
+  --log-root C:\Genesis_System3\logs `
+  --queue E:\System3_Drive_Archive_Queue `
+  --free-threshold-gib 20 --min-bytes 10485760 --min-age-hours 24
+```
+
+Primary path: the authenticated Google Drive connector uploads bounded archive
+parts and performs metadata plus downloaded-content hash readback. Alternative
+path: a separately authenticated user-OAuth Drive client may upload the same
+queue, but cleanup still requires the same API-derived receipt. A mounted
+DriveFS directory by itself may stage/synchronize bytes but may never authorize
+source deletion.
+
+This archive mechanism does not replace governed immutable Cloud Storage or
+BigQuery for production data integrity, market data, prediction lineage or
+PAPER audit records.
+
 ## Terminal and browser lifecycle
 
 - Track every agent-created process by purpose, PID/session ID, start time, and
@@ -1118,6 +1360,130 @@ that these are the best future choices.
 - Do not leave avoidable zombie processes or duplicate local servers.
 
 ## Completion ledger
+
+## Agent evidence discovery catalog
+
+Use `config/system3_agent_evidence_catalog.v1.json` as the canonical discovery
+**index**, not as a second runtime SSOT. Its schema is
+`schemas/system3_agent_evidence_catalog.v1.schema.json`; every normal
+`scripts/system3_preflight_control_plane.py` run embeds the catalog path,
+SHA-256, entry statuses and any missing required authority in the timestamped
+snapshot. This gives every agent one stable place to discover which existing
+authority, runner or ledger answers a question while preserving the evidence
+hierarchy in this runbook.
+
+Catalog states are `PRESENT`, `MISSING_REQUIRED`, `ABSENT_NOT_REQUIRED`, and
+`UNVERIFIED_CONDITIONAL`. A possible service such as BigQuery, Vertex AI,
+Dataflow, Kubernetes/Chaos Mesh, OPA, Redis, Prometheus or a separate inference
+endpoint is never mandatory merely because an external design proposes it.
+Discover the current architecture and need first. Promote a conditional entry
+only through policy/schema migration, least-privilege design, tests and normal
+PR review.
+
+External generated tables and “self-healing” plans are requirements input. Do
+not commit copied advertising, malformed encoding, invented URLs, example
+resource IDs, secret-name inventories or unverified PASS claims. In particular:
+
+- never enumerate or publish secret payloads; record sanitized presence and
+  metadata only when authorized;
+- never make a missing optional CLI, GCP product, signing key or dashboard a
+  global stop condition;
+- never infer that bare `DH-906` proves token expiry; use the bounded Dhan
+  authority and current request classification;
+- never let a detector repair IAM, blindly grant roles, enable APIs, create
+  infrastructure, publish artifacts, or open repetitive issues without the
+  governed remediation and approval boundary;
+- never write a competing root `CSV_GATE.csv`. Use the existing live issue
+  ledger, proof ledger and control-plane snapshot, with a stable blocker ID,
+  evidence time, owner, next action and genuine user action;
+- never poll or alert on a fixed timer solely to repeat unchanged concerns.
+  Re-run at request start and every material transition; scheduled automation
+  may run at a governed cadence with concurrency, cost and rate-limit controls.
+
+When an indexed required file is missing, fail closed before a production
+transition, update the existing blocker/concern ledger, and repair the canonical
+mechanism. When a conditional capability is absent, report
+`ABSENT_NOT_REQUIRED` or `UNVERIFIED_CONDITIONAL`; do not fabricate a resource
+or label the system failed. User-visible completion still requires new exact-
+serving production browser/API evidence, never a catalog or stored snapshot.
+
+## Drive-to-cloud MRI and single-authority import law
+
+GitHub `psw2025-cmd/Genesis_System3` current `main` is the source authority.
+Laptop drives are read-only discovery/input surfaces and never become a second
+runtime, training, deployment or truth authority.
+
+For a drive-to-cloud investigation:
+
+1. fresh-fetch cloud `main`, active PR ownership and the repo-clean/prediction
+   policies before scanning;
+2. auto-discover mounted filesystem drives; record unavailable network mounts as
+   absent rather than inventing them;
+3. exclude operating-system/package/cache trees, links, credential/secret-like
+   paths and secret contents; collect only necessary metadata and bounded hashes;
+4. compare against the exact cloud-main tracked manifest and classify only as
+   `Missing in Cloud`, `Duplicate`, `Outdated`, or `Already Synced`;
+5. SHA-256 equality proves byte identity; filename, size, timestamp or an old
+   report alone never proves duplication or safe deletion;
+6. collapse exact clone occurrences while retaining an occurrence count and a
+   representative sanitized path; never upload raw private path prefixes to a
+   public repository;
+7. emit one RFC 4180 CSV with the user-required nine columns. Large inventories
+   belong in a GitHub release asset or governed versioned object, referenced by
+   SHA-256 from the repo, not committed into Git history;
+8. every `Missing in Cloud` or `Outdated` row is a review candidate, not approval
+   to import it. Promote only the smallest useful subset through isolated
+   branch/PR, licensing, secret, lineage, test and ownership gates;
+9. prediction/data candidates require point-in-time lineage, availability time,
+   leakage checks, baselines, costed OOS evidence and immutable storage before
+   adoption; UI candidates require API/UI parity, accessibility and fresh
+   Playwright proof; orchestration candidates require one authority, provenance,
+   idempotency, least privilege and rollback;
+10. never bulk-copy laptop history, datasets, models, screenshots or scripts into
+    cloud merely because the scanner found them.
+
+This inventory law complements, and must not replace or fork,
+`scripts/system3_drive_archive_control.py`. The MRI scanner is report-only and
+has no archive upload, receipt, cleanup or deletion authority. If an identified
+artifact is later selected for private archival, use the archive controller's
+bounded parts and verified receipt gates. If selected for product integration,
+use the normal cloud-main branch/PR/data-lineage gates instead.
+
+The 2026-08-24 MRI used `scripts/system3_drive_cloud_mri.py` against cloud main
+`9dbf1911d016bcd3611651390cfca28658d96d41`. It discovered C:, D:, E: and F:
+(no network mount), evaluated 491,646 laptop candidates and 2,680 cloud files,
+and produced 296,395 sanitized, hash-collapsed rows after excluding secret-like
+laptop paths. Counts were: 245,145 `Missing in Cloud`, 40,041 `Duplicate`, 5,908
+`Outdated`, and 5,301 `Already Synced`. These counts measure inventory states,
+not usefulness or import readiness. The immutable CSV asset URI and SHA-256 are
+recorded in the associated controlled PR/release; reruns supersede this snapshot
+only when linked to a newer exact cloud-main SHA.
+
+## RUHI/RHUI execution and dashboard truth law
+
+`docs/RUHI_RULE_V2.md` is the canonical rolling-batch coordination contract and
+must be read with this runbook, the temporal-truth policy, Issue #188 and
+`reports/coordination/ruhi_task_ledger.csv`. Historical RUHI handoffs and ledger
+rows retain their observation time; they do not override freshly fetched GitHub
+main, current PR ownership, current GCP revision or new production-browser/API
+evidence.
+
+Each material transition records `RULE_VERSION`, `BATCH_ID`, current main and
+serving SHA, market phase, previous commitment/result, completed proof,
+unfinished work, blocker/owner, next commitment, `AGENT_OWNED_ACTION`,
+`MANDATORY_USER_ACTION`, `OPTIONAL_ACCELERATION_ACTION`,
+`LIVE_DASHBOARD_PROOF` and `HIGHEST_GAIN_NEXT_ACTION`. Unfinished tasks remain
+`PARTIAL`, `BLOCKED`, `SUPERSEDED` or `NOT_STARTED`; they never disappear from a
+new batch merely because code exists, CI is green or an old proof passed.
+
+For user-visible work the final authority is a new exact-serving production
+browser session plus same-session read-only APIs. A 22/22 render result is not
+semantic closure when a required card/table/chart is blank, waiting, stale,
+degraded, misleading or contradicted by the API. Repeat unchanged concerns only
+at material transitions; do not spam them on a timer. Continue safe agent-owned
+work while independent review, market-open evidence or an external account gate
+is pending. Neither RUHI nor multi-agent coordination may weaken PAPER/ANALYZE,
+secret, WIF/IAM, deployment, broker-rotation or real-order safety boundaries.
 
 The append-only proof ledger is authoritative:
 
@@ -1179,3 +1545,33 @@ Immediately before the final response, re-read this file again and report:
 
 If any required evidence is missing, use `PARTIAL`, `BLOCKED`, `FAIL`, or
 `NOT_PROVEN`. Never substitute confidence language for proof.
+
+## User-action escalation ledger
+
+Apply `SYSTEM3_USER_ACTION_ESCALATION_V2` from
+`docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` on every material
+transition.
+
+The completion ledger must carry:
+
+| Field | Required value |
+|---|---|
+| user_action_id | stable ID or `NONE` |
+| dashboard_impact | direct/indirect surfaces and blocked task IDs |
+| mandatory_user_action | true external blocker or `NONE` |
+| optional_acceleration_action | fastest safe owner leverage or `NONE` |
+| fastest_safe_recommended | exact least-privilege action |
+| safe_alternatives | time, benefit, risk, rollback, proof |
+| chat_delivery | timestamp/result |
+| mail_delivery | verified-recipient timestamp/result or `MAIL_DELIVERY_BLOCKED` |
+| user_evidence | received artifact/state or `NONE` |
+| cross_verify_result | `PASS / PARTIAL / FAIL / UNPROVEN` |
+| next_reminder_at | timestamp or `NONE` |
+| agent_continues_with | next non-blocked executable task |
+
+Notify immediately in chat and verified connected mail on discovery/material
+change. Keep unresolved actions in the ledger and repeat only the smallest
+remaining correction at the canonical cadence until practical proof closes the
+ID. Prioritize safe access/setup that unlocks multiple dashboard/data/proof
+dependencies. Do not stall agent-owned work and do not expose secrets, weaken
+IAM/WIF/checks, or enable LIVE/orders.

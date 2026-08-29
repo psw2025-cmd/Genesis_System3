@@ -1682,13 +1682,11 @@ async def get_multibagger_research():
 
 @app.get("/api/gain_rank")
 async def get_gain_rank(refresh: bool = False):
-    """Latest gain rank predictions — file history, or live scanner fallback."""
+    """Latest durable gain rank predictions, with local-only dev fallback."""
     try:
-        history = []
-        if GAIN_RANK_FILE.exists():
-            history = json.loads(GAIN_RANK_FILE.read_text())
-            if not isinstance(history, list):
-                history = []
+        from dashboard.backend.ml_evidence_store import load_rank_history
+
+        history, history_source, durable_required = load_rank_history(ROOT_DIR)
         today = datetime.now(IST).strftime("%Y-%m-%d")
         today_entry = next((e for e in reversed(history) if e.get("date") == today), None)
         latest = today_entry or (history[-1] if history else None)
@@ -1697,7 +1695,7 @@ async def get_gain_rank(refresh: bool = False):
         # Live fallback: build today's rankings from contract-gain scanner so
         # Signals/Trade tabs are not permanently empty when history file is missing.
         # Bound tightly — never block /api/batch/market-data for 60s+ on equity fan-out.
-        if stale or latest is None:
+        if (stale or latest is None) and not durable_required:
             try:
                 scan = await asyncio.wait_for(
                     get_top_contract_gainers(top_n=8, market_top_n=25, include_equity=False),
@@ -1772,7 +1770,14 @@ async def get_gain_rank(refresh: bool = False):
                 print(f"[gain_rank] live scanner fallback failed: {scan_err}")
 
         if latest is None:
-            return {"status": "no_data", "latest": None, "history": history[-14:], "is_today": False, "stale": True}
+            return {
+                "status": "no_data",
+                "latest": None,
+                "history": history[-14:],
+                "is_today": False,
+                "stale": True,
+                "source": history_source,
+            }
 
         latest = dict(latest)
         raw_rows = (latest.get("rankings") or latest.get("predictions") or [])
@@ -1821,7 +1826,7 @@ async def get_gain_rank(refresh: bool = False):
             "is_today": (latest or {}).get("date") == today,
             "stale": stale,
             "latest_date": (latest or {}).get("date"),
-            "source": (latest or {}).get("source") or "gain_rank_history",
+            "source": (latest or {}).get("source") or history_source,
         }
     except Exception as e:
         return {"status": "error", "error": str(e), "latest": None, "history": [], "is_today": False, "stale": True}
@@ -2190,13 +2195,11 @@ async def get_proof_ledger():
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------
-# CRITICAL ARCHITECTURE NOTE: Render's `web` and `worker` services
-# (render.yaml) run as two SEPARATE containers with separate ephemeral
-# filesystems — no shared disk is configured. The job scheduler daemon
-# (core/engine/system3_phase82_job_scheduler.py) runs inside the WORKER
-# service via scripts/cloud_worker.py. A web-service endpoint that reads
-# local files for scheduler state will ALWAYS see nothing, because those
-# files only ever exist on the worker container.
+# CRITICAL ARCHITECTURE NOTE: Cloud Run `genesis-system3-web` and the
+# worker/rotator Jobs are separate services with separate filesystems.
+# The job scheduler daemon (core/engine/system3_phase82_job_scheduler.py)
+# does not share disk with the web service. A web-service endpoint that
+# reads local files for scheduler state will not see worker-only files.
 #
 # Fix: the worker actively PUSHES its heartbeat/job-status to the web
 # service over HTTP every scheduler tick (~60s, see job scheduler daemon
@@ -2335,7 +2338,7 @@ async def get_deploy_info():
     """Expose deployed commit / host facts for Cloud Run (GCP) proofs.
 
     Prefers Cloud Run env (DEPLOY_GIT_SHA, K_SERVICE, SYSTEM3_DEPLOY_TARGET).
-    Falls back to legacy RENDER_* vars only if present on old hosts.
+    Render.com env vars are retired and are not used as SHA or service identity.
     """
     cfg: Dict[str, Any] = {}
     try:
@@ -2347,14 +2350,9 @@ async def get_deploy_info():
     except Exception:
         cfg = {}
 
-    git_sha = (
-        os.environ.get("DEPLOY_GIT_SHA")
-        or os.environ.get("RENDER_GIT_COMMIT")
-        or ""
-    ).strip()
+    git_sha = (os.environ.get("DEPLOY_GIT_SHA") or "").strip()
     service_name = (
         os.environ.get("K_SERVICE")
-        or os.environ.get("RENDER_SERVICE_NAME")
         or str(cfg.get("service_name") or "genesis-system3-web")
     )
     target = (
@@ -2368,7 +2366,7 @@ async def get_deploy_info():
     ).rstrip("/")
     return {
         "git_sha": git_sha,
-        "git_branch": os.environ.get("RENDER_GIT_BRANCH") or os.environ.get("GITHUB_REF_NAME") or "",
+        "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
         "service_name": service_name,
         "deploy_target": target,
         "cloud_provider": "google_cloud" if ("gcp" in target or "cloud-run" in target) else "unknown",
@@ -2379,7 +2377,7 @@ async def get_deploy_info():
         "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
         "live_trading_enabled": False,
         "deployed_at_known": bool(git_sha),
-        "render_git_commit_legacy": os.environ.get("RENDER_GIT_COMMIT", ""),
+        "render_git_commit_legacy": "",
     }
 
 
@@ -2434,22 +2432,14 @@ async def get_live_trading_gate():
     except Exception as e:
         gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
 
-    # Gate 3: ML accuracy — Spearman rho >= 0.70 over 10+ days
+    # Gate 3: ML accuracy — durable Firestore validation days in cloud mode.
     try:
-        history = (
-            json.loads((_VAL_DIR.parent / "gain_rank_history.json").read_text())
-            if (_VAL_DIR.parent / "gain_rank_history.json").exists()
-            else []
-        )
-        val_files = list(_VAL_DIR.glob("market_validation_*.json")) if _VAL_DIR.exists() else []
-        rhos = []
-        for vf in val_files:
-            v = json.loads(vf.read_text())
-            rho = v.get("spearman_correlation")
-            if rho is not None:
-                rhos.append(rho)
+        from scripts.system3_gate_evaluator import load_spearman_days
+
+        validation_rows, _, _ = load_spearman_days(ROOT_DIR)
+        rhos = [float(v["rho"]) for v in validation_rows if v.get("rho") is not None]
         avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
-        gate("validation_days", len(val_files) >= 10, f"{len(val_files)} validation days (need ≥10)")
+        gate("validation_days", len(validation_rows) >= 10, f"{len(validation_rows)} validation days (need ≥10)")
         gate("ml_accuracy_rho", avg_rho >= 0.70, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
     except Exception as e:
         gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
@@ -3644,6 +3634,74 @@ async def orch_cloud_ready():
     }
 
 
+def classify_qc_status(qc_data: dict) -> tuple:
+    """Classify QC truth for /api/health, failing closed.
+
+    Only positive evidence that QC ran and verified contracts yields PASS.
+    This previously defaulted to PASS whenever the QC file was absent or
+    lacked a result, which made /api/health report ``qc_status: PASS`` while
+    /api/state simultaneously reported ``NOT_READY`` with
+    ``NO_VERIFIED_CONTRACTS`` and raised a QC_FAIL alert.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    if not isinstance(qc_data, dict) or not qc_data:
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    if "qc_passed" not in qc_data:
+        return "NOT_READY", ["QC_RESULT_MISSING"]
+
+    # `qc_passed` must be a real boolean, as SystemHealthSchema already
+    # requires. This endpoint reads outputs/qc_report.json directly without
+    # running that validator, so truthiness alone is unsafe: the JSON string
+    # "false" is truthy and would otherwise be read as success. A non-boolean
+    # is a malformed result, not a verdict, so it fails closed.
+    qc_passed = qc_data.get("qc_passed")
+    if not isinstance(qc_passed, bool):
+        return "NOT_READY", ["QC_RESULT_NOT_BOOLEAN"]
+
+    # An explicit failure outranks NO_DATA: it is the more actionable verdict,
+    # and both are non-PASS, so precedence here cannot open the gate.
+    if not qc_passed:
+        failures = qc_data.get("qc_failures") or []
+        return "FAIL", list(failures)[:5]
+
+    if qc_data.get("status") == "NO_DATA":
+        return "NO_DATA", []
+
+    try:
+        verified_contracts = int(qc_data.get("total_contracts") or 0)
+    except (TypeError, ValueError):
+        verified_contracts = 0
+
+    if verified_contracts <= 0:
+        return "NOT_READY", ["NO_VERIFIED_CONTRACTS"]
+
+    return "PASS", []
+
+
+def read_qc_status() -> tuple:
+    """Read the live QC report and classify it, failing closed.
+
+    Used by the REAL_ONLY analyzer-ready branch of /api/health, which
+    previously returned a hardcoded ``qc_status: PASS`` without consulting QC
+    at all. That branch serves production whenever the broker is connected, so
+    it reported PASS while /api/state reported NOT_READY from the same runtime.
+
+    Returns a ``(status, failures)`` pair.
+    """
+    qc_file = OUTPUTS_DIR / "qc_report_live.json"
+    if not qc_file.exists():
+        return "NOT_READY", ["NO_QC_DATA"]
+
+    try:
+        qc_data = json.loads(qc_file.read_text())
+    except (OSError, ValueError):
+        return "NOT_READY", ["QC_REPORT_UNREADABLE"]
+
+    return classify_qc_status(qc_data)
+
+
 @app.get("/api/health")
 async def get_health():
     """Get system health overview"""
@@ -3770,25 +3828,10 @@ async def get_health():
                     "message": "BROKER_NOT_READY - Real data unavailable",
                 }
 
-            # Broker IS connected (Dhan) — return PAPER/ANALYZER ready state
-            # live_allowed=False always: LIVE trading is permanently disabled
-            # QC status must reflect real qc_report_live.json even when market is
-            # closed — do not hardcode PASS, or /api/health can contradict a live
-            # QC_FAIL surfaced by /api/state.
-            qc_status_analyzer = "PASS"
-            qc_failures_analyzer: list = []
-            try:
-                qc_file_analyzer = OUTPUTS_DIR / "qc_report_live.json"
-                if qc_file_analyzer.exists():
-                    qc_data_analyzer = json.loads(qc_file_analyzer.read_text())
-                    if not qc_data_analyzer.get("qc_passed", True):
-                        qc_status_analyzer = "FAIL"
-                        qc_failures_analyzer = qc_data_analyzer.get("qc_failures", [])[:5]
-                    elif qc_data_analyzer.get("status") == "NO_DATA":
-                        qc_status_analyzer = "NO_DATA"
-            except Exception:
-                pass
-
+            # Broker readiness is not QC truth: report the real QC verdict here
+            # rather than a hardcoded PASS, so this branch cannot contradict
+            # /api/state.
+            analyzer_qc_status, analyzer_qc_failures = read_qc_status()
             return {
                 "status": "ok",
                 "mode": "PAPER",
@@ -3809,8 +3852,8 @@ async def get_health():
                 "cycle_count": 0,
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(IST).isoformat(),
-                "qc_status": "PASS",
-                "qc_failures": [],
+                "qc_status": analyzer_qc_status,
+                "qc_failures": analyzer_qc_failures,
                 "trades_executed": 0,
                 "open_positions": 0,
                 "total_pnl": 0.0,
@@ -3901,14 +3944,7 @@ async def get_health():
             except Exception:
                 pass
 
-        # Determine QC status
-        qc_status = "PASS"
-        qc_failures = []
-        if not qc_data.get("qc_passed", True):
-            qc_status = "FAIL"
-            qc_failures = qc_data.get("qc_failures", [])[:5]
-        elif qc_data.get("status") == "NO_DATA":
-            qc_status = "NO_DATA"
+        qc_status, qc_failures = classify_qc_status(qc_data)
 
         # PRODUCTION GATE: live_allowed only when broker connected + real data + market open
         ds = (data_source if SSOT_AVAILABLE and state_store else "real").lower()

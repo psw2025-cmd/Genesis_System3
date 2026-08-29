@@ -1,18 +1,10 @@
 name: Workflow Priority Guard
 
 on:
+  # Emit the required check for every PR. Path-filtering a required workflow
+  # leaves unrelated PRs permanently pending and tempts ruleset dilution.
   pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/**"
-      - ".github/scripts/workflow_priority_guard.py"
-      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
-      - "scripts/gcp_full_cloud_audit.py"
-      - "scripts/fetch_exact_security_audit.py"
-      - "scripts/multi_ai_audit_consensus.py"
-      - "scripts/system3_preflight_control_plane.py"
-      - "tests/test_full_cloud_audit_contract.py"
-      - "tests/evals/test_system3_preflight_control_plane.py"
   push:
     branches: [main]
     paths:
@@ -67,7 +59,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout proposed repository state
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           clean: true
           persist-credentials: false
@@ -85,7 +77,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout trusted default branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: main
           clean: true
@@ -137,7 +129,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout trusted default branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: main
           clean: true
@@ -179,7 +171,7 @@ jobs:
               ref = deployment.get("ref")
               evidence_url = deployment_status.get("target_url") or deployment_status.get("log_url")
               deployment_app = str(app.get("slug") or "") or None
-              retired_runtime = deployment_app == "render"
+              retired_runtime = deployment_app == "render"  # Render hosting is forbidden; flag any leftover deploy events
 
           fingerprint = hashlib.sha256(
               "|".join([event_name, source, state, str(deployment_app or "none")]).lower().encode("utf-8")

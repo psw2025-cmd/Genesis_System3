@@ -1,6 +1,6 @@
 {
   "marker": "MRI_GMAIL_SCHEDULER_WATCH_V1",
-  "observed_at_utc": "2026-08-26T22:08:53.185250Z",
+  "observed_at_utc": "2026-08-26T19:45:36.421805Z",
   "severity": "WARN",
   "reasons": [
     "business_readiness=PARTIAL",
@@ -41,8 +41,8 @@
     "auth_classification": "AUTH_OK",
     "live_trading_enabled": false,
     "order_placement_allowed": false,
-    "hours_remaining": 22.52,
-    "secret_version": "321",
+    "hours_remaining": 2.82,
+    "secret_version": "320",
     "token_value_exposed": false
   },
   "scheduler": {

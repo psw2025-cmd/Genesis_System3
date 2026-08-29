@@ -93,6 +93,34 @@ def _calculate_max_pain(strikes: List[float], ce_oi_map: Dict[float, int], pe_oi
     return max_pain_strike
 
 
+def _optional_float(value: Any) -> Optional[float]:
+    """Preserve unavailable values as None while retaining genuine zero."""
+    if value is None or value is pd.NA:
+        return None
+    try:
+        if pd.isna(value):
+            return None
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _liquidity_bounce(df: pd.DataFrame) -> tuple[pd.DataFrame, Dict[str, int]]:
+    """Reject dead option legs before UI limiting or feature consumption."""
+    if df is None or df.empty:
+        return df, {"filtered_total": 0, "zero_or_missing_oi": 0, "zero_or_missing_volume": 0}
+    oi = pd.to_numeric(df.get("oi", pd.Series(index=df.index, dtype=float)), errors="coerce").fillna(0)
+    volume = pd.to_numeric(df.get("volume", pd.Series(index=df.index, dtype=float)), errors="coerce").fillna(0)
+    dead_oi = oi <= 0
+    dead_volume = volume <= 0
+    rejected = dead_oi | dead_volume
+    return df.loc[~rejected].copy(), {
+        "filtered_total": int(rejected.sum()),
+        "zero_or_missing_oi": int(dead_oi.sum()),
+        "zero_or_missing_volume": int(dead_volume.sum()),
+    }
+
+
 def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional[Dict[str, Any]]:
     """Fetch one requested expiry from Dhan and normalize for /api/chain."""
     if not hasattr(dsm, "fetch_option_chain"):
@@ -106,6 +134,10 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
 
     spot_f = float(spot or 0)
     broker_rows_total = int(len(df))
+    df, liquidity_counts = _liquidity_bounce(df)
+    liquidity_eligible_rows_total = int(len(df))
+    if df.empty:
+        return None
     df = _limit_chain_df(df, spot)
 
     # Determine ATM strike
@@ -125,68 +157,67 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             continue
         strike = float(row.get("strike", row.get("strike_price", 0)) or 0)
         oi = int(row.get("oi", 0) or 0)
-        prev_oi = int(row.get("previous_oi", row.get("prev_oi", 0)) or 0)
-        oi_change = int(row.get("change_in_oi", row.get("oi_change", oi - prev_oi)) or 0)
-        oi_change_pct = (oi_change / prev_oi * 100.0) if prev_oi > 0 else 0.0
+        volume = int(row.get("volume", 0) or 0)
+        ltp_val = float(row.get("ltp", row.get("last_price", 0)) or 0)
+        prev_close = float(row.get("previous_close_price", row.get("close", ltp_val)) or ltp_val)
+        change_rs = ltp_val - prev_close
+        change_pct = (change_rs / prev_close * 100.0) if prev_close > 0 else 0.0
+        oi_change = int(row.get("oi_change", 0) or 0)
+        oi_change_pct = float(row.get("oi_change_pct", 0) or 0)
 
+        row_expiry = str(row.get("expiry", row.get("expiry_date", "")) or "")
+        if row_expiry and not chain_expiry:
+            chain_expiry = row_expiry
+
+        # Track OI maps for max pain
         if opt == "CE":
             ce_oi_map[strike] = ce_oi_map.get(strike, 0) + oi
         else:
             pe_oi_map[strike] = pe_oi_map.get(strike, 0) + oi
 
-        if chain_expiry is None:
-            chain_expiry = row.get("expiry") or row.get("expiry_date") or expiry or None
-        row_source = _normalize_chain_source(row.get("source", "dhan"))
-        ltp_val = float(row.get("ltp", row.get("last_price", 0)) or 0)
-        prev_close = float(row.get("previous_close_price", row.get("previous_close", 0)) or 0)
-
-        if ltp_val > 0 and prev_close > 0:
-            change_rs = ltp_val - prev_close
-            change_pct = (ltp_val - prev_close) / prev_close * 100.0
-        else:
-            change_rs = 0.0
-            change_pct = float(row.get("change_percent", row.get("pChange", 0)) or 0)
-
-        bid = float(row.get("top_bid_price", row.get("bid", 0)) or 0)
-        ask = float(row.get("top_ask_price", row.get("ask", 0)) or 0)
-        spread = max(0.0, ask - bid) if (bid > 0 and ask > 0) else 0.0
-        spread_pct = (spread / ltp_val * 100.0) if ltp_val > 0 else 0.0
-        volume = int(row.get("volume", 0) or 0)
-
-        # Distance & Moneyness
+        # Moneyness & Distance
         dist_abs = abs(strike - spot_f) if spot_f > 0 else 0.0
         dist_pct = (dist_abs / spot_f * 100.0) if spot_f > 0 else 0.0
-        if spot_f <= 0 or abs(strike - atm_strike) < 1e-3:
+
+        if dist_pct <= 0.5:
             moneyness = "ATM"
-        elif opt == "CE":
-            moneyness = "ITM" if strike < spot_f else "OTM"
+        elif (opt == "CE" and strike < spot_f) or (opt == "PE" and strike > spot_f):
+            moneyness = "ITM"
         else:
-            moneyness = "ITM" if strike > spot_f else "OTM"
+            moneyness = "OTM"
 
         # Intrinsic & Time Value
         if opt == "CE":
             intrinsic = max(0.0, spot_f - strike) if spot_f > 0 else 0.0
         else:
             intrinsic = max(0.0, strike - spot_f) if spot_f > 0 else 0.0
-        time_val = max(0.0, ltp_val - intrinsic) if ltp_val > 0 else 0.0
+        time_val = max(0.0, ltp_val - intrinsic)
 
-        # Liquidity score (0 to 100) based on volume, OI, and tight spread
-        spread_factor = max(0.0, 1.0 - (spread_pct / 5.0)) if spread_pct > 0 else 0.5
-        oi_factor = min(1.0, oi / 100000.0) if oi > 0 else 0.0
-        vol_factor = min(1.0, volume / 50000.0) if volume > 0 else 0.0
-        liquidity_score = round((spread_factor * 40 + oi_factor * 30 + vol_factor * 30), 1)
+        # Spreads & Liquidity
+        bid = float(row.get("top_bid_price", row.get("bid", 0)) or 0)
+        ask = float(row.get("top_ask_price", row.get("ask", 0)) or 0)
+        spread = max(0.0, ask - bid) if (ask > 0 and bid > 0) else 0.0
+        spread_pct = (spread / ltp_val * 100.0) if ltp_val > 0 else 0.0
 
-        # Buildup & unusual activity
+        # Liquidity Score (0-100)
+        liquidity_score = 100
+        if spread_pct > 2.0:
+            liquidity_score -= min(50, int(spread_pct * 10))
+        if oi < 1000:
+            liquidity_score -= 20
+        if volume < 500:
+            liquidity_score -= 20
+        liquidity_score = max(0, min(100, liquidity_score))
+
         buildup = _classify_buildup(change_rs, oi_change)
-        unusual_flag = bool((volume > 0 and oi > 0 and (volume / oi) > 2.0) or abs(oi_change_pct) > 50.0)
+        unusual_flag = bool(volume > 5000 and abs(oi_change_pct) > 50.0)
+        row_source = _normalize_chain_source(row.get("source", row.get("data_source", "dhan")))
 
         base: Dict[str, Any] = {
             "exchange": "NSE_FNO",
-            "underlying": underlying.upper(),
             "underlying_symbol": underlying.upper(),
             "underlying_type": "INDEX" if underlying.upper() in LOT_SIZES else "EQUITY",
-            "expiry": chain_expiry,
-            "expiry_date": chain_expiry,
+            "expiry": row_expiry or expiry,
             "strike": strike,
             "option_type": opt,
             "spot_price": spot_f,
@@ -209,10 +240,10 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             "oi_change_pct": round(oi_change_pct, 2),
             "iv": float(row.get("iv", 0) or 0),
             "iv_change": float(row.get("iv_change", 0) or 0),
-            "delta": float(row.get("delta", 0) or 0),
-            "gamma": float(row.get("gamma", 0) or 0),
-            "theta": float(row.get("theta", 0) or 0),
-            "vega": float(row.get("vega", 0) or 0),
+            "delta": _optional_float(row.get("delta")) if _optional_float(row.get("delta")) is not None else float(row.get("delta", 0) or 0),
+            "gamma": _optional_float(row.get("gamma")) if _optional_float(row.get("gamma")) is not None else float(row.get("gamma", 0) or 0),
+            "theta": _optional_float(row.get("theta")) if _optional_float(row.get("theta")) is not None else float(row.get("theta", 0) or 0),
+            "vega": _optional_float(row.get("vega")) if _optional_float(row.get("vega")) is not None else float(row.get("vega", 0) or 0),
             "rho": float(row.get("rho", 0) or 0),
             "intrinsic_value": round(intrinsic, 2),
             "time_value": round(time_val, 2),
@@ -282,6 +313,10 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         "contracts": contracts,
         "total_contracts": len(contracts),
         "broker_rows_total": broker_rows_total,
+        "liquidity_eligible_rows_total": liquidity_eligible_rows_total,
+        "liquidity_filtered_rows": liquidity_counts["filtered_total"],
+        "liquidity_filter_reasons": liquidity_counts,
+        "liquidity_filter": "oi_gt_0_and_volume_gt_0",
         "data_source": source,
         "data_mode": "LIVE" if is_live else "SIMULATION",
         "verification_status": "VERIFIED_LIVE" if is_live else "VERIFIED_SIMULATION",
@@ -294,8 +329,8 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
         "expiry_date": chain_expiry,
         "requested_expiry": expiry or None,
-        "complete_chain": configured_limit <= 0 or len(contracts) >= broker_rows_total,
-        "limited_for_web": configured_limit > 0 and len(contracts) < broker_rows_total,
+        "complete_chain": configured_limit <= 0 or len(contracts) >= liquidity_eligible_rows_total,
+        "limited_for_web": configured_limit > 0 and len(contracts) < liquidity_eligible_rows_total,
         "max_contracts": configured_limit,
         "live_trading_enabled": False,
     }

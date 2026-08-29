@@ -71,8 +71,9 @@ class RuntimeStateStore:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            from core.brokers.dhan.dhan_readonly import sanitize_status_payload
 
-            return _dhan_status()
+            return sanitize_status_payload(_dhan_status())
         except Exception as e:
             return {
                 "connected": False,
@@ -107,7 +108,7 @@ class RuntimeStateStore:
                 "current_time_ist": datetime.now(IST).isoformat(),
             },
             "broker": broker_status,
-            "qc": {"status": "PASS", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
+            "qc": {"status": "NOT_READY", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
             "signals": {
                 "status": "NO_TRADE",
                 "underlying": None,
@@ -344,7 +345,7 @@ class RuntimeStateStore:
                 else:
                     updates["data_source"] = health_data_source
                 updates["qc"] = {
-                    "status": health.get("qc_status", "PASS"),
+                    "status": str(health.get("qc_status") or "NOT_READY").upper(),
                     "reasons": health.get("qc_failures", []),
                     "contracts_total": health.get("contracts_total", 0),
                     "underlyings": health.get("underlyings", 0),

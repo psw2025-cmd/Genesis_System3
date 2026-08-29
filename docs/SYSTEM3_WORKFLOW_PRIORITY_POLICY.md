@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following fifteen GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following seventeen GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -20,10 +20,12 @@ Only the following fifteen GitHub Actions workflows are allowed in `.github/work
 12. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
 13. `system3-preflight-control-plane.yml` — canonical read-only workflow/issue/artifact current-state snapshot on every `main` push plus manual dispatch. The same snapshot code is reused by Workflow Priority Guard after approved workflow completions. Snapshot artifacts are retained for 30 days. It has no GitHub Actions schedule trigger and does not replace mandatory agent-side fresh preflight before production transitions.
 14. `repo-clean-forensic-toolkit.yml` — report-only repository/storage cleanup evidence. It scans every current tracked file on relevant PR/main changes or manual dispatch, inventories duplicate/reference/import evidence and Actions storage metadata, and performs full Git-history blob analysis on non-PR runs. It never deletes files/artifacts, rewrites history, or touches broker/trading/IAM state.
+15. `command-center-access.yml` — validates `ACCESS_POLICY.yaml`, runs Command Center smoke (no LIVE mint), appends audit log, and uploads coordination artifacts. Credential mint remains denied until vault signature is VERIFIED.
+16. `live-proof-center.yml` — read-only GCP + public dashboard/API forensic MRI for multi-agent access. Runs on `main` push and `workflow_dispatch` only (no GitHub `schedule:`). Uses keyless WIF inventory + public HTTP probes, uploads sanitized Excel/JSON artifacts, never writes to the repo, never mints tokens, never enables LIVE/orders. Recurrence beyond main-push is owner-driven manual dispatch or future GCP Scheduler → `workflow_dispatch` (not an Actions cron).
 
 ### Manual emergency workflow
 
-15. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+17. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
 
 ## Event workflow rules
 

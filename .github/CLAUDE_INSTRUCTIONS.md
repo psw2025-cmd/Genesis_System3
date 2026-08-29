@@ -16,7 +16,8 @@ Read first:
 - Cloud Run service: `genesis-system3-web`.
 - Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
 - Dhan rotator job: `genesis-system3-dhan-token-rotate`.
-- Broker: **Dhan**. Render/Angel-era material is historical/non-authoritative.
+- Broker: **Dhan**.
+- Hosting lock: GCP Cloud Run only. Render.com is forbidden. Never recreate `render.yaml`, never add Render as production, never deploy workers to Render. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`. Angel-era material is historical/non-authoritative.
 - Normal cloud authentication: GitHub Actions keyless Workload Identity Federation. Do not create/export long-lived service-account JSON keys.
 
 ## Temporal truth: mandatory for every Claude instance
@@ -69,6 +70,16 @@ For a full UI/current-state investigation, capture all 22 canonical tabs from th
 ## User-action boundary
 
 Routine engineering should be autonomous through GitHub/GCP: investigation, code fixes, CI, deployment, IAM drift repair, logs, browser proof, and bounded broker recovery. User action is reserved for true break-glass/account-level events outside delegated authority.
+
+## Dashboard-impact blocker and owner escalation
+
+Claude must apply `SYSTEM3_USER_ACTION_ESCALATION_V2`. When a verified owner
+account/access/settings action can accelerate any dashboard/data/API↔UI/broker/
+prediction/PAPER/deploy/proof dependency, report the fastest safe option and
+all materially distinct safe alternatives, continue unblocked forensic work,
+and publish a stable action card to chat, verified connected mail, and Issue
+#188. Track it until practical proof, not acknowledgement, closes it. Never
+guess a recipient or expose secrets.
 
 ## Evidence hierarchy for a current-state claim
 

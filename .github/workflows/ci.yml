@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           clean: true
 
@@ -129,7 +129,7 @@ jobs:
     needs: workflow-policy-guard
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -149,7 +149,7 @@ jobs:
     needs: workflow-policy-guard
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Compile critical scripts
         shell: bash
@@ -178,7 +178,7 @@ jobs:
       DEFER_INSTRUMENT_WARMUP: "1"
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           clean: true
@@ -260,10 +260,24 @@ jobs:
             tests/test_dashboard_app.py \
             tests/test_qc_validator_dhan_aliases.py \
             tests/test_qc_runtime_anomaly.py \
+            tests/test_runtime_state_qc_fail_closed.py \
+            tests/test_health_qc_fail_closed.py \
             tests/test_scheduler_catchup.py \
             tests/test_quant_alpha_truth.py \
             tests/test_dhan_market_ltp.py \
             -v --tb=short
+
+      - name: QC fail-closed targeted proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          # pyproject sets addopts="-q", which suppresses per-test names in the
+          # step above. Clear it here so the exact-head log names every case,
+          # including the parametrised non-boolean type-safety cases.
+          python -m pytest \
+            tests/test_runtime_state_qc_fail_closed.py \
+            tests/test_health_qc_fail_closed.py \
+            -o addopts="" -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence
         shell: bash
@@ -330,7 +344,7 @@ jobs:
         working-directory: dashboard/frontend
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node 20 for reproducible frontend CI
         uses: actions/setup-node@v4

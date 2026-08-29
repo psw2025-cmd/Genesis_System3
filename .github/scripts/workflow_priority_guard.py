@@ -23,6 +23,8 @@ AUTOMATIC = {
     "full-cloud-audit.yml",
     "system3-preflight-control-plane.yml",
     "repo-clean-forensic-toolkit.yml",
+    "command-center-access.yml",
+    "live-proof-center.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
@@ -258,6 +260,21 @@ def main() -> int:
     if "workflow_dispatch:" not in preflight_on:
         raise SystemExit("PREFLIGHT_CONTROL_PLANE_MANUAL_TRIGGER_MISSING")
 
+    proof_on = trigger_blocks["live-proof-center.yml"]
+    proof_text = workflow_text["live-proof-center.yml"]
+    if "push:" not in proof_on or "workflow_dispatch:" not in proof_on:
+        raise SystemExit("LIVE_PROOF_CENTER_REQUIRED_TRIGGERS_MISSING")
+    if re.search(r"^\s*schedule\s*:", proof_on, re.MULTILINE):
+        raise SystemExit("LIVE_PROOF_CENTER_SCHEDULE_FORBIDDEN")
+    if "contents: write" in proof_text or "issues: write" in proof_text or "actions: write" in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_GITHUB_WRITE_FORBIDDEN")
+    if re.search(r"(?m)^\s*git\s+push\b", proof_text) or "gh issue comment" in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_WRITEBACK_FORBIDDEN")
+    if "persist-credentials: false" not in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
+    if "python scripts/system3_live_proof_center.py" not in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_CANONICAL_SCRIPT_MISSING")
+
     for name in (
         "gcp-stage2-ci.yml",
         "gcp-dhan-token-fix-ci.yml",
@@ -266,6 +283,7 @@ def main() -> int:
         "security-audit.yml",
         "sonarqube-audit.yml",
         "repo-clean-forensic-toolkit.yml",
+        "command-center-access.yml",
     ):
         if "pull_request:" not in trigger_blocks[name]:
             raise SystemExit(f"FOCUSED_PRIORITY_PR_TRIGGER_MISSING file={name}")

@@ -16,8 +16,9 @@ from fastapi import APIRouter
 
 from core.brokers.dhan.equity_fo_universe import (
     INDEX_FO_SYMBOLS,
-    SECURITY_MASTER,
     load_equity_fo_universe,
+    load_equity_market_coverage,
+    resolve_equity_security_master,
 )
 
 router = APIRouter(tags=["chain"])
@@ -31,8 +32,9 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
     BSE index options store SM_SYMBOL_NAME as BSXOPT/BKXOPT while the
     trading symbol is SENSEX-... / BANKEX-.... Prefer the trading prefix.
     """
-    trading = str(row.get("SEM_TRADING_SYMBOL") or "").strip().upper()
-    custom = str(row.get("SEM_CUSTOM_SYMBOL") or "").strip().upper()
+    trading = str(row.get("SEM_TRADING_SYMBOL") or row.get("TRADING_SYMBOL") or "").strip().upper()
+    custom = str(row.get("SEM_CUSTOM_SYMBOL") or row.get("DISPLAY_NAME") or "").strip().upper()
+    explicit = str(row.get("UNDERLYING_SYMBOL") or "").strip().upper()
     sm = str(row.get("SM_SYMBOL_NAME") or row.get("SYMBOL_NAME") or "").strip().upper()
     if "-" in trading:
         prefix = trading.split("-", 1)[0].strip()
@@ -42,6 +44,8 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
         first = custom.split()[0].strip()
         if first and first not in {"CE", "PE"}:
             return first
+    if explicit:
+        return explicit
     if sm in _MASTER_SYMBOL_ALIASES:
         return _MASTER_SYMBOL_ALIASES[sm]
     return sm
@@ -49,12 +53,15 @@ def underlying_from_master_row(row: Dict[str, Any]) -> str:
 
 def build_underlyings_payload() -> Dict[str, Any]:
     universe = load_equity_fo_universe()
+    coverage = load_equity_market_coverage()
     equity = [str(s).upper() for s in (universe.get("underlyings") or []) if s]
     index_set = {str(s).upper() for s in INDEX_FO_SYMBOLS if s}
     indices = [s for s in _INDEX_PRIORITY if s in index_set]
     indices.extend(sorted(index_set.difference(indices)))
     equity_unique = sorted(set(equity).difference(index_set))
     underlyings = indices + equity_unique
+    cash = coverage.get("cash") or {}
+    stock_options = coverage.get("stock_options") or {}
     return {
         "underlyings": underlyings,
         "indices": indices,
@@ -64,12 +71,24 @@ def build_underlyings_payload() -> Dict[str, Any]:
             "indices": len(indices),
             "equity_options": len(equity_unique),
             "option_contracts": int(universe.get("contract_count") or 0),
+            "nse_cash": int((cash.get("NSE") or {}).get("instrument_count") or 0),
+            "bse_cash": int((cash.get("BSE") or {}).get("instrument_count") or 0),
+            "nse_equity_option_underlyings": int((stock_options.get("NSE") or {}).get("underlying_count") or 0),
+            "bse_equity_option_underlyings": int((stock_options.get("BSE") or {}).get("underlying_count") or 0),
+            "nse_option_contracts": int((stock_options.get("NSE") or {}).get("contract_count") or 0),
+            "bse_option_contracts": int((stock_options.get("BSE") or {}).get("contract_count") or 0),
         },
         "default": "NIFTY",
         "chain_endpoint": "/api/chain/{underlying}",
         "expiry_endpoint": "/api/expiries/{underlying}",
         "explicit_expiry_chain_endpoint": "/api/chain-expiry/{underlying}?expiry=YYYY-MM-DD",
         "source": universe.get("source") or "dhan_security_master",
+        "source_mode": coverage.get("source_mode") or universe.get("source_mode"),
+        "source_sha256": coverage.get("source_sha256"),
+        "reliance_only": bool(coverage.get("reliance_only")),
+        "scan_plan": coverage.get("scan_plan") or {},
+        "prediction_horizons": coverage.get("prediction_horizons") or [],
+        "learning_contract": coverage.get("learning_contract") or {},
         "instrument_type": "OPTIDX+OPTSTK",
         "broker": "DHAN",
         "read_only": True,
@@ -81,15 +100,22 @@ def build_underlyings_payload() -> Dict[str, Any]:
 def _expiry_map() -> Dict[str, List[str]]:
     """Build all broker-master option expiries per underlying once per process."""
     result: Dict[str, set[str]] = {}
-    if not SECURITY_MASTER.exists():
+    master_path = resolve_equity_security_master()
+    if not master_path.exists():
         return {}
-    with SECURITY_MASTER.open(encoding="utf-8", errors="replace") as handle:
+    with master_path.open(encoding="utf-8", errors="replace") as handle:
         for row in csv.DictReader(handle):
             inst = str(row.get("SEM_INSTRUMENT_NAME") or row.get("INSTRUMENT") or "").strip().upper()
             if inst not in {"OPTIDX", "OPTSTK"}:
                 continue
             name = underlying_from_master_row(row)
-            expiry = str(row.get("SEM_EXPIRY_DATE") or row.get("EXPIRY_DATE") or row.get("XpryDt") or "").strip()[:10]
+            expiry = str(
+                row.get("SEM_EXPIRY_DATE")
+                or row.get("SM_EXPIRY_DATE")
+                or row.get("EXPIRY_DATE")
+                or row.get("XpryDt")
+                or ""
+            ).strip()[:10]
             if name and expiry:
                 result.setdefault(name, set()).add(expiry)
     return {name: sorted(values) for name, values in result.items()}
@@ -267,16 +293,84 @@ def _install_legacy_bridge() -> None:
             }
 
     _apply()
+    wrap_batch_chains_ondemand(parent)
+
+    @parent.app.middleware("http")
+    async def _ensure_batch_chains_ondemand(request, call_next):
+        wrap_batch_chains_ondemand(parent)
+        return await call_next(request)
 
     @parent.app.on_event("startup")
     async def _refresh_supported_underlyings_from_dhan_master() -> None:
         _apply()
+        wrap_batch_chains_ondemand(parent)
 
 
 # Do NOT call at import time — app.py imports this module before
 # ``app = FastAPI(...)`` exists, so the bridge would no-op and leave
 # /api/expiries/{underlying} unregistered (UI shows EXPIRY DATA HTTP_404).
 # app.py must call install_legacy_bridge() after the FastAPI app is created.
+
+
+_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S = 6.0
+
+
+def wrap_batch_chains_ondemand(parent: Any) -> None:
+    """R2/R3: fill CHAIN_CACHE_WARMING required symbols from Dhan when possible.
+
+    ``app.py`` still owns ``/api/batch/chains``. This wraps that callable so a
+    cache miss is not stuck on warming if Dhan can already answer. Incomplete
+    payloads are still never cached.
+    """
+    original = getattr(parent, "batch_chains", None)
+    if not callable(original) or getattr(original, "_system3_ondemand_wrapped", False):
+        return
+
+    timeout_s = float(
+        getattr(parent, "_BATCH_CHAIN_ON_DEMAND_TIMEOUT_S", _BATCH_CHAIN_ON_DEMAND_TIMEOUT_S)
+        or _BATCH_CHAIN_ON_DEMAND_TIMEOUT_S
+    )
+    usable = getattr(parent, "_usable_chain_snapshot", None)
+    warm_one = getattr(parent, "_warm_one_index_chain", None)
+    required = tuple(getattr(parent, "_REQUIRED_CHAIN_SYMBOLS", ()) or ())
+    cache_set = getattr(parent, "_cache_set", None)
+    if not callable(usable) or not callable(warm_one) or not required:
+        return
+
+    async def batch_chains_with_ondemand():
+        payload = await original()
+        if not isinstance(payload, dict) or payload.get("cache_hit") is True:
+            return payload
+        chains = payload.get("chains")
+        if not isinstance(chains, dict):
+            return payload
+        missing = [sym for sym in required if not usable(chains.get(sym))]
+        for sym in missing:
+            try:
+                filled = await asyncio.wait_for(warm_one(sym), timeout=timeout_s)
+            except Exception:
+                continue
+            if filled is not None and usable(filled):
+                chains[sym] = filled
+        ready = all(usable(chains.get(sym)) for sym in required)
+        payload["chains"] = chains
+        payload["required_symbols_ready"] = bool(ready)
+        if ready and callable(cache_set) and payload.get("cache_hit") is False:
+            payload = cache_set("batch_chains_v1", payload)
+        return payload
+
+    batch_chains_with_ondemand._system3_ondemand_wrapped = True  # type: ignore[attr-defined]
+    parent.batch_chains = batch_chains_with_ondemand
+    app = getattr(parent, "app", None)
+    if app is None:
+        return
+    for route in getattr(app, "routes", []) or []:
+        if getattr(route, "path", None) == "/api/batch/chains":
+            route.endpoint = batch_chains_with_ondemand
+            dependant = getattr(route, "dependant", None)
+            if dependant is not None:
+                dependant.call = batch_chains_with_ondemand
+            break
 
 
 def install_legacy_bridge() -> None:

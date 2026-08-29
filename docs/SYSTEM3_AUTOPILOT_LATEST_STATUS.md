@@ -1,5 +1,7 @@
 # System3 Autopilot Latest Status
 
+**HISTORICAL / NON-AUTHORITATIVE.** Captured `2026-08-06`. Render.com hosting rows below are retired. Production is GCP Cloud Run only.
+
 Generated UTC: `2026-08-06T04:53:20.235085+00:00`
 Owner/operator: **PRITAM S. WARGHADE**
 Status: **BLOCKED**

@@ -38,7 +38,6 @@ on:
       - "scripts/codespace_startup.sh"
       - "scripts/cloud_worker.py"
       - "scripts/system3_self_healing_watchdog.py"
-      - "tools/sync_render_secrets.py"
       - "dashboard/backend/**"
       - "dashboard/frontend/**"
       - "deploy/gcp/bootstrap_github_wif.sh"
@@ -76,7 +75,7 @@ jobs:
       DEPLOY_SA: genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com
       EXPECTED_RUNTIME_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           ref: ${{ env.EXPECTED_RUNTIME_SHA }}

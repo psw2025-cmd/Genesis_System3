@@ -29,11 +29,19 @@ CLOUD = os.environ.get(
     "http://127.0.0.1:8000",
 ).rstrip("/")
 
-TRADE_SOURCES = [
-    ROOT / "tests" / "fixtures" / "paper_closed_trades_feb2026.json",
+# Real ledgers only. The bundled 9-trade test fixture must never satisfy a
+# gate that can unlock live trading. Opt-in is explicit and tagged is_fixture.
+_FIXTURE_PATH = ROOT / "tests" / "fixtures" / "paper_closed_trades_feb2026.json"
+_ALLOW_FIXTURE_ENV = "SYSTEM3_ALLOW_FIXTURE_TRADES"
+
+REAL_TRADE_SOURCES = [
     ROOT / "storage" / "live" / "paper_closed_trades.json",
     ROOT / "outputs" / "paper_closed_trades.json",
 ]
+
+
+def _fixture_opted_in() -> bool:
+    return os.environ.get(_ALLOW_FIXTURE_ENV, "").strip().lower() in ("1", "true", "yes", "on")
 
 
 def _utc() -> str:
@@ -52,21 +60,30 @@ def _fetch_cloud_trades() -> List[Dict[str, Any]]:
     return []
 
 
-def _load_trades() -> tuple[List[Dict[str, Any]], str]:
-    for path in TRADE_SOURCES:
+def _load_trades() -> tuple[List[Dict[str, Any]], str, bool]:
+    """Return (trades, source, is_fixture). Fixture is never the default source."""
+    for path in REAL_TRADE_SOURCES:
         if not path.exists():
             continue
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             trades = data.get("trades") if isinstance(data, dict) else data
             if isinstance(trades, list) and trades:
-                return trades, str(path.relative_to(ROOT))
+                return trades, str(path.relative_to(ROOT)), False
         except Exception:
             continue
     cloud = _fetch_cloud_trades()
     if cloud:
-        return cloud, f"api:{CLOUD}/api/paper"
-    return [], "none"
+        return cloud, f"api:{CLOUD}/api/paper", False
+    if _fixture_opted_in() and _FIXTURE_PATH.exists():
+        try:
+            data = json.loads(_FIXTURE_PATH.read_text(encoding="utf-8"))
+            trades = data.get("trades") if isinstance(data, dict) else data
+            if isinstance(trades, list) and trades:
+                return trades, str(_FIXTURE_PATH.relative_to(ROOT)), True
+        except Exception:
+            pass
+    return [], "none", False
 
 
 def _cost_trade(t: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,7 +110,7 @@ def _cost_trade(t: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def build_report() -> Dict[str, Any]:
-    trades, source = _load_trades()
+    trades, source, is_fixture = _load_trades()
     rows = [_cost_trade(t) for t in trades]
     net_pnls = [float(r["net_pnl"]) for r in rows if r.get("net_pnl") is not None]
     gross_pnls = [float(r["gross_pnl"]) for r in rows if r.get("gross_pnl") is not None]
@@ -102,11 +119,19 @@ def build_report() -> Dict[str, Any]:
     net_total = sum(net_pnls) if net_pnls else 0.0
     expectancy = (net_total / trade_count) if trade_count else None
     win_rate = (wins / trade_count) if trade_count else None
-    pass_gate = trade_count >= 5 and expectancy is not None and expectancy > 0
+    # A live-trading unlock gate must never PASS on bundled test fixtures.
+    pass_gate = (
+        (not is_fixture)
+        and trade_count >= 5
+        and expectancy is not None
+        and expectancy > 0
+    )
     return {
         "generated_utc": _utc(),
         "pass": pass_gate,
+        "is_fixture": is_fixture,
         "source": source,
+        "blocker_if_fixture": "INSUFFICIENT_REAL_TRADES" if is_fixture else None,
         "evidence": {
             "trade_count": trade_count,
             "wins": wins,

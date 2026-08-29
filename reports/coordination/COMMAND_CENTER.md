@@ -1,64 +1,38 @@
-# COMMAND CENTER (overwrite — single source)
+# COMMAND CENTER — post-#369 live proof
 
-**Do not re-run ad-hoc curl/probe spam.** Refresh this file instead.
+**Updated:** 2026-08-27 00:55 IST (Cursor 0021 verification)  
+**Authority:** GitHub `main` + live `/api/deploy_info` (not laptop)
 
-```powershell
-# After ANY edit OR anytime (idempotent):
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_command_center_refresh.ps1
-```
+## Same-session truth
 
-## Access / token metadata
-
-| Field | Value |
+| Plane | Value |
 |---|---|
-| policy_id | `ACC-POL-CC-20260825` |
-| policy_version | `1.0.0` |
-| signature_status | `UNSIGNED_PENDING_VAULT` |
-| signed_by | `agent-id:cursor-composer` |
-| last_run_id | `local-20260829T095803Z` |
-| token_id | `dryrun-local-20260829T095803Z` |
-| token_ttl | `0s-mint-denied` |
-| mint_status | `DENIED until signature_status=VERIFIED` |
-| smoke_passed | `False` |
-| last_audit_entry_id | `aud-e927287e74b6` |
-| notify_channel | `issue:#188` |
-| approver_email | `warghade2012@gmail.com` |
+| GitHub main tip | `0d6955987115f88b710aca0f0f0dec68d23fa6bc` (#371 docs). Prior runtime tip `b33685e0f` (#370). #369 merge `6cda50c3f` is test-only. |
+| Serving | `fb4772f9d52b67a31b55ee85aab8604e525bbad6` (#367) · `genesis-system3-web-00617-vif` @ 100% |
+| Class | **DOCS/TEST_ONLY_LAG** on serving vs #370/#371 — do **not** blind-redeploy. 0021 is a runtime-path PR; redeploy only after merge + RHUI. |
+| Protection | `main.protected=true` · ruleset `21581518` active |
+| Broker | `AUTH_OK` · connected · LIVE **OFF** · orders **OFF** · 11 holdings |
+| Scheduler | **HEALTHY** · `alert_severity=none` · signals `92lf5` SUCCEEDED |
+| RHUI | **NOT_ACCEPTED** · HUMAN_ACTION=**NO** |
+| Patch 0021 | Cursor reconstructed T9/T11/T12/R2-R3/T14. **43 pytest passed.** Not on `origin/main` until PR merge. |
 
-## Live snapshot
+## Proof pack
 
-| Field | Value |
-|---|---|
-| UTC | 2026-08-29T09:58:06.700212+00:00 |
-| Serving | `01a4592f4c68c120a26b4fd955d1aff655b82e33` |
-| Gates | 3/7 trade_ready=False |
-| Broker | AUTH_OK v323 |
-| Scheduler healthy | True |
-| LIVE | False |
-| OPEN / IN_PROGRESS / DONE | 21 / 6 / 3 |
-| P0 active | 17 |
+- Live JSON: `reports/latest/post369_live_proof_20260827_000506/`
+- Cross-verify SSOT: `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
+- Runbook §0A: `docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md`
+- PR #369: https://github.com/psw2025-cmd/Genesis_System3/pull/369 (MERGED)
+- Coord bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
+- 0021 verification: `reports/coordination/SYSTEM3_PATCH_0021_CURSOR_VERIFICATION.md`
 
-## Open these artifacts (always same paths)
+## Do not
 
-| Artifact | Path |
-|---|---|
-| Issues only | `reports/coordination/ISSUES_ONLY.md` |
-| Mermaid network | `reports/coordination/ISSUES_MERMAID.md` |
-| Full checklist | `reports/coordination/TRACKING_CHECKLIST.md` |
-| Options Excel | `reports/coordination/AGENT_OPERATING_OPTIONS.xlsx` |
-| Access policy | `reports/coordination/ACCESS_POLICY.yaml` |
-| Audit log | `reports/coordination/AUDIT_LOG.jsonl` |
-| Smoke last | `reports/coordination/SMOKE_TEST_LAST.json` |
-| Catalog | `docs/handoffs/SESSION_ISSUES_MASTER.md` |
-| Runbook | `docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md` |
+- Claim ACCEPTED from this merge
+- Blind redeploy / token mint / IAM weaken / LIVE / orders
+- Apply Claude patches 0019 or 0020
+- Work in `C:\System3\Genesis_System3`
 
-## First priority for any agent
+## Agent next
 
-1. Read `ISSUES_ONLY.md`  
-2. Open Excel sheet `2_Options_Priority` → **OPT-A1**  
-3. If local fixes pending → get user **commit+PR** then deploy proof  
-4. After edit finish → **run this command_center immediately** (do not wait for hourly schedule)  
-5. Re-snap UI; flip DONE only on serving SHA  
-
-## User minimal involvement
-
-Primary path + approve PR + LIVE OFF + optional Dhan confirm. Everything else agent-automated.
+1. Review/merge `cursor/apply-system3-0021-93e4` when CI green
+2. Continue RHUI gates / semantic UI — redeploy only on **runtime** path merges

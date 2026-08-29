@@ -1,5 +1,5 @@
 {
-  "observed_at_utc": "2026-08-26T20:04:26.646303+00:00",
+  "observed_at_utc": "2026-08-26T19:50:00Z",
   "github_origin_main_sha": "1114ba3ab5afd29202482a151b654382e14de76c",
   "live_cloud_run_git_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
   "laptop_head_sha": "146eb69b697f86559d50519f8eaee3c8fbb8a82c",
@@ -8,10 +8,10 @@
   "primary_clone_ok": true,
   "banned_path_active": false,
   "lag_classification": "DOCS_TEST_CI_ONLY_LAG",
-  "note": "Serving SHA may lag main when tip is docs/test/CI-only; do not blind redeploy. MRI Gmail+Scheduler plan+watcher landed this session.",
-  "evidence_dir": "reports/latest/mri_watch",
+  "note": "Serving SHA may lag main when tip is docs/test/CI-only; do not blind redeploy. #373 MRI plan rebased onto #372 full-verify tip.",
+  "evidence_dir": "reports/latest/full_cross_verify_20260826_193000",
   "mri_plan": "docs/handoffs/MRI_GMAIL_SCHEDULER_5MIN_CONTROL_PLAN.md",
+  "mri_watch_dir": "reports/latest/mri_watch",
   "mri_watch_severity": "WARN",
-  "live_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-  "merged_docs_pr": "https://github.com/psw2025-cmd/Genesis_System3/pull/372"
+  "live_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 }

@@ -1,7 +1,7 @@
 # System3 Master Goal Lock
 
 Repository: `psw2025-cmd/Genesis_System3`
-Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`
+Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`
 
 **Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
@@ -25,7 +25,7 @@ Until separately and explicitly proven/authorized:
 - PAPER/analyzer only
 - no real broker order placement/modification/cancellation/square-off
 
-Broker authority is Dhan. Render/Angel-era operating instructions are historical/non-authoritative.
+Broker authority is Dhan. Render.com hosting is forbidden (retired host). Never recreate `render.yaml`. Angel-era operating instructions are historical/non-authoritative.
 
 ## Result-oriented execution rule
 

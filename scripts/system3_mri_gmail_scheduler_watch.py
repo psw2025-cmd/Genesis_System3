@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""System3 MRI ??? Gmail + Scheduler 5-minute watch tick.
+"""System3 MRI — Gmail + Scheduler 5-minute watch tick.
 
 Polls live deploy_info / broker / scheduler/health (and optionally Gmail),
 writes reports/latest/mri_watch/LATEST.json + TICK_LOG.jsonl + CHECKLIST.
 
 Never enables LIVE, never IAM/WIF, never dumps secrets.
-Does not add GitHub Actions schedule: ??? use --loop or Windows Task Scheduler.
+Does not add GitHub Actions schedule: — use --loop or Windows Task Scheduler.
 
 Usage:
   python scripts/system3_mri_gmail_scheduler_watch.py
@@ -62,7 +62,7 @@ def _http_json(url: str) -> tuple[dict[str, Any] | None, str | None, int | None]
             return json.loads(body), None, getattr(resp, "status", 200)
     except urllib.error.HTTPError as e:
         return None, f"HTTP {e.code}: {e.reason}", e.code
-    except Exception as e:  # noqa: BLE001 ??? tick must never crash silently without record
+    except Exception as e:  # noqa: BLE001 — tick must never crash silently without record
         return None, f"{type(e).__name__}: {e}", None
 
 
@@ -292,7 +292,7 @@ def _seed_checklist(
             "id": "MRI-GATES-001",
             "priority": "P0",
             "status": "OPEN" if (gpass is not None and gtot and gpass < gtot) else "WATCH",
-            "title": f"Gates {gpass}/{gtot} ??? LIVE stays OFF",
+            "title": f"Gates {gpass}/{gtot} — LIVE stays OFF",
             "how_to": "Do not weaken gates; close blockers via market-hours proofs",
             "owner": "AGENT",
             "proof_required": f"{LIVE_BASE}/api/auto_gates",
@@ -304,7 +304,7 @@ def _seed_checklist(
             "id": "MRI-LAG-001",
             "priority": "P1",
             "status": "WATCH",
-            "title": f"Serving SHA {serving[:12]} ??? classify lag; no blind redeploy",
+            "title": f"Serving SHA {serving[:12]} — classify lag; no blind redeploy",
             "how_to": "Compare origin/main; redeploy only for runtime path merges",
             "owner": "AGENT",
             "proof_required": "reports/latest/repo_path_audit/cloud_github_vs_laptop.json",

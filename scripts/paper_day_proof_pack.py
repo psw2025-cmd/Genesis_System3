@@ -122,34 +122,27 @@ def _fetch_text(path: str, timeout: int = 30) -> Dict[str, Any]:
 
 def check_1_deploy_sha(expected_sha: Optional[str], repo_head_sha: Optional[str]) -> Dict[str, Any]:
     """
-    Uses /api/deploy/info, which surfaces Render's auto-injected
-    RENDER_GIT_COMMIT env var — the ground truth for "what is actually
-    running", independent of what this script (or anyone) expected.
+    Uses /api/deploy/info, which surfaces Cloud Run DEPLOY_GIT_SHA —
+    the serving SHA, independent of what this script expected.
 
     Reports THREE values explicitly, never conflating them:
-      - deployed_sha   : what Render's web service is actually running
-      - repo_head_sha   : current scripts/ checkout's own commit (this
-                           script's git context, when available — proxy
-                           for "what main looked like when this job ran")
-      - expected_sha    : optional caller-supplied assertion via
-                           --expected-sha, only used if explicitly passed
+      - deployed_sha   : what Cloud Run genesis-system3-web is serving
+      - repo_head_sha   : current checkout commit when available
+      - expected_sha    : optional caller-supplied assertion via --expected-sha
 
-    PASS requires deployed_sha present and non-empty (Render is running
-    SOMETHING traceable). If expected_sha was explicitly passed and
-    doesn't match, that's a separate FAIL — a real mismatch, not stale
-    script data.
+    PASS requires deployed_sha present and non-empty. If expected_sha was
+    explicitly passed and doesn't match, that's a separate FAIL.
     """
     r = _fetch_json("/api/deploy/info")
     if not r.get("ok"):
-        return {"item": 1, "name": "Render deploy SHA", "status": "UNVERIFIABLE",
+        return {"item": 1, "name": "Cloud Run deploy SHA", "status": "UNVERIFIABLE",
                 "detail": f"/api/deploy/info unreachable: {r.get('error')}. "
-                          f"Confirm manually via Render dashboard Deploys tab."}
+                          f"Confirm via GET {r.get('url') or '/api/deploy/info'}."}
     data = r.get("data", {})
     deployed_sha = data.get("git_sha", "")
     if not deployed_sha:
-        return {"item": 1, "name": "Render deploy SHA", "status": "UNVERIFIABLE",
-                "detail": "RENDER_GIT_COMMIT env var empty — Render did not inject it "
-                          "(unusual; confirm manually via dashboard)."}
+        return {"item": 1, "name": "Cloud Run deploy SHA", "status": "UNVERIFIABLE",
+                "detail": "DEPLOY_GIT_SHA empty — Cloud Run revision did not inject it."}
 
     detail = f"deployed_sha={deployed_sha} branch={data.get('git_branch')} service={data.get('service_name')}"
     if repo_head_sha:
@@ -158,10 +151,10 @@ def check_1_deploy_sha(expected_sha: Optional[str], repo_head_sha: Optional[str]
     if expected_sha:
         match = deployed_sha.startswith(expected_sha[:9])
         detail += f" expected_sha={expected_sha[:9]} match={match}"
-        return {"item": 1, "name": "Render deploy SHA",
+        return {"item": 1, "name": "Cloud Run deploy SHA",
                 "status": "PASS" if match else "FAIL", "detail": detail}
 
-    return {"item": 1, "name": "Render deploy SHA", "status": "PASS", "detail": detail}
+    return {"item": 1, "name": "Cloud Run deploy SHA", "status": "PASS", "detail": detail}
 
 
 def check_2_health() -> Dict[str, Any]:

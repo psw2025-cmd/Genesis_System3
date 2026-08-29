@@ -1,0 +1,24 @@
+﻿ .github/workflows/command-center-access.yml       | 103 ++++++
+ reports/coordination/ACCESS_POLICY.yaml           |  98 ++++++
+ reports/coordination/AGENT_OPERATING_OPTIONS.xlsx | Bin 0 -> 21996 bytes
+ reports/coordination/AUDIT_LOG.jsonl              |   2 +
+ reports/coordination/COMMAND_CENTER.md            |  64 ++++
+ reports/coordination/ISSUES_MERMAID.md            |  54 +++
+ reports/coordination/ISSUES_ONLY.md               |  56 +++
+ reports/coordination/SMOKE_TEST_LAST.json         |  33 ++
+ reports/coordination/TRACKING_CHECKLIST.json      | 406 ++++++++++++++++++++++
+ reports/coordination/TRACKING_CHECKLIST.md        |  65 ++++
+ reports/coordination/proof/DIFF_NAME_STATUS.txt   |  18 +
+ reports/coordination/proof/DIFF_STAT.txt          |  19 +
+ reports/coordination/proof/SMOKE_LOG_EXCERPT.txt  |  10 +
+ reports/coordination/proof/SMOKE_TEST_LAST.json   |  33 ++
+ reports/coordination/session_issues_master.csv    |  33 ++
+ scripts/append_command_center_audit.py            |  45 +++
+ scripts/ci_apply_access_policy.yml                |  25 ++
+ scripts/command_center_smoke_test.py              | 113 ++++++
+ scripts/run_command_center_refresh.ps1            |  60 ++++
+ scripts/system3_build_operating_options_xlsx.py   | 321 +++++++++++++++++
+ scripts/system3_command_center_refresh.py         | 292 ++++++++++++++++
+ scripts/system3_pending_tracker_refresh.py        | 355 +++++++++++++++++++
+ scripts/validate_access_policy.py                 |  77 ++++
+ 23 files changed, 2282 insertions(+)

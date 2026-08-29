@@ -13,6 +13,7 @@ Closure: `python scripts/system3_continuous_closure_orchestrator.py` → `report
 | A4 | P1 | connected≠market-data reliability | prior URL proof 429/cache | OPEN — UI lane split already on main |
 | A5 | P2 | Auton telemetrics banner while loop active | live bundle contains `[AUTONOMOUS LOOP]` | VERIFIED LIVE |
 | C1 | P0 | Continuous closure system (scan/verify/watchdog/cards/resume) | `/api/continuous_closure` timed out on self-HTTP fan-out; request path now offline-first | IN_PROGRESS — patched pending live SHA verify |
+| R1 | P0 | Render.com leftover authority/tools still look current | PR #330 `22155657e`; eval `test_render_hosting_retired.py`; production already Cloud Run SHA `e6da6b469` at 2026-08-23T12:23:21Z | READY_FOR_MERGE — not VERIFIED LIVE until serving SHA includes #330 |
 
 Resolved count updates only after live SHA verifies the fix.
 Never remove banner until all proof gates genuinely READY.

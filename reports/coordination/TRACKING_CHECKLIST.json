@@ -1,46 +1,23 @@
 {
   "live": {
-    "captured_utc": "2026-08-29T09:58:06.700212+00:00",
+    "captured_utc": "2026-08-26T19:35:00Z",
     "base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-    "serving_sha": "01a4592f4c68c120a26b4fd955d1aff655b82e33",
-    "deploy_http": 200,
-    "broker_http": 200,
+    "serving_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+    "github_main_sha": "0d6955987115f88b710aca0f0f0dec68d23fa6bc",
+    "lag_class": "DOCS_TEST_CI_ONLY_LAG",
     "broker_connected": true,
     "broker_auth": "AUTH_OK",
-    "broker_secret_version": "323",
+    "broker_secret_version": "320",
     "live_trading_enabled": false,
-    "gates_http": 200,
-    "gates_passing": 3,
+    "gates_passing": 2,
     "gates_total": 7,
     "trade_ready": false,
-    "proof_gates": {
-      "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": true,
-      "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": false,
-      "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": false,
-      "WEBSOCKET_TICK_HEALTH_PROVEN": false,
-      "MODEL_ACCURACY_REPORT_PRESENT": true,
-      "OPTION_STRIKE_VISIBILITY_PROVEN": false,
-      "EQUITY_FO_ELIGIBILITY_PROVEN": true
-    },
-    "paper_http": 200,
-    "paper_open_count": 0,
-    "paper_total_trades": 9,
-    "paper_positions_message": "Positions file not found",
-    "ml_http": 200,
-    "ml_predictions": 0,
-    "signals_http": 200,
-    "signals_action": "NO_TRADE",
-    "scheduler_http": 200,
     "scheduler_healthy": true,
-    "holdings_http": 200,
-    "funds_http": 200,
-    "charts_http": 404,
-    "predictions_http": 404,
-    "multibagger_http": 404,
-    "paper_trades_http": 404,
-    "chain_http": 200,
-    "chain_spot": 24175.65,
-    "chain_contracts": 154
+    "scheduler_business_readiness": "PARTIAL",
+    "ruleset_id": 21581518,
+    "ruleset_required_contexts": 6,
+    "rhui": "NOT_ACCEPTED",
+    "evidence_dir": "reports/latest/full_cross_verify_20260826_193000"
   },
   "rows": [
     {
@@ -52,7 +29,7 @@
       "need_user": "None",
       "rec": "MRI Auto Deploy",
       "status": "OPEN",
-      "live_proof": "serving=01a4592 (compare origin/main in session)"
+      "live_proof": "serving=719566d (compare origin/main in session)"
     },
     {
       "id": "PEND-002",
@@ -62,8 +39,8 @@
       "verify": "scheduler/health healthy=true",
       "need_user": "None",
       "rec": "MRI Scheduler IAM",
-      "status": "DONE",
-      "live_proof": "healthy=True http=200"
+      "status": "OPEN",
+      "live_proof": "healthy=False http=200"
     },
     {
       "id": "PEND-003",
@@ -74,7 +51,7 @@
       "need_user": "None",
       "rec": "Watch rotate",
       "status": "WATCH",
-      "live_proof": "connected=True auth=AUTH_OK v=323"
+      "live_proof": "connected=True auth=AUTH_OK v=319"
     },
     {
       "id": "PEND-004",
@@ -161,8 +138,8 @@
       "verify": "HTTP 200 holdings+funds",
       "need_user": "None",
       "rec": "Deploy alias routes",
-      "status": "DONE",
-      "live_proof": "holdings=200 funds=200"
+      "status": "OPEN",
+      "live_proof": "holdings=404 funds=404"
     },
     {
       "id": "PEND-012",
@@ -249,8 +226,8 @@
       "verify": "ML_SPEARMAN pass",
       "need_user": "Do not lower threshold",
       "rec": "Retrain/validate",
-      "status": "DONE",
-      "live_proof": "pass=True"
+      "status": "OPEN",
+      "live_proof": "pass=False"
     },
     {
       "id": "PEND-020",
@@ -349,7 +326,7 @@
       "need_user": "LIVE OFF until 7/7",
       "rec": "Close blockers",
       "status": "OPEN",
-      "live_proof": "gates=3/7 trade_ready=False"
+      "live_proof": "gates=2/7 trade_ready=False"
     },
     {
       "id": "PEND-029",
@@ -397,10 +374,10 @@
     }
   ],
   "counts": {
-    "open": 21,
+    "open": 24,
     "in_progress": 6,
     "watch": 2,
-    "done": 3,
-    "p0_active": 17
+    "done": 0,
+    "p0_active": 19
   }
 }

@@ -2,30 +2,33 @@
 
 Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-laptop execution or local forensic authority.
 
-## 0. Current acceptance lock (material change — 2026-08-26)
+## 0. Current acceptance lock (material change — 2026-08-27 full cross-verify)
 
-**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria.
+**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria. Do **not** falsely claim ACCEPTED after a docs/test-only merge.
 
 Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` · revision `genesis-system3-web-00617-vif` @ 100%.
 
-GitHub `main` tip may advance with **docs/tools-only** commits (e.g. `afd28722…` #365 Render lock). That is **DOCS_ONLY_LAG**, not runtime drift, when Cloud Run Auto Deploy path-filters skip the push. Do not redeploy solely to equalize docs tips.
+GitHub `main` tip `0d6955987115f88b710aca0f0f0dec68d23fa6bc` (#371 docs; includes #370/#369) vs serving is **DOCS/TEST/CI_ONLY_LAG** — not a failed Cloud Run promotion. Do not redeploy solely to equalize.
+
+Live proof snapshot (2026-08-27 ~01:05 IST / evidence `reports/latest/full_cross_verify_20260826_193000/`): broker `AUTH_OK` / LIVE OFF / orders OFF; scheduler transport **HEALTHY**; business readiness **PARTIAL** (wrong-date rank/forecast/signals); auto_gates **2/7**. Ruleset `21581518` now has **six** required contexts including `BLOCKING - priority workflows only` (restored this cycle after Gmail/#188 correction). HUMAN_ACTION_REQUIRED=**NO** for ruleset (agent fixed). Continuous 5-min Gmail/scheduler MRI control plan is **owned by sibling agent** → `docs/handoffs/MRI_GMAIL_SCHEDULER_5MIN_CONTROL_PLAN.md` (do not invent a competing plan here).
 
 Mandatory multi-verify artifacts:
 
 - `docs/handoffs/RHUI_V2.2_MATERIAL_CHANGE.md`
 - `reports/coordination/RHUI_V2.2_Verification_Checklist.json`
-- `reports/latest/rhui_v22_verify/` (+ latest `cross_verify_*` folder)
+- `reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md`
+- `reports/latest/full_cross_verify_20260826_193000/` (+ prior `post369_live_proof_20260827_000506/`)
 - `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
 - Issue #188 `SYSTEM3_COORDINATION_V1` comments
 
 Fail-closed distinctions agents must keep:
 
-1. Cloud Run deploy PASS ≠ scheduler-health PASS ≠ RHUI ACCEPTED.  
-2. 22/22 visual tab mounts ≠ semantic API↔UI acceptance.  
-3. Pre-market 4/4 NOT READY ≠ broker/token failure (recheck after open).  
-4. `observability.alert_severity_none` failure is an observability predicate — attribute the workload (current: `genesis-system3-signals` stale) before touching tokens/IAM.  
-5. #367 code on serving ≠ prediction evidence proven (wait for genuine 18:45 IST signals run).  
-6. Docs-only `main` tip ahead of serving ≠ failed deploy (check Auto Deploy path filters before workflow_dispatch).
+1. Cloud Run deploy PASS ≠ scheduler-health PASS ≠ RHUI ACCEPTED.
+2. 22/22 visual tab mounts ≠ semantic API↔UI acceptance.
+3. Pre-market 4/4 NOT READY ≠ broker/token failure (recheck after open).
+4. Docs/test-only `main` tip ahead of serving ≠ failed deploy (check Auto Deploy path filters before workflow_dispatch).
+5. #369/#371 merge ≠ runtime change (test/docs-only).
+6. Claiming `HUMAN_ACTION_REQUIRED=NO` while a required provider context is still omitted from ruleset `21581518` is a governance false-green — re-verify contexts before asserting no human action.
 
 ## 1. Single source of truth
 
@@ -36,9 +39,10 @@ All agents (ChatGPT, Cursor, Claude, Codex and any future agent) must reconstruc
 3. `reports/coordination/ruhi_task_ledger.csv` — task ownership, dependencies, progress and proof.
 4. `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` — coordination snapshot.
 5. Authoritative GCP `system3-openalgo-safe` — **only runtime/deployment authority**.
-6. Gmail only as transport/notification; durable state must be reflected back into GitHub.
+6. **Live Proof Center** — `reports/latest/live_proof_center/LATEST/` (+ `reports/coordination/LIVE_PROOF_CENTER_POINTER.md`, branch `live-proof-center`, workflow `live-proof-center.yml`) — sanitized continuous MRI for agents without laptop/gcloud access.
+7. Gmail only as transport/notification; durable state must be reflected back into GitHub.
 
-Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
+Before claiming “no GCP / laptop / access”, agents MUST read the Live Proof Center pointer and INDEX. Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
 
 ## 2. Cloud-only execution lock
 
@@ -226,49 +230,3 @@ A useful cycle produces at least one of:
 - a new exact-serving browser/API truth observation.
 
 Pure restatement of old status does not count as progress.
-
-## 16. Dhan live market parity (HIGH PRIORITY)
-
-System3 production UI/API must be continuously compared to **live Dhan** (`web.dhan.co`) for every market-visible surface. Cloud serving SHA + browser proof beat laptop reports.
-
-### Mandatory compare surfaces
-
-1. Index option chain: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX, BANKEX  
-2. Equity option chain (underlying search + security_id mapping)  
-3. Top CE / equity option scanner ranks  
-4. Positions, portfolio/holdings, funds (read-only)  
-5. Charts/graphs and any visual market widgets  
-6. Header meta: spot, change%, ATM IV, PCR, lot, days-to-expiry, market open/closed  
-
-### Required chain columns (match Dhan advanced option chain)
-
-LTP, **LTP Chg (%)**, OI, **OI chg (%)**, Volume, **Vol chg (%)**, **Buildup**, IV, Bid, Ask, Strike, Delta, Gamma, Theta, Vega.
-
-Absolute-only ChgOI/Vol without % and without Buildup/LTP Chg/Greeks = **NOT full match**.
-
-### Freshness / false-green bans
-
-- During market hours, chain must be **LIVE** (age gated) or explicitly **STALE/DEGRADED** — never `status=OK` on an old EXPIRY SNAPSHOT while claiming live readiness.  
-- Default chain view must center **ATM ± N**, not deep OTM strikes that look like a wrong underlying.  
-- Equity options require Dhan **security_id** / scrip-master mapping; index-only proofs cannot close equity tasks.  
-- Missing chart/holdings/funds routes must be labeled MISSING/BROKEN — not silent 404 behind a green broker badge.
-
-### Live tracking evidence (keep updated)
-
-- Issue ledger path: `reports/latest/dhan_parity/DHAN_LIVE_PARITY_ISSUES.md`  
-- API compare: `reports/latest/dhan_parity/DHAN_PARITY_LIVE_COMPARE.json`  
-- Keep open: production `/?tab=chain` + `/?tab=broker` and Dhan advancedoptionchain / positions / portfolio  
-
-A batch that claims “chain ready” without same-session Dhan parity proof is **NOT DONE**.
-
-## 17. Agent project-memory is not authority
-
-Claude.ai / Cursor / ChatGPT **project memory**, chat recaps, scheduled Claude jobs, and uploaded lock files are **ingest-only**.
-
-Rules:
-
-1. Ingest useful goals into GitHub (`docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md` §9 + `reports/latest/claude_memory_audit/`).
-2. Cross-verify every SHA, revision, secret **version**, timeout, and blocker against GitHub `main` + live `/api/deploy_info` + `/api/broker/status` + `/api/auto_gates` in the same session.
-3. Classify claims: **KEEP** (principle) / **REFRESH** (re-fetch numbers) / **REJECT** (false or unsafe).
-4. Reject any memory that enables LIVE orders, weakens gates, or says “never wait for human approval” for LIVE/break-glass.
-5. Claude scheduled automations are helpers — they do not replace GitHub Actions or GCP Scheduler truth.

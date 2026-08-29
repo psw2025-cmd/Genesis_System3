@@ -27,7 +27,6 @@ from openpyxl.utils import get_column_letter
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "coordination"
 TRACK_JSON = OUT / "TRACKING_CHECKLIST.json"
-ACTION_MAP_CSV = OUT / "GITHUB_ACTION_MAP_STATUS.csv"
 
 
 def style_header(ws, ncols: int) -> None:
@@ -78,22 +77,6 @@ def load_pending() -> list[list]:
             ]
         )
     return rows
-
-
-def load_action_map() -> tuple[list[str], list[list]]:
-    """Sheet 9 — live GitHub action-map done/pending status (overwrite CSV)."""
-    import csv
-
-    if not ACTION_MAP_CSV.exists():
-        return (
-            ["item_id", "status", "title", "reason_if_pending", "solution_next", "user_needed"],
-            [["NO_ACTION_MAP_CSV", "MISSING", "Run action-map refresh", "CSV absent", "Write GITHUB_ACTION_MAP_STATUS.csv", "NO"]],
-        )
-    with ACTION_MAP_CSV.open(encoding="utf-8", newline="") as f:
-        reader = csv.DictReader(f)
-        headers = list(reader.fieldnames or [])
-        rows = [[r.get(h, "") for h in headers] for r in reader]
-    return headers, rows
 
 
 def main() -> int:
@@ -304,13 +287,8 @@ def main() -> int:
             ["LIVE_PRIORITY_URLS.md", "Keep open tabs list", "UI proof targets", "exists"],
             ["AGENT_COMMAND_CENTER.md", "NEW one-page: run one script get all truth", "Replace manual probe spam", "CREATE"],
             ["AGENTS.md", "Link command_center + Excel path", "Repo entrypoint clarity", "UPDATE"],
-            ["GITHUB_ACTION_MAP_STATUS.csv", "Sheet 9 live PR/issue action map", "Done vs pending with reason/solution", "LIVE"],
         ],
     )
-
-    # --- Sheet 9: GitHub action map (from CSV) ---
-    am_headers, am_rows = load_action_map()
-    write_sheet(wb, "9_GitHub_Action_Map", am_headers, am_rows)
 
     # Meta sheet
     write_sheet(
@@ -323,7 +301,6 @@ def main() -> int:
             ["gates", f"{live.get('gates_passing')}/{live.get('gates_total')}"],
             ["broker", f"{live.get('broker_auth')} v{live.get('broker_secret_version')}"],
             ["excel_path", str(OUT / "AGENT_OPERATING_OPTIONS.xlsx")],
-            ["action_map_csv", str(ACTION_MAP_CSV)],
             ["rule", "Overwrite only — do not create dated option workbooks"],
             ["first_priority", "OPT-A1 then OPT-A10 command_center"],
             ["thinking_before", "Inventory+local fix+tracker"],

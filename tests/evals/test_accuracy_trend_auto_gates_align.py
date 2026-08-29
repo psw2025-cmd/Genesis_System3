@@ -37,23 +37,20 @@ def test_accuracy_trend_aligns_with_load_spearman_days(tmp_path, monkeypatch):
         "dashboard.backend.firestore_state_backend.FirestoreSchedulerEvidenceBackend",
         FakeBackend,
     )
+    monkeypatch.setenv("SYSTEM3_STATE_BACKEND", "firestore")
 
     gate_days, passing, latest = load_spearman_days(root)
     payload = build_accuracy_trend_payload(root, retrain_needed=False)
 
     assert payload["status"] == "ok"
     assert payload["source"] == "load_spearman_days"
-    assert payload["days_available"] == len(gate_days) == 3
+    assert payload["days_available"] == len(gate_days) == 2
     assert [row["date"] for row in payload["trend"]] == [d["date"] for d in gate_days]
     assert [row["rho"] for row in payload["trend"]] == [d["rho"] for d in gate_days]
-    assert payload["avg_rho"] == round((0.2 + 0.55 + 0.72) / 3, 4)
+    assert payload["avg_rho"] == round((0.55 + 0.72) / 2, 4)
     assert latest == 0.72
     assert passing == 1  # only 0.72 crosses 0.70 — gate still honestly failing
-    # Local enrichment preserved for overlapping day
-    local = next(r for r in payload["trend"] if r["date"] == "2026-06-12")
-    assert local["predicted"] == ["NIFTY"]
-    assert local["actual"] == ["BANKNIFTY"]
-    assert local["status"] == "RETRAIN_NEEDED"
+    assert all(row["date"] != "2026-06-12" for row in payload["trend"])
 
 
 def test_accuracy_trend_empty_when_no_days(tmp_path, monkeypatch):

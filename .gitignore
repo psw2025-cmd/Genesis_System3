@@ -71,6 +71,9 @@ ONE_LINE_TESTS.js
 QUICK_FIX_CONSOLE.js
 verify_dashboard_fix.js
 *.xlsx
+# Live Proof Center Excel must stay readable on GitHub for all agents
+!reports/latest/live_proof_center/**/*.xlsx
+!reports/coordination/System3_LIVE_PROOF_CENTER.xlsx
 OptionChain_Master_v3_AI_FINAL.csv
 
 # Auto-generated test suites (regenerate from source if needed)
@@ -83,6 +86,7 @@ AI_AGENT_RUNS/
 # Phase reports: allow reports/latest/ (live proof artifacts), block everything else
 reports/*
 !reports/latest
+!reports/latest/**
 !reports/coordination
 !reports/coordination/**
 reports/latest/manual_*
@@ -92,3 +96,6 @@ state/
 # Generated deep-scan dumps can contain expanded environment values and must
 # never be committed. Keep the canonical scanners report-only/redacted.
 /scan_output.txt
+# Excel may hold the operator issue CSV open; the governed writer replays this
+# metadata-only spool and removes it after a successful atomic CSV update.
+audit/live_agent_issue_ledger/*.pending.jsonl

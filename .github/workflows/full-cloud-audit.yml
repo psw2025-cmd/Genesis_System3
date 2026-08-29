@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout exact source
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -69,12 +69,17 @@ jobs:
           python -m py_compile scripts/fetch_exact_security_audit.py
           python -m py_compile scripts/evaluate_rotator_reliability.py
           python -m py_compile scripts/multi_ai_audit_consensus.py
+          python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
+          python -m py_compile scripts/gcp_wait_for_expected_runtime_sha.py
+
+      - name: Wait read-only for exact expected runtime SHA
+        run: python scripts/gcp_wait_for_expected_runtime_sha.py
 
       - name: Collect Google Cloud runtime, logging, TLS and latency evidence
         shell: bash
         run: |
           set +e
-          python scripts/gcp_full_cloud_audit.py
+          GITHUB_SHA="${SYSTEM3_EXPECTED_SERVING_SHA}" python scripts/gcp_full_cloud_audit.py
           rc=$?
           echo "CLOUD_AUDIT_RC=${rc}" >> "$GITHUB_ENV"
           exit 0
@@ -141,24 +146,59 @@ jobs:
           security=load('reports/latest/security_audit/security_audit.json')
           exact=load('reports/latest/security_audit/exact_fetch_state.json')
           ai=load('reports/latest/ai_consensus/ai_consensus.json')
-          conditions={
+
+          deterministic_conditions={
               'cloud_audit_pass': cloud.get('state') == 'PASS',
               'cloud_safety_pass': (cloud.get('safety') or {}).get('state') == 'PASS',
               'rotator_reliability_pass': rotator.get('state') == 'PASS',
               'exact_security_evidence': exact.get('state') == 'PASS' and exact.get('sha') == os.environ.get('GITHUB_SHA'),
               'security_audit_pass': security.get('state') == 'PASS',
-              'ai_consensus_pass': ai.get('state') == 'PASS',
           }
-          overall='PASS' if all(conditions.values()) else 'FAIL'
+          deterministic_pass=all(deterministic_conditions.values())
+          ai_state=str(ai.get('state') or 'NOT_PROVEN')
+          ai_consensus_pass=ai_state == 'PASS'
+          ai_external_unavailable=ai_state == 'BLOCKED_EXTERNAL_AI'
+          ai_adverse_or_invalid=not ai_consensus_pass and not ai_external_unavailable
+
+          conditions={
+              **deterministic_conditions,
+              'ai_consensus_pass': ai_consensus_pass,
+              'ai_consensus_available': ai_consensus_pass,
+              'ai_external_unavailable': ai_external_unavailable,
+              'ai_adverse_or_invalid': ai_adverse_or_invalid,
+          }
+
+          # Deterministic runtime/safety/security/rotator evidence is authoritative.
+          # Missing or unavailable optional external AI reviewers are recorded but
+          # cannot turn a deterministic PASS into a false production failure.
+          # If configured external reviewers return an adverse/invalid result,
+          # the forensic audit remains fail-closed for explicit follow-up.
+          if not deterministic_pass or ai_adverse_or_invalid:
+              overall='FAIL'
+          else:
+              overall='PASS'
+
+          if overall == 'PASS' and ai_external_unavailable:
+              evidence_grade='DETERMINISTIC_PASS_EXTERNAL_AI_UNAVAILABLE'
+          elif overall == 'PASS':
+              evidence_grade='DETERMINISTIC_AND_EXTERNAL_AI_PASS'
+          else:
+              evidence_grade='FAIL_CLOSED'
+
           report={
-              'schema':'genesis-system3-unified-cloud-audit-v2',
+              'schema':'genesis-system3-unified-cloud-audit-v3',
               'state':overall,
+              'evidence_grade':evidence_grade,
               'github_sha':os.environ.get('GITHUB_SHA'),
+              'expected_runtime_sha':os.environ.get('SYSTEM3_EXPECTED_SERVING_SHA'),
               'conditions':conditions,
+              'deterministic_pass':deterministic_pass,
               'cloud_state':cloud.get('state'),
+              'cloud_runtime_sha':cloud.get('serving_deploy_git_sha'),
               'rotator_reliability_state':rotator.get('state'),
               'security_state':security.get('state'),
-              'ai_state':ai.get('state'),
+              'ai_state':ai_state,
+              'external_ai_required_for_deterministic_runtime_pass':False,
               'external_adapter_states':((cloud.get('durable_trail') or {}).get('external_adapters') or {}),
               'remediation_authority':'SEPARATE_BOUNDED_FAIL_CLOSED_PATH',
               'auto_deploy_or_live_order_authority_granted':False,
@@ -171,14 +211,18 @@ jobs:
           (out/'unified_verdict.json').write_text(json.dumps(report, indent=2, sort_keys=True), encoding='utf-8')
           md=[
               '# Unified Cloud Audit Verdict','',f"Overall: **{overall}**",'',
+              f"- Evidence grade: `{evidence_grade}`",
               f"- Cloud runtime audit: `{cloud.get('state')}`",
+              f"- Expected runtime SHA: `{os.environ.get('SYSTEM3_EXPECTED_SERVING_SHA')}`",
               f"- Dhan rotator reliability: `{rotator.get('state')}`",
               f"- Exact security audit: `{security.get('state')}`",
-              f"- AI consensus: `{ai.get('state')}`",
+              f"- External AI review: `{ai_state}`",
               f"- Exact-SHA security artifact: `{conditions['exact_security_evidence']}`",
+              '- External AI availability is advisory when deterministic evidence is complete and PASS.',
+              '- Configured AI adverse/invalid findings remain fail-closed for forensic follow-up.',
               '- LIVE trading: **OFF/LOCKED**','- Order actions performed: **false**','',
-              'Healthy broker state cannot override rotator reliability failure.',
-              'A deterministic FAIL/BLOCKED state cannot be overridden by AI.',''
+              'Healthy broker state cannot override attributable rotator reliability failure.',
+              'AI cannot override deterministic failure evidence.',''
           ]
           (out/'unified_verdict.md').write_text('\n'.join(md), encoding='utf-8')
           print('UNIFIED_CLOUD_AUDIT', json.dumps(report, sort_keys=True))
@@ -210,5 +254,5 @@ jobs:
           report=json.loads(p.read_text(encoding='utf-8'))
           if report.get('state') != 'PASS':
               raise SystemExit(f"UNIFIED_AUDIT_FAIL {report.get('conditions')}")
-          print('UNIFIED_AUDIT=PASS')
+          print('UNIFIED_AUDIT=PASS', report.get('evidence_grade'))
           PY

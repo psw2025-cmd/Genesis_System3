@@ -1,4 +1,4 @@
-﻿# Register Windows Task ΓÇö System3 MRI 5-min watch
+# Register Windows Task — System3 MRI 5-min watch
 
 **Do not** add GitHub Actions `schedule:` (policy ban).  
 Use local Task Scheduler or `python scripts/system3_mri_gmail_scheduler_watch.py --loop`.
@@ -29,4 +29,4 @@ python scripts\system3_mri_gmail_scheduler_watch.py --loop --interval-sec 300
 
 ## GCP alternative
 
-Cloud Scheduler ΓåÆ GitHub `workflow_dispatch` on an existing workflow ΓÇö never `on.schedule` in Actions YAML.
+Cloud Scheduler → GitHub `workflow_dispatch` on an existing workflow — never `on.schedule` in Actions YAML.
