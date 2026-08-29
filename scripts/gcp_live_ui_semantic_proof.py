@@ -13,12 +13,17 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import time
 import urllib.request
 from datetime import datetime, time as dt_time
 from pathlib import Path
 from urllib.parse import urlencode
 from zoneinfo import ZoneInfo
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import requests
 
