@@ -48,14 +48,14 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
     steps:
       - name: Checkout current tree on PR; full history otherwise
-        uses: actions/checkout@v7
+        uses: actions/checkout@v4
         with:
           fetch-depth: ${{ github.event_name == 'pull_request' && 1 || 0 }}
           clean: true
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
@@ -87,7 +87,7 @@ jobs:
 
       - name: Upload compact cleanup proof pack
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: system3-repo-clean-forensic-${{ github.run_number }}
           path: ${{ steps.scan.outputs.out }}/

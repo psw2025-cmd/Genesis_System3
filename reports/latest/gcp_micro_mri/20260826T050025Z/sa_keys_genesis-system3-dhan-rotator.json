@@ -1,0 +1,26 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com/keys/83d257612113881ebfaf3b63cb9f39dd31067624",
+    "validAfterTime": "2026-08-14T19:48:34Z",
+    "validBeforeTime": "2026-08-31T19:48:34Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com/keys/dac49bc9f5c95f10ed645409f0adb6b8c5dcd86c",
+    "validAfterTime": "2026-08-23T19:48:34Z",
+    "validBeforeTime": "2026-09-08T19:48:34Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com/keys/41706f546aea033b79328699cf0442f4996feecf",
+    "validAfterTime": "2026-08-12T01:12:19Z",
+    "validBeforeTime": "2028-08-11T01:12:19Z"
+  }
+]

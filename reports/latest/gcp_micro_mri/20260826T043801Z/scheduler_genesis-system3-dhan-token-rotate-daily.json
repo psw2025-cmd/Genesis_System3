@@ -1,0 +1,30 @@
+{
+  "attemptDeadline": "180s",
+  "httpTarget": {
+    "body": "e30=",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Google-Cloud-Scheduler"
+    },
+    "httpMethod": "POST",
+    "oauthToken": {
+      "scope": "https://www.googleapis.com/auth/cloud-platform",
+      "serviceAccountEmail": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com"
+    },
+    "uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate:run"
+  },
+  "lastAttemptTime": "2026-08-26T04:50:04.636192Z",
+  "name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate-daily",
+  "retryConfig": {
+    "maxBackoffDuration": "3600s",
+    "maxDoublings": 5,
+    "maxRetryDuration": "0s",
+    "minBackoffDuration": "5s"
+  },
+  "schedule": "*/5 * * * *",
+  "scheduleTime": "2026-08-26T04:55:04.522969Z",
+  "state": "ENABLED",
+  "status": {},
+  "timeZone": "Asia/Kolkata",
+  "userUpdateTime": "2026-08-26T02:49:35.561998Z"
+}

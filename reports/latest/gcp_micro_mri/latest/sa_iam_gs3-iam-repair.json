@@ -1,0 +1,12 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "principalSet://iam.googleapis.com/projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/attribute.authority/repair"
+      ],
+      "role": "roles/iam.workloadIdentityUser"
+    }
+  ],
+  "etag": "BwZZGzrBoE4=",
+  "version": 1
+}

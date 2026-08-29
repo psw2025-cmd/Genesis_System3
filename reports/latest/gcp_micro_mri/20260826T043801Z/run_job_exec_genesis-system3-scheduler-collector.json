@@ -1,0 +1,1477 @@
+[
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "6dcfdde3-2b76-4b73-8e7e-9a1f70687d3d"
+      },
+      "creationTimestamp": "2026-08-26T04:42:00.669029Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787719283493687",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-mgddv",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ69ckFto",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-mgddv",
+      "uid": "0e78b605-d2e2-4276-895b-a76433019fd3"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:42:01.866715Z",
+          "message": "Waiting for execution to start.",
+          "status": "Unknown",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:42:01.805324Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:42:01.866715Z",
+          "message": "Waiting for execution to start.",
+          "status": "Unknown",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:42:01.398623Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:42:01.917146Z",
+          "message": "System will retry after 00:01 from lastTransitionTime for polling interval",
+          "reason": "WaitingForOperation",
+          "severity": "Info",
+          "status": "True",
+          "type": "Retry"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-mgddv%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "12d69351-bc2e-490a-aafb-08c08760b75b"
+      },
+      "creationTimestamp": "2026-08-26T04:41:00.644592Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787719214814467",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-4vx2t",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ69TZ+zY",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-4vx2t",
+      "uid": "91468d70-edec-48be-a7fc-b333500e8150"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:41:23.235214Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:41:23.235214Z",
+          "message": "Execution completed successfully in 18.19s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:41:01.755099Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:41:12.466078Z",
+          "message": "Started deployed execution in 10.71s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:41:01.345580Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-4vx2t%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:41:05.040847Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "6c5b3b11-5c62-4ec5-aa09-01592173a1ba"
+      },
+      "creationTimestamp": "2026-08-26T04:40:01.172422Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787719161776721",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-wrp6n",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ69T1bk4",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-wrp6n",
+      "uid": "d631b2b1-68d8-4b02-9b7c-824df45e288c"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:40:25.091797Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:40:25.091797Z",
+          "message": "Execution completed successfully in 20.05s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:02.229133Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:13.968085Z",
+          "message": "Started deployed execution in 11.73s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:01.827277Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-wrp6n%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:40:05.036860Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "b3a5ac9e-dd63-4d07-8621-adf4e0280188"
+      },
+      "creationTimestamp": "2026-08-26T04:39:01.361611Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787719104133835",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-9k542",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ682YrYg",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-9k542",
+      "uid": "cc5cbefa-7043-4476-8e98-ad3b097f7519"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:39:19.125924Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:39:19.125924Z",
+          "message": "Execution completed successfully in 14.09s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:39:02.421914Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:39:10.752607Z",
+          "message": "Started deployed execution in 8.33s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:39:01.999409Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-9k542%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:39:05.033957Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "d49720bf-989b-460d-8704-8c098a199d21"
+      },
+      "creationTimestamp": "2026-08-26T04:38:01.333669Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787719046694273",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-jcrc7",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ68opIyU",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-jcrc7",
+      "uid": "14558174-25c0-43eb-a2be-85212ed383f0"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:38:23.788263Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:38:23.788263Z",
+          "message": "Execution completed successfully in 18.75s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:38:02.480008Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:38:13.204827Z",
+          "message": "Started deployed execution in 10.72s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:38:02.059842Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-jcrc7%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:38:05.033998Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "e031c08a-fdc5-4f65-90c1-057c9ef5a701"
+      },
+      "creationTimestamp": "2026-08-26T04:37:00.645298Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787718982353064",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-smzpt",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ68a8ohk",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-smzpt",
+      "uid": "ffec0686-c4c8-4969-aeea-7637b0f1f7cb"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:37:24.451665Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:37:24.451665Z",
+          "message": "Execution completed successfully in 19.42s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:37:01.752221Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:37:15.222534Z",
+          "message": "Started deployed execution in 13.47s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:37:01.348282Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-smzpt%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:37:05.027344Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "d24c85cf-70ac-48f1-b232-5e3c5c2cbbc6"
+      },
+      "creationTimestamp": "2026-08-26T04:36:00.645858Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787718924826765",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-cw9ns",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ68Lm6z0",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-cw9ns",
+      "uid": "852116cc-c160-4178-ad6e-c0a45ceb6a63"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:36:21.123471Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:36:21.123471Z",
+          "message": "Execution completed successfully in 16.09s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:36:01.788019Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:36:10.919978Z",
+          "message": "Started deployed execution in 9.13s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:36:01.354700Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-cw9ns%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:36:05.027036Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "352f487b-0888-4606-aa42-6d87f9d2f91f"
+      },
+      "creationTimestamp": "2026-08-26T04:35:00.653130Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787718864528817",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-bs8vm",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ6795E9c",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-bs8vm",
+      "uid": "073dee1c-6b23-4003-934e-d69997318fa4"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:35:24.597395Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:35:24.597395Z",
+          "message": "Execution completed successfully in 19.57s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:01.789906Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:14.106561Z",
+          "message": "Started deployed execution in 12.31s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:01.333565Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-bs8vm%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:35:05.024207Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "c6f1c93c-b2ce-45db-b74d-fdbd9e8e9ec4"
+      },
+      "creationTimestamp": "2026-08-26T04:34:00.672493Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787718801486946",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-bcz4x",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ67vhFIs",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-bcz4x",
+      "uid": "5456b736-6627-46f7-a72c-4c708838c535"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:34:22.647680Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:34:22.647680Z",
+          "message": "Execution completed successfully in 17.62s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:34:01.779628Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:34:13.264251Z",
+          "message": "Started deployed execution in 11.48s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:34:01.365981Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-bcz4x%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:34:05.023409Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "01012ba1-793f-42ed-8c51-004ee9186ec1"
+      },
+      "creationTimestamp": "2026-08-26T04:33:01.385126Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "zek_qid_pin",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-scheduler-collector",
+        "run.googleapis.com/jobGeneration": "80",
+        "run.googleapis.com/jobResourceVersion": "1787718743104135",
+        "run.googleapis.com/jobUid": "2e37170b-1bff-4718-b8e3-a103bc462e4d",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-scheduler-collector-p42lh",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-scheduler-collector",
+          "uid": "2e37170b-1bff-4718-b8e3-a103bc462e4d"
+        }
+      ],
+      "resourceVersion": "AAZZ67gfDfY",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-scheduler-collector-p42lh",
+      "uid": "9105e0f8-a79e-41be-89b4-3d570828a78e"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "scheduler-collector"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "GCP_REGION",
+                  "value": "asia-south1"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "120"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:33:21.084736Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:33:21.084736Z",
+          "message": "Execution completed successfully in 16.06s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:33:02.476980Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:33:11.131257Z",
+          "message": "Started deployed execution in 8.65s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:33:02.062119Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-scheduler-collector%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-scheduler-collector-p42lh%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:33:05.020957Z",
+      "succeededCount": 1
+    }
+  }
+]

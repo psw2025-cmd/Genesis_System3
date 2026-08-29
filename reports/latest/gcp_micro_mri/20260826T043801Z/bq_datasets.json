@@ -1,0 +1,3 @@
+{
+  "error": "ERROR: (gcloud.bq) Invalid choice: 'datasets'.\r\nMaybe you meant:\r\n  gcloud bq migration-workflows list\r\n  gcloud alpha bq datasets list\r\n  gcloud healthcare datasets list\r\n  gcloud bq migration-workflows create\r\n  gcloud bq migration-workflows delete\r\n  gcloud bq migration-workflows describe\r\n  gcloud network-security url-lists list\r\n  gcloud scc bqexports list\r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+}

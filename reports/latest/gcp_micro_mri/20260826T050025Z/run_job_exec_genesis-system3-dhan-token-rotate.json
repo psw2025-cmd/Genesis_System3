@@ -1,0 +1,1839 @@
+[
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "warghade2012@gmail.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "warghade2012@gmail.com",
+        "run.googleapis.com/operation-id": "1cd82528-a48b-4f7c-9bd2-e5a019685b32"
+      },
+      "creationTimestamp": "2026-08-09T23:01:20.249314Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "xes_fes_zug",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "7",
+        "run.googleapis.com/jobResourceVersion": "1786316166029897",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-25szr",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZYpTdQpH4",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-25szr",
+      "uid": "8b9a9744-563b-401b-8f1f-cf3f175688e8"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "6"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:2646304d2f82-1786053698",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "802404398783-compute@developer.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-09T23:01:21.143934Z",
+          "message": "spec.template.spec.containers[0].env[12].value_from.secret_key_ref.name: Failed to access secret projects/system3-openalgo-safe/secrets/dhan-totp-secret/versions/latest: Secret Version [projects/802404398783/secrets/dhan-totp-secret/versions/8] is in DESTROYED state.",
+          "status": "False",
+          "type": "Completed"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-25szr%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "0f7ece05-d82b-42c2-99dc-c49b9f6c5d5c"
+      },
+      "creationTimestamp": "2026-08-26T05:00:05.357209Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787720126213602",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-6b9b6",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ7Bkwctg",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-6b9b6",
+      "uid": "c434529b-500f-4aae-9250-fd9c92d901b8"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T05:00:25.173415Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T05:00:25.173415Z",
+          "message": "Execution completed successfully in 16.07s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T05:00:06.827718Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T05:00:18.444322Z",
+          "message": "Started deployed execution in 11.61s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T05:00:06.409884Z",
+          "message": "Imported container image in 1.05s.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-6b9b6%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T05:00:09.101535Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "dfd30a27-194b-45ed-9b89-353997ab1809"
+      },
+      "creationTimestamp": "2026-08-26T04:55:04.718201Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787719827493722",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-rck7b",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ7AcUz7Q",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-rck7b",
+      "uid": "e5eb2286-07bd-473a-8dab-bd5ecdbd09d3"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:55:23.072552Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:55:23.072552Z",
+          "message": "Execution completed successfully in 14s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:55:05.773590Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:55:15.327969Z",
+          "message": "Started deployed execution in 9.55s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:55:05.633858Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-rck7b%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:55:09.069119Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "4b4fd0c0-c617-47b7-bff3-deca702b2969"
+      },
+      "creationTimestamp": "2026-08-26T04:50:04.677727Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787719527334311",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-lxz7d",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ6/VGxUs",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-lxz7d",
+      "uid": "95164b99-55ce-4541-b204-8525a350d5ad"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:50:22.542071Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:50:22.542071Z",
+          "message": "Execution completed successfully in 13.47s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:50:05.790782Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:50:16.573334Z",
+          "message": "Started deployed execution in 10.78s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:50:05.621275Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-lxz7d%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:50:09.062374Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "84dcf548-c5da-4ed3-91df-8a063f117f99"
+      },
+      "creationTimestamp": "2026-08-26T04:45:05.351556Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787719225299150",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-dj8zh",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ6+Nipyw",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-dj8zh",
+      "uid": "75a122fa-f73b-491a-8784-dbd137ae8ffc"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:45:22.543537Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:45:22.543537Z",
+          "message": "Execution completed successfully in 13.49s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:45:06.663473Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:45:16.281368Z",
+          "message": "Started deployed execution in 9.61s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:45:06.422957Z",
+          "message": "Imported container image in 1.09s.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-dj8zh%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:45:09.047665Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "50213a50-a07c-4552-9633-690e500fd25d"
+      },
+      "creationTimestamp": "2026-08-26T04:40:04.663543Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787718924948505",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-bmsvf",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ69Fh9IQ",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-bmsvf",
+      "uid": "a12d6a94-0943-4ec8-8bc0-74b43837310f"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:40:21.110566Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:40:21.110566Z",
+          "message": "Execution completed successfully in 12.07s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:05.744541Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:14.383985Z",
+          "message": "Started deployed execution in 8.63s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:40:05.597976Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-bmsvf%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:40:09.036551Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "d8399436-085b-426f-bd8c-bea475532d61"
+      },
+      "creationTimestamp": "2026-08-26T04:35:04.739700Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787718621618214",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-zcr9l",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ6796+b0",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-zcr9l",
+      "uid": "eced6be8-fde1-4efa-a812-f4cc382f0a6d"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:35:21.190491Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:35:21.190491Z",
+          "message": "Execution completed successfully in 12.16s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:06.328733Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:14.412881Z",
+          "message": "Started deployed execution in 8.08s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:35:05.920396Z",
+          "message": "Imported container image in 1.18s.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-zcr9l%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:35:09.027018Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "7c348d3d-1a9a-4094-813e-724557605d62"
+      },
+      "creationTimestamp": "2026-08-26T04:30:04.752173Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787718324272736",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-8wj4l",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ661mgtk",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-8wj4l",
+      "uid": "1bdbc314-7aaf-487e-9bef-e891bb034bb2"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:30:21.104556Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:30:21.104556Z",
+          "message": "Execution completed successfully in 12.09s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:30:05.918042Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:30:15.093820Z",
+          "message": "Started deployed execution in 9.17s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:30:05.763105Z",
+          "message": "Imported container image in 1.01s.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-8wj4l%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:30:09.006062Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "a2cd6cbb-5a63-4d55-b715-5e5464009f31"
+      },
+      "creationTimestamp": "2026-08-26T04:25:05.330485Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787718028363054",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-jjq4q",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ65utZaw",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-jjq4q",
+      "uid": "12e4fd3f-7507-4936-9ac4-ba7377222f7b"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:25:20.569421Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:25:20.569421Z",
+          "message": "Execution completed successfully in 11.57s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:25:06.781773Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:25:13.464362Z",
+          "message": "Started deployed execution in 6.68s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:25:06.359372Z",
+          "message": "Imported container image in 1.03s.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-jjq4q%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:25:08.994486Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "1922a9f1-fed1-4b9b-a206-08f827021651"
+      },
+      "creationTimestamp": "2026-08-26T04:20:04.651029Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "kis_nep_cuc",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-dhan-token-rotate",
+        "run.googleapis.com/jobGeneration": "131",
+        "run.googleapis.com/jobResourceVersion": "1787717729417285",
+        "run.googleapis.com/jobUid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-dhan-token-rotate-cbr86",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-dhan-token-rotate",
+          "uid": "462e245a-6385-4f20-9b1b-4aa3bc6a4f45"
+        }
+      ],
+      "resourceVersion": "AAZZ64oKL7A",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-dhan-token-rotate-cbr86",
+      "uid": "5ec4176a-7c4e-4071-b63b-b6334513d774"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_dhan_token_rotation_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "GOOGLE_CLOUD_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                  "value": "1"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_CANDIDATE_SECRET_ID",
+                  "value": "dhan-access-token-candidate"
+                },
+                {
+                  "name": "DHAN_ROTATE_WHEN_HOURS_LEFT",
+                  "value": "2"
+                },
+                {
+                  "name": "DHAN_REMINT_COOLDOWN_MINUTES",
+                  "value": "30"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                },
+                {
+                  "name": "DHAN_CLIENT_ID",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "system3-dhan-client-id"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-access-token"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_PIN",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-pin"
+                    }
+                  }
+                },
+                {
+                  "name": "DHAN_TOTP_SECRET",
+                  "valueFrom": {
+                    "secretKeyRef": {
+                      "key": "latest",
+                      "name": "dhan-totp-secret"
+                    }
+                  }
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:20:24.975714Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:20:24.975714Z",
+          "message": "Execution completed successfully in 17.99s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:20:05.670330Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:20:17.090665Z",
+          "message": "Started deployed execution in 11.42s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:20:05.522651Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-dhan-token-rotate%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-dhan-token-rotate-cbr86%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:20:06.982788Z",
+      "succeededCount": 1
+    }
+  }
+]

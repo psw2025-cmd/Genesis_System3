@@ -329,6 +329,36 @@
       ],
       "timeout_minutes": 10,
       "description": "Weekly scan for duplicate/orphan modules vs declared authoritative entrypoints. Writes reports/latest/repo_authority/."
+    },
+    {
+      "id": "pending_tracker_refresh",
+      "name": "Pending Issues Tracking Checklist Refresh (overwrite-only)",
+      "script": "scripts/system3_pending_tracker_refresh.py",
+      "args": [],
+      "enabled": true,
+      "type": "interval",
+      "interval_minutes": 60,
+      "schedule_time": "*/60",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": false,
+      "market_dependent": false,
+      "timeout_minutes": 5,
+      "description": "Probes live Cloud Run APIs and OVERWRITES reports/coordination/TRACKING_CHECKLIST.md|.json + session_issues_master.csv. No dated duplicate tracking logs."
+    },
+    {
+      "id": "command_center_refresh",
+      "name": "Agent Command Center full refresh (tracker+Excel+issues mermaid)",
+      "script": "scripts/system3_command_center_refresh.py",
+      "args": [],
+      "enabled": true,
+      "type": "interval",
+      "interval_minutes": 120,
+      "schedule_time": "*/120",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": false,
+      "market_dependent": false,
+      "timeout_minutes": 8,
+      "description": "Overwrite COMMAND_CENTER.md, ISSUES_ONLY.md, ISSUES_MERMAID.md, TRACKING_CHECKLIST.*, AGENT_OPERATING_OPTIONS.xlsx. Agents should also run this immediately after edits (do not wait for schedule)."
     }
   ]
 }

@@ -1,0 +1,61 @@
+---
+description: Cloud+GitHub temporal truth; mandatory GitHub vs laptop compare; ban old local folders
+alwaysApply: true
+---
+
+# Cloud + GitHub temporal truth (mandatory)
+
+## Final authority (never invert this)
+
+1. **GitHub** `psw2025-cmd/Genesis_System3` (`origin/main`) = source-of-truth for code history and merges
+2. **Google Cloud Run** live `/api/deploy_info` (+ broker/health proofs) = source-of-truth for what is **serving now**
+3. **Laptop folders are not truth** — they are only a working checkout. Never claim PASS from local files alone.
+
+## Mandatory gate before ANY local edit / PR / agent work
+
+Run this compare **first** (every session / every task). If skipped → stop.
+
+```text
+1) git fetch origin
+2) record: GitHub/origin/main SHA
+3) record: live Cloud Run git_sha from /api/deploy_info
+4) record: laptop HEAD + branch + toplevel path
+5) only then edit — and only in the primary clone or its linked worktree
+```
+
+- If laptop path is **old/broken/stale** → **do not work there**; switch to primary first
+- If local is behind/ahead of GitHub → say so explicitly; do not pretend local == cloud
+- Serving SHA may lag `main` (deploy pending/failed) — report both; do not invent local “deployed”
+
+## Primary laptop clone (only allowed root)
+
+`C:\Users\ADMIN\Genesis_System3\Genesis_System3`
+
+Linked worktrees of this `.git` (C/D/E) are OK. Prefer **E:** when C: free space is low.
+
+## NEVER work here (hard ban)
+
+| Path | Why |
+|---|---|
+| `C:\System3\Genesis_System3` | Broken Git archive — no HEAD/objects |
+| `C:\Users\ADMIN\Genesis_System3` (parent only) | Stale non-primary checkout |
+| `C:\Genesis_System3` root | Not a clone (overlay only) |
+
+## Live endpoints (keep open — first priority)
+
+- UI symbols: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`
+- Broker tab: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=broker`
+- Deploy SHA: `https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy_info`
+- Broker JSON: `https://genesis-system3-web-doq2wplepa-el.a.run.app/api/broker/status`
+- Full list: `docs/handoffs/LIVE_PRIORITY_URLS.md`
+- Human also keeps Dhan open: `https://web.dhan.co/`
+
+## Live endpoints
+
+- UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`
+- Deploy: `…/api/deploy_info`
+- Broker: `…/api/broker/status`
+
+## Evidence location
+
+`reports/latest/repo_path_audit/cloud_github_vs_laptop.json`

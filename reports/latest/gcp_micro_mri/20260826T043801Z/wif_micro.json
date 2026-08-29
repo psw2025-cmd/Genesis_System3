@@ -1,0 +1,42 @@
+[
+  {
+    "pool": {
+      "displayName": "Genesis GitHub main deploy",
+      "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-main-deploy",
+      "state": "ACTIVE"
+    },
+    "providers": {
+      "error": "ERROR: (gcloud.iam.workload-identity-pools.providers.list) unrecognized arguments: gs3-github-main-deploy \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+    }
+  },
+  {
+    "pool": {
+      "displayName": "Genesis GitHub Main",
+      "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-main",
+      "state": "ACTIVE"
+    },
+    "providers": {
+      "error": "ERROR: (gcloud.iam.workload-identity-pools.providers.list) unrecognized arguments: gs3-github-main \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+    }
+  },
+  {
+    "pool": {
+      "displayName": "Genesis GitHub read-only CI",
+      "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-read",
+      "state": "ACTIVE"
+    },
+    "providers": {
+      "error": "ERROR: (gcloud.iam.workload-identity-pools.providers.list) unrecognized arguments: gs3-github-read \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+    }
+  },
+  {
+    "pool": {
+      "displayName": "Genesis System3 GitHub",
+      "name": "projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3",
+      "state": "ACTIVE"
+    },
+    "providers": {
+      "error": "ERROR: (gcloud.iam.workload-identity-pools.providers.list) unrecognized arguments: github-genesis-system3 \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+    }
+  }
+]

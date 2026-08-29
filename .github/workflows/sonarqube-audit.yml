@@ -16,7 +16,7 @@ jobs:
     outputs:
       configured: ${{ steps.preflight.outputs.configured }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - id: preflight
@@ -48,7 +48,7 @@ jobs:
           }, indent=2, sort_keys=True), encoding='utf-8')
           PY
       - if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: sonar-readiness-${{ github.run_number }}
           path: reports/latest/sonar_audit/
@@ -60,11 +60,11 @@ jobs:
     if: ${{ needs.readiness.outputs.configured == 'true' && vars.SONAR_ORGANIZATION != '' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: SonarQube Cloud scan
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
@@ -77,11 +77,11 @@ jobs:
     if: ${{ needs.readiness.outputs.configured == 'true' && vars.SONAR_ORGANIZATION == '' && vars.SONAR_HOST_URL != '' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: SonarQube Server scan
-        uses: SonarSource/sonarqube-scan-action@v7
+        uses: SonarSource/sonarqube-scan-action@v4
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}

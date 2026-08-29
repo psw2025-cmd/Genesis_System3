@@ -1,0 +1,46 @@
+[
+  {
+    "combiner": "OR",
+    "conditions": [
+      {
+        "conditionThreshold": {
+          "aggregations": [
+            {
+              "alignmentPeriod": "300s",
+              "crossSeriesReducer": "REDUCE_MEAN",
+              "perSeriesAligner": "ALIGN_FRACTION_TRUE"
+            }
+          ],
+          "comparison": "COMPARISON_LT",
+          "duration": "300s",
+          "filter": "resource.type = \"uptime_url\" AND metric.type = \"monitoring.googleapis.com/uptime_check/check_passed\" AND metric.labels.check_id = \"genesis-system3-web-api-health-AKMkUdZUqCo\"",
+          "thresholdValue": 1.0,
+          "trigger": {
+            "count": 1
+          }
+        },
+        "displayName": "Uptime check failing",
+        "name": "projects/system3-openalgo-safe/alertPolicies/11219724983257390289/conditions/11219724983257390874"
+      }
+    ],
+    "creationRecord": {
+      "mutateTime": "2026-08-13T20:23:39.889005090Z",
+      "mutatedBy": "warghade2012@gmail.com"
+    },
+    "displayName": "genesis-system3-web uptime failed",
+    "documentation": {
+      "content": "Cloud Run dependency-free liveness GET /api/healthz is failing. Canonical URL: https://genesis-system3-web-doq2wplepa-el.a.run.app/api/healthz . Investigate revision/platform availability first; use GET /api/health separately for broker, market, and business truth.",
+      "mimeType": "text/markdown",
+      "subject": "Genesis System3 /api/healthz failed"
+    },
+    "enabled": true,
+    "mutationRecord": {
+      "mutateTime": "2026-08-23T16:59:10.227881362Z",
+      "mutatedBy": "warghade2012@gmail.com"
+    },
+    "name": "projects/system3-openalgo-safe/alertPolicies/11219724983257390289",
+    "notificationChannels": [
+      "projects/system3-openalgo-safe/notificationChannels/5777127534136440481"
+    ]
+  }
+]

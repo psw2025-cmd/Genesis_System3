@@ -1,0 +1,14 @@
+{
+  "folders": [
+    {
+      "name": "Genesis_System3 (canonical)",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "git.autoRepositoryDetection": true,
+    "files.exclude": {
+      "**/.worktrees": false
+    }
+  }
+}

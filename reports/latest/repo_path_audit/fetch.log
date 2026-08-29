@@ -1,0 +1,62 @@
+﻿git : From https://github.com/psw2025-cmd/Genesis_System3
+At C:\Users\ADMIN\AppData\Local\Temp\ps-script-01e2bf61-1bdf-443e-b2eb-5bacab6a5eb5.ps1:93 char:1
++ git -C $Primary fetch origin --prune 2>&1 | Out-File (Join-Path $OutD ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (From https://gi...Genesis_System3:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+ - [deleted]             (none)                 -> origin/feat/drive-archive-control-20260824
+ - [deleted]             (none)                 -> origin/feat/live-unresolved-issue-ledger-20260824
+ - [deleted]             (none)                 -> origin/feat/p0-188-equity-coverage-horizons-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-20260824 -> origin/chatgpt/ruhi-capability-mri-v3-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-20260824-probe -> 
+origin/chatgpt/ruhi-capability-mri-v3-20260824-probe
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-actual-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-actual-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-clean-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-clean-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-commit-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-commit-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-doc-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-doc-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-doc2-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-doc2-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-final-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-final-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-keep-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-keep-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-one-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-one-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-policy-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-policy-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-policy-final-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-policy-final-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-probe2-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-probe2-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-real-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-real-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-rules-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-rules-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-single-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-single-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-writeprobe-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-writeprobe-20260824
+ * [new branch]          chatgpt/ruhi-capability-mri-v3-writeprobe2-20260824 -> 
+origin/chatgpt/ruhi-capability-mri-v3-writeprobe2-20260824
+ * [new branch]          chatgpt/ruhi-v3        -> origin/chatgpt/ruhi-v3
+ * [new branch]          chatgpt/ruhi-v3-authority -> origin/chatgpt/ruhi-v3-authority
+ * [new branch]          chatgpt/ruhi-v3-canonical -> origin/chatgpt/ruhi-v3-canonical
+ * [new branch]          chatgpt/ruhi-v3-capability -> origin/chatgpt/ruhi-v3-capability
+ * [new branch]          chatgpt/ruhi-v3-capability-policy -> origin/chatgpt/ruhi-v3-capability-policy
+ * [new branch]          chatgpt/ruhi-v3-capability-rule -> origin/chatgpt/ruhi-v3-capability-rule
+ * [new branch]          chatgpt/ruhi-v3-final  -> origin/chatgpt/ruhi-v3-final
+ * [new branch]          chatgpt/ruhi-v3-mri    -> origin/chatgpt/ruhi-v3-mri
+ * [new branch]          chatgpt/ruhi-v3-only   -> origin/chatgpt/ruhi-v3-only
+ * [new branch]          chatgpt/ruhi-v3-policy -> origin/chatgpt/ruhi-v3-policy
+ * [new branch]          chatgpt/ruhi-v3-rule   -> origin/chatgpt/ruhi-v3-rule
+ * [new branch]          docs/ruhi-agent-failover-v2-20260824 -> origin/docs/ruhi-agent-failover-v2-20260824
+ * [new branch]          fix/mri-cloud-audit-attribution-20260825 -> origin/fix/mri-cloud-audit-attribution-20260825
+ * [new branch]          fix/mri-webdriver-startup-retry-20260825 -> origin/fix/mri-webdriver-startup-retry-20260825
+ * [new branch]          fix/ruhi-external-ai-advisory-gate-20260825 -> 
+origin/fix/ruhi-external-ai-advisory-gate-20260825
+   719566d23..2c0b44a43  main                   -> origin/main

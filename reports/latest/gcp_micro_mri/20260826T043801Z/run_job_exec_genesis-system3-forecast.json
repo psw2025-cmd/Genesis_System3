@@ -1,0 +1,1487 @@
+[
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "8fa368e7-2c8a-4c88-9a3c-ca84501d37c8"
+      },
+      "creationTimestamp": "2026-08-26T04:00:00.239965Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "bas_xip_suv",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "84",
+        "run.googleapis.com/jobResourceVersion": "1787712598822460",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-xlfdg",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZ60IiABM",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-xlfdg",
+      "uid": "9073909b-eee2-453e-9d30-4feb3b0f1197"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-26T04:00:18.290838Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T04:00:18.290838Z",
+          "message": "Execution completed successfully in 13.35s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:00:01.261708Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:00:11.162218Z",
+          "message": "Started deployed execution in 9.9s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T04:00:00.855087Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-xlfdg%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-26T04:00:04.934957Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "2b743c3d-9a8c-4490-8551-41836364c435"
+      },
+      "creationTimestamp": "2026-08-25T04:00:00.215089Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "yex_ded_noh",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "77",
+        "run.googleapis.com/jobResourceVersion": "1787565150318382",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-mr78x",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZ1yPTiJk",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-mr78x",
+      "uid": "99855d5d-e3de-4f83-8c0b-5099e123b931"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "8ba7738a1583d17b6ce793411dcfd4087a8617b7"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:d99d63448fb8bc21f711b31cd316758011d6a942e295d072eb001320ec8756fd",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-25T04:00:14.024105Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T04:00:14.024105Z",
+          "message": "Execution completed successfully in 11.22s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T04:00:01.363550Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T04:00:06.247254Z",
+          "message": "Started deployed execution in 4.88s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T04:00:00.952716Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-mr78x%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-25T04:00:02.796509Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "f38ad613-73ca-4e23-89e8-c838df66d913"
+      },
+      "creationTimestamp": "2026-08-24T04:00:00.218952Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "yev_jaz_ciq",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "72",
+        "run.googleapis.com/jobResourceVersion": "1787506102659105",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-hfxrd",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZwwZ1CMo",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-hfxrd",
+      "uid": "0f8f0f52-de8e-4375-895d-c706e094fb98"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "887212b33b02da3247860f5e280e9a90a443b87a"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:7b722c22e2bbbcfeeb9e08c89437b4e2114f7eb850209f8e393c10d815b44711",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-24T04:00:18.276414Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T04:00:18.276414Z",
+          "message": "Execution completed successfully in 14.73s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T04:00:01.348573Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T04:00:10.673261Z",
+          "message": "Started deployed execution in 9.32s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T04:00:00.921705Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-hfxrd%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-24T04:00:03.544220Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "adf62ed2-d8f9-4b1c-b3da-9cd567b5b9e6"
+      },
+      "creationTimestamp": "2026-08-21T04:00:00.700740Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "sub_xab_lay",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "56",
+        "run.googleapis.com/jobResourceVersion": "1787258107749881",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-hrp5w",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZhqzDp88",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-hrp5w",
+      "uid": "aee40025-e1ad-4853-ac03-e7f9de6d568c"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "94d791f709afe2d801d0013da1db3fc871d5f12f"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:40c4d224ed74f04de7a6119e79262f6e8ec296bef1f3187a0e3339e1bbff1af0",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-21T04:00:15.452841Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-21T04:00:15.452841Z",
+          "message": "Task genesis-system3-forecast-hrp5w-task0 failed with exit code: 1 and message: The container exited with an error.",
+          "reason": "NonZeroExitCode",
+          "status": "False",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-21T04:00:01.775424Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-21T04:00:07.929417Z",
+          "message": "Started deployed execution in 6.15s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-21T04:00:01.355966Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "failedCount": 1,
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-hrp5w%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-21T04:00:03.845533Z"
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "cbc22ff8-b2b8-43f7-8ef1-2a2c123e8e37"
+      },
+      "creationTimestamp": "2026-08-20T04:00:00.950609Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "jeq_wan_kes",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "50",
+        "run.googleapis.com/jobResourceVersion": "1787154362237270",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-qff8t",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZco6K3Qs",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-qff8t",
+      "uid": "cd362a76-a98f-4b18-a66b-c5488a0c796d"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "680944481ba71834fe59dfab5e937fd43afa6609"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:ca3e70903cb9c097e03cacd585fb0b6d5c9adff0f989f4a2383229f8f0e7b71e",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-20T04:00:12.600393Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-20T04:00:12.600393Z",
+          "message": "Execution completed successfully in 9.39s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-20T04:00:01.808109Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-20T04:00:07.296551Z",
+          "message": "Started deployed execution in 5.48s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-20T04:00:01.659718Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-qff8t%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-20T04:00:03.210076Z",
+      "succeededCount": 1
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "4aad2ecd-b902-4d67-8624-6976fc6a57c7"
+      },
+      "creationTimestamp": "2026-08-19T04:00:00.253063Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "doz_xaz_jim",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "47",
+        "run.googleapis.com/jobResourceVersion": "1787087328541587",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-7xr4m",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZXnEqq4c",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-7xr4m",
+      "uid": "aaa2ee56-9f00-4777-9a06-6948b1f4b41f"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "309bec66c417f93e556a33ef62fa9f31254eeed1"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:facc72eb7f15d971f2d245ddf5201fc0141a25b7a5e047e685b9c5c9c672ce84",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-19T04:00:15.626194Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-19T04:00:15.626194Z",
+          "message": "Task genesis-system3-forecast-7xr4m-task0 failed with exit code: 1 and message: The container exited with an error.",
+          "reason": "NonZeroExitCode",
+          "status": "False",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-19T04:00:01.325664Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-19T04:00:10.115534Z",
+          "message": "Started deployed execution in 8.78s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-19T04:00:00.916952Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "failedCount": 1,
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-7xr4m%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-19T04:00:03.337777Z"
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "463dd563-d6f8-460c-846e-9e170cbc05ef"
+      },
+      "creationTimestamp": "2026-08-18T04:00:00.726313Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "rur_wic_raw",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "41",
+        "run.googleapis.com/jobResourceVersion": "1786962723618972",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-t6564",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZSlNbTP8",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-t6564",
+      "uid": "278d1779-6553-427e-a291-6ee4386c2f5d"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "8ee7258759c08b8ef19341342863ac6c25bfaf7e"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:1ebfae9949fa544dc53510662554c02e8c3ff15119cb75b4e07ee09fe796b335",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-18T04:00:17.405004Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-18T04:00:17.405004Z",
+          "message": "Task genesis-system3-forecast-t6564-task0 failed with exit code: 1 and message: The container exited with an error.",
+          "reason": "NonZeroExitCode",
+          "status": "False",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-18T04:00:01.705059Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-18T04:00:10.211053Z",
+          "message": "Started deployed execution in 8.5s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-18T04:00:01.445150Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "failedCount": 1,
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-t6564%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-18T04:00:03.224106Z"
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "f14e1002-31fb-453a-b506-c2f1e3f9ec86"
+      },
+      "creationTimestamp": "2026-08-17T05:50:08.048167Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "puy_nug_haq",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "39",
+        "run.googleapis.com/jobResourceVersion": "1786945597772912",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-xjk5g",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZN783s4A",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-xjk5g",
+      "uid": "0af51d53-0f0c-48de-91d8-e2e0c47219d8"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "a2b24ef9eebf314bf4a11ff7266542af9c8b7b69"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0b36584fa82dc04c87fc6aa291c14c76c4998a8c4a63e9ad2e45894c744479c2",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-17T05:50:24.867268Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-17T05:50:24.867268Z",
+          "message": "Task genesis-system3-forecast-xjk5g-task0 failed with exit code: 1 and message: The container exited with an error.",
+          "reason": "NonZeroExitCode",
+          "status": "False",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:50:09.216084Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:50:15.745576Z",
+          "message": "Started deployed execution in 6.52s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:50:08.794067Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "failedCount": 1,
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-xjk5g%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-17T05:50:10.480145Z"
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "fa561668-f893-4871-a240-422491940a1f"
+      },
+      "creationTimestamp": "2026-08-17T05:28:14.214476Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "yol_biz_xal",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "38",
+        "run.googleapis.com/jobResourceVersion": "1786944268609320",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-b7fdr",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZN3EWfGY",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-b7fdr",
+      "uid": "b7a18cb1-1efd-4a56-b2bd-3973cd762055"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "fdb5d4e4917cd5673eb7f755e480ccf71e3e877b"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:2f7cd5fdef2d5b072bcce0c262d48d6ea672b739178910e18e4059523115ef99",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-17T05:28:33.501668Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-17T05:28:33.501668Z",
+          "message": "Task genesis-system3-forecast-b7fdr-task0 failed with exit code: 1 and message: The container exited with an error.",
+          "reason": "NonZeroExitCode",
+          "status": "False",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:28:15.089585Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:28:25.222623Z",
+          "message": "Started deployed execution in 10.13s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T05:28:14.935863Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "failedCount": 1,
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-b7fdr%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-17T05:28:16.467016Z"
+    }
+  },
+  {
+    "apiVersion": "run.googleapis.com/v1",
+    "kind": "Execution",
+    "metadata": {
+      "annotations": {
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/execution-environment": "gen2",
+        "run.googleapis.com/lastModifier": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "run.googleapis.com/operation-id": "bf9f60d8-f1bc-4312-8bda-ac7921f9a829"
+      },
+      "creationTimestamp": "2026-08-17T04:00:00.241718Z",
+      "generation": 1,
+      "labels": {
+        "client.knative.dev/nonce": "xux_zuw_maq",
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/job": "genesis-system3-forecast",
+        "run.googleapis.com/jobGeneration": "37",
+        "run.googleapis.com/jobResourceVersion": "1786932890465959",
+        "run.googleapis.com/jobUid": "f3e13907-8095-46bc-8339-0681dae7b218",
+        "run.googleapis.com/satisfiesPzs": "true"
+      },
+      "name": "genesis-system3-forecast-84bfs",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Job",
+          "name": "genesis-system3-forecast",
+          "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+        }
+      ],
+      "resourceVersion": "AAZZNjVKmqc",
+      "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/executions/genesis-system3-forecast-84bfs",
+      "uid": "b05b8930-3997-455e-a569-f1b4baa79210"
+    },
+    "spec": {
+      "parallelism": 1,
+      "taskCount": 1,
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "args": [
+                "scripts/gcp_worker_job.py"
+              ],
+              "command": [
+                "python"
+              ],
+              "env": [
+                {
+                  "name": "SYSTEM3_JOB_KIND",
+                  "value": "forecast"
+                },
+                {
+                  "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_FIRESTORE_PROJECT",
+                  "value": "system3-openalgo-safe"
+                },
+                {
+                  "name": "DHAN_TOKEN_SOURCE",
+                  "value": "gcp-secret-manager-dynamic"
+                },
+                {
+                  "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                  "value": "dhan-access-token"
+                },
+                {
+                  "name": "LIVE_TRADING_ENABLED",
+                  "value": "0"
+                },
+                {
+                  "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                  "value": "0"
+                },
+                {
+                  "name": "AUTO_EXECUTE_TRADES",
+                  "value": "0"
+                },
+                {
+                  "name": "ANALYZE_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "CLOUD_MODE",
+                  "value": "1"
+                },
+                {
+                  "name": "DEPLOY_GIT_SHA",
+                  "value": "3e377e7a428f1ffefccb3348a7a0ed6edf178f7d"
+                }
+              ],
+              "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:ee5240a2368a749a4066ef5ab2ff68a8233d9f736cb2a15ba300c61048202d94",
+              "name": "genesis-system3-1",
+              "resources": {
+                "limits": {
+                  "cpu": "1000m",
+                  "memory": "512Mi"
+                }
+              }
+            }
+          ],
+          "maxRetries": 0,
+          "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+          "timeoutSeconds": "600"
+        }
+      }
+    },
+    "status": {
+      "completionTime": "2026-08-17T04:00:15.152444Z",
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-17T04:00:15.152444Z",
+          "message": "Execution completed successfully in 10.72s.",
+          "status": "True",
+          "type": "Completed"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T04:00:01.300431Z",
+          "message": "Provisioned imported containers.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T04:00:08.943439Z",
+          "message": "Started deployed execution in 7.64s.",
+          "status": "True",
+          "type": "Started"
+        },
+        {
+          "lastTransitionTime": "2026-08-17T04:00:00.886346Z",
+          "message": "Imported container image.",
+          "status": "True",
+          "type": "ContainerReady"
+        }
+      ],
+      "logUri": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&advancedFilter=resource.type%3D%22cloud_run_job%22%0Aresource.labels.job_name%3D%22genesis-system3-forecast%22%0Aresource.labels.location%3D%22asia-south1%22%0Alabels.%22run.googleapis.com/execution_name%22%3D%22genesis-system3-forecast-84bfs%22",
+      "observedGeneration": 1,
+      "startTime": "2026-08-17T04:00:04.424640Z",
+      "succeededCount": 1
+    }
+  }
+]

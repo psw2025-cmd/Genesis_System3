@@ -25,6 +25,7 @@ AUTOMATIC = {
     "repo-clean-forensic-toolkit.yml",
     "command-center-access.yml",
     "live-proof-center.yml",
+    "system3-runbook-audit.yml",
 }
 MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY

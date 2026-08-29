@@ -1,0 +1,22 @@
+[
+  {
+    "displayName": "Genesis GitHub main deploy",
+    "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-main-deploy",
+    "state": "ACTIVE"
+  },
+  {
+    "displayName": "Genesis GitHub Main",
+    "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-main",
+    "state": "ACTIVE"
+  },
+  {
+    "displayName": "Genesis GitHub read-only CI",
+    "name": "projects/802404398783/locations/global/workloadIdentityPools/gs3-github-read",
+    "state": "ACTIVE"
+  },
+  {
+    "displayName": "Genesis System3 GitHub",
+    "name": "projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3",
+    "state": "ACTIVE"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com/keys/f10fb100a7bebc01d0b3fda222efe5968ce7b46b",
+    "validAfterTime": "2026-08-14T19:48:39Z",
+    "validBeforeTime": "2026-08-31T19:48:39Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com/keys/78ca8ecc477d952fe40b8bbfa5eba1657f57462a",
+    "validAfterTime": "2026-08-23T19:48:39Z",
+    "validBeforeTime": "2026-09-08T19:48:39Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com/keys/dfa7cbfeb6963c9b4496f102933fa23d9f789e90",
+    "validAfterTime": "2026-08-13T21:35:33Z",
+    "validBeforeTime": "2028-08-12T21:35:33Z"
+  }
+]

@@ -1,0 +1,130 @@
+{
+  "apiVersion": "run.googleapis.com/v1",
+  "kind": "Job",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "568.0.0",
+      "run.googleapis.com/creator": "warghade2012@gmail.com",
+      "run.googleapis.com/lastModifier": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "run.googleapis.com/operation-id": "817a65bc-a2ed-4d6c-a838-a9d80a166a57"
+    },
+    "creationTimestamp": "2026-08-04T15:46:26.635998Z",
+    "generation": 84,
+    "labels": {
+      "cloud.googleapis.com/location": "asia-south1",
+      "run.googleapis.com/lastUpdatedTime": "2026-08-26T02:49:58.208093Z",
+      "run.googleapis.com/satisfiesPzs": "true"
+    },
+    "name": "genesis-system3-forecast",
+    "namespace": "802404398783",
+    "resourceVersion": "AAZZ60Ih5zA",
+    "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/jobs/genesis-system3-forecast",
+    "uid": "f3e13907-8095-46bc-8339-0681dae7b218"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "568.0.0",
+          "run.googleapis.com/execution-environment": "gen2"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "bas_xip_suv"
+        }
+      },
+      "spec": {
+        "parallelism": 1,
+        "taskCount": 1,
+        "template": {
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "scripts/gcp_worker_job.py"
+                ],
+                "command": [
+                  "python"
+                ],
+                "env": [
+                  {
+                    "name": "SYSTEM3_JOB_KIND",
+                    "value": "forecast"
+                  },
+                  {
+                    "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_FIRESTORE_PROJECT",
+                    "value": "system3-openalgo-safe"
+                  },
+                  {
+                    "name": "DHAN_TOKEN_SOURCE",
+                    "value": "gcp-secret-manager-dynamic"
+                  },
+                  {
+                    "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                    "value": "dhan-access-token"
+                  },
+                  {
+                    "name": "LIVE_TRADING_ENABLED",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                    "value": "0"
+                  },
+                  {
+                    "name": "AUTO_EXECUTE_TRADES",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ANALYZE_MODE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "CLOUD_MODE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "DEPLOY_GIT_SHA",
+                    "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+                  }
+                ],
+                "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226",
+                "name": "genesis-system3-1",
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ],
+            "maxRetries": 0,
+            "serviceAccountName": "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+            "timeoutSeconds": "600"
+          }
+        }
+      }
+    }
+  },
+  "status": {
+    "conditions": [
+      {
+        "status": "True",
+        "type": "Ready"
+      }
+    ],
+    "executionCount": 46,
+    "latestCreatedExecution": {
+      "completionStatus": "EXECUTION_SUCCEEDED",
+      "completionTimestamp": "2026-08-26T04:00:18.290838Z",
+      "creationTimestamp": "2026-08-26T04:00:00.239965Z",
+      "name": "genesis-system3-forecast-xlfdg"
+    },
+    "observedGeneration": 84
+  }
+}

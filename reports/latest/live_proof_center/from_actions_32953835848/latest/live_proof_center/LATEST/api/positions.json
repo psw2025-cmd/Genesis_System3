@@ -1,0 +1,12 @@
+{
+  "path": "/api/positions",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 563,
+  "content_type": "application/json",
+  "data": {
+    "positions": [],
+    "open_count": 0,
+    "message": "Positions file not found"
+  }
+}

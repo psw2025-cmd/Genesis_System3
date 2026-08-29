@@ -1,0 +1,16 @@
+{
+  "displayName": "Genesis Token Rotation Missed Run",
+  "conditions": [
+    {
+      "displayName": "Scheduler missed run",
+      "conditionThreshold": {
+        "filter": "metric.type=\"cloudscheduler.googleapis.com/job/execution_count\" resource.type=\"cloud_scheduler_job\" resource.label.job_id=\"genesis-system3-dhan-token-rotate-daily\"",
+        "comparison": "COMPARISON_LT",
+        "thresholdValue": 1,
+        "duration": "300s"
+      }
+    }
+  ],
+  "combiner": "OR",
+  "enabled": true
+}

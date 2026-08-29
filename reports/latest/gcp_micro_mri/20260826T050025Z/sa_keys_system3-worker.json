@@ -1,0 +1,18 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/system3-worker@system3-openalgo-safe.iam.gserviceaccount.com/keys/e4319b35a21b86332f4cc351a03c8dcc22c90e5b",
+    "validAfterTime": "2026-08-10T19:08:35Z",
+    "validBeforeTime": "2026-08-26T19:08:35Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/system3-worker@system3-openalgo-safe.iam.gserviceaccount.com/keys/f278435cd1a7aa1c63fffdd98f22b06487e462a6",
+    "validAfterTime": "2026-08-02T19:02:37Z",
+    "validBeforeTime": "2028-08-01T19:02:37Z"
+  }
+]

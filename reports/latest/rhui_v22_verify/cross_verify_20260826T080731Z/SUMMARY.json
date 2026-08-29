@@ -1,0 +1,92 @@
+{
+  "captured_at_utc": "2026-08-26T08:07:33.398290+00:00",
+  "endpoints": {
+    "api/deploy_info": {
+      "git_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "live": false
+    },
+    "api/broker/status": {
+      "connected": true,
+      "auth": "AUTH_OK",
+      "live": false,
+      "orders": false,
+      "secret_version": null
+    },
+    "api/health": {
+      "status": "ok",
+      "qc": "NOT_READY",
+      "qc_failures": [
+        "NO_QC_DATA"
+      ]
+    },
+    "api/state": {
+      "qc": "NOT_READY",
+      "reasons": [
+        "NO_VERIFIED_CONTRACTS"
+      ],
+      "market_open": true
+    },
+    "api/scheduler/health": {
+      "healthy": false,
+      "status": "UNHEALTHY",
+      "alert_severity": "warning",
+      "unhealthy_reasons": [
+        "enabled scheduler execution stale beyond cadence grace: genesis-system3-signals"
+      ],
+      "business_readiness": "PARTIAL"
+    },
+    "api/auto_gates": {
+      "passing": 2,
+      "total": 7,
+      "market_open": true,
+      "blockers": [
+        "PROFIT_BLOCKER",
+        "SYS3-BLK-003",
+        "SYS3-BLK-005",
+        "SYS3-BLK-008",
+        "TICK_HEALTH_BLOCKER"
+      ]
+    },
+    "api/batch/chains": {
+      "ready": true,
+      "chains": {
+        "NIFTY": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:23.489176+00:00",
+          "n_contracts": 462
+        },
+        "BANKNIFTY": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:30.616399+00:00",
+          "n_contracts": 714
+        },
+        "FINNIFTY": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:37.681451+00:00",
+          "n_contracts": 470
+        },
+        "MIDCPNIFTY": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:02.308999+00:00",
+          "n_contracts": 506
+        },
+        "SENSEX": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:09.365977+00:00",
+          "n_contracts": 392
+        },
+        "BANKEX": {
+          "status": "MARKET_OPEN",
+          "stale": false,
+          "fetched_at_utc": "2026-08-26T08:07:16.408685+00:00",
+          "n_contracts": 398
+        }
+      }
+    }
+  }
+}

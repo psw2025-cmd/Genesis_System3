@@ -5,29 +5,81 @@
       "label": "Open Streamlit Dashboard (in default browser)",
       "type": "shell",
       "command": "start",
-      "args": ["http://127.0.0.1:8501"],
-      "windows": { "command": "start", "args": ["http://127.0.0.1:8501"] },
-      "osx": { "command": "open", "args": ["http://127.0.0.1:8501"] },
-      "linux": { "command": "xdg-open", "args": ["http://127.0.0.1:8501"] },
-      "presentation": { "reveal": "silent", "panel": "shared" },
+      "args": [
+        "http://127.0.0.1:8501"
+      ],
+      "windows": {
+        "command": "start",
+        "args": [
+          "http://127.0.0.1:8501"
+        ]
+      },
+      "osx": {
+        "command": "open",
+        "args": [
+          "http://127.0.0.1:8501"
+        ]
+      },
+      "linux": {
+        "command": "xdg-open",
+        "args": [
+          "http://127.0.0.1:8501"
+        ]
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
       "problemMatcher": []
     },
     {
       "label": "Open Backend API Docs (in default browser)",
       "type": "shell",
       "command": "start",
-      "args": ["http://127.0.0.1:8000/docs"],
-      "windows": { "command": "start", "args": ["http://127.0.0.1:8000/docs"] },
-      "osx": { "command": "open", "args": ["http://127.0.0.1:8000/docs"] },
-      "linux": { "command": "xdg-open", "args": ["http://127.0.0.1:8000/docs"] },
-      "presentation": { "reveal": "silent", "panel": "shared" },
+      "args": [
+        "http://127.0.0.1:8000/docs"
+      ],
+      "windows": {
+        "command": "start",
+        "args": [
+          "http://127.0.0.1:8000/docs"
+        ]
+      },
+      "osx": {
+        "command": "open",
+        "args": [
+          "http://127.0.0.1:8000/docs"
+        ]
+      },
+      "linux": {
+        "command": "xdg-open",
+        "args": [
+          "http://127.0.0.1:8000/docs"
+        ]
+      },
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared"
+      },
       "problemMatcher": []
     },
     {
       "label": "Open all live URLs (Streamlit + API docs)",
-      "dependsOn": ["Open Streamlit Dashboard (in default browser)", "Open Backend API Docs (in default browser)"],
+      "dependsOn": [
+        "Open Streamlit Dashboard (in default browser)",
+        "Open Backend API Docs (in default browser)"
+      ],
       "dependsOrder": "parallel",
       "problemMatcher": []
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "path": ".worktrees/cloud_first_mri_20260828/desktop_app",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: build - .worktrees/cloud_first_mri_20260828/desktop_app",
+      "detail": "electron-builder"
     }
   ]
 }

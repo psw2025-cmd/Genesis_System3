@@ -1,0 +1,306 @@
+{
+  "apiVersion": "serving.knative.dev/v1",
+  "kind": "Service",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/build-enable-automatic-updates": "false",
+      "run.googleapis.com/build-image-uri": "asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web",
+      "run.googleapis.com/build-name": "projects/802404398783/locations/asia-south1/builds/9b77d989-13ae-43de-9524-50a4b9cf98a1",
+      "run.googleapis.com/build-source-location": "gs://run-sources-system3-openalgo-safe-asia-south1/services/genesis-system3-web/1786376854.329189-2c48e9dcf9f94557a8a62931ab56f4ae.zip#1786376876711702",
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "568.0.0",
+      "run.googleapis.com/ingress": "all",
+      "run.googleapis.com/ingress-status": "all",
+      "run.googleapis.com/invoker-iam-disabled": "true",
+      "run.googleapis.com/maxScale": "1",
+      "run.googleapis.com/minScale": "1",
+      "run.googleapis.com/operation-id": "7bac866e-7166-4c08-8f4d-0fefa7802182",
+      "run.googleapis.com/urls": "[\"https://genesis-system3-web-802404398783.asia-south1.run.app\",\"https://genesis-system3-web-doq2wplepa-el.a.run.app\"]",
+      "serving.knative.dev/creator": "warghade2012@gmail.com",
+      "serving.knative.dev/lastModifier": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com"
+    },
+    "creationTimestamp": "2026-08-02T21:05:36.482465Z",
+    "generation": 619,
+    "labels": {
+      "cloud.googleapis.com/location": "asia-south1",
+      "run.googleapis.com/satisfiesPzs": "true"
+    },
+    "name": "genesis-system3-web",
+    "namespace": "802404398783",
+    "resourceVersion": "AAZZ6j7V9+U",
+    "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/services/genesis-system3-web",
+    "uid": "16b93d94-9edf-445a-b249-3547393662ce"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "autoscaling.knative.dev/maxScale": "10",
+          "autoscaling.knative.dev/minScale": "1",
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "568.0.0",
+          "run.googleapis.com/cpu-throttling": "false",
+          "run.googleapis.com/sessionAffinity": "true",
+          "run.googleapis.com/startup-cpu-boost": "true",
+          "system3.deploy/ml-truth": "1786747979",
+          "system3.deploy/token-remount": "1786762303",
+          "system3.secrets-refresh": "1786011877",
+          "system3.token-permanent-fix": "1786011877"
+        },
+        "labels": {
+          "run.googleapis.com/startupProbeType": "Default"
+        },
+        "name": "genesis-system3-web-00617-vif"
+      },
+      "spec": {
+        "containerConcurrency": 50,
+        "containers": [
+          {
+            "env": [
+              {
+                "name": "DHAN_CLIENT_ID",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "latest",
+                    "name": "system3-dhan-client-id"
+                  }
+                }
+              },
+              {
+                "name": "WORKER_PUSH_TOKEN",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "key": "latest",
+                    "name": "system3-dashboard-worker-push-token"
+                  }
+                }
+              },
+              {
+                "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+                "value": "0"
+              },
+              {
+                "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+                "value": "0"
+              },
+              {
+                "name": "LIVE_TRADING_ENABLED",
+                "value": "0"
+              },
+              {
+                "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                "value": "0"
+              },
+              {
+                "name": "AUTO_EXECUTE_TRADES",
+                "value": "0"
+              },
+              {
+                "name": "REQUIRE_API_KEY",
+                "value": "false"
+              },
+              {
+                "name": "ANALYZE_MODE",
+                "value": "1"
+              },
+              {
+                "name": "SYSTEM3_MODE",
+                "value": "ANALYZER"
+              },
+              {
+                "name": "SYSTEM3_REAL_ONLY",
+                "value": "1"
+              },
+              {
+                "name": "CLOUD_PAPER_ENGINE",
+                "value": "0"
+              },
+              {
+                "name": "DEFER_INSTRUMENT_WARMUP",
+                "value": "1"
+              },
+              {
+                "name": "SYSTEM3_STATE_BACKEND",
+                "value": "firestore"
+              },
+              {
+                "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+                "value": "1"
+              },
+              {
+                "name": "SYSTEM3_FIRESTORE_PROJECT",
+                "value": "system3-openalgo-safe"
+              },
+              {
+                "name": "SYSTEM3_STATE_REFRESH_S",
+                "value": "5"
+              },
+              {
+                "name": "SYSTEM3_SYNC_INTERVAL_S",
+                "value": "60"
+              },
+              {
+                "name": "DHAN_TOKEN_SOURCE",
+                "value": "gcp-secret-manager-dynamic"
+              },
+              {
+                "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+                "value": "dhan-access-token"
+              },
+              {
+                "name": "DHAN_TOKEN_CACHE_TTL_S",
+                "value": "30"
+              },
+              {
+                "name": "DHAN_TOKEN_ROTATION_JOB",
+                "value": "genesis-system3-dhan-token-rotate"
+              },
+              {
+                "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+                "value": "*/5 * * * * Asia/Kolkata"
+              },
+              {
+                "name": "DHAN_STATUS_AUTO_REFRESH",
+                "value": "0"
+              },
+              {
+                "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+                "value": "3600"
+              },
+              {
+                "name": "DHAN_PERSIST_TOKEN_TO_SM",
+                "value": "0"
+              },
+              {
+                "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+                "value": "0"
+              },
+              {
+                "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+                "value": "900"
+              },
+              {
+                "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+                "value": "broker-token-rotate"
+              },
+              {
+                "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+                "value": "120"
+              },
+              {
+                "name": "CLOUD_MODE",
+                "value": "1"
+              },
+              {
+                "name": "SYSTEM3_DEPLOY_TARGET",
+                "value": "gcp-cloud-run"
+              },
+              {
+                "name": "MEM_LIMIT_MB",
+                "value": "960"
+              },
+              {
+                "name": "MEM_WARN_MB",
+                "value": "700"
+              },
+              {
+                "name": "MEM_GC_MB",
+                "value": "850"
+              },
+              {
+                "name": "MARKET_TOP_MICRO_STREAM",
+                "value": "0"
+              },
+              {
+                "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+                "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+              },
+              {
+                "name": "SYSTEM3_API_BASE",
+                "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+              },
+              {
+                "name": "PUBLIC_BACKEND_URL",
+                "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+              },
+              {
+                "name": "PUBLIC_DASHBOARD_URL",
+                "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+              },
+              {
+                "name": "DEPLOY_GIT_SHA",
+                "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+              },
+              {
+                "name": "FORCE_RESTART_TIMESTAMP",
+                "value": "1787324373"
+              }
+            ],
+            "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226",
+            "name": "genesis-system3-1",
+            "ports": [
+              {
+                "containerPort": 8080,
+                "name": "http1"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "cpu": "1",
+                "memory": "1Gi"
+              }
+            },
+            "startupProbe": {
+              "failureThreshold": 1,
+              "periodSeconds": 240,
+              "tcpSocket": {
+                "port": 8080
+              },
+              "timeoutSeconds": 240
+            }
+          }
+        ],
+        "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+        "timeoutSeconds": 300
+      }
+    },
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "genesis-system3-web-00617-vif"
+      }
+    ]
+  },
+  "status": {
+    "address": {
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-08-26T02:47:51.693285Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2026-08-26T02:47:08.029666Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2026-08-26T02:47:51.653988Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "genesis-system3-web-00617-vif",
+    "latestReadyRevisionName": "genesis-system3-web-00617-vif",
+    "observedGeneration": 619,
+    "traffic": [
+      {
+        "percent": 100,
+        "revisionName": "genesis-system3-web-00617-vif"
+      }
+    ],
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+  }
+}

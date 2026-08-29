@@ -1,0 +1,12 @@
+{
+  "path": "/api/signal/top",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 582,
+  "content_type": "application/json",
+  "data": {
+    "action": "NO_TRADE",
+    "reason": "Signal file not found",
+    "data_source": "real"
+  }
+}

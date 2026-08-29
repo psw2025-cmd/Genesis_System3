@@ -1,0 +1,171 @@
+{
+  "f12": {
+    "captured_at_utc": "2026-08-26T04:23:47Z",
+    "page_url": "https://console.cloud.google.com/iam-admin/iam?hl=en_GB&project=system3-openalgo-safe",
+    "page_title": "IAM \u2013 IAM and admin \u2013 system3-openalgo-safe \u2013 Google Cloud console",
+    "view_mode": "View by principals (also captured View by roles counts)",
+    "account": "warghade2012@gmail.com",
+    "navigation_duration_ms": 17657,
+    "dom_content_loaded_ms": 3483,
+    "transfer_size_bytes": 483182,
+    "performance_nodes": 47942,
+    "performance_js_heap_used": 130445556,
+    "performance_resources": 115,
+    "resource_entries_matched": 39,
+    "note": "F12 equivalent via CDP Network.enable + Performance.getMetrics + Runtime.evaluate (resource timings). Cookie/storage CDP denied by policy.",
+    "top_network_hosts": "console.cloud.google.com/p/ping; cloud.google.com/log; analytics.google.com"
+  },
+  "ui_roles": [
+    "Artifact Registry Administrator (1)",
+    "Artifact Registry Reader (4)",
+    "Artifact Registry Writer (2)",
+    "Browser (2)",
+    "Cloud Build Editor (3)",
+    "Cloud Build Service Account (1)",
+    "Cloud Build Viewer (2)",
+    "Cloud Datastore Owner (1)",
+    "Cloud Datastore User (7)",
+    "Cloud Datastore Viewer (1)",
+    "Cloud Run developer (4)",
+    "Cloud Run Viewer (8)",
+    "Cloud Scheduler Admin (3)",
+    "Cloud Scheduler Viewer (4)",
+    "Genesis System3 IAM Repair (2)",
+    "Logging Admin (1)",
+    "Logs Viewer (4)",
+    "Logs Writer (2)",
+    "Monitoring Admin (1)",
+    "Monitoring Viewer (4)",
+    "Owner (1)",
+    "Project IAM Admin (3)",
+    "Pub/Sub Viewer (1)",
+    "Role Administrator (2)",
+    "Secret Manager Secret Accessor (2)",
+    "Secret Manager Secret Version Adder (1)",
+    "Secret Manager Viewer (3)",
+    "Security Reviewer (2)",
+    "Service Account Admin (1)"
+  ],
+  "ui_principals": [
+    [
+      "serviceAccount",
+      "claude-system3-executor@system3-openalgo-safe.iam.gserviceaccount.com",
+      "",
+      "Artifact Registry Administrator; Cloud Build Editor; Cloud Datastore Owner; Cloud Run Viewer; Cloud Scheduler Admin; Logging Admin; Monitoring Admin; Project IAM Admin; Service Account Admin; Service Account Key Admin; Service Account User; Service Usage Admin; Storage Admin"
+    ],
+    [
+      "serviceAccount",
+      "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 GitHub Automation",
+      "Artifact Registry Reader; Artifact Registry Writer; Browser; Cloud Build Editor; Cloud Run developer; Cloud Run Viewer; Cloud Scheduler Admin; Logs Viewer; Monitoring Viewer; Service Account User; Service Usage Consumer; Storage Object Admin"
+    ],
+    [
+      "serviceAccount",
+      "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 Dhan token rotator",
+      "Secret Manager Secret Accessor; Secret Manager Secret Version Adder"
+    ],
+    [
+      "serviceAccount",
+      "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "genesis-system3-web",
+      "Cloud Datastore User; Cloud Run developer; Cloud Run Viewer; Secret Manager Secret Accessor"
+    ],
+    [
+      "serviceAccount",
+      "github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com",
+      "GitHub Actions Cloud Run Auto Deploy",
+      "Artifact Registry Writer; Cloud Build Editor; Cloud Build Service Account; Cloud Run developer; Cloud Scheduler Admin; Logs Writer; Service Account User; Service Usage Consumer; Storage Admin; Viewer"
+    ],
+    [
+      "serviceAccount",
+      "gs3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 read-only evidence collector",
+      "Artifact Registry Reader; Cloud Build Viewer; Cloud Run Viewer; Cloud Scheduler Viewer; Logs Viewer; Monitoring Viewer; Secret Manager Viewer; Security Reviewer"
+    ],
+    [
+      "serviceAccount",
+      "gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com",
+      "gs3-forecast-job",
+      "Cloud Datastore User"
+    ],
+    [
+      "serviceAccount",
+      "gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 IAM repair fallback",
+      "Genesis System3 IAM Repair; Project IAM Admin; Role Administrator"
+    ],
+    [
+      "serviceAccount",
+      "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 IAM repair primary",
+      "Genesis System3 IAM Repair; Project IAM Admin; Role Administrator"
+    ],
+    [
+      "serviceAccount",
+      "gs3-ops-controller@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis autonomous operations controller",
+      "Artifact Registry Reader; Cloud Build Viewer; Cloud Run Viewer; Cloud Scheduler Viewer; Logs Viewer; Monitoring Viewer; Pub/Sub Viewer; Secret Manager Viewer; Security Reviewer; Service Usage Consumer"
+    ],
+    [
+      "serviceAccount",
+      "gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com",
+      "gs3-rank-job",
+      "Cloud Datastore User"
+    ],
+    [
+      "serviceAccount",
+      "gs3-rollback@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis Cloud Run rollback controller",
+      "Cloud Run developer"
+    ],
+    [
+      "serviceAccount",
+      "gs3-scheduler-collector@system3-openalgo-safe.iam.gserviceaccount.com",
+      "gs3-scheduler-collector",
+      "Cloud Datastore User; Cloud Run Viewer; Cloud Scheduler Viewer"
+    ],
+    [
+      "serviceAccount",
+      "gs3-signals-job@system3-openalgo-safe.iam.gserviceaccount.com",
+      "gs3-signals-job",
+      "Cloud Datastore User"
+    ],
+    [
+      "serviceAccount",
+      "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 Dhan token manual recovery",
+      "Cloud Run Viewer"
+    ],
+    [
+      "serviceAccount",
+      "system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+      "System3 Cloud Build (keyless)",
+      "Logs Writer; Storage Object Viewer"
+    ],
+    [
+      "serviceAccount",
+      "system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com",
+      "System3 read-only evidence reader",
+      "Artifact Registry Reader; Browser; Cloud Datastore Viewer; Cloud Run Viewer; Cloud Scheduler Viewer; Logs Viewer; Monitoring Viewer; Secret Manager Viewer; Service Usage Consumer"
+    ],
+    [
+      "serviceAccount",
+      "system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 Web Runtime",
+      "Cloud Datastore User"
+    ],
+    [
+      "serviceAccount",
+      "system3-worker@system3-openalgo-safe.iam.gserviceaccount.com",
+      "Genesis System3 Worker Runtime",
+      "Cloud Datastore User"
+    ],
+    [
+      "user",
+      "warghade2012@gmail.com",
+      "Pritam Warghade",
+      "Owner"
+    ]
+  ]
+}

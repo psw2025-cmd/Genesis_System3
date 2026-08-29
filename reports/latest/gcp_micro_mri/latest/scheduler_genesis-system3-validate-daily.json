@@ -1,0 +1,30 @@
+{
+  "attemptDeadline": "180s",
+  "httpTarget": {
+    "body": "e30=",
+    "headers": {
+      "Content-Type": "application/json",
+      "User-Agent": "Google-Cloud-Scheduler"
+    },
+    "httpMethod": "POST",
+    "oauthToken": {
+      "scope": "https://www.googleapis.com/auth/cloud-platform",
+      "serviceAccountEmail": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com"
+    },
+    "uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate:run"
+  },
+  "lastAttemptTime": "2026-08-25T10:05:00.175774Z",
+  "name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate-daily",
+  "retryConfig": {
+    "maxBackoffDuration": "3600s",
+    "maxDoublings": 5,
+    "maxRetryDuration": "0s",
+    "minBackoffDuration": "5s"
+  },
+  "schedule": "5 10 * * MON-FRI",
+  "scheduleTime": "2026-08-26T10:05:00Z",
+  "state": "ENABLED",
+  "status": {},
+  "timeZone": "UTC",
+  "userUpdateTime": "2026-08-26T02:50:38.780491Z"
+}

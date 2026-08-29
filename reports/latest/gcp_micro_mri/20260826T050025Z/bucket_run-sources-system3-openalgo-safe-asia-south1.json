@@ -1,0 +1,35 @@
+{
+  "cors_config": [
+    {
+      "method": [
+        "GET"
+      ],
+      "origin": [
+        "https://*.cloud.google.com",
+        "https://*.corp.google.com",
+        "https://*.corp.google.com:*",
+        "https://*.cloud.google",
+        "https://*.byoid.goog"
+      ]
+    }
+  ],
+  "creation_time": "2026-08-06T10:54:35+0000",
+  "default_storage_class": "STANDARD",
+  "generation": 1786013674151146964,
+  "labels": {
+    "used-by": "cloudrun"
+  },
+  "location": "ASIA-SOUTH1",
+  "location_type": "region",
+  "metageneration": 1,
+  "name": "run-sources-system3-openalgo-safe-asia-south1",
+  "public_access_prevention": "inherited",
+  "satisfies_pzs": true,
+  "soft_delete_policy": {
+    "effectiveTime": "2026-08-06T10:54:35.130000+00:00",
+    "retentionDurationSeconds": "604800"
+  },
+  "storage_url": "gs://run-sources-system3-openalgo-safe-asia-south1/",
+  "uniform_bucket_level_access": true,
+  "update_time": "2026-08-06T10:54:35+0000"
+}

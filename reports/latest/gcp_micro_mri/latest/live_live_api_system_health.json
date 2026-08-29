@@ -1,0 +1,226 @@
+{
+  "status": "ok",
+  "timestamp": "2026-08-26T10:46:17.974058+05:30",
+  "token": {
+    "status": "unknown",
+    "log_line": "log not found"
+  },
+  "datasource_health": null,
+  "datasource_resilience": "UNKNOWN",
+  "retrain_needed": false,
+  "scheduler_daemon": {
+    "started_at": null,
+    "heartbeat": null,
+    "pid": null,
+    "active": false
+  },
+  "jobs": [
+    {
+      "id": "self_healing_watchdog",
+      "name": "Self-Healing Watchdog (Auto-Fix)",
+      "schedule_time": "08:30",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "datasource_health_check",
+      "name": "Data Source Health Check (Pre-Market)",
+      "schedule_time": "08:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "dashboard_endpoint_coverage",
+      "name": "Dashboard Endpoint Coverage Proof",
+      "schedule_time": "08:05",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "auto_coordinator_premarket",
+      "name": "Full Auto Coordinator (Pre-Market)",
+      "schedule_time": "08:10",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "dhan_instruments_sync",
+      "name": "Dhan Instrument Master Sync",
+      "schedule_time": "08:35",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "daily_gain_rank",
+      "name": "Daily Gain Rank (Pre-Market)",
+      "schedule_time": "09:15",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "paper_lifecycle_proof",
+      "name": "Analyzer Paper Lifecycle Proof",
+      "schedule_time": "09:30",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "ui_market_cross_verify",
+      "name": "UI Market Cross Verify",
+      "schedule_time": "10:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "paper_lifecycle_proof_midday",
+      "name": "Analyzer Paper Lifecycle Proof (Midday)",
+      "schedule_time": "12:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "ui_market_cross_verify_midday",
+      "name": "UI Market Cross Verify (Midday)",
+      "schedule_time": "12:30",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "paper_lifecycle_proof_afternoon",
+      "name": "Analyzer Paper Lifecycle Proof (Afternoon)",
+      "schedule_time": "14:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "ui_market_cross_verify_afternoon",
+      "name": "UI Market Cross Verify (Afternoon)",
+      "schedule_time": "14:30",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "daily_gain_validate",
+      "name": "Daily Gain Validate (Post-Market)",
+      "schedule_time": "15:35",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "daily_gain_trend",
+      "name": "Daily Accuracy Trend (Post-Market)",
+      "schedule_time": "15:40",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "daily_prediction_benchmark",
+      "name": "Daily Prediction-vs-Actual Benchmark (Issue #26)",
+      "schedule_time": "15:45",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "dashboard_browser_proof",
+      "name": "Dashboard Browser Proof (Playwright)",
+      "schedule_time": "16:05",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "system3_post_market_pipeline",
+      "name": "Post-Market Auto Pipeline",
+      "schedule_time": "15:50",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "paper_day_proof_pack",
+      "name": "Paper Day Proof Pack (Human-Requested 14-Point Checklist)",
+      "schedule_time": "16:15",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "auto_retrain",
+      "name": "Auto Model Retrain (Post-Market)",
+      "schedule_time": "16:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "auto_coordinator_post_market",
+      "name": "Full Auto Coordinator (Post-Market)",
+      "schedule_time": "16:10",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "bhavcopy_download",
+      "name": "NSE FO Bhavcopy Download (Post-Market)",
+      "schedule_time": "18:30",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "signal_engine_bhavcopy",
+      "name": "Signal Engine - Bhavcopy Runner (Post-Market)",
+      "schedule_time": "18:45",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    },
+    {
+      "id": "weekly_repo_authority_audit",
+      "name": "Weekly Repo Authority Audit (Issue #28)",
+      "schedule_time": "19:00",
+      "enabled": true,
+      "last_run_time": null,
+      "last_status": null,
+      "last_error": null
+    }
+  ]
+}

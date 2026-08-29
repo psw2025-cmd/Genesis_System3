@@ -1,0 +1,23 @@
+[
+  {
+    "description": "Bounded resource IAM repair; no secret payload or Cloud Run job execution",
+    "etag": "BwZZGzswf9g=",
+    "name": "projects/system3-openalgo-safe/roles/GenesisSystem3IamRepair",
+    "stage": "GA",
+    "title": "Genesis System3 IAM Repair"
+  },
+  {
+    "description": "Manage IAM policy only for the System3 token rotation job",
+    "etag": "BwZYYdHBz2E=",
+    "name": "projects/system3-openalgo-safe/roles/system3RunJobIamBinder",
+    "stage": "GA",
+    "title": "System3 Run Job IAM Binder"
+  },
+  {
+    "description": "Manage IAM bindings on selected System3 secrets only",
+    "etag": "BwZYYXCJE7M=",
+    "name": "projects/system3-openalgo-safe/roles/system3SecretIamBinder",
+    "stage": "GA",
+    "title": "System3 Secret IAM Binder"
+  }
+]
