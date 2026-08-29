@@ -1,11 +1,20 @@
 # Genesis System3 — Multi-Agent Live Handoff
 
-Updated: 2026-08-22 16:04 IST / 10:34 UTC (Cursor serving-SHA recapture; prior snapshots remain historical)
-Rule target: `docs/RUHI_RULE_V2.md`
+Updated: 2026-08-22 16:26 IST / 10:56 UTC (Cursor permanent UI-closure rule locked; prior snapshots remain historical)
+Rule target: `docs/RUHI_RULE_V2.md` + `docs/handoffs/CURSOR_PERMANENT_UI_CLOSURE_RULE.md`
 Task authority: `reports/coordination/ruhi_task_ledger.csv`
 Primary P0 issue: #188
 HUMAN_ACTION_REQUIRED=NO
-NEXT_ACTION_OWNER=ChatGPT (RUHI-022 cadence SSOT)
+NEXT_ACTION_OWNER=Cursor (finish frozen PR #321 / RUHI-022, then UI-closure)
+
+## Cursor 2026-08-22T10:56Z permanent UI-closure lock
+
+- Owner locked the Cursor permanent UI-closure rule. Durable path: `docs/handoffs/CURSOR_PERMANENT_UI_CLOSURE_RULE.md` and `.cursor/rules/ui-closure.mdc`.
+- Backend/API/CI PASS is never completion. Every user-visible feature must compare GCP runtime → API JSON → frontend store → rendered `/ui` on the exact serving SHA.
+- Current highest-priority Cursor lane remains frozen PR #321 (RUHI-022). Do not add files to that PR. Merge only if Global Safety + Security Audit + CodeQL are green. Then one normal deploy and prove `/api/scheduler/health?refresh=true` `healthy=true`.
+- ChatGPT PR #322 stays CLOSED. Do not merge #286. Do not edit `.cursor/rules/governance-watchdog.mdc` (PR #317).
+- After scheduler-health proof, Cursor continues tab-by-tab UI closure. Weekend market is CLOSED: distinguish last-session/CLOSED honesty from defects; never invent live values.
+- This identity cannot `gh issue comment` on #188. Durable write = these files + Gmail mirror.
 
 ## Cursor 2026-08-22T10:34:40Z serving + named-gate recapture
 
