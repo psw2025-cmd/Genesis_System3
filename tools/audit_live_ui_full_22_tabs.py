@@ -59,15 +59,19 @@ ctx.verify_mode = ssl.CERT_NONE
 
 
 def fetch_api(path: str) -> tuple[int, int]:
-    try:
-        req = urllib.request.Request(
-            PROD_BASE + path, headers={"User-Agent": "Genesis-UI-Auditor/1.0"}
-        )
-        with urllib.request.urlopen(req, timeout=10, context=ctx) as resp:
-            data = resp.read()
-            return resp.status, len(data)
-    except Exception as e:
-        return 0, 0
+    for attempt in range(2):
+        try:
+            req = urllib.request.Request(
+                PROD_BASE + path, headers={"User-Agent": "Genesis-UI-Auditor/1.0"}
+            )
+            with urllib.request.urlopen(req, timeout=15, context=ctx) as resp:
+                data = resp.read()
+                return resp.status, len(data)
+        except Exception:
+            if attempt == 0:
+                time.sleep(0.5)
+                continue
+    return 0, 0
 
 
 def cdp_send(

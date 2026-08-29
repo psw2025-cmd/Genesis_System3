@@ -1,7 +1,7 @@
 {
   "proof_id": "ISSUE_188_MASTER_PARITY_PROOF_V4",
-  "started_at_utc": "2026-08-29T17:26:33.581845+00:00",
-  "completed_at_utc": "2026-08-29T17:26:36.606828+00:00",
+  "started_at_utc": "2026-08-29T17:40:41.788189+00:00",
+  "completed_at_utc": "2026-08-29T17:40:44.709962+00:00",
   "production_service": "genesis-system3-web",
   "serving_revision": "genesis-system3-web-00653-rid",
   "overall_verdict": "PASS (15/15 CATEGORIES GREEN)",
@@ -11,7 +11,7 @@
       "expected_count": 136670,
       "api_observed_count": 136670,
       "missing_count": 0,
-      "latency_ms": 98.7,
+      "latency_ms": 114.5,
       "source": "dhan_master (runtime_json)",
       "verdict": "PASS"
     },
@@ -20,7 +20,7 @@
       "expected_count": 216,
       "api_observed_count": 216,
       "missing_count": 0,
-      "latency_ms": 57.1,
+      "latency_ms": 65.5,
       "source": "dhan_fno_master",
       "verdict": "PASS"
     },
@@ -29,7 +29,7 @@
       "expected_count": 44,
       "api_observed_count": 44,
       "missing_count": 0,
-      "latency_ms": 133.9,
+      "latency_ms": 130.3,
       "source": "chain_adapter (dhan)",
       "verdict": "PASS"
     },
@@ -38,7 +38,7 @@
       "expected_count": 4,
       "api_observed_count": 4,
       "missing_count": 0,
-      "latency_ms": 133.9,
+      "latency_ms": 130.3,
       "source": "dhan_live_chains",
       "verdict": "PASS"
     },
@@ -47,7 +47,7 @@
       "expected_count": 1,
       "api_observed_count": 1,
       "missing_count": 0,
-      "latency_ms": 173.9,
+      "latency_ms": 124.9,
       "source": "options_intel_engine",
       "verdict": "PASS"
     },
@@ -56,7 +56,7 @@
       "expected_count": 5,
       "api_observed_count": 5,
       "missing_count": 0,
-      "latency_ms": 69.5,
+      "latency_ms": 54.1,
       "source": "greeks_service",
       "verdict": "PASS"
     },
@@ -65,7 +65,7 @@
       "expected_count": 1,
       "api_observed_count": 1,
       "missing_count": 0,
-      "latency_ms": 70.2,
+      "latency_ms": 59.4,
       "source": "pcr_analytics",
       "verdict": "PASS"
     },
@@ -74,7 +74,7 @@
       "expected_count": 3,
       "api_observed_count": 3,
       "missing_count": 0,
-      "latency_ms": 55.5,
+      "latency_ms": 41.2,
       "source": "multibagger_screener",
       "verdict": "PASS"
     },
@@ -83,7 +83,7 @@
       "expected_count": 4,
       "api_observed_count": 4,
       "missing_count": 0,
-      "latency_ms": 59.8,
+      "latency_ms": 54.1,
       "source": "catalyst_service",
       "verdict": "PASS"
     },
@@ -92,7 +92,7 @@
       "expected_count": 129,
       "api_observed_count": 129,
       "missing_count": 0,
-      "latency_ms": 52.6,
+      "latency_ms": 58.4,
       "source": "feature_pipeline",
       "verdict": "PASS"
     },
@@ -101,7 +101,7 @@
       "expected_count": 184,
       "api_observed_count": 184,
       "missing_count": 0,
-      "latency_ms": 63.5,
+      "latency_ms": 42.3,
       "source": "gcs_manifest_lineage",
       "verdict": "PASS"
     },
@@ -110,7 +110,7 @@
       "expected_count": 1,
       "api_observed_count": 1,
       "missing_count": 0,
-      "latency_ms": 80.1,
+      "latency_ms": 82.6,
       "source": "firestore_paper_state",
       "verdict": "PASS"
     },
@@ -119,7 +119,7 @@
       "expected_count": 1,
       "api_observed_count": 1,
       "missing_count": 0,
-      "latency_ms": 1009.6,
+      "latency_ms": 1070.3,
       "source": "risk_engine",
       "verdict": "PASS"
     },
@@ -128,7 +128,7 @@
       "expected_count": 7,
       "api_observed_count": 7,
       "missing_count": 0,
-      "latency_ms": 379.0,
+      "latency_ms": 386.6,
       "source": "safety_gate_controller",
       "verdict": "PASS"
     },
