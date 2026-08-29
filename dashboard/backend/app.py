@@ -3697,9 +3697,6 @@ def classify_qc_status(qc_data: dict) -> tuple:
     except (TypeError, ValueError):
         verified_contracts = 0
 
-    if verified_contracts <= 0 and _INSTRUMENTS_CACHE:
-        verified_contracts = len(_INSTRUMENTS_CACHE)
-
     if verified_contracts <= 0:
         return "NOT_READY", ["NO_VERIFIED_CONTRACTS"]
 
@@ -3710,10 +3707,6 @@ def read_qc_status() -> tuple:
     """Read the live QC report and classify it, failing closed."""
     qc_file = OUTPUTS_DIR / "qc_report_live.json"
     if not qc_file.exists():
-        qc_file = OUTPUTS_DIR / "qc_report.json"
-    if not qc_file.exists():
-        if _INSTRUMENTS_CACHE and len(_INSTRUMENTS_CACHE) > 0:
-            return "PASS", []
         return "NOT_READY", ["NO_QC_DATA"]
 
     try:
