@@ -1,0 +1,145 @@
+{
+  "proof_id": "ISSUE_188_MASTER_PARITY_PROOF_V4",
+  "started_at_utc": "2026-08-29T17:26:33.581845+00:00",
+  "completed_at_utc": "2026-08-29T17:26:36.606828+00:00",
+  "production_service": "genesis-system3-web",
+  "serving_revision": "genesis-system3-web-00653-rid",
+  "overall_verdict": "PASS (15/15 CATEGORIES GREEN)",
+  "proof_matrix": [
+    {
+      "category": "Instrument Master Discovery",
+      "expected_count": 136670,
+      "api_observed_count": 136670,
+      "missing_count": 0,
+      "latency_ms": 98.7,
+      "source": "dhan_master (runtime_json)",
+      "verdict": "PASS"
+    },
+    {
+      "category": "F&O Derivatives Universe",
+      "expected_count": 216,
+      "api_observed_count": 216,
+      "missing_count": 0,
+      "latency_ms": 57.1,
+      "source": "dhan_fno_master",
+      "verdict": "PASS"
+    },
+    {
+      "category": "44-Field Option Chain Schema",
+      "expected_count": 44,
+      "api_observed_count": 44,
+      "missing_count": 0,
+      "latency_ms": 133.9,
+      "source": "chain_adapter (dhan)",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Multi-Index Option Chains",
+      "expected_count": 4,
+      "api_observed_count": 4,
+      "missing_count": 0,
+      "latency_ms": 133.9,
+      "source": "dhan_live_chains",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Options Intelligence & Vol Surface",
+      "expected_count": 1,
+      "api_observed_count": 1,
+      "missing_count": 0,
+      "latency_ms": 173.9,
+      "source": "options_intel_engine",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Black-Scholes Greeks Engine",
+      "expected_count": 5,
+      "api_observed_count": 5,
+      "missing_count": 0,
+      "latency_ms": 69.5,
+      "source": "greeks_service",
+      "verdict": "PASS"
+    },
+    {
+      "category": "PCR Flow & Buildup Analytics",
+      "expected_count": 1,
+      "api_observed_count": 1,
+      "missing_count": 0,
+      "latency_ms": 70.2,
+      "source": "pcr_analytics",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Multibagger Factor Screener",
+      "expected_count": 3,
+      "api_observed_count": 3,
+      "missing_count": 0,
+      "latency_ms": 55.5,
+      "source": "multibagger_screener",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Macro Catalyst & News Intelligence",
+      "expected_count": 4,
+      "api_observed_count": 4,
+      "missing_count": 0,
+      "latency_ms": 59.8,
+      "source": "catalyst_service",
+      "verdict": "PASS"
+    },
+    {
+      "category": "129-Feature ML Pipeline",
+      "expected_count": 129,
+      "api_observed_count": 129,
+      "missing_count": 0,
+      "latency_ms": 52.6,
+      "source": "feature_pipeline",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Institutional Backtest & Provenance",
+      "expected_count": 184,
+      "api_observed_count": 184,
+      "missing_count": 0,
+      "latency_ms": 63.5,
+      "source": "gcs_manifest_lineage",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Paper Trading & Portfolio State",
+      "expected_count": 1,
+      "api_observed_count": 1,
+      "missing_count": 0,
+      "latency_ms": 80.1,
+      "source": "firestore_paper_state",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Value-at-Risk Stress Testing",
+      "expected_count": 1,
+      "api_observed_count": 1,
+      "missing_count": 0,
+      "latency_ms": 1009.6,
+      "source": "risk_engine",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Automated Safety Invariant Locks",
+      "expected_count": 7,
+      "api_observed_count": 7,
+      "missing_count": 0,
+      "latency_ms": 379.0,
+      "source": "safety_gate_controller",
+      "verdict": "PASS"
+    },
+    {
+      "category": "Production 22-Tab Full UI Parity",
+      "expected_count": 22,
+      "api_observed_count": 22,
+      "missing_count": 0,
+      "latency_ms": 45.0,
+      "source": "chrome_cdp_audit",
+      "verdict": "PASS"
+    }
+  ]
+}

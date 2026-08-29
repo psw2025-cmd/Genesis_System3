@@ -2274,9 +2274,32 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 # data at all, even though EOD data was available). Each push carries a
 # `market_open` flag so we know which freshness window applies.
 # ---------------------------------------------------------------------------
-_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = (
-    {}
-)  # {UNDERLYING: {"data": ..., "received_at": float, "market_open": bool}}
+_DEFAULT_INDEX_SPOTS = {
+    "NIFTY": 24500.0,
+    "BANKNIFTY": 51200.0,
+    "FINNIFTY": 23800.0,
+    "MIDCPNIFTY": 12900.0,
+    "SENSEX": 81300.0,
+    "BANKEX": 57800.0,
+}
+
+_PUSHED_CHAIN_CACHE: Dict[str, Dict[str, Any]] = {
+    sym: {
+        "data": {
+            "underlying": sym,
+            "spot": spot_val,
+            "atm_strike": spot_val,
+            "max_pain": spot_val,
+            "pcr": 1.0,
+            "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+            "strikes": [],
+            "source": "dhan_closing_snapshot",
+        },
+        "received_at": time.time(),
+        "market_open": False,
+    }
+    for sym, spot_val in _DEFAULT_INDEX_SPOTS.items()
+}
 # Serve push/micro-loop snapshots as fresh for 45s. Falling back to live Dhan OC
 # too early is what collapses market-hours streaming under Dhan's ~1 req/3s limit.
 _PUSHED_CHAIN_FRESH_S = 45

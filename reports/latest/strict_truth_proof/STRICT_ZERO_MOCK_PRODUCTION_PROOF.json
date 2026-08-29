@@ -1,0 +1,253 @@
+{
+  "report_id": "SYSTEM3_STRICT_PRODUCTION_TRUTH_V1",
+  "generated_at_utc": "2026-08-29T17:01:58.866428+00:00",
+  "overall_verdict": "PASS",
+  "audit_records": [
+    {
+      "check": "GCP_CLOUD_RUN_SERVICE",
+      "status": "PASS",
+      "telemetry": {
+        "service_name": "genesis-system3-web",
+        "region": "asia-south1",
+        "serving_revision": "genesis-system3-web-00653-rid",
+        "traffic_allocation": [
+          {
+            "percent": 100,
+            "revisionName": "genesis-system3-web-00653-rid"
+          }
+        ],
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+      }
+    },
+    {
+      "check": "GCP_SECRET_MANAGER",
+      "status": "PASS",
+      "telemetry": {
+        "total_secrets_found": 11,
+        "sample_secret_names": [
+          "dhan-access-token",
+          "dhan-access-token-candidate",
+          "dhan-app-id",
+          "dhan-app-secret",
+          "dhan-pin",
+          "dhan-totp-secret"
+        ],
+        "dhan_access_token_exists": true
+      }
+    },
+    {
+      "check": "GCP_CLOUD_SCHEDULER",
+      "status": "PASS",
+      "telemetry": {
+        "job_name": "genesis-system3-dhan-token-rotate-daily",
+        "schedule": "*/5 * * * *",
+        "state": "ENABLED",
+        "last_attempt_time": "2026-08-29T17:00:04.646618Z",
+        "target_pubsub": ""
+      }
+    },
+    {
+      "check": "GCP_CLOUD_STORAGE",
+      "status": "PASS",
+      "telemetry": {
+        "bucket": "gs://system3-openalgo-safe-artifacts",
+        "accessible": true,
+        "root_directories": [
+          "gs://system3-openalgo-safe-artifacts/backtests/",
+          "gs://system3-openalgo-safe-artifacts/reports/"
+        ]
+      }
+    },
+    {
+      "check": "LIVE_PRODUCTION_APIS",
+      "status": "PASS",
+      "telemetry": {
+        "deploy_info": {
+          "path": "/api/deploy/info",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "git_sha",
+            "git_branch",
+            "service_name",
+            "deploy_target",
+            "cloud_provider",
+            "public_base_url",
+            "ui_url",
+            "region"
+          ]
+        },
+        "health": {
+          "path": "/api/health",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "status",
+            "mode",
+            "broker_status",
+            "market_status",
+            "data_source",
+            "live_allowed",
+            "live_blockers",
+            "broker"
+          ]
+        },
+        "option_chain": {
+          "path": "/api/option-chain",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "underlying",
+            "spot",
+            "atm_strike",
+            "max_pain",
+            "pcr",
+            "pcr_context",
+            "total_ce_oi",
+            "total_pe_oi"
+          ]
+        },
+        "options_intel": {
+          "path": "/api/options-intel",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "underlying",
+            "spot",
+            "atm_strike",
+            "max_pain",
+            "pcr",
+            "pcr_context",
+            "total_ce_oi",
+            "total_pe_oi"
+          ]
+        },
+        "multibagger": {
+          "path": "/api/multibagger",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "status",
+            "as_of",
+            "total_candidates",
+            "candidates",
+            "sections",
+            "reason",
+            "governance"
+          ]
+        },
+        "backtest_results": {
+          "path": "/api/backtest/results",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "status",
+            "passed",
+            "data_mode",
+            "verification_status",
+            "reason_if_unverified",
+            "generated_at_utc",
+            "run_id",
+            "git_sha"
+          ]
+        },
+        "catalysts": {
+          "path": "/api/catalysts",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "status",
+            "as_of",
+            "total_catalysts",
+            "catalysts",
+            "sentiment_summary",
+            "governance"
+          ]
+        },
+        "paper_positions": {
+          "path": "/api/paper/positions",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "positions",
+            "open_count",
+            "data_mode",
+            "source",
+            "as_of_utc",
+            "freshness_seconds",
+            "verification_status",
+            "reason_if_unverified"
+          ]
+        },
+        "paper_account": {
+          "path": "/api/paper/account",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "account_id",
+            "initial_capital",
+            "available_margin",
+            "used_margin",
+            "pnl",
+            "mode",
+            "live_trading_enabled"
+          ]
+        },
+        "runbook_audit": {
+          "path": "/api/runbook/audit",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "audit_id",
+            "checked_at_utc",
+            "overall_verdict",
+            "service",
+            "project",
+            "region",
+            "checks",
+            "governance"
+          ]
+        },
+        "ml_features": {
+          "path": "/api/ml/features",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "status",
+            "generated_utc",
+            "live_trading_enabled",
+            "pipeline",
+            "feature_importance",
+            "active_models",
+            "validation_summary",
+            "predictions"
+          ]
+        },
+        "auto_gates": {
+          "path": "/api/auto_gates",
+          "status_code": 200,
+          "is_pass": true,
+          "data_summary": [
+            "generated_utc",
+            "status",
+            "source",
+            "runtime_driven",
+            "evidence_plane",
+            "market_open",
+            "market_reason",
+            "broker_connected"
+          ]
+        }
+      }
+    },
+    {
+      "check": "GIT_PROVENANCE",
+      "status": "PASS",
+      "telemetry": {
+        "head_sha": "84207be3d9ad1d1d1109513b6c7f3c4a9b26b413",
+        "branch": "main",
+        "is_clean_worktree": false
+      }
+    }
+  ]
+}
