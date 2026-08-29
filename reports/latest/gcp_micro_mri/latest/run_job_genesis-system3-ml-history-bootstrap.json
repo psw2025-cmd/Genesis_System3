@@ -1,0 +1,125 @@
+{
+  "apiVersion": "run.googleapis.com/v1",
+  "kind": "Job",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "568.0.0",
+      "run.googleapis.com/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "run.googleapis.com/lastModifier": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+      "run.googleapis.com/operation-id": "89f3da06-f58c-40f6-bf76-a00b44402c40"
+    },
+    "creationTimestamp": "2026-08-14T00:34:50.340224Z",
+    "generation": 24,
+    "labels": {
+      "cloud.googleapis.com/location": "asia-south1",
+      "run.googleapis.com/lastUpdatedTime": "2026-08-17T02:16:13.105390Z",
+      "run.googleapis.com/satisfiesPzs": "true"
+    },
+    "name": "genesis-system3-ml-history-bootstrap",
+    "namespace": "802404398783",
+    "resourceVersion": "AAZZTISo6Zc",
+    "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/jobs/genesis-system3-ml-history-bootstrap",
+    "uid": "08d329af-60e9-471f-9cdc-5cd55b7053e2"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "568.0.0",
+          "run.googleapis.com/execution-environment": "gen2"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "wax_kej_nal"
+        }
+      },
+      "spec": {
+        "parallelism": 1,
+        "taskCount": 1,
+        "template": {
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "scripts/gcp_worker_job.py"
+                ],
+                "command": [
+                  "python"
+                ],
+                "env": [
+                  {
+                    "name": "SYSTEM3_JOB_KIND",
+                    "value": "ml-history-bootstrap"
+                  },
+                  {
+                    "name": "SYSTEM3_ALLOW_ML_HISTORY_BOOTSTRAP",
+                    "value": "1"
+                  },
+                  {
+                    "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_FIRESTORE_PROJECT",
+                    "value": "system3-openalgo-safe"
+                  },
+                  {
+                    "name": "LIVE_TRADING_ENABLED",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                    "value": "0"
+                  },
+                  {
+                    "name": "AUTO_EXECUTE_TRADES",
+                    "value": "0"
+                  },
+                  {
+                    "name": "ANALYZE_MODE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "CLOUD_MODE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "DEPLOY_GIT_SHA",
+                    "value": "3e377e7a428f1ffefccb3348a7a0ed6edf178f7d"
+                  }
+                ],
+                "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:3e377e7a428f-1786932292",
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ],
+            "maxRetries": 0,
+            "serviceAccountName": "gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com",
+            "timeoutSeconds": "300"
+          }
+        }
+      }
+    }
+  },
+  "status": {
+    "conditions": [
+      {
+        "status": "True",
+        "type": "Ready"
+      }
+    ],
+    "executionCount": 26,
+    "latestCreatedExecution": {
+      "completionStatus": "EXECUTION_SUCCEEDED",
+      "completionTimestamp": "2026-08-18T06:37:18.179488Z",
+      "creationTimestamp": "2026-08-18T06:36:59.230917Z",
+      "name": "genesis-system3-ml-history-bootstrap-ld52m"
+    },
+    "observedGeneration": 24
+  }
+}

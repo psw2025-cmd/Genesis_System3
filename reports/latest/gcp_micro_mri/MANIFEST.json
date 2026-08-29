@@ -1,0 +1,42 @@
+{
+  "schema": "system3_gcp_micro_mri_v1",
+  "generated_utc": "2026-08-26T05:21:11Z",
+  "project": "system3-openalgo-safe",
+  "workbook": "C:\\Users\\ADMIN\\Genesis_System3\\Genesis_System3\\System3_GCP_MICRO_MRI_FULL_20260826T052111Z.xlsx",
+  "raw_dir": "C:\\Users\\ADMIN\\Genesis_System3\\Genesis_System3\\reports\\latest\\gcp_micro_mri\\latest",
+  "coverage_total": 240,
+  "coverage_failed": 0,
+  "sheets": [
+    "00_Agent_README",
+    "02_Coverage_Verification",
+    "03_Gaps_And_Limits",
+    "04_Env_Vars_Micro",
+    "05_Secret_To_Env_Map",
+    "06_Secrets_Micro",
+    "14_IAM_Project_Bindings",
+    "11_Service_Accounts_Micro",
+    "12_SA_Keys_Metadata",
+    "07_CloudRun_Services",
+    "08_CloudRun_Jobs",
+    "09_Job_Executions",
+    "10_Scheduler_Full",
+    "15_WIF_Pools_Providers",
+    "16_PubSub_Topics",
+    "17_PubSub_Subscriptions",
+    "18_Storage_Buckets",
+    "23_APIs_Enabled",
+    "26_Repo_SAFE_ENV",
+    "27_Live_vs_Repo_Env_Diff",
+    "25_Live_APIs",
+    "28_URL_Catalog",
+    "01_Executive",
+    "29_Raw_Artifact_Index"
+  ],
+  "mode": "rebuild_from_latest",
+  "counts": {
+    "secrets": 11,
+    "service_accounts": 24,
+    "run_services": 1,
+    "run_jobs": 9
+  }
+}

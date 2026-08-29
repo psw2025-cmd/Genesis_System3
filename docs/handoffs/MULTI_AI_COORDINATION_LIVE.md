@@ -1,11 +1,55 @@
 # Genesis System3 — Multi-Agent Live Handoff
 
-Updated: 2026-08-22 16:04 IST / 10:34 UTC (Cursor serving-SHA recapture; prior snapshots remain historical)
-Rule target: `docs/RUHI_RULE_V2.md`
-Task authority: `reports/coordination/ruhi_task_ledger.csv`
+Updated: 2026-08-26 13:40 IST (cross-verify #3 main×cloud×laptop)
+Rule target: `docs/RUHI_RULE_V2.md` (RHUI_RULE_V2.2)
+Task authority: `reports/coordination/ruhi_task_ledger.csv` + `GITHUB_ACTION_MAP_STATUS.csv` + `RHUI_V2.2_GATE_BOARD.csv`
 Primary P0 issue: #188
-HUMAN_ACTION_REQUIRED=NO
-NEXT_ACTION_OWNER=ChatGPT (RUHI-022 cadence SSOT)
+Lane lock: `reports/coordination/AGENT_LANE_LOCK.md`
+Gmail protocol: read mail → post #188 + CSV (mail alone ≠ DONE)
+RHUI V2.2 handoff: `docs/handoffs/RHUI_V2.2_MATERIAL_CHANGE.md`
+Cross-verify SSOT: `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
+
+## Live truth (Cloud only — 2026-08-26 13:40 IST)
+
+| Field | Value |
+|---|---|
+| GitHub main | `afd28722…` (#365 Render lock — **docs/tools only**) |
+| Serving (runtime) | `fb4772f9…` (#367) · `genesis-system3-web-00617-vif` @ 100% |
+| Main vs serving | **DOCS_ONLY_LAG** (Auto Deploy path-filter skipped #365) — not failed deploy |
+| Laptop | `146eb69…` / `fix/p0-188…` — NON-AUTH |
+| Broker | AUTH_OK · LIVE OFF · orders OFF |
+| 4/4 chains API | `required_symbols_ready=true` (recheck) |
+| QC | health **NOT_READY** ↔ state **NOT_READY** |
+| Scheduler | UNHEALTHY — `alert_severity=warning` ← **signals stale** |
+| #367 effectiveness | PENDING (18:45 IST) |
+| RHUI V2.2 | **NOT_ACCEPTED** · HUMAN_ACTION=NO |
+
+## Agent lanes (no duplication) — RHUI V2.2 agreement
+
+| Agent | Lane | Blocked from |
+|---|---|---|
+| **Cursor** | Live multi-verify, runbook/CSV/SSOT, scheduler attribution, #188 | Blind redeploy; token mint |
+| **Claude** | Adversarial check of signals stale + post-18:45 #367 logs | New QC PR; laptop authority |
+| **ChatGPT** | RHUI mail/ledger reconcile to V2.2 SSOT; keep NOT_ACCEPTED until gates green | Claiming ACCEPTED from visual 22/22 |
+| **User** | None required for V2.2 blockers | — |
+
+## Gmail coordination (RUHI)
+
+1. Cursor reads Gmail (readonly OK) at session start  
+2. Durable updates → #188 comment + `GITHUB_ACTION_MAP_STATUS.csv`  
+3. Broadcast mirror → `GMAIL_AGENT_DIGEST.md` + optional mail to warghade2012@gmail.com  
+4. Never claim DONE from mail without Cloud Run proof  
+
+Access requests list: `reports/coordination/AGENT_ACCESS_REQUESTS.md`
+
+## Laptop path lock (2026-08-25)
+
+- **Canonical clone:** `C:\Users\ADMIN\Genesis_System3\Genesis_System3` — see `docs/handoffs/CANONICAL_LAPTOP_REPO_PATH.md` and `.cursor/rules/canonical-laptop-repo-path.mdc`
+- **Do not use:** `C:\System3\Genesis_System3` (broken Git archive), parent `C:\Users\ADMIN\Genesis_System3` (stale), `C:\Genesis_System3` root (not a clone)
+- Linked worktrees on C/D/E share the primary `.git`; prefer new worktrees on **E:** when C: free < 10 GB
+- Verify snapshot: `reports/latest/repo_path_audit/verify_summary.txt`
+- **Master automation runbook:** `docs/handoffs/SYSTEM3_MASTER_AUTOMATION_RUNBOOK.md` (access PASS 2026-08-25; RUHI + GitHub/GCP dual lanes)
+- Access confirm: `reports/latest/access_capability/ACCESS_VERIFY_CONFIRM.md`
 
 ## Cursor 2026-08-22T10:34:40Z serving + named-gate recapture
 

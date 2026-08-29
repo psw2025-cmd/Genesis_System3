@@ -1,0 +1,26 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com/keys/a07546958ea94d289056b560c411275dc507504c",
+    "validAfterTime": "2026-08-14T12:09:07Z",
+    "validBeforeTime": "2026-08-31T12:09:07Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com/keys/3f31594f66fed8635b061bef990dfb53a2b5cfe6",
+    "validAfterTime": "2026-08-23T12:09:07Z",
+    "validBeforeTime": "2026-09-08T12:09:07Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com/keys/e6730045379d7ff0f3cc94c6c3e61470ed63e905",
+    "validAfterTime": "2026-08-11T18:10:51Z",
+    "validBeforeTime": "2028-08-10T18:10:51Z"
+  }
+]

@@ -5,16 +5,18 @@
 **Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
 Read first:
-1. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
-2. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
-3. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
-4. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
-5. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
-6. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
-7. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
-8. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
-9. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
-10. `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` — permanent data/feature/model/prediction benchmark authority; compare material prediction changes against current primary research, simple baselines and relevant contemporary challengers before promotion
+0. `reports/coordination/COMMAND_CENTER.md` + `ISSUES_ONLY.md` + Excel `AGENT_OPERATING_OPTIONS.xlsx` (overwrite-only live boards — refresh via `scripts/run_command_center_refresh.ps1` after every edit)
+1. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` — persistent autonomous end-to-end self-instruction and completion-ledger contract; re-read before every merge, deployment, production mutation, issue closure, and final response
+2. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+3. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
+4. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
+5. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md` + flowchart `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png` (**permanent — all agents**)
+6. `docs/gemini-code-1786899974029.md` + `agent_policy.yaml` (autonomous loop invariants)
+7. `docs/CONTINUOUS_CLOSURE_SYSTEM.md` — repo-first scan → multi-verify → watchdog → blocker cards → auto-resume
+8. `docs/PREFLIGHT_CONTROL_PLANE.md` — current main + all workflow latest runs + actionable failures + artifacts + Issue #188/PR state before every production transition
+9. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md` — infinite GitOps ticks without waiting for the user on routine work; LIVE remains a human gate
+10. `docs/project_control/REPO_CLEAN_FORENSIC_TOOLKIT.md` — permanent full-repo cleanup/storage authority; improve this toolkit instead of creating competing cleanup scanners
+11. `docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md` — permanent data/feature/model/prediction benchmark authority; compare material prediction changes against current primary research, simple baselines and relevant contemporary challengers before promotion
 
 Old session notes, `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, proof packs, screenshots, workflow artifacts, and historical agent reports are **context/history only** until revalidated against current authoritative sources.
 

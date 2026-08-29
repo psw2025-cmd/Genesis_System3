@@ -1,0 +1,2182 @@
+[
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226"
+      ]
+    },
+    "createTime": "2026-08-26T02:43:50.769037358Z",
+    "finishTime": "2026-08-26T02:46:41.923727Z",
+    "id": "1c8c4884-bf55-4bf2-8e07-5fa0215557c6",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/1c8c4884-bf55-4bf2-8e07-5fa0215557c6?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/1c8c4884-bf55-4bf2-8e07-5fa0215557c6",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+          "digest": "sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226",
+          "pushTiming": {
+            "endTime": "2026-08-26T02:46:41.631900151Z",
+            "startTime": "2026-08-26T02:45:58.530157530Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-fb4772f9d52b-1787712228.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-fb4772f9d52b-1787712228.tgz#1787712230493383": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "r09f2_oYfxalU3ttmwBWeA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "vHMzOOoqerOHTtdiCL2vQWpE1Ise716_y3CceTA3ahU="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787712230493383",
+        "object": "source/genesis-auto-fb4772f9d52b-1787712228.tgz"
+      }
+    },
+    "startTime": "2026-08-26T02:43:51.497678761Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:fb4772f9d52b-1787712226",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-26T02:43:58.530710575Z",
+          "startTime": "2026-08-26T02:43:58.521606608Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-26T02:45:58.484167125Z",
+          "startTime": "2026-08-26T02:43:58.521606608Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-26T02:45:58.530024630Z",
+        "startTime": "2026-08-26T02:43:57.732288925Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-26T02:43:57.732054399Z",
+        "startTime": "2026-08-26T02:43:51.913052365Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-26T02:46:41.632070144Z",
+        "startTime": "2026-08-26T02:45:58.530156540Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-26T02:43:57.732054399Z",
+        "startTime": "2026-08-26T02:43:51.913052365Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:234e0b161f8c-1787710065"
+      ]
+    },
+    "createTime": "2026-08-26T02:07:49.670259773Z",
+    "finishTime": "2026-08-26T02:10:24.176526Z",
+    "id": "beb35a6c-0041-4d22-be83-dc5fe8cef359",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:234e0b161f8c-1787710065"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/beb35a6c-0041-4d22-be83-dc5fe8cef359?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/beb35a6c-0041-4d22-be83-dc5fe8cef359",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:661e95acd923514f71f47ce7b390e06a8d31b15febecf772e506babf62960528"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:932b077c42c66d80597adb3a5bc94000fe0f5bdd70295f0e0497f4c19df362ca",
+          "digest": "sha256:932b077c42c66d80597adb3a5bc94000fe0f5bdd70295f0e0497f4c19df362ca",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:234e0b161f8c-1787710065",
+          "pushTiming": {
+            "endTime": "2026-08-26T02:10:23.971987858Z",
+            "startTime": "2026-08-26T02:09:41.981059165Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-234e0b161f8c-1787710067.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-234e0b161f8c-1787710067.tgz#1787710069439966": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "dW0VPKWBdtljkbUKk3T4xw=="
+            },
+            {
+              "type": "SHA256",
+              "value": "hgeL3H4ytmGsXAIBiJXOjRNnYf05lKGr1FLLR4Ldy3k="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787710069439966",
+        "object": "source/genesis-auto-234e0b161f8c-1787710067.tgz"
+      }
+    },
+    "startTime": "2026-08-26T02:07:50.461284535Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:234e0b161f8c-1787710065",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-26T02:07:54.727554189Z",
+          "startTime": "2026-08-26T02:07:54.722603087Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-26T02:09:41.936140260Z",
+          "startTime": "2026-08-26T02:07:54.722603087Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-26T02:09:41.980862602Z",
+        "startTime": "2026-08-26T02:07:54.069838993Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-26T02:07:54.069561506Z",
+        "startTime": "2026-08-26T02:07:49.035039761Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-26T02:10:23.972112732Z",
+        "startTime": "2026-08-26T02:09:41.981051057Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-26T02:07:54.069561506Z",
+        "startTime": "2026-08-26T02:07:49.035039761Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705923"
+      ]
+    },
+    "createTime": "2026-08-26T00:58:47.511057490Z",
+    "finishTime": "2026-08-26T01:01:51.753109Z",
+    "id": "51072fe7-855e-4549-a1b6-d47a95e06bc4",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705923"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/51072fe7-855e-4549-a1b6-d47a95e06bc4?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/51072fe7-855e-4549-a1b6-d47a95e06bc4",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:661e95acd923514f71f47ce7b390e06a8d31b15febecf772e506babf62960528"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:9a9077a17b4b693ac4472cf8d4175e746693868f48f6e6384eecda5ea5980839",
+          "digest": "sha256:9a9077a17b4b693ac4472cf8d4175e746693868f48f6e6384eecda5ea5980839",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705923",
+          "pushTiming": {
+            "endTime": "2026-08-26T01:01:50.230501640Z",
+            "startTime": "2026-08-26T01:00:49.465805226Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-185ff0f23d5f-1787705925.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-185ff0f23d5f-1787705925.tgz#1787705927303429": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "eMkjLk2rHSfsTHtigyh8FQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "7DVTMWsCd8sqSsrynJaCSGKTQN8CF69TIfAFApcamTM="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787705927303429",
+        "object": "source/genesis-auto-185ff0f23d5f-1787705925.tgz"
+      }
+    },
+    "startTime": "2026-08-26T00:58:48.223736715Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705923",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-26T00:58:54.308762501Z",
+          "startTime": "2026-08-26T00:58:54.297599014Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-26T01:00:49.425583265Z",
+          "startTime": "2026-08-26T00:58:54.297599014Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-26T01:00:49.465657557Z",
+        "startTime": "2026-08-26T00:58:53.568338099Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-26T00:58:53.568093165Z",
+        "startTime": "2026-08-26T00:58:48.508811101Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-26T01:01:50.231069827Z",
+        "startTime": "2026-08-26T01:00:49.465804293Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-26T00:58:53.568093165Z",
+        "startTime": "2026-08-26T00:58:48.508811101Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705371"
+      ]
+    },
+    "createTime": "2026-08-26T00:49:36.334223193Z",
+    "finishTime": "2026-08-26T00:51:55.950981Z",
+    "id": "29f1bfea-c3b4-4c2d-9c16-e4d5d0a102c7",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705371"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/29f1bfea-c3b4-4c2d-9c16-e4d5d0a102c7?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/29f1bfea-c3b4-4c2d-9c16-e4d5d0a102c7",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:77a3fd8b4e801463eafca35bb2f5f78e2e5e8576625c814e778d48c098126b04",
+          "digest": "sha256:77a3fd8b4e801463eafca35bb2f5f78e2e5e8576625c814e778d48c098126b04",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705371",
+          "pushTiming": {
+            "endTime": "2026-08-26T00:51:55.652926423Z",
+            "startTime": "2026-08-26T00:51:17.236793941Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-185ff0f23d5f-1787705373.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-185ff0f23d5f-1787705373.tgz#1787705376112674": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "eMkjLk2rHSfsTHtigyh8FQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "7DVTMWsCd8sqSsrynJaCSGKTQN8CF69TIfAFApcamTM="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787705376112674",
+        "object": "source/genesis-auto-185ff0f23d5f-1787705373.tgz"
+      }
+    },
+    "startTime": "2026-08-26T00:49:37.111863901Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:185ff0f23d5f-1787705371",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-26T00:49:40.474344007Z",
+          "startTime": "2026-08-26T00:49:40.468925974Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-26T00:51:17.211955018Z",
+          "startTime": "2026-08-26T00:49:40.468925974Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-26T00:51:17.236643359Z",
+        "startTime": "2026-08-26T00:49:39.913806753Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-26T00:49:39.913601865Z",
+        "startTime": "2026-08-26T00:49:36.171727789Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-26T00:51:55.653131946Z",
+        "startTime": "2026-08-26T00:51:17.236792878Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-26T00:49:39.913601865Z",
+        "startTime": "2026-08-26T00:49:36.171727789Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:49f2c07d3373-1787700216"
+      ]
+    },
+    "createTime": "2026-08-25T23:23:40.858686420Z",
+    "finishTime": "2026-08-25T23:26:33.439663Z",
+    "id": "36ce552d-a086-490c-85de-cf0928b0abfd",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:49f2c07d3373-1787700216"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/36ce552d-a086-490c-85de-cf0928b0abfd?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/36ce552d-a086-490c-85de-cf0928b0abfd",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:71d5aa5b9e0de43e7c28a7f290d0cbcf93f7717c8a5776709a6298db66302274",
+          "digest": "sha256:71d5aa5b9e0de43e7c28a7f290d0cbcf93f7717c8a5776709a6298db66302274",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:49f2c07d3373-1787700216",
+          "pushTiming": {
+            "endTime": "2026-08-25T23:26:33.214788385Z",
+            "startTime": "2026-08-25T23:25:46.147882443Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-49f2c07d3373-1787700218.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-49f2c07d3373-1787700218.tgz#1787700220628734": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "YqN99ut_j5pVqMiNpCy_Wg=="
+            },
+            {
+              "type": "SHA256",
+              "value": "0EblFQ1eUy1CP8qcZ89RMMIfX5OSQUEEsiSBWcZDve4="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787700220628734",
+        "object": "source/genesis-auto-49f2c07d3373-1787700218.tgz"
+      }
+    },
+    "startTime": "2026-08-25T23:23:41.608983395Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:49f2c07d3373-1787700216",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-25T23:23:47.596785743Z",
+          "startTime": "2026-08-25T23:23:47.585964380Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-25T23:25:46.109879424Z",
+          "startTime": "2026-08-25T23:23:47.585964380Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-25T23:25:46.147698652Z",
+        "startTime": "2026-08-25T23:23:46.851691598Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-25T23:23:46.851215282Z",
+        "startTime": "2026-08-25T23:23:41.554804311Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-25T23:26:33.214920954Z",
+        "startTime": "2026-08-25T23:25:46.147881519Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-25T23:23:46.851215282Z",
+        "startTime": "2026-08-25T23:23:41.554804311Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:1036af8c96c7-1787698389"
+      ]
+    },
+    "createTime": "2026-08-25T22:53:13.819210670Z",
+    "finishTime": "2026-08-25T22:55:53.538280Z",
+    "id": "c703bed3-12ca-436c-b5f6-4dfc5ff61baa",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:1036af8c96c7-1787698389"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/c703bed3-12ca-436c-b5f6-4dfc5ff61baa?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/c703bed3-12ca-436c-b5f6-4dfc5ff61baa",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:661e95acd923514f71f47ce7b390e06a8d31b15febecf772e506babf62960528"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:d9fb3f8fda526954e176233c0ed04a477d3633e4644bc84c13bebc7551d6b4c3",
+          "digest": "sha256:d9fb3f8fda526954e176233c0ed04a477d3633e4644bc84c13bebc7551d6b4c3",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:1036af8c96c7-1787698389",
+          "pushTiming": {
+            "endTime": "2026-08-25T22:55:53.088645618Z",
+            "startTime": "2026-08-25T22:55:10.042413070Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-1036af8c96c7-1787698391.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-1036af8c96c7-1787698391.tgz#1787698393551117": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "mzRkwC07PpJScG5vTNX5Yg=="
+            },
+            {
+              "type": "SHA256",
+              "value": "_JY3bJfWMQ4zjYXBm7z8__VTDYSA_Pf-csNVg-OZmMM="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787698393551117",
+        "object": "source/genesis-auto-1036af8c96c7-1787698391.tgz"
+      }
+    },
+    "startTime": "2026-08-25T22:53:14.543725419Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:1036af8c96c7-1787698389",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-25T22:53:20.286618806Z",
+          "startTime": "2026-08-25T22:53:20.276130333Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-25T22:55:09.998631979Z",
+          "startTime": "2026-08-25T22:53:20.276130333Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-25T22:55:10.042227305Z",
+        "startTime": "2026-08-25T22:53:19.608736510Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-25T22:53:19.608529226Z",
+        "startTime": "2026-08-25T22:53:14.810268940Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-25T22:55:53.089165684Z",
+        "startTime": "2026-08-25T22:55:10.042410614Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-25T22:53:19.608529226Z",
+        "startTime": "2026-08-25T22:53:14.810268940Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dea6a8fee0fb-1787671057"
+      ]
+    },
+    "createTime": "2026-08-25T15:17:42.945716597Z",
+    "finishTime": "2026-08-25T15:20:40.352049Z",
+    "id": "6a3434a9-2d81-4287-a318-c3f714ac80da",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dea6a8fee0fb-1787671057"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/6a3434a9-2d81-4287-a318-c3f714ac80da?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/6a3434a9-2d81-4287-a318-c3f714ac80da",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:26a4ad18358feeb3a76698e86defe3b717a77fb0cc33782be6947fc905b358ee",
+          "digest": "sha256:26a4ad18358feeb3a76698e86defe3b717a77fb0cc33782be6947fc905b358ee",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dea6a8fee0fb-1787671057",
+          "pushTiming": {
+            "endTime": "2026-08-25T15:20:40.109513082Z",
+            "startTime": "2026-08-25T15:19:56.312720465Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-dea6a8fee0fb-1787671059.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-dea6a8fee0fb-1787671059.tgz#1787671062662791": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "tXNQlmDMMJjcy1Meiod5iA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "xTmIqFC-0y5Kf-ZhiKaGmQkZY8EGcMDTb5R4-iNSSsk="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787671062662791",
+        "object": "source/genesis-auto-dea6a8fee0fb-1787671059.tgz"
+      }
+    },
+    "startTime": "2026-08-25T15:17:51.752646131Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dea6a8fee0fb-1787671057",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-25T15:17:57.929760150Z",
+          "startTime": "2026-08-25T15:17:57.921377356Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-25T15:19:56.260097839Z",
+          "startTime": "2026-08-25T15:17:57.921377356Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-25T15:19:56.312485347Z",
+        "startTime": "2026-08-25T15:17:57.189971560Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-25T15:17:57.189690832Z",
+        "startTime": "2026-08-25T15:17:52.128243002Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-25T15:20:40.109696320Z",
+        "startTime": "2026-08-25T15:19:56.312708614Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-25T15:17:57.189690832Z",
+        "startTime": "2026-08-25T15:17:52.128243002Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:0d88c224917e-1787670380"
+      ]
+    },
+    "createTime": "2026-08-25T15:06:25.679563802Z",
+    "finishTime": "2026-08-25T15:10:24.606077Z",
+    "id": "a8802942-a28a-4aa4-9036-c89219646e25",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:0d88c224917e-1787670380"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/a8802942-a28a-4aa4-9036-c89219646e25?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/a8802942-a28a-4aa4-9036-c89219646e25",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:8986c4c67b90a1bbb1a5b9bc9b32871dd121e16f0fa481863e1bbe2e44a7a53e",
+          "digest": "sha256:8986c4c67b90a1bbb1a5b9bc9b32871dd121e16f0fa481863e1bbe2e44a7a53e",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:0d88c224917e-1787670380",
+          "pushTiming": {
+            "endTime": "2026-08-25T15:10:23.862916728Z",
+            "startTime": "2026-08-25T15:09:37.081274992Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-0d88c224917e-1787670382.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-0d88c224917e-1787670382.tgz#1787670385403932": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "o3sRKDYh6cyIJEP2WDKgLg=="
+            },
+            {
+              "type": "SHA256",
+              "value": "WEwIIlZ8FMIBLuPxZxfwr-vJko58q1_3c3z2AfjZ6tk="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787670385403932",
+        "object": "source/genesis-auto-0d88c224917e-1787670382.tgz"
+      }
+    },
+    "startTime": "2026-08-25T15:07:27.030379067Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:0d88c224917e-1787670380",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-25T15:07:34.737191507Z",
+          "startTime": "2026-08-25T15:07:34.728259211Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-25T15:09:37.042518723Z",
+          "startTime": "2026-08-25T15:07:34.728259211Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-25T15:09:37.081168250Z",
+        "startTime": "2026-08-25T15:07:33.898372406Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-25T15:07:33.898126777Z",
+        "startTime": "2026-08-25T15:07:28.366878661Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-25T15:10:23.863114162Z",
+        "startTime": "2026-08-25T15:09:37.081273908Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-25T15:07:33.898126777Z",
+        "startTime": "2026-08-25T15:07:28.366878661Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:6a69f01c3350-1787669788"
+      ]
+    },
+    "createTime": "2026-08-25T14:56:32.800508441Z",
+    "finishTime": "2026-08-25T14:59:45.075652Z",
+    "id": "5ab632c0-5557-4f64-a61d-d2a74f77c9cc",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:6a69f01c3350-1787669788"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/5ab632c0-5557-4f64-a61d-d2a74f77c9cc?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/5ab632c0-5557-4f64-a61d-d2a74f77c9cc",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:3cad88385ef529214e090946a05961ce8b6f147793f26b102184f6c14e75e6a1",
+          "digest": "sha256:3cad88385ef529214e090946a05961ce8b6f147793f26b102184f6c14e75e6a1",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:6a69f01c3350-1787669788",
+          "pushTiming": {
+            "endTime": "2026-08-25T14:59:44.450277466Z",
+            "startTime": "2026-08-25T14:58:58.492529308Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-6a69f01c3350-1787669789.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-6a69f01c3350-1787669789.tgz#1787669792497517": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "DgAAdeR5x9MxeV4bNW97SQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "DBtTWhpaBpHq8gNu_k1eeWxY-P3Q1-pcJTmKLFCfKrQ="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787669792497517",
+        "object": "source/genesis-auto-6a69f01c3350-1787669789.tgz"
+      }
+    },
+    "startTime": "2026-08-25T14:56:51.746424244Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:6a69f01c3350-1787669788",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-25T14:57:00.286617371Z",
+          "startTime": "2026-08-25T14:57:00.274836804Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-25T14:58:58.460036971Z",
+          "startTime": "2026-08-25T14:57:00.274836804Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-25T14:58:58.492403135Z",
+        "startTime": "2026-08-25T14:56:59.537386936Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-25T14:56:59.536983558Z",
+        "startTime": "2026-08-25T14:56:54.601788129Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-25T14:59:44.450504250Z",
+        "startTime": "2026-08-25T14:58:58.492528612Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-25T14:56:59.536983558Z",
+        "startTime": "2026-08-25T14:56:54.601788129Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:719566d23fd9-1787597418"
+      ]
+    },
+    "createTime": "2026-08-24T18:50:22.727257676Z",
+    "finishTime": "2026-08-24T18:53:04.548178Z",
+    "id": "63d9240b-4f8e-4762-bfde-bf04dcc96a76",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:719566d23fd9-1787597418"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/63d9240b-4f8e-4762-bfde-bf04dcc96a76?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/63d9240b-4f8e-4762-bfde-bf04dcc96a76",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:2e8d40d8e48dc14fab4213d5e532d74f63fd403d9e8d7f6463096a75820286c3"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:79b929a8cd767c17083c0b3f2fc24e123c56d3e61850fe019d9c6c34e7d79c35",
+          "digest": "sha256:79b929a8cd767c17083c0b3f2fc24e123c56d3e61850fe019d9c6c34e7d79c35",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:719566d23fd9-1787597418",
+          "pushTiming": {
+            "endTime": "2026-08-24T18:53:04.233038686Z",
+            "startTime": "2026-08-24T18:52:15.629929197Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-719566d23fd9-1787597420.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-719566d23fd9-1787597420.tgz#1787597422501738": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "hBTBi6pZFdgzY1tgeVkN-w=="
+            },
+            {
+              "type": "SHA256",
+              "value": "i0zHgCEsu_C2pk376K8CTIW3lnOJx9xL1UCHbU3jQpA="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787597422501738",
+        "object": "source/genesis-auto-719566d23fd9-1787597420.tgz"
+      }
+    },
+    "startTime": "2026-08-24T18:50:23.579857939Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:719566d23fd9-1787597418",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T18:50:28.940133691Z",
+          "startTime": "2026-08-24T18:50:28.931086524Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T18:52:15.598116446Z",
+          "startTime": "2026-08-24T18:50:28.931086524Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T18:52:15.629801449Z",
+        "startTime": "2026-08-24T18:50:28.347802538Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T18:50:28.347419249Z",
+        "startTime": "2026-08-24T18:50:23.893744431Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T18:53:04.233258590Z",
+        "startTime": "2026-08-24T18:52:15.629928394Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T18:50:28.347419249Z",
+        "startTime": "2026-08-24T18:50:23.893744431Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:8ba7738a1583-1787564768"
+      ]
+    },
+    "createTime": "2026-08-24T09:46:12.540283518Z",
+    "finishTime": "2026-08-24T09:49:01.466693Z",
+    "id": "de704d18-4081-4e4e-9376-418a0180f98e",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:8ba7738a1583-1787564768"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/de704d18-4081-4e4e-9376-418a0180f98e?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/de704d18-4081-4e4e-9376-418a0180f98e",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:d99d63448fb8bc21f711b31cd316758011d6a942e295d072eb001320ec8756fd",
+          "digest": "sha256:d99d63448fb8bc21f711b31cd316758011d6a942e295d072eb001320ec8756fd",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:8ba7738a1583-1787564768",
+          "pushTiming": {
+            "endTime": "2026-08-24T09:49:01.022604412Z",
+            "startTime": "2026-08-24T09:48:14.945730630Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-8ba7738a1583-1787564770.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-8ba7738a1583-1787564770.tgz#1787564772332283": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "hD-UsXwn5u7RCKEFF6vaqA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "nOSIDKSeA_LNQH7U53NMaFIX0PDAlqMFLZ9WWyvmyVI="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787564772332283",
+        "object": "source/genesis-auto-8ba7738a1583-1787564770.tgz"
+      }
+    },
+    "startTime": "2026-08-24T09:46:13.362856425Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:8ba7738a1583-1787564768",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T09:46:22.136575898Z",
+          "startTime": "2026-08-24T09:46:22.129202185Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T09:48:14.906877156Z",
+          "startTime": "2026-08-24T09:46:22.129202185Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T09:48:14.945542342Z",
+        "startTime": "2026-08-24T09:46:21.298246337Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T09:46:21.297968984Z",
+        "startTime": "2026-08-24T09:46:15.296983263Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T09:49:01.022760492Z",
+        "startTime": "2026-08-24T09:48:14.945711823Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T09:46:21.297968984Z",
+        "startTime": "2026-08-24T09:46:15.296983263Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a764f990b688-1787560844"
+      ]
+    },
+    "createTime": "2026-08-24T08:40:49.015610447Z",
+    "finishTime": "2026-08-24T08:43:30.047406Z",
+    "id": "5ab28861-8558-48f2-a69c-f585a1e62d79",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a764f990b688-1787560844"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/5ab28861-8558-48f2-a69c-f585a1e62d79?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/5ab28861-8558-48f2-a69c-f585a1e62d79",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:120036a3c8df9aec3c3ba3f293f91a6b2eda1d1e79afd37086db705f8ccc46f7",
+          "digest": "sha256:120036a3c8df9aec3c3ba3f293f91a6b2eda1d1e79afd37086db705f8ccc46f7",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a764f990b688-1787560844",
+          "pushTiming": {
+            "endTime": "2026-08-24T08:43:29.481328529Z",
+            "startTime": "2026-08-24T08:42:40.452567654Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-a764f990b688-1787560846.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-a764f990b688-1787560846.tgz#1787560848762950": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "DymwxU9QmObB1Qx2Kv6rJA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "d_Fb3SLIsknE7THJCbboXZdFFYMTSs0yxiuNovssrXI="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787560848762950",
+        "object": "source/genesis-auto-a764f990b688-1787560846.tgz"
+      }
+    },
+    "startTime": "2026-08-24T08:40:49.825416340Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a764f990b688-1787560844",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T08:40:57.163793626Z",
+          "startTime": "2026-08-24T08:40:57.155762937Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T08:42:40.404029732Z",
+          "startTime": "2026-08-24T08:40:57.155762937Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T08:42:40.452424700Z",
+        "startTime": "2026-08-24T08:40:56.494896409Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T08:40:56.494587568Z",
+        "startTime": "2026-08-24T08:40:51.864908724Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T08:43:29.481421445Z",
+        "startTime": "2026-08-24T08:42:40.452566650Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T08:40:56.494587568Z",
+        "startTime": "2026-08-24T08:40:51.864908724Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a5daad492b59-1787559504"
+      ]
+    },
+    "createTime": "2026-08-24T08:18:29.077371450Z",
+    "finishTime": "2026-08-24T08:21:15.407924Z",
+    "id": "16188855-99e2-45c6-86ed-1ffcd60a8c1e",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a5daad492b59-1787559504"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/16188855-99e2-45c6-86ed-1ffcd60a8c1e?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/16188855-99e2-45c6-86ed-1ffcd60a8c1e",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:8e2d9c874f8361d0c22567390447f31a64f2eb453c439c86726cd46f228e395e",
+          "digest": "sha256:8e2d9c874f8361d0c22567390447f31a64f2eb453c439c86726cd46f228e395e",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a5daad492b59-1787559504",
+          "pushTiming": {
+            "endTime": "2026-08-24T08:21:15.006005172Z",
+            "startTime": "2026-08-24T08:20:26.908350301Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-a5daad492b59-1787559506.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-a5daad492b59-1787559506.tgz#1787559508809559": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "IXICmw2tw-7-T6WvE8OZqA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "EZJJP7aGdAMAvvJ3oU4sJY7SrJUn-nr69p0dlPZnMEA="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787559508809559",
+        "object": "source/genesis-auto-a5daad492b59-1787559506.tgz"
+      }
+    },
+    "startTime": "2026-08-24T08:18:29.837063873Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a5daad492b59-1787559504",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T08:18:37.309306059Z",
+          "startTime": "2026-08-24T08:18:37.303107785Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T08:20:26.870861985Z",
+          "startTime": "2026-08-24T08:18:37.303107785Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T08:20:26.908208347Z",
+        "startTime": "2026-08-24T08:18:36.574661014Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T08:18:36.574140389Z",
+        "startTime": "2026-08-24T08:18:31.622314087Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T08:21:15.006146794Z",
+        "startTime": "2026-08-24T08:20:26.908348905Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T08:18:36.574140389Z",
+        "startTime": "2026-08-24T08:18:31.622314087Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:ce32d5148da7-1787558737"
+      ]
+    },
+    "createTime": "2026-08-24T08:05:42.401382971Z",
+    "finishTime": "2026-08-24T08:08:15.550732Z",
+    "id": "c10fa6c6-4992-4d99-91a2-6697f13a6ddc",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:ce32d5148da7-1787558737"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/c10fa6c6-4992-4d99-91a2-6697f13a6ddc?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/c10fa6c6-4992-4d99-91a2-6697f13a6ddc",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:042dfa614b2032f9ca19312bbc9e3b99f7b8eb447a8e346c202ea54cd2738afa",
+          "digest": "sha256:042dfa614b2032f9ca19312bbc9e3b99f7b8eb447a8e346c202ea54cd2738afa",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:ce32d5148da7-1787558737",
+          "pushTiming": {
+            "endTime": "2026-08-24T08:08:15.034634887Z",
+            "startTime": "2026-08-24T08:07:28.533614153Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-ce32d5148da7-1787558739.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-ce32d5148da7-1787558739.tgz#1787558742123797": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "M_joQJ0QK_LTqTkA-RydXQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "1OrXQSG6hKCuuCcMxZrbT_Ia1GzYoQOIo9Pzw5wYvPg="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787558742123797",
+        "object": "source/genesis-auto-ce32d5148da7-1787558739.tgz"
+      }
+    },
+    "startTime": "2026-08-24T08:05:43.201033735Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:ce32d5148da7-1787558737",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T08:05:49.779154847Z",
+          "startTime": "2026-08-24T08:05:49.773781297Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T08:07:28.503654273Z",
+          "startTime": "2026-08-24T08:05:49.773781297Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T08:07:28.533476278Z",
+        "startTime": "2026-08-24T08:05:49.184275992Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T08:05:49.184064188Z",
+        "startTime": "2026-08-24T08:05:45.805728193Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T08:08:15.034816022Z",
+        "startTime": "2026-08-24T08:07:28.533612868Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T08:05:49.184064188Z",
+        "startTime": "2026-08-24T08:05:45.805728193Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:390f721bc513-1787557984"
+      ]
+    },
+    "createTime": "2026-08-24T07:53:09.565259359Z",
+    "finishTime": "2026-08-24T07:55:12.600281Z",
+    "id": "094788f1-2fd5-4030-a2c6-fc121470485f",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:390f721bc513-1787557984"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/094788f1-2fd5-4030-a2c6-fc121470485f?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/094788f1-2fd5-4030-a2c6-fc121470485f",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:1901b4617ec58f5475cddefe37e78e546a987d5fa70397ef0f2bff2a7f007888",
+          "digest": "sha256:1901b4617ec58f5475cddefe37e78e546a987d5fa70397ef0f2bff2a7f007888",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:390f721bc513-1787557984",
+          "pushTiming": {
+            "endTime": "2026-08-24T07:55:12.277046391Z",
+            "startTime": "2026-08-24T07:54:33.208339720Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-390f721bc513-1787557986.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-390f721bc513-1787557986.tgz#1787557989231527": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "hMCPf8PX12ylZJkBRsNrAg=="
+            },
+            {
+              "type": "SHA256",
+              "value": "ZpXqegmR0eGbY3sLfq4IMojAuaCQ7qPNOzegDhRts6o="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787557989231527",
+        "object": "source/genesis-auto-390f721bc513-1787557986.tgz"
+      }
+    },
+    "startTime": "2026-08-24T07:53:10.327225030Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:390f721bc513-1787557984",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T07:53:15.835670866Z",
+          "startTime": "2026-08-24T07:53:15.828995396Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T07:54:33.187773660Z",
+          "startTime": "2026-08-24T07:53:15.828995396Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T07:54:33.208240340Z",
+        "startTime": "2026-08-24T07:53:15.356643542Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T07:53:15.356466902Z",
+        "startTime": "2026-08-24T07:53:11.773233533Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T07:55:12.277186670Z",
+        "startTime": "2026-08-24T07:54:33.208339060Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T07:53:15.356466902Z",
+        "startTime": "2026-08-24T07:53:11.773233533Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dc980519ba14-1787556230"
+      ]
+    },
+    "createTime": "2026-08-24T07:23:55.507566359Z",
+    "finishTime": "2026-08-24T07:26:37.347608Z",
+    "id": "2901be57-44fa-4cea-9896-3de3bfb51c04",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dc980519ba14-1787556230"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/2901be57-44fa-4cea-9896-3de3bfb51c04?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/2901be57-44fa-4cea-9896-3de3bfb51c04",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:90b0417aa889aa88c7a9cfebf2eb7a775bb249da06b3a6223ce496b5c9ac19db",
+          "digest": "sha256:90b0417aa889aa88c7a9cfebf2eb7a775bb249da06b3a6223ce496b5c9ac19db",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dc980519ba14-1787556230",
+          "pushTiming": {
+            "endTime": "2026-08-24T07:26:36.927367378Z",
+            "startTime": "2026-08-24T07:25:49.478743837Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-dc980519ba14-1787556233.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-dc980519ba14-1787556233.tgz#1787556235269381": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "v5TZ1Q6kAX3HO-KTbonNqQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "RofLzQ2_iNIFEEy1b_F3Rj5UCyirR1jJDcF_0QgubNI="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787556235269381",
+        "object": "source/genesis-auto-dc980519ba14-1787556233.tgz"
+      }
+    },
+    "startTime": "2026-08-24T07:23:56.284622911Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:dc980519ba14-1787556230",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-24T07:24:03.267454205Z",
+          "startTime": "2026-08-24T07:24:03.261603978Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-24T07:25:49.443846733Z",
+          "startTime": "2026-08-24T07:24:03.261603978Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-24T07:25:49.478594103Z",
+        "startTime": "2026-08-24T07:24:02.565543461Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-24T07:24:02.565052936Z",
+        "startTime": "2026-08-24T07:23:57.640526550Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-24T07:26:36.927505982Z",
+        "startTime": "2026-08-24T07:25:49.478742488Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-24T07:24:02.565052936Z",
+        "startTime": "2026-08-24T07:23:57.640526550Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:887212b33b02-1787505742"
+      ]
+    },
+    "createTime": "2026-08-23T17:22:26.802210360Z",
+    "finishTime": "2026-08-23T17:25:08.163024Z",
+    "id": "5f7e2533-8d2d-402c-b2a6-0552a5d4c792",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:887212b33b02-1787505742"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/5f7e2533-8d2d-402c-b2a6-0552a5d4c792?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/5f7e2533-8d2d-402c-b2a6-0552a5d4c792",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:7b722c22e2bbbcfeeb9e08c89437b4e2114f7eb850209f8e393c10d815b44711",
+          "digest": "sha256:7b722c22e2bbbcfeeb9e08c89437b4e2114f7eb850209f8e393c10d815b44711",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:887212b33b02-1787505742",
+          "pushTiming": {
+            "endTime": "2026-08-23T17:25:07.889026826Z",
+            "startTime": "2026-08-23T17:24:23.325264195Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-887212b33b02-1787505744.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-887212b33b02-1787505744.tgz#1787505746590325": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "RLZ6oEtGgyaFzVu5HkCxtA=="
+            },
+            {
+              "type": "SHA256",
+              "value": "WxN_ODgZ6-6_G1IwnXNjDAK2cjFVDyH07vRIWJqj0Yc="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787505746590325",
+        "object": "source/genesis-auto-887212b33b02-1787505744.tgz"
+      }
+    },
+    "startTime": "2026-08-23T17:22:27.739257923Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:887212b33b02-1787505742",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-23T17:22:35.936537914Z",
+          "startTime": "2026-08-23T17:22:35.928632646Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-23T17:24:23.281873913Z",
+          "startTime": "2026-08-23T17:22:35.928632646Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-23T17:24:23.325157101Z",
+        "startTime": "2026-08-23T17:22:35.204829276Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-23T17:22:35.204596844Z",
+        "startTime": "2026-08-23T17:22:30.247533998Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-23T17:25:07.889112966Z",
+        "startTime": "2026-08-23T17:24:23.325263625Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-23T17:22:35.204596844Z",
+        "startTime": "2026-08-23T17:22:30.247533998Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787504701"
+      ]
+    },
+    "createTime": "2026-08-23T17:05:05.960729824Z",
+    "finishTime": "2026-08-23T17:07:47.733202Z",
+    "id": "1b3d6278-1d51-4e47-a3ad-a130ecc472e8",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787504701"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/1b3d6278-1d51-4e47-a3ad-a130ecc472e8?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/1b3d6278-1d51-4e47-a3ad-a130ecc472e8",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:939dcfc1269311993992ba3a88ae7831a1e0913730987f281e44860285144030",
+          "digest": "sha256:939dcfc1269311993992ba3a88ae7831a1e0913730987f281e44860285144030",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787504701",
+          "pushTiming": {
+            "endTime": "2026-08-23T17:07:47.370883427Z",
+            "startTime": "2026-08-23T17:06:57.840844408Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-37331f671c6a-1787504703.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-37331f671c6a-1787504703.tgz#1787504705754634": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "B7aheIDifVvbKyqE8u7u-g=="
+            },
+            {
+              "type": "SHA256",
+              "value": "veP7zmNWjxLp9eewsnKL83eSRZVNeVDqkMgCZHcgQYM="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787504705754634",
+        "object": "source/genesis-auto-37331f671c6a-1787504703.tgz"
+      }
+    },
+    "startTime": "2026-08-23T17:05:06.783102048Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787504701",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-23T17:05:13.290513348Z",
+          "startTime": "2026-08-23T17:05:13.284347504Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-23T17:06:57.801173773Z",
+          "startTime": "2026-08-23T17:05:13.284347504Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-23T17:06:57.840514300Z",
+        "startTime": "2026-08-23T17:05:12.669249938Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-23T17:05:12.668979781Z",
+        "startTime": "2026-08-23T17:05:08.203232095Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-23T17:07:47.371000565Z",
+        "startTime": "2026-08-23T17:06:57.840841083Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-23T17:05:12.668979781Z",
+        "startTime": "2026-08-23T17:05:08.203232095Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787503371"
+      ]
+    },
+    "createTime": "2026-08-23T16:42:56.323685638Z",
+    "finishTime": "2026-08-23T16:45:40.589559Z",
+    "id": "426a2608-ede4-4844-9414-654cc0434526",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787503371"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/426a2608-ede4-4844-9414-654cc0434526?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/426a2608-ede4-4844-9414-654cc0434526",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:d7c2c6711a96de74897f7ff74c17245e37916493c8b1eb7f79af578dc6ef6b9a",
+          "digest": "sha256:d7c2c6711a96de74897f7ff74c17245e37916493c8b1eb7f79af578dc6ef6b9a",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787503371",
+          "pushTiming": {
+            "endTime": "2026-08-23T16:45:39.903749139Z",
+            "startTime": "2026-08-23T16:44:47.327090234Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-37331f671c6a-1787503373.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-37331f671c6a-1787503373.tgz#1787503376087599": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "B7aheIDifVvbKyqE8u7u-g=="
+            },
+            {
+              "type": "SHA256",
+              "value": "veP7zmNWjxLp9eewsnKL83eSRZVNeVDqkMgCZHcgQYM="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787503376087599",
+        "object": "source/genesis-auto-37331f671c6a-1787503373.tgz"
+      }
+    },
+    "startTime": "2026-08-23T16:42:57.186870222Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:37331f671c6a-1787503371",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-23T16:43:04.992968558Z",
+          "startTime": "2026-08-23T16:43:04.987650585Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-23T16:44:47.280385483Z",
+          "startTime": "2026-08-23T16:43:04.987650585Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-23T16:44:47.326937045Z",
+        "startTime": "2026-08-23T16:43:04.356330239Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-23T16:43:04.356122953Z",
+        "startTime": "2026-08-23T16:42:59.923479596Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-23T16:45:39.903872336Z",
+        "startTime": "2026-08-23T16:44:47.327089460Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-23T16:43:04.356122953Z",
+        "startTime": "2026-08-23T16:42:59.923479596Z"
+      }
+    }
+  },
+  {
+    "artifacts": {
+      "images": [
+        "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:e77ae1eca241-1787501911"
+      ]
+    },
+    "createTime": "2026-08-23T16:18:36.658928130Z",
+    "finishTime": "2026-08-23T16:21:10.853053Z",
+    "id": "73a98e6b-bf1a-4bb4-bd60-809826b4c89c",
+    "images": [
+      "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:e77ae1eca241-1787501911"
+    ],
+    "logUrl": "https://console.cloud.google.com/cloud-build/builds/73a98e6b-bf1a-4bb4-bd60-809826b4c89c?project=802404398783",
+    "name": "projects/802404398783/locations/global/builds/73a98e6b-bf1a-4bb4-bd60-809826b4c89c",
+    "options": {
+      "logging": "CLOUD_LOGGING_ONLY",
+      "pool": {}
+    },
+    "projectId": "system3-openalgo-safe",
+    "queueTtl": "3600s",
+    "results": {
+      "buildStepImages": [
+        "sha256:617f98016081e2978c0b44184d7b09446027b909f1078b8fdc23efc4c74c5f20"
+      ],
+      "buildStepOutputs": [
+        ""
+      ],
+      "images": [
+        {
+          "artifactRegistryPackage": "projects/system3-openalgo-safe/locations/asia-south1/repositories/system3-containers/packages/genesis-system3/versions/sha256:2fb6040210ec58182db908ee83d4bcce473e72a4f6bef16e53567b783c435ee7",
+          "digest": "sha256:2fb6040210ec58182db908ee83d4bcce473e72a4f6bef16e53567b783c435ee7",
+          "name": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:e77ae1eca241-1787501911",
+          "pushTiming": {
+            "endTime": "2026-08-23T16:21:10.448546366Z",
+            "startTime": "2026-08-23T16:20:22.930785919Z"
+          }
+        }
+      ]
+    },
+    "serviceAccount": "projects/system3-openalgo-safe/serviceAccounts/system3-builder@system3-openalgo-safe.iam.gserviceaccount.com",
+    "source": {
+      "storageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "object": "source/genesis-auto-e77ae1eca241-1787501913.tgz"
+      }
+    },
+    "sourceProvenance": {
+      "fileHashes": {
+        "gs://system3-openalgo-safe_cloudbuild/source/genesis-auto-e77ae1eca241-1787501913.tgz#1787501916449380": {
+          "fileHash": [
+            {
+              "type": "MD5",
+              "value": "YhUBibNW5_fTqN0JXCW2uQ=="
+            },
+            {
+              "type": "SHA256",
+              "value": "u-L5zCXanNzdjOvUoxdehK9Q2DfluAnl36lX-_Hdcw0="
+            }
+          ]
+        }
+      },
+      "resolvedStorageSource": {
+        "bucket": "system3-openalgo-safe_cloudbuild",
+        "generation": "1787501916449380",
+        "object": "source/genesis-auto-e77ae1eca241-1787501913.tgz"
+      }
+    },
+    "startTime": "2026-08-23T16:18:37.558061201Z",
+    "status": "SUCCESS",
+    "steps": [
+      {
+        "args": [
+          "build",
+          "--file=dashboard/backend/Dockerfile",
+          "--tag=asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:e77ae1eca241-1787501911",
+          "."
+        ],
+        "name": "gcr.io/cloud-builders/docker",
+        "pullTiming": {
+          "endTime": "2026-08-23T16:18:45.571722258Z",
+          "startTime": "2026-08-23T16:18:45.567250412Z"
+        },
+        "status": "SUCCESS",
+        "timing": {
+          "endTime": "2026-08-23T16:20:22.899688487Z",
+          "startTime": "2026-08-23T16:18:45.567250412Z"
+        }
+      }
+    ],
+    "timeout": "3600s",
+    "timing": {
+      "BUILD": {
+        "endTime": "2026-08-23T16:20:22.930634231Z",
+        "startTime": "2026-08-23T16:18:44.939111189Z"
+      },
+      "FETCHSOURCE": {
+        "endTime": "2026-08-23T16:18:44.938837995Z",
+        "startTime": "2026-08-23T16:18:40.668847277Z"
+      },
+      "PUSH": {
+        "endTime": "2026-08-23T16:21:10.448705987Z",
+        "startTime": "2026-08-23T16:20:22.930785009Z"
+      },
+      "STORAGE_SOURCE": {
+        "endTime": "2026-08-23T16:18:44.938837995Z",
+        "startTime": "2026-08-23T16:18:40.668847277Z"
+      }
+    }
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "path": "/api/state",
+  "ok": false,
+  "http_status": 429,
+  "elapsed_ms": 10340,
+  "error": "HTTPError 429",
+  "body_preview": "Rate exceeded."
+}

@@ -1,0 +1,3 @@
+{
+  "error": "ERROR: (gcloud.iam.workload-identity-pools.providers.list) unrecognized arguments: gs3-github-main \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+}

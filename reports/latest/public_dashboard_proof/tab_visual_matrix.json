@@ -1,0 +1,20 @@
+{
+  "browser_transport": "webdriver_single_session",
+  "expected_page_navigations_initial": 22,
+  "expected_sha": "",
+  "fatal_error": "RuntimeError:expected_git_sha_missing",
+  "mobile_reload_required": false,
+  "page_load_strategy": "eager",
+  "page_load_timeout_seconds": 45,
+  "retry_mode": "failed_tabs_fresh_browser_once",
+  "retry_page_load_timeout_seconds": 60,
+  "source": "real_deployed_cloud_run_ui",
+  "state": "FAIL",
+  "tab_count": 22,
+  "tabs": [],
+  "trading_mutations_called": false,
+  "viewports": {
+    "desktop": "1600x1000",
+    "mobile": "430x932"
+  }
+}

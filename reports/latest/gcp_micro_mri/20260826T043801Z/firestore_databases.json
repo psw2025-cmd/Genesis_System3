@@ -1,0 +1,22 @@
+[
+  {
+    "appEngineIntegrationMode": "DISABLED",
+    "concurrencyMode": "PESSIMISTIC",
+    "createTime": "2026-08-02T19:03:20.639530Z",
+    "databaseEdition": "STANDARD",
+    "deleteProtectionState": "DELETE_PROTECTION_ENABLED",
+    "earliestVersionTime": "2026-08-26T04:02:01.215869Z",
+    "enhancedTextSearchQueryMode": "ENHANCED_QUERY_MODE_ENABLED",
+    "etag": "IO+E4vTBvZYDMIensM3sgpYD",
+    "freeTier": true,
+    "keyPrefix": "j",
+    "locationId": "asia-south1",
+    "name": "projects/system3-openalgo-safe/databases/(default)",
+    "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+    "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+    "type": "FIRESTORE_NATIVE",
+    "uid": "69fe36f3-ccdb-49ac-ba80-5cbca4f870e7",
+    "updateTime": "2026-08-02T19:04:59.670538Z",
+    "versionRetentionPeriod": "3600s"
+  }
+]

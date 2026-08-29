@@ -1,0 +1,137 @@
+{
+  "apiVersion": "run.googleapis.com/v1",
+  "kind": "Job",
+  "metadata": {
+    "annotations": {
+      "run.googleapis.com/client-name": "gcloud",
+      "run.googleapis.com/client-version": "577.0.0",
+      "run.googleapis.com/creator": "warghade2012@gmail.com",
+      "run.googleapis.com/lastModifier": "warghade2012@gmail.com",
+      "run.googleapis.com/operation-id": "49e68ab5-81c2-4d98-8212-05c0483abb26"
+    },
+    "creationTimestamp": "2026-08-02T21:08:16.617036Z",
+    "generation": 1,
+    "labels": {
+      "cloud.googleapis.com/location": "asia-south1",
+      "run.googleapis.com/lastUpdatedTime": "2026-08-02T21:08:16.617036Z",
+      "run.googleapis.com/satisfiesPzs": "true"
+    },
+    "name": "genesis-system3-smoke",
+    "namespace": "802404398783",
+    "resourceVersion": "AAZYFtTJaNE",
+    "selfLink": "/apis/run.googleapis.com/v1/namespaces/802404398783/jobs/genesis-system3-smoke",
+    "uid": "41c509b7-e80d-4990-b7b6-1f4736f75d16"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "annotations": {
+          "run.googleapis.com/client-name": "gcloud",
+          "run.googleapis.com/client-version": "577.0.0",
+          "run.googleapis.com/execution-environment": "gen2"
+        },
+        "labels": {
+          "client.knative.dev/nonce": "yes_vax_fuf"
+        }
+      },
+      "spec": {
+        "parallelism": 1,
+        "taskCount": 1,
+        "template": {
+          "spec": {
+            "containers": [
+              {
+                "args": [
+                  "scripts/gcp_worker_job.py"
+                ],
+                "command": [
+                  "python"
+                ],
+                "env": [
+                  {
+                    "name": "SYSTEM3_DEPLOY_TARGET",
+                    "value": "gcp-cloud-run-job"
+                  },
+                  {
+                    "name": "SYSTEM3_WORKER_MODE",
+                    "value": "job"
+                  },
+                  {
+                    "name": "SYSTEM3_JOB_KIND",
+                    "value": "smoke"
+                  },
+                  {
+                    "name": "SYSTEM3_JOB_PUBLISH_STATE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "SYSTEM3_ENABLE_PAPER_JOB",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_STATE_BACKEND",
+                    "value": "firestore"
+                  },
+                  {
+                    "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+                    "value": "1"
+                  },
+                  {
+                    "name": "SYSTEM3_FIRESTORE_PROJECT",
+                    "value": "system3-openalgo-safe"
+                  },
+                  {
+                    "name": "SYSTEM3_REAL_ONLY",
+                    "value": "1"
+                  },
+                  {
+                    "name": "SYSTEM3_MODE",
+                    "value": "analyzer"
+                  },
+                  {
+                    "name": "ANALYZE_MODE",
+                    "value": "1"
+                  },
+                  {
+                    "name": "LIVE_TRADING_ENABLED",
+                    "value": "0"
+                  },
+                  {
+                    "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+                    "value": "0"
+                  }
+                ],
+                "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:1e8dca59755e203306d96c7400d4b5cda15792d6",
+                "resources": {
+                  "limits": {
+                    "cpu": "1000m",
+                    "memory": "512Mi"
+                  }
+                }
+              }
+            ],
+            "maxRetries": 0,
+            "serviceAccountName": "system3-worker@system3-openalgo-safe.iam.gserviceaccount.com",
+            "timeoutSeconds": "600"
+          }
+        }
+      }
+    }
+  },
+  "status": {
+    "conditions": [
+      {
+        "status": "True",
+        "type": "Ready"
+      }
+    ],
+    "executionCount": 1,
+    "latestCreatedExecution": {
+      "completionStatus": "EXECUTION_SUCCEEDED",
+      "completionTimestamp": "2026-08-02T21:09:02.626685Z",
+      "creationTimestamp": "2026-08-02T21:08:51.998529Z",
+      "name": "genesis-system3-smoke-85bfb"
+    },
+    "observedGeneration": 1
+  }
+}

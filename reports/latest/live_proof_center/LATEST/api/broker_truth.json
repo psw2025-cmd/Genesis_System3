@@ -1,0 +1,624 @@
+{
+  "path": "/api/broker/truth",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 364,
+  "content_type": "application/json",
+  "data": {
+    "generated_utc": "2026-08-26T08:32:32.526031Z",
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "broker": {
+      "broker": "dhan",
+      "mode": "ANALYZER",
+      "live_trading_enabled": false,
+      "order_placement_allowed": false,
+      "client_id_present": true,
+      "access_token_present": true,
+      "credentials_present": true,
+      "sdk_available": true,
+      "env_source": "core.utils.env_loader",
+      "cache_hit": true,
+      "probe_strategy": "cloud_rest_profile_bounded",
+      "probe_header_contract": "access-token-only",
+      "probe_header_variant": "docs-access-token-only",
+      "probe_contract_cached": true,
+      "probe_timeout_s": 5.0,
+      "auth_rejection_trace": {
+        "first_rejected_at_utc": null,
+        "last_rejected_at_utc": null,
+        "rejection_count": 0,
+        "secret_version": null,
+        "auth_classification": null,
+        "http_status": null,
+        "upstream_code": null,
+        "runtime_instance": "genesis-system3-web-00617-vif",
+        "raw_token_exposed": false,
+        "client_id_exposed": false
+      },
+      "connected": true,
+      "error": null,
+      "auth_classification": "AUTH_OK",
+      "upstream_classification": null,
+      "upstream_code": null,
+      "latency_ms": 47,
+      "profile_source": "rest",
+      "probe_header_attempts": [
+        {
+          "contract": "docs-access-token-only",
+          "public_contract": "access-token-only",
+          "outcome": "AUTH_OK",
+          "http_status": 200,
+          "upstream_code": null,
+          "credential_value_exposed": false
+        }
+      ],
+      "account_read_proof": {
+        "profile": {
+          "ok": true,
+          "error": null
+        },
+        "raw_payload_exposed": false,
+        "positions": {
+          "ok": true,
+          "error": null,
+          "item_count": 0,
+          "latency_ms": 39
+        },
+        "funds": {
+          "ok": true,
+          "error": null,
+          "item_count": null,
+          "latency_ms": 46
+        },
+        "holdings": {
+          "ok": true,
+          "error": null,
+          "item_count": 11,
+          "latency_ms": 48
+        }
+      },
+      "broker_truth_contract": "profile+funds+holdings+positions",
+      "broker_truth_complete": true,
+      "raw_account_payload_exposed": false,
+      "cache_age_s": 0.3,
+      "token_reload": "<REDACTED>",
+      "canonical_rotation": {
+        "attempted": false,
+        "success": false,
+        "raw_token_exposed": false
+      },
+      "token_proof": "<REDACTED>",
+      "cloud_runtime_patch": true
+    },
+    "broker_connected": true,
+    "validation": {
+      "overall": "PASS_WITH_WARNINGS",
+      "valid_pct": 90,
+      "valid_count": 9,
+      "total_fields": 10,
+      "all_apis_success": true
+    },
+    "trader_fields": {
+      "cash_available": {
+        "status": "VALID",
+        "valid": true,
+        "value": 1638.54
+      },
+      "utilized_margin": {
+        "status": "NOT_FOUND",
+        "valid": false,
+        "value": null
+      },
+      "total_limit": {
+        "status": "VALID",
+        "valid": true,
+        "value": 1638.54
+      },
+      "holdings_count": {
+        "status": "VALID",
+        "valid": true,
+        "value": 11.0
+      },
+      "positions_count": {
+        "status": "VALID",
+        "valid": true,
+        "value": 0.0
+      },
+      "holdings_total_value": {
+        "status": "VALID",
+        "valid": true,
+        "value": 381725.74
+      },
+      "positions_unrealized_pnl": {
+        "status": "VALID",
+        "valid": true,
+        "value": 0.0
+      },
+      "positions_realized_pnl": {
+        "status": "VALID",
+        "valid": true,
+        "value": 0.0
+      },
+      "holding_symbol_sample": {
+        "status": "VALID",
+        "valid": true,
+        "value": "PARADEEP"
+      },
+      "holding_ltp_sample": {
+        "status": "VALID",
+        "valid": true,
+        "value": 164.51
+      }
+    },
+    "funds": {
+      "success": true,
+      "source": "sdk",
+      "error": null,
+      "normalized": {
+        "available_balance": 1638.54,
+        "utilized_amount": null,
+        "total_limit": 1638.54,
+        "raw": {
+          "dhanClientId": "1106583741",
+          "availabelBalance": 1638.54,
+          "sodLimit": 1638.54,
+          "collateralAmount": 0.0,
+          "receiveableAmount": 0.0,
+          "utilizedAmount": 0.0,
+          "blockedPayoutAmount": 0.0,
+          "withdrawableBalance": 1638.54
+        }
+      },
+      "raw_count": 1
+    },
+    "holdings": {
+      "success": true,
+      "source": "sdk",
+      "error": null,
+      "count": 11,
+      "rows": [
+        {
+          "symbol": "PARADEEP",
+          "quantity": 165.0,
+          "avg_price": 115.44,
+          "ltp": 164.51,
+          "current_value": 27144.149999999998,
+          "pnl": 8096.549999999999,
+          "pnl_pct": 42.50693000693,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "PARADEEP",
+            "securityId": "9741",
+            "isin": "INE088F01024",
+            "totalQty": 165,
+            "dpQty": 165,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 165,
+            "collateralQty": 0,
+            "avgCostPrice": 115.44,
+            "lastTradedPrice": 164.51
+          }
+        },
+        {
+          "symbol": "MRPL",
+          "quantity": 164.0,
+          "avg_price": 188.52232,
+          "ltp": 173.21,
+          "current_value": 28406.440000000002,
+          "pnl": -2511.22048,
+          "pnl_pct": -8.122284936871136,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "MRPL",
+            "securityId": "2283",
+            "isin": "INE103A01014",
+            "totalQty": 164,
+            "dpQty": 164,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 164,
+            "collateralQty": 0,
+            "avgCostPrice": 188.52232,
+            "lastTradedPrice": 173.21
+          }
+        },
+        {
+          "symbol": "SANDUMA",
+          "quantity": 230.0,
+          "avg_price": 202.59615,
+          "ltp": 206.2,
+          "current_value": 47426.0,
+          "pnl": 828.8854999999987,
+          "pnl_pct": 1.7788343954216277,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "SANDUMA",
+            "securityId": "18359",
+            "isin": "INE149K01016",
+            "totalQty": 230,
+            "dpQty": 230,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 230,
+            "collateralQty": 0,
+            "avgCostPrice": 202.59615,
+            "lastTradedPrice": 206.2
+          }
+        },
+        {
+          "symbol": "CHENNPETRO",
+          "quantity": 31.0,
+          "avg_price": 921.15,
+          "ltp": 1385.9,
+          "current_value": 42962.9,
+          "pnl": 14407.250000000004,
+          "pnl_pct": 50.45323780057538,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "CHENNPETRO",
+            "securityId": "2049",
+            "isin": "INE178A01016",
+            "totalQty": 31,
+            "dpQty": 31,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 31,
+            "collateralQty": 0,
+            "avgCostPrice": 921.15,
+            "lastTradedPrice": 1385.9
+          }
+        },
+        {
+          "symbol": "MAHSEAMLES",
+          "quantity": 50.0,
+          "avg_price": 607.664,
+          "ltp": 637.8,
+          "current_value": 31889.999999999996,
+          "pnl": 1506.7999999999984,
+          "pnl_pct": 4.959319624002733,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "MAHSEAMLES",
+            "securityId": "2088",
+            "isin": "INE271B01025",
+            "totalQty": 50,
+            "dpQty": 50,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 50,
+            "collateralQty": 0,
+            "avgCostPrice": 607.664,
+            "lastTradedPrice": 637.8
+          }
+        },
+        {
+          "symbol": "BAJAJHIND",
+          "quantity": 2100.0,
+          "avg_price": 16.90938,
+          "ltp": 22.26,
+          "current_value": 46746.0,
+          "pnl": 11236.302000000005,
+          "pnl_pct": 31.642910621205527,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "BAJAJHIND",
+            "securityId": "308",
+            "isin": "INE306A01021",
+            "totalQty": 2100,
+            "dpQty": 2100,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 2100,
+            "collateralQty": 0,
+            "avgCostPrice": 16.90938,
+            "lastTradedPrice": 22.26
+          }
+        },
+        {
+          "symbol": "DWARKESH",
+          "quantity": 1.0,
+          "avg_price": 39.218,
+          "ltp": 54.28,
+          "current_value": 54.28,
+          "pnl": 15.061999999999998,
+          "pnl_pct": 38.4058340557907,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "DWARKESH",
+            "securityId": "11667",
+            "isin": "INE366A01041",
+            "totalQty": 1,
+            "dpQty": 1,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 1,
+            "collateralQty": 0,
+            "avgCostPrice": 39.218,
+            "lastTradedPrice": 54.28
+          }
+        },
+        {
+          "symbol": "RKFORGE",
+          "quantity": 40.0,
+          "avg_price": 590.99,
+          "ltp": 733.5,
+          "current_value": 29340.0,
+          "pnl": 5700.4,
+          "pnl_pct": 24.113775190781567,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "RKFORGE",
+            "securityId": "11411",
+            "isin": "INE399G01023",
+            "totalQty": 40,
+            "dpQty": 40,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 40,
+            "collateralQty": 0,
+            "avgCostPrice": 590.99,
+            "lastTradedPrice": 733.5
+          }
+        },
+        {
+          "symbol": "PAISALO",
+          "quantity": 880.0,
+          "avg_price": 38.21761,
+          "ltp": 67.89,
+          "current_value": 59743.2,
+          "pnl": 26111.7032,
+          "pnl_pct": 77.64062169246063,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "PAISALO",
+            "securityId": "25468",
+            "isin": "INE420C01059",
+            "totalQty": 880,
+            "dpQty": 880,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 880,
+            "collateralQty": 0,
+            "avgCostPrice": 38.21761,
+            "lastTradedPrice": 67.89
+          }
+        },
+        {
+          "symbol": "NMDC",
+          "quantity": 476.0,
+          "avg_price": 84.48,
+          "ltp": 87.27,
+          "current_value": 41540.52,
+          "pnl": 1328.0399999999963,
+          "pnl_pct": 3.3025568181818086,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "NMDC",
+            "securityId": "15332",
+            "isin": "INE584A01023",
+            "totalQty": 476,
+            "dpQty": 476,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 476,
+            "collateralQty": 0,
+            "avgCostPrice": 84.48,
+            "lastTradedPrice": 87.27
+          }
+        },
+        {
+          "symbol": "AARTIIND",
+          "quantity": 49.0,
+          "avg_price": 518.75,
+          "ltp": 540.25,
+          "current_value": 26472.25,
+          "pnl": 1053.5,
+          "pnl_pct": 4.144578313253012,
+          "raw": {
+            "exchange": "ALL",
+            "tradingSymbol": "AARTIIND",
+            "securityId": "7",
+            "isin": "INE769A01020",
+            "totalQty": 49,
+            "dpQty": 49,
+            "t1Qty": 0,
+            "mtf_t1_qty": 0,
+            "mtf_qty": 0,
+            "availableQty": 49,
+            "collateralQty": 0,
+            "avgCostPrice": 518.75,
+            "lastTradedPrice": 540.25
+          }
+        }
+      ],
+      "raw_rows": [
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "PARADEEP",
+          "securityId": "9741",
+          "isin": "INE088F01024",
+          "totalQty": 165,
+          "dpQty": 165,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 165,
+          "collateralQty": 0,
+          "avgCostPrice": 115.44,
+          "lastTradedPrice": 164.51
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "MRPL",
+          "securityId": "2283",
+          "isin": "INE103A01014",
+          "totalQty": 164,
+          "dpQty": 164,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 164,
+          "collateralQty": 0,
+          "avgCostPrice": 188.52232,
+          "lastTradedPrice": 173.21
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "SANDUMA",
+          "securityId": "18359",
+          "isin": "INE149K01016",
+          "totalQty": 230,
+          "dpQty": 230,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 230,
+          "collateralQty": 0,
+          "avgCostPrice": 202.59615,
+          "lastTradedPrice": 206.2
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "CHENNPETRO",
+          "securityId": "2049",
+          "isin": "INE178A01016",
+          "totalQty": 31,
+          "dpQty": 31,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 31,
+          "collateralQty": 0,
+          "avgCostPrice": 921.15,
+          "lastTradedPrice": 1385.9
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "MAHSEAMLES",
+          "securityId": "2088",
+          "isin": "INE271B01025",
+          "totalQty": 50,
+          "dpQty": 50,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 50,
+          "collateralQty": 0,
+          "avgCostPrice": 607.664,
+          "lastTradedPrice": 637.8
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "BAJAJHIND",
+          "securityId": "308",
+          "isin": "INE306A01021",
+          "totalQty": 2100,
+          "dpQty": 2100,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 2100,
+          "collateralQty": 0,
+          "avgCostPrice": 16.90938,
+          "lastTradedPrice": 22.26
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "DWARKESH",
+          "securityId": "11667",
+          "isin": "INE366A01041",
+          "totalQty": 1,
+          "dpQty": 1,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 1,
+          "collateralQty": 0,
+          "avgCostPrice": 39.218,
+          "lastTradedPrice": 54.28
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "RKFORGE",
+          "securityId": "11411",
+          "isin": "INE399G01023",
+          "totalQty": 40,
+          "dpQty": 40,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 40,
+          "collateralQty": 0,
+          "avgCostPrice": 590.99,
+          "lastTradedPrice": 733.5
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "PAISALO",
+          "securityId": "25468",
+          "isin": "INE420C01059",
+          "totalQty": 880,
+          "dpQty": 880,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 880,
+          "collateralQty": 0,
+          "avgCostPrice": 38.21761,
+          "lastTradedPrice": 67.89
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "NMDC",
+          "securityId": "15332",
+          "isin": "INE584A01023",
+          "totalQty": 476,
+          "dpQty": 476,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 476,
+          "collateralQty": 0,
+          "avgCostPrice": 84.48,
+          "lastTradedPrice": 87.27
+        },
+        {
+          "exchange": "ALL",
+          "tradingSymbol": "AARTIIND",
+          "securityId": "7",
+          "isin": "INE769A01020",
+          "totalQty": 49,
+          "dpQty": 49,
+          "t1Qty": 0,
+          "mtf_t1_qty": 0,
+          "mtf_qty": 0,
+          "availableQty": 49,
+          "collateralQty": 0,
+          "avgCostPrice": 518.75,
+          "lastTradedPrice": 540.25
+        }
+      ]
+    },
+    "positions": {
+      "success": true,
+      "source": "sdk",
+      "error": null,
+      "count": 0,
+      "rows": [],
+      "raw_rows": []
+    },
+    "data_source": "DHAN_BROKER_READONLY"
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com/keys/cbd320bd32eb58ae0dcf1fa9b22168b079ed5cf9",
+    "validAfterTime": "2026-08-14T19:48:43Z",
+    "validBeforeTime": "2026-08-31T19:48:43Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com/keys/c9211bbd9fc4f874796e7f177922fcb20401edfd",
+    "validAfterTime": "2026-08-23T19:48:43Z",
+    "validBeforeTime": "2026-09-08T19:48:43Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/gs3-forecast-job@system3-openalgo-safe.iam.gserviceaccount.com/keys/e91c0716b0a42d9b098c932085f7bd522e72be42",
+    "validAfterTime": "2026-08-13T21:35:42Z",
+    "validBeforeTime": "2028-08-12T21:35:42Z"
+  }
+]

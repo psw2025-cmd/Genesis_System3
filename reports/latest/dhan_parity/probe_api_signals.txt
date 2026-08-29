@@ -1,0 +1,1 @@
+{"action":"NO_TRADE","reason":"Signal file not found","data_source":"real"}

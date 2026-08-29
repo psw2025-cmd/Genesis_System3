@@ -1,0 +1,70 @@
+{
+  "acl": [
+    {
+      "entity": "project-editors-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-owners-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "creation_time": "2026-08-02T21:00:53+0000",
+  "default_acl": [
+    {
+      "entity": "project-owners-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-802404398783",
+      "projectTeam": {
+        "projectNumber": "802404398783",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "default_storage_class": "STANDARD",
+  "generation": 1785704452692717067,
+  "location": "US",
+  "location_type": "multi-region",
+  "metageneration": 2,
+  "name": "system3-openalgo-safe_cloudbuild",
+  "public_access_prevention": "inherited",
+  "rpo": "DEFAULT",
+  "soft_delete_policy": {
+    "effectiveTime": "2026-08-02T21:00:53.005000+00:00",
+    "retentionDurationSeconds": "604800"
+  },
+  "storage_url": "gs://system3-openalgo-safe_cloudbuild/",
+  "uniform_bucket_level_access": false,
+  "update_time": "2026-08-15T19:46:25+0000"
+}

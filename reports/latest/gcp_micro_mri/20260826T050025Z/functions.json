@@ -1,0 +1,3 @@
+{
+  "error": "ERROR: (gcloud.functions.list) unrecognized arguments: --gen2 (did you mean '--v2'?) \r\n\r\nTo search the help text of gcloud commands, run:\r\n  gcloud help -- SEARCH_TERMS"
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com/keys/f6b08700d0e2208628c6a7e08d0abda0bbb3b912",
+    "validAfterTime": "2026-08-18T15:44:09Z",
+    "validBeforeTime": "2026-09-03T15:44:09Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com/keys/0c78e0f43c644fae72a9c4413284cf5186e6753f",
+    "validAfterTime": "2026-08-09T15:44:09Z",
+    "validBeforeTime": "2026-08-26T15:44:09Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "SYSTEM_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com/keys/ac0bafd6bedf66620dc24cb3df4a4f0f8fe6cc43",
+    "validAfterTime": "2026-08-04T17:38:46Z",
+    "validBeforeTime": "2028-08-03T17:38:46Z"
+  },
+  {
+    "keyAlgorithm": "KEY_ALG_RSA_2048",
+    "keyOrigin": "GOOGLE_PROVIDED",
+    "keyType": "USER_MANAGED",
+    "name": "projects/system3-openalgo-safe/serviceAccounts/github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com/keys/072b04bab465d2b0a52bc47133169f9a3c05c350",
+    "validAfterTime": "2026-08-04T17:39:44Z",
+    "validBeforeTime": "9999-12-31T23:59:59Z"
+  }
+]

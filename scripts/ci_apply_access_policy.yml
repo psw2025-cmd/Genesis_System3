@@ -1,0 +1,25 @@
+# CI apply / validate ACCESS_POLICY + Command Center smoke (documentation + reusable steps)
+# Wired by .github/workflows/command-center-access.yml
+#
+# Local:
+#   python scripts/validate_access_policy.py
+#   python scripts/command_center_smoke_test.py
+#   python scripts/append_command_center_audit.py smoke_test pass
+
+name: ci_apply_access_policy
+description: >
+  Validate ACCESS_POLICY.yaml, deny credential mint when unsigned,
+  run Command Center smoke tests, append audit log, update COMMAND_CENTER.md status.
+steps:
+  - id: validate_policy
+    run: python scripts/validate_access_policy.py
+  - id: decide_mint
+    note: >
+      Mint only if metadata.signature_status == VERIFIED and spec.credentials.mint_allowed.
+      Current policy keeps mint_allowed false → create access-request instead.
+  - id: smoke
+    run: python scripts/command_center_smoke_test.py
+  - id: audit
+    run: python scripts/append_command_center_audit.py smoke_test ${{SMOKE_RESULT}}
+  - id: write_status
+    run: python scripts/system3_command_center_refresh.py

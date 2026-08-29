@@ -1,0 +1,32 @@
+{
+    "permissions_admin":  true,
+    "branches_main_protected":  true,
+    "repo":  "psw2025-cmd/Genesis_System3",
+    "actor":  "psw2025-cmd",
+    "recorded_at":  "2026-08-26T23:03:41.9847362+05:30",
+    "CAN_DO":  "yes",
+    "ruleset":  {
+                    "current_user_can_bypass":  "never",
+                    "required_status_checks":  [
+                                                   "BLOCKING - workflow policy and trading safety guard",
+                                                   "BLOCKING - architecture and trading safety gate",
+                                                   "BLOCKING - Python compile proof",
+                                                   "BLOCKING - full proof pack validation",
+                                                   "BLOCKING - frontend production build + browser runtime",
+                                                   "BLOCKING - priority workflows only"
+                                               ],
+                    "bypass_actors":  [
+
+                                      ],
+                    "id":  21581518,
+                    "name":  "main-protection-fail-closed",
+                    "enforcement":  "active",
+                    "html":  "https://github.com/psw2025-cmd/Genesis_System3/rules/21581518",
+                    "rules":  [
+                                  "pull_request",
+                                  "required_status_checks",
+                                  "deletion",
+                                  "non_fast_forward"
+                              ]
+                }
+}

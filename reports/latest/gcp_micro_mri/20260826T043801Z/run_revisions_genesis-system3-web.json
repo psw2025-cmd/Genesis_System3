@@ -1,0 +1,4688 @@
+[
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "f9409f52-35a0-437f-8970-485c23f08a2f",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-26T02:47:01.408392Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "380",
+        "serving.knative.dev/route": "genesis-system3-web",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00617-vif",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ6j44EDE",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00617-vif",
+      "uid": "47da605e-14ac-4d3f-937b-c644ba95def9"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T02:47:39.285952Z",
+          "message": "Updating revision scaling succeeded.",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:23.061867Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:22.974500Z",
+          "message": "Containers became healthy in 10.52s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:07.951688Z",
+          "message": "Container image import completed in 6.05s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:39.229490Z",
+          "message": "Min instances provisioned successfully .",
+          "status": "True",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:11.874064Z",
+          "message": "Provisioning imported containers completed in 3.92s. Checking container health. This will wait for up to 4m for the configured startup probe, including an initial delay of 0s.",
+          "status": "True",
+          "type": "ResourcesAvailable"
+        }
+      ],
+      "desiredReplicas": 1,
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:28b4d29f5a5a856fa490085b1ea947341f2b87c1a22e5012082b785de190a2a7",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00617-vif&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00617-vif%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "7bac866e-7166-4c08-8f4d-0fefa7802182",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-26T02:10:45.526381Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "379",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00614-gaj",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ6k7+GBk",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00614-gaj",
+      "uid": "e8a339f1-8e7c-423c-a6cf-2c7547ad2348"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "234e0b161f8c2c14ae8e9bd242584864c5e7a541"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:932b077c42c66d80597adb3a5bc94000fe0f5bdd70295f0e0497f4c19df362ca",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T02:52:22.691563Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:52:22.691563Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:11:11.241650Z",
+          "message": "Containers became healthy in 8.8s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:10:57.670872Z",
+          "message": "Container image import completed in 11.63s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:52:22.691563Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:52:22.691563Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:47:41.426479Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:932b077c42c66d80597adb3a5bc94000fe0f5bdd70295f0e0497f4c19df362ca",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00614-gaj&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00614-gaj%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "9b480557-499c-47e7-ae59-780bdb6655c0",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-26T01:02:14.039893Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "378",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00611-gaz",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ6cqDqKs",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00611-gaz",
+      "uid": "c55f0012-9233-44e6-b5a0-8fe581a28267"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "185ff0f23d5f9da79d498f9a1da4fc94c073df1e"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:9a9077a17b4b693ac4472cf8d4175e746693868f48f6e6384eecda5ea5980839",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T02:15:20.075735Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:15:20.075735Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:02:39.877826Z",
+          "message": "Containers became healthy in 10.39s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:02:26.082588Z",
+          "message": "Container image import completed in 11.53s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:15:20.075735Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:15:20.075735Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T02:11:34.949426Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:9a9077a17b4b693ac4472cf8d4175e746693868f48f6e6384eecda5ea5980839",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00611-gaz&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00611-gaz%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "6e20da33-7d9a-47c9-ad09-0e3770d91a5f",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-26T00:52:16.140925Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "377",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00608-jar",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ6NhVo3Q",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00608-jar",
+      "uid": "c3ecf9d4-c049-4db6-8e53-2ad67807c784"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "185ff0f23d5f9da79d498f9a1da4fc94c073df1e"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:77a3fd8b4e801463eafca35bb2f5f78e2e5e8576625c814e778d48c098126b04",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T01:07:36.954952Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:07:36.954952Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:52:34.920588Z",
+          "message": "Containers became healthy in 9.18s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:52:22.389706Z",
+          "message": "Container image import completed in 5.75s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:07:36.954952Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:07:36.954952Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T01:03:00.727580Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:77a3fd8b4e801463eafca35bb2f5f78e2e5e8576625c814e778d48c098126b04",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00608-jar&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00608-jar%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "c673649a-2f7f-498c-8a56-672d0582692f",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-25T23:26:52.147009Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "376",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00605-had",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ6LPhy2Y",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00605-had",
+      "uid": "f46b2049-0ee3-498b-8b09-3966addf9f5c"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "49f2c07d3373368edd5f67d51c585e7f83d83f90"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:71d5aa5b9e0de43e7c28a7f290d0cbcf93f7717c8a5776709a6298db66302274",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-26T00:57:25.397996Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:57:25.397996Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:27:10.023547Z",
+          "message": "Containers became healthy in 8.73s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:26:59.029050Z",
+          "message": "Container image import completed in 6.37s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:57:25.397996Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:57:25.397996Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-26T00:52:54.355965Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:71d5aa5b9e0de43e7c28a7f290d0cbcf93f7717c8a5776709a6298db66302274",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00605-had&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00605-had%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "2f2f5fb6-f41c-4905-b994-80eb5f08d672",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-25T22:56:07.527175Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "375",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00602-dow",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ536GxXA",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00602-dow",
+      "uid": "14da9158-55e3-4d9f-941c-e506e2a108ff"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "1036af8c96c719f0394b8e9015783439e1ffde74"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:d9fb3f8fda526954e176233c0ed04a477d3633e4644bc84c13bebc7551d6b4c3",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T23:30:55.265700Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:30:55.265700Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:29.339417Z",
+          "message": "Containers became healthy in 10.77s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:14.062986Z",
+          "message": "Container image import completed in 6.07s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:30:55.265700Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:30:55.265700Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T23:27:36.141284Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:d9fb3f8fda526954e176233c0ed04a477d3633e4644bc84c13bebc7551d6b4c3",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00602-dow&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00602-dow%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "c09ebb60-a38d-4c45-99a2-bd9a2e296241",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-25T15:20:53.088672Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "374",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00599-mif",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ5wStlh8",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00599-mif",
+      "uid": "3c208c7a-1aec-4fdf-beeb-4acf801c404c"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "dea6a8fee0fb845658ed7c629653fe3fb7bf3954"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:26a4ad18358feeb3a76698e86defe3b717a77fb0cc33782be6947fc905b358ee",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T22:56:51.066399Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:51.066399Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:21:13.052961Z",
+          "message": "Containers became healthy in 8.89s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:20:59.437563Z",
+          "message": "Container image import completed in 5.85s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:51.066399Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:51.066399Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T22:56:48.732618Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:26a4ad18358feeb3a76698e86defe3b717a77fb0cc33782be6947fc905b358ee",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00599-mif&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00599-mif%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "cffcd610-27ef-4467-b77b-97574afc9f56",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-25T15:10:35.427091Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "373",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00596-duj",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ4K9DA4E",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00596-duj",
+      "uid": "84a56026-ddaa-49ae-966f-7d5e283619ee"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "0d88c224917e9ba6b02524fd0bf9e083d1ebeb39"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:8986c4c67b90a1bbb1a5b9bc9b32871dd121e16f0fa481863e1bbe2e44a7a53e",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T15:23:28.144013Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:23:28.144013Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:10:54.345843Z",
+          "message": "Containers became healthy in 9.89s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:10:42.183748Z",
+          "message": "Container image import completed in 6.29s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:23:28.144013Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:23:28.144013Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:21:35.679673Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:8986c4c67b90a1bbb1a5b9bc9b32871dd121e16f0fa481863e1bbe2e44a7a53e",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00596-duj&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00596-duj%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "757a7f91-07bc-4f72-ab91-6b294c346eb4",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-25T14:59:58.753070Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "372",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00593-leb",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ4IwnrN0",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00593-leb",
+      "uid": "d17722b8-8a44-4da3-a533-6334f6de7076"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "6a69f01c3350d6b95c7d17451d15c5a7cb3aa2cc"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:3cad88385ef529214e090946a05961ce8b6f147793f26b102184f6c14e75e6a1",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T15:13:39.156654Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:13:39.156654Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:00:16.661379Z",
+          "message": "Containers became healthy in 9.38s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:00:05.062109Z",
+          "message": "Container image import completed in 5.82s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:13:39.156654Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:13:39.156654Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:11:16.333714Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:3cad88385ef529214e090946a05961ce8b6f147793f26b102184f6c14e75e6a1",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00593-leb&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00593-leb%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "fade58d6-b7b3-4439-97ad-7f50c1cdf66c",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T18:53:16.989669Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "371",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00590-zab",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZ4GZwpHk",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00590-zab",
+      "uid": "91d0544d-7b42-4124-909b-38ec8d0e97c3"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "719566d23fd9aeb783a72fcec9493557f783781f"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:79b929a8cd767c17083c0b3f2fc24e123c56d3e61850fe019d9c6c34e7d79c35",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-25T15:03:06.380707Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:03:06.380707Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:53:35.008886Z",
+          "message": "Containers became healthy in 8.73s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:53:22.863447Z",
+          "message": "Container image import completed in 5.41s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:03:06.380707Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:03:06.380707Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-25T15:00:38.361395Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:79b929a8cd767c17083c0b3f2fc24e123c56d3e61850fe019d9c6c34e7d79c35",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00590-zab&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00590-zab%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "9b31c23c-fc24-4094-b6fa-154d17970c22",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T09:49:23.691534Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "370",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00587-gom",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZz4hRoxI",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00587-gom",
+      "uid": "2bba319a-e75a-437b-9830-2da948b46d9b"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "8ba7738a1583d17b6ce793411dcfd4087a8617b7"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:d99d63448fb8bc21f711b31cd316758011d6a942e295d072eb001320ec8756fd",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T18:55:40.348799Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:55:40.348799Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:49:43.607191Z",
+          "message": "Containers became healthy in 8.83s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:49:31.314612Z",
+          "message": "Container image import completed in 7.05s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:55:40.348799Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:55:40.348799Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T18:53:58.194230Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:d99d63448fb8bc21f711b31cd316758011d6a942e295d072eb001320ec8756fd",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00587-gom&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00587-gom%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "c49b9fce-e6f9-4a88-a9b7-2986fe082eeb",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T08:43:46.251527Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "369",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00584-faq",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZx/PEi1k",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00584-faq",
+      "uid": "b60556a3-c1b1-405a-9a40-81257af6c028"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "a764f990b688791f803f8d46b72473558fd63de2"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:120036a3c8df9aec3c3ba3f293f91a6b2eda1d1e79afd37086db705f8ccc46f7",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T09:53:03.295514Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:53:03.295514Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:44:03.933017Z",
+          "message": "Containers became healthy in 7.51s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:43:52.990889Z",
+          "message": "Container image import completed in 6.11s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:53:03.295514Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:53:03.295514Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T09:50:04.270460Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:120036a3c8df9aec3c3ba3f293f91a6b2eda1d1e79afd37086db705f8ccc46f7",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00584-faq&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00584-faq%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "311d13c6-5f03-41df-868d-e7c0535c4126",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T08:21:23.207104Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "368",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00581-vod",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZxw4XTOo",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00581-vod",
+      "uid": "6746e2f2-d453-4072-9736-e576e36ccbf4"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "a5daad492b595b24de132582de3a4def454979f2"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:8e2d9c874f8361d0c22567390447f31a64f2eb453c439c86726cd46f228e395e",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T08:48:49.956804Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:48:49.956804Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:21:40.580160Z",
+          "message": "Containers became healthy in 7.37s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:21:30.793210Z",
+          "message": "Container image import completed in 7.05s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:48:49.956804Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:48:49.956804Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:44:28.827113Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:8e2d9c874f8361d0c22567390447f31a64f2eb453c439c86726cd46f228e395e",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00581-vod&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00581-vod%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "157521af-3f1a-4e81-a32f-852e13308a9d",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T08:08:37.597324Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "367",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00578-boz",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZxrj6/9o",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00578-boz",
+      "uid": "51a3ef6b-8096-438a-b5c9-ef83fba70f1f"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "ce32d5148da79eae363a4cc384f3d55b23f97182"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:042dfa614b2032f9ca19312bbc9e3b99f7b8eb447a8e346c202ea54cd2738afa",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T08:25:02.037479Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:25:02.037479Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:09:00.832096Z",
+          "message": "Containers became healthy in 7.47s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:08:50.980451Z",
+          "message": "Container image import completed in 12.87s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:25:02.037479Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:25:02.037479Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:22:03.077345Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:042dfa614b2032f9ca19312bbc9e3b99f7b8eb447a8e346c202ea54cd2738afa",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00578-boz&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00578-boz%22",
+      "observedGeneration": 1
+    }
+  },
+  {
+    "apiVersion": "serving.knative.dev/v1",
+    "kind": "Revision",
+    "metadata": {
+      "annotations": {
+        "autoscaling.knative.dev/maxScale": "10",
+        "autoscaling.knative.dev/minScale": "1",
+        "run.googleapis.com/client-name": "gcloud",
+        "run.googleapis.com/client-version": "568.0.0",
+        "run.googleapis.com/cpu-throttling": "false",
+        "run.googleapis.com/ingress": "all",
+        "run.googleapis.com/operation-id": "95ab83fd-a18c-4fb3-9d11-3aab026b782a",
+        "run.googleapis.com/sessionAffinity": "true",
+        "run.googleapis.com/startup-cpu-boost": "true",
+        "serving.knative.dev/creator": "genesis-system3-automation@system3-openalgo-safe.iam.gserviceaccount.com",
+        "system3.deploy/ml-truth": "1786747979",
+        "system3.deploy/token-remount": "1786762303",
+        "system3.secrets-refresh": "1786011877",
+        "system3.token-permanent-fix": "1786011877"
+      },
+      "creationTimestamp": "2026-08-24T07:55:34.584814Z",
+      "generation": 1,
+      "labels": {
+        "cloud.googleapis.com/location": "asia-south1",
+        "run.googleapis.com/satisfiesPzs": "true",
+        "run.googleapis.com/startupProbeType": "Default",
+        "serving.knative.dev/configuration": "genesis-system3-web",
+        "serving.knative.dev/configurationGeneration": "366",
+        "serving.knative.dev/service": "genesis-system3-web",
+        "serving.knative.dev/serviceUid": "16b93d94-9edf-445a-b249-3547393662ce"
+      },
+      "name": "genesis-system3-web-00575-saw",
+      "namespace": "802404398783",
+      "ownerReferences": [
+        {
+          "apiVersion": "serving.knative.dev/v1",
+          "blockOwnerDeletion": true,
+          "controller": true,
+          "kind": "Configuration",
+          "name": "genesis-system3-web",
+          "uid": "8570a8b4-78d2-4b33-adb4-b6b35eb0e19d"
+        }
+      ],
+      "resourceVersion": "AAZZxoE/Qpc",
+      "selfLink": "/apis/serving.knative.dev/v1/namespaces/802404398783/revisions/genesis-system3-web-00575-saw",
+      "uid": "d72e75f6-7b00-4908-b3d1-4dea099d6d30"
+    },
+    "spec": {
+      "containerConcurrency": 50,
+      "containers": [
+        {
+          "env": [
+            {
+              "name": "DHAN_CLIENT_ID",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dhan-client-id"
+                }
+              }
+            },
+            {
+              "name": "WORKER_PUSH_TOKEN",
+              "valueFrom": {
+                "secretKeyRef": {
+                  "key": "latest",
+                  "name": "system3-dashboard-worker-push-token"
+                }
+              }
+            },
+            {
+              "name": "SYSTEM3_STARTUP_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+              "value": "0"
+            },
+            {
+              "name": "LIVE_TRADING_ENABLED",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_LIVE_TRADING_ALLOWED",
+              "value": "0"
+            },
+            {
+              "name": "AUTO_EXECUTE_TRADES",
+              "value": "0"
+            },
+            {
+              "name": "REQUIRE_API_KEY",
+              "value": "false"
+            },
+            {
+              "name": "ANALYZE_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_MODE",
+              "value": "ANALYZER"
+            },
+            {
+              "name": "SYSTEM3_REAL_ONLY",
+              "value": "1"
+            },
+            {
+              "name": "CLOUD_PAPER_ENGINE",
+              "value": "0"
+            },
+            {
+              "name": "DEFER_INSTRUMENT_WARMUP",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND",
+              "value": "firestore"
+            },
+            {
+              "name": "SYSTEM3_STATE_BACKEND_REQUIRED",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_FIRESTORE_PROJECT",
+              "value": "system3-openalgo-safe"
+            },
+            {
+              "name": "SYSTEM3_STATE_REFRESH_S",
+              "value": "5"
+            },
+            {
+              "name": "SYSTEM3_SYNC_INTERVAL_S",
+              "value": "60"
+            },
+            {
+              "name": "DHAN_TOKEN_SOURCE",
+              "value": "gcp-secret-manager-dynamic"
+            },
+            {
+              "name": "DHAN_ACCESS_TOKEN_SECRET_ID",
+              "value": "dhan-access-token"
+            },
+            {
+              "name": "DHAN_TOKEN_CACHE_TTL_S",
+              "value": "30"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_JOB",
+              "value": "genesis-system3-dhan-token-rotate"
+            },
+            {
+              "name": "DHAN_TOKEN_ROTATION_SCHEDULE",
+              "value": "*/5 * * * * Asia/Kolkata"
+            },
+            {
+              "name": "DHAN_STATUS_AUTO_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_STATUS_REFRESH_COOLDOWN_S",
+              "value": "3600"
+            },
+            {
+              "name": "DHAN_PERSIST_TOKEN_TO_SM",
+              "value": "0"
+            },
+            {
+              "name": "BROKER_SELF_HEAL_TOKEN_REFRESH",
+              "value": "0"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_COOLDOWN_S",
+              "value": "900"
+            },
+            {
+              "name": "DHAN_ROTATE_PUBSUB_TOPIC",
+              "value": "broker-token-rotate"
+            },
+            {
+              "name": "DHAN_CANONICAL_ROTATION_WAIT_S",
+              "value": "120"
+            },
+            {
+              "name": "CLOUD_MODE",
+              "value": "1"
+            },
+            {
+              "name": "SYSTEM3_DEPLOY_TARGET",
+              "value": "gcp-cloud-run"
+            },
+            {
+              "name": "MEM_LIMIT_MB",
+              "value": "960"
+            },
+            {
+              "name": "MEM_WARN_MB",
+              "value": "700"
+            },
+            {
+              "name": "MEM_GC_MB",
+              "value": "850"
+            },
+            {
+              "name": "MARKET_TOP_MICRO_STREAM",
+              "value": "0"
+            },
+            {
+              "name": "SYSTEM3_PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "SYSTEM3_API_BASE",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_BACKEND_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+            },
+            {
+              "name": "PUBLIC_DASHBOARD_URL",
+              "value": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
+            },
+            {
+              "name": "DEPLOY_GIT_SHA",
+              "value": "390f721bc513ac245a590ade3dbbdfb583bf79dd"
+            },
+            {
+              "name": "FORCE_RESTART_TIMESTAMP",
+              "value": "1787324373"
+            }
+          ],
+          "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:1901b4617ec58f5475cddefe37e78e546a987d5fa70397ef0f2bff2a7f007888",
+          "name": "genesis-system3-1",
+          "ports": [
+            {
+              "containerPort": 8080,
+              "name": "http1"
+            }
+          ],
+          "resources": {
+            "limits": {
+              "cpu": "1",
+              "memory": "1Gi"
+            }
+          },
+          "startupProbe": {
+            "failureThreshold": 1,
+            "periodSeconds": 240,
+            "tcpSocket": {
+              "port": 8080
+            },
+            "timeoutSeconds": 240
+          }
+        }
+      ],
+      "serviceAccountName": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+      "timeoutSeconds": 300
+    },
+    "status": {
+      "conditions": [
+        {
+          "lastTransitionTime": "2026-08-24T08:09:27.067287Z",
+          "message": "Updating revision scaling succeeded.",
+          "reason": "Retired",
+          "status": "True",
+          "type": "Ready"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:09:27.067287Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "severity": "Info",
+          "status": "False",
+          "type": "Active"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T07:55:59.929452Z",
+          "message": "Containers became healthy in 7.33s.",
+          "status": "True",
+          "type": "ContainerHealthy"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T07:55:50.313920Z",
+          "message": "Container image import completed in 15.17s.",
+          "status": "True",
+          "type": "ContainerReady"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:09:27.067287Z",
+          "reason": "NotProvisioned",
+          "severity": "Info",
+          "status": "False",
+          "type": "MinInstancesProvisioned"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:09:27.067287Z",
+          "message": "Revision retired.",
+          "reason": "Retired",
+          "status": "Unknown",
+          "type": "ResourcesAvailable"
+        },
+        {
+          "lastTransitionTime": "2026-08-24T08:09:21.446368Z",
+          "severity": "Info",
+          "status": "True",
+          "type": "TrafficShutDown"
+        }
+      ],
+      "imageDigest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:1901b4617ec58f5475cddefe37e78e546a987d5fa70397ef0f2bff2a7f007888",
+      "logUrl": "https://console.cloud.google.com/logs/viewer?project=system3-openalgo-safe&resource=cloud_run_revision/service_name/genesis-system3-web/revision_name/genesis-system3-web-00575-saw&advancedFilter=resource.type%3D%22cloud_run_revision%22%0Aresource.labels.service_name%3D%22genesis-system3-web%22%0Aresource.labels.revision_name%3D%22genesis-system3-web-00575-saw%22",
+      "observedGeneration": 1
+    }
+  }
+]

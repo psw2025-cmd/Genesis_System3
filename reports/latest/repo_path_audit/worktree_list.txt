@@ -1,0 +1,54 @@
+﻿worktree C:/Users/ADMIN/Genesis_System3/Genesis_System3
+HEAD 146eb69b697f86559d50519f8eaee3c8fbb8a82c
+branch refs/heads/fix/p0-188-bankex-paced-cache-20260824
+
+worktree C:/Genesis_System3/worktrees/agent-evidence-catalog-20260825
+HEAD d28dac9ddf6faa73d665e396a385347f92d0739c
+branch refs/heads/feat/agent-evidence-catalog-v1-20260825
+
+worktree C:/Users/ADMIN/AppData/Local/Temp/Genesis_System3_contract_fix_20260823
+HEAD a200d2e694955709a692037044d589673e5ec820
+branch refs/heads/integration/contract-and-iam-reconciliation
+prunable gitdir file points to non-existent location
+
+worktree C:/Users/ADMIN/AppData/Local/Temp/Genesis_System3_workflow_fix_20260822
+HEAD 8666aa2ac2615c7d55aafb22c1002f71f1cbfa48
+detached
+prunable gitdir file points to non-existent location
+
+worktree C:/Users/ADMIN/Genesis_System3/Genesis_System3/.worktrees/master-production-closure
+HEAD 372ad1c3d5c72d58850238151fe0842f55d8f4f5
+branch refs/heads/docs/master-production-closure-contract-20260824
+
+worktree D:/Genesis_System3_p0_188_equity_coverage_20260824
+HEAD 3be149ceee1692d9d005035f7ec471f927273687
+branch refs/heads/feat/live-unresolved-issue-ledger-20260824
+
+worktree E:/Genesis_System3_chain_parser
+HEAD b6e42ae0202ce370a7dc0785d456f4def04f81d3
+branch refs/heads/fix/chain-source-proof-parser-20260824
+
+worktree E:/Genesis_System3_drive_archive_control
+HEAD 3a6a9602c38dae9528935ae6eed04b5dd7df7c6e
+branch refs/heads/feat/drive-archive-control-20260824
+
+worktree E:/Genesis_System3_drive_cloud_mri
+HEAD 99ef7f48f821729514775808aedc05f08c71f3f1
+branch refs/heads/audit/drive-cloud-mri-20260824
+
+worktree E:/Genesis_System3_github_monitor
+HEAD 120de9c86c1330d05a392e442e4c260ac03e79bc
+branch refs/heads/feat/github-control-monitor-20260824
+
+worktree E:/Genesis_System3_master_mri
+HEAD 18ec97714ba0b660d4d56710264fb095d5fe4952
+branch refs/heads/feat/mri-connectors-policy-20260824
+
+worktree E:/Genesis_System3_pr347_fix
+HEAD 426a7921f7b1c32e300c72d1640abaeeb860eaed
+branch refs/heads/fix/pr347-privacy-ruhi
+
+worktree E:/Genesis_System3_user_reference
+HEAD 04a6ec92ebc9f78cdcdf59b79e98bb0a84e59c50
+branch refs/heads/docs/ruhi-user-reference-20260824
+

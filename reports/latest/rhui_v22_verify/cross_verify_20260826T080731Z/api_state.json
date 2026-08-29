@@ -1,0 +1,238 @@
+{
+  "data_source": "BROKER_LIVE",
+  "live_trading_enabled": false,
+  "timestamp_ist": "2026-08-26T13:37:36.211770+05:30",
+  "reconciliation": {
+    "timestamp": "2026-08-26T11:26:55.525907+05:30",
+    "mismatches": [],
+    "status": "OK"
+  },
+  "refresh_interval": 60,
+  "last_fetch_ts_iso": "2026-08-26T13:37:36.211770+05:30",
+  "market": {
+    "next_open": "2026-08-26 09:15:00 IST",
+    "current_time_ist": "2026-08-26T13:37:20.232460+05:30",
+    "is_open": true,
+    "reason": "Market open"
+  },
+  "model": {
+    "fallback_used": false,
+    "active": null,
+    "metrics": {},
+    "type": null
+  },
+  "safety": {
+    "execution_mode": "ANALYZER",
+    "live_trading_enabled": false
+  },
+  "positions_source": "NO_POSITIONS",
+  "last_cycle_ts_iso": "2026-08-26T13:37:36.211770+05:30",
+  "last_tick_age_sec": 13.63,
+  "timestamp_utc": "2026-08-26T08:07:36.211766Z",
+  "state_version": 60798,
+  "cloud_job": {
+    "status": "PASS",
+    "detail": "Analyzer-only bounded worker smoke test",
+    "kind": "smoke",
+    "task_index": 0,
+    "completed_utc": "2026-08-02T21:08:58.592140Z",
+    "task_attempt": 0,
+    "mode": "PAPER",
+    "live_trading_enabled": false
+  },
+  "qc": {
+    "contracts_total": 0,
+    "failures": [],
+    "reasons": [
+      "NO_VERIFIED_CONTRACTS"
+    ],
+    "status": "NOT_READY",
+    "underlyings": 0
+  },
+  "pnl": {
+    "realized": 0.0,
+    "total": 0.0,
+    "day_total": 0.0,
+    "unrealized": 0.0
+  },
+  "cycle_count": 60798,
+  "positions": [],
+  "alerts": [
+    {
+      "level": "WARN",
+      "ts": "2026-08-26T13:37:20.233411+05:30",
+      "code": "QC_FAIL",
+      "read": false,
+      "message": "Quality control not ready: NOT_READY",
+      "resolved": false
+    }
+  ],
+  "risk": {
+    "concentration": 0.0,
+    "limits": {
+      "breaches": [],
+      "status": "PASS"
+    },
+    "exposure": 0.0,
+    "es95": 0.0,
+    "greeks": {
+      "theta": 0.0,
+      "vega": 0.0,
+      "delta": 0.0,
+      "gamma": 0.0
+    },
+    "var95": 0.0
+  },
+  "tick_health": {
+    "source": "rest_poll_ssot",
+    "market_open": true,
+    "last_tick_age_sec": 13.63,
+    "refresh_interval_sec": 60,
+    "websocket_endpoint": "/ws/stream"
+  },
+  "firestore_updated_at_utc": "2026-08-26T08:07:36.255865Z",
+  "signals": {
+    "last_signal": null,
+    "status": "NO_TRADE",
+    "confidence": 0,
+    "underlying": null,
+    "reason": "No signal generated"
+  },
+  "mode": "PAPER",
+  "broker": {
+    "cache_age_s": 0.6,
+    "auto_refresh": {
+      "strategy": "generate_token",
+      "cooldown_remaining_s": 13,
+      "attempted": false,
+      "reason": "TOKEN_EXPIRED_OR_INVALID",
+      "cooldown_s": 3600,
+      "skipped": "AUTO_REFRESH_DISABLED_OR_LIVE_GATE",
+      "message": "Token generated via PIN + TOTP (fully automated)",
+      "token_value_printed": false,
+      "success": false
+    },
+    "broker_truth_contract": "profile+funds+holdings+positions",
+    "truth_source": "dhan_readonly_probe",
+    "connected": true,
+    "probe_header_attempts": [
+      {
+        "contract": "docs-access-token-only",
+        "public_contract": "access-token-only",
+        "outcome": "AUTH_OK",
+        "http_status": 200,
+        "upstream_code": null,
+        "credential_value_exposed": false
+      }
+    ],
+    "profile_source": "rest",
+    "observed_at_ist": "2026-08-26T07:02:45.588186+05:30",
+    "error": null,
+    "auth_classification": "AUTH_OK",
+    "raw_account_payload_exposed": false,
+    "order_placement_allowed": false,
+    "mode": "ANALYZER",
+    "broker": "dhan",
+    "sdk_available": true,
+    "canonical_rotation": {
+      "success": false,
+      "error_type": "HTTPError",
+      "cooldown_remaining_s": 254,
+      "job": "genesis-system3-dhan-token-rotate",
+      "attempted": false,
+      "reason": "get_status_auth_failure",
+      "authority": "gcp-cloud-run-job",
+      "skipped": "CANONICAL_SELF_HEAL_DISABLED",
+      "raw_token_exposed": false,
+      "operation_started": true,
+      "message": "403 Client Error: Forbidden for url: https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/operations/65a2c16c-19d4-42c0-b7b3-45f5b",
+      "live_trading_enabled": false,
+      "order_placement_allowed": false
+    },
+    "upstream_code": null,
+    "live_trading_enabled": false,
+    "status": "connected",
+    "last_ok": null,
+    "name": "dhan",
+    "access_token_present": true,
+    "token_proof": {
+      "loaded_at_utc": "2026-08-26T08:07:28.763780+00:00",
+      "hours_remaining": 14.47,
+      "cache_age_s": 7.4,
+      "auth_reload_suppressed_count": 0,
+      "last_reload_reason": "pre_get_holdings",
+      "rejected_secret_version": null,
+      "secret_id": "dhan-access-token",
+      "reload_count": 158,
+      "token_value_exposed": false,
+      "last_error_type": null,
+      "expired": false,
+      "secret_version_created_at_utc": null,
+      "rotation_schedule": "*/5 * * * * Asia/Kolkata",
+      "secret_version": "320",
+      "cache_ttl_s": 30.0,
+      "auth_reload_backoff_s": 30.0,
+      "expires_at_utc": "2026-08-26T22:36:02+00:00",
+      "token_present": true,
+      "source": "GCP_SECRET_MANAGER_DYNAMIC",
+      "rotation_job": "genesis-system3-dhan-token-rotate",
+      "rejected_at_utc": null,
+      "runtime_instance": "genesis-system3-web-00617-vif"
+    },
+    "probe_header_contract": "access-token-only",
+    "env_source": "core.utils.env_loader",
+    "probe_contract_cached": true,
+    "client_id_present": true,
+    "auth_rejection_trace": {
+      "client_id_exposed": false,
+      "secret_version": null,
+      "auth_classification": null,
+      "last_rejected_at_utc": null,
+      "rejection_count": 0,
+      "http_status": null,
+      "raw_token_exposed": false,
+      "first_rejected_at_utc": null,
+      "upstream_code": null,
+      "runtime_instance": "genesis-system3-web-00617-vif"
+    },
+    "probe_header_variant": "docs-access-token-only",
+    "broker_truth_complete": true,
+    "cloud_runtime_patch": true,
+    "cache_hit": false,
+    "credentials_present": true,
+    "upstream_classification": null,
+    "probe_strategy": "cloud_rest_profile_bounded",
+    "probe_timeout_s": 5.0,
+    "token_reload": {
+      "raw_token_exposed": false,
+      "success": false,
+      "attempted": false
+    },
+    "latency_ms": 34,
+    "account_read_proof": {
+      "funds": {
+        "error": null,
+        "item_count": null,
+        "latency_ms": 38,
+        "ok": true
+      },
+      "profile": {
+        "error": null,
+        "ok": true
+      },
+      "holdings": {
+        "error": null,
+        "item_count": 11,
+        "latency_ms": 44,
+        "ok": true
+      },
+      "positions": {
+        "error": null,
+        "item_count": 0,
+        "latency_ms": 34,
+        "ok": true
+      },
+      "raw_payload_exposed": false
+    }
+  }
+}

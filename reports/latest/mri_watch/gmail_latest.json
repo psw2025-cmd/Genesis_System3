@@ -1,0 +1,143 @@
+{
+  "ok": true,
+  "blocked": false,
+  "query": "(System3 OR Genesis_System3 OR genesis-system3 OR RHUI OR \"issue #188\" OR \"Cloud Run\" OR \"Cloud Scheduler\" OR \"Workflow Priority Guard\" OR CodeQL OR billing OR uptime OR \"Google Cloud\" OR psw2025-cmd OR system3-openalgo-safe) newer_than:7d",
+  "count": 15,
+  "messages": [
+    {
+      "id": "1a03fc33b9003de2",
+      "threadId": "1a03fc33b9003de2",
+      "from": "ChatGPT <noreply@tm.openai.com>",
+      "subject": "[Task Update] RHUI V2 Claude Coordination: GCP proof blocked while GitHub safeguards pass",
+      "date": "Wed, 26 Aug 2026 20:29:13 +0000 (UTC)",
+      "snippet": "RHUI V2.2 \u2014 Material authority and governance change PREVIOUS_COMMITMENTS \u2192 Restore the missing sixth GitHub fail-closed check, preserve GCP-only execution, obtain exact-serving cloud proof, and keep",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fc179aa58aee",
+      "threadId": "1a03fc179aa58aee",
+      "from": "ChatGPT <noreply@tm.openai.com>",
+      "subject": "[Task Update] RHUI V2 Genesis Controller: Stop local watcher and review PR blockers",
+      "date": "Wed, 26 Aug 2026 20:27:18 +0000 (UTC)",
+      "snippet": "Material safety update Current GitHub authority is 43584e2b\u2026 (https://github.com/psw2025-cmd/Genesis_System3/commit/43584e2b124f26cc23718d1eb7e8fab7512d53dc). - The active GitHub ruleset now contains",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fc0ce9f8318a",
+      "threadId": "1a03fc0ce9f8318a",
+      "from": "Pritam Warghade <warghade2012@gmail.com>",
+      "subject": "System3: stop non-authoritative local watcher; PR #374 blocked",
+      "date": "Wed, 26 Aug 2026 13:26:35 -0700",
+      "snippet": "Material RHUI transition GitHub ruleset restoration is PROVEN_COMPLETE: active ruleset 21581518 now has all six required contexts, including BLOCKING - priority workflows only. Its reminders stop. A",
+      "class": "MRI-GH"
+    },
+    {
+      "id": "1a03fbcdbe84581a",
+      "threadId": "1a03fbbfad776033",
+      "from": "Google Cloud Alerting <alerting-noreply@google.com>",
+      "subject": "[RESOLVED - No severity] Genesis System3 /api/healthz failed",
+      "date": "Wed, 26 Aug 2026 13:22:16 -0700",
+      "snippet": "VIEW INCIDENT This is an automated notification set up by a Google Cloud user, not an official message from Google. If you weren&#39;t expecting this, please ignore it. Learn more about Cloud Alerting.",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fbbfad776033",
+      "threadId": "1a03fbbfad776033",
+      "from": "Google Cloud Alerting <alerting-noreply@google.com>",
+      "subject": "[ALERT - No severity] Genesis System3 /api/healthz failed",
+      "date": "Wed, 26 Aug 2026 13:21:18 -0700",
+      "snippet": "VIEW INCIDENT This is an automated notification set up by a Google Cloud user, not an official message from Google. If you weren&#39;t expecting this, please ignore it. Learn more about Cloud Alerting.",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fb5339c497a1",
+      "threadId": "1a03fb5339c497a1",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 43584e: docs(mri): Gmail+Scheduler 5-min continuous contro...",
+      "date": "Wed, 26 Aug 2026 13:13:54 -0700",
+      "snippet": "Branch: refs/heads/main Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 43584e2b124f26cc23718d1eb7e8fab7512d53dc https://github.com/psw2025-cmd/Genesis_System3/commit/",
+      "class": "MRI-SCHED"
+    },
+    {
+      "id": "1a03fb5334acfd40",
+      "threadId": "1a0396b8787d27bf",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3]",
+      "date": "Wed, 26 Aug 2026 13:13:54 -0700",
+      "snippet": "Branch: refs/heads/docs/mri-gmail-scheduler-5min-control Home: https://github.com/psw2025-cmd/Genesis_System3 To unsubscribe from these emails, change your notification settings at https://github.com/",
+      "class": "MRI-SCHED"
+    },
+    {
+      "id": "1a03fb45544f9586",
+      "threadId": "1a03fb45544f9586",
+      "from": "\"cursor[bot]\" <notifications@github.com>",
+      "subject": "Re: [psw2025-cmd/Genesis_System3] fix: apply System3 consolidated patch 0021 (T9/T11/T12/R2-R3/T14) (PR #374)",
+      "date": "Wed, 26 Aug 2026 13:12:55 -0700",
+      "snippet": "cursor[bot] left a comment (psw2025-cmd/Genesis_System3#374) Bugbot couldn&#39;t run - usage limit reached Bugbot is counted against Cursor usage for this user or team, and this run hit a usage or",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fb31c022396d",
+      "threadId": "1a03fb31c022396d",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 134d73: fix: apply System3 0021 R2/R3 on-demand chain fill...",
+      "date": "Wed, 26 Aug 2026 13:11:37 -0700",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021c-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 134d737a4904d6073ff94b3d4019717924155979 https://github.com/psw2025-cmd/Genesis_System3/",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fb273823b8ac",
+      "threadId": "1a03fb273823b8ac",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 40fa39: fix: apply System3 0021 T11 sanitizer on broker st...",
+      "date": "Wed, 26 Aug 2026 13:10:54 -0700",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021c-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 40fa39d2d2612997898638ca8be713ca91c4251d https://github.com/psw2025-cmd/Genesis_System3/",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03fb0d8d025a1b",
+      "threadId": "1a03fb0d8d025a1b",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 3fa719: fix: apply System3 0021 T11 sanitizer on broker st...",
+      "date": "Wed, 26 Aug 2026 13:09:09 -0700",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021c-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 3fa71961a4620575f85ba6ff1adbd73f24616058 https://github.com/psw2025-cmd/Genesis_System3/",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03faf97e02ab8b",
+      "threadId": "1a03faf97e02ab8b",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 55c045: fix: apply System3 0021 T11 sanitizer on broker st...",
+      "date": "Wed, 26 Aug 2026 13:07:46 -0700",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021c-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 55c04539b30d24f9e7d1ef28eb126dd53e7ada41 https://github.com/psw2025-cmd/Genesis_System3/",
+      "class": "MRI-OTHER"
+    },
+    {
+      "id": "1a03faf2cb491bbb",
+      "threadId": "1a03fa0bd79d5c3a",
+      "from": "\"cursor[bot]\" <notifications@github.com>",
+      "subject": "Re: [psw2025-cmd/Genesis_System3] docs(mri): Gmail+Scheduler 5-min continuous control plan + watcher (PR #373)",
+      "date": "Wed, 26 Aug 2026 13:07:19 -0700",
+      "snippet": "cursor[bot] left a comment (psw2025-cmd/Genesis_System3#373) Bugbot couldn&#39;t run - usage limit reached Bugbot is counted against Cursor usage for this user or team, and this run hit a usage or",
+      "class": "MRI-SCHED"
+    },
+    {
+      "id": "1a03faef39d64837",
+      "threadId": "1a03faef39d64837",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] d7853f: docs(mri): continuous Gmail+Scheduler 5-min contro...",
+      "date": "Wed, 26 Aug 2026 13:07:05 -0700",
+      "snippet": "Branch: refs/heads/docs/mri-gmail-scheduler-5min-control Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: d7853fe40772fcb4d1c3baefbbe07a7f2d866ee6 https://github.com/psw2025-cmd/",
+      "class": "MRI-SCHED"
+    },
+    {
+      "id": "1a03faec2e8a96a5",
+      "threadId": "1a03faec2e8a96a5",
+      "from": "psw2025-cmd <noreply@github.com>",
+      "subject": "[psw2025-cmd/Genesis_System3] 70f37c: fix: apply System3 0021 T11 sanitizer on broker st...",
+      "date": "Wed, 26 Aug 2026 13:06:52 -0700",
+      "snippet": "Branch: refs/heads/cursor/apply-system3-0021c-93e4 Home: https://github.com/psw2025-cmd/Genesis_System3 Commit: 70f37c379310104b33c99c8100929833db80f617 https://github.com/psw2025-cmd/Genesis_System3/",
+      "class": "MRI-OTHER"
+    }
+  ]
+}

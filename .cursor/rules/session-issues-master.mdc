@@ -1,0 +1,21 @@
+---
+description: Every session must read COMMAND_CENTER + ISSUES_ONLY; overwrite-only; post-edit auto refresh
+alwaysApply: true
+---
+
+# Command Center + session issues (always)
+
+Before any edit / PASS / merge claim:
+
+1. Read `reports/coordination/COMMAND_CENTER.md` (or generate via refresh)
+2. Read `reports/coordination/ISSUES_ONLY.md`
+3. Open Excel `reports/coordination/AGENT_OPERATING_OPTIONS.xlsx` sheet `2_Options_Priority` — prefer **OPT-A1**
+4. Read `docs/handoffs/SESSION_ISSUES_MASTER.md` for solutions catalog
+5. Refresh SHAs; implement; **immediately** run command_center (do not wait for schedule)
+6. Re-snap UI; never DONE without serving SHA
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run_command_center_refresh.ps1
+```
+
+Never create dated duplicate tracking logs. Never work in `C:\System3\Genesis_System3`. LIVE OFF until gates 7/7.

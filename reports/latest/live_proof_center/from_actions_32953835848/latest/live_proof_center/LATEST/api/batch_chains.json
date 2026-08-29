@@ -1,0 +1,70 @@
+{
+  "path": "/api/batch/chains",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 2401,
+  "content_type": "application/json",
+  "data": {
+    "generated_at": "2026-08-26T15:07:11.653152+05:30",
+    "required_symbols": [
+      "NIFTY",
+      "BANKNIFTY",
+      "FINNIFTY",
+      "MIDCPNIFTY"
+    ],
+    "required_symbols_ready": true,
+    "symbols": [
+      "NIFTY",
+      "BANKNIFTY",
+      "FINNIFTY",
+      "MIDCPNIFTY",
+      "SENSEX",
+      "BANKEX"
+    ],
+    "chains": {
+      "NIFTY": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:37:10.035604+00:00",
+        "n_contracts": 21,
+        "source": null
+      },
+      "BANKNIFTY": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:36:30.644753+00:00",
+        "n_contracts": 21,
+        "source": null
+      },
+      "FINNIFTY": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:36:38.671194+00:00",
+        "n_contracts": 21,
+        "source": null
+      },
+      "MIDCPNIFTY": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:36:46.777848+00:00",
+        "n_contracts": 21,
+        "source": null
+      },
+      "SENSEX": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:36:55.190241+00:00",
+        "n_contracts": 21,
+        "source": null
+      },
+      "BANKEX": {
+        "status": "MARKET_OPEN",
+        "stale": false,
+        "fetched_at_utc": "2026-08-26T09:37:02.668494+00:00",
+        "n_contracts": 21,
+        "source": null
+      }
+    },
+    "live_trading_enabled": false
+  }
+}

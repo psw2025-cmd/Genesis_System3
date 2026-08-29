@@ -1,0 +1,33 @@
+{
+  "utc": "2026-08-28T14:08:40.189843+00:00",
+  "run_id": "local-20260828T140758Z",
+  "agent_id": "cursor-composer",
+  "passed": false,
+  "results": [
+    {
+      "name": "access_policy_schema",
+      "ok": true,
+      "detail": "validate_exit=0"
+    },
+    {
+      "name": "excel_sheets_1_to_8",
+      "ok": true,
+      "detail": "sheets=10 missing=[]"
+    },
+    {
+      "name": "command_center_artifacts_exist",
+      "ok": true,
+      "detail": "missing=[]"
+    },
+    {
+      "name": "live_deploy_info_http",
+      "ok": false,
+      "detail": "<urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>"
+    },
+    {
+      "name": "no_live_trading_flag",
+      "ok": false,
+      "detail": "live_trading_enabled=None"
+    }
+  ]
+}

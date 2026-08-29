@@ -1,0 +1,366 @@
+[
+  {
+    "displayName": "Johannesburg",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "africa-south1",
+    "name": "system3-openalgo-safe/locations/africa-south1"
+  },
+  {
+    "displayName": "Taiwan",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-east1",
+    "name": "system3-openalgo-safe/locations/asia-east1"
+  },
+  {
+    "displayName": "Hong Kong",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "asia-east2",
+    "name": "system3-openalgo-safe/locations/asia-east2"
+  },
+  {
+    "displayName": "Tokyo",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-northeast1",
+    "name": "system3-openalgo-safe/locations/asia-northeast1"
+  },
+  {
+    "displayName": "Osaka",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-northeast2",
+    "name": "system3-openalgo-safe/locations/asia-northeast2"
+  },
+  {
+    "displayName": "Seoul",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-northeast3",
+    "name": "system3-openalgo-safe/locations/asia-northeast3"
+  },
+  {
+    "displayName": "Mumbai",
+    "labels": {
+      "initialized": "true",
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-south1",
+    "name": "system3-openalgo-safe/locations/asia-south1"
+  },
+  {
+    "displayName": "Delhi",
+    "labels": {
+      "run.googleapis.com/supportedAccelerators": "nvidia-rtx-pro-6000",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true"
+    },
+    "locationId": "asia-south2",
+    "name": "system3-openalgo-safe/locations/asia-south2"
+  },
+  {
+    "displayName": "Singapore",
+    "labels": {
+      "run.googleapis.com/supportedAccelerators": "nvidia-l4,nvidia-rtx-pro-6000",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true"
+    },
+    "locationId": "asia-southeast1",
+    "name": "system3-openalgo-safe/locations/asia-southeast1"
+  },
+  {
+    "displayName": "Jakarta",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-southeast2",
+    "name": "system3-openalgo-safe/locations/asia-southeast2"
+  },
+  {
+    "displayName": "Bangkok",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "asia-southeast3",
+    "name": "system3-openalgo-safe/locations/asia-southeast3"
+  },
+  {
+    "displayName": "Sydney",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "australia-southeast1",
+    "name": "system3-openalgo-safe/locations/australia-southeast1"
+  },
+  {
+    "displayName": "Melbourne",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "australia-southeast2",
+    "name": "system3-openalgo-safe/locations/australia-southeast2"
+  },
+  {
+    "displayName": "Warsaw",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-central2",
+    "name": "system3-openalgo-safe/locations/europe-central2"
+  },
+  {
+    "displayName": "Finland",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-north1",
+    "name": "system3-openalgo-safe/locations/europe-north1"
+  },
+  {
+    "displayName": "Stockholm",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-north2",
+    "name": "system3-openalgo-safe/locations/europe-north2"
+  },
+  {
+    "displayName": "Madrid",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-southwest1",
+    "name": "system3-openalgo-safe/locations/europe-southwest1"
+  },
+  {
+    "displayName": "Belgium",
+    "labels": {
+      "initialized": "true",
+      "run.googleapis.com/supportedAccelerators": "nvidia-l4",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true"
+    },
+    "locationId": "europe-west1",
+    "name": "system3-openalgo-safe/locations/europe-west1"
+  },
+  {
+    "displayName": "Berlin",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-west10",
+    "name": "system3-openalgo-safe/locations/europe-west10"
+  },
+  {
+    "displayName": "Turin",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-west12",
+    "name": "system3-openalgo-safe/locations/europe-west12"
+  },
+  {
+    "displayName": "London",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "europe-west2",
+    "name": "system3-openalgo-safe/locations/europe-west2"
+  },
+  {
+    "displayName": "Frankfurt",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "europe-west3",
+    "name": "system3-openalgo-safe/locations/europe-west3"
+  },
+  {
+    "displayName": "Netherlands",
+    "labels": {
+      "run.googleapis.com/supportedAccelerators": "nvidia-l4,nvidia-rtx-pro-6000",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true"
+    },
+    "locationId": "europe-west4",
+    "name": "system3-openalgo-safe/locations/europe-west4"
+  },
+  {
+    "displayName": "Zurich",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-west6",
+    "name": "system3-openalgo-safe/locations/europe-west6"
+  },
+  {
+    "displayName": "Milan",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-west8",
+    "name": "system3-openalgo-safe/locations/europe-west8"
+  },
+  {
+    "displayName": "Paris",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "europe-west9",
+    "name": "system3-openalgo-safe/locations/europe-west9"
+  },
+  {
+    "displayName": "Doha",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "me-central1",
+    "name": "system3-openalgo-safe/locations/me-central1"
+  },
+  {
+    "displayName": "Dammam",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "me-central2",
+    "name": "system3-openalgo-safe/locations/me-central2"
+  },
+  {
+    "displayName": "Tel Aviv",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "me-west1",
+    "name": "system3-openalgo-safe/locations/me-west1"
+  },
+  {
+    "displayName": "Montr?al",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "northamerica-northeast1",
+    "name": "system3-openalgo-safe/locations/northamerica-northeast1"
+  },
+  {
+    "displayName": "Toronto",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "northamerica-northeast2",
+    "name": "system3-openalgo-safe/locations/northamerica-northeast2"
+  },
+  {
+    "displayName": "Mexico",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "northamerica-south1",
+    "name": "system3-openalgo-safe/locations/northamerica-south1"
+  },
+  {
+    "displayName": "S?o Paulo",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "southamerica-east1",
+    "name": "system3-openalgo-safe/locations/southamerica-east1"
+  },
+  {
+    "displayName": "Santiago",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "southamerica-west1",
+    "name": "system3-openalgo-safe/locations/southamerica-west1"
+  },
+  {
+    "displayName": "Iowa",
+    "labels": {
+      "run.googleapis.com/supportedAccelerators": "nvidia-l4,nvidia-a100-80gb,nvidia-rtx-pro-6000",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true"
+    },
+    "locationId": "us-central1",
+    "name": "system3-openalgo-safe/locations/us-central1"
+  },
+  {
+    "displayName": "South Carolina",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-east1",
+    "name": "system3-openalgo-safe/locations/us-east1"
+  },
+  {
+    "displayName": "Northern Virginia",
+    "labels": {
+      "run.googleapis.com/supportedAccelerators": "nvidia-l4,nvidia-h100-80gb",
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsGpu": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "us-east4",
+    "name": "system3-openalgo-safe/locations/us-east4"
+  },
+  {
+    "displayName": "Columbus",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-east5",
+    "name": "system3-openalgo-safe/locations/us-east5"
+  },
+  {
+    "displayName": "Dallas",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-south1",
+    "name": "system3-openalgo-safe/locations/us-south1"
+  },
+  {
+    "displayName": "Oregon",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-west1",
+    "name": "system3-openalgo-safe/locations/us-west1"
+  },
+  {
+    "displayName": "Los Angeles",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-west2",
+    "name": "system3-openalgo-safe/locations/us-west2"
+  },
+  {
+    "displayName": "Salt Lake City",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true",
+      "run.googleapis.com/supportsPzs": "true"
+    },
+    "locationId": "us-west3",
+    "name": "system3-openalgo-safe/locations/us-west3"
+  },
+  {
+    "displayName": "Las Vegas",
+    "labels": {
+      "run.googleapis.com/supportsEphemeralDisk": "true"
+    },
+    "locationId": "us-west4",
+    "name": "system3-openalgo-safe/locations/us-west4"
+  }
+]

@@ -1,0 +1,103 @@
+name: Command Center Access Policy
+
+on:
+  push:
+    paths:
+      - "reports/coordination/**"
+      - "scripts/validate_access_policy.py"
+      - "scripts/command_center_smoke_test.py"
+      - "scripts/append_command_center_audit.py"
+      - "scripts/system3_command_center_refresh.py"
+      - "scripts/system3_pending_tracker_refresh.py"
+      - "scripts/system3_build_operating_options_xlsx.py"
+      - "scripts/run_command_center_refresh.ps1"
+      - "scripts/ci_apply_access_policy.yml"
+      - ".github/workflows/command-center-access.yml"
+  pull_request:
+    paths:
+      - "reports/coordination/**"
+      - "scripts/validate_access_policy.py"
+      - "scripts/command_center_smoke_test.py"
+      - "scripts/append_command_center_audit.py"
+      - "scripts/system3_command_center_refresh.py"
+      - "scripts/system3_pending_tracker_refresh.py"
+      - "scripts/system3_build_operating_options_xlsx.py"
+      - "scripts/run_command_center_refresh.ps1"
+      - "scripts/ci_apply_access_policy.yml"
+      - ".github/workflows/command-center-access.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  access-policy-smoke:
+    name: Validate ACCESS_POLICY + Command Center smoke
+    runs-on: ubuntu-latest
+    env:
+      CC_AGENT_ID: cursor-composer
+      CC_RUN_ID: ${{ github.run_id }}
+      SYSTEM3_PUBLIC_BASE: https://genesis-system3-web-doq2wplepa-el.a.run.app
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml openpyxl
+
+      - name: Validate ACCESS_POLICY.yaml
+        id: validate
+        run: python scripts/validate_access_policy.py
+
+      - name: Refresh Command Center artifacts (overwrite)
+        run: python scripts/system3_command_center_refresh.py
+
+      - name: Smoke tests
+        id: smoke
+        run: python scripts/command_center_smoke_test.py
+
+      - name: Audit append (pass)
+        if: success()
+        run: |
+          export CC_TOKEN_ID="dryrun-${GITHUB_RUN_ID}"
+          export CC_TOKEN_TTL="0s-mint-denied"
+          python scripts/append_command_center_audit.py smoke_test pass
+
+      - name: Audit append (fail)
+        if: failure()
+        run: |
+          export CC_TOKEN_ID="dryrun-${GITHUB_RUN_ID}"
+          export CC_TOKEN_TTL="0s-mint-denied"
+          python scripts/append_command_center_audit.py smoke_test fail || true
+
+      - name: Rewrite COMMAND_CENTER status (post-smoke/audit)
+        if: always()
+        run: |
+          export CC_TOKEN_ID="dryrun-${GITHUB_RUN_ID}"
+          export CC_TOKEN_TTL="0s-mint-denied"
+          python scripts/system3_command_center_refresh.py
+
+      - name: Upload coordination artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: command-center-access-${{ github.run_id }}
+          path: |
+            reports/coordination/ACCESS_POLICY.yaml
+            reports/coordination/COMMAND_CENTER.md
+            reports/coordination/ISSUES_ONLY.md
+            reports/coordination/ISSUES_MERMAID.md
+            reports/coordination/TRACKING_CHECKLIST.md
+            reports/coordination/TRACKING_CHECKLIST.json
+            reports/coordination/SMOKE_TEST_LAST.json
+            reports/coordination/AUDIT_LOG.jsonl
+            reports/coordination/AGENT_OPERATING_OPTIONS.xlsx
+            scripts/ci_apply_access_policy.yml
+          if-no-files-found: warn
