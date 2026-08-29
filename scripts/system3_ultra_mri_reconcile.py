@@ -18,6 +18,7 @@ import os
 import re
 import subprocess
 import sys
+import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -131,6 +132,39 @@ def _run_canonical_proof_in_process(serving_sha: str) -> tuple[int, str, str]:
     return rc, stdout.getvalue(), stderr.getvalue()
 
 
+
+def _publish_reconciled_head_status(head_sha: str, serving_sha: str) -> None:
+    """Replace the head's initial drift failure only after bounded reconciliation passes."""
+    token = os.getenv("GITHUB_TOKEN", "").strip()
+    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+    api = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+    if not (token and repo and _valid_commit_sha(head_sha) and _valid_commit_sha(serving_sha)):
+        raise RuntimeError("github_reconciled_status_context_missing")
+    server = os.getenv("GITHUB_SERVER_URL", "https://github.com").rstrip("/")
+    run_id = os.getenv("GITHUB_RUN_ID", "").strip()
+    target = f"{server}/{repo}/actions/runs/{run_id}" if run_id else f"{server}/{repo}"
+    payload = json.dumps({
+        "state": "success",
+        "context": "public-dashboard/runtime-proof",
+        "description": "Exact serving SHA proved; head is non-runtime-only; LIVE OFF",
+        "target_url": target,
+    }).encode()
+    request = urllib.request.Request(
+        f"{api}/repos/{repo}/statuses/{head_sha}",
+        data=payload,
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        if response.status not in (200, 201):
+            raise RuntimeError(f"reconciled_status_publish_failed:{response.status}")
+
+
 def main() -> int:
     if not (MATRIX.exists() and VERDICT.exists() and DEPLOY.exists()):
         return 0
@@ -181,6 +215,16 @@ def main() -> int:
         fh.write(proof_err[-10000:])
         fh.write("\n")
     if proof_rc == 0:
+        try:
+            _publish_reconciled_head_status(head, serving)
+        except Exception as exc:
+            report["head_status_publish_error"] = type(exc).__name__
+            RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
+            _recompute(rows)
+            return 0
+        report["head_status_context"] = "public-dashboard/runtime-proof"
+        report["head_status_state"] = "success"
+        RECON.write_text(json.dumps(report, indent=2), encoding="utf-8")
         browser["status"] = "PASS"
         browser["detail"] = f"serving_sha_proof={serving};head_control_plane_only={head}"
         _write_rows(rows)
