@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
+import { PnlEquityCurveChart } from './LiveInteractiveCharts'
 
 interface PnlData {
   summary?: {
@@ -119,6 +120,9 @@ export function PerformanceTab() {
             <StatCard label="Total Trades" value={String(totalTrades)} sub={`${winning}W / ${losing}L`} />
             <StatCard label="Open Paper" value={String(openPos)} sub="Cloud paper engine" />
           </div>
+
+          {/* Interactive PnL Equity Curve Visual Surface */}
+          <PnlEquityCurveChart totalPnl={totalPnl} />
 
           {backtest?.status === 'ok' && (
             <div className="card p-4" data-testid="costed-walkforward-truth">
