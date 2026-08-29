@@ -2407,6 +2407,29 @@ async def get_deploy_info():
     }
 
 
+@app.get("/api/paper/run")
+async def api_paper_run(symbol: str = "NIFTY", loops: int = 5):
+    """Trigger real live comparison paper trading loop on Cloud Run."""
+    try:
+        from core.trading.system3_paper_live_comparator import System3PaperLiveComparator
+        engine = System3PaperLiveComparator()
+        result = engine.run_live_loop(symbol=symbol, iterations=min(max(1, loops), 10), delay_s=0.5)
+        return result
+    except Exception as e:
+        logger.error(f"Paper run error: {e}")
+        return {"error": str(e), "status": "ERROR"}
+
+
+@app.get("/api/paper/chart")
+async def api_paper_chart():
+    """Return generated live vs predicted comparison chart from Cloud Run."""
+    from fastapi.responses import FileResponse
+    chart_path = ROOT_DIR / "state" / "paper_trades" / "live_vs_pred_chart.png"
+    if chart_path.exists():
+        return FileResponse(str(chart_path), media_type="image/png")
+    return {"error": "Chart not found yet", "status": "PENDING"}
+
+
 # ---------------------------------------------------------------------------
 # Live Trading Gate — evaluates ALL conditions before allowing live mode
 # ---------------------------------------------------------------------------
