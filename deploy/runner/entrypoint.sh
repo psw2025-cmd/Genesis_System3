@@ -170,5 +170,9 @@ cat "$TMPDIR/final_audit.json"
 # Upload audit report to GCS
 gsutil cp "$TMPDIR/final_audit.json" "$GCS_REPORTS_PATH/audit_${AUDIT_ID}.json" 2>/dev/null || true
 
+# --- Step 7: Run runbook audit endpoint and upload final audit
+curl -sS -X GET "https://${SERVICE}-doq2wplepa-el.a.run.app/api/runbook/audit" -o "$TMPDIR/post_merge_audit.json" || true
+gsutil cp "$TMPDIR/post_merge_audit.json" "$GCS_REPORTS_PATH/audit_postmerge_${AUDIT_ID}.json" 2>/dev/null || true
+
 echo "Pre-merge audit complete. Overall verdict: $OVERALL"
 exit 0

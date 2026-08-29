@@ -5883,7 +5883,7 @@ async def get_news_endpoint():
     return get_catalysts_data()
 
 
-@app.api_route("/api/runbook/audit", methods=["GET", "POST"])
+@app.get("/api/runbook/audit")
 async def runbook_audit_endpoint():
     """Automated operational runbook audit endpoint."""
     utc_now = datetime.now(timezone.utc).isoformat()
