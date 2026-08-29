@@ -102,6 +102,7 @@ def _api_snapshot() -> dict:
             deploy.get("revision")
             or deploy.get("cloud_run_revision")
             or deploy.get("revision_name")
+            or deploy.get("service_name")
             or ""
         ),
         "broker_connected": bool(broker.get("connected", False)),
