@@ -4,6 +4,7 @@ import { asPct, cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { statusToneCss } from '../lib/statusTone'
 import { AuthUnlock } from './AuthUnlock'
 import { ContinuousClosureBoard } from './ContinuousClosureBoard'
+import { NiftyIntradayChart, VolatilitySmileChart, PnlEquityCurveChart } from './LiveInteractiveCharts'
 
 function Metric({ label, value, sub, tone, icon }: {
   label: string; value: string; sub?: string; tone?: 'up' | 'down' | 'warn' | 'accent'; icon?: React.ReactNode
@@ -189,9 +190,9 @@ export function Overview() {
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr minmax(270px, .95fr)', marginTop: 10 }}>
-        <ChartPlaceholder title="NIFTY Snapshot" value={spot('NIFTY') > 0 ? fmt(spot('NIFTY'), 2) : '--'} />
-        <ChartPlaceholder title="Market / Volatility Monitor" value={marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'} tone="down" />
-        <ChartPlaceholder title="Paper P&L Snapshot" value={totalPnl == null ? '--' : fmtCr(totalPnl)} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'accent' : 'down'} />
+        <NiftyIntradayChart spot={spot('NIFTY')} changePct={change('NIFTY')} title="NIFTY 50 Intraday Dynamics" />
+        <VolatilitySmileChart spot={spot('NIFTY')} />
+        <PnlEquityCurveChart totalPnl={totalPnl ?? 0} />
         <div className="card" style={{ padding: 12 }}>
           <div className="panel-title">Automation Status</div>
           <div style={{ marginTop: 9 }}>

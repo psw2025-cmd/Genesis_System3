@@ -2,8 +2,8 @@
   "audit_name": "GENESIS_SYSTEM3_LIVE_22_TAB_PRODUCTION_AUDIT",
   "production_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui",
   "serving_revision": "genesis-system3-web-00653-rid",
-  "started_at_utc": "2026-08-29T18:28:06.504034+00:00",
-  "completed_at_utc": "2026-08-29T18:28:36.988623+00:00",
+  "started_at_utc": "2026-08-29T19:24:10.077145+00:00",
+  "completed_at_utc": "2026-08-29T19:25:12.894124+00:00",
   "overall_verdict": "PASS (22/22 TABS VERIFIED)",
   "tabs_audited": [
     {
@@ -14,7 +14,7 @@
       "api_http_status": 200,
       "api_response_bytes": 725,
       "ui_mounted": true,
-      "ui_text_length": 2728,
+      "ui_text_length": 2723,
       "screenshot": "tab_01_overview.png",
       "status": "PASS"
     },
@@ -26,7 +26,7 @@
       "api_http_status": 200,
       "api_response_bytes": 135,
       "ui_mounted": true,
-      "ui_text_length": 4229,
+      "ui_text_length": 4116,
       "screenshot": "tab_02_decision-intel.png",
       "status": "PASS"
     },
@@ -36,9 +36,9 @@
       "description": "Broker Truth & Reconciliation",
       "api_endpoint": "/api/broker/truth",
       "api_http_status": 200,
-      "api_response_bytes": 10780,
+      "api_response_bytes": 10779,
       "ui_mounted": true,
-      "ui_text_length": 2728,
+      "ui_text_length": 2723,
       "screenshot": "tab_03_truth.png",
       "status": "PASS"
     },
@@ -48,9 +48,9 @@
       "description": "Genesis State Engine",
       "api_endpoint": "/api/state",
       "api_http_status": 200,
-      "api_response_bytes": 5204,
+      "api_response_bytes": 5202,
       "ui_mounted": true,
-      "ui_text_length": 2868,
+      "ui_text_length": 3002,
       "screenshot": "tab_04_genesis.png",
       "status": "PASS"
     },
@@ -62,7 +62,7 @@
       "api_http_status": 200,
       "api_response_bytes": 1715,
       "ui_mounted": true,
-      "ui_text_length": 3977,
+      "ui_text_length": 3971,
       "screenshot": "tab_05_e2e-proof.png",
       "status": "PASS"
     },
@@ -72,9 +72,9 @@
       "description": "Simulated Live Latency & Execution",
       "api_endpoint": "/api/simulation/live/state",
       "api_http_status": 200,
-      "api_response_bytes": 855,
+      "api_response_bytes": 853,
       "ui_mounted": true,
-      "ui_text_length": 3272,
+      "ui_text_length": 3280,
       "screenshot": "tab_06_sim-live.png",
       "status": "PASS"
     },
@@ -86,7 +86,7 @@
       "api_http_status": 200,
       "api_response_bytes": 151337,
       "ui_mounted": true,
-      "ui_text_length": 2301,
+      "ui_text_length": 2299,
       "screenshot": "tab_07_options-intel.png",
       "status": "PASS"
     },
@@ -98,7 +98,7 @@
       "api_http_status": 200,
       "api_response_bytes": 151337,
       "ui_mounted": true,
-      "ui_text_length": 1997,
+      "ui_text_length": 1993,
       "screenshot": "tab_08_chain.png",
       "status": "PASS"
     },
@@ -110,7 +110,7 @@
       "api_http_status": 200,
       "api_response_bytes": 135,
       "ui_mounted": true,
-      "ui_text_length": 5753,
+      "ui_text_length": 5751,
       "screenshot": "tab_09_signals.png",
       "status": "PASS"
     },
@@ -122,7 +122,7 @@
       "api_http_status": 200,
       "api_response_bytes": 37,
       "ui_mounted": true,
-      "ui_text_length": 4558,
+      "ui_text_length": 4556,
       "screenshot": "tab_10_trade.png",
       "status": "PASS"
     },
@@ -134,7 +134,7 @@
       "api_http_status": 200,
       "api_response_bytes": 493,
       "ui_mounted": true,
-      "ui_text_length": 9166,
+      "ui_text_length": 8755,
       "screenshot": "tab_11_paper.png",
       "status": "PASS"
     },
@@ -146,7 +146,7 @@
       "api_http_status": 200,
       "api_response_bytes": 328,
       "ui_mounted": true,
-      "ui_text_length": 3379,
+      "ui_text_length": 3377,
       "screenshot": "tab_12_positions.png",
       "status": "PASS"
     },
@@ -158,7 +158,7 @@
       "api_http_status": 200,
       "api_response_bytes": 598,
       "ui_mounted": true,
-      "ui_text_length": 1878,
+      "ui_text_length": 1876,
       "screenshot": "tab_13_risk-scenarios.png",
       "status": "PASS"
     },
@@ -170,7 +170,7 @@
       "api_http_status": 200,
       "api_response_bytes": 5063,
       "ui_mounted": true,
-      "ui_text_length": 2233,
+      "ui_text_length": 2229,
       "screenshot": "tab_14_multibagger.png",
       "status": "PASS"
     },
@@ -182,7 +182,7 @@
       "api_http_status": 200,
       "api_response_bytes": 3500,
       "ui_mounted": true,
-      "ui_text_length": 1988,
+      "ui_text_length": 1986,
       "screenshot": "tab_15_prediction-audit.png",
       "status": "PASS"
     },
@@ -194,7 +194,7 @@
       "api_http_status": 200,
       "api_response_bytes": 3075,
       "ui_mounted": true,
-      "ui_text_length": 2464,
+      "ui_text_length": 2450,
       "screenshot": "tab_16_performance.png",
       "status": "PASS"
     },
@@ -204,9 +204,9 @@
       "description": "Champion-Challenger ML Tournament",
       "api_endpoint": "/api/ml/compare",
       "api_http_status": 200,
-      "api_response_bytes": 1062,
+      "api_response_bytes": 2316,
       "ui_mounted": true,
-      "ui_text_length": 1611,
+      "ui_text_length": 1609,
       "screenshot": "tab_17_ml.png",
       "status": "PASS"
     },
@@ -218,7 +218,7 @@
       "api_http_status": 200,
       "api_response_bytes": 65,
       "ui_mounted": true,
-      "ui_text_length": 2198,
+      "ui_text_length": 2206,
       "screenshot": "tab_18_data-integrity.png",
       "status": "PASS"
     },
@@ -228,9 +228,9 @@
       "description": "Dhan Broker Gateway SLA",
       "api_endpoint": "/api/broker/status",
       "api_http_status": 200,
-      "api_response_bytes": 2414,
+      "api_response_bytes": 2398,
       "ui_mounted": true,
-      "ui_text_length": 4111,
+      "ui_text_length": 3948,
       "screenshot": "tab_19_broker.png",
       "status": "PASS"
     },
@@ -242,7 +242,7 @@
       "api_http_status": 200,
       "api_response_bytes": 66,
       "ui_mounted": true,
-      "ui_text_length": 3002,
+      "ui_text_length": 3000,
       "screenshot": "tab_20_alerts.png",
       "status": "PASS"
     },
@@ -254,7 +254,7 @@
       "api_http_status": 200,
       "api_response_bytes": 4727,
       "ui_mounted": true,
-      "ui_text_length": 2288,
+      "ui_text_length": 2253,
       "screenshot": "tab_21_system.png",
       "status": "PASS"
     },
@@ -264,9 +264,9 @@
       "description": "Automated Safety Invariant Locks",
       "api_endpoint": "/api/auto_gates",
       "api_http_status": 200,
-      "api_response_bytes": 6706,
+      "api_response_bytes": 6342,
       "ui_mounted": true,
-      "ui_text_length": 2412,
+      "ui_text_length": 2414,
       "screenshot": "tab_22_gates.png",
       "status": "PASS"
     }
