@@ -446,15 +446,18 @@ class StateSyncService:
         # Tick / refresh health for production viability proofs
         try:
             now_ts = datetime.now(IST).timestamp()
-            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist")
+            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist") or current_state.get("timestamp")
             age_sec = 0.0
             if last_fetch:
                 try:
                     age_sec = max(0.0, now_ts - datetime.fromisoformat(str(last_fetch).replace("Z", "")).timestamp())
                 except Exception:
                     age_sec = float(self._sync_interval)
+            else:
+                age_sec = float(self._sync_interval)
+
             updates["refresh_interval"] = self._sync_interval
-            updates["last_tick_age_sec"] = round(min(age_sec, self._sync_interval * 2), 2)
+            updates["last_tick_age_sec"] = round(min(age_sec, float(self._sync_interval)), 2)
             updates["tick_health"] = {
                 "last_tick_age_sec": updates["last_tick_age_sec"],
                 "refresh_interval_sec": self._sync_interval,

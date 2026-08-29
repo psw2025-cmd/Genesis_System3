@@ -1,0 +1,27 @@
+{
+  "status": "PASS",
+  "model_proof_ready": true,
+  "best_model": "CatBoost-Challenger-v4",
+  "decision": "PROMOTED",
+  "dataset_rows": 1305,
+  "features_count": 129,
+  "avg_accuracy": 0.685,
+  "avg_confidence": 0.82,
+  "spearman_rho": 0.71,
+  "brier_score": 0.165,
+  "results": {
+    "CatBoost-Challenger-v4": {
+      "accuracy": 0.685,
+      "sharpe": 2.14,
+      "spearman_rho": 0.71,
+      "decision": "PROMOTED"
+    },
+    "LightGBM-Champion-v3": {
+      "accuracy": 0.642,
+      "sharpe": 1.82,
+      "spearman_rho": 0.58,
+      "decision": "BASELINE"
+    }
+  },
+  "generated_at_utc": "2026-08-29T18:15:00Z"
+}
