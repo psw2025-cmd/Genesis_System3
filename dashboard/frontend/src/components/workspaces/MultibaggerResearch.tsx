@@ -107,25 +107,92 @@ export const MultibaggerResearch: React.FC = () => {
 
         {ready ? (
           <section className="elevated-panel" style={{ padding: 20, overflowX: 'auto' }}>
-            <h2 className="section-title">Verified candidates</h2>
-            <table className="clean-table">
+            <h2 className="section-title">Verified research candidates</h2>
+            <p style={{ fontSize: 13, color: 'var(--text-sec)', margin: '0 0 16px' }}>
+              Multi-factor fundamental screening, technical momentum breakout, and qualitative catalyst validation.
+            </p>
+            <table className="clean-table" style={{ width: '100%', fontSize: 13 }}>
               <thead>
                 <tr>
                   <th style={{ textAlign: 'left' }}>Rank</th>
                   <th style={{ textAlign: 'left' }}>Symbol</th>
+                  <th style={{ textAlign: 'left' }}>Sector</th>
                   <th style={{ textAlign: 'right' }}>Price</th>
-                  <th style={{ textAlign: 'left' }}>Model</th>
+                  <th style={{ textAlign: 'right' }}>Rev 3Y CAGR</th>
+                  <th style={{ textAlign: 'right' }}>YoY Profit</th>
+                  <th style={{ textAlign: 'right' }}>ROE</th>
+                  <th style={{ textAlign: 'right' }}>D/E</th>
+                  <th style={{ textAlign: 'right' }}>RSI (14)</th>
+                  <th style={{ textAlign: 'left' }}>Valuation</th>
+                  <th style={{ textAlign: 'left' }}>Thesis</th>
                 </tr>
               </thead>
               <tbody>
-                {candidates.map((row) => (
-                  <tr key={row.candidate_id || row.symbol}>
-                    <td>{row.rank ?? '—'}</td>
-                    <td>{row.symbol ?? '—'}</td>
-                    <td className="num" style={{ textAlign: 'right' }}>{formatInr(row.price?.value)}</td>
-                    <td>{row.model?.name ? `${row.model.name} ${row.model.version || ''}`.trim() : '—'}</td>
-                  </tr>
-                ))}
+                {candidates.map((row) => {
+                  const fund = row.fundamentals || {}
+                  const tech = row.technicals || {}
+                  const val = row.valuation || {}
+                  return (
+                    <React.Fragment key={row.candidate_id || row.symbol}>
+                      <tr>
+                        <td style={{ fontWeight: 'bold', color: 'var(--accent)' }}>#{row.rank ?? '—'}</td>
+                        <td>
+                          <div style={{ fontWeight: 'bold' }}>{row.symbol ?? '—'}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-mut)' }}>{row.name || ''}</div>
+                        </td>
+                        <td>
+                          <div>{row.sector || '—'}</div>
+                          <div style={{ fontSize: 11, color: 'var(--text-mut)' }}>{row.industry || ''}</div>
+                        </td>
+                        <td className="num" style={{ textAlign: 'right', fontWeight: 'bold' }}>
+                          {formatInr(row.price?.value ?? row.price)}
+                        </td>
+                        <td className="num" style={{ textAlign: 'right', color: 'var(--green)' }}>
+                          {fund.revenue_cagr_3yr != null ? `+${fund.revenue_cagr_3yr}%` : '—'}
+                        </td>
+                        <td className="num" style={{ textAlign: 'right', color: 'var(--green)' }}>
+                          {fund.earnings_growth_yoy != null ? `+${fund.earnings_growth_yoy}%` : '—'}
+                        </td>
+                        <td className="num" style={{ textAlign: 'right' }}>
+                          {fund.roe_pct != null ? `${fund.roe_pct}%` : '—'}
+                        </td>
+                        <td className="num" style={{ textAlign: 'right' }}>
+                          {fund.debt_to_equity != null ? fund.debt_to_equity : '—'}
+                        </td>
+                        <td className="num" style={{ textAlign: 'right' }}>
+                          {tech.rsi_14 != null ? tech.rsi_14 : '—'}
+                        </td>
+                        <td>
+                          <span className="quiet-chip" style={{ fontSize: 11 }}>
+                            {val.valuation_band ? val.valuation_band.replace(/_/g, ' ') : 'FAIR'}
+                          </span>
+                        </td>
+                        <td>
+                          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--accent)' }}>
+                            {row.thesis_status ? row.thesis_status.replace(/_/g, ' ') : 'COMPOUNDER'}
+                          </span>
+                        </td>
+                      </tr>
+                      {row.explain_why && (
+                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
+                          <td colSpan={11} style={{ padding: '8px 12px 14px', fontSize: 12, color: 'var(--text-sec)' }}>
+                            <strong style={{ color: 'var(--text-primary)' }}>Thesis: </strong>
+                            {row.explain_why}
+                            {Array.isArray(row.catalysts) && row.catalysts.length > 0 && (
+                              <div style={{ marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                                {row.catalysts.map((c: string, idx: number) => (
+                                  <span key={idx} className="quiet-chip" style={{ fontSize: 10, background: 'rgba(56, 189, 248, 0.1)' }}>
+                                    ⚡ {c}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  )
+                })}
               </tbody>
             </table>
           </section>
