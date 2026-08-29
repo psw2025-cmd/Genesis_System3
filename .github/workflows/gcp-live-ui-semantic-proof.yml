@@ -50,11 +50,16 @@ jobs:
         if: always()
         env:
           SYSTEM3_LIVE_UI_READY_WAIT_S: "240"
-          # Diagnostic/full-product proof must not overwrite the established
-          # live-ui/semantic-proof commit-status context emitted by the canonical
-          # proof above. The step result still gates this workflow and its artifact.
+          # Keep this diagnostic/full-product step from publishing the canonical
+          # status by itself. The strict RHUI step below is the final status owner.
           GITHUB_TOKEN: ""
         run: python scripts/gcp_full_dashboard_acceptance.py
+
+      - name: Enforce strict RHUI broker/API/UI parity on all 22 tabs
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/gcp_rhui_strict_semantic_gate.py
 
       - name: Upload semantic and visual proof
         if: always()
@@ -64,5 +69,6 @@ jobs:
           path: |
             reports/latest/live_ui_semantic_proof/
             reports/latest/full_dashboard_acceptance/
+            reports/latest/rhui_strict_semantic_gate/
           if-no-files-found: warn
           retention-days: 14
