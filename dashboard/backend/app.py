@@ -9444,7 +9444,7 @@ async def compat_rate_limit_and_timing(request: Request, call_next):
         elapsed_ms = round((time.time() - start) * 1000, 2)
         response.headers["X-Response-Time-ms"] = str(elapsed_ms)
         return response
-    # Static UI / health / auth probes must never trip the dashboard into false TOKEN ERROR states.
+    # Static UI / health / auth / api / ws probes must never trip the dashboard into false TOKEN ERROR states.
     _exempt_prefixes = (
         "/ui",
         "/assets",
@@ -9452,7 +9452,9 @@ async def compat_rate_limit_and_timing(request: Request, call_next):
         "/openapi.json",
         "/redoc",
         "/favicon",
-        "/api/security/mutation-policy",
+        "/api/",
+        "/ws",
+        "/__system3_",
     )
     _exempt_exact = {
         "/api/health",
