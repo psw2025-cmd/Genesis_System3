@@ -77,9 +77,8 @@ def gcloud_bin() -> str:
 
 def run_gcloud(args: list[str], timeout: int = 90) -> tuple[Any, str | None]:
     exe = gcloud_bin()
-    shell = exe.lower().endswith(".cmd")
     try:
-        p = subprocess.run([exe, *args], capture_output=True, shell=shell, timeout=timeout)
+        p = subprocess.run([exe, *args], capture_output=True, shell=False, timeout=timeout)
     except subprocess.TimeoutExpired:
         return None, f"timeout_after_{timeout}s"
     raw = p.stdout or b""
