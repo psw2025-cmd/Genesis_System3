@@ -198,24 +198,32 @@ class System3PaperLiveComparator:
         return summary
 
     def _generate_chart(self, symbol: str, live_ltps: List[float], preds: List[float], market_open: bool):
-        """Generates live vs predicted price comparison chart using matplotlib."""
-        plt.figure(figsize=(10, 5), dpi=120)
-        iters = list(range(1, len(live_ltps) + 1))
+        """Generates live vs predicted price comparison chart using matplotlib if available."""
+        try:
+            import matplotlib
+            matplotlib.use("Agg")
+            import matplotlib.pyplot as plt
 
-        plt.plot(iters, live_ltps, marker="o", color="#10b981", linewidth=2.5, label=f"Live {symbol} Spot")
-        plt.plot(iters, preds, marker="s", color="#38bdf8", linewidth=2.0, linestyle="--", label=f"Predicted Move ({symbol} ML)")
+            plt.figure(figsize=(10, 5), dpi=120)
+            iters = list(range(1, len(live_ltps) + 1))
 
-        status_tag = "LIVE MARKET" if market_open else "MARKET CLOSED (Standby)"
-        plt.title(f"Genesis System3 — Live Spot vs ML Prediction [{status_tag}]", fontsize=13, fontweight="bold", pad=12)
-        plt.xlabel("Iteration (2-sec intervals)", fontsize=10)
-        plt.ylabel("Price (INR)", fontsize=10)
-        plt.grid(True, linestyle=":", alpha=0.6)
-        plt.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1")
-        plt.tight_layout()
+            plt.plot(iters, live_ltps, marker="o", color="#10b981", linewidth=2.5, label=f"Live {symbol} Spot")
+            plt.plot(iters, preds, marker="s", color="#38bdf8", linewidth=2.0, linestyle="--", label=f"Predicted Move ({symbol} ML)")
 
-        plt.savefig(self.chart_file)
-        plt.close()
-        logger.info(f"Generated comparison chart at: {self.chart_file}")
+            status_tag = "LIVE MARKET" if market_open else "MARKET CLOSED (Standby)"
+            plt.title(f"Genesis System3 — Live Spot vs ML Prediction [{status_tag}]", fontsize=13, fontweight="bold", pad=12)
+            plt.xlabel("Iteration (2-sec intervals)", fontsize=10)
+            plt.ylabel("Price (INR)", fontsize=10)
+            plt.grid(True, linestyle=":", alpha=0.6)
+            plt.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1")
+            plt.tight_layout()
+
+            self.chart_file.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(self.chart_file)
+            plt.close()
+            logger.info(f"Generated comparison chart at: {self.chart_file}")
+        except Exception as exc:
+            logger.debug(f"Matplotlib chart generation skipped: {exc}")
 
 
 def main():
