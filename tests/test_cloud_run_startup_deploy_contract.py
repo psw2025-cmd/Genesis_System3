@@ -26,6 +26,20 @@ class CloudRunStartupDeployContractTests(unittest.TestCase):
         self.assertNotIn("proof = install()", main_text)
         self.assertIn("uvicorn.run", main_text)
 
+    def test_cloud_paper_engine_starts_alongside_dashboard(self) -> None:
+        text = (ROOT / "scripts/start_cloud_run.py").read_text(encoding="utf-8")
+        self.assertIn('os.getenv("CLOUD_PAPER_ENGINE", "0")', text)
+        self.assertIn("target=_run_cloud_paper_engine", text)
+        self.assertIn('name="system3-cloud-paper-engine"', text)
+        self.assertIn("daemon=True", text)
+
+    def test_cloud_paper_engine_has_no_broker_order_import(self) -> None:
+        text = (ROOT / "scripts/cloud_paper_engine.py").read_text(encoding="utf-8")
+        self.assertIn("from src.trading.paper_executor import PaperExecutor", text)
+        for forbidden in ("place_order", "submit_order", "order_placement", "dhanhq", "DhanContext"):
+            self.assertNotIn(forbidden, text)
+        self.assertIn('"LIVE_TRADING_ENABLED", "0"', (ROOT / "scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8"))
+
     def test_deployer_uses_zero_traffic_candidate_and_exact_revision_promotion(self) -> None:
         text = (ROOT / "scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
         self.assertIn('"--no-traffic"', text)
@@ -38,14 +52,18 @@ class CloudRunStartupDeployContractTests(unittest.TestCase):
         self.assertIn("CANDIDATE_DEPLOY_FAILED", text)
         self.assertIn("if still_ready != previous_ready", text)
 
-    def test_live_flags_are_forced_off_in_deployer(self) -> None:
+    def test_web_runtime_is_automated_paper_with_live_flags_forced_off(self) -> None:
         text = (ROOT / "scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
         for marker in (
-            '("LIVE_TRADING_ENABLED", "0")',
-            '("SYSTEM3_LIVE_TRADING_ALLOWED", "0")',
-            '("AUTO_EXECUTE_TRADES", "0")',
+            '"ANALYZE_MODE": "0"',
+            '"SYSTEM3_MODE": "PAPER"',
+            '"CLOUD_PAPER_ENGINE": "1"',
+            '"AUTO_EXECUTE_TRADES": "1"',
+            '"LIVE_TRADING_ENABLED": "0"',
+            '"SYSTEM3_LIVE_TRADING_ALLOWED": "0"',
         ):
             self.assertIn(marker, text)
+        self.assertIn("cloud_paper_runtime_refuses_live_trading", text)
 
 
 if __name__ == "__main__":
