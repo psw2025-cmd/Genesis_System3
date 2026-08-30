@@ -1,0 +1,72 @@
+name: Patch Cloud PAPER Contract
+
+on:
+  push:
+    branches:
+      - fix/cloud-paper-engine-deploy-20260830
+    paths:
+      - .github/workflows/patch-cloud-paper-contract.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/cloud-paper-engine-deploy-20260830
+          fetch-depth: 0
+
+      - name: Patch canonical Cloud Run workflow
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('.github/workflows/cloud-run-auto-deploy.yml')
+          text = path.read_text(encoding='utf-8')
+
+          old_env = '''      # Canonical runtime contract: REQUIRE_API_KEY=false.\n      REQUIRE_API_KEY: "false"\n      GOOGLE_CLOUD_PROJECT: system3-openalgo-safe\n'''
+          new_env = '''      # Canonical web runtime: autonomous PAPER simulation; LIVE remains independently locked OFF.\n      REQUIRE_API_KEY: "false"\n      ANALYZE_MODE: "0"\n      SYSTEM3_MODE: "PAPER"\n      CLOUD_PAPER_ENGINE: "1"\n      AUTO_EXECUTE_TRADES: "1"\n      LIVE_TRADING_ENABLED: "0"\n      SYSTEM3_LIVE_TRADING_ALLOWED: "0"\n      GOOGLE_CLOUD_PROJECT: system3-openalgo-safe\n'''
+          if old_env not in text:
+              raise SystemExit('expected deployment env anchor not found')
+          text = text.replace(old_env, new_env, 1)
+
+          old_gate = '''          if not report.get("source_matches_deployment"): failures.append("source_matches_deployment=false")\n          if not safety.get("analyze_mode"): failures.append("analyze_mode=false")\n          if not safety.get("dashboard_public_readonly"): failures.append("dashboard_public_readonly=false")\n          for key in ("live_trading_enabled","system3_live_trading_allowed","auto_execute_trades","secret_payloads_exposed","api_key_required","api_key_mounted","api_key_plaintext_exposed"):\n              if safety.get(key): failures.append(f"{key}=true")\n          if report.get("secret_values_exposed"): failures.append("secret_values_exposed=true")\n'''
+          new_gate = '''          if not report.get("source_matches_deployment"): failures.append("source_matches_deployment=false")\n          if not safety.get("paper_mode"): failures.append("paper_mode=false")\n          if not safety.get("cloud_paper_engine"): failures.append("cloud_paper_engine=false")\n          if not safety.get("auto_execute_trades"): failures.append("auto_execute_trades=false")\n          if not safety.get("auto_execute_is_paper_only"): failures.append("auto_execute_is_paper_only=false")\n          if not safety.get("live_locks_ok"): failures.append("live_locks_ok=false")\n          if not safety.get("dashboard_public_readonly"): failures.append("dashboard_public_readonly=false")\n          for key in ("live_trading_enabled","system3_live_trading_allowed","secret_payloads_exposed","api_key_required","api_key_mounted","api_key_plaintext_exposed"):\n              if safety.get(key): failures.append(f"{key}=true")\n          if report.get("secret_values_exposed"): failures.append("secret_values_exposed=true")\n'''
+          if old_gate not in text:
+              raise SystemExit('expected analyzer-only runtime gate not found')
+          text = text.replace(old_gate, new_gate, 1)
+
+          # Static source contract: future workflow edits must preserve the six web runtime values.
+          static_anchor = '''          workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")\n'''
+          static_insert = '''          workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")\n          for marker in (\n              'ANALYZE_MODE: "0"',\n              'SYSTEM3_MODE: "PAPER"',\n              'CLOUD_PAPER_ENGINE: "1"',\n              'AUTO_EXECUTE_TRADES: "1"',\n              'LIVE_TRADING_ENABLED: "0"',\n              'SYSTEM3_LIVE_TRADING_ALLOWED: "0"',\n          ):\n              assert marker in workflow, f"missing web PAPER runtime marker: {marker}"\n'''
+          if static_anchor not in text:
+              raise SystemExit('expected workflow static-gate anchor not found')
+          text = text.replace(static_anchor, static_insert, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Verify exact requested runtime markers
+        run: |
+          grep -F 'ANALYZE_MODE: "0"' .github/workflows/cloud-run-auto-deploy.yml
+          grep -F 'SYSTEM3_MODE: "PAPER"' .github/workflows/cloud-run-auto-deploy.yml
+          grep -F 'CLOUD_PAPER_ENGINE: "1"' .github/workflows/cloud-run-auto-deploy.yml
+          grep -F 'AUTO_EXECUTE_TRADES: "1"' .github/workflows/cloud-run-auto-deploy.yml
+          grep -F 'LIVE_TRADING_ENABLED: "0"' .github/workflows/cloud-run-auto-deploy.yml
+          grep -F 'SYSTEM3_LIVE_TRADING_ALLOWED: "0"' .github/workflows/cloud-run-auto-deploy.yml
+
+      - name: Commit patched canonical workflow
+        run: |
+          git config user.name "system3-controller"
+          git config user.email "176781239+psw2025-cmd@users.noreply.github.com"
+          git add .github/workflows/cloud-run-auto-deploy.yml
+          if git diff --cached --quiet; then
+            echo "canonical workflow already patched"
+            exit 0
+          fi
+          git commit -m "fix(paper): persist Cloud Run PAPER env in deployment workflow"
+          git push origin HEAD:fix/cloud-paper-engine-deploy-20260830
