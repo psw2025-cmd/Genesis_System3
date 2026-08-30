@@ -4,6 +4,8 @@ import { asPct, cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { statusToneCss } from '../lib/statusTone'
 import { AuthUnlock } from './AuthUnlock'
 import { ContinuousClosureBoard } from './ContinuousClosureBoard'
+import { HolographicIndexCards } from './HolographicIndexCards'
+import { ModelVsMarketComparator } from './ModelVsMarketComparator'
 import { NiftyIntradayChart, VolatilitySmileChart, PnlEquityCurveChart } from './LiveInteractiveCharts'
 
 function Metric({ label, value, sub, tone, icon }: {
@@ -119,6 +121,9 @@ export function Overview() {
   return (
     <div className="workspace-shell">
       {apiAuthNeeded && <div style={{ marginBottom: 10 }}><AuthUnlock /></div>}
+
+      <HolographicIndexCards />
+      <ModelVsMarketComparator />
 
       <ContinuousClosureBoard />
 

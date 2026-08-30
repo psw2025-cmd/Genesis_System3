@@ -210,7 +210,7 @@ export function SystemProgressPanel() {
           ? 'Dhan rate-limit health contract verified: single-flight pacing (1 req/3.5s), zero 429/805 errors, and cache fallback SLA active.'
           : instrumentFresh
             ? 'Market data cache active; awaiting broker live session handshake.'
-            : 'Awaiting market data health verification.',
+            : 'Awaiting market data health verification (BACKEND_DEPENDENCY).',
         source: '/api/instruments/health + /api/broker/status',
         verifiedAt: checkedAt,
       },

@@ -167,6 +167,8 @@ export default function PaperTrading() {
   const summary = pnl?.summary || paper?.pnl?.summary || {}
   const totalRealized = Number(summary?.total_realized_pnl ?? summary?.realized_pnl ?? 0)
   const totalUnrealized = positions.reduce((sum, p) => sum + Number(p.unrealized_pnl ?? p.unrealizedProfit ?? 0), 0)
+  const totalPnL = Number(summary?.total_pnl ?? (totalRealized + totalUnrealized))
+  const maxPositions = Number(paper?.max_positions ?? state?.max_positions ?? 3)
   const initialCapital = Number(account.initial_capital || 500000.0)
   const availableMargin = Number(account.available_margin || 450000.0)
   const usedMargin = Number(account.used_margin || 50000.0)
