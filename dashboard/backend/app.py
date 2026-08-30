@@ -2197,11 +2197,11 @@ async def get_proof_ledger():
 async def get_agent_status_telemetry():
     """Universal Zero-Restriction Telemetry Mirror for external AI agents, WhatsApp bots, and MCP servers."""
     try:
-        from dashboard.backend.deploy_info_service import get_deploy_info
-    except ImportError:
-        from deploy_info_service import get_deploy_info
+        deploy = await get_deploy_info()
+    except Exception:
+        deploy = {}
     
-    deploy = get_deploy_info()
+    now_utc = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return {
         "status": "HEALTHY",
         "system": "Genesis_System3",
@@ -2209,7 +2209,7 @@ async def get_agent_status_telemetry():
         "service": "genesis-system3-web",
         "public_ui_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/",
         "serving_sha": deploy.get("git_sha", "dd5e6bdeb"),
-        "deployed_at": deploy.get("deployed_at_utc", _utc()),
+        "deployed_at": deploy.get("deployed_at_utc", now_utc),
         "mode": "PAPER",
         "live_trading_enabled": False,
         "broker": {
@@ -2233,7 +2233,7 @@ async def get_agent_status_telemetry():
             "paper_account": "/api/paper/account",
             "paper_smoke": "/api/paper/run?symbol=NIFTY&loops=5",
         },
-        "timestamp_utc": _utc(),
+        "timestamp_utc": now_utc,
     }
 
 
