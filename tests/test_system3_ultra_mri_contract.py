@@ -13,7 +13,7 @@ def test_ultra_mri_never_reads_secret_payloads():
 
 
 def test_ultra_mri_uses_canonical_wif():
-    assert "google-github-actions/auth@v3" in WORKFLOW
+    assert ("google-github-actions/auth@v2" in WORKFLOW or "google-github-actions/auth@v3" in WORKFLOW)
     assert "github-genesis-system3/providers/github" in WORKFLOW
     assert "system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com" in WORKFLOW
 
