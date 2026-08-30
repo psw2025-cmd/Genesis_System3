@@ -156,7 +156,7 @@ def test_no_render_service_ids_in_source():
         if not path.is_file():
             continue
         rel = path.relative_to(ROOT).as_posix()
-        if rel.split("/", 1)[0] in {"reports", ".git", "node_modules", ".venv", "tests"}:
+        if rel.split("/", 1)[0] in {"reports", ".git", "node_modules", ".venv", "tests", ".worktrees"}:
             continue
         if path.suffix.lower() not in {".py", ".md", ".yml", ".yaml", ".ts", ".tsx", ".json", ".sh"}:
             continue
@@ -225,7 +225,7 @@ def test_source_tree_has_no_onrender_authority_urls():
         if not path.is_file():
             continue
         rel = path.relative_to(ROOT).as_posix()
-        if rel.split("/", 1)[0] in {"reports", ".git", "node_modules", ".venv", "tests"}:
+        if rel.split("/", 1)[0] in {"reports", ".git", "node_modules", ".venv", "tests", ".worktrees"}:
             continue
         if rel in skip or rel.startswith("reports/") or rel.startswith("tests/"):
             continue

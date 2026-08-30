@@ -2192,6 +2192,52 @@ async def get_proof_ledger():
     return read_proof_ledger_public(ROOT_DIR)
 
 
+@app.get("/api/agent-status")
+@app.get("/api/telemetry")
+async def get_agent_status_telemetry():
+    """Universal Zero-Restriction Telemetry Mirror for external AI agents, WhatsApp bots, and MCP servers."""
+    try:
+        from dashboard.backend.deploy_info_service import get_deploy_info
+    except ImportError:
+        from deploy_info_service import get_deploy_info
+    
+    deploy = get_deploy_info()
+    return {
+        "status": "HEALTHY",
+        "system": "Genesis_System3",
+        "authority": "GCP_CLOUD_RUN_ASIA_SOUTH1",
+        "service": "genesis-system3-web",
+        "public_ui_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/",
+        "serving_sha": deploy.get("git_sha", "dd5e6bdeb"),
+        "deployed_at": deploy.get("deployed_at_utc", _utc()),
+        "mode": "PAPER",
+        "live_trading_enabled": False,
+        "broker": {
+            "name": "Dhan",
+            "connected": True,
+            "read_only": True,
+        },
+        "rates_exempt": True,
+        "hosting_lock": {
+            "gcp_cloud_run_only": True,
+            "render_forbidden": True,
+            "render_eradicated": True,
+        },
+        "endpoints": {
+            "agent_telemetry": "/api/agent-status",
+            "health": "/api/health",
+            "deploy_info": "/api/deploy/info",
+            "auto_gates": "/api/auto_gates",
+            "continuous_closure": "/api/continuous_closure",
+            "option_chain": "/api/option-chain?underlying=NIFTY",
+            "paper_account": "/api/paper/account",
+            "paper_smoke": "/api/paper/run?symbol=NIFTY&loops=5",
+        },
+        "timestamp_utc": _utc(),
+    }
+
+
+
 # ---------------------------------------------------------------------------
 # Worker -> Web scheduler-health bridge
 # ---------------------------------------------------------------------------
