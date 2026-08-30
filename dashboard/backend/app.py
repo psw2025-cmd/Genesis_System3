@@ -2416,7 +2416,8 @@ async def api_paper_run(symbol: str = "NIFTY", loops: int = 5):
         result = engine.run_live_loop(symbol=symbol, iterations=min(max(1, loops), 10), delay_s=0.5)
         return result
     except Exception as e:
-        logger.error(f"Paper run error: {e}")
+        import logging
+        logging.getLogger("system3_paper").error(f"Paper run error: {e}")
         return {"error": str(e), "status": "ERROR"}
 
 
