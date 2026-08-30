@@ -4,6 +4,7 @@ import { useData } from './hooks/useData'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
+import { TruthStrip } from './components/TruthStrip'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
@@ -107,6 +108,7 @@ export default function App() {
       <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
+      <TruthStrip />
       <AutonomousLoopBanner />
       {/*
         Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden

@@ -40,10 +40,8 @@ def _gcloud_bin() -> str:
 
 def gcloud(args: list[str]) -> Any:
     exe = _gcloud_bin()
-    # .cmd wrappers on Windows need shell=True
-    use_shell = exe.lower().endswith(".cmd")
     cmd = [exe, *args]
-    p = subprocess.run(cmd, capture_output=True, shell=use_shell)
+    p = subprocess.run(cmd, capture_output=True, shell=False)
     raw = p.stdout or b""
     if p.returncode != 0 and not raw:
         raise RuntimeError(p.stderr.decode("utf-8", "replace") or f"gcloud rc={p.returncode}")
