@@ -153,7 +153,7 @@ class HistoricalDataPipeline:
             params.append(end_date)
         query += " ORDER BY date ASC"
 
-        df = pd.read_sql_query(query, conn, parse_dates=["date"], index_col="date")
+        df = pd.read_sql_query(query, conn, params=params, parse_dates=["date"], index_col="date")
         conn.close()
         return df
 
