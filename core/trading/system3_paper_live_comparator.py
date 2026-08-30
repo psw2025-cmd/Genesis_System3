@@ -19,7 +19,6 @@ from typing import Any, Dict, List, Optional, Tuple
 from zoneinfo import ZoneInfo
 
 import joblib
-import matplotlib.pyplot as plt
 
 _BASE_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _BASE_DIR.parents[1] if len(_BASE_DIR.parents) >= 2 else _BASE_DIR.parent
