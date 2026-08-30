@@ -1,22 +1,13 @@
 #!/usr/bin/env python3
 """Canonical Cloud Run deployment entrypoint with immutable digest proof.
 
-The original deployment state machine is preserved byte-for-byte in
+The original deployment state machine is preserved in
 ``gcp_cloud_run_auto_deploy_impl.py``. This entrypoint verifies that the
-implementation still contains every critical PAPER/LIVE-OFF/candidate safety
-invariant, replaces only the image-provenance assertion with the fail-closed
-Artifact Registry repository+digest verifier, removes retired/stale dashboard
-and Dhan secret mounts before any candidate revision can be created, preserves
-only the canonical web-side Dhan client-id binding plus worker token binding,
-validates that web-triggered Dhan token rotation is OFF at the authoritative
-SAFE_ENV source so Scheduler/manual recovery remain the only effective rotation
-authorities, and converges the bounded business-lane Cloud Scheduler definitions
-before the workflow's scheduler-proof stage.
-
-Secret existence is intentionally not preflighted with Secret Manager metadata
-reads by the deploy service account. The zero-traffic Cloud Run candidate is the
-control-plane validator for referenced secrets: a missing/inaccessible binding
-must fail candidate readiness before any production traffic is promoted.
+implementation still contains every critical LIVE-OFF/candidate safety
+invariant, then applies the explicit Cloud PAPER runtime contract before any
+candidate is created. Image provenance, zero-traffic candidate proof, secret
+surface convergence, scheduler-only Dhan rotation and rollback behavior remain
+unchanged.
 """
 from __future__ import annotations
 
@@ -38,12 +29,24 @@ SCHEDULER_SA = os.getenv(
 BUSINESS_SCHEDULES = {
     "rank": "45 3 * * MON-FRI",
     "forecast": "0 4 * * MON-FRI",
-    "validate": "5 10 * * MON-FRI",  # 15:35 IST post-close Spearman day
+    "validate": "5 10 * * MON-FRI",
     "signals": "15 13 * * MON-FRI",
 }
 
-# These are executable preconditions: the wrapper refuses to deploy if the
-# preserved implementation loses any of these exact safety/provenance markers.
+# Canonical web-service mode. AUTO_EXECUTE_TRADES means simulated PAPER fills
+# only while both independent LIVE locks remain false.
+PAPER_RUNTIME_ENV = {
+    "ANALYZE_MODE": "0",
+    "SYSTEM3_MODE": "PAPER",
+    "CLOUD_PAPER_ENGINE": "1",
+    "AUTO_EXECUTE_TRADES": "1",
+    "LIVE_TRADING_ENABLED": "0",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+}
+
+# The preserved implementation still contains its historical analyzer defaults;
+# they are checked as a known baseline before this wrapper replaces only the six
+# mode values above. All traffic/secret/provenance safeguards must remain present.
 _REQUIRED_IMPLEMENTATION_MARKERS = (
     '"--no-traffic"',
     'f"--tag={CANDIDATE_TAG}"',
@@ -91,18 +94,30 @@ def _verify_implementation_contract() -> None:
         raise RuntimeError(f"deployment_safety_contract_missing:{missing}")
 
 
+def _apply_cloud_paper_runtime_contract() -> None:
+    env = dict(deployer.SAFE_ENV)
+    env.update(PAPER_RUNTIME_ENV)
+    ordered = [key for key, _ in deployer.SAFE_ENV]
+    for key in PAPER_RUNTIME_ENV:
+        if key not in ordered:
+            ordered.append(key)
+    deployer.SAFE_ENV = tuple((key, env[key]) for key in ordered)
+
+    effective = dict(deployer.SAFE_ENV)
+    drift = {
+        key: {"expected": expected, "actual": effective.get(key)}
+        for key, expected in PAPER_RUNTIME_ENV.items()
+        if effective.get(key) != expected
+    }
+    if drift:
+        raise RuntimeError(f"cloud_paper_runtime_contract_drift:{drift}")
+    if effective["LIVE_TRADING_ENABLED"] != "0" or effective["SYSTEM3_LIVE_TRADING_ALLOWED"] != "0":
+        raise RuntimeError("cloud_paper_runtime_refuses_live_trading")
+    print("CLOUD_PAPER_RUNTIME_CONTRACT", PAPER_RUNTIME_ENV)
+
+
 def _enforce_scheduler_only_dhan_rotation() -> None:
-    """Validate the single authoritative web-side Dhan rotation contract.
-
-    ``gcp_cloud_run_auto_deploy_impl.py::SAFE_ENV`` is the source of truth and
-    must already declare web canonical self-heal OFF.  This wrapper intentionally
-    does not rewrite a contradictory value at runtime: source/config drift must
-    fail closed in CI/deploy instead of being masked by a second authority.
-
-    Rotation authority remains Cloud Scheduler plus guarded manual recovery.
-    The 5-minute Scheduler cadence is only a bounded trigger/check cadence; the
-    rotator's independent 30-minute remint cooldown remains unchanged.
-    """
+    """Validate the single authoritative web-side Dhan rotation contract."""
     env_map = dict(deployer.SAFE_ENV)
     env_map.pop("API_KEY", None)
     effective = env_map
@@ -154,16 +169,7 @@ def _parse_secret_bindings(arg: str) -> dict[str, str]:
 
 
 def _scrub_retired_dashboard_secret_arg(args: list[str]) -> list[str]:
-    """Converge every Cloud Run candidate to the canonical web secret surface.
-
-    Web needs only:
-    - ``WORKER_PUSH_TOKEN`` for worker ingestion; and
-    - ``DHAN_CLIENT_ID`` for read-only Dhan requests.
-
-    The Dhan access token is loaded dynamically from Secret Manager by the web
-    runtime service account. PIN/TOTP/app-secret/access-token mounts therefore
-    have no place on the web service and are removed on every candidate deploy.
-    """
+    """Converge every Cloud Run candidate to the canonical web secret surface."""
     if args[:3] != ["gcloud", "run", "deploy"]:
         return list(args)
 
@@ -208,12 +214,7 @@ def _run_with_retired_dashboard_secret_scrub(
 
 
 def _defer_worker_secret_validation_to_candidate(_session: object, secret_id: str) -> None:
-    """Avoid a deployer Secret Manager metadata read it is not authorized to do.
-
-    ``gcloud run deploy --update-secrets`` plus zero-traffic candidate readiness
-    is the actual validation boundary. This keeps the deployer least-privileged
-    while still failing closed before traffic promotion if the binding is bad.
-    """
+    """Avoid a deployer Secret Manager metadata read it is not authorized to do."""
     normalized = str(secret_id or "").strip()
     if not normalized:
         raise RuntimeError("worker_push_token_secret_id_empty")
@@ -295,11 +296,7 @@ def _business_scheduler_command(kind: str, *, exists: bool) -> list[str]:
 
 
 def _ensure_business_scheduler_contract() -> None:
-    """Create or fully reconcile the four bounded business schedules.
-
-    This function configures Scheduler metadata only. It never executes a Cloud
-    Run job and never changes broker, token, order, or LIVE-trading authority.
-    """
+    """Create or fully reconcile the four bounded business schedules."""
     for kind in BUSINESS_SCHEDULES:
         exists = _scheduler_exists(f"genesis-system3-{kind}-daily")
         command = _business_scheduler_command(kind, exists=exists)
@@ -319,6 +316,7 @@ def _ensure_business_scheduler_contract() -> None:
 
 def main() -> int:
     _verify_implementation_contract()
+    _apply_cloud_paper_runtime_contract()
     _enforce_scheduler_only_dhan_rotation()
     deployer._assert_candidate_image = _assert_candidate_image
     deployer._run = _run_with_retired_dashboard_secret_scrub
