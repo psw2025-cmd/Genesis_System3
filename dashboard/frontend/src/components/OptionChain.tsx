@@ -321,9 +321,7 @@ export function OptionChain() {
   }, [rawContracts, spot])
 
   const pcr = chainMismatch ? '--' : (data?.pcr ?? 1.05)
-  const status = chainMismatch ? 'CHAIN_SYMBOL_MISMATCH' : (data?.status ?? 'SESSION_SNAPSHOT')
-  const streamLive = Boolean(marketOpen && !selectedExpiry && (data?.verified_live_dhan || data?.live === true))
-  const streamLabel = marketOpen ? (streamLive ? '● LIVE DHAN' : 'POLLING FEED') : 'SESSION REPLAY (WEEKEND)'
+  const streamLabel = marketOpen ? (streamLive ? '● LIVE DHAN' : 'POLLING FEED') : 'SESSION SNAPSHOT'
 
   const strikeMap = new Map<number, { CE?: Contract; PE?: Contract }>()
   for (const contract of contracts) {
