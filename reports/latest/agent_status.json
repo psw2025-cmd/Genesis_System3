@@ -1,0 +1,30 @@
+{
+  "system": "Genesis_System3",
+  "cloud_authority": "GCP_CLOUD_RUN_ASIA_SOUTH1",
+  "service": "genesis-system3-web",
+  "public_ui_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/",
+  "serving_sha": "dd5e6bdeb",
+  "mode": "PAPER",
+  "live_trading_enabled": false,
+  "broker": {
+    "name": "Dhan",
+    "connected": true,
+    "read_only": true
+  },
+  "hosting_lock": {
+    "gcp_cloud_run_only": true,
+    "render_forbidden": true,
+    "render_eradicated": true
+  },
+  "endpoints": {
+    "agent_telemetry": "/api/agent-status",
+    "health": "/api/health",
+    "deploy_info": "/api/deploy/info",
+    "auto_gates": "/api/auto_gates",
+    "continuous_closure": "/api/continuous_closure",
+    "option_chain": "/api/option-chain?underlying=NIFTY",
+    "paper_account": "/api/paper/account",
+    "paper_smoke": "/api/paper/run?symbol=NIFTY&loops=5"
+  },
+  "timestamp_utc": "2026-08-30T06:01:00Z"
+}
