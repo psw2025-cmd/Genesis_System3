@@ -18,7 +18,7 @@ function Clock() {
     return () => window.clearInterval(timer)
   }, [])
   return (
-    <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-900/80 border border-slate-800 text-slate-300 font-mono text-xs font-semibold">
+    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300 font-mono text-xs font-semibold shrink-0">
       <ClockIcon size={13} className="text-sky-400" />
       <span>{time || '00:00:00'} IST</span>
     </div>
@@ -40,16 +40,16 @@ function MarketTicker({
 }) {
   const up = (chg ?? 0) >= 0
   const missing = !spot || spot <= 0
-  const missingText = missingLabel || (marketOpen ? 'Warming' : 'Closed')
+  const missingText = missingLabel || (marketOpen ? 'Warming' : 'After hours')
 
   return (
-    <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[100px] shrink-0">
+    <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[100px] shrink-0" title={missing ? missingText : undefined}>
       <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
       <div className="font-mono text-sm font-bold text-slate-100 mt-0.5 tabular-nums">
         {missing ? '—' : fmt(spot, 2)}
       </div>
       <div className={`font-mono text-[11px] font-semibold mt-0.5 tabular-nums ${
-        missing ? 'text-slate-500' : chg == null ? 'text-slate-400' : up ? 'text-emerald-400' : 'text-rose-400'
+        missing ? 'text-amber-400' : chg == null ? 'text-slate-400' : up ? 'text-emerald-400' : 'text-rose-400'
       }`}>
         {missing ? missingText : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
       </div>
@@ -101,18 +101,29 @@ export function TopBar() {
   const fin = getSpot('FINNIFTY')
   const vix = getSpot('INDIAVIX')
   const mid = getSpot('MIDCPNIFTY')
+  const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
+
+  const vixMissingLabel = vix.spot
+    ? undefined
+    : vix.rowFound
+      ? 'Dhan no quote'
+      : liveBoardOk
+        ? 'Dhan unavailable'
+        : marketOpen
+          ? 'Feed warming'
+          : 'After-hours n/a'
 
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
   const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
   const requestRejected = isNonAuthBrokerRejection(brokerStatus)
   const brokerLabel = requestRejected
-    ? 'Request Rejected'
+    ? 'Request rejected'
     : (brokerConnected || brokerGood)
       ? 'Session OK'
       : hasError
-        ? 'Auth Issue'
-        : 'Standby'
+        ? 'Auth issue'
+        : 'Waiting'
 
   const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
   const alertCount = Array.isArray(alerts) ? alerts.length : 0
@@ -163,7 +174,13 @@ export function TopBar() {
         <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
         <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
         <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
-        <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={marketOpen ? 'Warming' : 'Standby'} />
+        <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={vixMissingLabel} />
+        <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[70px] shrink-0">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Board</div>
+          <div className={`font-mono text-xs font-bold mt-0.5 ${liveBoardOk ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {liveBoardOk ? (marketOpen ? 'Feed OK' : 'Snapshot') : marketOpen ? 'Warming' : 'Idle'}
+          </div>
+        </div>
       </div>
 
       {/* Right Actions & Telemetry */}
