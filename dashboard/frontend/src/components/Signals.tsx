@@ -239,7 +239,7 @@ export default function Signals() {
   if (isCandidate) blockingReasons.push('Candidate only: paper/risk/live gates still decide whether trade is allowed')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <h2 className="text-3xl font-bold">Signals & Recommendations</h2>
 
       <div className={`p-6 rounded-lg ${isTrade ? 'bg-green-900' : isCandidate ? 'bg-indigo-900' : isManaging ? 'bg-blue-900' : 'bg-gray-800'}`}>

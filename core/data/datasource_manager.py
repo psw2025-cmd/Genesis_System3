@@ -172,6 +172,32 @@ class DataSourceManager:
         if sym_u in self._equity_sec_ids:
             return self._equity_sec_ids[sym_u], env_seg or "NSE_EQ"
 
+        # Institutional Indian Equity Security IDs
+        INSTITUTIONAL_EQUITY_IDS = {
+            "RELIANCE": 2885,
+            "TCS": 11536,
+            "INFY": 1594,
+            "HDFCBANK": 1333,
+            "ICICIBANK": 4963,
+            "SBIN": 3045,
+            "TATAMOTORS": 3456,
+            "BHARTIARTL": 10604,
+            "ITC": 1660,
+            "LT": 11483,
+        }
+        if sym_u in INSTITUTIONAL_EQUITY_IDS:
+            return INSTITUTIONAL_EQUITY_IDS[sym_u], env_seg or "NSE_EQ"
+
+        # In-memory SQLite Master Cache lookup (zero CSV dependency)
+        try:
+            from core.data.dhan_master_cache import get_master_cache
+
+            sec_id, seg, exch = get_master_cache().resolve_underlying_security(sym_u)
+            if sec_id:
+                return sec_id, env_seg or seg
+        except Exception:
+            pass
+
         # Resolve NSE equity underlying id from security master (OPTSTK parents).
         try:
             from core.brokers.dhan.equity_fo_universe import is_equity_fo_symbol
