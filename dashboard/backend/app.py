@@ -2407,6 +2407,19 @@ async def get_deploy_info():
     }
 
 
+@app.get("/api/chronos/fused")
+async def api_chronos_fused(symbol: str = "NIFTY"):
+    """Chronos Multi-Horizon AI Fusion Signal (L0 Microsecond + L1 RL + L2 TFT + L3 Macro)."""
+    try:
+        from core.trading.chronos_fusion import ChronosFusionEngine
+        engine = ChronosFusionEngine()
+        return engine.chronos_fusion_signal(symbol=symbol)
+    except Exception as e:
+        import logging
+        logging.getLogger("chronos_fusion").error(f"Chronos fusion error: {e}")
+        return {"error": str(e), "status": "ERROR"}
+
+
 @app.get("/api/paper/run")
 async def api_paper_run(symbol: str = "NIFTY", loops: int = 5):
     """Trigger real live comparison paper trading loop on Cloud Run."""
