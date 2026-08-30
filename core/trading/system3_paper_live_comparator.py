@@ -1,21 +1,24 @@
 #!/usr/bin/env python3
-"""Genesis System3 — Paper Trading Engine with Live Market Comparison & Market Clock.
+"""Genesis System3 — truthful PAPER market/prediction comparator.
 
-Closes the 5-year open PnL loop with symbol-specific model discovery, live execution loop,
-and Indian market session awareness (09:15-15:30 IST).
-Zero hardcoded absolute paths. Dynamic runtime path discovery using pathlib.
+Production/PAPER truth rules:
+- use broker-backed prices only; never synthesize or hard-code fallback market prices;
+- use only a symbol-specific model artifact;
+- invoke the model's real ``predict`` method when the artifact explicitly declares a
+  one-feature input contract compatible with this narrow comparator;
+- otherwise fail closed with DATA_NOT_READY / MODEL_NOT_READY;
+- never place broker orders. This module records PAPER/reference observations only.
 """
 from __future__ import annotations
 
 import argparse
 import json
 import logging
-import os
 import sys
 import time
 from datetime import datetime, time as dt_time, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 from zoneinfo import ZoneInfo
 
 import joblib
@@ -25,7 +28,6 @@ _REPO_ROOT = _BASE_DIR.parents[1] if len(_BASE_DIR.parents) >= 2 else _BASE_DIR.
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-# Real import from discovered broker path
 from core.brokers.dhan.market_ltp import INDEX_SECURITY_IDS, fetch_market_quotes
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -34,51 +36,78 @@ logger = logging.getLogger("system3_paper_live_comparator")
 IST = ZoneInfo("Asia/Kolkata")
 
 
+class DataNotReady(RuntimeError):
+    """Raised when an authoritative broker quote is unavailable."""
+
+
+class ModelNotReady(RuntimeError):
+    """Raised when no compatible symbol-specific model can be proven."""
+
+
 def is_market_open_ist(now_dt: Optional[datetime] = None) -> bool:
-    """Check if current time is within official NSE market session (Mon-Fri 09:15-15:30 IST)."""
+    """Return the normal weekday NSE cash-session state.
+
+    Official holiday/special-session authority belongs to the central market-session
+    service. This helper deliberately does not claim calendar authority; callers use it
+    only to avoid generating PAPER fills outside the normal session window.
+    """
     now = now_dt or datetime.now(IST)
-    # Weekday check: 0=Mon, 4=Fri, 5=Sat, 6=Sun
     if now.weekday() >= 5:
         return False
-    market_open = dt_time(9, 15, 0)
-    market_close = dt_time(15, 30, 0)
-    return market_open <= now.time() <= market_close
+    return dt_time(9, 15, 0) <= now.time() <= dt_time(15, 30, 0)
 
 
-def fetch_live_ltp(symbol: str = "NIFTY") -> float:
-    """Fetch live LTP from Dhan marketfeed API via core/brokers/dhan/market_ltp.py."""
+def fetch_live_ltp(symbol: str = "NIFTY") -> Optional[float]:
+    """Fetch an authoritative positive LTP from Dhan; return ``None`` if unavailable."""
     symbol_clean = symbol.upper()
-    sec_id = INDEX_SECURITY_IDS.get(symbol_clean, "13")
-    quotes = fetch_market_quotes({"IDX_I": [sec_id]})
-    q = quotes.get(str(sec_id), {})
-    ltp = q.get("ltp")
-    if ltp is not None and float(ltp) > 0:
-        return float(ltp)
+    sec_id = INDEX_SECURITY_IDS.get(symbol_clean)
+    if not sec_id:
+        return None
 
-    # Reference closing spot when market is closed / weekend
-    fallback_spots = {
-        "NIFTY": 24175.65,
-        "BANKNIFTY": 51240.30,
-        "FINNIFTY": 23410.80,
-        "MIDCPNIFTY": 12850.40,
-        "SENSEX": 79820.50
-    }
-    return float(fallback_spots.get(symbol_clean, 24175.65))
-
-
-def load_prediction(model_path: Path, current_ltp: float, iteration: int) -> float:
-    """Load model artifact via joblib/pickle and compute predicted price float."""
+    quotes = fetch_market_quotes({"IDX_I": [str(sec_id)]})
+    q = quotes.get(str(sec_id), {}) if isinstance(quotes, dict) else {}
+    ltp = q.get("ltp") if isinstance(q, dict) else None
     try:
-        model_obj = joblib.load(model_path)
-        delta = ((iteration % 3) - 1) * (current_ltp * 0.0015) + (current_ltp * 0.0008)
-        return round(current_ltp + delta, 2)
-    except Exception:
-        delta = (current_ltp * 0.0012)
-        return round(current_ltp + delta, 2)
+        value = float(ltp)
+    except (TypeError, ValueError):
+        return None
+    return value if value > 0 else None
+
+
+def load_prediction(model_path: Path, current_ltp: float) -> float:
+    """Invoke a compatible model's real prediction method.
+
+    This narrow comparator can only prove a model whose artifact explicitly declares a
+    single input feature. Multi-feature models must be served through the registered
+    feature-pipeline inference path instead of guessing their schema here.
+    """
+    if model_path is None or not model_path.exists():
+        raise ModelNotReady("symbol-specific model artifact is unavailable")
+
+    model_obj = joblib.load(model_path)
+    predict = getattr(model_obj, "predict", None)
+    if not callable(predict):
+        raise ModelNotReady("model artifact does not expose predict()")
+
+    n_features = getattr(model_obj, "n_features_in_", None)
+    if n_features != 1:
+        raise ModelNotReady(
+            "comparator refuses unproven feature schema; expected n_features_in_=1"
+        )
+
+    raw = predict([[float(current_ltp)]])
+    try:
+        predicted = float(raw[0])
+    except (TypeError, ValueError, IndexError, KeyError) as exc:
+        raise ModelNotReady("model predict() returned a non-numeric result") from exc
+
+    if predicted <= 0:
+        raise ModelNotReady("model predict() returned a non-positive price")
+    return round(predicted, 2)
 
 
 class System3PaperLiveComparator:
-    """Paper trading live comparison engine with real loop & matplotlib chart generation."""
+    """Read-only PAPER comparator with broker truth and fail-closed model semantics."""
 
     def __init__(self, output_dir: Optional[Path] = None):
         self.root = _REPO_ROOT
@@ -88,116 +117,156 @@ class System3PaperLiveComparator:
         self.chart_file = self.state_dir / "live_vs_pred_chart.png"
 
     def discover_model_for_symbol(self, symbol: str) -> Optional[Path]:
-        """Dynamically discover ML model matching the requested symbol without hardcoded paths."""
+        """Return only a symbol-specific model; never fall back to an arbitrary pickle."""
         sym = symbol.upper()
-        matching_models = []
+        matching_models: List[Path] = []
         for p in self.root.rglob("*.pkl"):
             try:
                 if p.stat().st_size > 1000 and sym in p.name.upper():
                     matching_models.append(p)
             except OSError:
-                pass
-        if matching_models:
-            # Sort by name length / specificity
-            matching_models.sort(key=lambda x: len(x.name))
-            return matching_models[0]
-        # Fallback to any valid pkl if specific symbol not found
-        all_pkls = [p for p in self.root.rglob("*.pkl") if p.stat().st_size > 1000]
-        return all_pkls[0] if all_pkls else None
+                continue
+        if not matching_models:
+            return None
+        matching_models.sort(key=lambda x: (len(x.name), x.name))
+        return matching_models[0]
 
-    def run_live_loop(self, symbol: str = "NIFTY", iterations: int = 5, delay_s: float = 2.0) -> Dict[str, Any]:
-        """Runs a real live loop for N iterations with live LTP fetching, ML predictions & trade ledger."""
+    def run_live_loop(
+        self,
+        symbol: str = "NIFTY",
+        iterations: int = 5,
+        delay_s: float = 2.0,
+    ) -> Dict[str, Any]:
+        """Collect broker observations and PAPER comparison rows without inventing truth."""
         market_open = is_market_open_ist()
-        logger.info(f"Starting real live loop ({iterations} iterations, delay={delay_s}s) for {symbol}...")
-        logger.info(f"Market Status (09:15-15:30 IST): {'OPEN' if market_open else 'CLOSED / STANDBY'}")
-
-        chosen_model = self.discover_model_for_symbol(symbol)
-        model_name = chosen_model.name if chosen_model else "Dynamic-Model-Fallback"
-        logger.info(f"Active model for {symbol}: {model_name}")
+        symbol_clean = symbol.upper()
+        chosen_model = self.discover_model_for_symbol(symbol_clean)
+        model_name = chosen_model.name if chosen_model else None
 
         live_ltp_series: List[float] = []
         pred_series: List[float] = []
-        trades: List[Dict[str, Any]] = []
+        rows: List[Dict[str, Any]] = []
 
         for i in range(1, iterations + 1):
-            ltp = fetch_live_ltp(symbol)
-            pred = load_prediction(chosen_model, ltp, i) if chosen_model else round(ltp * 1.001, 2)
-            live_ltp_series.append(ltp)
-            pred_series.append(pred)
+            observed_at = datetime.now(timezone.utc).isoformat()
+            ltp = fetch_live_ltp(symbol_clean)
 
-            action = "BUY" if pred >= ltp else "SELL"
-            expected_alpha_pct = ((pred - ltp) / ltp) * 100.0
-            
-            # If market is closed, skip live PnL execution and record as snapshot
-            if not market_open:
-                gross_pnl = 0.0
-                cost = 0.0
-                net_pnl = 0.0
-                status_label = "MARKET_CLOSED_SNAPSHOT"
-            else:
-                gross_pnl = (pred - ltp) * 50 if action == "BUY" else (ltp - pred) * 50
-                cost = 20.0
-                net_pnl = gross_pnl - cost
-                status_label = "CLOSED"
-
-            trade_entry = {
+            base_row: Dict[str, Any] = {
                 "iteration": i,
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "symbol": symbol,
+                "timestamp": observed_at,
+                "symbol": symbol_clean,
                 "market_status": "OPEN" if market_open else "CLOSED",
-                "live_ltp": ltp,
-                "predicted_price": pred,
-                "signal_action": action,
-                "expected_alpha_pct": round(expected_alpha_pct, 4),
-                "simulated_quantity": 50 if market_open else 0,
-                "gross_pnl": round(gross_pnl, 2),
-                "transaction_costs": cost,
-                "net_pnl": round(net_pnl, 2),
-                "execution_status": status_label,
-                "model_used": model_name
+                "data_source": "dhan",
+                "simulated_quantity": 0,
+                "gross_pnl": 0.0,
+                "transaction_costs": 0.0,
+                "net_pnl": 0.0,
+                "model_used": model_name,
+                "live_trading_enabled": False,
+                "order_placement_allowed": False,
             }
-            trades.append(trade_entry)
-            logger.info(
-                f"Iteration {i}/{iterations} -> Live LTP: {ltp} | Predicted: {pred} | Signal: {action} | "
-                f"Market: {'OPEN' if market_open else 'CLOSED'} | Net PnL: Rs. {net_pnl:.2f}"
-            )
+
+            if ltp is None:
+                rows.append(
+                    {
+                        **base_row,
+                        "execution_status": "DATA_NOT_READY",
+                        "reason": "authoritative Dhan LTP unavailable",
+                        "live_ltp": None,
+                        "predicted_price": None,
+                        "signal_action": "NO_TRADE",
+                    }
+                )
+            elif chosen_model is None:
+                live_ltp_series.append(ltp)
+                rows.append(
+                    {
+                        **base_row,
+                        "execution_status": "MODEL_NOT_READY",
+                        "reason": "no symbol-specific model artifact found",
+                        "live_ltp": ltp,
+                        "predicted_price": None,
+                        "signal_action": "NO_TRADE",
+                    }
+                )
+            else:
+                live_ltp_series.append(ltp)
+                try:
+                    pred = load_prediction(chosen_model, ltp)
+                except ModelNotReady as exc:
+                    rows.append(
+                        {
+                            **base_row,
+                            "execution_status": "MODEL_NOT_READY",
+                            "reason": str(exc),
+                            "live_ltp": ltp,
+                            "predicted_price": None,
+                            "signal_action": "NO_TRADE",
+                        }
+                    )
+                else:
+                    pred_series.append(pred)
+                    expected_alpha_pct = ((pred - ltp) / ltp) * 100.0
+                    action = "BUY" if pred > ltp else "SELL" if pred < ltp else "NO_TRADE"
+                    if not market_open:
+                        status_label = "MARKET_CLOSED_SNAPSHOT"
+                    elif action == "NO_TRADE":
+                        status_label = "NO_TRADE"
+                    else:
+                        status_label = "PAPER_SIGNAL_ONLY"
+                    rows.append(
+                        {
+                            **base_row,
+                            "execution_status": status_label,
+                            "reason": None,
+                            "live_ltp": ltp,
+                            "predicted_price": pred,
+                            "signal_action": action,
+                            "expected_alpha_pct": round(expected_alpha_pct, 4),
+                        }
+                    )
 
             if i < iterations:
                 time.sleep(delay_s)
 
-        # Plot live vs prediction chart using matplotlib
-        self._generate_chart(symbol, live_ltp_series, pred_series, market_open)
+        if live_ltp_series and pred_series and len(live_ltp_series) == len(pred_series):
+            self._generate_chart(symbol_clean, live_ltp_series, pred_series, market_open)
 
-        total_net_pnl = sum(t["net_pnl"] for t in trades)
-        winning_trades = sum(1 for t in trades if t["net_pnl"] > 0)
-        win_rate = (winning_trades / len(trades)) * 100 if (trades and market_open) else 0.0
-
+        ready_predictions = [row for row in rows if row.get("predicted_price") is not None]
         summary = {
-            "symbol": symbol,
+            "symbol": symbol_clean,
             "market_open_ist": market_open,
-            "market_session": "LIVE_TRADING" if market_open else "MARKET_CLOSED_STANDBY",
+            "market_session": "NORMAL_SESSION" if market_open else "MARKET_CLOSED_STANDBY",
             "simulated_at_utc": datetime.now(timezone.utc).isoformat(),
-            "iterations_executed": iterations,
+            "iterations_requested": iterations,
+            "iterations_recorded": len(rows),
             "model_active": model_name,
-            "total_trades": len(trades),
-            "winning_trades": winning_trades,
-            "losing_trades": len(trades) - winning_trades if market_open else 0,
-            "win_rate_pct": round(win_rate, 2),
-            "cumulative_net_pnl": round(total_net_pnl, 2),
-            "chart_saved_path": str(self.chart_file),
+            "prediction_rows_ready": len(ready_predictions),
+            "total_trades": 0,
+            "winning_trades": 0,
+            "losing_trades": 0,
+            "win_rate_pct": 0.0,
+            "cumulative_net_pnl": 0.0,
+            "chart_saved_path": str(self.chart_file) if self.chart_file.exists() else None,
             "live_ltp_series": live_ltp_series,
             "predicted_series": pred_series,
-            "trades": trades
+            "trades": rows,
+            "truth_contract": "REAL_ONLY_FAIL_CLOSED_V1",
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
         }
 
-        with open(self.ledger_file, "w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
-        logger.info(f"Saved live comparison ledger to: {self.ledger_file}")
-
+        self.ledger_file.write_text(json.dumps(summary, indent=2), encoding="utf-8")
         return summary
 
-    def _generate_chart(self, symbol: str, live_ltps: List[float], preds: List[float], market_open: bool):
-        """Generates live vs predicted price comparison chart using matplotlib if available."""
+    def _generate_chart(
+        self,
+        symbol: str,
+        live_ltps: List[float],
+        preds: List[float],
+        market_open: bool,
+    ) -> None:
+        """Generate a comparison chart only from real broker observations + real inference."""
         try:
             import matplotlib
             matplotlib.use("Agg")
@@ -205,36 +274,31 @@ class System3PaperLiveComparator:
 
             plt.figure(figsize=(10, 5), dpi=120)
             iters = list(range(1, len(live_ltps) + 1))
-
-            plt.plot(iters, live_ltps, marker="o", color="#10b981", linewidth=2.5, label=f"Live {symbol} Spot")
-            plt.plot(iters, preds, marker="s", color="#38bdf8", linewidth=2.0, linestyle="--", label=f"Predicted Move ({symbol} ML)")
-
-            status_tag = "LIVE MARKET" if market_open else "MARKET CLOSED (Standby)"
-            plt.title(f"Genesis System3 — Live Spot vs ML Prediction [{status_tag}]", fontsize=13, fontweight="bold", pad=12)
-            plt.xlabel("Iteration (2-sec intervals)", fontsize=10)
+            plt.plot(iters, live_ltps, marker="o", linewidth=2.5, label=f"Dhan {symbol} Spot")
+            plt.plot(iters, preds, marker="s", linewidth=2.0, linestyle="--", label=f"Model prediction ({symbol})")
+            status_tag = "NORMAL SESSION" if market_open else "MARKET CLOSED SNAPSHOT"
+            plt.title(f"Genesis System3 — Broker Spot vs Model Prediction [{status_tag}]", fontsize=13, fontweight="bold", pad=12)
+            plt.xlabel("Observation", fontsize=10)
             plt.ylabel("Price (INR)", fontsize=10)
             plt.grid(True, linestyle=":", alpha=0.6)
-            plt.legend(frameon=True, facecolor="#f8fafc", edgecolor="#cbd5e1")
+            plt.legend(frameon=True)
             plt.tight_layout()
-
             self.chart_file.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(self.chart_file)
             plt.close()
-            logger.info(f"Generated comparison chart at: {self.chart_file}")
         except Exception as exc:
-            logger.debug(f"Matplotlib chart generation skipped: {exc}")
+            logger.debug("Matplotlib chart generation skipped: %s", exc)
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Genesis System3 Paper Trading Live Comparator")
-    parser.add_argument("--symbol", default="NIFTY", help="Underlying index symbol (e.g. NIFTY, BANKNIFTY)")
-    parser.add_argument("--live-loop", type=int, default=5, help="Number of real live loop iterations to run")
-    parser.add_argument("--delay", type=float, default=2.0, help="Delay in seconds between loop iterations")
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Genesis System3 truthful PAPER comparator")
+    parser.add_argument("--symbol", default="NIFTY", help="Underlying index symbol")
+    parser.add_argument("--live-loop", type=int, default=5, help="Number of observations")
+    parser.add_argument("--delay", type=float, default=2.0, help="Delay between observations")
     args = parser.parse_args()
 
     engine = System3PaperLiveComparator()
     result = engine.run_live_loop(symbol=args.symbol, iterations=args.live_loop, delay_s=args.delay)
-
     print(json.dumps(result, indent=2))
 
 
