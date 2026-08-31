@@ -8,8 +8,35 @@ import { resolveFeedQuality } from '../../lib/feedQuality'
 import { SystemHealthDiagnostics } from '../SystemHealthDiagnostics'
 import { SystemProgressPanel } from '../SystemProgressPanel'
 
+const REQUIRED_OPTION_CHAINS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'] as const
+
+function verifiedDhanContracts(chain: Record<string, any> | null | undefined): number {
+  return REQUIRED_OPTION_CHAINS.reduce((total, symbol) => {
+    const payload = chain?.[symbol]
+    if (!payload || typeof payload !== 'object') return total
+
+    const source = String(payload.data_source || payload.source || '').toLowerCase()
+    const priority = String(payload.source_priority || '').toLowerCase()
+    const status = String(payload.status || '').toUpperCase()
+    const dhanBacked = source.includes('dhan') || priority.startsWith('dhan') || priority.includes('worker_push')
+    const staleUnverified = payload.stale === true
+      && !/MARKET_CLOSED|SNAPSHOT/.test(status)
+      && payload.snapshot !== true
+      && payload.live !== false
+    const count = Number(
+      payload.total_contracts
+      ?? payload.contract_count
+      ?? (Array.isArray(payload.contracts) ? payload.contracts.length : 0),
+    )
+
+    return dhanBacked && !staleUnverified && Number.isFinite(count) && count > 0
+      ? total + count
+      : total
+  }, 0)
+}
+
 export const DataIntegrity: React.FC = () => {
-  const { health, brokerConnected, wsStatus, lastSync, brokerStatus, state, deployInfo, marketOpen } = useStore()
+  const { health, brokerConnected, wsStatus, lastSync, brokerStatus, state, deployInfo, marketOpen, chain } = useStore()
   const connected = brokerIsConnected(health, brokerConnected, brokerStatus)
   const recon = String(state?.reconciliation?.status || '').toUpperCase()
   const qc = String(state?.qc?.status || '').toUpperCase()
@@ -22,7 +49,11 @@ export const DataIntegrity: React.FC = () => {
       : []
   const brokerError = String(brokerStatus?.error || state?.broker?.error || '').trim()
   const contractsRaw = state?.qc?.contracts_total
-  const contractsTotal = Number(contractsRaw ?? 0)
+  const qcContractsTotal = Number(contractsRaw ?? 0)
+  const chainContractsTotal = verifiedDhanContracts(chain)
+  const verifiedContractsTotal = Number.isFinite(qcContractsTotal) && qcContractsTotal > 0
+    ? qcContractsTotal
+    : chainContractsTotal
   const derivedBlockers: string[] = []
   if (!connected && (Boolean(marketOpen) || Boolean(brokerError))) {
     derivedBlockers.push(brokerError ? `Broker not connected: ${brokerError}` : 'Broker not connected during market hours')
@@ -30,7 +61,7 @@ export const DataIntegrity: React.FC = () => {
   if (qc && qc !== 'PASS') {
     derivedBlockers.push(`QC ${qc}`)
   }
-  if (contractsRaw == null || !Number.isFinite(contractsTotal) || contractsTotal <= 0) {
+  if (!Number.isFinite(verifiedContractsTotal) || verifiedContractsTotal <= 0) {
     derivedBlockers.push('No verified option contracts')
   }
   const blockers = Array.from(new Set([...explicitBlockers.map((b: any) => String(b)), ...derivedBlockers]))
