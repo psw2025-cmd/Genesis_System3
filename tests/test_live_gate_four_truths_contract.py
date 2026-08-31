@@ -11,21 +11,31 @@ def _text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def test_live_gate_renders_four_independent_truths():
+def test_live_gate_renders_four_independent_truths_from_canonical_sources():
     text = _text(COMPONENT)
     for label in ("Execution Mode", "Owner Sign-off", "Technical Readiness", "LIVE Arming"):
         assert label in text
-    assert 'fetch("/api/live-trading/gate")' in text
+    assert 'fetch("/api/auto_gates")' in text
     assert 'fetch("/api/approval/status")' in text
     assert 'fetch("/api/health")' in text
+    assert 'fetch("/api/live-trading/gate")' not in text
 
 
-def test_owner_signoff_comes_from_owner_approval_endpoint_not_legacy_live_arming_gate():
+def test_owner_signoff_and_live_arming_are_not_inferred_from_each_other():
     text = _text(COMPONENT)
     assert "approval.human_approval === true" in text
-    assert 'LEGACY_LIVE_ARMING_GATE = "human_approved"' in text
-    assert "This is not the same as owner sign-off" in text
-    assert "human approval is recorded, AND LIVE_TRADING_ENABLED" not in text
+    assert "approval.live_trading_env_flip_authorized === true" in text
+    assert "independent of owner development/PAPER sign-off" in text
+    assert "owner sign-off and LIVE arming are never inferred from each other" in text
+
+
+def test_technical_readiness_uses_canonical_auto_gate_denominator():
+    text = _text(COMPONENT)
+    assert "autoGates.gates_passing" in text
+    assert "autoGates.gates_total" in text
+    assert "autoGates.production_live_ready" in text
+    assert "Canonical Technical Readiness Gates" in text
+    assert "open_blockers" in text
 
 
 def test_existing_owner_approval_and_live_arming_remain_separate_and_safe():
@@ -40,9 +50,9 @@ def test_existing_owner_approval_and_live_arming_remain_separate_and_safe():
     assert '"live_trading_env_flip_authorized": bool(gate.get("live_trading_env_flip_authorized"))' in service
 
 
-def test_ui_does_not_modify_or_offer_live_controls():
+def test_ui_is_read_only_and_does_not_offer_live_mutation_controls():
     text = _text(COMPONENT)
     assert "read-only" in text
-    assert "protected Cloud Run operation enables LIVE" in text
+    assert "protected runtime LIVE enablement remain separate controls" in text
     assert "setLive" not in text
     assert "toggle" not in text.lower()
