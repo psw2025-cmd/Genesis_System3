@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from "react"
 
-interface Gate {
-  gate: string
-  passed: boolean
-  detail: string
+interface AutoGate {
+  gate_id?: string
+  pass?: boolean
+  status?: string
+  note?: string
+  blocker_id?: string | null
+  auto_action?: string
 }
 
-interface GateStatus {
-  gate_open: boolean
-  gates: Gate[]
-  summary: string
-  verdict: string
-  message: string
+interface AutoGateStatus {
+  gates?: Record<string, AutoGate>
+  gates_passing?: number
+  gates_total?: number
+  production_live_ready?: boolean
+  technical_gates_still_required?: string[]
+  open_blockers?: string[]
 }
 
 interface ApprovalStatus {
@@ -26,14 +30,12 @@ interface HealthStatus {
   mode?: string
   live_allowed?: boolean
   live_trading_enabled?: boolean
+  live_blockers?: string[]
   safety?: {
     execution_mode?: string
     live_trading_enabled?: boolean
   }
 }
-
-const LEGACY_LIVE_ARMING_GATE = "human_approved"
-const NON_TECHNICAL_GATE_NAMES = new Set(["env_live_disabled", LEGACY_LIVE_ARMING_GATE])
 
 function truthBadge(pass: boolean | null, yes: string, no: string, pending = "CHECKING") {
   if (pass === null) return { label: pending, color: "var(--amber)" }
@@ -41,7 +43,7 @@ function truthBadge(pass: boolean | null, yes: string, no: string, pending = "CH
 }
 
 export function LiveTradingGate() {
-  const [status, setStatus] = useState<GateStatus | null>(null)
+  const [autoGates, setAutoGates] = useState<AutoGateStatus | null>(null)
   const [approval, setApproval] = useState<ApprovalStatus | null>(null)
   const [health, setHealth] = useState<HealthStatus | null>(null)
   const [loading, setLoading] = useState(true)
@@ -50,16 +52,16 @@ export function LiveTradingGate() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [gateResponse, approvalResponse, healthResponse] = await Promise.all([
-          fetch("/api/live-trading/gate"),
+        const [autoGateResponse, approvalResponse, healthResponse] = await Promise.all([
+          fetch("/api/auto_gates"),
           fetch("/api/approval/status"),
           fetch("/api/health"),
         ])
-        if (!gateResponse.ok) throw new Error(`Gate proof unavailable (HTTP ${gateResponse.status})`)
+        if (!autoGateResponse.ok) throw new Error(`Technical readiness proof unavailable (HTTP ${autoGateResponse.status})`)
         if (!approvalResponse.ok) throw new Error(`Owner approval proof unavailable (HTTP ${approvalResponse.status})`)
         if (!healthResponse.ok) throw new Error(`Execution mode proof unavailable (HTTP ${healthResponse.status})`)
 
-        setStatus(await gateResponse.json())
+        setAutoGates(await autoGateResponse.json())
         setApproval(await approvalResponse.json())
         setHealth(await healthResponse.json())
         setError(null)
@@ -75,55 +77,66 @@ export function LiveTradingGate() {
     return () => clearInterval(t)
   }, [])
 
-  const legacyLiveArmingGate = useMemo(
-    () => status?.gates?.find((g) => g.gate === LEGACY_LIVE_ARMING_GATE) ?? null,
-    [status],
-  )
   const technicalGates = useMemo(
-    () => (status?.gates ?? []).filter((g) => !NON_TECHNICAL_GATE_NAMES.has(g.gate)),
-    [status],
+    () => Object.entries(autoGates?.gates ?? {}).map(([name, gate]) => ({
+      name,
+      passed: gate.pass === true,
+      detail: gate.note ?? gate.auto_action ?? gate.blocker_id ?? "No detail supplied",
+      blocker: gate.blocker_id ?? null,
+    })),
+    [autoGates],
   )
-  const technicalReady = status ? technicalGates.length > 0 && technicalGates.every((g) => g.passed) : null
-  const ownerApproved = approval ? approval.human_approval === true : null
-  const liveArmed = approval && legacyLiveArmingGate
-    ? approval.live_trading_env_flip_authorized === true && legacyLiveArmingGate.passed === true
+
+  const technicalReady = autoGates
+    ? autoGates.production_live_ready === true || (
+        Number(autoGates.gates_total ?? 0) > 0 &&
+        Number(autoGates.gates_passing ?? 0) === Number(autoGates.gates_total ?? 0)
+      )
     : null
+  const ownerApproved = approval ? approval.human_approval === true : null
+  const liveArmed = approval ? approval.live_trading_env_flip_authorized === true : null
+  const runtimeLiveEnabled = Boolean(health?.live_trading_enabled ?? health?.safety?.live_trading_enabled ?? health?.live_allowed)
   const executionMode = String(health?.mode ?? health?.safety?.execution_mode ?? "UNKNOWN").toUpperCase()
 
   const ownerBadge = truthBadge(ownerApproved, "APPROVED", "PENDING")
-  const readinessBadge = truthBadge(technicalReady, "PASSED", "PENDING")
+  const readinessBadge = truthBadge(technicalReady, "PASSED", "NOT READY")
   const armingBadge = truthBadge(liveArmed, "ARMED", "NOT ARMED")
+  const overallLabel = runtimeLiveEnabled
+    ? "LIVE ENABLED"
+    : technicalReady
+      ? "PAPER · LIVE TECH READY"
+      : "PAPER · LIVE NOT READY"
 
   const truthCards = [
     {
       title: "Execution Mode",
       value: loading ? "CHECKING" : executionMode,
-      color: executionMode === "LIVE" ? "var(--down)" : "var(--up)",
-      detail: executionMode === "LIVE"
-        ? "Real-order mode. Requires every independent live lock to be satisfied."
-        : "PAPER/ANALYZER execution is separated from real-money LIVE arming.",
+      color: runtimeLiveEnabled ? "var(--down)" : "var(--up)",
+      detail: runtimeLiveEnabled
+        ? "Real-order runtime is enabled. All independent locks must remain satisfied."
+        : "PAPER/ANALYZER runtime is active; broker order placement remains separate and locked.",
     },
     {
       title: "Owner Sign-off",
       value: ownerBadge.label,
       color: ownerBadge.color,
-      detail: approval?.dashboard_reason ?? "Owner approval is read from /api/approval/status, not from the LIVE arming flag.",
+      detail: approval?.dashboard_reason ?? "Owner approval is read only from /api/approval/status.",
     },
     {
       title: "Technical Readiness",
       value: readinessBadge.label,
       color: readinessBadge.color,
-      detail: status
-        ? `${technicalGates.filter((g) => g.passed).length}/${technicalGates.length} live-readiness technical checks passed.`
-        : "Technical gate proof is loading.",
+      detail: autoGates
+        ? `${autoGates.gates_passing ?? 0}/${autoGates.gates_total ?? 0} canonical auto-gates passed${(autoGates.open_blockers ?? []).length ? ` · blockers: ${(autoGates.open_blockers ?? []).join(", ")}` : ""}.`
+        : "Canonical /api/auto_gates proof is loading.",
     },
     {
       title: "LIVE Arming",
       value: armingBadge.label,
       color: armingBadge.color,
       detail: liveArmed
-        ? "Explicit LIVE arming is recorded. Runtime LIVE enablement is still a separate protected operation."
-        : "Expected safe state for PAPER/ANALYZER. This is not the same as owner sign-off.",
+        ? `Owner LIVE arming authorization is recorded. Runtime LIVE enabled=${String(runtimeLiveEnabled)}.`
+        : "Expected safe state for PAPER/ANALYZER. This is independent of owner development/PAPER sign-off.",
     },
   ]
 
@@ -131,18 +144,18 @@ export function LiveTradingGate() {
     <div className="p-6 space-y-6 overflow-y-auto h-full">
       {error && (
         <div className="card p-4" style={{ color: "var(--down)" }}>
-          {error}. LIVE trading remains locked.
+          {error}. Real-money LIVE execution remains locked.
         </div>
       )}
 
-      <div className="card p-4" style={{ borderColor: status?.gate_open ? "var(--up)" : "var(--border)", borderWidth: "2px" }}>
+      <div className="card p-4" style={{ borderColor: runtimeLiveEnabled ? "var(--down)" : "var(--border)", borderWidth: "2px" }}>
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-pri)" }}>
               Execution Truth & Live Gate
             </h2>
             <p style={{ fontSize: ".75rem", color: "var(--text-mut)", marginTop: "4px" }}>
-              Execution mode, owner sign-off, technical readiness and LIVE arming are independent truths.
+              Execution mode, owner sign-off, technical readiness and LIVE arming are four independent truths.
             </p>
           </div>
           <div style={{
@@ -151,14 +164,14 @@ export function LiveTradingGate() {
             fontWeight: 700,
             fontSize: ".8rem",
             fontFamily: "var(--font-mono)",
-            background: status?.gate_open ? "var(--up)" : "var(--surface-3)",
-            color: status?.gate_open ? "#000" : "var(--text-pri)",
+            background: runtimeLiveEnabled ? "var(--down)" : "var(--surface-3)",
+            color: runtimeLiveEnabled ? "#000" : "var(--text-pri)",
           }}>
-            {loading ? "CHECKING" : status?.verdict ?? "UNAVAILABLE"}
+            {loading ? "CHECKING" : overallLabel}
           </div>
         </div>
         <p style={{ marginTop: "8px", fontSize: ".75rem", color: "var(--text-mut)" }}>
-          {status?.message ?? "Loading current live-gate proof..."}
+          Technical readiness comes from the canonical auto-gate evaluator; owner sign-off and LIVE arming are never inferred from each other.
         </p>
       </div>
 
@@ -181,11 +194,11 @@ export function LiveTradingGate() {
       <div className="card" style={{ overflow: "hidden" }}>
         <div style={{ padding: "8px 16px", borderBottom: "1px solid var(--border)", background: "var(--surface-2)" }}>
           <h3 style={{ fontSize: ".75rem", fontWeight: 700, color: "var(--text-pri)", textTransform: "uppercase" }}>
-            Technical / Safety Preconditions
+            Canonical Technical Readiness Gates
           </h3>
         </div>
         {technicalGates.map((g, i) => (
-          <div key={`${g.gate}-${i}`} style={{
+          <div key={`${g.name}-${i}`} style={{
             padding: "12px 16px",
             borderBottom: "1px solid var(--border)",
             display: "flex",
@@ -200,9 +213,11 @@ export function LiveTradingGate() {
                 color: g.passed ? "var(--up)" : "var(--down)",
                 fontFamily: "var(--font-mono)",
               }}>
-                {g.gate}
+                {g.name}
               </div>
-              <div style={{ fontSize: ".7rem", color: "var(--text-mut)", marginTop: "2px" }}>{g.detail}</div>
+              <div style={{ fontSize: ".7rem", color: "var(--text-mut)", marginTop: "2px" }}>
+                {g.detail}{g.blocker ? ` · blocker=${g.blocker}` : ""}
+              </div>
             </div>
           </div>
         ))}
@@ -210,13 +225,7 @@ export function LiveTradingGate() {
 
       <div className="card p-4" style={{ borderColor: "var(--border)" }}>
         <p style={{ fontSize: ".75rem", color: "var(--text-mut)" }}>
-          This public Cloud Run dashboard is read-only. Owner sign-off already recorded for development/PAPER operation does not arm real-money execution. LIVE arming and the protected runtime LIVE enablement remain separate controls.
-        </p>
-      </div>
-
-      <div className="card p-4" style={{ borderColor: "var(--surface-3)" }}>
-        <p style={{ fontSize: ".7rem", color: "var(--text-mut)" }}>
-          <strong>Real-money LIVE execution remains OFF</strong> unless technical readiness passes, owner sign-off is present, explicit LIVE arming is recorded, and the protected Cloud Run operation enables LIVE. Max daily loss protection remains independent.
+          This public Cloud Run dashboard is read-only. Existing owner sign-off covers development/PAPER operation; it does not authorize or enable real-money execution. Explicit LIVE arming and protected runtime LIVE enablement remain separate controls.
         </p>
       </div>
     </div>
