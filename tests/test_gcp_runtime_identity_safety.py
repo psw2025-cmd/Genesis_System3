@@ -153,6 +153,10 @@ class RuntimeSafetyTests(unittest.TestCase):
 
 
 class DeployWorkflowSafetyTests(unittest.TestCase):
+    def test_deploy_triggers_when_runtime_contract_implementation_changes(self):
+        workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+        self.assertIn('- "scripts/gcp_cloud_run_auto_deploy_impl.py"', workflow)
+
     def test_deploy_enables_cache_only_market_top_stream(self):
         deploy = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
         self.assertIn('("MARKET_TOP_MICRO_STREAM", "1")', deploy)
