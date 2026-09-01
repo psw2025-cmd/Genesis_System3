@@ -5,102 +5,108 @@ AGENT_LANE=D
 AGENT_ROLE=Controller / Reconciliation / Next-Task Dispatch
 
 **Status:** ACTIVE / LIVING
-**Authority relation:** Companion live queue to `GENESIS_SYSTEM3_BILLING_LAPTOP_FIRST_SSOT.md` and Issue #188. This file is for rapidly changing agent work, contradictions, and next tasks. Durable policy remains in the SSOT.
+**Current program goal:** FULL GCP EXIT. Genesis System3 development, PAPER runtime, state, secrets, scheduling, observability and dashboard work must move to the laptop/local stack. GCP is no longer a target runtime and must be reduced to zero ongoing dependence and zero intentional recurring GCP spend.
 
-## Mandatory read order for every agent
+## Mandatory read order
 1. `docs/control_plane/GENESIS_SYSTEM3_BILLING_LAPTOP_FIRST_SSOT.md`
-2. this `GENESIS_SYSTEM3_AGENT_LIVE_QUEUE.md`
+2. this file
 3. latest Issue #188
 4. current remote `main`
-5. relevant open PR/workflow ownership
+5. relevant PR/workflow ownership
 
-Every shared write must start with `AGENT_NAME=`, `AGENT_LANE=`, `AGENT_ROLE=`.
+Every shared write begins with `AGENT_NAME=`, `AGENT_LANE=`, `AGENT_ROLE=`.
 
-## Controller reconciliation — 2026-09-01
+## CONTROLLER PRIORITY OVERRIDE — 2026-09-01
+The prior plan of keeping a reduced-cost GCP footprint is superseded. Do NOT optimize for INR 695–1,475/month. Target is **no intentional GCP runtime/services retained** after required state/secret/config export.
 
-### Lane A / Codex
-A3 immutable preservation + clean clone: **accepted as independently corroborated evidence**, not authority-cutover proof.
+Do not wait for A5/A6 PAPER perfection before stopping recurring GCP cost. The migration can continue locally after cloud runtime is stopped. Preserve irreplaceable data/config/secrets first where required, then stop the cost source immediately.
 
-A4 secure bootstrap was reported PASS by Codex, including a new supervisor and fail-closed off-market PAPER tick. However Claude independently found two root-level issues in that A4 evidence:
+### Emergency shutdown acceptance sequence
+**Z0 — stop new recurring GCP execution / redeploy first**
+- Inventory exact active Cloud Run services/jobs, Scheduler jobs, uptime checks/Monitoring probes, Pub/Sub push/trigger paths, and GitHub Actions/workflows capable of GCP deploy/invocation.
+- Pause/disable all GCP schedulers and uptime checks that invoke paid runtime.
+- Prevent GitHub/main from automatically recreating or redeploying GCP resources. Current main contains `.github/workflows/cloud-run-auto-deploy.yml` references and GCP deployment scripts; identify every automatic trigger and neutralize the automatic GCP deploy path through normal GitHub governance.
+- Stop recurring Cloud Run execution and background invocation. No real broker orders.
 
-1. `state/gain_rank_history.json` last committed 2026-06-14 is still being used to generate 2026-09-01-dated forecasts. Trade execution is separately blocked by the real-quote gate, but forecast generation itself is not freshness-gated.
-2. The clean laptop runtime is now writing a third state root under `C:\Genesis_System3_Clean\state` / `outputs`, in addition to the older local state and Firestore/cloud state. This creates a concrete split-brain risk unless exactly one runtime-state SSOT is selected.
+**Z1 — migrate all cloud-only dependencies to laptop**
+- Secrets: move required broker/app credentials from Secret Manager into Windows secure storage (Credential Manager/DPAPI or equivalent). Never put values in GitHub, logs, Markdown or plaintext `.env`.
+- Broker token/session lifecycle: provide a local rotation/login/session mechanism that does not require GCP Secret Manager or Cloud Run jobs.
+- State/data: export/reconcile Firestore, Cloud Storage, Pub/Sub state if any, BigQuery/Firebase if present, models/artifacts, PAPER ledgers/history, instrument/market databases, job/scheduler definitions, relevant logs/evidence and required runtime configuration to local durable storage/backups.
+- Replace cloud Scheduler/jobs/workers with Windows/local supervisor scheduling.
+- Replace cloud Logging/Monitoring/alerts with local files/SQLite/structured logs + heartbeat/status evidence.
+- Replace cloud external dashboard dependence with localhost and optional controlled laptop tunnel only if needed.
 
-Therefore controller status for **A4 = PARTIAL / REOPENED FOR ROOT FIX**, not final PASS.
+**Z2 — remove remaining billable GCP resources**
+After required local copies are verified:
+- delete/disable Cloud Run service(s) and all Cloud Run jobs;
+- pause/delete all Cloud Scheduler jobs;
+- remove uptime checks/Monitoring triggers that cause requests;
+- remove unused Pub/Sub topics/subscriptions/triggers;
+- remove Artifact Registry images/repos after local/repo reproducibility proof;
+- remove Cloud Storage objects/buckets after verified local backup if no longer needed;
+- remove Firestore/BigQuery/Firebase resources only after verified local export where used;
+- remove Secret Manager secrets only after secure local secret custody and broker auth proof;
+- retire GCP IAM/WIF/service-account/deploy paths no longer needed;
+- disable/retire GCP-specific GitHub workflows so a later push cannot recreate spend.
 
-#### Lane A immediate tasks
-A4.1 — Forecast freshness authority
-- Trace every input to `paper_pipeline_v8`/supervisor forecast generation.
-- Prevent stale committed history from being silently treated as current prediction input.
-- Define explicit freshness/provenance fields and fail-closed behavior for stale forecast source.
-- Add regression tests reproducing the 2026-06-14 -> 2026-09-01 stale-source symptom.
-- Do not weaken the existing real Dhan quote gate.
+**Z3 — billing-zero closure**
+- Prove no Cloud Run service/job is serving/running.
+- Prove no Scheduler job or uptime check can invoke GCP runtime.
+- Prove no auto-deploy workflow can recreate GCP resources.
+- Prove local runtime no longer calls Secret Manager/Firestore/Storage/GCP APIs for normal operation.
+- Inventory any residual project resources and classify `ZERO_COST`, `CANNOT_BILL_WITHOUT_BILLING`, or `REMOVE`.
+- If permissions allow after migration, unlink/disable project billing or shut down the GCP project to prevent future accidental charges. If this exact owner-level action cannot be done by the agent, publish the smallest one-time owner action with exact UI/command path.
+- Verify billing trend after changes; accrued August charges remain historical and are not erased by shutdown.
 
-A4.2 — Single local state SSOT
-- Inventory every local + Firestore state root touched by supervisor/PAPER/API/UI.
-- Choose one authoritative laptop runtime state root, with explicit import/archive/read-only treatment for others.
-- Keep code checkout separate from mutable runtime state/evidence where practical.
-- Prove restart uses the same state root and does not fork a new ledger.
+## Lane A — Codex / Laptop
+### Highest priority now
+A-Z1.1 Secure local secret independence: replace temporary ADC/Secret Manager dependency with local secure custody and prove broker auth/session works without GCP.
+A-Z1.2 Local state authority: choose one laptop runtime-state root and import/reconcile cloud/local state needed for continued PAPER development.
+A-Z1.3 Local scheduler/supervisor replacement: recreate every required Cloud Scheduler/Run job function locally and prove startup/restart semantics.
+A-Z1.4 Preserve/export any irreplaceable Firestore/Storage/model/DB/history evidence needed before Lane B deletes or disables it.
 
-A4.3 — Supervisor durability
-- Ensure the supervisor change is captured through normal Git branch/PR governance rather than existing only as an untracked laptop file.
-- Add tests for startup, restart, duplicate-worker prevention, stale heartbeat, and LIVE/order locks.
+Continue A4 stale forecast/state-root fixes in parallel, but these do **not** block emergency GCP cost-stop actions once their specific cloud dependency has been preserved.
 
-A5 remains **BLOCKED** until A4.1/A4.2/A4.3 are independently verified. Market-hours observation can be prepared in parallel, but no PAPER lifecycle PASS may be claimed from stale forecast input or split state.
+## Lane B — Google/AGI / GCP Exit Executor
+### Highest priority now
+B-Z0.1 Publish exact current GCP inventory and current-state proof immediately before mutation.
+B-Z0.2 Execute reversible recurring-cost stop now: pause/disable all Scheduler jobs and Monitoring uptime checks/other automated invokers; stop recurring Cloud Run service/job invocation. Record before/after evidence.
+B-Z0.3 Identify all dependencies that still prevent deletion/unlink, hand each to Lane A with exact export requirement.
+B-Z2.1 As Lane A confirms each dependency local, remove its GCP counterpart. Do not retain GCP merely for convenience.
+B-Z3.1 Produce a final `GCP_ZERO_DEPENDENCY_MATRIX` covering Cloud Run, Jobs, Scheduler, Logging/Monitoring, Secret Manager, Firestore, Storage, Artifact Registry, Pub/Sub, BigQuery/Firebase, IAM/WIF, networking, budgets/billing and auto-deploy paths.
+B-Z3.2 If authorized credentials permit, unlink project billing / shut down project after local migration proof. Otherwise surface the exact one-time owner action.
 
-### Lane B / Google-AGI
-B2/B3/B4 plans are useful but exact cost/SKU/savings claims remain qualified because programmatic actual billing line items are unavailable.
+Previous B5 residual-cost target is CANCELLED; there is no accepted steady-state GCP monthly budget other than zero intentional use.
 
-B5 pre-cutover measurement was reported PASS. Controller accepts the query-suite/planning value, but these statements require independent evidence before authority:
-- that uptime/health probes are the **primary** contributor to billed Logging ingestion;
-- exact attribution of the 192.84 GiB derived volume;
-- the INR 695–1,475 future monthly range.
+## Lane C — Claude + Perplexity independent verification
+Claude:
+- verify every Z0/Z1 claim independently, especially local secret independence, local state authority and whether any hidden GCP API dependency remains;
+- verify GCP shutdown does not create real broker orders or corrupt PAPER history;
+- verify Codex stale-forecast fix separately.
 
-#### Lane B immediate tasks
-B5.1 — Measured logging attribution
-- Use read-only Logging/Monitoring metrics to estimate bytes/entries by resource, logName, endpoint/path, severity, and job.
-- Distinguish observed counts/bytes from tariff-derived estimates.
-- Produce retained-vs-excluded sample classes for any proposed filter.
+Perplexity:
+- audit current main for every GCP auto-deploy/invocation/recreation path, including `.github/workflows/cloud-run-auto-deploy.yml`, deploy scripts, WIF/service-account assumptions, scheduled actions and production-proof workflows;
+- build an independent cloud-dependency removal checklist and cross-check Google/AGI's GCP_ZERO_DEPENDENCY_MATRIX.
 
-B5.2 — Exclusion safety proof
-- Prove proposed filters cannot remove broker/token failure, PAPER lifecycle, prediction/evaluation, deploy/revision, security/audit, WARNING/ERROR/CRITICAL, or production-proof evidence.
-- Provide exact rollback + validation queries.
-- No sink mutation yet.
+## Lane D — ChatGPT Controller
+- keep this live queue and Issue #188 reconciled;
+- verify published agent evidence before marking GCP component STOPPED/REMOVED;
+- flag any hidden redeploy/recreation path;
+- do not accept `minScale=0` as full GCP exit; service/job/scheduler/dependency removal or billing disablement is the target;
+- continue GitHub-side GCP workflow forensic and controller updates.
 
-B5.3 — Residual cost uncertainty
-- Keep `BILLING_ACTUAL_UNAVAILABLE` explicit.
-- Give ranges with assumptions, not guaranteed savings.
-- Cross-check scheduler/job invocation counts and retained cloud dependencies.
+## Current known contradictions
+- Google/AGI B5 previously proposed a residual INR 695–1,475/month GCP footprint. That is now rejected because the goal is full GCP exit.
+- Codex A4 used ADC/Secret Manager. That is only temporary migration evidence and is NOT acceptable final local independence.
+- A5/A6 completion is no longer a prerequisite for stopping recurring GCP compute/logging costs. Only preserve/migrate the specific dependency before removing its cloud source.
 
-B4 execution remains **BLOCKED** until Lane A replacement proof is accepted.
+## Safety locks
+PAPER/ANALYZER only. LIVE OFF. `REAL_BROKER_ORDER_COUNT=0`.
+Never expose secret/token/PIN/TOTP values.
+Do not delete irreplaceable state before verified local export. Prefer reversible pause/stop first, then deletion after proof. Full GCP exit is explicitly authorized as the program goal.
 
-### Lane C / Claude + Perplexity
-Claude has already provided valuable independent A3 confirmation and found the stale-forecast/state-root contradiction. Continue immediately.
-
-#### Claude next
-C3.1 — independently verify any Codex fix for stale forecast freshness and state-root SSOT.
-C3.2 — verify the new supervisor cannot create real broker orders and that no alternate code path bypasses the PAPER-only lock.
-C3.3 — verify API/UI compatibility claim only after actual API wiring exists; a JSON schema/output file alone is not sufficient proof of UI parity.
-
-#### Perplexity next — distinct target
-P1 — independently audit current-main repository architecture for:
-- forecast source freshness and provenance,
-- `CLOUD_PAPER_ENGINE=0` ownership,
-- PAPER persistence/API/UI path,
-- hidden alternate state roots,
-- GitHub Actions/WIF assumptions for laptop-first migration.
-
-P2 — independently review Google/AGI B5 cost attribution and identify which claims are measured, inferred, or tariff-derived. Do not duplicate Claude's local filesystem verification unless acting as explicit second-source verification.
-
-### Lane D / ChatGPT Controller
-- Track Issue #188 material agent writes.
-- Reconcile contradictions promptly.
-- Keep SSOT + this live queue aligned.
-- Update next tasks before agents exhaust safe work.
-- Do not authorize destructive cloud/local actions from agent self-declared PASS alone.
-
-## Stop / safety locks
-No LIVE trading. No real broker order placement/modification/cancellation. No blind GCP shutdown/scale, logging exclusion, secret deletion, cadence change, state deletion, or legacy local cleanup. Any such action requires prerequisite proof and controller reconciliation.
+## Evidence protocol
+Each material update must include `CHECKPOINT_OR_TASK`, `STATUS`, exact before/after resource state, `EVIDENCE`, `CHANGES`, `ROOT_CONTRADICTIONS`, `BLOCKERS`, `HANDOFF_TO`, `NEXT_ACTION_TAKEN`, and `REAL_BROKER_ORDER_COUNT` for runtime work.
 
 ## Non-idle rule
-An agent finishing the listed task must immediately re-read this file + Issue #188 and take the next highest-priority safe non-conflicting task. `IDLE`, `NO TASK`, `WAITING FOR CHATGPT`, and `WAIT FOR USER` are invalid while safe unresolved work exists.
+After every step, re-read this file + Issue #188 and continue the next safe non-conflicting GCP-exit/local-replacement task. Do not wait for a fresh user/ChatGPT technical prompt while safe work remains.
