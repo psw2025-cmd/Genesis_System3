@@ -1,121 +1,132 @@
-# Genesis System3 — Billing Emergency + Laptop-First PAPER Runtime SSOT
+# Genesis System3 — Billing + Laptop-First Controller SSOT
 
-**Authority marker:** `SYSTEM3_BILLING_LAPTOP_FIRST_SSOT_V1`
-**Status:** LIVING DOCUMENT — update whenever evidence, architecture, cost, blockers, or migration state changes.
-**Repository authority:** `psw2025-cmd/Genesis_System3` remote `main`.
-**Coordination:** Issue #188 and owning PR threads.
+**Authority marker:** `SYSTEM3_BILLING_LAPTOP_FIRST_SSOT_V2`
+**Status:** LIVING CONTROLLER DOCUMENT
+**Repository:** `psw2025-cmd/Genesis_System3`
+**Coordination bus:** Issue #188
+**Controller document PR:** #436 until merged
 
-## 1. Goal and controller rule
-The user defines the outcome; agents own technical discovery, downstream-impact analysis, implementation planning, verification, recovery, and proof. Classify dependencies as VERIFIED / TO VERIFY / CONFLICT / RISK / BLOCKER. Do not require the non-coder user to discover technical impacts.
+## 0. Agent bootstrap — READ THIS FIRST
+Every Codex/Google/other execution agent must start here, then read latest Issue #188 and relevant owning PRs. Never trust a stale local copy of this document. Fetch it from GitHub branch `docs/billing-laptop-first-ssot` while PR #436 is unmerged; after #436 merges, fetch it from current `main`.
 
-Current objective: stop unnecessary GCP cost; move development/runtime proof to a clean laptop-first architecture; make Genesis PAPER a complete simulated-trading mode; retain truthful external-agent observability; return to GCP for final deployment only when justified.
+Before work, post/record: AGENT, LANE, START_TIME_UTC, CURRENT_REMOTE_MAIN_SHA, LOCAL_SHA if applicable, CLAIMED_SCOPE, and whether another agent already owns that scope. Never duplicate an active lane unless explicitly assigned independent verification.
 
-## 2. Billing emergency
-August 2026 Cloud Assist analysis reported:
-- Total: INR 21,086.72
-- Cloud Run: INR 10,115.50
-- Cloud Logging: INR 8,002.64
-- Lower-risk projection: about INR 11,499.16 (about INR 9,587.56 / 45.5% saving), pending independent verification.
+At completion, post evidence to Issue #188 and/or owning PR, including exact SHA/timestamp, commands/tests/proof, files changed, unresolved blockers, next recommended action. End with `WAIT FOR CHATGPT`. ChatGPT/controller reviews proof and advances the READY queue. The user should not need to relay technical output between agents.
 
-Cloud Assist also reported that `genesis-system3-web` has persistent memory queues, event listeners and live socket synchronization. Therefore DO NOT switch it to request-based CPU merely for savings unless repository/runtime evidence disproves that dependency.
+## 1. Non-negotiable authority/safety
+- GitHub remote `main` is code authority. Current main must be re-read at every checkpoint; never hard-code an old SHA as permanent truth.
+- Issue #188 is live coordination/status authority.
+- Existing dirty laptop checkouts are evidence/salvage sources, not code authority.
+- Until a deliberate authority cutover is merged/recorded, GCP remains authoritative production and laptop is migration/PAPER-shadow candidate.
+- LIVE remains locked: `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0` unless a future explicit human break-glass changes policy.
+- Never place/modify/cancel real broker orders during this program.
+- Never print/store secret values in GitHub, issues, PRs, reports, screenshots or prompts.
+- No destructive cleanup, secret deletion, GCP shutdown, state deletion, scheduler cadence change, logging exclusion, or authority cutover without prerequisite proof and controller approval.
 
-Priorities: prevent new unnecessary spend; preserve migration/rollback evidence before destructive cleanup; classify every billed resource KEEP / STOP / SCALE-DOWN / ARCHIVE / DELETE-LATER; take zero-functional-impact savings first; treat collector cadence changes (e.g. 1m -> 3m) as functional until proven; investigate Billing Support review/possible goodwill credit without promising it.
+## 2. Goal
+Stop unnecessary GCP spend without losing state/recovery capability; establish a clean laptop-first development/PAPER runtime; prove genuine PAPER lifecycle; preserve external observability; later deploy the exact proven SHA to GCP only when justified.
 
-Payment/bank controls do not erase accrued charges and are not a substitute for stopping billable resources. Do not blindly delete the project, secrets, DBs, artifacts, revisions, logs or broker configuration.
+PAPER acceptance means: real/current market input where available -> strategy/prediction -> candidate -> PAPER-relevant gates -> simulated fill only -> durable authoritative PAPER persistence -> API -> dashboard -> exit -> costed P&L/reconciliation, with broker real-order count zero.
 
-## 3. PAPER vs LIVE — OpenAlgo behavior is benchmark
-### PAPER / Analyzer
-- current market data where available;
-- real strategy/prediction/signal computation;
-- simulated execution only;
-- simulated trade persisted in authoritative PAPER store/DB;
-- entry/exit/qty/price/SL/TP/reason/P&L/lifecycle visible in dashboard/evidence;
-- ZERO broker real-money orders.
+## 3. Billing truth and rules
+Observed August 2026 Cloud Assist baseline:
+- Total INR 21,086.72
+- Cloud Run INR 10,115.50
+- Cloud Logging INR 8,002.64
+- Cloud Run + Logging are the dominant cost drivers.
 
-PAPER is not working merely because forecasts/signals exist. Acceptance requires an end-to-end genuine PAPER lifecycle created by current runtime logic and persisted/displayed truthfully.
+Do not substitute tariff-model estimates for actual billing truth. If Billing Export/API is unavailable, mark detailed line-item cost `BILLING_ACTUAL_UNAVAILABLE` and retain Cloud Assist observed figures as the best observed baseline.
 
-### LIVE
-LIVE is separate broker-directed real-money execution and remains locked/off under existing safety authority until explicit future human break-glass authorization. PAPER debugging must never require LIVE.
+Do not switch `genesis-system3-web` to request-based CPU merely for savings while persistent queues/event listeners/socket/background dependencies remain. Do not blindly scale to zero before laptop replacements, token/state/recovery and observability are proven.
 
-### Gate investigation
-Trace every candidate through `market data -> features -> strategy/prediction -> candidate -> every gate -> PAPER executor -> persistence -> API -> dashboard`. Record gate name/result/reason and whether it belongs to PAPER or LIVE-only. Re-derive the historical "5 of 7 gates" claim from current evidence; never guess the remaining two gates.
+Cost-control order: identify actual billable resources -> preserve state/current+rollback artifacts/secrets -> prove laptop replacements -> stop/scale unnecessary Cloud Run/jobs/schedulers -> reduce genuinely redundant logging without losing PAPER/broker/error/deploy/security/proof evidence -> archive/delete stale resources later -> verify new daily burn -> request Billing Support review/goodwill-credit consideration without promising credit.
 
-## 4. Laptop-first architecture
-During development/PAPER validation:
-`GitHub remote main (code authority) -> clean laptop runtime -> PAPER state -> local dashboard -> controlled observability/proof -> GitHub evidence/coordination`.
+## 4. Verified migration findings to carry forward
+Checkpoint forensics found the active historical laptop checkout dirty/behind and multiple Genesis repos/worktrees. Therefore no bulk cleanup/reset/delete is allowed before salvage reconciliation. Preserve potentially irreplaceable DB/state, PAPER ledgers, market/option data, models, evidence and unique patches; rebuildable venv/node_modules/cache/build artifacts are not automatically migrated.
 
-Laptop PASS is not final GCP production PASS.
+The historical technical seven-gate matrix is distinct from broader LIVE-readiness gates. Stored historical evidence showed 2/7 technical gates, not a reliable current 5/7. Re-derive current gate state from current code/runtime.
 
-Before migration map: exact SHA/branch; runtimes/dependencies; env/config; GCP Secret Manager dependencies (names only, never values); broker credential/token lifecycle and secure local replacement; DB/schema/migrations/state; market data/instruments; schedulers/jobs/collector cadence; models/artifacts; PAPER engine; APIs/backend; frontend; WebSockets/event listeners/queues; alerts; logs/metrics/heartbeats; controlled URLs/tunnels; recovery/backfill; GCP-only IAM/services; startup/shutdown; backup/rollback; retained-GCP cost.
+Current deployment architecture has used `CLOUD_PAPER_ENGINE=0`. This is a P0 architecture question, not permission to flip the flag. Determine the intended single PAPER producer/owner and prove whether another job/service owns execution. Do not manufacture PAPER trades by weakening genuine data/risk gates.
 
-Never put secrets in GitHub, Markdown, screenshots, issues, logs or prompts.
+## 5. Parallel lane ownership
+### LANE A — CODEX / LAPTOP MIGRATION + PAPER FORENSIC
+Codex owns laptop filesystem/runtime evidence, salvage reconciliation, clean-main preparation, secure local runtime design, Windows tasks/processes/recovery, and current-main PAPER execution trace. It must not mutate GCP.
 
-## 5. Laptop outage truth
-Runtime states: `RUNNING`, `OFFLINE`, `RECOVERING`, `INCOMPLETE_GAP`.
-Every proof includes last verified heartbeat/time and exact Git SHA. Power/hang/internet loss means no continuity assumption. Mark the exact gap. Backfill only what data can legitimately reconstruct; otherwise preserve the gap. Recovery: stale heartbeat -> OFFLINE -> restart -> verify code/config/state -> reconcile/backfill -> validate -> RECOVERING -> RUNNING only after proof.
+### LANE B — GOOGLE/AGI / GCP BILLING + CLOUD DEPENDENCY MRI
+Google/AGI owns read-only GCP inventory and billing evidence: Cloud Run services/revisions/jobs, Scheduler, Logging buckets/sinks/exclusions/retention, Artifact Registry, Secret Manager metadata only, Pub/Sub, Firestore, Storage, BigQuery/Firebase status, IAM/WIF metadata, Monitoring/alerts, networking and other billable dependencies. It must not access secret payloads or mutate GCP.
 
-## 6. External-AI observability
-GitHub = code authority + Issue #188 coordination + durable evidence pointers. Laptop = runtime authority during laptop-first phase. Controlled HTTPS endpoint/tunnel may expose dashboard/API while online but no secrets/unsafe controls. Google Drive may archive/synchronize snapshots but is NOT the live coordination authority and does not prove runtime is online.
+### LANE C — CHATGPT CONTROLLER
+ChatGPT owns GitHub remote reconciliation, Issue #188 coordination, PR/workflow evidence, conflict resolution between lanes, this living SSOT, readiness gates, and authorization of next checkpoints. ChatGPT should do all work available through connected tools before asking the user/laptop agents.
 
-Every snapshot: generated-at, runtime state, Git SHA, heartbeat freshness, gap/recovery status, provenance. Stale heartbeat => OFFLINE/UNKNOWN.
+Agents must not overwrite another lane. Cross-lane discoveries are posted as `HANDOFF_TO=<lane>` with evidence.
 
-## 7. Clean clone/local hygiene
-Preferred after forensic preflight: fresh clone from verified remote `main` becomes canonical laptop code runtime. Preserve old checkout read-only until local-only material is classified/salvaged. Do not automatically migrate venv, node_modules, caches, generated logs/builds, duplicate agent folders, temporary downloads or token files.
+## 6. READY QUEUE — Codex
+### A2 — exhaustive salvage/reconciliation (READY)
+Read-only/network-read allowed. Establish current remote main; inventory tracked/untracked changes; group ignored files; inventory all Genesis repos/worktrees and unique commits; inventory local DB/state/models/evidence; secret names+locations only; Windows tasks/processes/ports/resources; resolve intended PAPER owner including `CLOUD_PAPER_ENGINE=0`; produce exact salvage plan. No cleanup/reset/pull/merge/clone/install.
 
-Separate clean clone, runtime-data/state, evidence/backups, and read-only archive. No arbitrary duplicate project folders without purpose/owner/source SHA/cleanup plan.
+PASS requires: meaningful local differences classified; irreplaceable ignored state identified; unique commits reconciled; state stores and split-brain risk mapped; secret custody classified; Windows runtime mapped; current-main PAPER owner question answered; non-destructive salvage plan ready.
 
-## 8. Laptop agent — CHECKPOINT 1 READ-ONLY PROMPT
-```text
-SYSTEM3 LAPTOP-FIRST MIGRATION — CHECKPOINT 1 / READ-ONLY FORENSIC PREFLIGHT
+### A3 — preservation + clean-clone preparation (BLOCKED on A2 controller approval)
+Hash/archive only approved irreplaceable material; preserve old checkouts read-only; create canonical clean clone from freshly verified main only after salvage proof. No arbitrary duplicate folders.
 
-Repository authority is ONLY psw2025-cmd/Genesis_System3 remote main.
-Do not modify, delete, move, clean, reset, checkout, pull, merge, stash, install, rotate credentials, start LIVE trading, deploy, or create a replacement clone yet.
+### A4 — local dependency/bootstrap (BLOCKED on A3)
+Build secure local config/state/broker-token strategy. Prefer Windows secure storage/DPAPI/Credential Manager or temporary Secret Manager via ADC; do not normalize plaintext `.env` secrets and do not create service-account JSON keys. Recreate required schedulers/workers/supervisor/restart behavior.
 
-Goal: produce evidence for ChatGPT controller to decide clean-clone and laptop migration.
+### A5 — genuine PAPER E2E (BLOCKED on A4)
+Prove market -> prediction/signal -> every PAPER gate -> simulated entry -> durable persistence -> API/UI -> exit -> costed P&L/reconciliation. Real broker order count must remain zero.
 
-1. Re-read current repo agent/runbook/authority instructions and latest Issue #188.
-2. Identify every plausible Genesis System3 local checkout/folder. Report absolute path, size, branch, HEAD SHA, remote, ahead/behind if safely obtainable, git status, untracked/ignored footprint and last-modification evidence.
-3. Inventory modified/untracked/local-only files without changing them. Classify SOURCE / CONFIG / SECRET-SENSITIVE / DB-STATE / MODEL / LOG-EVIDENCE / CACHE-BUILD / UNKNOWN.
-4. Identify local DB/state stores, models, instruments, schedulers/tasks/services, environment/config and broker/runtime credential mechanisms. NEVER print secret/token/password/TOTP values; names/locations/metadata only.
-5. Identify dependencies supplied by GCP: Secret Manager names, Cloud Run services/jobs, Scheduler jobs, DB/storage, Artifact Registry, IAM/service identities, URLs, logging/monitoring and other cloud-only assumptions. Do not mutate GCP.
-6. Trace current PAPER path from signal through gates to simulated execution, persistence, API and dashboard. Re-derive any "5 of 7" state rather than trusting history.
-7. Inventory startup/shutdown/recovery requirements and power/internet failure risks.
-8. Identify genuinely local-only material that would be LOST by a fresh clone versus reproducible material.
-9. Recommend but DO NOT execute the smallest salvage set and clean directory structure.
-10. Produce concise evidence with exact timestamps/SHA; redact secrets.
+### A6 — resilience/observability (BLOCKED on A5)
+Prove RUNNING/OFFLINE/RECOVERING/INCOMPLETE_GAP truth, power/process/internet restart, broker token expiry handling, missed schedule/data-gap behavior, backup/restore, heartbeat and controlled external visibility.
 
-End exactly:
-WAIT FOR CHATGPT — NO MUTATION PERFORMED
-```
-Return the complete output to ChatGPT. ChatGPT decides Checkpoint 2.
+## 7. READY QUEUE — Google/AGI
+### B2 — billing truth + dependency MRI (READY)
+Strict read-only. First check whether actual Billing Export/API evidence exists. Never enable APIs or create exports. Reconcile observed August baseline with actual rows if accessible; otherwise state `BILLING_ACTUAL_UNAVAILABLE` and do not invent exact resource costs.
 
-## 9. Sequential checkpoints
-0 GitHub/cloud remote evidence -> 1 laptop read-only forensic -> 2 reconciliation/salvage decision -> 3 preserve required local-only state -> 4 clean clone -> 5 secure local dependencies/config/secrets -> 6 data/runtime bootstrap -> 7 PAPER E2E proof -> 8 outage/recovery proof -> 9 external observability -> 10 evidence-approved GCP cost shutdown/retention -> 11 final GCP redeployment later.
+Inventory current resource configuration and dependency graph. For every resource classify provisional `KEEP_FOR_MIGRATION`, `STOP_AFTER_REPLACEMENT`, `SCALE_AFTER_PROOF`, `ARCHIVE`, `DELETE_LATER`, or `TO_VERIFY`; include dependency, risk, evidence, and prerequisite. Logging analysis must preserve ERROR/WARNING/CRITICAL, broker/token failures, PAPER trade evidence, prediction/evaluation evidence, deployment/revision evidence, security/audit and production-proof failures. Never access Secret Manager payloads.
 
-At each checkpoint: evidence -> controller review -> decision -> next prompt. Local agent must not race through destructive checkpoints.
+### B3 — zero-impact cost candidate plan (BLOCKED on B2 controller review)
+Prepare exact reversible commands/rollback for only evidence-proven zero-functional-impact savings. Do not execute.
 
-## 10. Ownership
-ChatGPT/controller: remote GitHub/Issue/PR/workflow forensics; PAPER gate architecture; reconciliation; maintain this SSOT; prepare sequential prompts; review local evidence and choose next technical action; separate GCP-authority changes; maintain cost/migration/proof/blocker ledger.
+### B4 — laptop-cutover cloud shutdown plan (BLOCKED on A4/A5 + B3)
+Map exact Cloud Run/jobs/schedulers/logging sources that become unnecessary after laptop replacements. Calculate retained-cloud dependency/cost uncertainty and rollback. Do not execute until controller authorizes.
 
-Local agent only when required: actual laptop filesystem/runtime forensics; local-only DB/config/artifact/scheduler discovery; approved migration/bootstrap/tests; laptop-only evidence; stop at `WAIT FOR CHATGPT` boundaries.
+### B5 — post-cutover billing verification (BLOCKED on actual cutover)
+Verify stopped/scaled resources, residual billable inventory, new accrued/daily trend if actual billing data is available, and unexpected cost drivers. Billing Support review/credit request is separate and must not be represented as guaranteed.
 
-## 11. Acceptance
-### Laptop PAPER
-Exact SHA/config; valid market input; strategy/prediction path; candidate + gate trace; simulated trade; authoritative DB persistence; API parity; dashboard parity; lifecycle/P&L progression; broker real-order count zero.
+## 8. State, secret and cloud migration checklist
+Must explicitly reconcile: Secret Manager/broker credentials/token rotation; local secure secret storage/env mapping; broker auth/session/TOTP/token lifecycle; Firestore; Cloud Storage; BigQuery/Firebase if present; local DB/state and backups; Cloud Run services/jobs; Scheduler/background workers; Pub/Sub/queues/events/WebSockets; Logging/Monitoring/alerts; GitHub Actions/WIF/deploy assumptions; Artifact Registry; market/instrument history; models/features/evaluation history; APIs/frontend; controlled external URL; startup/shutdown/recovery/backfill; data gaps; disk/clock/backup failure.
 
-### Cost control
-Current GCP evidence proves unnecessary workloads stopped/reduced, retained resources justified, appropriate alerts/monitoring exist, and required state is preserved.
+No cloud state is considered safely removable until its local replacement and rollback are proven.
 
-### Final production
-Laptop success is not final cloud proof. Final PASS later requires exact-serving-SHA GCP deployment plus independent live URL/UI/API semantic proof.
+## 9. Evidence protocol
+Every agent update uses:
+- `AGENT=`
+- `LANE=`
+- `CHECKPOINT=`
+- `STATUS=PASS|FAIL|BLOCKED|PARTIAL`
+- `START_SHA=` / `END_SHA=` where applicable
+- `EVIDENCE=` exact commands/tests/URLs/artifacts/timestamps (no secrets)
+- `CHANGES=` none or exact paths/resources
+- `BLOCKERS=`
+- `HANDOFF_TO=`
+- `NEXT_RECOMMENDED_ACTION=`
+- `REAL_BROKER_ORDER_COUNT=` when PAPER/runtime work is involved
 
-## 12. Living-document rule
-Update this file for every material new impact: credentials, broker lifecycle, DB/state, cadence, models/data, outages, external observability, costs, architecture, gates or blockers. Record evidence/source; unresolved contradictions remain visible.
+End exactly: `WAIT FOR CHATGPT — <CHECKPOINT> COMPLETE`.
 
-## 13. Immediate next actions
-- [ ] ChatGPT remote forensic of current PAPER gate path and GCP dependencies available from GitHub.
-- [ ] User later handles/authorizes required GCP Billing Console/payment/support actions with kid-level guidance.
-- [ ] When laptop returns, run Checkpoint 1 prompt and return output.
-- [ ] No local cleanup/fresh clone before Checkpoint 1 review.
-- [ ] Stop unnecessary GCP spend while preserving migration/rollback state.
-- [ ] LIVE remains locked/off.
+Do not claim PASS from code/CI alone when runtime/UI/billing proof is required. Stale heartbeat means runtime OFFLINE/UNKNOWN. Laptop PASS is not final GCP production PASS.
+
+## 10. Controller advancement rules
+The controller may give both lanes work in parallel. An agent may execute only checkpoints marked READY for its lane. BLOCKED checkpoints are pre-written so the next work is already visible, but the agent must not self-authorize them. When evidence lands in GitHub, controller reviews it, updates this SSOT/Issue #188, changes checkpoint state, and assigns the next lane work.
+
+Material contradictions remain visible until reconciled. No agent may silently choose one conflicting truth.
+
+## 11. Immediate state
+- Codex: A2 READY.
+- Google/AGI: B2 READY.
+- ChatGPT: continuously reconcile GitHub/Issue/PR evidence and prepare A3/B3 decisions.
+- PR #436 must be rebased/reconciled against current main before merge because its original base is stale. Do not force merge.
+- No GCP shutdown, secret migration, laptop cleanup, fresh-clone cutover, logging exclusion, scheduler cadence change, or LIVE enablement is authorized by this document yet.
+
+## 12. User instruction
+The user should only need to point each agent to this GitHub controller document and tell it to execute its READY lane. Technical results must be posted back to GitHub, not manually relayed by the user.
