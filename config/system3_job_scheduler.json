@@ -359,6 +359,21 @@
       "market_dependent": false,
       "timeout_minutes": 8,
       "description": "Overwrite COMMAND_CENTER.md, ISSUES_ONLY.md, ISSUES_MERMAID.md, TRACKING_CHECKLIST.*, AGENT_OPERATING_OPTIONS.xlsx. Agents should also run this immediately after edits (do not wait for schedule)."
+    },
+    {
+      "id": "local_dhan_token_rotate",
+      "name": "Local Dhan Access Token Rotation (Windows DPAPI vault)",
+      "script": "scripts/local_dhan_token_rotate.py",
+      "args": [],
+      "enabled": true,
+      "type": "interval",
+      "interval_minutes": 5,
+      "schedule_time": "*/5",
+      "timezone": "Asia/Kolkata",
+      "weekdays_only": false,
+      "market_dependent": false,
+      "timeout_minutes": 2,
+      "description": "Local-laptop replacement for the retired GCP genesis-system3-dhan-token-rotate-daily Cloud Scheduler job. Reads/writes the Dhan access token via core.security.windows_secret_vault (DPAPI), never Secret Manager. Rotates only when the current token is missing or has less than DHAN_ROTATE_WHEN_HOURS_LEFT (default 2) hours remaining. Never calls order endpoints."
     }
   ]
 }
