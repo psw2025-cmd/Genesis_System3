@@ -1,447 +1,101 @@
-# agent_policy.yaml — permanent invariants for Genesis System3 autonomous SWE loop
-# Source authority:
-#   - docs/gemini-code-1786899974029.md (user: permanently follow)
-#   - docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md + flowchart image (user: all agents permanently follow)
-
-version: 4
-schema_version: 4
-schema_path: schemas/agent_policy.v4.schema.json
+# agent_policy.yaml — Genesis System3 execution authority and permanent safety invariants
+version: 5
+schema_version: 5
+schema_path: schemas/agent_policy.v5.schema.json
 target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 coordination_bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
 
-autonomous_end_to_end_runbook:
-  authority: SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1
-  doc: docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md
-  role: persistent_self_instruction_and_completion_ledger
-  mandatory_reread_before:
-    - merge_decision
-    - deployment
-    - production_mutation
-    - production_acceptance_or_rollback
-    - issue_or_blocker_closure
-    - final_response
-  chat_memory_satisfies_reread: false
-  require_current_checked_out_copy: true
-  ledger_script: scripts/system3_proof_ledger.py
-  user_design_reference: audit/USER_RECOMMDATION_FOR _AGENT_UPDATE_RUNBOOK
-  solution_matrix: docs/project_control/SYSTEM3_USER_SELECTABLE_SOLUTION_MATRIX.md
-  full_lifecycle_required:
-    - dhan_instruments_and_live_feed
-    - immutable_historical_lake
-    - point_in_time_features_and_labels
-    - leakage_safe_backtest_and_training
-    - ce_pe_equity_multibagger_prediction_lineage
-    - dashboard_chart_text_api_semantic_proof
-    - github_gcp_serving_sha_browser_trace
-  external_strategy_artifact_intake:
-    authority_role: unverified_requirement_and_design_input
-    require_path_size_sha256_completeness: true
-    claim_ledger_required_for: [issue_id, url, sha, service_project_region, percentage, current_state, architecture]
-    claim_classes: [user_requirement, design_proposal, historical_context, currently_verified, contradicted, stale, incomplete_source, unverified]
-    automatable_percentage_is_completion_proof: false
-    referenced_file:
-      path: audit/USER_RECOMMDATION_FOR _AGENT_UPDATE_RUNBOOK/FOR_INFO_FOR_IMPROMENT.txt
-      bytes: 20120
-      sha256: C70E3604A18F7EFE5A72A2CC3E686B17E09FDDC17EE35ED31E1D15CBD6203B31
-      completeness: incomplete_ends_mid_url
-  readiness_control:
-    dependency_dag_fail_closed: true
-    automation_classes: [automatable, automatable_with_guard, user_account_action, human_break_glass_only]
-    live_and_real_orders_class: human_break_glass_only
-  production_sentinel:
-    read_only_observer: true
-    may_call_order_mutation_rotation_or_live_control: false
-    may_redeploy_or_repair_iam: false
-    on_iam_drift: freeze_evidence_and_open_or_update_blocker
-    deduplicate_unchanged_defects: true
-  deployment_supply_chain:
-    github_to_gcp_auth: oidc_workload_identity_federation
-    service_account_json_keys: forbidden
-    require_artifact_digest_revision_sha_mapping: true
-    self_reported_serving_sha_alone_sufficient: false
-    canonical_production_deployer: github_actions_to_gcp
-    alternate_active_deployer_state: split_brain_deployment_risk
-    web_runtime_may_invoke_dhan_rotator: false
-    split_brain_sentinel: SPLIT_BRAIN_DEPLOYMENT_RISK
-    require_single_production_writer: true
-    workflow_actions_must_use_reviewed_full_sha: true
-    workflow_permissions_default: read_only
-    protections:
-      branch: required_exact_head_checks_and_pr_review
-      environment: trusted_ref_and_required_review_when_supported
-      wif_claims: exact_repository_workflow_and_trusted_ref_or_environment
-  recommendation_ledger:
-    schema_version: 1
-    ids: [R01, R02, R03, R04, R05, R06, R07, R08, R09, R10, R11, R12]
-    statuses: [PASS, FAIL, PARTIAL, BLOCKED]
-    required_fields: [id, status, evidence_time_utc, primary_path, alternative_path, evidence, next_action]
-  data_integrity_audit:
-    schema_version: 1
-    mode: read_only
-    preferred_store: immutable_versioned_cloud_storage
-    alternative_store: bigquery_append_only_audit_tables_plus_versioned_cloud_storage
-    public_mutation: forbidden
-  dhan_rotation_governance:
-    authority: dedicated_bounded_rotator_and_scheduler
-    web_runtime_invocation: forbidden
-    refresh_token_mechanism_may_be_invented: false
-    audit_payload: metadata_only
-    metadata: [cadence, attempted_at_utc, completed_at_utc, result, sanitized_error_class, secret_version_reference]
-  iam_recovery:
-    sentinel_can_repair: false
-    audit_log_function_can_grant_roles: false
-    audit_log_function_role: detect_and_queue_only
-    remediation_identity: separate_authenticated_least_privilege_preapproved
-    required_controls: [allowlisted_drift, dry_run_plan, concurrency_lock, before_after_bindings, rollback, immutable_audit]
-    human_gates: [destructive, privilege_expanding, wif_destroying, ambiguous, organization_level]
-  policy_schema_lifecycle:
-    canonical_schema: schemas/agent_policy.v4.schema.json
-    validate_before_merge: true
-    breaking_change_requires_new_major_schema: true
-    migration_and_backward_compatibility_tests: true
-    unknown_future_major: reject
-    silently_drop_unknown_safety_fields: false
-  paper_lifecycle_reconciliation:
-    mode: read_only
-    stages: [signal, prediction, simulated_order, simulated_fill, position, costs, pnl]
-    timestamps: [exchange_event_at, source_observed_at, received_at, simulation_event_at]
-    paper_equals_real_execution: false
-    infer_missing_fills_or_rewrite_records: forbidden
-    material_mismatch_gate: fail_closed
-  paper_telemetry:
-    latency_metrics: [p50, p95, p99, max]
-    reliability_metrics: [sample_count, drops, reconnects, stale, out_of_order]
-  dag_resilience_testing:
-    fail_closed: true
-    primary: [pytest, property_based, state_machine, fault_injection]
-    locust_role: bounded_load_and_latency_only
-    chaos_mesh: only_if_governed_kubernetes_environment_exists
-  master_production_closure:
-    mission: maximum_safely_achievable_production_pass
-    do_not_stop_at_reporting_when_safe_remediation_exists: true
-    gate_ids: [G01, G02, G03, G04, G05, G06, G07, G08, G09, G10, G11, G12, G13, G14, G15, G16, G17, G18, G19]
-    verdicts: [PASS, FAIL, UNPROVEN, NOT_APPLICABLE, BLOCKED_EXTERNAL]
-    stop_states: [STATE_A_VERIFIED, STATE_B_EXTERNAL_BLOCKER, STATE_C_OWNERSHIP_BLOCKER]
-    api_mri:
-      allowlist_from_current_remote_source: true
-      inherited_bulk_list_safe_by_default: false
-      methods: [GET, HEAD]
-      require_bounds_and_recursive_secret_redaction: true
-    repository_deep_mri:
-      source: freshly_fetched_remote_main
-      active_pr_and_issue_188_ownership_check: true
-      string_match_alone_proves_defect: false
-      duplicate_root_cause_lane: forbidden
-    issue_188_coordination:
-      format: RHUI_PROGRESS_V2
-      post_at: [task_start, material_state_change, handoff]
-      deduplicate_unchanged_state: true
-    production_score:
-      formula: freshly_pass_applicable_gates_divided_by_applicable_required_gates
-      unproven_stale_fail_or_blocked_counts_green: false
-      require_numerator_denominator_and_capture_window: true
-    user_result_sections: [GREEN_WORKING, RED_BROKEN, YELLOW_UNPROVEN, FIXED_DURING_RUN, REMAINING_TOP_20, HUMAN_ACTION]
-  generated_visuals_are_design_inspiration_only: true
-  laptop_to_cloud_loop:
-    laptop_role: authorized_read_only_intake
-    processing_location: governed_cloud_jobs
-    git_dataset_policy: manifests_hashes_and_compact_evidence_only
-    historical_validation_can_start_paper_immediately: true
-    historical_validation_replaces_forward_paper: false
-    champion_weights_mutable_in_place: false
-    paper_can_trigger_challenger_retraining: true
-    mri_nodes: [data, features_labels, model, validation_backtest, paper, api_ui, monitoring_improvement, governance]
-  mri_autonomous_scan:
-    objective: full_system_data_model_validation_paper_improvement_scan
-    concern_list_markdown: reports/latest/mri/Concern_List.md
-    concern_list_json: reports/latest/mri/Concern_List.json
-    concerns_required_before_first_commit: true
-    report_material_concerns_before_commit_merge_and_final: true
-    reporting_pauses_routine_work: false
-    paper_start_after_historical_gates: immediate
-    active_champion_in_place_weight_update: forbidden
-    improvement_output: immutable_challenger_or_recalibration
-    rescan_after_material_change: true
-    market_data_authority:
-      primary_live_indian_broker: dhan
-      alternative_sources_role: labeled_research_or_backfill_only
-      alternative_sources_never_masquerade_as_dhan: true
-      candidate_sources: [kaggle, yahoo_finance, nasdaq_data_link_quandl]
-      require_current_license_lineage_and_coverage_check: true
-    compute:
-      selection: profile_then_cpu_gpu_or_compatible_tpu
-      primary_execution: google_cloud
-      fallback_order: [alternate_cloud_node, smaller_cloud_cpu, bounded_laptop_cpu_last_resort]
-      laptop_production_or_paper_serving: false
-      immutable_artifact_sync_only: true
-    paper_latency:
-      websocket_tick_to_observation_p95_target_ms: 1000
-      target_is_slo_not_guarantee: true
-      option_chain_rest_is_separate_cadence: true
-      live_or_hft_authority_granted: false
-    continuous_concern_reporting:
-      scan_each_stage_before_and_after: true
-      immediate_new_or_changed_concern_report: true
-      unresolved_visible_at_transitions_and_final: true
-      repeat_identical_unchanged_messages: false
-      user_acknowledgement_alone_closes_concern: false
-      concern_history_cloud_governed: true
-      compact_summary_in_git: true
-    benchmark_sources:
-      dhan: primary_live_indian_broker_authority
-      bloomberg: licensed_institutional_benchmark_if_entitled
-      kaggle: dataset_specific_research_only
-      nasdaq_data_link_quandl: verify_current_access_license_and_coverage
-      yahoo_finance: labeled_convenience_research_only
-    catalyst_intelligence:
-      market_and_broker_truth: dhan_only
-      official_event_sources: [nse, bse, sebi, rbi, government_releases]
-      editorial_sources_require_current_ml_license: [moneycontrol, economic_times_markets]
-      tradingview_automated_non_display_use_without_separate_license: forbidden
-      educational_taxonomy_only_by_default: [finshots, zerodha_varsity]
-      derived_market_catalysts_source: dhan_timestamped_data
-      categories: [earnings, policy, macro, technical_derived, unusual_volume_derived, insider_or_shareholding_disclosure]
-      point_in_time_and_revision_lineage_required: true
-      price_only_vs_catalyst_ablation_required: true
-      targets: [short_horizon_volatility, directional_bias_with_abstention]
-      large_data_storage: governed_cloud
-      compact_audit_storage: git
-    paid_ai_connector_control_plane:
-      public_dashboard_raw_secret_input: forbidden
-      public_dashboard_mode: read_only_connector_status
-      admin_activation_requires: [authentication, reauthentication, rbac, csrf, audit_log]
-      secret_store: google_secret_manager
-      browser_may_read_secret_payload: false
-      prefer_oauth_wif_short_lived_identity: true
-      oauth_button_requires_documented_provider_support: true
-      api_key_auth_must_not_be_relabelled_oauth: true
-      oauth_flow: authorization_code_with_pkce
-      oauth_server_side_controls: [single_use_state, nonce, session_binding, exact_scopes, issuer_audience_validation, allowlisted_https_redirect, replay_protection]
-      oauth_browser_receives: [opaque_connection_id, sanitized_status]
-      oauth_browser_never_receives: [authorization_code_after_callback, access_token, refresh_token, client_secret]
-      oauth_tokens_server_side_encrypted_only: true
-      oauth_lifecycle_required: [expiry, refresh_rotation, revocation, disconnect, reconsent, incident_invalidation]
-      api_key_provider_setup: authenticated_admin_to_secret_manager_only
-      connector_not_proven_when_official_api_missing: true
-      requested_connectors:
-        bloomberg: exact_licensed_enterprise_product_required
-        tradingview: automated_non_display_disabled_without_separate_license
-        nasdaq_data_link_quandl: dataset_specific_entitlement
-        openai: official_api_nlp_challenger_not_market_authority
-        gemini: official_api_or_vertex_nlp_challenger_not_market_authority
-        claude: official_api_or_cloud_nlp_challenger_not_market_authority
-        perplexity: official_api_research_with_source_verification
-        deepseek: official_api_after_terms_region_privacy_review
-        github_copilot: engineering_orchestration_not_finance_authority
-        google_finance: no_general_api_assumed
-      hot_patch_serving_app_during_market_hours: forbidden
-      predeployed_governed_connector_toggle_during_market_hours: allowed_with_canary_circuit_breaker_and_audit
-      activation_can_enable_live_or_orders: false
-      version_pinned_same_input_evals_required: true
-      prompt_injection_and_exfiltration_tests_required: true
-    cycle_decisions:
-      - continue_collecting
-      - recalibrate
-      - retrain_challenger
-      - data_repair
-      - rollback_champion
-      - abstain
-      - blocked_external
-    nap_required_for_genuine_user_action: true
-    never_request_secret_in_chat: true
+execution_authority:
+  effective_date: 2026-09-01
+  authority_doc: docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md
+  sole_controller: Claude
+  supersedes_conflicting_multi_agent_execution_ownership: true
+  other_agents_default_role: advisory_forensic_verification_only
+  other_agents_may_mutate: false
+  delegated_work_requires:
+    - explicit_claude_delegation
+    - bounded_scope
+    - non_overlapping_ownership
+    - issue_188_coordination
+  claude_owns:
+    - architecture
+    - implementation
+    - debugging
+    - testing
+    - ci_remediation
+    - pull_request_and_merge_sequence
+    - gcp_billing_cleanup
+    - gcp_exit
+    - laptop_migration
+    - runtime_takeover_and_recovery
+    - broker_token_lifecycle
+    - state_data_migration_and_backup_restore
+    - scheduler_job_worker_consolidation
+    - logging_monitoring_cost_control
+    - paper_runtime_validation
+    - final_ui_and_end_to_end_proof
 
-invariants:
-  zero_synthetic_inventions:
-    description: Never fabricate fake prices, synthetic market quotes, or dummy metrics to force green UI.
-    allowed_fallbacks: authenticated snapshot buffers only
-  strict_risk_and_gate_preservation:
-    description: Never weaken, bypass, or lower safety gates, risk limits, or LIVE/order locks.
-    live_trading_enabled: false
-    order_placement_allowed: false
-  test_first_eval_specs:
-    description: For every self-discovered issue, write a failing test in tests/evals/ first; only ship when it passes.
-    path: tests/evals/
+mandatory_reads:
+  - docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md
+  - docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md
+  - agent_policy.yaml
+  - latest_issue_188_coordination
+  - active_pr_ownership
 
-end_to_end_issues_solutions:
-  authority_image: docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png
-  authority_doc: docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md
-  applies_to_agents: [Cursor, Claude, Codex, Gemini, ChatGPT]
-  flow: [issue_found, end_to_end_solution, intermediate_outcome, overall_outcome]
-  rows:
-    - id: 1
-      issue: incomplete_incorrect_intake
-      solution: standardize_intake_and_validation
-    - id: 2
-      issue: unclear_ownership_communication_gaps
-      solution: define_roles_and_communication_plan
-    - id: 3
-      issue: compliance_risks
-      solution: standardize_and_ensure_compliance
-    - id: 4
-      issue: inefficient_review_approval
-      solution: streamline_review_and_approval
-    - id: 5
-      issue: version_control_confusion
-      solution: centralized_document_and_version_control
-    - id: 6
-      issue: manual_repetitive_tasks
-      solution: automate_and_digitize
-    - id: 7
-      issue: lack_of_visibility_tracking
-      solution: realtime_tracking_and_dashboards
-    - id: 8
-      issue: poor_storage_retrieval
-      solution: centralized_secure_repository
-    - id: 9
-      issue: delays_in_authority_signatures
-      solution: stakeholder_enablement_and_human_gates
-    - id: 10
-      issue: poor_post_execution_management
-      solution: post_ship_verify_backlog_and_obligations
-  overall_outcomes:
-    - faster_cycle_time
-    - reduced_risk
-    - lower_costs
-    - better_compliance
-    - improved_stakeholder_satisfaction
-  key_enablers: [people, process, technology, policies, kpis]
-
-preflight_control_plane:
-  authority: SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1
-  doc: docs/PREFLIGHT_CONTROL_PLANE.md
-  script: scripts/system3_preflight_control_plane.py
-  workflow: .github/workflows/system3-preflight-control-plane.yml
-  artifacts:
-    - reports/latest/control_plane/workflow_issue_artifact_snapshot.json
-    - reports/latest/control_plane/NEXT_ACTION.md
-  mandatory_before:
-    - production_relevant_transition
-    - merge_decision
-    - deploy_acceptance
-    - url_acceptance
-    - remediation_handoff
-  inventory:
-    - current_remote_main
-    - all_workflow_latest_runs
-    - active_and_current_relevant_failed_runs
-    - workflow_artifacts
-    - failing_jobs_and_steps
-    - active_pull_requests
-    - recent_open_issues
-    - issue_188_coordination_markers
-  transition_law:
-    ci_green: merge_without_unnecessary_wait
-    merged: check_canonical_deploy
-    deploy_complete: verify_exact_serving_sha_then_new_url_proof
-    url_fail: investigate_and_open_next_remediation_immediately
-    stop_only_for: real_external_dependency_or_genuine_user_approval
-
-continuous_closure:
-  doc: docs/CONTINUOUS_CLOSURE_SYSTEM.md
-  orchestrator: scripts/system3_continuous_closure_orchestrator.py
-  api: /api/continuous_closure
-  ui: Overview ContinuousClosureBoard
-  artifacts:
-    - reports/latest/continuous_closure/summary.json
-    - reports/latest/continuous_closure/resume_state.json
-  phases:
-    - repo_first_scan
-    - multi_source_verify
-    - watchdog
-    - blocker_cards
-    - auto_resume
-  auto_resume_rule: Next session/Automation reads resume_state.json and executes next OPEN card test-first
-
-infinite_gitops_loop:
-  doc: docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md
-  grounding: docs/architecture/META_SOVEREIGN_ARCHITECTURE_GROUNDING.md
-  proof_ledger:
-    script: scripts/system3_proof_ledger.py
-    service: dashboard/backend/proof_ledger_service.py
-    artifact: reports/latest/proof_ledger/ledger.jsonl
-    intent_tick: reports/latest/autonomous_loop/intent_tick.json
-  wait_for_user:
-    routine_engineering: false
-    live_enablement: true
-    order_placement: true
-    gate_threshold_changes: true
-    secret_mint_outside_rotator: true
-  strategy_mutation: code_via_pr_and_evals_only
-  hot_graph_rewrite: false
-  synthetic_metrics: false
+safety:
+  analyze_mode: true
   live_trading_enabled: false
+  system3_live_trading_allowed: false
+  auto_execute_trades: false
+  mode: PAPER_ANALYZER_ONLY
+  real_order_count_required: 0
+  real_order_placement_modification_cancellation_squareoff: forbidden
+  broker_secret_payload_exposure: forbidden
+  service_account_json_keys: forbidden
+  live_enablement_requires_human_break_glass: true
 
-loop:
-  name: AUTONOMOUS-LOOP-GEMINI
-  roles: [Architect, CoreEngineer, QAEvaluator]
-  steps:
-    - preflight_control_plane
-    - crawl_and_backlog
-    - deploy_progress_telemetry_banner
-    - test_first_heal_and_gitops_release
-    - live_verify_sha
-    - continuous_closure_orchestrator
-    - append_proof_ledger_and_intent_tick
-    - remove_banner_only_when_all_gates_ready
+coordination:
+  github_issue_188_is_live_bus: true
+  claude_posts: [task_start, material_state_change, blocker, completion]
+  parallel_overlapping_mutation: forbidden
+  stale_agent_ownership_yields_to_claude: true
+  advisory_agents_may_report_findings: true
 
-ban_list:
-  - invent_spot_prices
-  - force_proof_gate_pass
-  - enable_live_trading
-  - paste_secrets_or_mint_tokens_outside_job
-  - paint_ui_green_without_matching_solution_row
-  - skip_post_execution_live_verify
-  - wait_for_user_on_routine_gitops
-  - mutate_prompt_weights_in_production
-  - claim_zk_or_quantum_proof
-  - enable_live_without_human_gate
-  - skip_fresh_preflight_before_transition
+completion:
+  stop_at_code_or_pr_or_ci: false
+  require_runtime_proof: true
+  require_repo_runtime_authority_reconciled: true
+  require_cost_trigger_inventory: true
+  require_state_data_dependency_reconciliation: true
+  require_broker_lifecycle_proof: true
+  require_startup_recovery_automation_proof: true
+  require_paper_zero_order_proof: true
+  require_truthful_ui_proof: true
+  genuine_external_or_user_only_blocker_must_be_explicit: true
 
-user_action_escalation:
-  authority: SYSTEM3_USER_ACTION_ESCALATION_V2
-  policy: docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md
-  applies_to_agents: [ChatGPT, Codex, Cursor, Claude, Gemini, generic]
-  dashboard_impact_priority:
-    - dashboard_content_and_status_truth
-    - market_data_source_freshness_and_api_ui_parity
-    - broker_option_chain_quote_candle_and_instrument_coverage
-    - predictions_ml_paper_pnl_risk_and_proof_visibility
-    - ci_review_merge_deploy_gcp_browser_and_agent_access
-  execution:
-    continue_unblocked_agent_work: true
-    prioritize_multi_dependency_least_privilege_access: true
-    fastest_safe_option_first: true
-    list_all_materially_distinct_safe_alternatives: true
-  delivery:
-    chat_on_discovery_or_material_change: true
-    verified_connected_mail_on_discovery_or_material_change: true
-    canonical_bus: github_issue_188
-    never_guess_or_commit_private_recipient: true
-    mail_failure_state: MAIL_DELIVERY_BLOCKED
-  tracking:
-    states: [DISCOVERED, NOTIFIED, ACKNOWLEDGED, IN_PROGRESS, PROVEN_COMPLETE, SUPERSEDED]
-    unresolved_actions_never_disappear: true
-    acknowledgement_is_not_completion: true
-    practical_proof_required_to_close: true
-    default_reminder_hours: 6
-    p0_market_session_minimum_reminder_hours: 1
-    deduplicate_key: user_action_id_plus_action_revision
-  required_card_fields:
-    - user_action_id
-    - detected_at
-    - owner
-    - blocked_task_ids
-    - dashboard_impact
-    - mandatory_user_action
-    - optional_acceleration_action
-    - fastest_safe_recommended
-    - safe_alternatives
-    - why_where_click_set_do_not_result_proof_urgency
-    - agent_continues_with
-    - status
-    - next_reminder_at
-  safety:
-    live_trading_enabled: false
-    order_placement_allowed: false
-    secret_values_in_chat_mail_repo: false
-    iam_wif_or_gate_weakening: false
+gcp_exit_billing_control:
+  observed_2026_09_01:
+    asia_south1_scheduler_count: 9
+    schedulers_observed_state: PAUSED
+    prior_collector_cadence: every_minute
+    prior_dhan_rotation_cadence: every_5_minutes
+    containment_is_completion: false
+  required_claude_actions:
+    - preserve_current_high_frequency_scheduler_containment
+    - reconcile_scheduler_contract_with_runtime
+    - prevent_automatic_recreation_of_expensive_triggers
+    - inventory_and_remove_or_migrate_unneeded_gcp_dependencies
+    - reconcile_cloud_run_jobs_services_storage_firestore_pubsub_bigquery_artifacts_logging_monitoring_iam
+    - migrate_required_state_and_secrets_without_exposing_values
+    - prove_backup_and_restore
+    - prove_laptop_runtime_and_broker_recovery
+    - prove_cost_generating_resources_are_absent_or_explicitly_required
+  high_frequency_scheduler_resume_without_reconciled_ssot: forbidden
+
+evidence:
+  current_evidence_over_historical_claims: true
+  chat_memory_is_not_runtime_proof: true
+  exact_source_sha_required: true
+  production_or_selected_runtime_semantic_proof_required: true
+  ui_and_api_parity_required: true
+  broker_source_freshness_truth_required: true
