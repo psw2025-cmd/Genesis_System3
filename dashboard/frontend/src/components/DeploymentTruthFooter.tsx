@@ -4,7 +4,7 @@ import { shortSha, formatIstStamp } from '../lib/formatLive'
 export function DeploymentTruthFooter() {
   const { deployInfo, health, marketOpen, lastSync } = useStore()
   const sha = String(deployInfo?.git_sha || '')
-  const target = String(deployInfo?.deploy_target || 'gcp-cloud-run')
+  const target = String(deployInfo?.deploy_target || 'unknown')
   const region = String(deployInfo?.region || 'asia-south1')
 
   return (

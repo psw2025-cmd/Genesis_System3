@@ -6,11 +6,11 @@ export function TruthStrip() {
   const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo } = useStore()
   
   // Authoritative live deployed SHA resolution (never hardcoded fallback)
-  const deploySha = deployInfo?.git_sha 
-    || (state as any)?.deployment_sha 
-    || (state as any)?.git_sha 
-    || (health as any)?.git_sha 
-    || '7b26b87'
+  const deploySha = deployInfo?.git_sha
+    || (state as any)?.deployment_sha
+    || (state as any)?.git_sha
+    || (health as any)?.git_sha
+    || ''
     
   const isLive = marketOpen && brokerConnected
 
@@ -32,7 +32,7 @@ export function TruthStrip() {
         <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">SERVING:</span>
           <span className="font-mono text-sky-400 font-bold">
-            {String(deploySha).slice(0, 7)}
+            {deploySha ? String(deploySha).slice(0, 7) : '—'}
           </span>
         </div>
 
