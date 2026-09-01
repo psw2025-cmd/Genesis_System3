@@ -1,7 +1,7 @@
 # agent_policy.yaml — Genesis System3 execution authority and permanent safety invariants
 version: 5
-schema_version: 4
-schema_path: schemas/agent_policy.v4.schema.json
+schema_version: 5
+schema_path: schemas/agent_policy.v5.schema.json
 target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 coordination_bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
 
