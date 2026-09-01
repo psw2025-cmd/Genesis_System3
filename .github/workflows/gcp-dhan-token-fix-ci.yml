@@ -1,32 +1,11 @@
 name: GCP Dhan Token Fix CI
 
 on:
-  push:
-    branches:
-      - main
-      - "fix/gcp-dhan-token-rotation-ui-proof-*"
-      - "fix/br1-dhan-rejection-backoff"
-      - "fix/br1-current-main-rebuild-*"
-    paths:
-      - "core/brokers/dhan/**"
-      - "core/utils/env_loader.py"
-      - "scripts/start_cloud_run.py"
-      - "scripts/gcp_dhan_token_rotation_job.py"
-      - "scripts/gcp_cloud_run_auto_deploy.py"
-      - "scripts/gcp_failed_revision_forensic.py"
-      - "scripts/codespace_startup.sh"
-      - "scripts/cloud_worker.py"
-      - "scripts/system3_self_healing_watchdog.py"
-      - "dashboard/backend/**"
-      - "dashboard/frontend/**"
-      - "deploy/gcp/bootstrap_github_wif.sh"
-      - "tests/test_gcp_dhan_token_rotation_contract.py"
-      - "tests/test_gcp_rotator_identity_contract.py"
-      - "tests/test_dhan_single_token_authority.py"
-      - "tests/test_br1_dhan_auth_reliability.py"
-      - "tests/test_broker_auth_permanent_fix.py"
-      - ".github/workflows/cloud-run-auto-deploy.yml"
-      - ".github/workflows/gcp-dhan-token-rotation.yml"
+  # GCP-EXIT NOTE (2026-09-01): automatic push-to-main trigger removed so a
+  # normal merge cannot invoke/recreate GCP dependencies while the owner is
+  # exiting Google Cloud. pull_request checks are unchanged (PR-scoped CI,
+  # not a main-push GCP invocation). See Issue #188 / A-GCP-KILL.
+  workflow_dispatch:
   pull_request:
     paths:
       - "core/brokers/dhan/**"

@@ -1,8 +1,9 @@
 name: Full Cloud Audit and Forensic Consensus
 
 on:
-  push:
-    branches: [main]
+  # GCP-EXIT NOTE (2026-09-01): automatic push trigger removed — this audit
+  # calls live GCP on every push; a normal main push must not invoke GCP.
+  # Manual only now. See Issue #188 / A-GCP-KILL.
   workflow_dispatch:
 
 permissions:

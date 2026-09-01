@@ -3,30 +3,14 @@ name: Cloud Run Auto Deploy
 # GitHub is the code source; Google Cloud is the runtime and scheduler.
 # PAPER/ANALYZER dashboard reads are public. LIVE remains locked OFF and
 # unauthenticated mutation requests remain fail-closed in backend policy.
+#
+# GCP-EXIT NOTE (2026-09-01): the automatic push trigger is intentionally
+# removed. The owner is exiting Google Cloud to stop recurring billing while
+# unemployed; a normal `git push` to main must not be able to redeploy/
+# recreate Cloud Run resources. This workflow is kept, unmodified below,
+# for a deliberate future manual redeploy (`workflow_dispatch`) if the owner
+# ever decides to resume the GCP runtime. See Issue #188 / A-GCP-KILL.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "dashboard/**"
-      - "core/**"
-      - "scripts/gcp_worker_job.py"
-      - "scripts/smoke_ml_validate_e2e.py"
-      - "scripts/start_cloud_run.py"
-      - "scripts/gcp_dhan_token_rotation_job.py"
-      - "scripts/gcp_cloud_run_auto_deploy.py"
-      - "scripts/gcp_cloud_run_auto_deploy_impl.py"
-      - "scripts/gcp_runtime_iam_preflight.py"
-      - "scripts/gcp_failed_revision_forensic.py"
-      - "scripts/gcp_runtime_evidence.py"
-      - "scripts/gcp_public_dashboard_runtime_proof.py"
-      - "scripts/gcp_mutation_policy_runtime_proof.py"
-      - "scripts/gcp_runtime_identity_safety.py"
-      - "scripts/sync_dhan_instruments_master.py"
-      - "src/**"
-      - "config/**"
-      - "deploy/gcp/**"
-      - ".github/workflows/cloud-run-auto-deploy.yml"
-      - ".github/workflows/gcp-dhan-token-rotation.yml"
   workflow_dispatch:
   workflow_call:
 
