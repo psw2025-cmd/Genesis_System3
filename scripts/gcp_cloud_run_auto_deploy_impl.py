@@ -85,7 +85,10 @@ SAFE_ENV = (
     ("MEM_LIMIT_MB", "960"),
     ("MEM_WARN_MB", "700"),
     ("MEM_GC_MB", "850"),
-    ("MARKET_TOP_MICRO_STREAM", "0"),
+    # Rank the already-paced option-chain cache for the Signals/Market Top WS
+    # board. This loop performs no additional Dhan option-chain fan-out; keeping
+    # it disabled leaves the market-hours UI permanently at 0 rows.
+    ("MARKET_TOP_MICRO_STREAM", "1"),
     ("SYSTEM3_PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),
     ("SYSTEM3_API_BASE", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),
     ("PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app"),

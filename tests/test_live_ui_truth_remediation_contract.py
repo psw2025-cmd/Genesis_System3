@@ -191,6 +191,30 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("source=dhan", _chain_metadata_line(sample, "NIFTY"))
         self.assertEqual(_chain_source_value(sample, "BANKNIFTY"), "csv")
 
+    def test_chain_source_parser_accepts_provenance_after_full_header_controls(self):
+        sample = "\n".join(
+            [
+                "SYMBOL NIFTY",
+                "SPOT 24,077.50",
+                "PCR 1.02",
+                "CONTRACTS 159",
+                "STRIKES 105",
+                "VISIBLE",
+                "ALL STRIKES (105)",
+                "+/-5 ATM",
+                "+/-10 ATM",
+                "+/-20 ATM",
+                "+/-40 ATM",
+                "2026-09-01",
+                "2026-09-08",
+                "2026-09-15",
+                "symbol NIFTY · source=dhan_p0_live · status=MARKET_OPEN · complete_chain=true",
+                "CE OI CE LTP STRIKE PE LTP PE OI",
+            ]
+        )
+        self.assertEqual(_chain_source_value(sample, "NIFTY"), "dhan_p0_live")
+        self.assertIn("complete_chain=true", _chain_metadata_line(sample, "NIFTY"))
+
     def test_chain_source_parser_rejects_explicit_non_dhan_sources(self):
         for source in ["csv", "synthetic", "yahoo", "mock", "fake"]:
             sample = f"status=ok · symbol NIFTY · source={source} · contracts=100 · strikes=50"
