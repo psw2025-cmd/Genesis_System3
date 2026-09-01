@@ -1,7 +1,7 @@
 name: Cloud Run Auto Deploy
 
 # GitHub is the code source; Google Cloud is the runtime and scheduler.
-# PAPER/ANALYZER dashboard reads are public. LIVE remains locked OFF and
+# PAPER dashboard reads are public. LIVE remains locked OFF and
 # unauthenticated mutation requests remain fail-closed in backend policy.
 on:
   push:
@@ -12,6 +12,7 @@ on:
       - "scripts/gcp_worker_job.py"
       - "scripts/smoke_ml_validate_e2e.py"
       - "scripts/start_cloud_run.py"
+      - "scripts/cloud_paper_engine.py"
       - "scripts/gcp_dhan_token_rotation_job.py"
       - "scripts/gcp_cloud_run_auto_deploy.py"
       - "scripts/gcp_runtime_iam_preflight.py"
@@ -43,8 +44,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
-      # Canonical runtime contract: REQUIRE_API_KEY=false.
+      # Canonical web runtime: autonomous PAPER simulation; LIVE remains independently locked OFF.
       REQUIRE_API_KEY: "false"
+      ANALYZE_MODE: "0"
+      SYSTEM3_MODE: "PAPER"
+      CLOUD_PAPER_ENGINE: "1"
+      AUTO_EXECUTE_TRADES: "1"
+      LIVE_TRADING_ENABLED: "0"
+      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
       GOOGLE_CLOUD_PROJECT: system3-openalgo-safe
       GCP_REGION: asia-south1
       GCP_CLOUD_RUN_SERVICE: genesis-system3-web
@@ -84,7 +91,7 @@ jobs:
       - name: Static safety and syntax gates
         run: |
           python -m compileall -q core dashboard scripts
-          python -m unittest -q tests.test_gcp_runtime_identity_safety
+          python -m unittest -q tests.test_gcp_runtime_identity_safety tests.test_cloud_run_startup_deploy_contract
           python - <<'PY'
           from pathlib import Path
           required = {
@@ -98,6 +105,8 @@ jobs:
               "scripts/gcp_public_dashboard_runtime_proof.py": "PUBLIC_DASHBOARD_RUNTIME_PROOF",
               "scripts/gcp_mutation_policy_runtime_proof.py": "MUTATION_POLICY_RUNTIME_PROOF",
               "scripts/gcp_runtime_identity_safety.py": "CLOUD_RUNTIME_SAFETY_OK",
+              "scripts/cloud_paper_engine.py": "paper_runtime_contract_invalid",
+              "scripts/start_cloud_run.py": "system3-cloud-paper-engine",
               "dashboard/frontend/src/App.tsx": "public/read-only",
               "dashboard/backend/security_policy.py": "PUBLIC_DASHBOARD_READ_ONLY",
               "dashboard/backend/mutation_policy.py": "LIVE_MUTATION_LOCKED",
@@ -109,6 +118,15 @@ jobs:
           assert 'LIVE_TRADING_ENABLED"] = "0"' in Path("scripts/gcp_dhan_token_rotation_job.py").read_text()
 
           workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
+          for marker in (
+              'ANALYZE_MODE: "0"',
+              'SYSTEM3_MODE: "PAPER"',
+              'CLOUD_PAPER_ENGINE: "1"',
+              'AUTO_EXECUTE_TRADES: "1"',
+              'LIVE_TRADING_ENABLED: "0"',
+              'SYSTEM3_LIVE_TRADING_ALLOWED: "0"',
+          ):
+              assert marker in workflow, f"missing web PAPER runtime marker: {marker}"
           legacy_sa_key_name = "GCP_" + "SA_KEY"
           legacy_credentials_field = "credentials_" + "json"
           legacy_auth_hits = [
@@ -165,6 +183,15 @@ jobs:
           )
 
           deployer = Path("scripts/gcp_cloud_run_auto_deploy.py").read_text(encoding="utf-8")
+          for marker in (
+              '"ANALYZE_MODE": "0"',
+              '"SYSTEM3_MODE": "PAPER"',
+              '"CLOUD_PAPER_ENGINE": "1"',
+              '"AUTO_EXECUTE_TRADES": "1"',
+              '"LIVE_TRADING_ENABLED": "0"',
+              '"SYSTEM3_LIVE_TRADING_ALLOWED": "0"',
+          ):
+              assert marker in deployer, f"missing canonical deploy PAPER marker {marker}"
           assert '("REQUIRE_API_KEY", "false")' in deployer
           assert '("SYSTEM3_STATE_BACKEND", "firestore")' in deployer
           assert '("SYSTEM3_STATE_BACKEND_REQUIRED", "1")' in deployer
@@ -521,9 +548,13 @@ jobs:
           if not path.is_file(): raise SystemExit("GCP_RUNTIME_EVIDENCE_MISSING")
           report=json.loads(path.read_text(encoding="utf-8")); safety=report.get("safety") or {}; failures=[]
           if not report.get("source_matches_deployment"): failures.append("source_matches_deployment=false")
-          if not safety.get("analyze_mode"): failures.append("analyze_mode=false")
+          if not safety.get("paper_mode"): failures.append("paper_mode=false")
+          if not safety.get("cloud_paper_engine"): failures.append("cloud_paper_engine=false")
+          if not safety.get("auto_execute_trades"): failures.append("auto_execute_trades=false")
+          if not safety.get("auto_execute_is_paper_only"): failures.append("auto_execute_is_paper_only=false")
+          if not safety.get("live_locks_ok"): failures.append("live_locks_ok=false")
           if not safety.get("dashboard_public_readonly"): failures.append("dashboard_public_readonly=false")
-          for key in ("live_trading_enabled","system3_live_trading_allowed","auto_execute_trades","secret_payloads_exposed","api_key_required","api_key_mounted","api_key_plaintext_exposed"):
+          for key in ("live_trading_enabled","system3_live_trading_allowed","secret_payloads_exposed","api_key_required","api_key_mounted","api_key_plaintext_exposed"):
               if safety.get(key): failures.append(f"{key}=true")
           if report.get("secret_values_exposed"): failures.append("secret_values_exposed=true")
           print("GCP_RUNTIME_LOCK", {"lock_result":report.get("lock_result"),"source_matches_deployment":report.get("source_matches_deployment"),"operational_blockers":report.get("blockers")})
