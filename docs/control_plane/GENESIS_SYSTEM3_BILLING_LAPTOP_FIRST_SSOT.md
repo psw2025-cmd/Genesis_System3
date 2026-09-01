@@ -1,13 +1,13 @@
 # Genesis System3 — Billing + Laptop-First Controller SSOT
 
-**Authority marker:** `SYSTEM3_BILLING_LAPTOP_FIRST_SSOT_V3`
+**Authority marker:** `SYSTEM3_BILLING_LAPTOP_FIRST_SSOT_V4`
 **Status:** LIVING CONTROLLER DOCUMENT
 **Repository:** `psw2025-cmd/Genesis_System3`
 **Coordination bus:** Issue #188
 **Controller document PR:** #436 until merged
 
 ## 0. Permanent bootstrap — every agent gets the SAME prompt
-Every Codex / Google-AGI / Claude / future agent must start by reading this document from GitHub, then latest Issue #188, current remote `main`, relevant open PR ownership, and its own platform/repo instructions. Never trust a stale local copy.
+Every Codex / Google-AGI / Claude / Perplexity / future agent must start by reading this document from GitHub, then latest Issue #188, current remote `main`, relevant open PR ownership, and its own platform/repo instructions. Never trust a stale local copy.
 
 While PR #436 is unmerged, fetch this document from branch `docs/billing-laptop-first-ssot`. After merge, fetch it from current `main`.
 
@@ -25,6 +25,16 @@ If intermediate evidence exposes a base/root problem, STOP downstream dependent 
 Before substantive work publish/record: `AGENT`, `LANE`, `START_TIME_UTC`, `CURRENT_REMOTE_MAIN_SHA`, `LOCAL_SHA` if applicable, `CLAIMED_SCOPE`, `CONFLICT_CHECK`.
 
 After each material milestone publish evidence to Issue #188 and/or owning PR so other agents and ChatGPT can consume it without the user carrying reports manually.
+
+## 0A. Mandatory agent identity on every write
+Every agent-generated GitHub issue comment, PR comment/review, commit/PR body, controller status update, handoff, report, artifact manifest, or other shared coordination write MUST visibly identify the generating agent at the top.
+
+Required header:
+- `AGENT_NAME=` exact human-readable agent identity, e.g. `Codex CLI`, `Google/AGI`, `Claude`, `Perplexity`, `ChatGPT Controller`.
+- `AGENT_LANE=` current lane, e.g. `A`, `B`, `C`, `D`, or explicitly claimed verification sublane.
+- `AGENT_ROLE=` short role, e.g. `Laptop/PAPER`, `GCP Billing`, `Independent Verifier`, `Controller`.
+
+Never post a shared coordination update anonymously or only under the GitHub account name `psw2025-cmd`; all agents share that account surface, so explicit identity is mandatory for humans and other agents to know who produced the evidence. If an old comment lacks identity, do not rewrite history unless necessary; reference it with its comment ID and state which agent is now validating it.
 
 ## 1. Non-negotiable authority and safety
 - GitHub remote `main` is code authority. Re-read it at each material checkpoint; do not hard-code an old SHA as permanent truth.
@@ -85,11 +95,11 @@ Primary scope: laptop filesystem/runtime evidence, salvage reconciliation, clean
 ### LANE B — GOOGLE/AGI / GCP BILLING + CLOUD DEPENDENCY
 Primary scope: billing/cloud inventory, Cloud Run/services/jobs/Scheduler/Logging/Artifact Registry/Secret Manager metadata/PubSub/Firestore/Storage/BigQuery/Firebase/IAM-WIF/Monitoring/network dependency evidence and cost-reduction design. Secret payload access prohibited.
 
-### LANE C — CLAUDE / INDEPENDENT VERIFICATION + GAP FINDER
-Primary scope: independently cross-check Lane A/B claims against current GitHub/main/Issue #188/repo architecture; identify contradictions, missed downstream impacts, unsafe assumptions, stale evidence, PR/workflow conflicts, and the smallest verification/fix. Do not duplicate or overwrite active A/B write surfaces. If a separate safe implementation lane is clearly unowned, claim it in #188 first.
+### LANE C — CLAUDE + PERPLEXITY / INDEPENDENT VERIFICATION + GAP FINDER
+Primary scope: independently cross-check Lane A/B claims against current GitHub/main/Issue #188/repo architecture; identify contradictions, missed downstream impacts, unsafe assumptions, stale evidence, PR/workflow conflicts, and the smallest verification/fix. Claude and Perplexity MUST not duplicate each other blindly: each claims a distinct verification target or clearly labels independent second-source verification. Do not overwrite active A/B write surfaces. If a separate safe implementation lane is clearly unowned, claim it in #188 first.
 
 ### LANE D — CHATGPT CONTROLLER
-ChatGPT owns connected-GitHub reconciliation, Issue #188 dispatch, PR/workflow evidence, conflict resolution, SSOT maintenance, gate decisions and next-priority design. ChatGPT is not a continuously running daemon and cannot see unpublised laptop/CLI screens. Therefore agent continuity MUST NOT depend on a fresh ChatGPT message; the non-idle loop above is mandatory.
+ChatGPT owns connected-GitHub reconciliation, Issue #188 dispatch, PR/workflow evidence, conflict resolution, SSOT maintenance, gate decisions and next-priority design. ChatGPT is not a continuously running daemon and cannot see unpublished laptop/CLI screens. Therefore agent continuity MUST NOT depend on a fresh ChatGPT message; the non-idle loop above is mandatory.
 
 Cross-lane discoveries use `HANDOFF_TO=` with evidence. Agents may independently verify another lane but must label it verification, not ownership takeover.
 
@@ -98,10 +108,10 @@ Cross-lane discoveries use `HANDOFF_TO=` with evidence. Agents may independently
 If not already fully proven, continue until all meaningful tracked/untracked/ignored differences, all Genesis repos/worktrees/unique commits, high-value DB/state/models/evidence, secret locations (names only), Windows tasks/processes/ports, and current PAPER owner are reconciled. Network read/fetch allowed. No blind cleanup/reset/pull/merge/install.
 
 ### A3 — immutable preservation + clean clone
-When A2 evidence is sufficient and no contradiction remains: verify free disk space; create immutable/hash manifest of approved irreplaceable material and unique patches; preserve legacy repos read-only; create a NEW canonical clean clone from freshly verified remote main. Do not delete old evidence.
+Reported PASS in Issue #188 by the agent identifying itself there as `Codex / Laptop Agent`: immutable archive + manifest created, clean exact-main worktree created, legacy evidence preserved. Controller must still independently inspect proof quality and downstream A4 assumptions; PASS does not authorize cloud cutover or deletion.
 
-### A4 — secure local bootstrap
-Establish separate code/state/evidence roots; secure secret mechanism using Windows secure storage/DPAPI/Credential Manager or temporary Secret Manager via ADC; no plaintext secret normalization and no new long-lived service-account JSON keys. Recreate required local workers/schedules/supervisor/restart semantics and explicit runtime authority metadata.
+### A4 — secure local bootstrap — NEXT FOR LANE A
+Establish separate code/state/evidence roots; secure secret mechanism using Windows secure storage/DPAPI/Credential Manager or temporary Secret Manager via ADC; no plaintext secret normalization and no new long-lived service-account JSON keys. Recreate required local workers/schedules/supervisor/restart semantics and explicit runtime authority metadata. Verify that restored model/DB files do not make the canonical clean code tree misleadingly dirty without an explicit runtime-data separation plan.
 
 ### A5 — genuine PAPER proof
 Trace and prove market data -> features/model/strategy -> candidate -> every PAPER-relevant gate -> real quote/contract eligibility -> simulated entry -> durable ledger/state -> API/UI -> exit -> costed P&L/reconciliation. `REAL_BROKER_ORDER_COUNT=0` mandatory.
@@ -115,30 +125,26 @@ When any A-step completes, immediately re-read current truth and take the next s
 ### B2 — billing truth + dependency MRI
 Reported complete in Issue #188. Re-open only if fresh evidence contradicts it.
 
-### B3 — reversible cost-reduction design — NOW READY
-Prepare, but do not blindly execute, an exact candidate-by-candidate plan. For Logging, first measure which log classes/paths/resources actually drive ingestion; separate request access logs from application/PAPER/broker/deploy/audit logs; propose narrowly scoped filters; show examples of logs retained vs excluded; quantify savings as ranges/uncertainty rather than claiming full August Logging cost disappears. Include exact commands, rollback commands, validation queries and stop conditions.
-
-Also identify zero-impact savings candidates such as stale images/artifacts or obsolete revisions, but preserve current serving and rollback images. Secret version cleanup is only a proposal and must preserve current/active/rollback broker-token versions.
+### B3 — reversible cost-reduction design
+Reported PASS in Issue #188. Controller acceptance is conditional: the design is useful, but any exact savings/SKU/volume assertions remain estimates unless backed by direct metered billing/logging evidence. No logging exclusion execution is authorized by B3 PASS alone.
 
 ### B4 — cutover shutdown plan
-In parallel where read-only evidence allows, prepare the future exact Cloud Run/job/scheduler stop/scale sequence, prerequisites, rollback and residual-cost inventory. Execution remains blocked until Lane A replacement proof is complete.
+Reported PASS in Issue #188 as a plan. Treat it as planning evidence only. Execution remains blocked until Lane A A4/A5/A6 replacement proof and controller reconciliation are complete. No GCP shutdown/scale action is authorized by B4 PASS.
 
-### B5 — post-cutover billing verification
-After authorized cutover, verify actual resource state and residual billing trend if accessible; flag unexpected cost sources. Billing Support review/credit remains separate.
+### B5 — post-cutover billing verification / pre-cutover measurement — NEXT FOR LANE B
+Until actual cutover is authorized, Lane B should NOT idle. It should perform pre-cutover measurement that reduces uncertainty: quantify current log ingestion by resource/log class/path using read-only metrics/queries; validate which candidate exclusions would remove only low-value routine success logs; measure current Cloud Run/job/scheduler invocation patterns; produce a residual-cost floor/range with explicit uncertainty; and prepare post-cutover verification queries. If direct billing export remains unavailable, keep `BILLING_ACTUAL_UNAVAILABLE` and do not fabricate exact future savings.
 
-After B3 design completion, Lane B must continue B4 read-only planning or another unowned cloud verification task rather than idling.
-
-## 8. Dynamic ready queue — Lane C (Claude)
-### C1 — cross-verify A/B controller truth — READY
-Independently verify latest Issue #188 claims, current main, PR #436 state, `CLOUD_PAPER_ENGINE=0` ownership, GCP-vs-local state assumptions, B2 cost derivations, proposed Logging exclusions, Secret Manager/ADC strategy, and whether any proposed change conflicts with `.github/CLAUDE_INSTRUCTIONS.md`, authority docs, workflows or current runtime architecture.
+## 8. Dynamic ready queue — Lane C (Claude / Perplexity)
+### C1 — cross-verify latest controller truth — READY
+Independently verify latest Issue #188 claims, current main, PR #436 state, A3 archive/clean-clone claims where remotely verifiable, `CLOUD_PAPER_ENGINE=0` ownership, GCP-vs-local state assumptions, B2/B3/B4 cost derivations, proposed Logging exclusions, Secret Manager/ADC strategy, and whether any proposed change conflicts with `.github/CLAUDE_INSTRUCTIONS.md`, authority docs, workflows or current runtime architecture.
 
 ### C2 — downstream-impact matrix
 Map missed dependencies across broker/token lifecycle, Firestore/storage/state, jobs/schedulers, queues/WebSockets, logs/alerts, GitHub Actions/WIF, local startup/recovery, UI/API parity, PAPER persistence and billing. Publish concrete corrections/handoffs.
 
 ### C3 — independent acceptance verifier
-As A3/A4/A5/B3/B4 evidence appears, independently test/review it. If a root contradiction appears, publish it immediately and tell affected lane to stop downstream dependent work. Do not wait for all fifty tasks to finish.
+As A4/A5/A6/B5 evidence appears, independently test/review it. If a root contradiction appears, publish it immediately and tell affected lane to stop downstream dependent work. Do not wait for all tasks to finish.
 
-Claude must continue C1 -> C2 -> C3 style verification as new evidence appears; if no new evidence exists, inspect unresolved open contradictions/PRs/workflows relevant to this program rather than declaring `NO TASK`.
+Claude and Perplexity must continue C1 -> C2 -> C3 style verification as new evidence appears; if no new evidence exists, inspect unresolved open contradictions/PRs/workflows relevant to this program rather than declaring `NO TASK`.
 
 ## 9. State/secret/cloud migration checklist
 Every material review must reconcile: Secret Manager/broker credentials/token rotation; local secure secret storage/environment mapping; broker auth/session/TOTP/token lifecycle; Firestore; Cloud Storage; BigQuery/Firebase if present; local DB/state/backups; Cloud Run services/jobs; Scheduler/background workers; Pub/Sub/queues/events/WebSockets; Logging/Monitoring/alerts; GitHub Actions/WIF/deploy assumptions; Artifact Registry; market/instrument history; models/features/evaluation history; APIs/frontend; controlled external URL; startup/shutdown/recovery/backfill; data gaps; disk/clock/backup failure.
@@ -146,9 +152,12 @@ Every material review must reconcile: Secret Manager/broker credentials/token ro
 No cloud state is safely removable until its replacement and rollback are proven.
 
 ## 10. Evidence protocol
-Each material update must include:
-- `AGENT=`
-- `LANE=`
+Each material update must begin with:
+- `AGENT_NAME=`
+- `AGENT_LANE=`
+- `AGENT_ROLE=`
+
+Then include:
 - `CHECKPOINT_OR_TASK=`
 - `STATUS=PASS|FAIL|BLOCKED|PARTIAL|IN_PROGRESS`
 - `START_SHA=` / `END_SHA=` where applicable
@@ -173,14 +182,16 @@ The queues are guides, not a blind script. Every intermediate proof can change p
 Agents should publish intermediate evidence frequently enough that other agents can consume it. They cannot assume ChatGPT is watching unpublished live output.
 
 ## 12. Current immediate state
-- Google/AGI B2: reported PASS; controller accepts inventory value but keeps derived cost/SKU/savings claims qualified.
-- Google/AGI B3: READY now; B4 read-only planning may follow without waiting.
-- Codex: continue from latest A2 evidence into A3 only after it itself verifies A2 salvage prerequisites remain satisfied against current main; old evidence must not be deleted.
-- Claude: C1 READY, then C2/C3 continuously.
+- A3: reported PASS by Codex/Laptop Agent; controller records this as agent evidence, not final acceptance of A4+ cutover readiness.
+- Lane A next: A4 secure local bootstrap/runtime ownership proof; continue non-idle.
+- B2/B3/B4: reported PASS by Google/AGI; controller preserves uncertainty around derived cost/savings claims and keeps cloud execution blocked.
+- Lane B next: B5-style pre-cutover measurement/read-only residual-cost verification; continue non-idle.
+- Claude: C1/C2/C3 verification loop.
+- Perplexity: same C lane, but claim a distinct verification target or explicitly second-source verify Claude/other-agent claims.
 - ChatGPT: reconcile GitHub evidence, keep this SSOT and Issue #188 aligned, review contradictions and take all connected-tool actions available.
-- PR #436 remains open/mergeable but based on stale original main; no force merge. Reconcile/rebase through normal protected workflow before authority promotion.
+- PR #436 remains controller branch until merged through normal protected workflow.
 - No real broker order actions or LIVE enablement.
 - No blind GCP shutdown, secret deletion, logging exclusion, local cleanup or state deletion.
 
 ## 13. One-default-prompt rule for the user
-The user may send the exact same bootstrap prompt to every agent. Each agent must infer its lane from its identity/capability/current claims and this SSOT, then enter the permanent non-idle loop. The user must not be required to formulate fresh technical prompts after every task.
+The user may send the exact same bootstrap prompt to every agent. Each agent must infer its lane from identity/capability/current claims and this SSOT, visibly identify itself on every shared write, then enter the permanent non-idle loop. The user must not be required to formulate fresh technical prompts after every task.
