@@ -1,7 +1,9 @@
+// LAST_EDITED_BY=Codex | TASK_OR_ISSUE=#442 | CHANGE_NOTE=Derive market closure and serving identity from runtime truth
 import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { shortSha } from '../lib/formatLive'
 import { Info, CheckCircle2, ShieldAlert } from 'lucide-react'
+import { safeDeployTruth } from '../lib/dashboardTruth'
 
 const IST_FMT = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kolkata',
@@ -32,8 +34,9 @@ export function AutonomousLoopBanner() {
   const proof = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const passCount = proof.filter((g: any) => g?.pass === true || String(g?.status).toUpperCase() === 'PASS').length
   const brokerOk = brokerStatus?.connected === true
-  const serving = shortSha(deployInfo?.git_sha || '7b26b87')
-  const nextOpen = String(state?.market?.next_open || health?.market?.next_open || '2026-08-31 09:15:00 IST')
+  const serving = safeDeployTruth(deployInfo).shortSha
+  const nextOpen = String(state?.market?.next_open || health?.market?.next_open || 'NOT PROVIDED')
+  const marketReason = String(state?.market?.reason || health?.market?.reason || 'closed').replace(/_/g, ' ').toUpperCase()
 
   if (!AUTONOMOUS_LOOP_BANNER_ENABLED) return null
 
@@ -51,7 +54,7 @@ export function AutonomousLoopBanner() {
             : 'bg-slate-800 text-slate-300 border border-slate-700'
         }`}>
           <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
-          <span>{marketOpen ? 'MARKET SESSION OPEN' : 'MARKET CLOSED (WEEKEND STANDBY)'}</span>
+          <span>{marketOpen ? 'MARKET SESSION OPEN' : `MARKET CLOSED (${marketReason})`}</span>
         </div>
 
         {!marketOpen && (

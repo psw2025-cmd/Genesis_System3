@@ -1485,6 +1485,15 @@ work while independent review, market-open evidence or an external account gate
 is pending. Neither RUHI nor multi-agent coordination may weaken PAPER/ANALYZE,
 secret, WIF/IAM, deployment, broker-rotation or real-order safety boundaries.
 
+Material execution failures are user-visible transitions. If a promised
+browser/video/screenshot/API/test/evidence run stalls, fails, times out, is
+interrupted, or loses output, notify the user immediately instead of waiting
+for a later summary or question. State the failed step, timestamp, practical
+impact, preserved and unproven work, current recovery action, required user
+action, and safety state. Preserve useful diagnostics, clean orphan processes,
+and never represent partial or missing output as completed proof. This is the
+RUHI immediate-interruption disclosure contract in `docs/RUHI_RULE_V2.md`.
+
 The append-only proof ledger is authoritative:
 
 ```text

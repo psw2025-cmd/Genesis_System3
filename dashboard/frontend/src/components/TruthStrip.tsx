@@ -1,16 +1,18 @@
+// LAST_EDITED_BY=Codex | TASK_OR_ISSUE=#442 | CHANGE_NOTE=Remove fabricated SHA, latency, and chain-readiness claims
 import React from 'react'
 import { useStore } from '../store'
 import { Activity, ShieldCheck, Zap, Clock, CheckCircle2 } from 'lucide-react'
+import { chainReadiness, safeDeployTruth } from '../lib/dashboardTruth'
 
 export function TruthStrip() {
-  const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo } = useStore()
+  const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo, chain, brokerStatus } = useStore()
   
   // Authoritative live deployed SHA resolution (never hardcoded fallback)
-  const deploySha = deployInfo?.git_sha 
-    || (state as any)?.deployment_sha 
-    || (state as any)?.git_sha 
-    || (health as any)?.git_sha 
-    || '7b26b87'
+  const deploy = safeDeployTruth({
+    ...deployInfo,
+    git_sha: deployInfo?.git_sha || (state as any)?.deployment_sha || (state as any)?.git_sha || (health as any)?.git_sha,
+  })
+  const chains = chainReadiness(chain)
     
   const isLive = marketOpen && brokerConnected
 
@@ -32,7 +34,7 @@ export function TruthStrip() {
         <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">SERVING:</span>
           <span className="font-mono text-sky-400 font-bold">
-            {String(deploySha).slice(0, 7)}
+            {deploy.shortSha}
           </span>
         </div>
 
@@ -60,7 +62,9 @@ export function TruthStrip() {
         {/* Option Chains */}
         <div className="hidden lg:flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">CHAINS:</span>
-          <span className="text-emerald-400 font-bold">4-of-4 FRESH</span>
+          <span className={chains.complete ? 'text-emerald-400 font-bold' : 'text-amber-400 font-bold'}>
+            {chains.ready}-of-{chains.total} {chains.complete ? 'READY' : 'WAITING'}
+          </span>
         </div>
       </div>
 
@@ -77,7 +81,7 @@ export function TruthStrip() {
 
         <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 font-mono text-[11px] font-semibold">
           <Zap size={12} />
-          <span>LATENCY: &lt;15ms</span>
+          <span>LATENCY: {brokerConnected && Number.isFinite(Number((brokerStatus as any)?.latency_ms)) ? `${Number((brokerStatus as any)?.latency_ms)}ms` : 'UNPROVEN'}</span>
         </div>
       </div>
     </div>

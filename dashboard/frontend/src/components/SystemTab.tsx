@@ -1,4 +1,5 @@
 import { useStore } from '../store'
+import { brokerTokenSourceIsLocal } from '../lib/dashboardTruth'
 import { cn } from '../lib/utils'
 import { AuthUnlock } from './AuthUnlock'
 
@@ -37,7 +38,7 @@ export function SystemTab() {
   const rotation = brokerStatus?.canonical_rotation || {}
   const hoursRemaining = proof?.hours_remaining == null ? null : Number(proof.hours_remaining)
   const tokenHealthy = proof?.expired === false && hoursRemaining != null && hoursRemaining > 0
-  const tokenSourceProven = proof?.source === 'GCP_SECRET_MANAGER_DYNAMIC'
+  const tokenSourceProven = brokerTokenSourceIsLocal(proof?.source)
   const tokenExposureProvenSafe = proof?.token_value_exposed === false
   const orderLockProven = brokerStatus?.order_placement_allowed === false
   const liveFlagProvenOff = brokerStatus?.live_trading_enabled === false
