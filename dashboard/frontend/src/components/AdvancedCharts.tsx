@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts'
+import { chartEvidenceReady } from '../lib/dashboardTruth'
 
 const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
 
@@ -131,7 +132,9 @@ export default function AdvancedCharts() {
                 </div>
               </div>
             )}
-            <p className="text-sm text-green-400 mt-2">✓ Heatmap data loaded successfully</p>
+            <p className={`text-sm mt-2 ${chartEvidenceReady(heatmapData, 'surface') ? 'text-green-400' : 'text-amber-400'}`}>
+              {chartEvidenceReady(heatmapData, 'surface') ? 'VERIFIED HEATMAP DATA READY' : 'NO VERIFIED HEATMAP DATA — strikes, expiries, and spot are required'}
+            </p>
           </div>
         ) : (
           <div className="text-gray-400">Loading heatmap data...</div>
@@ -157,7 +160,9 @@ export default function AdvancedCharts() {
                 <div className="text-xl font-bold">₹{ivSurface.spot?.toFixed(2) || '0.00'}</div>
               </div>
             </div>
-            <p className="text-sm text-green-400 mt-2">✓ IV surface data loaded successfully</p>
+            <p className={`text-sm mt-2 ${chartEvidenceReady(ivSurface, 'surface') ? 'text-green-400' : 'text-amber-400'}`}>
+              {chartEvidenceReady(ivSurface, 'surface') ? 'VERIFIED IV SURFACE READY' : 'NO VERIFIED IV SURFACE — strikes, expiries, and spot are required'}
+            </p>
           </div>
         ) : (
           <div className="text-gray-400">Loading IV surface data...</div>
@@ -214,7 +219,9 @@ export default function AdvancedCharts() {
                 </div>
               </div>
             )}
-            <p className="text-sm text-green-400 mt-2">✓ Greeks data loaded successfully</p>
+            <p className={`text-sm mt-2 ${chartEvidenceReady(greeksData, 'greeks') ? 'text-green-400' : 'text-amber-400'}`}>
+              {chartEvidenceReady(greeksData, 'greeks') ? 'VERIFIED GREEKS DATA READY' : 'NO VERIFIED GREEKS DATA — strikes, values, and spot are required'}
+            </p>
           </div>
         ) : (
           <div className="text-gray-400">Loading Greeks data...</div>
@@ -269,7 +276,9 @@ export default function AdvancedCharts() {
                 </div>
               </div>
             )}
-            <p className="text-sm text-green-400 mt-2">✓ PCR data loaded successfully</p>
+            <p className={`text-sm mt-2 ${chartEvidenceReady(pcrData, 'pcr') ? 'text-green-400' : 'text-amber-400'}`}>
+              {chartEvidenceReady(pcrData, 'pcr') ? 'VERIFIED PCR DATA READY' : 'NO VERIFIED PCR DATA — strikes, PCR, and spot are required'}
+            </p>
           </div>
         ) : (
           <div className="text-gray-400">Loading PCR data...</div>

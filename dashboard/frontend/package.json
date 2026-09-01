@@ -4,13 +4,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run test:broker-status && npm run test:data-integrity",
+    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:local-truth",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test:ui-obs": "node scripts/ui_obs_contract.mjs",
     "test:broker-status": "node scripts/broker_status_freshness_contract.mjs",
-    "test:data-integrity": "node scripts/data_integrity_chain_truth_contract.mjs"
+    "test:data-integrity": "node scripts/data_integrity_chain_truth_contract.mjs",
+    "test:local-truth": "node scripts/local_dashboard_truth_contract.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",

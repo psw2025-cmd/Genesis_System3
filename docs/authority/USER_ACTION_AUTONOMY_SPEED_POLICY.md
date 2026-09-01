@@ -118,6 +118,8 @@ At minimum it means:
 - correct only what is still missing;
 - continue until the practical product result is proven;
 - treat live dashboard/UI + backend/API/data/model/paper-trade truth as the acceptance surface, not chat, plans, code existence, or render-only success.
+- immediately tell the user when a material run stalls, fails, times out, is interrupted, or loses promised evidence; do not wait for the user to discover or ask about it;
+- state what failed, the impact, what remains proven, what became unproven, and the recovery action already being taken.
 
 ## False-NO prevention
 

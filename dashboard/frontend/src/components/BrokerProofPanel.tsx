@@ -1,6 +1,8 @@
+// LAST_EDITED_BY=Codex | TASK_OR_ISSUE=#442 | CHANGE_NOTE=Require laptop-local secure broker token provenance
 import { Activity, Database, Shield, Wallet } from 'lucide-react'
 import { useStore } from '../store'
 import { BrokerPanel } from './BrokerPanel'
+import { brokerTokenSourceIsLocal } from '../lib/dashboardTruth'
 
 function fmtTime(value: any) {
   if (!value) return 'PENDING PROOF'
@@ -35,7 +37,7 @@ export function BrokerProofPanel() {
   }).length
   const hours = proof?.hours_remaining
   const tokenHealthy = proof?.expired === false && (hours == null || Number(hours) > 0)
-  const sourceOk = proof?.source === 'GCP_SECRET_MANAGER_DYNAMIC'
+  const sourceOk = brokerTokenSourceIsLocal(proof?.source)
   const liveOff = !Boolean(state?.live_trading_enabled || state?.liveTradingEnabled || brokerStatus?.live_trading_enabled || brokerStatus?.order_placement_allowed)
 
   return (
@@ -46,7 +48,7 @@ export function BrokerProofPanel() {
             <div style={{ width: 34, height: 34, display: 'grid', placeItems: 'center', borderRadius: 9, color: 'var(--accent)', background: 'rgba(59,140,255,.10)', border: '1px solid rgba(59,140,255,.28)' }}><Database size={17} /></div>
             <div>
               <div className="workspace-title" style={{ fontSize: '.92rem' }}>Broker Connection · DHAN</div>
-              <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.59rem' }}>Read-only account proof · Google Cloud token authority · Raw token exposed: NO</div>
+              <div style={{ marginTop: 3, color: 'var(--text-mut)', fontSize: '.59rem' }}>Read-only account proof · Laptop-local secure token authority required · Raw token exposed: NO</div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>

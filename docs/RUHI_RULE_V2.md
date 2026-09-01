@@ -199,6 +199,22 @@ Before starting or reporting a task, verify current remote main, current serving
 
 Any recurrence after a claimed fix reopens the task or creates a linked regression. Current production truth overrides historical green status.
 
+### 12.1 Immediate interruption and lost-proof disclosure
+
+Every agent must notify the user immediately when a material task, browser
+capture, video, screenshot run, test, deployment, API probe, upload, or evidence
+write stalls, fails, is interrupted, times out, loses output, or can no longer
+finish its promised acceptance proof. The agent must not wait for the user to
+ask what happened and must not hide the event inside later status prose.
+
+The immediate update must state: `WHAT_FAILED`, `WHEN`, `USER_VISIBLE_IMPACT`,
+`WORK_PRESERVED`, `WORK_LOST_OR_UNPROVEN`, `RECOVERY_ACTION_NOW`,
+`USER_ACTION_NEEDED`, and `SAFETY_STATE`. Partial files are never promoted to
+valid evidence until integrity and completeness are verified. The agent must
+freeze useful diagnostics, stop or clean orphan processes, resume through the
+fastest safe path, and report the first recovered proof as a new observation.
+Silence after a known material interruption is a RUHI violation.
+
 ## 13. Human escalation boundary
 
 The user is not a routine coordination relay.
