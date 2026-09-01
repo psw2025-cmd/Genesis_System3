@@ -122,6 +122,64 @@ def test_chain_adapter_is_full_by_default_and_accepts_expiry(monkeypatch):
     assert result["live_trading_enabled"] is False
 
 
+def test_chain_adapter_publishes_dhan_volume_change_percent_for_every_leg(monkeypatch):
+    monkeypatch.delenv("CHAIN_MAX_CONTRACTS", raising=False)
+    df = pd.DataFrame([
+        {
+            "strike": 25000,
+            "option_type": "CE",
+            "oi": 100,
+            "volume": 7500,
+            "previous_volume": 5000,
+            "ltp": 100,
+            "source": "dhan",
+        },
+        {
+            "strike": 25000,
+            "option_type": "PE",
+            "oi": 100,
+            "volume": 2400,
+            "previous_volume": 3000,
+            "ltp": 90,
+            "source": "dhan",
+        },
+    ])
+
+    class DSM:
+        def fetch_option_chain(self, underlying, expiry=""):
+            return df, 25000.0
+
+    result = chain_adapter.fetch_chain_for_api(DSM(), "NIFTY")
+    by_side = {row["option_type"]: row for row in result["contracts"]}
+    assert by_side["CE"]["previous_volume"] == 5000
+    assert by_side["CE"]["volume_change"] == 2500
+    assert by_side["CE"]["volume_change_percent"] == 50.0
+    assert by_side["PE"]["previous_volume"] == 3000
+    assert by_side["PE"]["volume_change"] == -600
+    assert by_side["PE"]["volume_change_percent"] == -20.0
+
+
+def test_chain_adapter_keeps_volume_percent_unavailable_without_dhan_baseline(monkeypatch):
+    monkeypatch.delenv("CHAIN_MAX_CONTRACTS", raising=False)
+    df = pd.DataFrame([{
+        "strike": 25000,
+        "option_type": "CE",
+        "oi": 100,
+        "volume": 7500,
+        "previous_volume": 0,
+        "ltp": 100,
+        "source": "dhan",
+    }])
+
+    class DSM:
+        def fetch_option_chain(self, underlying, expiry=""):
+            return df, 25000.0
+
+    contract = chain_adapter.fetch_chain_for_api(DSM(), "NIFTY")["contracts"][0]
+    assert contract["volume_change"] is None
+    assert contract["volume_change_percent"] is None
+
+
 def test_install_legacy_bridge_registers_expiry_routes_after_app_exists():
     from fastapi import FastAPI
 
