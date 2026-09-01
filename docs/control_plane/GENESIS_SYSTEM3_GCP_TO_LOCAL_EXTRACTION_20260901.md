@@ -81,13 +81,28 @@ Container images for Cloud Run deploys. Not required locally once Cloud Run is r
 ## 7. Pub/Sub — 3 topics: `genesis-system3-ops-events`, `genesis-system3-incidents`, `broker-token-rotate`
 Used for inter-service signaling (token-rotation notifications, ops/incident events). No local subscriber currently proven; if the laptop supervisor doesn't need cross-process pub/sub, these can likely be deleted once confirmed unused locally (in-process function calls replace them).
 
-## 8. What's already been changed today (by other agents, before this document existed)
+## 8. Windows Scheduled Tasks — found pointing at the wrong, legacy repo, now disabled
+
+Live `Get-ScheduledTask` inspection on this laptop found four tasks named `System3_*` that were all actually invoking `C:\openalgo-main`, which is **not** this repo — it's a separate, older codebase (`git remote` = `psw2025-cmd/System-3-Openalgo`, a top-level `app.py`, no `dashboard/` folder), matching what `.github/CLAUDE_INSTRUCTIONS.md` already calls "Angel-era... historical/non-authoritative":
+
+| Task | Path | Target (before) |
+|---|---|---|
+| `System3_DailyFreshStart` | `\` | `C:\openalgo-main\daily_system3_fresh_start.bat` |
+| `System3_WeeklyMaintenance` | `\` | `C:\openalgo-main\scripts\venv_scheduled.cmd scripts\repo_weekly_maintenance.py --apply` |
+| `System3_MarketOpenAutoProof` | `\OpenAlgo\` | `C:\openalgo-main\scripts\venv_scheduled.cmd scripts\market_open_auto_proof.py --mode market-open` |
+| `System3_WeeklyMaintenance` | `\OpenAlgo\` | `C:\openalgo-main\scripts\venv_scheduled.cmd scripts\repo_weekly_maintenance.py --apply` |
+
+These were already failing (see Checkpoint-2/A2 last-run-result codes) and, even when they did run, were executing the wrong, non-authoritative codebase — not `Genesis_System3`. **All four have now been disabled** (`Disable-ScheduledTask`, reversible via `Enable-ScheduledTask` with the same name/path), at the owner's explicit direction, so there is no confusing parallel legacy activity while the real local supervisor/dashboard is being brought up. A separate, unrelated task (`Genesis_DiskRepair`, running `chkdsk C: /f /r`) was left untouched — it is not part of this system and its ownership/purpose has not been established.
+
+Once the current `Genesis_System3` local supervisor + dashboard are proven working, a **new** scheduled task should be created pointing at the correct location (the clean checkout, not `C:\openalgo-main`) rather than re-enabling these.
+
+## 9. What's already been changed today (by other agents, before this document existed)
 
 - All 9 active Cloud Schedulers: `PAUSED` (confirmed live, this pass).
 - `genesis-system3-web`: scaled to `minScale=0`/`maxScale=1`/CPU-throttled (confirmed live, this pass).
 - A Cloud Logging exclusion filter `emergency-health-200` was added to the `_Default` sink — already flagged by the controller thread as too broad (may suppress non-health-check evidence) and not yet corrected as of this document.
 
-## 9. Do-not-delete-yet checklist (blocks full shutdown until each is proven)
+## 10. Do-not-delete-yet checklist (blocks full shutdown until each is proven)
 
 - [ ] Dhan broker token rotation proven working from the laptop, without GCP, before that scheduler/job is deleted (not just paused).
 - [ ] Single local state SSOT chosen and Firestore reconciled/exported into it (the export above is a start, not the finish).
