@@ -220,6 +220,12 @@ def _chain_metadata_line(text: str, symbol: str) -> str:
     symbol_re = re.compile(rf"\bsymbol\s+{re.escape(symbol)}\b", flags=re.IGNORECASE)
     source_re = re.compile(r"\bsource\s*=", flags=re.IGNORECASE)
     lines = [re.sub(r"\s+", " ", raw.strip()) for raw in text.splitlines() if raw.strip()]
+    # Prefer the explicit combined provenance row. The current production
+    # OptionChain layout places it after filters/expiry controls, beyond the
+    # older twelve-row adjacency window.
+    for line in lines:
+        if symbol_re.search(line) and source_re.search(line):
+            return line
     for index, line in enumerate(lines):
         if not symbol_re.search(line):
             continue
@@ -228,7 +234,7 @@ def _chain_metadata_line(text: str, symbol: str) -> str:
         # The production OptionChain header renders `SYMBOL ...` and its
         # provenance on adjacent rows. Keep the search bounded to this symbol
         # block so another chain or unrelated card cannot satisfy the proof.
-        for candidate in lines[index + 1 : index + 13]:
+        for candidate in lines[index + 1 :]:
             if re.search(r"\bsymbol\s+", candidate, flags=re.IGNORECASE):
                 break
             if source_re.search(candidate):
