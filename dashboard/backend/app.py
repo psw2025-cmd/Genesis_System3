@@ -7,6 +7,7 @@ import asyncio
 import hashlib
 import hmac
 import json
+import logging
 import math
 import os
 import re
@@ -19,6 +20,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 import pytz
+
+logger = logging.getLogger("system3.dashboard")
 
 IST = pytz.timezone("Asia/Kolkata")
 
@@ -5981,16 +5984,6 @@ async def get_multibagger_workspace_endpoint():
     return get_multibagger_research_data()
 
 
-@app.get("/api/backtest/results")
-async def get_backtest_results_endpoint():
-    """Backtest execution results endpoint (PEND-013)."""
-    try:
-        from dashboard.backend.backtest_service import get_backtest_results
-    except ImportError:
-        from backtest_service import get_backtest_results
-    return get_backtest_results()
-
-
 @app.get("/api/backtest/strategies")
 async def get_backtest_strategies_endpoint():
     """Backtest strategy catalogue endpoint."""
@@ -6915,7 +6908,7 @@ async def validate_data():
             def run_validation():
                 try:
                     subprocess.run(
-                        [str(ROOT_DIR / "venv" / "Scripts" / "python.exe"), str(validator_path)],
+                        [sys.executable, str(validator_path)],
                         timeout=30,
                         capture_output=True,
                     )
@@ -8048,7 +8041,7 @@ async def get_journal_notes(position_id: Optional[str] = None, tags: List[str] =
 
 
 @app.get("/api/journal/search")
-async def search_journal_notes(query: str, limit: int = 50):
+async def search_journal_notes(query: str = "", limit: int = 50):
     """Search journal notes"""
     try:
         if not ADVANCED_FEATURES_AVAILABLE:
@@ -10386,7 +10379,7 @@ async def get_ml_predictions():
         return {"predictions": [], "status": "error", "error": str(exc)[:200]}
 
 # SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES
-@app.get("/api/simulation/live/state")
+@app.get("/api/simulation/virtual/state")
 async def get_virtual_live_simulation_state(scenario: str = "trend"):
     """Backend virtual live-market simulation feed. No real broker/orders."""
     try:
@@ -10394,7 +10387,7 @@ async def get_virtual_live_simulation_state(scenario: str = "trend"):
     except ImportError:
         from live_simulation_service import build_virtual_live_state
     payload = build_virtual_live_state(scenario=scenario)
-    payload["api_route"] = "/api/simulation/live/state"
+    payload["api_route"] = "/api/simulation/virtual/state"
     payload["live_trading_enabled"] = False
     payload["order_placement_allowed"] = False
     payload["real_broker_routes_called"] = False
@@ -10464,3 +10457,25 @@ async def get_virtual_live_simulation_paper(scenario: str = "trend"):
         "order_placement_allowed": False,
         "real_broker_routes_called": False,
     }
+
+
+def _assert_no_duplicate_routes(application):
+    """Inventory duplicate method/path registrations and optionally fail closed."""
+    seen = set()
+    duplicates = []
+    for route in application.routes:
+        path = getattr(route, "path", None)
+        for method in sorted(getattr(route, "methods", set()) or set()):
+            key = (method, path)
+            if key in seen:
+                duplicates.append(key)
+            else:
+                seen.add(key)
+    if duplicates:
+        logger.critical("DASHBOARD_DUPLICATE_ROUTES code=SYSTEM3_DUPLICATE_ROUTES routes=%s", duplicates)
+        if os.getenv("SYSTEM3_STRICT_ROUTES", "0") == "1":
+            raise RuntimeError(f"Duplicate dashboard routes: {duplicates}")
+    return duplicates
+
+
+DUPLICATE_ROUTES = _assert_no_duplicate_routes(app)
