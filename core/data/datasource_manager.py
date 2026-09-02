@@ -132,18 +132,19 @@ class DataSourceManager:
         self._equity_sec_ids: Dict[str, int] = {}
 
     def _get_client(self):
-        if self._client is None:
+        from core.utils.env_loader import get_dhan_credentials
+        creds = get_dhan_credentials()
+        client_id = creds.get("client_id", "").strip().lstrip("\ufeff")
+        token = creds.get("access_token", "").strip().lstrip("\ufeff")
+        if hasattr(self, "_cached_token") and self._cached_token != token:
+            self._client = None
+        self._cached_token = token
+        if self._client is None and client_id and token:
             try:
                 from dhanhq import dhanhq
                 from dhanhq.dhan_context import DhanContext
-                from core.utils.env_loader import get_dhan_credentials
-
-                creds = get_dhan_credentials()
-                client_id = creds.get("client_id", "").strip().lstrip("\ufeff")
-                token = creds.get("access_token", "").strip().lstrip("\ufeff")
-                if client_id and token:
-                    ctx = DhanContext(client_id, token)
-                    self._client = dhanhq(ctx)
+                ctx = DhanContext(client_id, token)
+                self._client = dhanhq(ctx)
             except Exception as e:
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client
@@ -362,26 +363,13 @@ class DataSourceManager:
 
         for source_name, source_fn in sources:
             try:
-                if source_name == "dhan":
-                    res = source_fn()
-                    if res == (None, None):
-                        dhan_res = self._fetch_dhan_real(sym, expiry)
-                        if dhan_res is not None and dhan_res[0] is not None and not dhan_res[0].empty:
-                            self._cache[sym] = (time.time(), dhan_res[0], dhan_res[1])
-                            return dhan_res
-                    elif res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
+                res = source_fn()
+                if res is not None and isinstance(res, tuple) and len(res) >= 2 and res[0] is not None:
+                    df, spot = res[0], res[1]
+                    if hasattr(df, "empty") and not df.empty:
+                        if source_name != "synthetic":
                             self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
-                else:
-                    res = source_fn()
-                    if res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
-                            if source_name != "synthetic":
-                                self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
+                        return df, float(spot or 0.0)
             except AssertionError as e:
                 raise e
             except Exception as e:
@@ -631,9 +619,9 @@ class DataSourceManager:
 
         return pd.DataFrame(rows), spot
 
-    # ── Backward compatible shims for unit testing ──
     def _try_dhan(self, symbol: str, expiry: str = "") -> Tuple[Optional[Any], Optional[float]]:
-        return None, None
+        res = self._fetch_dhan_real(symbol, expiry)
+        return res if res is not None else (None, None)
 
     def _try_nse(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
         return None, None
