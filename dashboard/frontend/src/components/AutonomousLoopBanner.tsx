@@ -32,8 +32,10 @@ export function AutonomousLoopBanner() {
   const proof = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
   const passCount = proof.filter((g: any) => g?.pass === true || String(g?.status).toUpperCase() === 'PASS').length
   const brokerOk = brokerStatus?.connected === true
-  const serving = shortSha(deployInfo?.git_sha || '7b26b87')
-  const nextOpen = String(state?.market?.next_open || health?.market?.next_open || '2026-08-31 09:15:00 IST')
+  const serving = deployInfo?.git_sha ? shortSha(deployInfo.git_sha) : '—'
+  const marketReason = String(state?.market?.reason || health?.market?.reason || '')
+  const isWeekendClosed = /weekend/i.test(marketReason)
+  const nextOpen = String(state?.market?.next_open || health?.market?.next_open || '—')
 
   if (!AUTONOMOUS_LOOP_BANNER_ENABLED) return null
 
@@ -51,7 +53,7 @@ export function AutonomousLoopBanner() {
             : 'bg-slate-800 text-slate-300 border border-slate-700'
         }`}>
           <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
-          <span>{marketOpen ? 'MARKET SESSION OPEN' : 'MARKET CLOSED (WEEKEND STANDBY)'}</span>
+          <span>{marketOpen ? 'MARKET SESSION OPEN' : `MARKET CLOSED${isWeekendClosed ? ' (WEEKEND STANDBY)' : ' (AFTER HOURS)'}`}</span>
         </div>
 
         {!marketOpen && (
@@ -65,7 +67,7 @@ export function AutonomousLoopBanner() {
       {/* System State Chips */}
       <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-          BROKER: <strong className={brokerOk ? 'text-emerald-400' : 'text-slate-300'}>{brokerOk ? 'OK' : 'CONNECTED'}</strong>
+          BROKER: <strong className={brokerOk ? 'text-emerald-400' : 'text-rose-400'}>{brokerOk ? 'CONNECTED' : 'DISCONNECTED'}</strong>
         </div>
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
           SERVING: <strong className="text-sky-400">{serving}</strong>

@@ -31,8 +31,8 @@ export function HolographicIndexCards() {
     const chainRow = chain?.[cfg.symbol]
     const chainSpot = Number(chainRow?.spot)
     const chainChg = chainRow?.change_pct != null ? Number(chainRow.change_pct) : null
-    const chainPcr = chainRow?.pcr != null ? Number(chainRow.pcr) : cfg.defaultPcr
-    const chainPain = chainRow?.max_pain != null ? Number(chainRow.max_pain) : cfg.defaultPain
+    const chainPcr = chainRow?.pcr != null && !isNaN(Number(chainRow.pcr)) && Number(chainRow.pcr) > 0 ? Number(chainRow.pcr) : cfg.defaultPcr
+    const chainPain = chainRow?.max_pain != null && !isNaN(Number(chainRow.max_pain)) && Number(chainRow.max_pain) > 0 ? Number(chainRow.max_pain) : cfg.defaultPain
 
     const spot = boardLtp > 0 ? boardLtp : chainSpot > 0 ? chainSpot : cfg.defaultSpot
     const changePct = boardChg != null ? boardChg : chainChg != null ? chainChg : 0.45

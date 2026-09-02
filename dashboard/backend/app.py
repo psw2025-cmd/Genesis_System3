@@ -2202,13 +2202,15 @@ async def get_agent_status_telemetry():
         deploy = {}
     
     now_utc = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    deploy_target = str(deploy.get("deploy_target") or "unknown")
+    is_local = "local" in deploy_target.lower()
     return {
         "status": "HEALTHY",
         "system": "Genesis_System3",
-        "authority": "GCP_CLOUD_RUN_ASIA_SOUTH1",
-        "service": "genesis-system3-web",
-        "public_ui_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/",
-        "serving_sha": deploy.get("git_sha", "dd5e6bdeb"),
+        "authority": "LOCAL_LAPTOP_RUNTIME" if is_local else "GCP_CLOUD_RUN_ASIA_SOUTH1",
+        "service": deploy.get("service_name") or "genesis-system3-web",
+        "public_ui_url": deploy.get("ui_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/",
+        "serving_sha": deploy.get("git_sha") or "",
         "deployed_at": deploy.get("deployed_at_utc", now_utc),
         "mode": "PAPER",
         "live_trading_enabled": False,
@@ -2420,6 +2422,17 @@ async def get_deploy_info():
         cfg = {}
 
     git_sha = (os.environ.get("DEPLOY_GIT_SHA") or "").strip()
+    if not git_sha:
+        # No cloud deploy pipeline set this env var (e.g. running locally) —
+        # fall back to the actual checked-out commit instead of leaving this blank.
+        try:
+            import subprocess
+
+            git_sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=str(ROOT_DIR), timeout=3, stderr=subprocess.DEVNULL
+            ).decode().strip()
+        except Exception:
+            git_sha = ""
     service_name = (
         os.environ.get("K_SERVICE")
         or str(cfg.get("service_name") or "genesis-system3-web")
@@ -3288,7 +3301,11 @@ def _slim_health(h: Any) -> Dict[str, Any]:
             "name": broker.get("name"),
             "error": broker.get("error"),
         },
-        "market": {"is_open": market.get("is_open"), "reason": market.get("reason")},
+        "market": {
+            "is_open": market.get("is_open"),
+            "reason": market.get("reason"),
+            "next_open": market.get("next_open"),
+        },
         "cycle_count": h.get("cycle_count"),
         "last_fetch": h.get("last_fetch"),
     }
@@ -3847,13 +3864,15 @@ async def get_health():
         # Check market status first
         market_is_open = False
         market_status_str = "closed"
+        market_detail: Dict[str, Any] = {}
         data_source = "real"
 
         if MARKET_DETECTION_AVAILABLE:
             try:
-                market_is_open, reason = is_market_open()
+                market_detail = get_market_status()
+                market_is_open = bool(market_detail.get("is_open"))
                 market_status_str = "open" if market_is_open else "closed"
-            except Exception as e:
+            except Exception:
                 pass  # fallback: market_status_str stays "closed"
 
         # REAL_ONLY MODE: Never use synthetic data. Return broker-not-ready state instead.
@@ -3874,7 +3893,7 @@ async def get_health():
                 "live_allowed": False,
                 "live_blockers": live_blockers,
                 "broker": {"connected": False, "error": "Synthetic data - no broker"},
-                "market": {"is_open": False, "reason": market_status_str},
+                "market": {**market_detail, "is_open": False},
                 "cycle_count": synthetic_health.get("total_trades_today", 0),
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(pytz.timezone("Asia/Kolkata")).isoformat(),
@@ -3947,7 +3966,7 @@ async def get_health():
                     "live_allowed": False,
                     "live_blockers": live_blockers,
                     "broker": {"connected": False, "status": broker_status_str, "error": "Broker not connected"},
-                    "market": {"is_open": market_is_open, "reason": market_status_str},
+                    "market": {**market_detail, "is_open": market_is_open},
                     "cycle_count": 0,
                     "refresh_interval": 5,
                     "last_fetch": None,
@@ -3986,7 +4005,7 @@ async def get_health():
                     "status": "connected",
                     "error": None,
                 },
-                "market": {"is_open": market_is_open, "reason": market_status_str},
+                "market": {**market_detail, "is_open": market_is_open},
                 "cycle_count": 0,
                 "refresh_interval": 5,
                 "last_fetch": datetime.now(IST).isoformat(),
@@ -4109,7 +4128,7 @@ async def get_health():
             "live_allowed": live_allowed,
             "live_blockers": live_blockers,
             "broker": {"connected": broker_connected, "status": broker_status},
-            "market": {"is_open": market_status_str == "open", "reason": market_status_str},
+            "market": {**market_detail, "is_open": market_status_str == "open"},
             "cycle_count": health.get("total_cycles", 0),
             "refresh_interval": 5,  # From config
             "last_fetch": health.get("last_data_fetch"),
