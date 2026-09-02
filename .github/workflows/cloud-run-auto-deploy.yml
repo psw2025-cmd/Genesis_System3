@@ -6,7 +6,7 @@ name: Cloud Run Auto Deploy
 #
 # GCP-EXIT NOTE (2026-09-01): the automatic push trigger is intentionally
 # removed. The owner is exiting Google Cloud to stop recurring billing while
-# unemployed; a normal `git push` to main must not be able to redeploy/
+# unemployed; a normal commit landing on main must not be able to redeploy/
 # recreate Cloud Run resources. This workflow is kept, unmodified below,
 # for a deliberate future manual redeploy (`workflow_dispatch`) if the owner
 # ever decides to resume the GCP runtime. See Issue #188 / A-GCP-KILL.

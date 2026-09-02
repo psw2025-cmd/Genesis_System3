@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 import unittest
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -130,12 +129,14 @@ class TemporalTruthContractTests(unittest.TestCase):
         self.assertNotIn("/api/deploy-info", frontend)
         self.assertNotIn("/api/deploy-info", proof)
 
-    def test_runtime_sha_resolver_exactly_tracks_cloud_run_deploy_trigger_paths(self):
-        workflow = (ROOT / ".github" / "workflows" / "cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-        paths_block = workflow.split("paths:", 1)[1].split("workflow_dispatch:", 1)[0]
-        declared = tuple(re.findall(r'^\s*-\s+"([^"]+)"\s*$', paths_block, flags=re.MULTILINE))
-        self.assertTrue(declared, "Cloud Run deploy trigger paths were not parsed")
-        self.assertEqual(set(declared), set(DEPLOY_TRIGGER_PATTERNS))
+    def test_runtime_sha_resolver_deploy_trigger_patterns_match_probes(self):
+        # GCP-EXIT NOTE (2026-09-01): cloud-run-auto-deploy.yml's automatic
+        # push+paths trigger was removed (Issue #188 / A-GCP-KILL), so there
+        # is no longer a workflow-declared paths list to cross-check
+        # DEPLOY_TRIGGER_PATTERNS against. This test now only verifies the
+        # resolver's own pattern behavior, which stays meaningful for manual
+        # (workflow_dispatch) deploys and live-proof SHA resolution.
+        self.assertTrue(DEPLOY_TRIGGER_PATTERNS)
         for pattern in DEPLOY_TRIGGER_PATTERNS:
             probe = pattern.replace("/**", "/probe.txt")
             self.assertTrue(path_triggers_deploy(probe), pattern)

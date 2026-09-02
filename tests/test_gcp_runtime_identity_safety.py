@@ -153,9 +153,17 @@ class RuntimeSafetyTests(unittest.TestCase):
 
 
 class DeployWorkflowSafetyTests(unittest.TestCase):
-    def test_deploy_triggers_when_runtime_contract_implementation_changes(self):
+    def test_deploy_is_manual_only_and_no_longer_auto_triggers_on_push(self):
+        # GCP-EXIT NOTE (2026-09-01): the automatic push+paths trigger
+        # (which used to fire on scripts/gcp_cloud_run_auto_deploy_impl.py
+        # changes) was intentionally removed so a normal push to main can
+        # never invoke/recreate GCP resources (Issue #188 / A-GCP-KILL).
+        # Deploy is workflow_dispatch/workflow_call only now.
         workflow = Path(".github/workflows/cloud-run-auto-deploy.yml").read_text(encoding="utf-8")
-        self.assertIn('- "scripts/gcp_cloud_run_auto_deploy_impl.py"', workflow)
+        on_block = workflow.split("\non:", 1)[1].split("\npermissions:", 1)[0]
+        self.assertNotRegex(on_block, r"(?m)^\s*push\s*:")
+        self.assertIn("workflow_dispatch:", on_block)
+        self.assertIn("workflow_call:", on_block)
 
     def test_deploy_enables_cache_only_market_top_stream(self):
         deploy = Path("scripts/gcp_cloud_run_auto_deploy_impl.py").read_text(encoding="utf-8")
