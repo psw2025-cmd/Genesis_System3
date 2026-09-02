@@ -5,7 +5,10 @@ export function DeploymentTruthFooter() {
   const { deployInfo, health, marketOpen, lastSync } = useStore()
   const sha = String(deployInfo?.git_sha || '')
   const target = String(deployInfo?.deploy_target || 'unknown')
-  const region = String(deployInfo?.region || 'asia-south1')
+  // GCP-EXIT NOTE (2026-09-02): no hardcoded GCP-region fallback — a local
+  // laptop run reports an empty region from the backend now, and must not
+  // fall back to claiming asia-south1 when it isn't actually on Cloud Run.
+  const region = String(deployInfo?.region || '')
 
   return (
     <footer
@@ -26,7 +29,7 @@ export function DeploymentTruthFooter() {
       }}
     >
       <span>
-        Deploy truth · {target} · {region} · SHA{' '}
+        Deploy truth · {target}{region ? ` · ${region}` : ''} · SHA{' '}
         <strong style={{ color: 'var(--accent-2)' }}>{shortSha(sha)}</strong>
         {sha.length > 8 ? ` (${sha})` : ''}
       </span>

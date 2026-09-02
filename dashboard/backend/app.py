@@ -2433,29 +2433,35 @@ async def get_deploy_info():
             ).decode().strip()
         except Exception:
             git_sha = ""
+    # GCP-EXIT NOTE (2026-09-02): config/cloud_runtime.json's deploy_target
+    # etc. describe the canonical PRODUCTION config, not where this process
+    # is actually running right now - K_SERVICE (set only by Cloud Run
+    # itself) is the real ground truth. Without this, a local laptop run
+    # falsely claimed "gcp-cloud-run"/asia-south1 on every dashboard tab.
+    on_cloud_run = bool(os.environ.get("K_SERVICE"))
     service_name = (
         os.environ.get("K_SERVICE")
-        or str(cfg.get("service_name") or "genesis-system3-web")
+        or (str(cfg.get("service_name") or "genesis-system3-web") if on_cloud_run else "local-laptop")
     )
     target = (
         os.environ.get("SYSTEM3_DEPLOY_TARGET")
-        or str(cfg.get("deploy_target") or "gcp-cloud-run")
+        or ("gcp-cloud-run" if on_cloud_run else "local-laptop")
     ).strip()
     base = (
         os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
         or os.environ.get("SYSTEM3_API_BASE")
-        or str(cfg.get("public_base_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app")
+        or (str(cfg.get("public_base_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app") if on_cloud_run else "http://127.0.0.1:8000")
     ).rstrip("/")
     return {
         "git_sha": git_sha,
         "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
         "service_name": service_name,
         "deploy_target": target,
-        "cloud_provider": "google_cloud" if ("gcp" in target or "cloud-run" in target) else "unknown",
+        "cloud_provider": "google_cloud" if on_cloud_run else "unknown",
         "public_base_url": base,
         "ui_url": f"{base}{cfg.get('ui_path') or '/ui'}",
-        "region": os.environ.get("GCP_REGION") or cfg.get("region") or "",
-        "project_id": os.environ.get("GOOGLE_CLOUD_PROJECT") or cfg.get("project_id") or "",
+        "region": (os.environ.get("GCP_REGION") or cfg.get("region") or "") if on_cloud_run else "",
+        "project_id": (os.environ.get("GOOGLE_CLOUD_PROJECT") or cfg.get("project_id") or "") if on_cloud_run else "",
         "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
         "revision": os.environ.get("K_REVISION") or os.environ.get("CLOUD_RUN_REVISION") or service_name,
         "cloud_run_revision": os.environ.get("K_REVISION") or os.environ.get("CLOUD_RUN_REVISION") or service_name,
