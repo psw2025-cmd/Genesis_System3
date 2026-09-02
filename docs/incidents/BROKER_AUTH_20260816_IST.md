@@ -42,7 +42,7 @@
 | Enable `DHAN_CANONICAL_ROTATION_SELF_HEAL=1` + 900s cooldown | On DH-906, web invokes Job, waits for SM version advance, hot-reloads |
 | Pub/Sub topic `broker-token-rotate` + web publisher | Operator/event signal (mint still only via Job) |
 | Grant web SA `run.invoker` on rotate Job | Required for auto-heal invoke |
-| Docs `docs/BROKER_SETUP.md` + `infra/rotate-job.yaml` | Permanent policy for humans/agents |
+| Docs `docs/BROKER_SETUP.md` + former `infra/rotate-job.yaml` | Historical 2026-08-16 implementation; the GCP manifest was later retired and is non-authoritative |
 | PR #244 merged | Code + deploy contract on `main` |
 
 **Safety unchanged:** `LIVE_TRADING_ENABLED=false`, orders disabled.
