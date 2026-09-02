@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/psw2025-cmd/Genesis_System3/schemas/agent_policy.v5.schema.json",
+  "title": "Genesis System3 Agent Policy v5 (Claude Single Execution Authority)",
+  "type": "object",
+  "required": ["version", "schema_version", "schema_path", "execution_authority", "safety", "coordination", "completion"],
+  "properties": {
+    "version": {"const": 5},
+    "schema_version": {"const": 5},
+    "schema_path": {"const": "schemas/agent_policy.v5.schema.json"},
+    "execution_authority": {
+      "type": "object",
+      "required": ["sole_controller", "other_agents_default_role", "other_agents_may_mutate"],
+      "properties": {
+        "sole_controller": {"const": "Claude"},
+        "other_agents_default_role": {"const": "advisory_forensic_verification_only"},
+        "other_agents_may_mutate": {"const": false}
+      }
+    },
+    "safety": {
+      "type": "object",
+      "required": [
+        "live_trading_enabled",
+        "system3_live_trading_allowed",
+        "auto_execute_trades",
+        "real_order_count_required",
+        "real_order_placement_modification_cancellation_squareoff",
+        "broker_secret_payload_exposure",
+        "service_account_json_keys",
+        "live_enablement_requires_human_break_glass"
+      ],
+      "properties": {
+        "live_trading_enabled": {"const": false},
+        "system3_live_trading_allowed": {"const": false},
+        "auto_execute_trades": {"const": false},
+        "real_order_count_required": {"const": 0},
+        "real_order_placement_modification_cancellation_squareoff": {"const": "forbidden"},
+        "broker_secret_payload_exposure": {"const": "forbidden"},
+        "service_account_json_keys": {"const": "forbidden"},
+        "live_enablement_requires_human_break_glass": {"const": true}
+      }
+    },
+    "coordination": {
+      "type": "object",
+      "required": ["github_issue_188_is_live_bus", "parallel_overlapping_mutation"],
+      "properties": {
+        "github_issue_188_is_live_bus": {"const": true},
+        "parallel_overlapping_mutation": {"const": "forbidden"}
+      }
+    },
+    "completion": {
+      "type": "object",
+      "required": ["stop_at_code_or_pr_or_ci", "require_runtime_proof", "require_truthful_ui_proof", "genuine_external_or_user_only_blocker_must_be_explicit"],
+      "properties": {
+        "stop_at_code_or_pr_or_ci": {"const": false},
+        "require_runtime_proof": {"const": true},
+        "require_truthful_ui_proof": {"const": true},
+        "genuine_external_or_user_only_blocker_must_be_explicit": {"const": true}
+      }
+    },
+    "gcp_exit_billing_control": {
+      "type": "object",
+      "properties": {
+        "high_frequency_scheduler_resume_without_reconciled_ssot": {"const": "forbidden"}
+      }
+    }
+  }
+}

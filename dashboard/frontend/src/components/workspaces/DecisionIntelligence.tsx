@@ -173,7 +173,7 @@ export const DecisionIntelligence: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <StatusChip label="DHAN" value={dhanOk ? 'AUTH OK' : 'NO AUTH'} status={dhanOk ? 'ok' : 'error'} />
               <StatusChip label="SOURCE" value={state?.data_source || health?.data_source || 'UNKNOWN'} status={state?.data_source || health?.data_source ? 'ok' : 'mut'} />
-              <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'gcp-cloud-run')} status="ok" />
+              <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'unknown')} status="ok" />
             </div>
           </div>
 
