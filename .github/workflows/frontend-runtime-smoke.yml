@@ -3,6 +3,28 @@ name: Frontend Browser Runtime Smoke
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - "dashboard/**"
+      - "core/**"
+      - "scripts/gcp_worker_job.py"
+      - "scripts/smoke_ml_validate_e2e.py"
+      - "scripts/start_cloud_run.py"
+      - "scripts/gcp_dhan_token_rotation_job.py"
+      - "scripts/gcp_cloud_run_auto_deploy.py"
+      - "scripts/gcp_cloud_run_auto_deploy_impl.py"
+      - "scripts/gcp_runtime_iam_preflight.py"
+      - "scripts/gcp_failed_revision_forensic.py"
+      - "scripts/gcp_runtime_evidence.py"
+      - "scripts/gcp_public_dashboard_runtime_proof.py"
+      - "scripts/gcp_mutation_policy_runtime_proof.py"
+      - "scripts/gcp_runtime_identity_safety.py"
+      - "scripts/sync_dhan_instruments_master.py"
+      - "src/**"
+      - "config/**"
+      - "deploy/gcp/**"
+      - ".github/workflows/cloud-run-auto-deploy.yml"
+      - ".github/workflows/gcp-dhan-token-rotation.yml"
+      - ".github/workflows/frontend-runtime-smoke.yml"
   pull_request:
     branches: [ main, develop ]
   workflow_dispatch:
@@ -26,8 +48,20 @@ env:
   SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS: "720"
 
 jobs:
+  converge-current-main:
+    name: Guarded Cloud Run current-main convergence
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      id-token: write
+      statuses: write
+    uses: ./.github/workflows/cloud-run-auto-deploy.yml
+    secrets: inherit
+
   frontend-browser-runtime-smoke:
     name: BLOCKING - frontend browser runtime smoke
+    needs: converge-current-main
+    if: ${{ always() && (needs.converge-current-main.result == 'success' || needs.converge-current-main.result == 'skipped') }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
