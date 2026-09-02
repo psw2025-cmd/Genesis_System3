@@ -2362,27 +2362,24 @@ _CHAIN_COLD_START_GAP_S = 3.5  # DSM OC pacing only; never the 20s closed-market
 _CHAIN_LIVE_TIMEOUT_OPEN_S = 25.0
 _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 
-# Single-flight Dhan option-chain executor — Cloud Run 1 vCPU cannot run many
-# concurrent sync OC HTTP calls; queued to_thread work was burning the timeout
-# before the HTTP request even started (NO_DHAN_DATA / DSM timed out).
-_DHAN_OC_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="dhan-oc")
-_DHAN_OC_LOCK = asyncio.Lock()
+# core.data.datasource_manager already serializes real Dhan OC HTTP calls with
+# its own threading.Lock (_DHAN_OC_LOCK there, a distinct object from any lock
+# here) — an app-level asyncio.Lock on top of a single-worker executor was
+# redundant and reproduced exactly the deadlock this comment used to warn
+# against: a call that times out at the asyncio.wait_for layer does not cancel
+# the underlying thread, so the one worker can stay stuck running it forever
+# while every subsequent call queues behind that same worker, never runs, and
+# eventually stops responding to any Dhan-OC-serving endpoint entirely.
+_DHAN_OC_EXECUTOR = ThreadPoolExecutor(max_workers=4, thread_name_prefix="dhan-oc")
 
 
 async def _run_dhan_oc(fn, *args, timeout: float = 25.0, **kwargs):
-    """Run one Dhan OC fetch at a time on a dedicated worker thread.
-
-    DSM already serializes with its own threading lock — do not add a second
-    app-level thread lock here (that deadlocked against market-top and timed out
-    /api/chain at exactly 25s).
-    """
-
-    async with _DHAN_OC_LOCK:
-        loop = asyncio.get_running_loop()
-        return await asyncio.wait_for(
-            loop.run_in_executor(_DHAN_OC_EXECUTOR, lambda: fn(*args, **kwargs)),
-            timeout=timeout,
-        )
+    """Run a Dhan OC fetch on a dedicated worker thread pool, off the event loop."""
+    loop = asyncio.get_running_loop()
+    return await asyncio.wait_for(
+        loop.run_in_executor(_DHAN_OC_EXECUTOR, lambda: fn(*args, **kwargs)),
+        timeout=timeout,
+    )
 
 
 @app.post("/api/chain/push")
