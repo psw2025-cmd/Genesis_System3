@@ -6,8 +6,9 @@ name: Live Proof Center (GCP + Dashboard MRI)
 # Publishes Actions artifacts only (agents download LATEST pack from the run).
 
 on:
-  push:
-    branches: [main]
+  # GCP-EXIT NOTE (2026-09-01): automatic push trigger removed — this pack
+  # calls live GCP on every push; a normal main push must not invoke GCP.
+  # Manual only now. See Issue #188 / A-GCP-KILL.
   workflow_dispatch:
 
 concurrency:

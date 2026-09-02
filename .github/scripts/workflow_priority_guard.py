@@ -243,15 +243,22 @@ def main() -> int:
     if "STRICT_BROKER_RUNTIME_TRUTH=PASS" not in dhan_verify_text:
         raise SystemExit("DHAN_VERIFY_STRICT_BROKER_PROOF_MISSING")
 
+    # GCP-EXIT NOTE (2026-09-01): a normal push to main must never be able to
+    # invoke/recreate GCP resources while the owner is exiting Google Cloud
+    # to stop recurring billing (Issue #188 / A-GCP-KILL). These GCP-invoking
+    # workflows are manual-only (workflow_dispatch) now; asserting the
+    # absence of an automatic push trigger, not its presence.
     deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
-    if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
-        raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
+    if re.search(r"^\s*push\s*:", deploy_on, re.MULTILINE):
+        raise SystemExit("CLOUD_RUN_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN")
+    if "workflow_dispatch:" not in deploy_on:
+        raise SystemExit("CLOUD_RUN_MANUAL_TRIGGER_MISSING")
     if "workflow_call:" not in deploy_on:
         raise SystemExit("CLOUD_RUN_REUSABLE_TRIGGER_MISSING")
 
     full_audit_on = trigger_blocks["full-cloud-audit.yml"]
-    if "push:" not in full_audit_on or not re.search(r"branches:\s*\[\s*main\s*\]", full_audit_on):
-        raise SystemExit("FULL_CLOUD_AUDIT_MAIN_TRIGGER_MISSING")
+    if re.search(r"^\s*push\s*:", full_audit_on, re.MULTILINE):
+        raise SystemExit("FULL_CLOUD_AUDIT_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN")
     if "workflow_dispatch:" not in full_audit_on:
         raise SystemExit("FULL_CLOUD_AUDIT_MANUAL_TRIGGER_MISSING")
 
@@ -263,8 +270,10 @@ def main() -> int:
 
     proof_on = trigger_blocks["live-proof-center.yml"]
     proof_text = workflow_text["live-proof-center.yml"]
-    if "push:" not in proof_on or "workflow_dispatch:" not in proof_on:
-        raise SystemExit("LIVE_PROOF_CENTER_REQUIRED_TRIGGERS_MISSING")
+    if re.search(r"^\s*push\s*:", proof_on, re.MULTILINE):
+        raise SystemExit("LIVE_PROOF_CENTER_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN")
+    if "workflow_dispatch:" not in proof_on:
+        raise SystemExit("LIVE_PROOF_CENTER_MANUAL_TRIGGER_MISSING")
     if re.search(r"^\s*schedule\s*:", proof_on, re.MULTILINE):
         raise SystemExit("LIVE_PROOF_CENTER_SCHEDULE_FORBIDDEN")
     if "contents: write" in proof_text or "issues: write" in proof_text or "actions: write" in proof_text:

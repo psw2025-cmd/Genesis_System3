@@ -1,12 +1,10 @@
 name: system3-runbook-audit
 
 on:
+  # GCP-EXIT NOTE (2026-09-01): automatic push trigger removed — this audit
+  # calls live GCP; a normal main push must not invoke GCP. Manual only now.
+  # See Issue #188 / A-GCP-KILL.
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - "deploy/runner/**"
-      - "dashboard/backend/**"
 
 jobs:
   run-audit:
