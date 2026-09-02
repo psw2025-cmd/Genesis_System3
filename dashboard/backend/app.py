@@ -6006,16 +6006,6 @@ async def get_multibagger_workspace_endpoint():
     return get_multibagger_research_data()
 
 
-@app.get("/api/backtest/results")
-async def get_backtest_results_endpoint():
-    """Backtest execution results endpoint (PEND-013)."""
-    try:
-        from dashboard.backend.backtest_service import get_backtest_results
-    except ImportError:
-        from backtest_service import get_backtest_results
-    return get_backtest_results()
-
-
 @app.get("/api/backtest/strategies")
 async def get_backtest_strategies_endpoint():
     """Backtest strategy catalogue endpoint."""
@@ -6048,28 +6038,74 @@ async def get_news_endpoint():
 
 @app.get("/api/runbook/audit")
 async def runbook_audit_endpoint():
-    """Automated operational runbook audit endpoint."""
+    """Automated operational runbook audit endpoint.
+
+    Every check here is computed from a real signal - several other internal
+    audit tools treat this response as evidence, so it must never report a
+    fixed PASS (including governance flags) that nobody actually verified.
+    """
     utc_now = datetime.now(timezone.utc).isoformat()
+
+    live_trading_enabled = os.environ.get("LIVE_TRADING_ENABLED", "0").strip() == "1"
+    system3_live_trading_allowed = os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0").strip() == "1"
+    auto_execute_trades = os.environ.get("AUTO_EXECUTE_TRADES", "0").strip() == "1"
+
+    on_cloud_run = bool(os.environ.get("K_SERVICE"))
+
+    try:
+        secrets_report = await audit_secrets()
+        secrets_status = secrets_report.get("status", "FAIL") if isinstance(secrets_report, dict) else "FAIL"
+    except Exception:
+        secrets_status = "FAIL"
+
+    # Duplicate (path, method) route registrations silently shadow one
+    # handler with another (the T21/T22 bug shape) - this doubles as a
+    # standing regression guard, not a fresh fixture.
+    seen_routes: set = set()
+    duplicate_routes = []
+    for route in app.routes:
+        path = getattr(route, "path", None)
+        methods = getattr(route, "methods", None) or set()
+        if not path:
+            continue
+        for method in methods:
+            key = (path, method)
+            if key in seen_routes:
+                duplicate_routes.append(f"{method} {path}")
+            seen_routes.add(key)
+    ui_alignment_status = "FAIL" if duplicate_routes else "PASS"
+
+    # These require live GCP API calls this request path does not make; while
+    # actually running on Cloud Run, honestly report as unverified rather
+    # than a fabricated PASS. Off Cloud Run (the laptop-first GCP-exit
+    # state), they are simply not applicable.
+    gcp_check_status = "NOT_APPLICABLE_LOCAL" if not on_cloud_run else "NOT_VERIFIED_NO_LIVE_CHECK"
+
+    checks = {
+        "live_endpoint": gcp_check_status,
+        "gcs_artifact": gcp_check_status,
+        "secrets": secrets_status,
+        "scheduler_pubsub": gcp_check_status,
+        "iam_wif": gcp_check_status,
+        "ui_alignment": ui_alignment_status,
+    }
+    overall_verdict = "PASS" if all(v in ("PASS", "NOT_APPLICABLE_LOCAL") for v in checks.values()) else "FAIL"
+
     return {
         "audit_id": "audit-live-runbook",
         "checked_at_utc": utc_now,
-        "overall_verdict": "PASS",
+        "overall_verdict": overall_verdict,
         "service": "genesis-system3-web",
         "project": "system3-openalgo-safe",
         "region": "asia-south1",
-        "checks": {
-            "live_endpoint": "PASS",
-            "gcs_artifact": "PASS",
-            "secrets": "PASS",
-            "scheduler_pubsub": "PASS",
-            "iam_wif": "PASS",
-            "ui_alignment": "PASS"
-        },
+        "deploy_target": "gcp-cloud-run" if on_cloud_run else "local-laptop",
+        "checks": checks,
+        "duplicate_routes": duplicate_routes,
         "governance": {
-            "analyze_mode": 1,
-            "live_trading_enabled": False,
-            "system3_live_trading_allowed": False,
-            "auto_execute_trades": False
+            "analyze_mode": os.environ.get("ANALYZE_MODE", "1"),
+            "live_trading_enabled": live_trading_enabled,
+            "system3_live_trading_allowed": system3_live_trading_allowed,
+            "auto_execute_trades": auto_execute_trades,
         }
     }
 
@@ -10411,7 +10447,14 @@ async def get_ml_predictions():
         return {"predictions": [], "status": "error", "error": str(exc)[:200]}
 
 # SYSTEM3_BACKEND_VIRTUAL_LIVE_SIMULATION_ROUTES
-@app.get("/api/simulation/live/state")
+# NOTE (2026-09-02): renamed from /api/simulation/live/state, which collided
+# with the earlier, real paper-data-backed handler of the same path/method
+# above (get_simulation_live_state) - a duplicate registration silently
+# shadowed this one (dead code, unreachable) since Starlette matches routes
+# in registration order. No frontend consumer calls this virtual-scenario
+# path, so it is only renamed here, not removed, to keep this route family
+# (chain/signals/paper) internally consistent.
+@app.get("/api/simulation/live/virtual-state")
 async def get_virtual_live_simulation_state(scenario: str = "trend"):
     """Backend virtual live-market simulation feed. No real broker/orders."""
     try:
@@ -10419,7 +10462,7 @@ async def get_virtual_live_simulation_state(scenario: str = "trend"):
     except ImportError:
         from live_simulation_service import build_virtual_live_state
     payload = build_virtual_live_state(scenario=scenario)
-    payload["api_route"] = "/api/simulation/live/state"
+    payload["api_route"] = "/api/simulation/live/virtual-state"
     payload["live_trading_enabled"] = False
     payload["order_placement_allowed"] = False
     payload["real_broker_routes_called"] = False
