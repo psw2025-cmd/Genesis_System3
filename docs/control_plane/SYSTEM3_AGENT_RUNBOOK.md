@@ -61,9 +61,9 @@ For each issue or goal Claude must: verify the authoritative symptom; identify r
 
 ## GCP-exit and billing-control requirement
 
-The 2026-09-01 evidence establishes a contained but unresolved configuration conflict: all nine asia-south1 Cloud Scheduler jobs were observed PAUSED, while prior same-day executions show the scheduler collector firing approximately every minute and Dhan token rotation approximately every five minutes. Repository scheduler authority also conflicts: the scheduler contract encodes high-frequency behavior while the rotation infrastructure documentation describes a 07:30 Asia/Kolkata trigger.
+The 2026-09-01 evidence established a contained configuration conflict: all nine asia-south1 Cloud Scheduler jobs were observed PAUSED, while prior same-day executions showed the scheduler collector firing approximately every minute and Dhan token rotation approximately every five minutes. PR #449 retires the contradictory `infra/rotate-job.yaml` GCP manifest; that deleted file and its 07:30 Asia/Kolkata trigger are historical and non-authoritative.
 
-Claude must keep the high-frequency schedules contained while reconciling repository SSOT, GCP runtime, laptop runtime, broker token lifecycle, state/data dependencies, backup/restore, background workers, logging/monitoring, deployment triggers and cost-generating resources. A pause alone is not completion if repository automation can recreate the cost source.
+Claude must keep retired GCP schedules from being recreated while reconciling repository SSOT, laptop runtime, broker token lifecycle, state/data dependencies, backup/restore, background workers, logging/monitoring and cost-generating triggers. A deleted manifest alone is not proof of the selected laptop runtime.
 
 ## Production and UI proof
 

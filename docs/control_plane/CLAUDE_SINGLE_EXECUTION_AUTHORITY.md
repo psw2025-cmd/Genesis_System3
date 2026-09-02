@@ -40,7 +40,7 @@ All agents may identify defects, risks, contradictions and evidence. They must h
 
 Current operator evidence on 2026-09-01 shows all nine Cloud Scheduler jobs in `asia-south1` PAUSED. Prior same-day execution evidence shows `genesis-system3-scheduler-collector` had been invoked approximately every minute and `genesis-system3-dhan-token-rotate` approximately every five minutes before containment.
 
-Repository evidence also contains contradictory scheduler authority: `dashboard/backend/scheduler_contract.py` encodes the collector as enabled and the Dhan rotation cadence as `*/5 * * * *`, while `infra/rotate-job.yaml` documents a 07:30 Asia/Kolkata primary scheduler trigger. Claude must reconcile source SSOT and runtime so paused/high-cost automation cannot be silently recreated.
+The contradictory `infra/rotate-job.yaml` GCP manifest was removed by PR #449. It is historical and non-authoritative. `dashboard/backend/scheduler_contract.py` remains the repository scheduler-contract source; laptop runtime scheduling must not recreate the retired GCP manifest or its 07:30 Asia/Kolkata trigger.
 
 Do not resume high-frequency schedulers merely to obtain proof. Preserve containment while identifying the canonical low-cost architecture.
 

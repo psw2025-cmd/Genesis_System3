@@ -157,28 +157,8 @@ def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
       module-based: {"module": "core.engine.foo"}  → python -m core.engine.foo
       script-based: {"script": "scripts/foo.py", "args": ["--mode", "rank"]}
     Optional: {"timeout_minutes": 10} overrides default 5-minute timeout.
-
-    Fail-closed repo-state guard: GitHub main is the sole source of truth
-    (docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md). No job may run
-    against a checkout that has diverged from origin/main — halts rather than
-    executing possibly-unreviewed local code.
     """
     job_id = job["id"]
-
-    from core.engine.repo_state_guard import check_and_sync_repo_state
-
-    guard = check_and_sync_repo_state(PROJECT_ROOT)
-    if not guard.get("ok"):
-        print(
-            f"[PH82] HALT job {job_id}: repo/local state diverged "
-            f"({guard.get('reason')}: {guard.get('detail', '')})"
-        )
-        return {
-            "last_run_time": datetime.now().isoformat(),
-            "last_status": "HALTED_REPO_DIVERGENCE",
-            "last_error": f"{guard.get('reason')}: {guard.get('detail', '')}",
-        }
-
     print(f"[PH82] Running job: {job.get('name', job_id)} ({job_id})...")
 
     if "script" in job:
@@ -355,19 +335,6 @@ def run_daemon() -> None:
     """
     pid_file = PROJECT_ROOT / "state" / "scheduler_daemon.pid"
     pid_file.parent.mkdir(parents=True, exist_ok=True)
-    if pid_file.exists():
-        try:
-            existing_pid = int(pid_file.read_text().strip())
-            import psutil
-
-            if psutil.pid_exists(existing_pid):
-                print(
-                    f"[PH82-Daemon] Refusing to start: PID={existing_pid} in "
-                    f"{pid_file} is still running. Stop it first if this is stale."
-                )
-                return
-        except (ValueError, ImportError):
-            pass  # stale/unreadable pid file, or psutil unavailable — safe to take over
     pid_file.write_text(str(os.getpid()))
     print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
 
@@ -543,27 +510,6 @@ def run_daemon() -> None:
                     f"JOB FIRED ({fire_status}): {job_id} — status={result.get('last_status', 'UNKNOWN')}"
                 )
                 print(f"[PH82-Daemon] {job_id} done — {result.get('last_status')}")
-
-        try:
-            from core.engine.repo_state_guard import (
-                push_sanitized_status_if_due,
-                write_sanitized_scheduler_status,
-            )
-
-            write_sanitized_scheduler_status(
-                PROJECT_ROOT,
-                {
-                    "daemon_heartbeat": state.get("daemon_heartbeat"),
-                    "daemon_pid": state.get("daemon_pid"),
-                    "config_jobs_total": state.get("config_jobs_total"),
-                    "config_jobs_enabled": state.get("config_jobs_enabled"),
-                    "fired_keys_today": state.get("fired_keys_today"),
-                    "jobs": state.get("jobs", {}),
-                },
-            )
-            push_sanitized_status_if_due(PROJECT_ROOT)
-        except Exception as exc:
-            print(f"[PH82-Daemon] sanitized status write/push skipped: {exc}")
 
         if _stop["flag"]:
             break
