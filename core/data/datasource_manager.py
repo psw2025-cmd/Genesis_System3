@@ -136,9 +136,11 @@ class DataSourceManager:
             try:
                 from dhanhq import dhanhq
                 from dhanhq.dhan_context import DhanContext
+                from core.utils.env_loader import get_dhan_credentials
 
-                client_id = os.environ.get("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff")
-                token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+                creds = get_dhan_credentials()
+                client_id = creds.get("client_id", "").strip().lstrip("\ufeff")
+                token = creds.get("access_token", "").strip().lstrip("\ufeff")
                 if client_id and token:
                     ctx = DhanContext(client_id, token)
                     self._client = dhanhq(ctx)
