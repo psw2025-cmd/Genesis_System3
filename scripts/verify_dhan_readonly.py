@@ -98,8 +98,11 @@ except Exception as exc:
 # ── Masked credentials ────────────────────────────────────────────────────────
 if ADAPTER_OK:
     masked = get_dhan_credentials_masked()
-    print(f"CLIENT_ID_MASKED: {masked['client_id_masked']}")
-    print(f"TOKEN_MASKED: {masked['access_token_masked']}")
+    # get_dhan_credentials_masked() already redacts both values (see
+    # dhan_readonly._mask) before they reach this print - CodeQL's taint
+    # tracker does not recognize that sanitizer, hence the false positive.
+    print(f"CLIENT_ID_MASKED: {masked['client_id_masked']}")  # lgtm[py/clear-text-logging-sensitive-data]
+    print(f"TOKEN_MASKED: {masked['access_token_masked']}")  # lgtm[py/clear-text-logging-sensitive-data]
 
 # ── Profile check ─────────────────────────────────────────────────────────────
 PROFILE_PASS = False
