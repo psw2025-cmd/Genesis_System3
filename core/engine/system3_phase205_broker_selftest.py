@@ -53,12 +53,8 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
 
                 creds = get_dhan_credentials()
 
-                # mask_sensitive() redacts the client id before it reaches this
-                # write, and the access token line only ever writes the fixed
-                # literal '***'/'NOT_SET' - never the value itself. CodeQL's
-                # taint tracker flags the raw expression regardless.
-                f.write(f"Client ID: {mask_sensitive(creds.get('client_id', ''))}\n")  # lgtm[py/clear-text-storage-sensitive-data]
-                f.write(f"Access Token: {'***' if creds.get('access_token') else 'NOT_SET'}\n\n")  # lgtm[py/clear-text-storage-sensitive-data]
+                f.write(f"Client ID: {mask_sensitive(creds.get('client_id', ''))}\n")
+                f.write(f"Access Token: {'***' if creds.get('access_token') else 'NOT_SET'}\n\n")
 
                 if not all([creds.get("client_id"), creds.get("access_token")]):
                     f.write("Status: INCOMPLETE_CREDENTIALS\n")
