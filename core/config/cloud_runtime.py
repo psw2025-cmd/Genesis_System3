@@ -55,11 +55,17 @@ def is_cloud_runtime() -> bool:
 
 
 def _cloud_permanent() -> bool:
-    if is_cloud_runtime():
-        return True
-    deploy = (os.environ.get("SYSTEM3_DEPLOY_TARGET") or "").strip().lower()
-    cloud_mode = (os.environ.get("CLOUD_MODE") or "").strip().lower()
-    return deploy == "gcp-cloud-run" or cloud_mode in {"1", "true", "yes", "on"}
+    """Runtime truth must come from the actual process location, not stale env/config."""
+    return is_cloud_runtime()
+
+
+def _first_loopback_env(*names: str) -> str:
+    """Return the first explicitly configured loopback URL, ignoring stale remote URLs."""
+    for name in names:
+        value = (os.environ.get(name) or "").strip().rstrip("/")
+        if value and _is_loopback_url(value):
+            return value
+    return ""
 
 
 def public_cors_origins() -> list[str]:
@@ -77,6 +83,24 @@ def public_cors_origins() -> list[str]:
 
 
 def public_base_url() -> str:
+    """Return truthful public metadata for the current runtime.
+
+    Local-laptop mode is authoritative whenever this process is not actually on
+    Cloud Run.  Stale machine/user environment variables left over from the GCP
+    era must therefore never make a localhost process advertise a Cloud Run URL.
+    """
+    if not is_cloud_runtime():
+        local_env = _first_loopback_env(
+            "SYSTEM3_API_BASE",
+            "DASHBOARD_BASE_URL",
+            "SYSTEM3_PUBLIC_BACKEND_URL",
+            "PUBLIC_BACKEND_URL",
+        )
+        if local_env:
+            return local_env
+        canonical = _canonical_public_base_url()
+        return canonical if _is_loopback_url(canonical) else str(_DEFAULTS["public_base_url"])
+
     env = (
         os.environ.get("PUBLIC_BACKEND_URL")
         or os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
@@ -84,25 +108,26 @@ def public_base_url() -> str:
         or os.environ.get("DASHBOARD_BASE_URL")
         or ""
     ).strip().rstrip("/")
-    cloud_permanent = _cloud_permanent()
-    if env and not (_is_loopback_url(env) and cloud_permanent):
+    if env and not _is_loopback_url(env):
         return env
-    if cloud_permanent or not env:
-        canonical = _canonical_public_base_url()
-        if cloud_permanent and _is_loopback_url(canonical):
-            return _CLOUD_DEFAULT_PUBLIC_BASE_URL
+    canonical = _canonical_public_base_url()
+    if canonical and not _is_loopback_url(canonical):
         return canonical
-    return env
+    return _CLOUD_DEFAULT_PUBLIC_BASE_URL
 
 
 def public_dashboard_url() -> str:
     env = (os.environ.get("PUBLIC_DASHBOARD_URL") or "").strip().rstrip("/")
-    if env and not (_is_loopback_url(env) and _cloud_permanent()):
+    if is_cloud_runtime() and env and not _is_loopback_url(env):
+        return env
+    if not is_cloud_runtime() and env and _is_loopback_url(env):
         return env
     return f"{public_base_url()}{public_ui_path()}"
 
 
 def deploy_target() -> str:
+    if not is_cloud_runtime():
+        return "local-laptop"
     return (
         os.environ.get("SYSTEM3_DEPLOY_TARGET")
         or str(load_cloud_runtime().get("deploy_target") or "local-laptop")
