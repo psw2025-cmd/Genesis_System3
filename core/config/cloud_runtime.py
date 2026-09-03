@@ -18,6 +18,7 @@ _DEFAULTS: Dict[str, Any] = {
     "public_base_url": "http://127.0.0.1:8000",
     "ui_path": "/ui",
 }
+_CLOUD_DEFAULT_PUBLIC_BASE_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 
 def load_cloud_runtime() -> Dict[str, Any]:
@@ -54,7 +55,11 @@ def is_cloud_runtime() -> bool:
 
 
 def _cloud_permanent() -> bool:
-    return is_cloud_runtime()
+    if is_cloud_runtime():
+        return True
+    deploy = (os.environ.get("SYSTEM3_DEPLOY_TARGET") or "").strip().lower()
+    cloud_mode = (os.environ.get("CLOUD_MODE") or "").strip().lower()
+    return deploy == "gcp-cloud-run" or cloud_mode in {"1", "true", "yes", "on"}
 
 
 def public_cors_origins() -> list[str]:
@@ -79,10 +84,14 @@ def public_base_url() -> str:
         or os.environ.get("DASHBOARD_BASE_URL")
         or ""
     ).strip().rstrip("/")
-    if env and not (_is_loopback_url(env) and _cloud_permanent()):
+    cloud_permanent = _cloud_permanent()
+    if env and not (_is_loopback_url(env) and cloud_permanent):
         return env
-    if _cloud_permanent() or not env:
-        return _canonical_public_base_url()
+    if cloud_permanent or not env:
+        canonical = _canonical_public_base_url()
+        if cloud_permanent and _is_loopback_url(canonical):
+            return _CLOUD_DEFAULT_PUBLIC_BASE_URL
+        return canonical
     return env
 
 
