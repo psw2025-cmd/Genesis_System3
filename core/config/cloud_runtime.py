@@ -1,4 +1,4 @@
-"""Canonical Google Cloud Run runtime defaults for Genesis System3."""
+"""Canonical runtime defaults for Genesis System3."""
 from __future__ import annotations
 
 import json
@@ -10,12 +10,12 @@ _ROOT = Path(__file__).resolve().parents[2]
 _CONFIG_PATH = _ROOT / "config" / "cloud_runtime.json"
 
 _DEFAULTS: Dict[str, Any] = {
-    "deploy_target": "gcp-cloud-run",
-    "cloud_provider": "google_cloud",
-    "region": "asia-south1",
-    "project_id": "system3-openalgo-safe",
-    "service_name": "genesis-system3-web",
-    "public_base_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "deploy_target": "local-laptop",
+    "cloud_provider": "local",
+    "region": "",
+    "project_id": "",
+    "service_name": "local-laptop",
+    "public_base_url": "http://127.0.0.1:8000",
     "ui_path": "/ui",
 }
 
@@ -49,14 +49,8 @@ def _is_loopback_url(url: str) -> bool:
 
 
 def is_cloud_runtime() -> bool:
-    """True only for this running process, not for the checked-in production target."""
-    mode = os.environ.get("CLOUD_MODE", "").strip().lower()
-    target = os.environ.get("SYSTEM3_DEPLOY_TARGET", "").strip().lower()
-    return (
-        mode in {"1", "true", "yes", "on"}
-        or "cloud-run" in target
-        or bool(os.environ.get("K_SERVICE", "").strip())
-    )
+    """True only when the process is actually running on Cloud Run."""
+    return bool(os.environ.get("K_SERVICE", "").strip())
 
 
 def _cloud_permanent() -> bool:
@@ -102,5 +96,5 @@ def public_dashboard_url() -> str:
 def deploy_target() -> str:
     return (
         os.environ.get("SYSTEM3_DEPLOY_TARGET")
-        or str(load_cloud_runtime().get("deploy_target") or "gcp-cloud-run")
+        or str(load_cloud_runtime().get("deploy_target") or "local-laptop")
     ).strip()

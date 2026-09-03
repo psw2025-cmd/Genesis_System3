@@ -37,7 +37,7 @@ jobs:
     env:
       CC_AGENT_ID: cursor-composer
       CC_RUN_ID: ${{ github.run_id }}
-      SYSTEM3_PUBLIC_BASE: https://genesis-system3-web-doq2wplepa-el.a.run.app
+      SYSTEM3_PUBLIC_BASE: http://127.0.0.1:8000
     steps:
       - name: Checkout
         uses: actions/checkout@v4

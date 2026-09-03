@@ -43,7 +43,7 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("useStore", text)
         self.assertNotIn("if (data.loading) return", text)
         self.assertIn("BACKGROUND REFRESH", text)
-        self.assertIn("Shared GCP/Dhan truth renders immediately", text)
+        self.assertIn("Shared local/Dhan truth renders immediately", text)
         self.assertIn("loading: false", text)
 
     def test_positions_explicitly_separates_paper_and_dhan_ledgers(self):

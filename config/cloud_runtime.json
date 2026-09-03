@@ -1,18 +1,16 @@
 {
   "schema": 1,
-  "deploy_target": "gcp-cloud-run",
-  "cloud_provider": "google_cloud",
-  "region": "asia-south1",
-  "project_id": "system3-openalgo-safe",
-  "service_name": "genesis-system3-web",
-  "public_base_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-  "public_origin_aliases": [
-    "https://genesis-system3-web-802404398783.asia-south1.run.app"
-  ],
+  "deploy_target": "local-laptop",
+  "cloud_provider": "local",
+  "region": "",
+  "project_id": "",
+  "service_name": "local-laptop",
+  "public_base_url": "http://127.0.0.1:8000",
+  "public_origin_aliases": [],
   "ui_path": "/ui",
   "notes": [
-    "Canonical production host is Google Cloud Run — not Render.",
-    "Frontend on Cloud Run must use same-origin API (empty VITE_API_BASE_URL).",
-    "Local tools default to http://127.0.0.1:8000 unless SYSTEM3_API_BASE / DASHBOARD_BASE_URL is set."
+    "Default development/runtime host is the local laptop loopback URL.",
+    "Frontend dev server should target http://127.0.0.1:8000 for API access.",
+    "Environment variables may still override these defaults when needed."
   ]
 }

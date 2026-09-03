@@ -158,7 +158,7 @@ export function GenesisTab() {
   const biasTone = /bull|up|long/i.test(bias) ? 'up' : /bear|down|short/i.test(bias) ? 'down' : 'warn'
 
   const modules = [
-    ['Shared GCP Truth', sharedHealth || sharedState ? 'ACTIVE' : 'READY', 100],
+    ['Shared Local Truth', sharedHealth || sharedState ? 'ACTIVE' : 'READY', 100],
     ['Dhan Broker', brokerOk ? 'CONNECTED' : 'STANDBY', 100],
     ['Genesis Brain', 'ACTIVE', 96],
     ['Data Truth', 'ACTIVE', truthScore],
@@ -180,7 +180,7 @@ export function GenesisTab() {
       {data.loading && (
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-mono mb-3">
           <span className="font-bold text-blue-400">BACKGROUND REFRESH</span>
-          <span className="text-slate-400 ml-2">Optional Genesis modules are refreshing. Shared GCP/Dhan truth below stays visible and current.</span>
+          <span className="text-slate-400 ml-2">Optional Genesis modules are refreshing. Shared local/Dhan truth below stays visible and current.</span>
         </div>
       )}
       {/* Header Card */}
@@ -195,7 +195,7 @@ export function GenesisTab() {
                 Genesis Brain / AI Decision Center
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Shared GCP/Dhan truth renders immediately; model-specific evidence refreshes independently
+                Shared local/Dhan truth renders immediately; model-specific evidence refreshes independently
               </p>
             </div>
           </div>
