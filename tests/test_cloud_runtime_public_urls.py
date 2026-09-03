@@ -8,24 +8,40 @@ from core.config.cloud_runtime import (
 )
 
 LOCAL = "http://127.0.0.1:8000"
+GCP = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 
 def test_public_base_url_prefers_system3_env(monkeypatch):
     monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", LOCAL)
     monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
+    monkeypatch.delenv("K_SERVICE", raising=False)
     assert public_base_url() == LOCAL
     assert public_dashboard_url() == f"{LOCAL}/ui"
     assert public_ui_path() == "/ui"
 
 
-def test_public_base_url_reads_legacy_public_backend_url(monkeypatch):
+def test_local_runtime_ignores_stale_remote_public_backend_url(monkeypatch):
     monkeypatch.delenv("K_SERVICE", raising=False)
-    monkeypatch.delenv("SYSTEM3_DEPLOY_TARGET", raising=False)
     monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
     monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)
-    monkeypatch.setenv("PUBLIC_BACKEND_URL", "https://example.invalid")
-    assert public_base_url() == "https://example.invalid"
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", GCP)
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
+    assert deploy_target() == "local-laptop"
+
+
+def test_local_runtime_ignores_stale_gcp_mode_and_deploy_target(monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
+    monkeypatch.setenv("CLOUD_MODE", "1")
+    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", GCP)
+    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", GCP)
+    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", f"{GCP}/ui")
+    assert is_cloud_runtime() is False
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
+    assert deploy_target() == "local-laptop"
 
 
 def test_local_defaults_use_loopback(monkeypatch):
@@ -35,6 +51,7 @@ def test_local_defaults_use_loopback(monkeypatch):
     monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
     monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_DEPLOY_TARGET", raising=False)
+    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
     assert public_base_url() == LOCAL
     assert public_dashboard_url() == f"{LOCAL}/ui"
     assert deploy_target() == "local-laptop"
