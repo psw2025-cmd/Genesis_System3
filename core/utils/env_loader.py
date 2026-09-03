@@ -25,22 +25,28 @@ def _local_vault_secret(key: str) -> str:
 
 
 def _dynamic_cloud_token() -> str:
-    """Load token from local Windows vault first, then GCP Secret Manager if in cloud."""
-    # 1. Local secure vault target
+    """Load Dhan token with local-laptop authority and cloud fallback only on real Cloud Run."""
+    # 1. Canonical local secure vault target.
     local_token = _local_vault_secret("DHAN_ACCESS_TOKEN")
     if local_token:
         return local_token
 
-    # 2. Cloud Secret Manager dynamic provider (Cloud Run only)
-    if bool(os.getenv("K_SERVICE") or os.getenv("CLOUD_MODE")):
+    # 2. Plain environment fallback for an explicitly configured local session.
+    env_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+    if env_token:
+        return env_token
+
+    # 3. Legacy Cloud Secret Manager is reachable only when the process is
+    # actually on Cloud Run.  Stale CLOUD_MODE=0/1 values on a Windows laptop
+    # must never redirect broker credential discovery back to GCP.
+    if bool(os.getenv("K_SERVICE", "").strip()):
         try:
             from core.brokers.dhan.cloud_token_provider import get_access_token
             return get_access_token(reason="env_loader")
         except Exception:
             pass
 
-    # 3. Environment variable fallback
-    return os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+    return ""
 
 
 def get_dhan_credentials():
