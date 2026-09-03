@@ -24,6 +24,11 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+try:
+    from dashboard.backend.trade_logger import log_trade_event
+except ImportError:
+    from trade_logger import log_trade_event
+
 IST = timezone(timedelta(hours=5, minutes=30))
 
 LOT_SIZES = {
@@ -320,6 +325,21 @@ class CloudPaperEngine:
                     del self.open_positions[i]
                     self.closed_positions.append(closed)
                     self._append_trade_csv(closed, "CLOSE")
+                    log_trade_event(
+                        event_type="POSITION_CLOSED",
+                        position_id=closed.get("position_id"),
+                        underlying=closed.get("underlying"),
+                        symbol=closed.get("trading_symbol"),
+                        strike=closed.get("strike"),
+                        option_type=closed.get("option_type"),
+                        action="CLOSE",
+                        entry_price=closed.get("entry_price"),
+                        exit_price=closed.get("exit_price"),
+                        qty=closed.get("qty"),
+                        pnl=closed.get("realized_pnl"),
+                        strategy=closed.get("strategy"),
+                        exit_reason=closed.get("exit_reason"),
+                    )
                     self._save_state()
                     self._write_outputs()
                     return closed
@@ -393,6 +413,22 @@ class CloudPaperEngine:
                 }
                 self.closed_positions.append(closed)
                 self._append_trade_csv(closed, "CLOSE")
+                log_trade_event(
+                    event_type="POSITION_CLOSED",
+                    position_id=closed.get("position_id"),
+                    underlying=closed.get("underlying"),
+                    symbol=closed.get("trading_symbol"),
+                    strike=closed.get("strike"),
+                    option_type=closed.get("option_type"),
+                    action="CLOSE",
+                    entry_price=closed.get("entry_price"),
+                    exit_price=closed.get("exit_price"),
+                    qty=closed.get("qty"),
+                    pnl=closed.get("realized_pnl"),
+                    strategy=closed.get("strategy"),
+                    exit_reason=closed.get("exit_reason"),
+                    timestamp=closed.get("timestamp"),
+                )
             else:
                 pos["current_price"] = round(cur, 2)
                 pos["ltp"] = round(cur, 2)
@@ -474,6 +510,19 @@ class CloudPaperEngine:
                 }
                 self.open_positions.append(pos)
                 self._append_trade_csv(pos, "OPEN")
+                log_trade_event(
+                    event_type="POSITION_OPENED",
+                    position_id=pos["position_id"],
+                    underlying=pos["underlying"],
+                    symbol=pos["trading_symbol"],
+                    strike=pos["strike"],
+                    option_type=pos["option_type"],
+                    action="OPEN",
+                    entry_price=pos["entry_price"],
+                    qty=pos["qty"],
+                    strategy=pos["strategy"],
+                    timestamp=pos["timestamp"],
+                )
 
         self._write_outputs()
         self._save_state()
