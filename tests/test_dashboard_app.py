@@ -218,37 +218,30 @@ def test_multibagger_model_proof_requires_all_hashes(app):
     assert "proof" not in model
 
 
-def test_root_advertises_cloud_urls_not_localhost(app, monkeypatch):
-    monkeypatch.setenv("CLOUD_MODE", "1")
-    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
-    monkeypatch.setenv(
-        "SYSTEM3_PUBLIC_BACKEND_URL",
-        "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-    )
+def test_root_advertises_local_urls(app, monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+    monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
     status, _, body = call(app, "GET", "/")
     assert status == 200
     data = json.loads(body)
-    assert data["backend_url"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app"
-    assert data["dashboard_url"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui"
-    assert data["health"] == "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/health"
-    assert "127.0.0.1" not in data["backend_url"]
-    assert "localhost" not in data["dashboard_url"]
+    assert data["backend_url"] == "http://127.0.0.1:8000"
+    assert data["dashboard_url"] == "http://127.0.0.1:8000/ui"
+    assert data["health"] == "http://127.0.0.1:8000/api/health"
     assert data["relative_paths"]["dashboard"] == "/ui"
 
 
-def test_root_ignores_localhost_env_when_cloud_permanent(app, monkeypatch):
+def test_root_ignores_stale_cloud_env_in_local_runtime(app, monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.setenv("CLOUD_MODE", "1")
     monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
-    monkeypatch.setenv("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000")
-    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", "http://127.0.0.1:8000")
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app")
     status, _, body = call(app, "GET", "/")
     assert status == 200
     data = json.loads(body)
-    assert data["backend_url"].startswith("https://")
-    assert data["dashboard_url"].endswith("/ui")
-    assert "127.0.0.1" not in json.dumps(data)
+    assert data["backend_url"] == "http://127.0.0.1:8000"
+    assert data["dashboard_url"] == "http://127.0.0.1:8000/ui"
 
 
 def test_state_endpoint_returns_200(app):
