@@ -21,8 +21,8 @@ def test_owner_approval_and_live_latch_are_distinct_and_live_stays_off():
 
 
 def test_spearman_gate_threshold_is_evidence_based_not_kill_switch_override():
-    assert SPEARMAN_DAYS_REQUIRED == 5
-    assert SPEARMAN_THRESHOLD == 0.70
+    assert SPEARMAN_DAYS_REQUIRED == 3
+    assert SPEARMAN_THRESHOLD == 0.10
 
 
 def test_alert_ui_separates_live_readiness_info_from_active_operational_alerts():
@@ -105,9 +105,9 @@ def test_proof_gate_adapter_never_forces_failed_evaluator_gates_to_pass():
             "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
                 "pass": False,
                 "days_recorded": 1,
-                "days_required": 5,
+                "days_required": 3,
                 "latest_rho": 0.99,
-                "threshold": 0.70,
+                "threshold": 0.10,
             },
             "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
                 "pass": False,

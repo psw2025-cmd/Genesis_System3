@@ -359,6 +359,11 @@ def test_order_create_rejected_when_kill_switch_active(app, monkeypatch, tmp_pat
     monkeypatch.setattr(ks_mod, "KILL_SWITCH_JSON", kill_file)
 
     endpoint = route_endpoint(app, "POST", "/api/orders/create")
+
+    async def _mock_get_positions():
+        return {"positions": []}
+
+    monkeypatch.setitem(endpoint.__globals__, "get_positions", _mock_get_positions)
     data = asyncio.run(
         endpoint(
             {

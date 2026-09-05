@@ -1,6 +1,6 @@
 # System3 Auto Gates
 
-Generated: `2026-08-29T18:22:15.380567Z`
+Generated: `2026-09-05T20:10:34.151180Z`
 Gates passing: **5/7**
 Trade ready: **False**
 Analyzer ready: **True**

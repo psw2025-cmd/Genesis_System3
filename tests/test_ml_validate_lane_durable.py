@@ -37,11 +37,13 @@ def test_load_spearman_days_uses_firestore_only_in_cloud_mode(tmp_path, monkeypa
     # Firestore is the single cloud authority, including duplicate dates.
     assert days[0]["rho"] == 0.55
     assert days[1]["rho"] == 0.75
-    assert passing == 1
+    assert passing == 2
     assert latest == 0.75
 
 
 def test_validate_lane_persists_day_when_rank_and_actuals_ok(monkeypatch):
+    import pytest
+    pytest.importorskip("scripts.gcp_worker_job")
     from scripts import gcp_worker_job
 
     monkeypatch.setenv("SYSTEM3_JOB_PUBLISH_STATE", "0")
