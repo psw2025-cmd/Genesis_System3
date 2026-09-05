@@ -21,15 +21,10 @@ on:
   workflow_run:
     workflows:
       - "Genesis System3 Global Safety CI"
-      - "Cloud Run Auto Deploy"
       - "Frontend Browser Runtime Smoke"
-      - "GCP Dhan Token Fix CI"
-      - "GCP Dhan Token Rotation Manual Recovery"
-      - "GCP Stage 2 Safety Checks"
       - "CodeQL Security Audit"
       - "Security Audit Evidence"
       - "SonarQube Audit"
-      - "Full Cloud Audit and Forensic Consensus"
     types: [completed]
   deployment_status:
 
