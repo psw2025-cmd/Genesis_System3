@@ -6,6 +6,11 @@ expected NSE market session it waits for exact-SHA API readiness, a connected
 read-only Dhan broker, and four fresh required index chains, then verifies the
 rendered browser no longer shows the known cold-start/false-closed markers.
 
+The browser phase deliberately loads the SPA exactly once and switches tabs by
+clicking the existing dashboard navigation. This preserves one continuously
+hydrated frontend document/store epoch across the semantic scan and records a
+stable document marker for every captured tab.
+
 Read-only only: GET/browser reads. No token mint, Secret Manager write, order,
 LIVE toggle, IAM mutation, or control-plane mutation is performed here.
 """
@@ -51,12 +56,10 @@ KEY_TAB_FORBIDDEN = {
     "system": ("BROKER NOT PROVEN",),
 }
 
-# Honest after-hours UI may show these; only reject them during an expected NSE session.
 SESSION_OPEN_ONLY_FORBIDDEN = frozenset({"MARKET CLOSED", "AFTER HOURS"})
 
 
 def _effective_forbidden(forbidden: tuple[str, ...], *, expect_open: bool) -> tuple[str, ...]:
-    """Return tab forbidden markers applicable for the current session window."""
     if expect_open:
         return forbidden
     return tuple(marker for marker in forbidden if marker not in SESSION_OPEN_ONLY_FORBIDDEN)
@@ -200,44 +203,71 @@ def _wait_api_ready(expect_open: bool) -> tuple[dict, list[dict]]:
         time.sleep(POLL_SECONDS)
 
 
-def _browser_semantic_check(expect_open: bool) -> dict:
-    from scripts.gcp_ui_tab_visual_proof import ChromeDriverSession
+def _execute(browser, script: str, args: list | None = None):
+    return browser._request(
+        "POST",
+        f"/session/{browser.session_id}/execute/sync",
+        {"script": script, "args": args or []},
+        timeout=15,
+    )
 
+
+def _document_probe(browser, *, initialize: bool = False) -> dict:
+    script = r"""
+if (arguments[0] && !window.__SYSTEM3_SEMANTIC_PROOF_DOCUMENT_ID__) {
+  const randomPart = (globalThis.crypto && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+  window.__SYSTEM3_SEMANTIC_PROOF_DOCUMENT_ID__ = String(performance.timeOrigin) + ':' + randomPart;
+}
+return {
+  document_id: String(window.__SYSTEM3_SEMANTIC_PROOF_DOCUMENT_ID__ || ''),
+  time_origin: Number(performance.timeOrigin || 0),
+  href: String(location.href || ''),
+  ready_state: String(document.readyState || '')
+};
+"""
+    value = _execute(browser, script, [bool(initialize)])
+    return value if isinstance(value, dict) else {}
+
+
+def _click_dashboard_tab(browser, tab_id: str) -> bool:
+    script = r"""
+const id = String(arguments[0] || '');
+const button = document.querySelector('[data-dashboard-tab="' + CSS.escape(id) + '"]');
+if (!button) return false;
+button.click();
+return true;
+"""
+    return bool(_execute(browser, script, [tab_id]))
+
+
+def _body_text_upper(browser) -> str:
+    value = _execute(browser, "return (document.body && document.body.innerText || '').toUpperCase();")
+    return str(value or "")
+
+
+def _scan_tabs_same_document(browser, expect_open: bool) -> dict:
+    """Switch dashboard tabs without navigation and prove document continuity."""
     failures: list[str] = []
     rows: list[dict] = []
-    with ChromeDriverSession(page_load_timeout_s=60) as browser:
-        for tab_id, forbidden in KEY_TAB_FORBIDDEN.items():
-            effective_forbidden = _effective_forbidden(forbidden, expect_open=expect_open)
-            url = f"{BASE}/ui?{urlencode({'tab': tab_id})}"
-            browser.set_viewport(1600, 1000)
-            browser.navigate(url)
+    initial = _document_probe(browser, initialize=True)
+    document_id = str(initial.get("document_id") or "")
+    if not document_id:
+        return {"state": "FAIL", "rows": [], "failures": ["document_identity_missing"], "document_id": None}
+
+    for tab_id, forbidden in KEY_TAB_FORBIDDEN.items():
+        effective_forbidden = _effective_forbidden(forbidden, expect_open=expect_open)
+        clicked = _click_dashboard_tab(browser, tab_id)
+        deadline = time.monotonic() + 25
+        last_text = ""
+        active = False
+        probe: dict = {}
+        if clicked:
             browser.wait_for_active(tab_id)
-            deadline = time.monotonic() + 25
-            last_text = ""
-            active = False
-            while time.monotonic() < deadline:
-                snapshot = browser.proof_snapshot(tab_id)
-                active = bool(snapshot.get("active"))
-                value = browser._request(
-                    "POST",
-                    f"/session/{browser.session_id}/execute/sync",
-                    {
-                        "script": "return (document.body && document.body.innerText || '').toUpperCase();",
-                        "args": [],
-                    },
-                    timeout=15,
-                )
-                last_text = str(value or "")
-                bad = [marker for marker in effective_forbidden if marker in last_text]
-                global_bad = []
-                if expect_open:
-                    if "MARKET CLOSED" in last_text or "AFTER HOURS" in last_text:
-                        global_bad.append("false_closed_market_banner")
-                    if "DHAN · WAITING" in last_text:
-                        global_bad.append("broker_waiting_after_api_ready")
-                if active and not bad and not global_bad:
-                    break
-                time.sleep(1)
+        while clicked and time.monotonic() < deadline:
+            snapshot = browser.proof_snapshot(tab_id)
+            active = bool(snapshot.get("active"))
+            probe = _document_probe(browser)
+            last_text = _body_text_upper(browser)
             bad = [marker for marker in effective_forbidden if marker in last_text]
             global_bad = []
             if expect_open:
@@ -245,10 +275,53 @@ def _browser_semantic_check(expect_open: bool) -> dict:
                     global_bad.append("false_closed_market_banner")
                 if "DHAN · WAITING" in last_text:
                     global_bad.append("broker_waiting_after_api_ready")
-            row_failures = ([] if active else ["active_tab_not_proven"]) + [f"forbidden:{x}" for x in bad] + global_bad
-            failures.extend(f"{tab_id}:{item}" for item in row_failures)
-            rows.append({"tab": tab_id, "active": active, "failures": row_failures})
-    return {"state": "PASS" if not failures else "FAIL", "rows": rows, "failures": failures}
+            if active and str(probe.get("document_id") or "") == document_id and not bad and not global_bad:
+                break
+            time.sleep(1)
+
+        probe = probe or _document_probe(browser)
+        bad = [marker for marker in effective_forbidden if marker in last_text]
+        global_bad = []
+        if expect_open:
+            if "MARKET CLOSED" in last_text or "AFTER HOURS" in last_text:
+                global_bad.append("false_closed_market_banner")
+            if "DHAN · WAITING" in last_text:
+                global_bad.append("broker_waiting_after_api_ready")
+        row_failures = ([] if clicked else ["tab_button_missing"])
+        row_failures += ([] if active else ["active_tab_not_proven"])
+        if str(probe.get("document_id") or "") != document_id:
+            row_failures.append("document_reloaded_during_tab_scan")
+        row_failures += [f"forbidden:{x}" for x in bad] + global_bad
+        failures.extend(f"{tab_id}:{item}" for item in row_failures)
+        rows.append({
+            "tab": tab_id,
+            "clicked": clicked,
+            "active": active,
+            "document_id": probe.get("document_id"),
+            "document_time_origin": probe.get("time_origin"),
+            "href": probe.get("href"),
+            "captured_at_ist": datetime.now(IST).isoformat(),
+            "failures": row_failures,
+        })
+    return {
+        "state": "PASS" if not failures else "FAIL",
+        "rows": rows,
+        "failures": failures,
+        "document_id": document_id,
+        "initial_document": initial,
+        "navigation_mode": "single_document_dashboard_tab_clicks",
+    }
+
+
+def _browser_semantic_check(expect_open: bool) -> dict:
+    from scripts.gcp_ui_tab_visual_proof import ChromeDriverSession
+
+    first_tab = next(iter(KEY_TAB_FORBIDDEN))
+    with ChromeDriverSession(page_load_timeout_s=60) as browser:
+        browser.set_viewport(1600, 1000)
+        browser.navigate(f"{BASE}/ui?{urlencode({'tab': first_tab})}")
+        browser.wait_for_active(first_tab)
+        return _scan_tabs_same_document(browser, expect_open)
 
 
 def _publish_status(state: str, description: str) -> None:
@@ -303,7 +376,7 @@ def main() -> int:
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8")
 
     if summary["state"] == "PASS":
-        _publish_status("success", "Exact-SHA live API + rendered UI semantics passed; LIVE/orders OFF")
+        _publish_status("success", "Exact-SHA same-document API + rendered UI semantics passed; LIVE/orders OFF")
         print("LIVE_UI_SEMANTIC_PROOF " + json.dumps({"state": "PASS", "expected_market_open": expect_open}, sort_keys=True))
         return 0
 
