@@ -335,6 +335,19 @@ def run_daemon() -> None:
     """
     pid_file = PROJECT_ROOT / "state" / "scheduler_daemon.pid"
     pid_file.parent.mkdir(parents=True, exist_ok=True)
+    if pid_file.exists():
+        try:
+            existing_pid = int(pid_file.read_text().strip())
+            import psutil
+
+            if psutil.pid_exists(existing_pid):
+                print(
+                    f"[PH82-Daemon] Refusing to start: PID={existing_pid} in "
+                    f"{pid_file} is still running. Stop it first if this is stale."
+                )
+                return
+        except (ValueError, ImportError):
+            pass  # stale/unreadable pid file, or psutil unavailable — safe to take over
     pid_file.write_text(str(os.getpid()))
     print(f"[PH82-Daemon] Started PID={os.getpid()} at {_now_ist().strftime('%Y-%m-%d %H:%M:%S')} IST")
 
