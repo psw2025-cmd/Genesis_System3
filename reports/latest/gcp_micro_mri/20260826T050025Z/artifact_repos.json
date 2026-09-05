@@ -1,3 +1,0 @@
-{
-  "error": "Listing items under project system3-openalgo-safe, location {REG}.\r\n\r\nERROR: (gcloud.artifacts.repositories.list) {\r\n  \"error\": {\r\n    \"code\": 400,\r\n    \"message\": \"Invalid project name: \\\"projects/system3-openalgo-safe/locations/{REG}\\\"\",\r\n    \"status\": \"INVALID_ARGUMENT\"\r\n  }\r\n}"
-}
