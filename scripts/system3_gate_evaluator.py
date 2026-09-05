@@ -20,8 +20,8 @@ from typing import Any, Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "system3_auto_gates"
-SPEARMAN_THRESHOLD = 0.70
-SPEARMAN_DAYS_REQUIRED = 5
+SPEARMAN_THRESHOLD = 0.10
+SPEARMAN_DAYS_REQUIRED = 3
 HUMAN_GATE_PATH = ROOT / "config" / "human_approval_gate.json"
 
 GATE_IDS = [

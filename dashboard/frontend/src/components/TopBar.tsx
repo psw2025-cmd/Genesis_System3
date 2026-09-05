@@ -187,7 +187,7 @@ export function TopBar() {
       <div className="flex items-center gap-2.5 shrink-0">
         <Clock />
 
-        {/* Broker Button */}
+        {/* Broker / System Health Button */}
         <button
           type="button"
           onClick={() => setActiveTab('broker')}
@@ -196,18 +196,19 @@ export function TopBar() {
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
               : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
           }`}
-          title="Open Broker Status"
+          title="System health · Dhan status"
+          aria-label="System health"
         >
           <Shield size={14} />
           <span>Dhan · {brokerLabel}</span>
         </button>
 
         {/* Paper / Live Mode Pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold">
+        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold" title={liveOn ? 'Live on' : 'Live off'}>
           <span className="text-amber-400 font-bold">PAPER</span>
           <span className="text-slate-600">|</span>
           <span className={liveOn ? 'text-rose-400 font-bold' : 'text-slate-400'}>
-            {liveOn ? 'LIVE ON' : 'LIVE OFF'}
+            {liveOn ? 'Live on' : 'Live off'}
           </span>
         </div>
 
