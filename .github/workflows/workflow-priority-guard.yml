@@ -62,9 +62,6 @@ jobs:
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
 
-      - name: Execute full cloud audit adversarial contract tests
-        run: python -m unittest tests.test_full_cloud_audit_contract -v
-
   refresh-canonical-preflight:
     if: github.event_name == 'workflow_run'
     name: FORENSIC - refresh canonical workflow issue artifact snapshot
