@@ -1,249 +1,139 @@
-# RHUI_RULE_V2.2 — Genesis System3 Cloud-Only Multi-Agent Execution Contract
+# RHUI_RULE_V2.3 — Genesis System3 LOCAL-LAPTOP-ONLY Execution Contract
 
-Status: ACTIVE when merged. Supersedes prior RUHI/RHUI rules that allowed local-laptop execution or local forensic authority.
+Status: ACTIVE when merged. Supersedes every prior RUHI/RHUI instruction that treated GCP or any Google Cloud service as System3 runtime, deployment, broker-token, evidence, or acceptance authority.
 
-## 0. Current acceptance lock (material change — 2026-08-27 full cross-verify)
+## 0. Permanent GCP prohibition and migration lock — 2026-09-03
 
-**Overall RHUI V2.2 = NOT_ACCEPTED** until the gate board in `reports/coordination/RHUI_V2.2_GATE_BOARD.csv` is all green for acceptance criteria. Do **not** falsely claim ACCEPTED after a docs/test-only merge.
+Genesis System3 MUST NOT use GCP for runtime or acceptance. GCP is retired architecture and cleanup debt only.
 
-Pinned **runtime** serving (do not blind-redeploy): SHA `fb4772f9d52b67a31b55ee85aab8604e525bbad6` · revision `genesis-system3-web-00617-vif` @ 100%.
+Every current and future agent MUST:
 
-GitHub `main` tip `0d6955987115f88b710aca0f0f0dec68d23fa6bc` (#371 docs; includes #370/#369) vs serving is **DOCS/TEST/CI_ONLY_LAG** — not a failed Cloud Run promotion. Do not redeploy solely to equalize.
+1. Never deploy, execute, schedule, authenticate, store runtime state, rotate broker tokens, collect current proof, or establish acceptance through GCP.
+2. Never restore/recreate Cloud Run, Cloud Scheduler, Secret Manager, Firebase, Firestore, BigQuery, Cloud Storage, Pub/Sub, Artifact Registry, WIF, GCP logging/monitoring, GCP CI/CD, or another Google Cloud dependency merely because historical code/docs reference it.
+3. Continuously discover every remaining GCP reference/resource dependency/workflow/script/env mapping/credential mapping/document/test/URL/scheduler/database/storage/monitoring/cost driver/stale proof artifact related to Genesis System3.
+4. Classify each discovery as `REMOVE`, `REPLACE_LOCAL`, `HISTORICAL_ONLY`, or `EXTERNAL_CLEANUP_REQUIRED`.
+5. Replace every still-required GCP capability with a safe local-laptop equivalent before removing it. Preserve PAPER/analyzer functionality and evidence continuity.
+6. Never allow GCP removal to break broker authentication, market data, option chains, persistence, scheduling/background work, alerts, logs, UI, prediction, ML, risk, PAPER trading, backup/recovery, or proof.
+7. GitHub current `main` is the ONLY code authority. The authorized Windows laptop running fresh/current main is the ONLY runtime/execution authority.
+8. Google Drive System3 logs/reports/screenshots are evidence/backup transport only. Current acceptance requires correlation to current main, capture time, local process/runtime identity, and same-session API/UI evidence.
+9. Gmail is notification/transport only. Durable state belongs in GitHub Issue #188 and repository control-plane material.
+10. Residual GCP billing/resources are cleanup debt and must remain tracked until independently proven removed. Never reactivate GCP to obtain proof.
+11. Never use old Cloud Run URLs, serving SHA/revision, GCP secret versions, cloud screenshots/workflows/logs as current runtime evidence.
+12. Deleting a GCP reference alone is not completion. Required functionality must work locally or be proven obsolete.
 
-Live proof snapshot (2026-08-27 ~01:05 IST / evidence `reports/latest/full_cross_verify_20260826_193000/`): broker `AUTH_OK` / LIVE OFF / orders OFF; scheduler transport **HEALTHY**; business readiness **PARTIAL** (wrong-date rank/forecast/signals); auto_gates **2/7**. Ruleset `21581518` now has **six** required contexts including `BLOCKING - priority workflows only` (restored this cycle after Gmail/#188 correction). HUMAN_ACTION_REQUIRED=**NO** for ruleset (agent fixed). Continuous 5-min Gmail/scheduler MRI control plan is **owned by sibling agent** → `docs/handoffs/MRI_GMAIL_SCHEDULER_5MIN_CONTROL_PLAN.md` (do not invent a competing plan here).
+## 1. Current authority
 
-Mandatory multi-verify artifacts:
+1. GitHub current `main` SHA in `psw2025-cmd/Genesis_System3` — ONLY code authority.
+2. GitHub Issue #188 — canonical coordination/progress bus.
+3. Repository task ledger/control-plane material — ownership/dependencies/progress.
+4. Authorized Windows laptop fresh/current-main checkout — ONLY runtime/execution authority.
+5. Fresh local API/UI/runtime evidence from that current-main runtime.
+6. Google Drive evidence only when correlated to that runtime.
+7. Gmail only for transport/notification.
 
-- `docs/handoffs/RHUI_V2.2_MATERIAL_CHANGE.md`
-- `reports/coordination/RHUI_V2.2_Verification_Checklist.json`
-- `reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md`
-- `reports/latest/full_cross_verify_20260826_193000/` (+ prior `post369_live_proof_20260827_000506/`)
-- `reports/latest/repo_path_audit/cloud_github_vs_laptop.json`
-- Issue #188 `SYSTEM3_COORDINATION_V1` comments
+Non-current local branches, stale databases, stale Cursor state, old token files, old scheduler output and historical artifacts remain NON-AUTHORITATIVE.
 
-Fail-closed distinctions agents must keep:
+## 2. Required local replacements
 
-1. Cloud Run deploy PASS ≠ scheduler-health PASS ≠ RHUI ACCEPTED.
-2. 22/22 visual tab mounts ≠ semantic API↔UI acceptance.
-3. Pre-market 4/4 NOT READY ≠ broker/token failure (recheck after open).
-4. Docs/test-only `main` tip ahead of serving ≠ failed deploy (check Auto Deploy path filters before workflow_dispatch).
-5. #369/#371 merge ≠ runtime change (test/docs-only).
-6. Claiming `HUMAN_ACTION_REQUIRED=NO` while a required provider context is still omitted from ruleset `21581518` is a governance false-green — re-verify contexts before asserting no human action.
+All implementation starts from fresh GitHub current main. Required replacements for retired cloud capabilities must be explicitly mapped/tested, including where applicable:
 
-## 1. Single source of truth
+- secure local secret storage and environment-variable mapping;
+- broker auth/session/TOTP/access-token lifecycle with safe refresh/rotation;
+- local database/state persistence and backup/restore;
+- local file/object/history storage replacing cloud data/storage;
+- Windows Task Scheduler or approved local supervisor replacing Cloud Scheduler/Run jobs;
+- local background workers, queues/events/websocket processes;
+- local logging, health checks, watchdogs and alerts;
+- local startup/restart/recovery after reboot/process failure;
+- GitHub CI that validates code without deploying GCP;
+- dashboard/API code that does not depend on Cloud Run metadata or cloud URLs.
 
-All agents (ChatGPT, Cursor, Claude, Codex and any future agent) must reconstruct current state from:
+LIVE trading remains disabled unless separately explicitly authorized.
 
-1. GitHub current `main` SHA in `psw2025-cmd/Genesis_System3` — **only code authority**.
-2. GitHub Issue #188 — canonical shared technical/progress bus.
-3. `reports/coordination/ruhi_task_ledger.csv` — task ownership, dependencies, progress and proof.
-4. `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` — coordination snapshot.
-5. Authoritative GCP `system3-openalgo-safe` — **only runtime/deployment authority**.
-6. **Live Proof Center** — `reports/latest/live_proof_center/LATEST/` (+ `reports/coordination/LIVE_PROOF_CENTER_POINTER.md`, branch `live-proof-center`, workflow `live-proof-center.yml`) — sanitized continuous MRI for agents without laptop/gcloud access.
-7. Gmail only as transport/notification; durable state must be reflected back into GitHub.
+## 3. Continuous GCP eradication verification
 
-Before claiming “no GCP / laptop / access”, agents MUST read the Live Proof Center pointer and INDEX. Local laptop repos, local branches, local databases, local Cursor state/history, local token files, local schedulers, local reports and local historical artifacts are **NON-AUTHORITATIVE**. They must not be used for execution, deployment, broker/token recovery, proof or acceptance.
+Every material forensic/controller cycle must inspect current main and recent runtime evidence for residual Google Cloud coupling. At minimum inspect `.github/workflows/**`, scripts, source, config/env templates, docs/runbooks, tests, scheduler definitions, broker/token code, DB/storage adapters, logging/alerts, UI/API metadata, package dependencies, recent Drive evidence, Gmail billing/decommission alerts, Issue #188 and active PRs.
 
-## 2. Cloud-only execution lock
+Maintain migration inventory:
 
-All implementation must start from a fresh remote GitHub `main` in a clean cloud-capable lane.
+`ITEM | LOCATION | OLD_GCP_ROLE | REQUIRED_CAPABILITY | LOCAL_REPLACEMENT | STATE | PROOF | OWNER | BLOCKER`
 
-Forbidden:
+Required migration lifecycle:
 
-- deploying from a laptop checkout;
-- minting/rotating broker tokens from a laptop;
-- using local `.env`, token files, databases or scheduled tasks as current truth;
-- copying a local file/branch into current main because it existed historically;
-- using local screenshots/logs as production acceptance;
-- allowing a local Cursor/IDE agent to become runtime authority.
+`DISCOVERED -> LOCAL_REPLACEMENT_DESIGNED -> REPLACED -> TESTED -> CURRENT_MAIN -> LOCAL_RUNTIME_PROVEN -> GCP_REFERENCE_REMOVED -> COMPLETE`
 
-Any useful historical idea must be re-derived from current GitHub main, independently reviewed, and implemented through the normal GitHub PR → CI → merge → GCP deploy → exact-serving proof flow.
+For obsolete functionality:
 
-## 3. No invisible work
+`DISCOVERED -> PROVEN_OBSOLETE -> REMOVED -> CURRENT_MAIN -> REGRESSION_CHECKED -> COMPLETE`
 
-Every meaningful agent status must reconcile:
+Unfinished items may never silently disappear.
 
-- `RULE_VERSION`
-- `BATCH_ID`
-- `CURRENT_MAIN_SHA`
-- `SERVING_SHA`
-- `MARKET_PHASE`
-- `PREVIOUS_BATCH_COMMITMENT`
-- `PREVIOUS_BATCH_RESULT`
-- `COMPLETED_WITH_PROOF`
-- `NOT_COMPLETED`
-- `BLOCKERS_OR_CONFUSION`
-- `HANDOFF_REQUIRED`
-- `NEXT_BATCH_COMMITMENT`
-- `USER_ACTION_REQUIRED`
+## 4. Proof hierarchy
 
-A task is not complete because code exists, CI is green, a PR merged or an API returned 200. Completion requires the proof class defined in the ledger.
-
-## 4. Rolling batch rule
-
-Default next batch is the highest-priority executable work, normally up to 20 real tasks.
-
-Every new RHUI status must reconcile the previous batch task-by-task:
-
-- `DONE`: acceptance criteria met and proof recorded.
-- `PARTIAL`: some criteria met; remaining work explicit.
-- `BLOCKED`: exact blocker and owner/access dependency recorded.
-- `SUPERSEDED`: newer task/fix invalidated it; link replacement.
-- `NOT_STARTED`: explain why skipped.
-
-Unfinished commitments may not silently disappear.
-
-## 5. Proof hierarchy
-
-For user-visible dashboard behavior, proof priority is:
-
-1. Production dashboard URL rendered in a real browser on exact serving SHA.
-2. Screenshot/video/browser artifact tied to URL + timestamp + serving SHA.
-3. UI semantic assertion/result tied to exact serving SHA.
-4. Same-session backend/API correlation.
-5. CI/unit tests.
+1. Fresh authorized local-laptop browser from current GitHub main.
+2. Screenshot/video/browser artifact tied to capture time + current main SHA + local runtime identity.
+3. Same-runtime UI semantic assertions.
+4. Same-session local backend/API correlation.
+5. Current-main CI/unit/integration tests.
 6. Source/docs only.
 
-For UI tasks, levels 4–6 alone cannot yield `DONE`.
+Render PASS is not semantic readiness. Blank/WAITING/placeholder/false-green states fail unless explicitly truthful.
 
-A route-render PASS is not a semantic/data-readiness PASS. Blank/WAITING/placeholder/false-green state fails unless it is explicitly truthful for the current state.
+## 5. Broker/token authority
 
-## 6. Specialist ownership
+Broker/token operations are LOCAL-LAPTOP-ONLY. Credentials use secure local storage and secret values must never be committed to GitHub or uploaded to Drive/Gmail. Token lifecycle must be single-flight/rate-limit aware; no blind minting/retry-until-green. Evidence is metadata-only and never exposes token/PIN/TOTP values.
 
-- **ChatGPT**: controller/consolidator, task ownership, acceptance criteria, GitHub/GCP coordination, contradiction resolution, PR/merge/deploy/proof decisions.
-- **Claude**: independent cloud/GCP/UI/API forensic verifier and adversarial cross-checker.
-- **Cursor/Codex/other coding agents**: implementation only from current GitHub main in cloud/remote lanes; no local-laptop authority.
-- **Other agents**: claim a bounded lane in Issue #188/ledger before modifying overlapping files.
+Broker acceptance requires visible local UI plus same-session local `/api/broker/status`, required market-data capability, truthful source/freshness, positive applicable NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY contracts/strikes, and `LIVE=false`/orders disabled. `connected=true` alone is insufficient.
 
-Multiple agents may investigate independently; only one implementation writer owns a functional root-cause/file lane.
+## 6. PAPER acceptance
 
-## 7. Broker/token authority
+PAPER trading is complete only after applicable real-market-session local proof demonstrates:
 
-Broker/token operations are cloud-only.
+market data -> scanner/ranker -> signal -> PAPER/analyzer decision -> persisted local paper record -> dashboard row -> P&L/position update -> restart/reconciliation persistence.
 
-Canonical authority:
-
-- GCP Secret Manager;
-- isolated Cloud Run job `genesis-system3-dhan-token-rotate`;
-- approved Cloud Scheduler authority;
-- guarded GitHub manual-recovery workflow only when preconditions prove it is required.
-
-The web runtime and local machines must never mint/rotate tokens.
-
-Never blind-mint or retry-until-green. Recovery requires current evidence, single-flight/cooldown protection and metadata-only proof. Do not expose token/PIN/TOTP values.
-
-Broker acceptance requires, on exact current serving revision:
-
-- `/ui` visibly shows broker connected;
-- same-session `/api/broker/status` confirms usable broker state;
-- token source is canonical dynamic GCP authority, with metadata only;
-- NIFTY/BANKNIFTY/FINNIFTY/MIDCPNIFTY have positive contracts/strikes and truthful source/freshness;
-- no contradictory WAITING/CLOSED/stale-success state;
-- `LIVE=false` and `orders=false`.
-
-`connected=true` alone is not full acceptance.
-
-## 8. Paper-trade acceptance
-
-Do not mark paper trading complete until a real market-session production proof demonstrates:
-
-market data → scanner/ranker → signal decision → paper/analyzer path → persisted paper record → dashboard row → P&L/position update.
-
-Zero live-order safety remains mandatory:
+Mandatory safety remains:
 
 - `LIVE_TRADING_ENABLED=0`
 - `SYSTEM3_LIVE_TRADING_ALLOWED=0`
 - `AUTO_EXECUTE_TRADES=0`
 
-unless a separate explicit live-trading authorization is given later.
+## 7. Dashboard truth
 
-## 9. Dashboard truth contract
+All 22 canonical tabs must be audited semantically on the authorized local runtime. Visible states are classified `PASS_TRUTHFUL`, `PASS_DERIVED_TRANSPARENT`, `STALE_EXPLICIT`, `DEGRADED_EXPLICIT`, `UNKNOWN_EXPLICIT`, `PLACEHOLDER`, `HARDCODED`, `DEMO_OR_MOCK`, `FALSE_GREEN`, `MISLEADING`, `MISSING`, `BROKEN`, or `NOT_APPLICABLE`.
 
-The user should be able to judge progress from the authoritative production URL, not from logs or agent narrative.
+User-visible DONE requires current-main local runtime plus fresh same-session browser/API proof. Cloud Run URLs/revisions are forbidden as current acceptance evidence.
 
-All 22 current canonical tabs must be audited region-by-region. Each visible card/badge/table/chart/status/empty-state should be classified as one of:
+## 8. No stale claims
 
-- `PASS_TRUTHFUL`
-- `PASS_DERIVED_TRANSPARENT`
-- `STALE_EXPLICIT`
-- `DEGRADED_EXPLICIT`
-- `UNKNOWN_EXPLICIT`
-- `PLACEHOLDER`
-- `HARDCODED`
-- `DEMO_OR_MOCK`
-- `FALSE_GREEN`
-- `MISLEADING`
-- `MISSING`
-- `BROKEN`
-- `NOT_APPLICABLE`
+Before starting/reporting, verify remote current main, authorized local runtime identity and latest Issue #188 state. Old SHA/email/Drive/cloud artifacts are historical unless freshly correlated.
 
-User-visible DONE requires exact-current-main Cloud Run revision at 100% traffic and fresh browser proof.
+## 9. Agent ownership
 
-## 10. Stages and progress measurement
+ChatGPT remains controller/consolidator. Coding agents implement from current GitHub main with bounded ownership coordinated through Issue #188/active PRs. Local runtime agents execute/test/prove on the authorized laptop without becoming code authority. No agent may reintroduce GCP as a shortcut.
 
-Use:
+## 10. Human escalation
 
-`DISCOVERED -> ROOT_CAUSE_PROVEN -> PATCHED -> TESTED -> EXACT_HEAD_GATED -> MERGED -> DEPLOYED -> UI_PROVEN -> STABILITY_PROVEN -> COMPLETE`
+The user is not the routine technical operator. Agents own safe repo/local-runtime work whenever connected tools permit it. Human action is only for genuine owner-only boundaries such as billing/account closure, identity/consent, broker MFA/account reset, unavailable laptop permission, destructive external deletion requiring approval, or explicit LIVE authorization.
 
-Each meaningful report must publish task counts and reconcile:
+## 11. Safety
 
-`PREVIOUS_TARGET -> ACTUAL_RESULT -> PROOF -> DELTA -> NEXT_TARGET_BATCH`.
+Do not expose secrets, enable LIVE trading, place/modify/cancel live orders, dilute gates, blind-rotate broker credentials, delete irreplaceable state, or remove a required cloud capability before its local replacement and backup are proven.
 
-Progress percentages must come from task states, not estimates.
+## 12. Action-over-narrative
 
-## 11. No stale-claim rule
+Every material cycle must produce an execution delta whenever possible: implementation, test, current-main reconciliation, local proof, migration inventory update, stale-GCP removal, or blocker resolution. Repeated commentary without advancing known work is non-compliant.
 
-Before starting or reporting a task, verify current remote main, current serving SHA/revision and latest shared RHUI state. Old SHA/revision/email/artifact proof is historical and cannot drive current acceptance.
+## 13. GCP exit completion
 
-## 12. Failure and regression rule
+GCP exit is COMPLETE only when:
 
-Any recurrence after a claimed fix reopens the task or creates a linked regression. Current production truth overrides historical green status.
+1. Current main has no active System3 dependency requiring GCP.
+2. Every required former GCP capability has a tested local replacement or is proven obsolete.
+3. No GitHub workflow can automatically recreate/deploy System3 to GCP.
+4. Local startup/scheduling/secrets/state/logging/backups/recovery are proven.
+5. Broker/data/UI/PAPER/ML/risk/alerts lifecycle is proven locally from current main.
+6. Residual GCP billing/resources are independently confirmed removed or recorded as owner-only external cleanup debt.
+7. Historical GCP documentation/evidence is clearly historical and cannot become current authority.
+8. Issue #188 and active PR ownership contain no contradictory cloud-authority instruction.
 
-## 13. Human escalation boundary
-
-The user is not a routine coordination relay.
-
-Human action is allowed only for genuine external owner-only boundaries such as:
-
-- billing/subscription/funding;
-- identity/consent;
-- official broker account/MFA/credential reset;
-- unavailable external permission with no safe cloud bridge;
-- destructive action requiring explicit approval;
-- explicit LIVE trading approval.
-
-Routine repo, CI, deploy, broker-status, scheduler, UI and proof work remains agent-owned.
-
-## 14. Safety
-
-Do not weaken IAM/WIF, expose secret values, mint/rotate tokens unnecessarily, enable live trading, place/modify/cancel live orders, dilute gates or accept retry-until-green behavior merely to make proof pass.
-
-## 15. Definition of a useful agent cycle
-
-A useful cycle produces at least one of:
-
-- a newly completed task with required proof;
-- a materially narrowed root cause with evidence;
-- a tested bounded remediation;
-- a resolved access/coordination blocker;
-- a regression converted into an owned task;
-- a new exact-serving browser/API truth observation.
-
-Pure restatement of old status does not count as progress.
-
-## 16. Action-over-narrative and controller accountability (2026-08-30)
-
-This rule is mandatory for ChatGPT/controller and every current or future agent. It exists because prolonged analysis, status reporting, email/Issue commentary, repeated diagnosis, or coordination without converting known gaps into implementation is a System3 failure mode.
-
-1. **The controller must act, not merely observe.** When a material defect is found and the connected execution lane can safely modify the repository, tests, workflow, tracker, or documentation, the controller must create the bounded implementation change in the same working cycle or explicitly record the exact technical blocker that makes execution impossible. A response that only describes what another agent should do is non-compliant when the controller has the capability to do it.
-2. **No repeated rediscovery.** Once a defect/root cause is known, future cycles must start from that state and advance it through `PATCHED -> TESTED -> EXACT_HEAD_GATED -> MERGED -> DEPLOYED -> UI_PROVEN`, rather than repeatedly rescanning and rewriting the same explanation.
-3. **Multi-agent work does not reduce controller responsibility.** ChatGPT remains accountable for continuously checking whether specialist work actually closes the end-to-end requirement. A specialist producing major progress in one day that exposes long-standing controller omissions must trigger immediate reconciliation: identify what the controller failed to implement/check, add those omissions to the ledger, and execute all safe controller-owned remediation without waiting for the user.
-4. **New-agent discoveries are mandatory learning inputs.** Any materially better architecture, tool, proof mechanism, dashboard capability, forensic technique, or implementation produced by another agent must be compared against the current authoritative system. Missing superior capability becomes an owned upgrade task; it may not be ignored because an older controller/script already exists.
-5. **Command Center must never be stale authority.** `scripts/system3_command_center_refresh.py` and its outputs are not accepted as authoritative merely because they are named Command Center. They must be cross-verified against current GitHub main, current GCP serving revision/traffic, Live Proof Center/Ultra-MRI, browser reconciliation, current Issue #188 state, and India market-session authority. A stale committed snapshot must be explicitly labelled `STALE/NOT_AUTHORITY`.
-6. **Controller scripts must evolve with the system.** When newer proof machinery supersedes a narrower controller path, the established central controller must integrate the newer machinery instead of leaving parallel disconnected truth systems. Specifically, the Command Center should orchestrate canonical Live Proof Center, Ultra-MRI, serving-SHA/browser reconciliation, current GitHub issue/workflow evidence, market-session classification, and lifecycle dependency generation rather than relying on a fixed PEND catalog alone.
-7. **Dynamic discovery over hard-coded comfort.** Hard-coded issue catalogs/dependency maps may seed checks but cannot be the sole source for current defects. Current P0/P1 GitHub issues, exact-main workflow failures, production API/browser failures, GCP runtime/scheduler/job failures, stale/false-green UI states, broker/data gaps, prediction/paper lifecycle failures, and cleanup/resource hygiene findings must be dynamically reconciled.
-8. **Every material chat cycle needs an execution delta.** Unless genuinely blocked by an owner-only boundary, a material System3 cycle must produce at least one concrete delta such as a commit/PR, test, workflow run, live proof refresh, issue/ledger state transition, safe configuration repair, or implemented controller improvement. Chat/email/Issue text alone is not sufficient when an executable remediation is available.
-9. **No credit for activity without closure.** Number of messages, emails, comments, scans, reports, years spent, agents involved, or tests run is not progress by itself. Progress is measured only by verified lifecycle state advancement and truthful production proof.
-10. **Controller self-audit after material specialist progress.** After any specialist lands a material batch, the controller must ask: `What did this expose that the controller should already have detected, implemented, integrated, or verified?` The answer becomes immediate actionable work, not narrative commentary.
-11. **User is not the enforcement mechanism.** The user must not need to repeatedly remind agents to implement rather than discuss. Violation of this section is itself a governance defect that must be surfaced in Issue #188/ledger and corrected.
-12. **Safety remains unchanged.** Action-over-narrative never authorizes LIVE trading, secret exposure, destructive cleanup, gate dilution, blind token rotation, or unsafe IAM changes. Safe PAPER/analyzer implementation and proof should proceed autonomously; genuine irreversible/owner-only boundaries still require explicit authorization.
+Until all eight are proven, report `GCP_EXIT_INCOMPLETE`, continue local implementation/verification, and NEVER restore GCP to close the gap.
