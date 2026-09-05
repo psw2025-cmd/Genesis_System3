@@ -34,7 +34,7 @@ nsepython>=2.97
 
 # yfinance: Yahoo Finance — spot price fallback only (^NSEI, ^NSEBANK)
 # P5 fallback: provides real spot price when all chain sources fail
-yfinance>=0.2.38
+yfinance>=1.6.0
 
 # jugaad-data: NSE historical F&O bhavcopy downloader (alternative to direct CDN fetch)
 # P4 fallback. Note: UDiFF format (post-Jul 2024) support is limited — prefer direct bhavcopy
