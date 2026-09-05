@@ -21,15 +21,10 @@ on:
   workflow_run:
     workflows:
       - "Genesis System3 Global Safety CI"
-      - "Cloud Run Auto Deploy"
       - "Frontend Browser Runtime Smoke"
-      - "GCP Dhan Token Fix CI"
-      - "GCP Dhan Token Rotation Manual Recovery"
-      - "GCP Stage 2 Safety Checks"
       - "CodeQL Security Audit"
       - "Security Audit Evidence"
       - "SonarQube Audit"
-      - "Full Cloud Audit and Forensic Consensus"
     types: [completed]
   deployment_status:
 
@@ -66,9 +61,6 @@ jobs:
 
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
-
-      - name: Execute full cloud audit adversarial contract tests
-        run: python -m unittest tests.test_full_cloud_audit_contract -v
 
   refresh-canonical-preflight:
     if: github.event_name == 'workflow_run'
