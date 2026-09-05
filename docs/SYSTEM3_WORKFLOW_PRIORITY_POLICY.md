@@ -2,67 +2,41 @@
 
 ## Permanent standing rule
 
-Only the following seventeen GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following eleven GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
 1. `ci.yml` — blocking analyzer/paper safety validation for pull requests and protected branches.
-2. `workflow-priority-guard.yml` — enforces this allow-list and is the approved read-only forensic observer for `workflow_run` and `deployment_status` events. After each approved production-relevant workflow completion it also refreshes the canonical preflight workflow/issue/artifact snapshot from trusted `main`; it does not create a second control-plane authority.
-3. `cloud-run-auto-deploy.yml` — path-scoped Google Cloud Run deployment from `main`; also reusable only by the approved IAM repair workflow.
-4. `gcp-authority-repair.yml` — bounded IAM-drift repair after a failed `Cloud Run Auto Deploy` on `main`; primary/fallback keyless repair identities, declared-baseline convergence only, no GitHub write token, no Dhan job execution, and one reusable deploy only when actual IAM drift changed.
-5. `gcp-live-ui-semantic-proof.yml` — bounded read-only post-deploy acceptance proof. It runs only after a successful `Cloud Run Auto Deploy` on `main` (or manual dispatch), checks the exact deployed SHA through public read APIs, waits for expected market-session broker/four-chain readiness, verifies rendered UI semantics, and may publish only a commit status plus proof artifact. It has no GCP mutation identity and no trading/token/secret/IAM authority.
-6. `gcp-stage2-ci.yml` — focused Google Cloud safety tests for relevant pull-request changes.
-7. `gcp-dhan-token-fix-ci.yml` — focused Dhan token/runtime contract checks for relevant pull-request changes.
-8. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard.
-9. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
-10. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
-11. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
-12. `full-cloud-audit.yml` — read-only exact-SHA Google Cloud runtime/log/TLS/latency/IAM/Scheduler audit plus exact security-artifact binding and external OpenAI/Claude consensus. It cannot mutate deployment, infrastructure, broker state or orders.
-13. `system3-preflight-control-plane.yml` — canonical read-only workflow/issue/artifact current-state snapshot on every `main` push plus manual dispatch. The same snapshot code is reused by Workflow Priority Guard after approved workflow completions. Snapshot artifacts are retained for 30 days. It has no GitHub Actions schedule trigger and does not replace mandatory agent-side fresh preflight before production transitions.
-14. `repo-clean-forensic-toolkit.yml` — report-only repository/storage cleanup evidence. It scans every current tracked file on relevant PR/main changes or manual dispatch, inventories duplicate/reference/import evidence and Actions storage metadata, and performs full Git-history blob analysis on non-PR runs. It never deletes files/artifacts, rewrites history, or touches broker/trading/IAM state.
-15. `command-center-access.yml` — validates `ACCESS_POLICY.yaml`, runs Command Center smoke (no LIVE mint), appends audit log, and uploads coordination artifacts. Credential mint remains denied until vault signature is VERIFIED.
-16. `live-proof-center.yml` — read-only GCP + public dashboard/API forensic MRI for multi-agent access. Runs on `main` push and `workflow_dispatch` only (no GitHub `schedule:`). Uses keyless WIF inventory + public HTTP probes, uploads sanitized Excel/JSON artifacts, never writes to the repo, never mints tokens, never enables LIVE/orders. Recurrence beyond main-push is owner-driven manual dispatch or future GCP Scheduler → `workflow_dispatch` (not an Actions cron).
+2. `workflow-priority-guard.yml` — enforces this allow-list and is the approved read-only forensic observer for `workflow_run` and `deployment_status` events.
+3. `frontend-runtime-smoke.yml` — focused browser runtime proof for the built dashboard.
+4. `codeql-security.yml` — GitHub Advanced Security CodeQL analysis for Python and JavaScript/TypeScript on PR/main changes.
+5. `security-audit.yml` — deterministic npm, pip-audit and Bandit evidence with fail-closed findings.
+6. `sonarqube-audit.yml` — SonarQube/SonarQube Cloud readiness and scan adapter; missing external configuration is explicit, never fake PASS.
+7. `system3-preflight-control-plane.yml` — canonical read-only workflow/issue/artifact current-state snapshot on every `main` push plus manual dispatch.
+8. `repo-clean-forensic-toolkit.yml` — report-only repository/storage cleanup evidence.
+9. `command-center-access.yml` — validates `ACCESS_POLICY.yaml`, runs Command Center smoke, appends audit log.
+10. `live-proof-center.yml` — read-only public dashboard/API forensic MRI for multi-agent access.
+11. `system3-runbook-audit.yml` — persistent autonomous runbook validation.
 
-### Manual emergency workflow
+### Retired workflows (GCP Exit Complete)
 
-17. `gcp-dhan-token-rotation.yml` — manual recovery/proof only. Daily rotation remains owned by Google Cloud Scheduler.
+All Google Cloud Platform workflows (`cloud-run-auto-deploy.yml`, `gcp-authority-repair.yml`, `gcp-live-ui-semantic-proof.yml`, `gcp-stage2-ci.yml`, `gcp-dhan-token-fix-ci.yml`, `full-cloud-audit.yml`, `gcp-dhan-token-rotation.yml`) are permanently retired under RUHI_RULE_V2.3.
 
 ## Event workflow rules
 
-`workflow-priority-guard.yml` may use `workflow_run` and `deployment_status` only as an evidence-only observer. It may observe only the approved workflow names listed in its event allow-list. It uses a GitHub-hosted runner, read permissions, trusted `main` checkout, credential persistence disabled, and performs no repository/deployment/trading mutation. For every observed workflow completion it refreshes `scripts/system3_preflight_control_plane.py` from trusted `main` and uploads the resulting canonical snapshot; failure events additionally retain their immutable event-forensic artifact.
-
-`gcp-authority-repair.yml` may use `workflow_run` only for its exact source `Cloud Run Auto Deploy`; automatic repair is restricted to failed runs whose `head_branch` is `main`. It may also support `workflow_dispatch` for bounded recovery. It must not use `deployment_status`, `push`, `pull_request`, GitHub `actions: write`/`contents: write`, Dhan/Cloud Run job execution, or arbitrary IAM mutation code outside the repository-declared baseline reconciler. Its only deployment continuation is one reusable invocation of `cloud-run-auto-deploy.yml` when the reconciler reports actual IAM changes.
-
-`gcp-live-ui-semantic-proof.yml` is the sole read-only acceptance workflow additionally allowed to use `workflow_run`. Its source must be exactly `Cloud Run Auto Deploy`; automatic execution is restricted to successful runs whose `head_branch` is `main`. It may also support `workflow_dispatch`. It must not use `push`, `pull_request`, `deployment_status`, GCP credentials, `actions: write`, `contents: write`, deployment/IAM/job mutation, token mint/rotation, Secret Manager payload access, or order endpoints. `statuses: write` is allowed only to publish the exact-SHA semantic proof result. Checkout credential persistence must remain disabled.
-
-No other workflow may use `workflow_run` or `deployment_status`.
+`workflow-priority-guard.yml` may use `workflow_run` and `deployment_status` only as an evidence-only observer. It may observe only the approved workflow names listed in its event allow-list.
 
 ## Scheduling authority
 
-GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to Google Cloud Scheduler. Code/security/cloud audits execute on every relevant `main` commit; code/security checks also execute on pull requests where configured and may be dispatched manually. Dependabot uses its own repository-native update schedule and is not a GitHub Actions workflow scheduler.
-
-The canonical preflight workflow itself runs on `main` push and manual dispatch only. Event-driven refresh is performed inside the already-approved Workflow Priority Guard after relevant workflow completions, so no duplicate scheduled control-plane workflow is introduced. The post-deploy live UI semantic proof is an acceptance gate tied to a deployment completion, not a scheduler or second deployment/control-plane authority. Fresh preflight before a production transition remains an agent operating-contract obligation.
-
-The repo-clean forensic toolkit likewise has no GitHub cron. Its persistent discoverability is governed by `AGENTS.md`; agents run it on demand for cleanup/storage work, while its own relevant PR/main changes prove the scanner itself.
-
-## AI and external observability rule
-
-- External AI review is advisory-plus-consensus only; it can never override deterministic safety/runtime/security failure evidence.
-- Missing OpenAI, Anthropic, Sonar, Elasticsearch, Jaeger, Grafana or PowerBI configuration is a typed BLOCKED state, never PASS.
-- GCP Cloud Logging/Monitoring is the default runtime evidence authority until external adapters are explicitly configured and proven.
-- Secret payloads and broker credentials must not be copied into AI prompts, GitHub artifacts, logs, dashboards or external observability stores.
-
-## Disabled workflow classes
-
-All additional workflow files are prohibited, including Render workflows, self-hosted workflows, scheduled proof writers, legacy failure trackers, duplicate proof workflows, unapproved repair runners, experimental swarms, and unapproved ML workflows.
+GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to the local laptop Windows Service.
 
 ## Operating rules
 
 - Run the smallest required priority workflow first.
 - Never start duplicate or overlapping workflow runs.
 - Use GitHub-hosted cloud runners only.
-- Google Cloud is the sole runtime/deployment authority.
-- Render remains retired and prohibited.
+- Local Self-Hosted Laptop is the sole runtime/deployment authority (`http://127.0.0.1:8000`).
+- Google Cloud Platform and Render remain retired and prohibited.
 - `LIVE_TRADING_ENABLED=0`.
 - `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
 - `AUTO_EXECUTE_TRADES=0`.
