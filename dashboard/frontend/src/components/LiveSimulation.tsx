@@ -116,7 +116,7 @@ export function LiveSimulation() {
 
       {error && (
         <div style={{ ...cardStyle('rgba(239,68,68,.35)'), marginBottom: '14px', color: 'var(--down)', fontWeight: 900 }}>
-          Backend simulation API unavailable: {error}. Expected Cloud Run route: /api/simulation/live/state.
+          Backend simulation API unavailable: {error}. Expected local route: /api/simulation/live/state.
         </div>
       )}
 

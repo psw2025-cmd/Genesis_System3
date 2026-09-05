@@ -70,7 +70,7 @@ export function EndToEndProof() {
     const apiOk = Boolean(health || state)
     const token = brokerStatus?.token_proof || {}
     const tokenOk = brokerOk
-      && String(token?.source || '').toUpperCase().includes('GCP_SECRET_MANAGER')
+      && Boolean(String(token?.source || '').trim())
       && token?.token_value_exposed !== true
       && Number(token?.hours_remaining ?? 1) > 0
     const fundsOk = Boolean(brokerFunds) && brokerFunds?.success !== false && brokerFunds?.pendingProof !== true

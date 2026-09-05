@@ -57,8 +57,6 @@ jobs:
         shell: bash
         run: |
           python -m py_compile scripts/frontend_local_runtime_smoke.py
-          python -m py_compile scripts/gcp_live_ui_snapshot.py
-          python -m py_compile scripts/gcp_live_ui_semantic_proof.py
           python -m py_compile scripts/system3_temporal_truth_guard.py
           python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
 

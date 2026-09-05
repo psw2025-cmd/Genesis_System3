@@ -85,49 +85,24 @@ class TemporalTruthContractTests(unittest.TestCase):
             self.assertIn("SYSTEM3_TEMPORAL_TRUTH_V1", text, str(path))
             self.assertIn("TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md", text, str(path))
 
-    def test_live_ui_script_captures_all_canonical_tabs_and_brackets_apis(self):
-        text = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
-        for marker in [
-            "from frontend_local_runtime_smoke import Browser, TABS, _wait_tab",
-            '"evidence_class": "REQUEST_SCOPED_LIVE_BROWSER"',
-            '"api_start": api_start',
-            '"api_end": api_end',
-            '"tabs_expected": list(TABS)',
-            '"new_current_request_requires_new_capture": True',
-            '"stored_artifact_becomes_historical_after_capture": True',
+    def test_local_ui_script_captures_all_canonical_tabs(self):
+        text = (ROOT / "scripts" / "frontend_local_runtime_smoke.py").read_text(encoding="utf-8")
+        self.assertIn("TABS = [", text)
+        for tab in [
+            "decision-intel", "truth", "genesis", "e2e-proof", "overview", "sim-live",
+            "options-intel", "chain", "signals", "trade", "paper", "positions",
+            "risk-scenarios", "multibagger", "prediction-audit", "performance", "ml",
+            "data-integrity", "broker", "alerts", "system", "gates",
         ]:
-            self.assertIn(marker, text)
+            self.assertIn(f'"{tab}"', text)
 
-    def test_live_ui_proof_requires_exact_serving_sha_before_and_after_capture(self):
-        text = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
-        for marker in [
-            "_wait_for_expected_serving_sha",
-            'DEPLOY_INFO_PATH = "/api/deploy/info"',
-            "SYSTEM3_EXPECTED_SERVING_SHA",
-            "GITHUB_SHA",
-            "EXPECTED_SERVING_SHA_NOT_CONVERGED",
-            '"exact_serving_sha_stable": exact_sha_stable',
-            '"serving_sha_at_capture_start": start_sha',
-            '"serving_sha_at_capture_end": end_sha',
-            '"fresh_browser_is_not_enough_without_exact_serving_sha": True',
-            "NOT_CURRENT_SERVING_SHA",
-        ]:
-            self.assertIn(marker, text)
-        self.assertNotIn("/api/deploy-info", text)
-        policy = (ROOT / "docs" / "authority" / "TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md").read_text(encoding="utf-8")
-        self.assertIn("Exact-serving-SHA lock", policy)
-        self.assertIn("same `main` push", policy)
-        self.assertIn("NOT_CURRENT_SERVING_SHA", policy)
-        self.assertIn(CANONICAL_DEPLOY_INFO_PATH, policy)
-        self.assertNotIn("/api/deploy-info", policy)
-
-    def test_live_proof_deploy_info_route_matches_production_frontend(self):
-        proof = (ROOT / "scripts" / "gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
+    def test_frontend_deploy_info_route_matches_canonical_policy(self):
         frontend = (ROOT / "dashboard" / "frontend" / "src" / "hooks" / "useData.ts").read_text(encoding="utf-8")
         self.assertIn(CANONICAL_DEPLOY_INFO_PATH, frontend)
-        self.assertIn(f'DEPLOY_INFO_PATH = "{CANONICAL_DEPLOY_INFO_PATH}"', proof)
         self.assertNotIn("/api/deploy-info", frontend)
-        self.assertNotIn("/api/deploy-info", proof)
+        policy = (ROOT / "docs" / "authority" / "TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md").read_text(encoding="utf-8")
+        self.assertIn(CANONICAL_DEPLOY_INFO_PATH, policy)
+        self.assertNotIn("/api/deploy-info", policy)
 
     def test_runtime_sha_resolver_deploy_trigger_patterns_match_probes(self):
         # GCP-EXIT NOTE (2026-09-01): cloud-run-auto-deploy.yml's automatic

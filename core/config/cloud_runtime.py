@@ -1,4 +1,4 @@
-"""Canonical Google Cloud Run runtime defaults for Genesis System3."""
+"""Canonical runtime defaults for Genesis System3."""
 from __future__ import annotations
 
 import json
@@ -10,14 +10,15 @@ _ROOT = Path(__file__).resolve().parents[2]
 _CONFIG_PATH = _ROOT / "config" / "cloud_runtime.json"
 
 _DEFAULTS: Dict[str, Any] = {
-    "deploy_target": "gcp-cloud-run",
-    "cloud_provider": "google_cloud",
-    "region": "asia-south1",
-    "project_id": "system3-openalgo-safe",
-    "service_name": "genesis-system3-web",
-    "public_base_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "deploy_target": "local-laptop",
+    "cloud_provider": "local",
+    "region": "",
+    "project_id": "",
+    "service_name": "local-laptop",
+    "public_base_url": "http://127.0.0.1:8000",
     "ui_path": "/ui",
 }
+_CLOUD_DEFAULT_PUBLIC_BASE_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 
 def load_cloud_runtime() -> Dict[str, Any]:
@@ -49,18 +50,22 @@ def _is_loopback_url(url: str) -> bool:
 
 
 def is_cloud_runtime() -> bool:
-    """True only for this running process, not for the checked-in production target."""
-    mode = os.environ.get("CLOUD_MODE", "").strip().lower()
-    target = os.environ.get("SYSTEM3_DEPLOY_TARGET", "").strip().lower()
-    return (
-        mode in {"1", "true", "yes", "on"}
-        or "cloud-run" in target
-        or bool(os.environ.get("K_SERVICE", "").strip())
-    )
+    """True only when the process is actually running on Cloud Run."""
+    return bool(os.environ.get("K_SERVICE", "").strip())
 
 
 def _cloud_permanent() -> bool:
+    """Runtime truth must come from the actual process location, not stale env/config."""
     return is_cloud_runtime()
+
+
+def _first_loopback_env(*names: str) -> str:
+    """Return the first explicitly configured loopback URL, ignoring stale remote URLs."""
+    for name in names:
+        value = (os.environ.get(name) or "").strip().rstrip("/")
+        if value and _is_loopback_url(value):
+            return value
+    return ""
 
 
 def public_cors_origins() -> list[str]:
@@ -78,6 +83,24 @@ def public_cors_origins() -> list[str]:
 
 
 def public_base_url() -> str:
+    """Return truthful public metadata for the current runtime.
+
+    Local-laptop mode is authoritative whenever this process is not actually on
+    Cloud Run.  Stale machine/user environment variables left over from the GCP
+    era must therefore never make a localhost process advertise a Cloud Run URL.
+    """
+    if not is_cloud_runtime():
+        local_env = _first_loopback_env(
+            "SYSTEM3_API_BASE",
+            "DASHBOARD_BASE_URL",
+            "SYSTEM3_PUBLIC_BACKEND_URL",
+            "PUBLIC_BACKEND_URL",
+        )
+        if local_env:
+            return local_env
+        canonical = _canonical_public_base_url()
+        return canonical if _is_loopback_url(canonical) else str(_DEFAULTS["public_base_url"])
+
     env = (
         os.environ.get("PUBLIC_BACKEND_URL")
         or os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
@@ -85,22 +108,27 @@ def public_base_url() -> str:
         or os.environ.get("DASHBOARD_BASE_URL")
         or ""
     ).strip().rstrip("/")
-    if env and not (_is_loopback_url(env) and _cloud_permanent()):
+    if env and not _is_loopback_url(env):
         return env
-    if _cloud_permanent() or not env:
-        return _canonical_public_base_url()
-    return env
+    canonical = _canonical_public_base_url()
+    if canonical and not _is_loopback_url(canonical):
+        return canonical
+    return _CLOUD_DEFAULT_PUBLIC_BASE_URL
 
 
 def public_dashboard_url() -> str:
     env = (os.environ.get("PUBLIC_DASHBOARD_URL") or "").strip().rstrip("/")
-    if env and not (_is_loopback_url(env) and _cloud_permanent()):
+    if is_cloud_runtime() and env and not _is_loopback_url(env):
+        return env
+    if not is_cloud_runtime() and env and _is_loopback_url(env):
         return env
     return f"{public_base_url()}{public_ui_path()}"
 
 
 def deploy_target() -> str:
+    if not is_cloud_runtime():
+        return "local-laptop"
     return (
         os.environ.get("SYSTEM3_DEPLOY_TARGET")
-        or str(load_cloud_runtime().get("deploy_target") or "gcp-cloud-run")
+        or str(load_cloud_runtime().get("deploy_target") or "local-laptop")
     ).strip()
