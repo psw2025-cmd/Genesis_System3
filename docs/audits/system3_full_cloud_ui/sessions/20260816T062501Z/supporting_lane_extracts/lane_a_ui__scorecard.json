@@ -1,0 +1,1877 @@
+[
+  {
+    "tab": "decision-intel",
+    "capture_utc": "2026-08-16T06:32:09.236333+00:00",
+    "capture_ist": "2026-08-16T12:02:09.236333+05:30",
+    "end_utc": "2026-08-16T06:32:13.376297+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=decision-intel",
+    "text_len": 1748,
+    "text_sha256": "1882642ff5cc16d5a4922b2a76c0601ad6e71245ed665662a4d1a890ed51f595",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n\u2014\nAfter hours\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:12 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nDecision Intelligence\nMODE\nPAPER\nLIVE\nOFF\nSHA\na48e7b3\nLIVE OPERATIONS\nExposure\n\u20b973,851\nRead-only portfolio\nUnrealized P&L\n\u20b9-128.13\nPaper / analyzer\nVaR 95\n\u20b90\nFrom /api/state\nReconciliation\nOK\nTick age\n5s\nAfter hours poll\nCycle\n19724\n16 Aug, 12:02:09\nBroker latency\n43 ms\nNext open\n2026-08-17 09:15:00 IST\nMarket closed: Weekend (Sunday)\nSYSTEM HEALTH & TRUTH\nTruth Control\nBROKER\nCONNECTED\nWS\nLIVE\nMARKET\nCLOSED\nService Availability\nAPI\nOK\nSCANNER\nAFTER HOURS\nPREDICTOR\nANALYZER\nData Sources\nDHAN\nAUTH OK\nSOURCE\nBROKER_CONNECTED_MARKET_CLOSED\nDEPLOY\ngcp-cloud-run\nRuntime Connectivity Blockers\n\u2713 NO RUNTIME CONNECTIVITY BLOCKERS\nThis does not mean model maturity, E2E evidence, human approval, or live-money gates are complete. See E2E Proof and Live Gate for those independent blockers.\nLIVE DECISION BRIEF\nOperating in PAPER with LIVE OFF. Signal: NO_TRADE. Last fetch 16 Aug, 12:02:09. Automated order placement remains inhibited by safety gates.\nTRUTH CONTROL\nOPTIONS INTEL\nRISK & SCENARIOS\nDATA INTEGRITY",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=decision-intel",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "00_decision-intel.png"
+  },
+  {
+    "tab": "truth",
+    "capture_utc": "2026-08-16T06:32:13.378297+00:00",
+    "capture_ist": "2026-08-16T12:02:13.378297+05:30",
+    "end_utc": "2026-08-16T06:32:17.099959+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=truth",
+    "text_len": 2351,
+    "text_sha256": "823d993dd73bec61dbf0acd7223bae5f6fa3cec5fe263e7a0d62599a45c54d4a",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:16 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSystem Truth Control\nShared live dashboard truth \u2014 no duplicate broker/API probe burst. Required chains: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY.\nShared-store sync\n2026-08-16T06:32:16.768Z\nWAITING\nInfrastructure / broker read state\nWAITING\nReadiness evidence still incomplete\nPASS\nPAPER / LIVE safety lock\nREADINESS_NOT_PROVEN \u2014 at least one required current evidence layer below is incomplete. This does not enable live broker orders.\nLAYER\tSTATUS\tREQUIRED\tCURRENT SHARED EVIDENCE\nBackend/API shared live truth\tPASS\tYES\thealth=ok, state=present, api=responding/idle\nBroker read-only connection\tPASS\tYES\tconnected=true, source=dhan, order_allowed=false\nFunds / margin truth\tPASS\tYES\tavailable=2227.36, used=-, source=dhan\nHoldings and Dhan positions read path\tPASS\tYES\tholdings=11, positions=1, empty broker response is valid when success=true\nRequired Dhan option-chain availability\tPARTIAL\tYES\trequired_ready=3/4, safe_no_trade=0/4, optional_ready=0/1\nUniverse / ranking candidates\tPASS\tYES\tcandidate_rows=50; zero candidates is not fabricated into a PASS\nCE / PE decision evidence\tPASS\tYES\tCE/PE field found in the current shared rank/scanner truth\nPaper/analyzer lifecycle read path\tPASS\tNO\tpaper=ok; read-path presence does not prove completed lifecycle\nRisk gates / automation state\tPASS\tYES\tauto_gates=ok\nLive-money safety lock\tPASS\tYES\tlive_flag=false, order_allowed=false; analyzer/PAPER requires both false\nTruth source: the same Zustand state populated by the dashboard's bounded read-only poller. A separate tab must not stampede the same Dhan/GCP endpoints and then display its timeout as broker truth.",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "source=",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=truth",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "01_truth.png"
+  },
+  {
+    "tab": "genesis",
+    "capture_utc": "2026-08-16T06:32:17.100959+00:00",
+    "capture_ist": "2026-08-16T12:02:17.100959+05:30",
+    "end_utc": "2026-08-16T06:32:20.937942+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=genesis",
+    "text_len": 3277,
+    "text_sha256": "c0c726026a89a1fe3d626e7c9063f558b3f364a5a810c55a37e68170f248e643",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:20 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nGenesis Brain / AI Decision Center\nShared GCP/Dhan truth renders immediately; model-specific evidence refreshes independently\nDHAN CONNECTED\nCANDIDATES 25\nRefresh model evidence\nANALYZER \u00b7 LIVE OFF\nShared truth sync: 2026-08-16T06:32:20.500Z\nMarket Regime\nAFTER HOURS\nRead-only after hours\nPrediction Confidence\n--\nModel field only\nModel Ensemble\nWAITING\nOptional brain service\nTruth Score\n63%\nModel/data truth evidence\nDrift Detection\n--\nPSI / model field\nAnomaly State\nWAITING\nExisting evidence only\nRetraining\nWAITING\nNo UI auto-promotion\nWHY THE MODEL / EVIDENCE\nWAITING FOR MODEL EVIDENCE\nBias is displayed only when returned by current Genesis evidence.\n\u2713\nbroker connected/read-only latency\n\u2713\nlive option chain contracts by symbol\n\u2713\nPCR, max pain, IV, OI buildup\n\u2713\ntop gain-ranked symbols\n\u2713\nprediction BUY/SELL/HOLD confidence\n\u2713\nspread/liquidity risk\nSCENARIO / CONFIDENCE\nConfidence\n--\nCurrent model\nAccuracy\n--\nOnly if API supplies it\nHit Rate\n--\nOnly if API supplies it\nMODEL PERFORMANCE / QUALITY\nAccuracy\n--\nModel evidence\nHit Rate\n--\nModel evidence\nProfit Factor\n--\nEvidence field\nMax Drawdown\n--\nEvidence field\nTruth Score\n63%\nData quality\nMemory Events\n0\nBrain state\nMODEL CONFIDENCE HISTORY\nHistorical curve binds when the API exposes a series\nAI AGENTS / MODULES\nShared GCP Truth\nACTIVE\n100%\nDhan Broker\nCONNECTED\n100%\nGenesis Brain\nACTIVE\n--\nData Truth\nACTIVE\n63%\nSystem Health\nok\n--\nNever Die Monitor\nACTIVE\n--\nResearch / Sources\nACTIVE\n100%\nFORECAST DISTRIBUTION\nNo verified forecast-distribution series returned\nCONFIDENCE HISTORY & BANDS\nNo verified confidence-band series returned\nDECISION AUDIT TRAIL\nNo decision-audit rows supplied by current Genesis API.\nAGENT ORCHESTRATION / COMMAND CONSOLE\nVisual orchestration console only. This dashb",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=genesis",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/health",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/data-truth-score",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/genesis-production-brief",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/hidden-secrets-lab",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/system_health",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/autonomous-brain",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/final-message",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/hunger-meter",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/never-die-monitor",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "02_genesis.png"
+  },
+  {
+    "tab": "e2e-proof",
+    "capture_utc": "2026-08-16T06:32:20.948999+00:00",
+    "capture_ist": "2026-08-16T12:02:20.948999+05:30",
+    "end_utc": "2026-08-16T06:32:24.837837+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=e2e-proof",
+    "text_len": 2633,
+    "text_sha256": "a947422a9188c0fc073e3772746e6b67a61ff1d8eafc40994861ce05e78ae09a",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:24 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nEnd-to-End Current Truth Proof\nUses the dashboard's bounded shared read-only truth. No duplicate 3.5-second probe storm; valid market-closed Dhan snapshots are accepted.\nShared-store sync\n2026-08-16T06:32:22.668Z\nWAITING \u00b7 FULL E2E\nCurrent shared proof\nPASS \u00b7 BROKER\nDhan connectivity\nWAITING \u00b7 4 CHAINS\nRequired option chains\nPASS \u00b7 CE/PE\nDecision evidence\nPASS \u00b7 SAFETY\nLIVE/order lock\nCurrent Readiness Truth Checklist\nREQUIRED EVIDENCE\tSTATUS\tCURRENT SHARED EVIDENCE\nCurrent backend/API shared state\tPASS\thealth=present, state=present\nDhan broker connection\tPASS\tconnected=true\nDynamic Dhan token/session\tPASS\tsource=GCP_SECRET_MANAGER_DYNAMIC, version=257, hours=22.09\nReal broker funds/margin\tPASS\tavailable=2227.36\nReal broker holdings response\tPASS\trows=11; empty success is valid\nReal broker positions response\tPASS\trows=1; empty success is valid\nRequired Dhan option chains\tWAITING\t3/4 ready\nNo non-Dhan source in required chains\tPASS\tclean\nCurrent CE / PE candidate evidence\tPASS\t30 candidate rows include CE/PE truth\nPaper/analyzer read path\tPASS\tok\nGate/risk state visible\tPASS\tok\nLIVE/order safety lock\tPASS\tlive=false, order_allowed=false\nRequired Dhan Option Chain Truth\nSYMBOL\tSTATUS\tSOURCE\tAPI STATUS\tSPOT\tCONTRACTS\tREASON\nNIFTY\tPASS\tdhan\tMARKET_CLOSED_DHAN_SNAPSHOT\t24366\t462\tVERIFIED_DHAN_SESSION_SNAPSHOT\nBANKNIFTY\tPASS\tdhan\tMARKET_CLOSED_DHAN_SNAPSHOT\t57491.1\t762\tVERIFIED_DHAN_SESSION_SNAPSHOT\nFINNIFTY\tPASS\tdhan\tMARKET_CLOSED_DHAN_SNAPSHOT\t26213.65\t510\tVERIFIED_DHAN_SESSION_SNAPSHOT\nMIDCPNIFTY\tWAITING\tdhan\tCHAIN_CACHE_WARMING\t0\t0\tIndex chain warming from micro-loop \u2014 UI must not wait on live Dhan OC\nOptional Watchlist Truth\nSENSEX: NOT_LOADED\nRELIANCE: NOT_LOADED\nThis panel proves current read-only dashboard state only. It does not e",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "source=",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=e2e-proof",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "03_e2e-proof.png"
+  },
+  {
+    "tab": "overview",
+    "capture_utc": "2026-08-16T06:32:24.839839+00:00",
+    "capture_ist": "2026-08-16T12:02:24.839839+05:30",
+    "end_utc": "2026-08-16T06:32:28.778241+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=overview",
+    "text_len": 2403,
+    "text_sha256": "fa5eb3c928c6cc2c8a8efe3d27302736113d088fe68c4d92606a1f3329512a9c",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:27 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\n24,366.00\nWaiting for market data\nBANKNIFTY\n57,491.10\nWaiting for market data\nMIDCPNIFTY\n--\nWaiting for market data\nTotal P&L (Paper)\n\u20b9-1,806\nPaper / analyzer truth\nWin Rate\n33.3%\nFrom paper evidence\nModel Confidence\n0%\nNo value invented\nSystem Health\nOK\n6/7 proof gates\nLatency\n43ms\nBroker read-only\nAI DECISION CENTER\nRead-only presentation of existing model/state evidence\nPAPER \u00b7 LIVE OFF\nDirectional Bias\nWAITING FOR MODEL EVIDENCE\nMarket regime: Awaiting regime evidence\nPrediction Confidence\n0.0%\nBound to current System3 model state\nEvidence & Safety\nBroker\nCONNECTED\nMarket\nCLOSED / POLL\nAlerts\n2\nProof Gates\n6/7\nBROKER & ACCOUNT\nBroker\nDHAN\nCONNECTED\nMode\nREAD-ONLY\nNo order authority from dashboard\nAvailable\n\u20b92,227\nFrom broker API only\nPaper P&L\n\u20b9-1,806\nSimulation evidence\nNIFTY SNAPSHOT\n24,366.00\nNO TIME-SERIES DATA \u00b7 SNAPSHOT ONLY\nMARKET / VOLATILITY MONITOR\nAFTER HOURS\nNO TIME-SERIES DATA \u00b7 SNAPSHOT ONLY\nPAPER P&L SNAPSHOT\n\u20b9-1,806\nNO TIME-SERIES DATA \u00b7 SNAPSHOT ONLY\nAUTOMATION STATUS\nData engine\nRESPONDED\nBroker monitor\nCONNECTED\nModel state\nRESPONDED\nExecution authority\nLOCKED\nTOP CONTRACTS / GAIN RANK\nNo synthetic contracts displayed\nUNDERLYING / CONTRACT\tSPOT\tCHANGE\tSCORE\tSOURCE\nNIFTY\t--\t+41.67%\t--\tSCANNER\nNIFTY\t--\t+33.33%\t--\tSCANNER\nNIFTY\t--\t+31.25%\t--\tSCANNER\nNIFTY\t--\t+30.30%\t--\tSCANNER\nNIFTY\t--\t+30.00%\t--\tSCANNER\nNIFTY\t--\t+29.17%\t--\tSCANNER\nRISK STATUS\nLIVE LOCKED\nMax Drawdown\n--\nPaper evidence\nProof Gates\n6/7\nCurrent gate matrix\nMarket\nCLOSED\nRead-only data remains visible\nAuthority\nLOCKED\nLive execution state\nANALYZER MODE \u00b7 PAPER MODE ONLY \u00b7 LIVE EXECUTION DISABLED\nData shown only when supported by current System3 APIs",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=overview",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "04_overview.png"
+  },
+  {
+    "tab": "sim-live",
+    "capture_utc": "2026-08-16T06:32:28.780242+00:00",
+    "capture_ist": "2026-08-16T12:02:28.780242+05:30",
+    "end_utc": "2026-08-16T06:32:32.513148+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=sim-live",
+    "text_len": 1643,
+    "text_sha256": "dd78944e6c348efa7b179c665871320c5d864143e6a9405a03baa744648102d0",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n\u2014\nAfter hours\nBoard\nLive\n12:02:31 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBackend Virtual Live Trading Simulation\n\nThis tab consumes backend API route /api/simulation/live/state like a live feed. It is simulation only: no broker order APIs, no real live gate credit, no live trading enablement.\n\n\u2713 BACKEND FEED\n\u2713 SIMULATION ONLY\n\u2713 NO REAL ORDERS\n\u2713 LIVE OFF\nBACKEND SIM MODE\nSTREAMING\nVIRTUAL P&L\n\u20b9-1806.07\nREAL LIVE STATUS\nOFF / LOCKED\nSOURCE\nok\nPause backend stream\nRefresh backend tick #0\nTREND\nRANGE\nVOLATILE\nBackend virtual paper order tape\nID\tSymbol\tSide\tStrike\tExpiry\tLTP\tP&L\tStatus\tSource\nBackend virtual checklist\nML SPEARMAN RHO GTE 0 70 OVER 5 DAYS\nSIM ONLY\nPOSITIVE NET EXPECTANCY AFTER COSTS\nSIM ONLY\nREAL PAPER LIFECYCLE MARKET DAY PROOF\nSIM ONLY\nWEBSOCKET TICK HEALTH PROVEN\nSIM ONLY\nMODEL ACCURACY REPORT PRESENT\n\u2713 SIM OK\nOPTION STRIKE VISIBILITY PROVEN\nSIM ONLY\nEQUITY FO ELIGIBILITY PROVEN\n\u2713 SIM OK\nSIMULATION ONLY \u2014 no broker order APIs, live trading remains OFF",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=sim-live",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/simulation/live/state?scenario=trend",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "05_sim-live.png"
+  },
+  {
+    "tab": "options-intel",
+    "capture_utc": "2026-08-16T06:32:32.514149+00:00",
+    "capture_ist": "2026-08-16T12:02:32.514149+05:30",
+    "end_utc": "2026-08-16T06:32:36.285719+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=options-intel",
+    "text_len": 1368,
+    "text_sha256": "92b247df8a1ec04260f620c60a8e353b1fe95f6389aec34f9bfa785a180d3823",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:35 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nOptions Intelligence\nSYMBOL\nNIFTY\nMARKET\nCLOSED\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nOPEN FULL OPTION CHAIN\nMarket Sentiment & Flows\nPCR (OI)\n\u2014\nPCR (VOL)\n\u2014\nIV PERCENTILE\nPENDING\nOI CHANGE\nPENDING\nSOURCE\ndhan\nGain Rank Comparison\nSystem3 Top Forecasts vs Market Leaders\nNIFTY\n41.7\nNIFTY\n33.3\nNIFTY\n31.3\nMarket Leaders vs System3\nMarket-wide top contract gainers\nNIFTY PE\n41.7%\nNIFTY PE\n33.3%\nNIFTY PE\n31.3%\nAbnormal Activity\nAFTER HOURS\nNo catalyst/sentiment feed is wired. Unusual activity is not invented from empty after-hours chains.\nDhan Position Context\nINSTRUMENT\tQTY\tAVG\tLTP\tP&L\nPOWERGRID-Aug2026-280-CE\t3800\t1.55\t0.65\t-3402.71",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=options-intel",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "06_options-intel.png"
+  },
+  {
+    "tab": "chain",
+    "capture_utc": "2026-08-16T06:32:36.288733+00:00",
+    "capture_ist": "2026-08-16T12:02:36.288733+05:30",
+    "end_utc": "2026-08-16T06:32:40.139444+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=chain",
+    "text_len": 16953,
+    "text_sha256": "8c4fa06ca8c74ea8b001e2e1544179ac085d1af5e4979258b29e00376197e810",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:39 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nNIFTY\nBANKNIFTY\nFINNIFTY\nMIDCPNIFTY\nSENSEX\nBANKEX\nLoad\nDHAN UNIVERSE 217\nEQ OPT 211\nSESSION SNAPSHOT\nEXPIRY\nAUTO / NEAREST\n2026-06-16\n2026-06-23\n2026-06-30\n2026-07-07\n2026-07-14\n2026-07-28\n2026-08-18\n2026-08-25\n2026-09-29\n2026-12-29\n2027-03-30\n2027-06-29\n2027-12-28\n2028-06-27\n2028-12-26\n2029-06-26\n2029-12-24\n2030-06-25\n2030-12-31\nEXPIRIES 19\nSYMBOL NIFTY\nSPOT 24,366.00\nPCR 0.88\nCONTRACTS 462\nSTRIKES 231\nVISIBLE\nALL STRIKES (231)\n+/-5 ATM\n+/-10 ATM\n+/-20 ATM\n+/-40 ATM\nsource=dhan priority=dhan_last_verified_snapshot status=MARKET_CLOSED_DHAN_SNAPSHOT complete_chain=true age=78.3s fetched=2026-08-16T06:31:20.039199+00:00 universe=security_id_list.csv - Market closed \u2014 last verified Dhan option-chain snapshot (2026-08-16 12:01 IST)\nOI\tCHGOI\tVOL\tIV\tLTP\tBID\tSTRIKE\tASK\tLTP\tIV\tVOL\tCHGOI\tOI\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,500.00\t--\t0.00\t0.11\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,550.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,600.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,650.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,700.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,750.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,800.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,850.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,900.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t18,950.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,000.00\t--\t0.00\t0.10\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,050.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,100.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,150.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,200.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,250.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,300.00\t--\t0.00\t0.09\t0\t+0\t\n0\n\n\n0\n\t+0\t0\t0.00\t0.00\t--\t19,350.00\t--\t0.00\t0.09\t0\t+0\t\n0\n",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "source=",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=chain",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/underlyings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/expiries/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "07_chain.png"
+  },
+  {
+    "tab": "signals",
+    "capture_utc": "2026-08-16T06:32:40.144443+00:00",
+    "capture_ist": "2026-08-16T12:02:40.144443+05:30",
+    "end_utc": "2026-08-16T06:32:44.010306+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=signals",
+    "text_len": 3935,
+    "text_sha256": "dfb16f36dcc6b056c6cd67f809815e27963e0d20bcca41322a6d811cb7126818",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:43 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nSignals & Recommendations\nREAL CANDIDATE EVIDENCE\nTRADE_CANDIDATE_ONLY\nRead-only scanner/ranker evidence found.\nThis is not a broker order. Live trading remains disabled until paper/risk gates prove readiness.\nWhat Is Preventing Trading?\nCandidate only: paper/risk/live gates still decide whether trade is allowed\nUnderlying\nNIFTY\nStrategy\nscanner_top_contract_gainers: PE candidate evidence\nConfidence\n41.7%\nSide\nPE\nStrike\n23650\nExpiry\n2026-08-18\nGain %\n41.67%\nEntry Mid\nRs 2.55\nStop Loss\nRs 2.04\nTarget\nRs 3.31\nMARKET TOP CE / PE\nRefreshed 2026-08-16 12:01:25 \u00b7 ok \u00b7 25 rows \u00b7 Dhan live \u00b7 ultra_micro\nMONEYCONTROL\nDHAN LIVE\nWS STREAM\nLIVE OFF\n#\tSYMBOL\tEXPIRY\tTYPE\tSTRIKE\tLTP\tCHANGE\tGAIN %\tVOLUME\tOI\tSOURCE\n1\tNIFTY\t18-Aug-26\tPE\t23,650\t2.55\t0.75\t41.67%\t2,01,25,495\t14,86,550\tDHAN_OPTION_CHAIN_LIVE\n2\tNIFTY\t18-Aug-26\tPE\t23,700\t2.80\t0.70\t33.33%\t3,94,36,605\t38,86,285\tDHAN_OPTION_CHAIN_LIVE\n3\tNIFTY\t18-Aug-26\tPE\t22,600\t1.05\t0.25\t31.25%\t15,56,880\t4,01,570\tDHAN_OPTION_CHAIN_LIVE\n4\tNIFTY\t18-Aug-26\tPE\t23,550\t2.15\t0.50\t30.30%\t1,13,75,715\t8,98,885\tDHAN_OPTION_CHAIN_LIVE\n5\tNIFTY\t18-Aug-26\tPE\t22,800\t1.30\t0.30\t30.00%\t58,68,590\t13,85,735\tDHAN_OPTION_CHAIN_LIVE\n6\tNIFTY\t18-Aug-26\tPE\t23,150\t1.55\t0.35\t29.17%\t30,66,700\t3,17,200\tDHAN_OPTION_CHAIN_LIVE\n7\tNIFTY\t18-Aug-26\tPE\t22,750\t1.20\t0.25\t26.32%\t10,85,695\t1,80,375\tDHAN_OPTION_CHAIN_LIVE\n8\tNIFTY\t18-Aug-26\tPE\t23,600\t2.25\t0.45\t25.00%\t3,59,93,230\t34,08,990\tDHAN_OPTION_CHAIN_LIVE\n9\tNIFTY\t18-Aug-26\tPE\t22,650\t1.05\t0.20\t23.53%\t8,86,210\t1,72,770\tDHAN_OPTION_CHAIN_LIVE\n10\tNIFTY\t18-Aug-26\tPE\t23,750\t2.90\t0.55\t23.40%\t2,70,14,325\t14,46,705\tDHAN_OPTION_CHAIN_LIVE\n11\tNIFTY\t18-Aug-26\tPE\t22,900\t1.35\t0.25\t22.73%\t33,83,965\t6,17,175\tDHAN_OPTION_CHAIN_LIVE\n12\tNIFTY\t18-Aug-26\tPE\t22,950\t1.35\t0.25\t22.73%\t20,73,760\t2,13,330\tDHAN_OPTION_CHAIN_L",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=signals",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/gain_rank",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/moneycontrol_gainers?top_n=25",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "08_signals.png"
+  },
+  {
+    "tab": "trade",
+    "capture_utc": "2026-08-16T06:32:44.012304+00:00",
+    "capture_ist": "2026-08-16T12:02:44.012304+05:30",
+    "end_utc": "2026-08-16T06:32:48.028328+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=trade",
+    "text_len": 19889,
+    "text_sha256": "9bafa450900c87ea3a200f39fc29e09f1abfa1d197bb6735749ad96eb56ce8f7",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:47 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nMARKET TOP CE / PE\nRefreshed 2026-08-16 12:01:25 \u00b7 ok \u00b7 25 rows \u00b7 Dhan live \u00b7 index_chain_cache\nMONEYCONTROL\nDHAN LIVE\nWS STREAM\nLIVE OFF\n#\tSYMBOL\tEXPIRY\tTYPE\tSTRIKE\tLTP\tCHANGE\tGAIN %\tVOLUME\tOI\tSOURCE\n1\tNIFTY\t18-Aug-26\tPE\t23,650\t2.55\t0.75\t41.67%\t2,01,25,495\t14,86,550\tDHAN_OPTION_CHAIN_LIVE\n2\tNIFTY\t18-Aug-26\tPE\t23,700\t2.80\t0.70\t33.33%\t3,94,36,605\t38,86,285\tDHAN_OPTION_CHAIN_LIVE\n3\tNIFTY\t18-Aug-26\tPE\t22,600\t1.05\t0.25\t31.25%\t15,56,880\t4,01,570\tDHAN_OPTION_CHAIN_LIVE\n4\tNIFTY\t18-Aug-26\tPE\t23,550\t2.15\t0.50\t30.30%\t1,13,75,715\t8,98,885\tDHAN_OPTION_CHAIN_LIVE\n5\tNIFTY\t18-Aug-26\tPE\t22,800\t1.30\t0.30\t30.00%\t58,68,590\t13,85,735\tDHAN_OPTION_CHAIN_LIVE\n6\tNIFTY\t18-Aug-26\tPE\t23,150\t1.55\t0.35\t29.17%\t30,66,700\t3,17,200\tDHAN_OPTION_CHAIN_LIVE\n7\tNIFTY\t18-Aug-26\tPE\t22,750\t1.20\t0.25\t26.32%\t10,85,695\t1,80,375\tDHAN_OPTION_CHAIN_LIVE\n8\tNIFTY\t18-Aug-26\tPE\t23,600\t2.25\t0.45\t25.00%\t3,59,93,230\t34,08,990\tDHAN_OPTION_CHAIN_LIVE\n9\tNIFTY\t18-Aug-26\tPE\t22,650\t1.05\t0.20\t23.53%\t8,86,210\t1,72,770\tDHAN_OPTION_CHAIN_LIVE\n10\tNIFTY\t18-Aug-26\tPE\t23,750\t2.90\t0.55\t23.40%\t2,70,14,325\t14,46,705\tDHAN_OPTION_CHAIN_LIVE\n11\tNIFTY\t18-Aug-26\tPE\t22,900\t1.35\t0.25\t22.73%\t33,83,965\t6,17,175\tDHAN_OPTION_CHAIN_LIVE\n12\tNIFTY\t18-Aug-26\tPE\t22,950\t1.35\t0.25\t22.73%\t20,73,760\t2,13,330\tDHAN_OPTION_CHAIN_LIVE\n13\tNIFTY\t18-Aug-26\tPE\t23,400\t1.75\t0.30\t20.69%\t1,36,86,465\t20,78,440\tDHAN_OPTION_CHAIN_LIVE\n14\tNIFTY\t18-Aug-26\tPE\t23,350\t1.80\t0.30\t20.00%\t81,34,425\t12,47,415\tDHAN_OPTION_CHAIN_LIVE\n15\tNIFTY\t18-Aug-26\tPE\t23,800\t3.15\t0.50\t18.87%\t5,30,01,585\t54,03,840\tDHAN_OPTION_CHAIN_LIVE\n16\tNIFTY\t18-Aug-26\tPE\t22,550\t1.00\t0.15\t17.65%\t3,71,280\t96,135\tDHAN_OPTION_CHAIN_LIVE\n17\tNIFTY\t18-Aug-26\tPE\t23,500\t2.00\t0.30\t17.65%\t3,88,70,585\t65,39,780\tDHAN_OPTION_CHAIN_LIVE\n18\tNIFTY\t18-Aug-26\tPE\t23,050\t1.35\t0.20\t17.39%\t26,06,435\t",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "source=",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=trade",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/equity_options?top_n=8",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/scanner/moneycontrol_gainers?top_n=25",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/underlyings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/expiries/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/POWERGRID",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "09_trade.png"
+  },
+  {
+    "tab": "paper",
+    "capture_utc": "2026-08-16T06:32:48.044330+00:00",
+    "capture_ist": "2026-08-16T12:02:48.044330+05:30",
+    "end_utc": "2026-08-16T06:32:51.893754+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=paper",
+    "text_len": 2719,
+    "text_sha256": "901165b7a80e839a385fee0d199b7d0f54faf0bc97c454835051edbf5132585c",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:51 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPaper Trading Console\nAligned to DhanHQ v2 Positions fields \u00b7 Source: PAPER_CLOUD_SIM \u00b7 Refresh: 8/16/2026, 12:02:48 PM\nDhan production tokens have no paper sandbox \u2014 fills are local sim; LTP/PnL from live Dhan option chain. LIVE orders stay OFF.\nRefresh\nMode Safety\nPAPER SAFE\nLive trading: OFF\nMarket Data (Dhan)\nCONNECTED\nMark-to-market: DHAN_LIVE_MARK_TO_MARKET\nToday Paper Entries\n0\nOpen positions: 0\nToday Paper Exits\n0\nRealized: \u20b9-1806.07\nPaper Truth Provenance\nLedger / source\n/app/outputs/positions_live.json\nDisplayed rows\n0\nFake/fixture rejected\n0\nDhan /orders API\nINTENTIONALLY NOT CALLED\nCorrect for paper \u2014 broker orders must stay off\nSources checked: DhanHQ Portfolio/Positions docs \u00b7 Dhan Sandbox (separate tokens) \u00b7 OpenAlgo Dhan notes \u00b7 industry paper dashboards (entry, LTP, unrealized/realized PnL, SL/TP, order book empty in paper).\nPAPER TRADING MODE (NO REAL ORDERS)\nFills are simulated locally. Dhan /orders APIs are intentionally not called. Mark-to-market uses live Dhan option-chain LTP.\nMode: PAPER | Data Source: DHAN_LIVE_MARK_TO_MARKET | Broker: Connected\nOpen Paper Positions (0)\nColumns map to DhanHQ v2 Positions: tradingSymbol, positionType, productType, buyAvg, netQty, unrealizedProfit, drvOptionType, drvStrikePrice, drvExpiryDate + paper SL/Target.\nNo open paper positions\nPublic dashboard controls are read-only. Paper fills are created only by the protected cloud paper loop.\nPnL Summary (Dhan-style)\nTotal PnL\n\u20b9-1806.07\nUnrealized (open)\n\u20b90.00\nRealized (booked)\n\u20b9-1806.07\nOpen Positions\n0 / 3\nToday Entries / Exits\n0 / 0\nPaper Exposure\n\u20b90.00\nOrder Book (Paper)\nBroker order book stays empty in paper mode.\nPOST /v2/orders \u2192 NOT CALLED\nGET /v2/orders \u2192 N/A (paper ledger only)\nGET /v2/positions \u2192 Live broker positions separ",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=paper",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/paper",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/pnl",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/trades/today",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "10_paper.png"
+  },
+  {
+    "tab": "positions",
+    "capture_utc": "2026-08-16T06:32:51.898293+00:00",
+    "capture_ist": "2026-08-16T12:02:51.898293+05:30",
+    "end_utc": "2026-08-16T06:32:55.648430+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=positions",
+    "text_len": 1302,
+    "text_sha256": "0ea63f60d486315afb6d1e653a3292d3f146fc939f1e46e486815fa24eb568d7",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:55 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPAPER NET P&L\n\u20b9-1,806\nPAPER WIN RATE\n0.3%\nPAPER TRADES\n9\nPAPER OPEN\n0\nDHAN LIVE POSITIONS\n1\nPAPER LEDGER \u2014 NO REAL ORDER ACTIONS\nOpen read-only Dhan broker truth\nThis tab is intentionally the PAPER positions ledger. Real Dhan positions are read-only and shown separately on the Broker tab. A paper count of 0 does not mean Dhan has 0 broker positions.\nPAPER OPEN POSITIONS (0)\n\nNo paper positions are open\n\nPaper engine positions are separate from the read-only Dhan broker ledger.\n\nDhan currently reports 1 broker position; open the Broker tab for read-only details.",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=positions",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "11_positions.png"
+  },
+  {
+    "tab": "risk-scenarios",
+    "capture_utc": "2026-08-16T06:32:55.650428+00:00",
+    "capture_ist": "2026-08-16T12:02:55.650428+05:30",
+    "end_utc": "2026-08-16T06:32:59.565981+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=risk-scenarios",
+    "text_len": 1610,
+    "text_sha256": "da5e6bcbdbb0dffae6452b14790de947a99e31d1706beea1f99f4ab5157466bc",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:02:58 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n2\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nRisk & Scenarios\nGATE\nLOCKED\nLive Portfolio Risk\nSOURCE\nPORTFOLIO RISK API\nSTATUS\nREADY\nRead-only portfolio risk loaded\nVALUE AT RISK (95%)\n\u20b9-1,00,168.23\nEXPECTED SHORTFALL (95%)\n\u20b9-1,85,310.08\nTOTAL EXPOSURE\n\u20b93,19,825.18\nCONCENTRATION RISK\n14.6%\nTOTAL P&L\n\u20b944,604.18\nOPEN POSITIONS\n12\nGreeks Exposure\nDELTA\n0.0000\nGAMMA\n0.0000\nTHETA\n0.0000\nVEGA\n0.0000\nExposure by Underlying\nPARADEEP\n\u20b919,047.6\nMRPL\n\u20b930,917.66\nSANDUMA\n\u20b946,597.11\nCHENNPETRO\n\u20b928,555.65\nMAHSEAMLES\n\u20b930,383.2\nBAJAJHIND\n\u20b935,509.7\nDWARKESH\n\u20b939.22\nRKFORGE\n\u20b923,639.6\nPAISALO\n\u20b933,631.5\nNMDC\n\u20b940,212.48\nAARTIIND\n\u20b925,418.75\nPOWERGRID-AUG2026-280-CE\n\u20b95,872.71\nPre-Trade Security Gate\nState reported by the system proof gates\nGATE STATE\nINHIBITED\nLive order execution remains locked unless every server-side proof gate passes.\nScenario Analysis\nMARKET\nCLOSED\nLIMITS\nPASS\nLIVE ORDERS\nLOCKED\nMarket closed: Weekend (Sunday)",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=risk-scenarios",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/risk/portfolio",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "12_risk-scenarios.png"
+  },
+  {
+    "tab": "multibagger",
+    "capture_utc": "2026-08-16T06:32:59.567983+00:00",
+    "capture_ist": "2026-08-16T12:02:59.567983+05:30",
+    "end_utc": "2026-08-16T06:33:03.765899+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=multibagger",
+    "text_len": 1333,
+    "text_sha256": "d9ea74ef2726baafc8f566b65f144b883383858bfa621544573f7656d579db65",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:02 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nMultibagger research\n\nWaiting for verified candidates\n\nDelayed\nCandidates\n0\n\nPrimary research board for verified multibagger candidates.\n\nP&L\n\u20b9-1,806.07\nRead-only portfolio\nExposure\n\u20b973,851\nCurrent exposure\nUpdated\n16 Aug, 12:02:48\nMarket closed \u00b7 poll / snapshot\nNo research candidates are ready\n\nWe do not yet have enough validated market and research evidence to publish a candidate.\n\nLast research scan\n16 Aug, 12:02:48\nMarket status\nClosed\nResearch data\nWaiting for the next validated scan\nFeed\nDelayed \u00b7 Broker connected\nView data status\nHow candidates are selected\nResearch readiness details",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "13_multibagger.png"
+  },
+  {
+    "tab": "prediction-audit",
+    "capture_utc": "2026-08-16T06:33:03.892755+00:00",
+    "capture_ist": "2026-08-16T12:03:03.892755+05:30",
+    "end_utc": "2026-08-16T06:33:08.047978+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=prediction-audit",
+    "text_len": 1084,
+    "text_sha256": "002a32cd40e5c2a5d08b5ee92e6735e101af3d55825c74ebf3d839c71854d075",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:07 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPrediction Audit Ledger\nGATES\n6/7 PASS\nLast signal\nNO_TRADE\nNo signal generated\nConfidence\n0\nCycle\n19731\n16 Aug, 12:03:00\nMode\nPAPER\nLive proof-gate ledger\nML Accuracy (Spearman \u03c1)\nCOLLECTING\nProfit / Expectancy\nPASS\nPaper Lifecycle\nPASS\nTick / Data Freshness\nPASS\nModel Accuracy Report\nPASS\nOption Strike Visibility\nPASS\nEquity F&O Eligibility\nPASS",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=prediction-audit",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "14_prediction-audit.png"
+  },
+  {
+    "tab": "performance",
+    "capture_utc": "2026-08-16T06:33:08.048979+00:00",
+    "capture_ist": "2026-08-16T12:03:08.048979+05:30",
+    "end_utc": "2026-08-16T06:33:11.821832+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=performance",
+    "text_len": 2180,
+    "text_sha256": "feb18f1373127e331438f640d58798f94ecd80b7df3fc80f6ce4d047b4a5b176",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:11 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nPerformance\nlast checked 12:03:08 IST\nTOTAL P&L\n\u20b9-1,806\nRealized + Unrealized\nWIN RATE\n0.3%\nTOTAL TRADES\n9\n3W / 6L\nOPEN PAPER\n0\nCloud paper engine\nBACKTEST / WALK-FORWARD PROOF\n{\n  \"proof_id\": \"WALKFORWARD_20260614_151049\",\n  \"started\": \"2026-06-14T15:10:49.111203+00:00\",\n  \"completed\": \"2026-06-14T15:10:52.694857+00:00\",\n  \"pass\": true,\n  \"status\": \"PASS\",\n  \"recent_costed_walkforward_proven\": true,\n  \"costs_slippage_included_proven\": true,\n  \"walk_pairs\": 8,\n  \"trade_count\": 8,\n  \"win_trades\": 4,\n  \"loss_trades\": 4,\n  \"win_rate_pct\": 50,\n  \"total_gross_pnl\": -101258.25,\n  \"total_costs\": 1378.1,\n  \"total_net_pnl\": -102636.35,\n  \"avg_net_pnl_per_trade\": -12829.54,\n  \"bhavcopy_days_used\": [\n    \"20260608\",\n    \"20260609\",\n    \"20260610\",\n    \"20260611\",\n    \"20260612\"\n  ],\n  \"cost_model\": {\n    \"brokerage_per_side\": 20,\n    \"stt_rate\": 0.000625,\n    \"exchange_txn_charge\": 0.0005,\n    \"slippage_pct\": 0.001,\n    \"description\": \"Dhan flat-fee plan: \u20b920/side + STT + exc charge + 18% GST + SEBI\"\n  },\n  \"symbols_tested\": [\n    \"NIFTY\",\n    \"BANKNIFTY\"\n  ],\n  \"strategy\": \"OI-change-ranked ATM CE next-day exit \u2014 walk-forward proof only, not trading signal\",\n  \"live_trading_enabled\": false,\n  \"note\": \"Walk-forward proof validates cost model and pipeline correctness. Not a performance claim.\",\n  \"trades\": [\n    {\n      \"symbol\": \"NIFTY\",\n      \"strike\": 23200,\n     \nML ACCURACY (SPEARMAN \u03a1) \u2014 0 DAY HISTORY\n\nNo \u03c1 history recorded yet",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=performance",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/backtest/results",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/pnl",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "15_performance.png"
+  },
+  {
+    "tab": "ml",
+    "capture_utc": "2026-08-16T06:33:11.823833+00:00",
+    "capture_ist": "2026-08-16T12:03:11.823833+05:30",
+    "end_utc": "2026-08-16T06:33:15.651499+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=ml",
+    "text_len": 1538,
+    "text_sha256": "a73ba5d0f079fb7d1b61b0983c85527947c8b9297de56de0662603aaf35a103e",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:14 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nML Model Truth\nThis tab is proof-only. It does not train inline and does not invent metrics.\nMODEL_PROOF_VALIDATION_PENDING\nLoaded 1 blocked accuracy artifact(s). Model not proven \u2014 missing matured prediction history / post-market validation. Blocker: model_accuracy_report:NO_PREDICTION_SOURCE_FOUND\nRequired proof: matured prediction history, post-market validation, accuracy/drift report, and retrain output. Without that, no 90% or money-ready claim is allowed.\nActive model\nNOT_PROVEN\nFallback used\nNO\nProof records\n0 proven / 1 validation pending\nTraining status\nVALIDATION PENDING\nModel Performance Records\nMODEL\tSTATUS\tPREDICTIONS\tAVG ACCURACY\tPROOF PASS / VALIDATION PENDING\tBLOCKER\tGENERATED\nmodel_accuracy_report\tBLOCKED\t0\tN/A\t0 / 0\tNO_PREDICTION_SOURCE_FOUND\t2026-07-24T03:53:31.406031+00:00",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=ml",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/ml/compare",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/ml/performance",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "16_ml.png"
+  },
+  {
+    "tab": "data-integrity",
+    "capture_utc": "2026-08-16T06:33:15.688497+00:00",
+    "capture_ist": "2026-08-16T12:03:15.688497+05:30",
+    "end_utc": "2026-08-16T06:33:19.517189+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=data-integrity",
+    "text_len": 1472,
+    "text_sha256": "482af3fe3c04aecfdb5eac46df9538cd110f74a124f2254979a3e81fd6aba816",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:18 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nData integrity\n\nFreshness, broker auth, and engineering diagnostics\n\nDelayed\nSystem health\n\nEngineering diagnostics for deploy proofs and runtime checks. Hidden from the main trading workspace.\n\nDeploy diagnostics\nSystem\nPAPER\nAPI\nResponding\nWebSocket\nLive\nData\nDhan\nML\n0/5d\nPaper\nGate ok\nUI\nRendered\nSHA\na48e7b3\nReconciliation\nOK\nQC\nPASS\nTick age\n9s\nDeploy SHA\na48e7b3\ngenesis-system3-web\nAuthentication\nDhan login\nAuthenticated\nToken\nPresent\nBackend reports an active read-only broker session.\nConnectivity\nAPI path\nCloud Run \u2192 Dhan\nWebSocket\nlive\nLatency\n56 ms\nFreshness\nLast sync\n16 Aug, 12:03:19\nLast fetch\n16 Aug, 12:03:12\nSource\nBROKER_CONNECTED_MARKET_CLOSED\nErrors and blockers\nLive trading permanently disabled in analyzer mode",
+    "markers": [
+      "error",
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=data-integrity",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "17_data-integrity.png"
+  },
+  {
+    "tab": "broker",
+    "capture_utc": "2026-08-16T06:33:19.520203+00:00",
+    "capture_ist": "2026-08-16T12:03:19.520203+05:30",
+    "end_utc": "2026-08-16T06:33:23.273745+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=broker",
+    "text_len": 2344,
+    "text_sha256": "219227b77b242035a4891384e2643f28215c1c54746ecdf125b9072798c62690",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:22 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nBroker Connection \u00b7 DHAN\nRead-only account proof \u00b7 Google Cloud token authority \u00b7 Raw token exposed: NO\nCONNECTED\nREAD-ONLY / LIVE OFF\nAPI / Broker\nCONNECTED \u00b7 56ms\nToken Source\nGCP_SECRET_MANAGER_DYNAMIC\nSecret Version\nVERSION 257\nToken Loaded\n16/8/2026, 12:02:46 pm\nToken Time Left\n22.08 HOURS\nAccount APIs\nF / H / P\nRequired Chains\n4/4 READY\nReload State\nNOT REQUIRED\nExpiry\n17/8/2026, 10:07:53 am\nAuthority\nANALYZER \u00b7 ORDERS DISABLED\nBROKER CONNECTION - DHAN\nStatus\nCONNECTED\nTruth\nREAD-ONLY BROKER PROOF OK\nMode\nREAD-ONLY BROKER PROOF\nClient ID\nNOT PROVIDED BY BROKER API\nToken Status\nVALID\nHoldings API\nRESPONDED\nFunds API\nRESPONDED\nBroker Blocker\nNONE - MARKET CLOSED IS OK\nMarket State\nMARKET CLOSED / READ-ONLY OK\nData Visibility\nVISIBLE ONLY WHEN LIVE READ-ONLY BROKER API RESPONDS\nLive Trading\nDISABLED BY BACKEND FLAG\nPORTFOLIO VALUE (DHAN LIVE)\nInvestment\n3.14 L\nCurrent Value\n3.62 L\nOverall P&L\n\u20b948,007 (+15.29%)\nOpen Positions\n1\nACCOUNT FUNDS\nAvailable Balance\n\u20b92,227\nUsed Margin\n--\nTotal Balance\n\u20b92,227\nEQUITY HOLDINGS (11)\nSYMBOL\tQTY\tAVG COST\tLTP\tP&L\tP&L%\nPARADEEP\t165\t115.44\t147.85\t\u20b95,348\t+28.08%\nMRPL\t164\t188.52\t170.54\t\u20b9-2,949\t-9.54%\nSANDUMA\t230\t202.60\t198.01\t\u20b9-1,055\t-2.26%\nCHENNPETRO\t31\t921.15\t1,321.90\t\u20b912,423\t+43.51%\nMAHSEAMLES\t50\t607.66\t612.45\t\u20b9239\t+0.79%\nBAJAJHIND\t2100\t16.91\t17.30\t\u20b9820\t+2.31%\nDWARKESH\t1\t39.22\t42.95\t\u20b94\t+9.52%\nRKFORGE\t40\t590.99\t732.60\t\u20b95,664\t+23.96%\nPAISALO\t880\t38.22\t68.67\t\u20b926,798\t+79.68%\nNMDC\t476\t84.48\t84.40\t\u20b9-38\t-0.09%\nAARTIIND\t49\t518.75\t534.10\t\u20b9752\t+2.96%\nDHAN LIVE POSITIONS (1)\nSYMBOL\tSIDE\tQTY\tENTRY\tLTP\tP&L\nPOWERGRID-Aug2026-280-CE\tLONG\t3800\t1.55\t0.65\t\u20b9-3,403",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=broker",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "18_broker.png"
+  },
+  {
+    "tab": "alerts",
+    "capture_utc": "2026-08-16T06:33:23.275747+00:00",
+    "capture_ist": "2026-08-16T12:03:23.275747+05:30",
+    "end_utc": "2026-08-16T06:33:26.986399+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=alerts",
+    "text_len": 1439,
+    "text_sha256": "01c92fb9a1b33eaa25377a2571b5f20e5de8121398748f75343a8a7d15efd606",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:26 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nAlerts & Activity Intelligence\nSystem, broker, data-quality and model notifications\n1 ACTIVE\nCritical\n0\nHigh\n0\nMedium\n0\nMarket\nCLOSED\nBroker\nCONNECTED\nWebSocket\nLIVE\nLIVE ALERT STREAM\nNewest evidence first\nhuman_approved=NOT APPROVED \u2014 owner must set live_trading_approved=true in kill_switch.json; validation_days=1 validation days (need \u226510); ml_accuracy_rho=Avg Spearman \u03c1=0.200 (need \u22650.70)\n2026-08-16T12:03:23.976417+05:30\nMONITORING CHANNELS\nMarket & chain data\nMONITORED\nBroker connectivity\nMONITORED\nModel / ML evidence\nMONITORED\nRisk & truth gates\nMONITORED\nSystem runtime\nMONITORED\nAUTHORITY\nANALYZER / PAPER \u00b7 LIVE OFF\nAlert handling is observational. This tab does not expose order execution.",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=alerts",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "19_alerts.png"
+  },
+  {
+    "tab": "system",
+    "capture_utc": "2026-08-16T06:33:26.989403+00:00",
+    "capture_ist": "2026-08-16T12:03:26.989403+05:30",
+    "end_utc": "2026-08-16T06:33:30.708800+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=system",
+    "text_len": 1717,
+    "text_sha256": "fb79c203ff7b2e7b6a83b6193ce4e85b56a095a0c5cd5739fc8bfecafb2bc210",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:30 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nConnection Truth\nBroker (Dhan)\nCONNECTED\nBroker Latency\n41 ms\nWebSocket\nLIVE\nMode\nPAPER\nData Source\nlive\nMarket State\nCLOSED / OFFLINE\nPublic Read API\nAVAILABLE / WAITING\nDhan Token & Connection Truth\n\nRead-only broker provenance from the existing broker status contract. No token value is rendered.\n\nCONNECTED\nToken Source\nGCP_SECRET_MANAGER_DYNAMIC\nSecret Version\nVERSION 257\nToken Loaded (IST)\n16/8/2026, 12:03:28 pm\nToken Expiry (IST)\n17/8/2026, 10:07:53 am\nToken Time Left\n22.07 h\nLast Reload\npre_get_status\nReload Result\nNOT REQUIRED / NOT ATTEMPTED\nCanonical Rotation\ngenesis-system3-dhan-token-rotate\nRotation Schedule\n07:30 IST daily\nRaw Token Exposure\nPROVEN NO\nOrder Authority\nLOCKED\nRuntime Performance\nCycle Count\n0\nCycle Duration\n0.00s\nSLA Result\ntrue\nQC Status\nPASS\nSafety Truth\nRuntime LIVE Flag\nOFF\nSystem LIVE State\nOFF / LOCKED\nPaper / Analyzer\nPAPER\nLive Allowed\nfalse\nBroker Data Visibility\nREAD-ONLY\nBlocker 1\nLive trading permanently disabled in analyzer mode",
+    "markers": [
+      "waiting",
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=system",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "20_system.png"
+  },
+  {
+    "tab": "gates",
+    "capture_utc": "2026-08-16T06:33:30.710800+00:00",
+    "capture_ist": "2026-08-16T12:03:30.710800+05:30",
+    "end_utc": "2026-08-16T06:33:34.433580+00:00",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=gates",
+    "text_len": 1757,
+    "text_sha256": "c6824bf06cfe6506edaff24480efa7f9610ae2b8c926ac547e3c4364c4d4a0f5",
+    "text_excerpt": "Skip to content\nS\nSYSTEM3\nGenesis\nMarket closed\nRead-only / poll\nDelayed\nMarket closed \u00b7 poll / snapshot\nNifty 50\n24,366.00\n\u2014\nBank Nifty\n57,491.10\n\u2014\nFin Nifty\n26,213.65\n\u2014\nIndia VIX\n\u2014\nDhan no quote\nMidcap\n14,971.75\n\u2014\nBoard\nLive\n12:03:33 IST\nBroker\nDhan \u00b7 Connected\nPaper\nLive off\nSystem health\n1\nSYSTEM3 GENESIS v2.0System PAPERAPI RespondingWebSocket LiveData DhanML 0/5dPaper Gate okUI RenderedSHA a48e7b3\nCOMMAND\nDecision Intel\nTruth Control\nTRUTH\nGenesis Brain\nE2E Proof\nPROOF\nOverview\nSim Live\nSIM\nMARKET DATA\nOptions Intel\nOption Chain\nPOLL\nSignals\nPOLL\nTRADING\nTrade\nPOLL\nPaper Trades\nPositions\nANALYSIS\nRisk & Scenarios\nMultibagger\nPrediction Audit\nPerformance\nML Model\nSYSTEM\nData Integrity\nBroker\nAlerts\nSystem\nLive Gate\nLOCK\nLive Trading Gate\n\n3/6 gates passed\n\nLIVE_TRADING_BLOCKED\n\nLive trading blocked \u2014 see failed gates above\n\nGATE CHECKLIST\n\u2705\nenv_live_disabled\nLIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)\n\u2705\nkill_switch_off\nKill switch not activated\n\u274c\nhuman_approved\nNOT APPROVED \u2014 owner must set live_trading_approved=true in kill_switch.json\n\u274c\nvalidation_days\n1 validation days (need \u226510)\n\u274c\nml_accuracy_rho\nAvg Spearman \u03c1=0.200 (need \u22650.70)\n\u2705\nmax_loss_configured\nMax daily loss = \u20b95000 hardcoded in kill_switch.json\n\n\u26a0\ufe0f Gates not yet passed\n\nAll technical gates must pass before the approval section appears. Continue running in PAPER mode to accumulate proof data.\n\nThis public Cloud Run dashboard is read-only. Approval and configuration changes are intentionally unavailable here.\n\nLive trading remains OFF until all gates pass, human approval is recorded, AND LIVE_TRADING_ENABLED is manually set to 1 through the protected Cloud Run operations workflow. Max daily loss: \u20b95,000. System halts automatically when limit is hit.",
+    "markers": [
+      "poll",
+      "market closed",
+      "connected",
+      "dhan",
+      "paper",
+      "live off"
+    ],
+    "console_errors": [],
+    "api_statuses": [
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui?tab=gates",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-BMjvMzdS.js",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/assets/index-UdMjElQ1.css",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/market-data",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/research/multibagger",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/market/live_board",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/state",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/live-trading/gate",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/chain/NIFTY",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "screenshot": "21_gates.png"
+  }
+]

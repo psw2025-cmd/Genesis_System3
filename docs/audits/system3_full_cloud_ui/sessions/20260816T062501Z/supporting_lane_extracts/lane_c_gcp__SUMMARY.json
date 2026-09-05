@@ -1,0 +1,354 @@
+{
+  "forensic": "lane_c_gcp",
+  "mode": "READ_ONLY",
+  "mutated": false,
+  "project": "system3-openalgo-safe",
+  "region": "asia-south1",
+  "service": "genesis-system3-web",
+  "capture_utc_start": "2026-08-16T06:27:14Z",
+  "capture_utc_summary": "2026-08-16T06:32:03Z",
+  "gcloud": "AVAILABLE (SDK 578.0.0)",
+  "web": {
+    "latestReadyRevision": "genesis-system3-web-00384-tuw",
+    "image_tag": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a48e7b3c7c08-1786830179",
+    "serving_digest_image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+    "serviceAccount": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+    "cpu": "1",
+    "memory": "1Gi",
+    "concurrency": 50,
+    "timeoutSeconds": 300,
+    "minInstances": "1",
+    "maxInstances": "10",
+    "traffic": {
+      "revision": "genesis-system3-web-00384-tuw",
+      "percent": 100,
+      "tag": null,
+      "latestRevision": null
+    },
+    "env_name_count": 41,
+    "secret_ref_count": 2,
+    "secret_refs": [
+      {
+        "env": "DHAN_CLIENT_ID",
+        "secret": "system3-dhan-client-id",
+        "key": "latest"
+      },
+      {
+        "env": "WORKER_PUSH_TOKEN",
+        "secret": "system3-dashboard-worker-push-token",
+        "key": "latest"
+      }
+    ]
+  },
+  "revisions_top5": [
+    {
+      "name": "genesis-system3-web-00384-tuw",
+      "created": "2026-08-15T21:46:01.816216Z",
+      "traffic_percent": 100,
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+      "ready": "True"
+    },
+    {
+      "name": "genesis-system3-web-00381-hoj",
+      "created": "2026-08-15T19:58:30.760012Z",
+      "traffic_percent": 0,
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:b639f61135ee4bf1c7aa0311c1258b81e19dcc0dde2d67aa4fc7b6842317d656",
+      "ready": "True"
+    },
+    {
+      "name": "genesis-system3-web-00378-hay",
+      "created": "2026-08-15T12:57:48.369361Z",
+      "traffic_percent": 0,
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:5fa3042ff4206267ce2dad7a18cfdd25662ac678f434432f3f95687fcabbe4d5",
+      "ready": "True"
+    },
+    {
+      "name": "genesis-system3-web-00287-ngg",
+      "created": "2026-08-15T11:19:25.718123Z",
+      "traffic_percent": 0,
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:35003e7394f6ba6ccd6cf8690197ed0e87db718e98cc1e8db5e3ad7051aa0dcc",
+      "ready": "True"
+    },
+    {
+      "name": "genesis-system3-web-00286-2ls",
+      "created": "2026-08-15T10:30:41.568829Z",
+      "traffic_percent": 0,
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:35003e7394f6ba6ccd6cf8690197ed0e87db718e98cc1e8db5e3ad7051aa0dcc",
+      "ready": "True"
+    }
+  ],
+  "jobs": {
+    "matching_count": 9,
+    "matching_names": [
+      "genesis-system3-control-plane-verify",
+      "genesis-system3-dhan-token-rotate",
+      "genesis-system3-forecast",
+      "genesis-system3-ml-history-bootstrap",
+      "genesis-system3-rank",
+      "genesis-system3-scheduler-collector",
+      "genesis-system3-signals",
+      "genesis-system3-smoke",
+      "genesis-system3-validate"
+    ],
+    "token_rotate_image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3:a48e7b3c7c08-1786830179",
+    "token_rotate_sa": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+    "last_5_executions": [
+      {
+        "name": "genesis-system3-dhan-token-rotate-25szr",
+        "createTime": "2026-08-09T23:01:20.249314Z",
+        "completionTime": null,
+        "succeededCount": null,
+        "failedCount": null,
+        "cancelledCount": null,
+        "completed_status": "False",
+        "message": "spec.template.spec.containers[0].env[12].value_from.secret_key_ref.name: Failed to access secret projects/system3-openalgo-safe/secrets/dhan-totp-secret/versions/latest: Secret Version [projects/802404398783/secrets/dhan-totp-secret/versions/8] is in DESTROYED state."
+      },
+      {
+        "name": "genesis-system3-dhan-token-rotate-56gcf",
+        "createTime": "2026-08-16T04:37:39.02485Z",
+        "completionTime": "2026-08-16T04:38:01.839979Z",
+        "succeededCount": 1,
+        "failedCount": null,
+        "cancelledCount": null,
+        "completed_status": "True",
+        "message": "Execution completed successfully in 18.81s."
+      },
+      {
+        "name": "genesis-system3-dhan-token-rotate-dnr2r",
+        "createTime": "2026-08-16T03:40:09.928845Z",
+        "completionTime": "2026-08-16T03:40:43.800627Z",
+        "succeededCount": 1,
+        "failedCount": null,
+        "cancelledCount": null,
+        "completed_status": "True",
+        "message": "Execution completed successfully in 30.79s."
+      },
+      {
+        "name": "genesis-system3-dhan-token-rotate-2nbfj",
+        "createTime": "2026-08-16T02:00:00.219956Z",
+        "completionTime": "2026-08-16T02:00:21.653293Z",
+        "succeededCount": 1,
+        "failedCount": null,
+        "cancelledCount": null,
+        "completed_status": "True",
+        "message": "Execution completed successfully in 18.69s."
+      },
+      {
+        "name": "genesis-system3-dhan-token-rotate-rbvhd",
+        "createTime": "2026-08-15T20:18:09.80732Z",
+        "completionTime": "2026-08-15T20:19:11.243698Z",
+        "succeededCount": 1,
+        "failedCount": null,
+        "cancelledCount": null,
+        "completed_status": "True",
+        "message": "Execution completed successfully in 58.44s."
+      }
+    ]
+  },
+  "scheduler_asia_south1": [
+    {
+      "name": "genesis-system3-forecast-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast-daily",
+      "schedule": "0 4 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast:run"
+    },
+    {
+      "name": "genesis-system3-signals-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals-schedule",
+      "schedule": "0 10 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals:run"
+    },
+    {
+      "name": "genesis-system3-validate-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate-daily",
+      "schedule": "5 10 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate:run"
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate-daily",
+      "schedule": "30 7 * * *",
+      "timeZone": "Asia/Kolkata",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate:run"
+    },
+    {
+      "name": "genesis-system3-rank-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank-daily",
+      "schedule": "45 3 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank:run"
+    },
+    {
+      "name": "genesis-system3-rank-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank-schedule",
+      "schedule": "50 3 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank:run"
+    },
+    {
+      "name": "genesis-system3-forecast-schedule",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast-schedule",
+      "schedule": "0 4,5,6,7,8,9 * * 1-5",
+      "timeZone": "UTC",
+      "state": "PAUSED",
+      "target": "http:https://www.googleapis.com/run/v1/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-forecast:run"
+    },
+    {
+      "name": "genesis-system3-signals-daily",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals-daily",
+      "schedule": "15 13 * * MON-FRI",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals:run"
+    },
+    {
+      "name": "genesis-system3-scheduler-collector-every-minute",
+      "full_name": "projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-scheduler-collector-every-minute",
+      "schedule": "* * * * *",
+      "timeZone": "UTC",
+      "state": "ENABLED",
+      "target": "http:https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-scheduler-collector:run"
+    }
+  ],
+  "scheduler_duplicates_elsewhere": "NONE found in us-central1, us-east1, europe-west1, asia-east1",
+  "secrets": {
+    "dhan_names": [
+      "DHAN_BROKER_TOKEN",
+      "dhan-access-token",
+      "dhan-app-id",
+      "dhan-app-secret",
+      "dhan-pin",
+      "dhan-totp-secret",
+      "system3-dhan-access-token",
+      "system3-dhan-client-id"
+    ],
+    "dhan_access_token_enabled_count": 257,
+    "dhan_access_token_enabled_latest_10": [
+      {
+        "versionId": "257",
+        "createTime": "2026-08-16T04:37:57.858776Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "256",
+        "createTime": "2026-08-16T03:40:39.141252Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "255",
+        "createTime": "2026-08-16T02:00:16.058822Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "254",
+        "createTime": "2026-08-15T20:19:07.184887Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "253",
+        "createTime": "2026-08-15T11:19:08.96461Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "252",
+        "createTime": "2026-08-15T02:48:36.128883Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "251",
+        "createTime": "2026-08-14T20:58:34.496104Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "250",
+        "createTime": "2026-08-14T18:10:05.527866Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "249",
+        "createTime": "2026-08-14T17:29:06.896413Z",
+        "state": "ENABLED"
+      },
+      {
+        "versionId": "248",
+        "createTime": "2026-08-14T16:48:11.03822Z",
+        "state": "ENABLED"
+      }
+    ]
+  },
+  "artifact": {
+    "serving_image_with_digest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+    "digest": "sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+    "artifact_describe_ok": true,
+    "image_summary": {
+      "digest": "sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+      "fully_qualified_digest": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9",
+      "registry": "asia-south1-docker.pkg.dev",
+      "repository": "system3-containers",
+      "slsa_build_level": "unknown"
+    },
+    "related_tags": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3@sha256:0906924c1ececd24787a7b35ffbaebfe85d786d7cb87bddcc4643262252b83f9"
+  },
+  "logs_last_2h_samples": {
+    "window": "last ~2h via --freshness=2h",
+    "note": "Counts via --format=value(timestamp) with --limit=200 (if count==200 may be truncated)",
+    "error_count": 0,
+    "http_429_count": 8,
+    "timeout_text_count": 0,
+    "http_429_sample_file_count": 8,
+    "http_429_sample_head": [
+      {
+        "timestamp": "2026-08-16T05:48:16.559659Z",
+        "status": 429,
+        "latency": "0s",
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/data-truth-score"
+      },
+      {
+        "timestamp": "2026-08-16T05:48:16.559314Z",
+        "status": 429,
+        "latency": "0s",
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/final-message"
+      },
+      {
+        "timestamp": "2026-08-16T05:48:12.522598Z",
+        "status": 429,
+        "latency": "0s",
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/positions-holdings"
+      },
+      {
+        "timestamp": "2026-08-16T05:48:12.515666Z",
+        "status": 429,
+        "latency": "0s",
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ws/stream"
+      },
+      {
+        "timestamp": "2026-08-16T05:48:12.506589Z",
+        "status": 429,
+        "latency": "0s",
+        "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/batch/chains"
+      }
+    ],
+    "first_attempt_failure": "INVALID_ARGUMENT: timestamp>='-2h'; retried with --freshness=2h"
+  },
+  "iam_sa_names_only": {
+    "note": "READ-ONLY observation only — IAM was NOT changed; no policy get/set performed",
+    "web_service_account": "genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+    "rotator_service_account": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+    "compare": "Web SA (runtime) vs Rotator SA (mint job) are distinct — expected isolation"
+  },
+  "failures": [
+    "logging first attempt: INVALID_ARGUMENT timestamp>='-2h' — fixed with --freshness=2h",
+    "scheduler probe asia-south2: invalid location",
+    "scheduler probe global: invalid location",
+    "secrets list filter name:dhan deprecation WARNING"
+  ]
+}

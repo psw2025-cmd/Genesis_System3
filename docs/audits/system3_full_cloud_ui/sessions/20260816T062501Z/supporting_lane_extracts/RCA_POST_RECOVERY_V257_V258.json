@@ -1,0 +1,727 @@
+{
+  "rca_request_start_utc": "2026-08-16T07:34:46Z",
+  "rca_request_start_ist": "2026-08-16 13:04:46 IST",
+  "github_main_sha": "41f7a80cf0c31711f4c26d46fdc0e3f26fc6a311",
+  "serving_sha": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+  "url_now_revalidated": {
+    "connected": true,
+    "error": null,
+    "secret_version": "258",
+    "expires_at_utc": "2026-08-17T07:16:47+00:00",
+    "hours_remaining": 23.7,
+    "reload_count": 1682,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "serving_sha": "a48e7b3c7c086a21352f718355d1c12d4a48955b",
+    "canonical_rotation": {
+      "attempted": false,
+      "success": false,
+      "raw_token_exposed": false
+    }
+  },
+  "preservation_check": {
+    "expected_secret": "258",
+    "expected_connected": true,
+    "expected_live_false": true,
+    "match_secret": true,
+    "match_connected": true,
+    "match_live_off": true
+  },
+  "timeline_v254_v258": [
+    {
+      "token_version": "254",
+      "mint_time_utc": "2026-08-15T20:19:07Z",
+      "mint_time_ist": "2026-08-16 01:49:07 IST",
+      "mint_authority_principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "mint_authority_note": "AddSecretVersion audit principal",
+      "cloud_run_job_execution": "genesis-system3-dhan-token-rotate-rbvhd",
+      "job_success": 1,
+      "job_failed": null,
+      "job_client": "gcloud",
+      "job_delta_s_to_mint": 4.058811,
+      "job_creator": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+      "initiator_class": "MANUAL_RECOVERY_SA",
+      "first_dh906_utc": null,
+      "first_dh906_ist": null,
+      "first_dh906_note": "DH-906 string not present in 3d Cloud Logging textPayload sample; app maps Invalid Token/DH-906/401 \u2192 TOKEN_EXPIRED_OR_INVALID (see first_token_expired_log)",
+      "first_http401_utc": null,
+      "first_http401_ist": null,
+      "first_token_expired_log_utc": "2026-08-15T23:08:32Z",
+      "first_token_expired_log_ist": "2026-08-16 04:38:32 IST",
+      "first_broker_down_utc": "2026-08-15T23:08:32Z",
+      "first_broker_down_ist": "2026-08-16 04:38:32 IST",
+      "first_broker_down_fail": 1,
+      "first_429_utc": "2026-08-15T21:22:53Z",
+      "first_429_ist": "2026-08-16 02:52:53 IST",
+      "useful_life_hours_to_first_down": 2.82,
+      "useful_life_hours_to_first_token_expired_log": 2.82,
+      "next_token_version": "255",
+      "next_mint_utc": "2026-08-16T02:00:16Z",
+      "window_end_utc": "2026-08-16T02:00:16Z",
+      "first_successful_broker_use": "NOT_PROVEN_EXACT_LOG_LINE (no dedicated CONNECTED log); inferred: mint+absence of broker-down until first down",
+      "reload_attempts": "NOT_PROVEN_PER_VERSION (reload_count is process counter; v257 era hit 600-900+; current v258 reload_count observed in url_now)",
+      "recovery_time_to_next_mint_hours": 2.86,
+      "premature_reject_before_next_mint": true
+    },
+    {
+      "token_version": "255",
+      "mint_time_utc": "2026-08-16T02:00:16Z",
+      "mint_time_ist": "2026-08-16 07:30:16 IST",
+      "mint_authority_principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "mint_authority_note": "AddSecretVersion audit principal",
+      "cloud_run_job_execution": "genesis-system3-dhan-token-rotate-2nbfj",
+      "job_success": 1,
+      "job_failed": null,
+      "job_client": "gcloud",
+      "job_delta_s_to_mint": 5.594471,
+      "job_creator": "gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+      "initiator_class": "CLOUD_SCHEDULER",
+      "first_dh906_utc": null,
+      "first_dh906_ist": null,
+      "first_dh906_note": "DH-906 string not present in 3d Cloud Logging textPayload sample; app maps Invalid Token/DH-906/401 \u2192 TOKEN_EXPIRED_OR_INVALID (see first_token_expired_log)",
+      "first_http401_utc": null,
+      "first_http401_ist": null,
+      "first_token_expired_log_utc": "2026-08-16T03:00:09Z",
+      "first_token_expired_log_ist": "2026-08-16 08:30:09 IST",
+      "first_broker_down_utc": "2026-08-16T02:50:05Z",
+      "first_broker_down_ist": "2026-08-16 08:20:05 IST",
+      "first_broker_down_fail": 1,
+      "first_429_utc": null,
+      "first_429_ist": null,
+      "useful_life_hours_to_first_down": 0.83,
+      "useful_life_hours_to_first_token_expired_log": 1.0,
+      "next_token_version": "256",
+      "next_mint_utc": "2026-08-16T03:40:39Z",
+      "window_end_utc": "2026-08-16T03:40:39Z",
+      "first_successful_broker_use": "NOT_PROVEN_EXACT_LOG_LINE (no dedicated CONNECTED log); inferred: mint+absence of broker-down until first down",
+      "reload_attempts": "NOT_PROVEN_PER_VERSION (reload_count is process counter; v257 era hit 600-900+; current v258 reload_count observed in url_now)",
+      "recovery_time_to_next_mint_hours": 0.84,
+      "premature_reject_before_next_mint": true
+    },
+    {
+      "token_version": "256",
+      "mint_time_utc": "2026-08-16T03:40:39Z",
+      "mint_time_ist": "2026-08-16 09:10:39 IST",
+      "mint_authority_principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "mint_authority_note": "AddSecretVersion audit principal",
+      "cloud_run_job_execution": "genesis-system3-dhan-token-rotate-dnr2r",
+      "job_success": 1,
+      "job_failed": null,
+      "job_client": "gcloud",
+      "job_delta_s_to_mint": 4.659375,
+      "job_creator": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+      "initiator_class": "MANUAL_RECOVERY_SA",
+      "first_dh906_utc": null,
+      "first_dh906_ist": null,
+      "first_dh906_note": "DH-906 string not present in 3d Cloud Logging textPayload sample; app maps Invalid Token/DH-906/401 \u2192 TOKEN_EXPIRED_OR_INVALID (see first_token_expired_log)",
+      "first_http401_utc": null,
+      "first_http401_ist": null,
+      "first_token_expired_log_utc": "2026-08-16T04:23:20Z",
+      "first_token_expired_log_ist": "2026-08-16 09:53:20 IST",
+      "first_broker_down_utc": "2026-08-16T04:23:20Z",
+      "first_broker_down_ist": "2026-08-16 09:53:20 IST",
+      "first_broker_down_fail": 1,
+      "first_429_utc": null,
+      "first_429_ist": null,
+      "useful_life_hours_to_first_down": 0.71,
+      "useful_life_hours_to_first_token_expired_log": 0.71,
+      "next_token_version": "257",
+      "next_mint_utc": "2026-08-16T04:37:57Z",
+      "window_end_utc": "2026-08-16T04:37:57Z",
+      "first_successful_broker_use": "NOT_PROVEN_EXACT_LOG_LINE (no dedicated CONNECTED log); inferred: mint+absence of broker-down until first down",
+      "reload_attempts": "NOT_PROVEN_PER_VERSION (reload_count is process counter; v257 era hit 600-900+; current v258 reload_count observed in url_now)",
+      "recovery_time_to_next_mint_hours": 0.24,
+      "premature_reject_before_next_mint": true
+    },
+    {
+      "token_version": "257",
+      "mint_time_utc": "2026-08-16T04:37:57Z",
+      "mint_time_ist": "2026-08-16 10:07:57 IST",
+      "mint_authority_principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "mint_authority_note": "AddSecretVersion audit principal",
+      "cloud_run_job_execution": "genesis-system3-dhan-token-rotate-56gcf",
+      "job_success": 1,
+      "job_failed": null,
+      "job_client": "gcloud",
+      "job_delta_s_to_mint": 3.981203,
+      "job_creator": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+      "initiator_class": "MANUAL_RECOVERY_SA",
+      "first_dh906_utc": null,
+      "first_dh906_ist": null,
+      "first_dh906_note": "DH-906 string not present in 3d Cloud Logging textPayload sample; app maps Invalid Token/DH-906/401 \u2192 TOKEN_EXPIRED_OR_INVALID (see first_token_expired_log)",
+      "first_http401_utc": null,
+      "first_http401_ist": null,
+      "first_token_expired_log_utc": "2026-08-16T06:51:07Z",
+      "first_token_expired_log_ist": "2026-08-16 12:21:07 IST",
+      "first_broker_down_utc": "2026-08-16T06:51:07Z",
+      "first_broker_down_ist": "2026-08-16 12:21:07 IST",
+      "first_broker_down_fail": 1,
+      "first_429_utc": "2026-08-16T05:30:11Z",
+      "first_429_ist": "2026-08-16 11:00:11 IST",
+      "useful_life_hours_to_first_down": 2.22,
+      "useful_life_hours_to_first_token_expired_log": 2.22,
+      "next_token_version": "258",
+      "next_mint_utc": "2026-08-16T07:16:52Z",
+      "window_end_utc": "2026-08-16T07:16:52Z",
+      "first_successful_broker_use": "NOT_PROVEN_EXACT_LOG_LINE (no dedicated CONNECTED log); inferred: mint+absence of broker-down until first down",
+      "reload_attempts": "NOT_PROVEN_PER_VERSION (reload_count is process counter; v257 era hit 600-900+; current v258 reload_count observed in url_now)",
+      "recovery_time_to_next_mint_hours": 0.43,
+      "premature_reject_before_next_mint": true
+    },
+    {
+      "token_version": "258",
+      "mint_time_utc": "2026-08-16T07:16:52Z",
+      "mint_time_ist": "2026-08-16 12:46:52 IST",
+      "mint_authority_principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "mint_authority_note": "AddSecretVersion audit principal",
+      "cloud_run_job_execution": "genesis-system3-dhan-token-rotate-gdn6k",
+      "job_success": 1,
+      "job_failed": null,
+      "job_client": "gcloud",
+      "job_delta_s_to_mint": 4.103678,
+      "job_creator": "gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com",
+      "initiator_class": "MANUAL_RECOVERY_SA",
+      "first_dh906_utc": null,
+      "first_dh906_ist": null,
+      "first_dh906_note": "DH-906 string not present in 3d Cloud Logging textPayload sample; app maps Invalid Token/DH-906/401 \u2192 TOKEN_EXPIRED_OR_INVALID (see first_token_expired_log)",
+      "first_http401_utc": null,
+      "first_http401_ist": null,
+      "first_token_expired_log_utc": null,
+      "first_token_expired_log_ist": null,
+      "first_broker_down_utc": null,
+      "first_broker_down_ist": null,
+      "first_broker_down_fail": null,
+      "first_429_utc": "2026-08-16T07:18:49Z",
+      "first_429_ist": "2026-08-16 12:48:49 IST",
+      "useful_life_hours_to_first_down": null,
+      "useful_life_hours_to_first_token_expired_log": null,
+      "next_token_version": null,
+      "next_mint_utc": null,
+      "window_end_utc": null,
+      "first_successful_broker_use": "NOT_PROVEN_EXACT_LOG_LINE (no dedicated CONNECTED log); inferred: mint+absence of broker-down until first down",
+      "reload_attempts": "NOT_PROVEN_PER_VERSION (reload_count is process counter; v257 era hit 600-900+; current v258 reload_count observed in url_now)",
+      "recovery_time_to_next_mint_hours": null,
+      "premature_reject_before_next_mint": false
+    }
+  ],
+  "addsecret_audit_sample": [
+    {
+      "ts_utc": "2026-08-15T20:19:03Z",
+      "principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "version": "254"
+    },
+    {
+      "ts_utc": "2026-08-16T02:00:11Z",
+      "principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "version": "255"
+    },
+    {
+      "ts_utc": "2026-08-16T03:40:36Z",
+      "principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "version": "256"
+    },
+    {
+      "ts_utc": "2026-08-16T04:37:53Z",
+      "principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "version": "257"
+    },
+    {
+      "ts_utc": "2026-08-16T07:16:47Z",
+      "principal": "genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+      "version": "258"
+    }
+  ],
+  "rotate_executions_recent": [
+    {
+      "name": "genesis-system3-dhan-token-rotate-4fhjm",
+      "start_utc": "2026-08-14T18:09:48Z",
+      "done_utc": "2026-08-14T18:10:11Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-2grh7",
+      "start_utc": "2026-08-14T18:09:56Z",
+      "done_utc": "2026-08-14T18:10:09Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.09s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-mm4dv",
+      "start_utc": "2026-08-14T20:56:10Z",
+      "done_utc": "2026-08-14T20:56:26Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-svqgk",
+      "start_utc": "2026-08-14T20:58:20Z",
+      "done_utc": "2026-08-14T20:58:42Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-vs4vd",
+      "start_utc": "2026-08-15T02:00:02Z",
+      "done_utc": "2026-08-15T02:00:15Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.15s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-p7vp9",
+      "start_utc": "2026-08-15T08:15:22Z",
+      "done_utc": "2026-08-15T08:15:34Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.18s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-28h7r",
+      "start_utc": "2026-08-15T10:31:06Z",
+      "done_utc": "2026-08-15T10:31:15Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.12s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-px6pr",
+      "start_utc": "2026-08-15T10:36:10Z",
+      "done_utc": "2026-08-15T10:36:23Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.16s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-lvmmd",
+      "start_utc": "2026-08-15T16:03:54Z",
+      "done_utc": "2026-08-15T16:04:08Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.05s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-m8wjk",
+      "start_utc": "2026-08-15T18:52:12Z",
+      "done_utc": "2026-08-15T18:52:25Z",
+      "succ": null,
+      "fail": 1,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.06s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-rbvhd",
+      "start_utc": "2026-08-15T20:18:12Z",
+      "done_utc": "2026-08-15T20:19:11Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.3s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-2nbfj",
+      "start_utc": "2026-08-16T02:00:02Z",
+      "done_utc": "2026-08-16T02:00:21Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.01s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-dnr2r",
+      "start_utc": "2026-08-16T03:40:13Z",
+      "done_utc": "2026-08-16T03:40:43Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.05s."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-56gcf",
+      "start_utc": "2026-08-16T04:37:43Z",
+      "done_utc": "2026-08-16T04:38:01Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image."
+    },
+    {
+      "name": "genesis-system3-dhan-token-rotate-gdn6k",
+      "start_utc": "2026-08-16T07:16:01Z",
+      "done_utc": "2026-08-16T07:16:56Z",
+      "succ": 1,
+      "fail": null,
+      "client": "gcloud",
+      "msg": "Imported container image in 1.09s."
+    }
+  ],
+  "log_counts_3d": {
+    "HTTP_429": 66,
+    "DH-906": 0,
+    "HTTP_401": 0,
+    "BROKER_DOWN": 262,
+    "429_near_auth_fail_5min": 13
+  },
+  "scheduler_dhan": [
+    {
+      "name": "genesis-system3-dhan-token-rotate-daily",
+      "schedule": "30 7 * * *",
+      "timeZone": "Asia/Kolkata",
+      "state": "ENABLED",
+      "httpTarget": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-dhan-token-rotate:run",
+      "attemptDeadline": "180s"
+    }
+  ],
+  "job_iam_bindings": [
+    {
+      "role": "projects/system3-openalgo-safe/roles/system3RunJobIamBinder",
+      "members": [
+        "serviceAccount:github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com"
+      ]
+    },
+    {
+      "role": "roles/run.invoker",
+      "members": [
+        "serviceAccount:gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com",
+        "serviceAccount:gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com"
+      ]
+    }
+  ],
+  "sm_version_adders": [
+    "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com"
+  ],
+  "sm_accessors": [
+    "serviceAccount:802404398783-compute@developer.gserviceaccount.com",
+    "serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com",
+    "serviceAccount:genesis-system3-web@system3-openalgo-safe.iam.gserviceaccount.com",
+    "serviceAccount:gs3-rank-job@system3-openalgo-safe.iam.gserviceaccount.com",
+    "serviceAccount:system3-web@system3-openalgo-safe.iam.gserviceaccount.com"
+  ],
+  "gh_manual_recovery_runs": [
+    {
+      "conclusion": "success",
+      "createdAt": "2026-08-15T16:03:16Z",
+      "databaseId": 31894446890,
+      "displayTitle": "GCP Dhan Token Rotation Manual Recovery",
+      "event": "workflow_dispatch",
+      "headBranch": "main",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31894446890"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T15:58:15Z",
+      "databaseId": 31894208895,
+      "displayTitle": "GCP Dhan Token Rotation Manual Recovery",
+      "event": "workflow_dispatch",
+      "headBranch": "main",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31894208895"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T15:55:59Z",
+      "databaseId": 31894107372,
+      "displayTitle": "GCP Dhan Token Rotation Manual Recovery",
+      "event": "workflow_dispatch",
+      "headBranch": "main",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31894107372"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T12:54:40Z",
+      "databaseId": 31885807334,
+      "displayTitle": "Merge pull request #224 from psw2025-cmd/fix/broker-authority-ship-ab\u2026",
+      "event": "push",
+      "headBranch": "main",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31885807334"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T12:52:31Z",
+      "databaseId": 31885713219,
+      "displayTitle": "Fix deploy static gate self-match on rotator execute forbid.",
+      "event": "push",
+      "headBranch": "fix/broker-authority-ship-abc-hotfix",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31885713219"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T12:48:50Z",
+      "databaseId": 31885554721,
+      "displayTitle": "Merge pull request #223 from psw2025-cmd/fix/broker-authority-ship-abc",
+      "event": "push",
+      "headBranch": "main",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31885554721"
+    },
+    {
+      "conclusion": "failure",
+      "createdAt": "2026-08-15T12:43:59Z",
+      "databaseId": 31885348632,
+      "displayTitle": "Lock Dhan mint to scheduler + break-glass recovery only.",
+      "event": "push",
+      "headBranch": "fix/broker-authority-ship-abc",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31885348632"
+    }
+  ],
+  "authorities": [
+    {
+      "name": "Cloud Scheduler genesis-system3-dhan-token-rotate-daily",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": true,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "CAN_TRIGGER_ROTATOR",
+      "notes": "Triggers Cloud Run Job on schedule Asia/Kolkata 07:30"
+    },
+    {
+      "name": "Cloud Run Job genesis-system3-dhan-token-rotate (SA genesis-system3-dhan-rotator)",
+      "CAN_MINT": true,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": true,
+      "class": "CAN_MINT + CAN_WRITE_ACCESS_TOKEN_SECRET",
+      "notes": "Sole generate_token + AddSecretVersion in production design"
+    },
+    {
+      "name": "GitHub workflow GCP Dhan Token Rotation Manual Recovery",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": true,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "CAN_TRIGGER_ROTATOR",
+      "notes": "workflow_dispatch via WIF recovery SA run.invoker"
+    },
+    {
+      "name": "GitHub Actions generally / deploy workflow",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "NOT_AUTHORIZED_TO_MINT (deploy may update job image)",
+      "notes": "cloud-run-auto-deploy sets self-heal=0; must not mint"
+    },
+    {
+      "name": "Web self-heal / canonical_rotation invoke",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": "CONDITIONAL",
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "READ_ONLY mint path when DHAN_CANONICAL_ROTATION_SELF_HEAL=0 (current)",
+      "notes": "Code can invoke job if enabled; production disabled; observed skipped=CANONICAL_SELF_HEAL_DISABLED"
+    },
+    {
+      "name": "ops-controller / local dhan_token_auto_refresh / watchdog",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "NOT_AUTHORIZED / no-op mint on current main",
+      "notes": "Scripts explicitly refuse mint"
+    },
+    {
+      "name": "default compute / rank job SA",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "READ_ONLY (secretAccessor on token per baseline)",
+      "notes": "gs3-rank-job accessor only in baseline"
+    },
+    {
+      "name": "Web SA genesis-system3-web / system3-web",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "READ_ONLY secretAccessor",
+      "notes": "Live SM IAM: accessor not versionAdder; not Job invoker"
+    },
+    {
+      "name": "Job IAM invokers (live policy)",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": true,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "CAN_TRIGGER_ROTATOR",
+      "notes": "bindings=[{'role': 'projects/system3-openalgo-safe/roles/system3RunJobIamBinder', 'members': ['serviceAccount:github-actions-deploy@system3-openalgo-safe.iam.gserviceaccount.com']}, {'role': 'roles/run.invoker', 'members': ['serviceAccount:gs3-scheduler@system3-openalgo-safe.iam.gserviceaccount.com', 'serviceAccount:gs3-token-recovery@system3-openalgo-safe.iam.gserviceaccount.com']}]"
+    },
+    {
+      "name": "SM secretVersionAdder principals (live)",
+      "CAN_MINT": "IF_ALSO_RUNS_JOB_CODE",
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": true,
+      "class": "CAN_WRITE_ACCESS_TOKEN_SECRET",
+      "notes": "members=['serviceAccount:genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com']"
+    },
+    {
+      "name": "github-actions-deploy SA",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "NOT_AUTHORIZED_TO_MINT (IAM binder roles only)",
+      "notes": "system3RunJobIamBinder + system3SecretIamBinder \u2014 can change IAM bindings, not AddSecretVersion by default"
+    },
+    {
+      "name": "802404398783-compute default compute SA",
+      "CAN_MINT": false,
+      "CAN_TRIGGER_ROTATOR": false,
+      "CAN_WRITE_ACCESS_TOKEN_SECRET": false,
+      "class": "READ_ONLY secretAccessor",
+      "notes": "Present on secretAccessor; no versionAdder; not Job invoker"
+    }
+  ],
+  "hypotheses": {
+    "H1_competing_mint_invalidates_previous": {
+      "verdict": "SECONDARY_AFTER_REMINT_NOT_ROOT_OF_FIRST_REJECT",
+      "confidence": "HIGH",
+      "evidence_for": [
+        "Code comments state minting a new token invalidates prior Cloud token (DH-906 churn).",
+        "Every AddSecretVersion for v254-v258 is by genesis-system3-dhan-rotator SA; next mint follows disconnect recovery.",
+        "After remint, old version is expected dead (single-active-token behavior)."
+      ],
+      "evidence_against": [
+        "For v254-v257, first broker-down / TOKEN_EXPIRED_OR_INVALID occurs BEFORE the next SM version is created (premature_reject_before_next_mint=true).",
+        "Therefore a Genesis remint cannot be the cause of the first premature reject of that same version."
+      ],
+      "remaining_proof": "Controlled mint while prior still accepted (authorized experiment) to prove Dhan single-active policy; does not explain first reject without remint."
+    },
+    "H2_scheduler_manual_deploy_overlap": {
+      "verdict": "PARTIAL_TRIGGER_OVERLAP_REAL",
+      "confidence": "HIGH",
+      "evidence_for": [
+        "Job invokers live: gs3-scheduler + gs3-token-recovery only (run.invoker).",
+        "v255 creator=gs3-scheduler (07:30 IST daily); v254/v256/v257/v258 creator=gs3-token-recovery (manual recovery).",
+        "Multiple recovery mints same day after disconnects (dense remint cadence)."
+      ],
+      "evidence_against": [
+        "Deploy SA is Job IAM binder / Secret IAM binder \u2014 not secretVersionAdder; deploy must not mint.",
+        "Web self-heal DHAN_CANONICAL_ROTATION_SELF_HEAL=0 \u2014 web does not remint.",
+        "Overlap explains remint frequency AFTER outages, not the first premature reject."
+      ],
+      "remaining_proof": "Optional: map each recovery workflow_dispatch to exact execution id for v256-v258."
+    },
+    "H3_rate_limit_causes_invalidation": {
+      "verdict": "UNRELATED_BUT_REAL_DEFECT",
+      "confidence": "MEDIUM",
+      "evidence_for": [
+        "HTTP 429 events observed in 3d web logs count=66.",
+        "Frontend useData.ts documents prior OC stampede risk and rate-limit backoff."
+      ],
+      "evidence_against": [
+        "Weak 5-min co-occurrence corr_count=13; disconnects labeled TOKEN_EXPIRED_OR_INVALID not rate-limit.",
+        "Auth reject classifier is distinct from 429; correlation is not causation."
+      ],
+      "remaining_proof": "Tag Dhan upstream 429 body vs Cloud Run platform 429; market-hours request-rate metrics."
+    },
+    "H4_misclassification_of_failure_as_token_invalid": {
+      "verdict": "PARTIAL_CONTRIBUTOR_TO_SYMPTOM",
+      "confidence": "HIGH",
+      "evidence_for": [
+        "dhan_readonly.py maps DH-906/Invalid Token/401 \u2192 TOKEN_EXPIRED_OR_INVALID even when clock not expired.",
+        "Observed on v257: hours_remaining ~21 while error TOKEN_EXPIRED_OR_INVALID.",
+        "3d Cloud Logging shows TOKEN_EXPIRED_OR_INVALID on self-heal broker-down lines; dedicated DH-906 textPayload filter returned 0 rows in 3d."
+      ],
+      "evidence_against": [
+        "Underlying rejection is still an auth-class failure per classifier design \u2014 not a random 5xx."
+      ],
+      "remaining_proof": "Capture raw Dhan response body (redacted) on next incident to confirm DH-906 vs other auth codes."
+    },
+    "H5_stale_reload_behavior": {
+      "verdict": "CONTRIBUTOR_NOT_ROOT",
+      "confidence": "HIGH",
+      "evidence_for": [
+        "reload_count storms (v257 era 600-900+; process still elevated after v258).",
+        "Self-heal mint disabled \u2192 keeps reloading same rejected SM version."
+      ],
+      "evidence_against": [
+        "Reload alone does not create auth rejection; Dhan rejection is prerequisite."
+      ],
+      "remaining_proof": "Per-instance reload metrics / backoff proof after fix."
+    },
+    "H6_multi_instance_token_divergence": {
+      "verdict": "POSSIBLE_NOT_PROVEN",
+      "confidence": "LOW",
+      "evidence_for": [
+        "Cloud Run multi-instance + 30s token cache can briefly diverge."
+      ],
+      "evidence_against": [
+        "token_proof.source=GCP_SECRET_MANAGER_DYNAMIC; disconnects correlate with same SM version id rejected."
+      ],
+      "remaining_proof": "Log instance id + secret version on each probe during next incident."
+    },
+    "H7_dhan_policy_differs_from_nominal_24h": {
+      "verdict": "MOST_LIKELY_ROOT_FOR_PREMATURE_REJECT",
+      "confidence": "HIGH",
+      "evidence_for": [
+        "Useful life to first broker-down for v254-v257 is 0.71-2.82h while expires_at_utc ~24h from mint.",
+        "Premature reject occurs with NO intervening AddSecretVersion (H1 ruled out as first-cause).",
+        "All AddSecretVersion principals are rotator SA only \u2014 no alternate Genesis writer found for these versions."
+      ],
+      "evidence_against": [
+        "Exact Dhan-side mechanism (session revoke, concurrent login, idle timeout, IP/policy) NOT_PROVEN.",
+        "Could still be external non-Genesis mint not writing this SM secret (would require another Dhan client_id login)."
+      ],
+      "remaining_proof": "Soak one token with zero remints + no other Dhan logins; or vendor policy; or capture raw reject body."
+    },
+    "H8_legacy_local_mint_outside_gcp": {
+      "verdict": "CODE_PATHS_DISABLED_NO_EVIDENCE_IN_V254_258",
+      "confidence": "MEDIUM",
+      "evidence_for": [
+        "Historical comments: local mint invalidated cloud token.",
+        "generate_token still exists for Job use."
+      ],
+      "evidence_against": [
+        "AddSecretVersion for v254-v258 principals exclusively genesis-system3-dhan-rotator.",
+        "codespace_startup/dhan_token_auto_refresh/dhan_startup_check refuse mint on current main.",
+        "SM secretVersionAdder = rotator SA only."
+      ],
+      "remaining_proof": "Confirm no human logged into web.dhan.co / other apps using same API credentials during windows."
+    }
+  },
+  "request_graph_429": {
+    "frontend_polling": [
+      "dashboard/frontend/src/hooks/useData.ts \u2014 CORE/BROKER/LIVE_BOARD/SECONDARY setIntervals; /api/batch/market-data, /api/broker/status, /api/batch/chains, positions-holdings",
+      "useWebSocket.ts \u2014 fallback polling when WS offline",
+      "useWebSocketProd.ts \u2014 heartbeat + state intervals"
+    ],
+    "backend_polling_loops": [
+      "index_chain_micro_loop paced OC ~3.4s gap",
+      "market_top_micro_loop from paced cache",
+      "state sync / tick loops / cloud_status_probe"
+    ],
+    "direct_dhan_calls": [
+      "core/brokers/dhan/market_ltp.py \u2014 ltp/ohlc/quote REST",
+      "core/data/datasource_manager.py \u2014 option_chain paced",
+      "cloud_status_probe / profile bounded for broker status"
+    ],
+    "caches": [
+      "_PUSHED_CHAIN_CACHE / paced_chain_cache",
+      "token cache TTL 30s",
+      "broker status cache"
+    ],
+    "retries_concurrency_duplicates": "FE retries on failure with staggered chain polls; backend paced OC; duplicate callers possible across tabs (hidden-tab NOT_PROVEN)",
+    "hidden_tab_polling": "NOT_PROVEN in this RCA pass (needs browser network while tab hidden)",
+    "429_classification": "UNRELATED_BUT_REAL_DEFECT",
+    "429_as_token_invalidation_cause": "NOT_PROVEN"
+  },
+  "root_cause": {
+    "most_likely_root_cause": "Premature Dhan auth rejection of an otherwise clock-valid access token (H7), surfaced as TOKEN_EXPIRED_OR_INVALID (H4 labeling). For v254-v257 the first reject occurs BEFORE the next Secret Manager version exists, so Genesis remint (H1) is not the first-cause of those disconnects. With web self-heal mint OFF, the service storms reloads (H5) until scheduler or manual recovery triggers Cloud Run Job mint (H2). Remint then makes prior versions permanently unusable (H1 secondary). HTTP 429 is a separate real defect (H3) \u2014 NOT_PROVEN as the invalidation cause.",
+    "alternatives": [
+      "External non-Genesis Dhan login/session revoke using same API credentials (H8-adjacent, not SM-visible).",
+      "Overlapping recovery remints amplifying churn after outages (H2).",
+      "Multi-instance cache skew (H6) \u2014 possible, not proven.",
+      "429-induced invalidation (H3) \u2014 not proven."
+    ]
+  },
+  "safety": {
+    "functional_code_changed": false,
+    "deployed": false,
+    "token_rotated_by_this_rca": false,
+    "secret_payload_read": false,
+    "iam_mutated": false,
+    "LIVE": false
+  }
+}
