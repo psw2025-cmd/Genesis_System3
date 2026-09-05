@@ -315,7 +315,22 @@ class StateSyncService:
                     "total": pnl_data.get("total_pnl", 0.0),
                     "day_total": pnl_data.get("daily_pnl", pnl_data.get("day_total", 0.0)),
                 }
-        except Exception as e:
+                _pnl_note = str(pnl_data.get("note", "")).lower()
+                _pnl_source = str(pnl_data.get("data_source", "")).lower()
+                _pnl_synthetic_markers = ("synthetic", "fixture", "simulation", "mock", "fake")
+                if pnl_data.get("synthetic") is True or any(
+                    m in _pnl_note or m in _pnl_source for m in _pnl_synthetic_markers
+                ):
+                    updates["pnl"] = {
+                        "unrealized": 0.0,
+                        "realized": 0.0,
+                        "total": 0.0,
+                        "day_total": 0.0,
+                        "is_synthetic_source_ignored": True,
+                        "synthetic_source_note": pnl_data.get("note")
+                        or "Synthetic/simulated paper data detected; suppressed from live P&L display.",
+                    }
+        except Exception as e:            
             print(f"Error syncing PnL: {e}")
 
         # Sync signals
