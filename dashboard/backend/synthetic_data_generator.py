@@ -18,6 +18,7 @@ IV_BOUNDS = {
     "BANKNIFTY": (10.0, 45.0),  # 10-45% for BANKNIFTY (more volatile)
     "FINNIFTY": (9.0, 42.0),  # 9-42% for FINNIFTY
     "MIDCPNIFTY": (10.0, 45.0),  # 10-45% for MIDCPNIFTY
+    "BANKEX": (10.0, 45.0),
     "SENSEX": (8.0, 38.0),  # 8-38% for SENSEX
 }
 
@@ -36,10 +37,11 @@ BASE_SPOT_PRICES = {
     "FINNIFTY": 22000.0,
     "MIDCPNIFTY": 12000.0,
     "SENSEX": 75000.0,
+    "BANKEX": 55000.0,
 }
 
 # Typical strike intervals
-STRIKE_INTERVALS = {"NIFTY": 50, "BANKNIFTY": 100, "FINNIFTY": 50, "MIDCPNIFTY": 25, "SENSEX": 100}
+STRIKE_INTERVALS = {"NIFTY": 50, "BANKNIFTY": 100, "FINNIFTY": 50, "MIDCPNIFTY": 25, "SENSEX": 100, "BANKEX": 100}
 
 
 # Typical expiry dates (weekly, monthly)

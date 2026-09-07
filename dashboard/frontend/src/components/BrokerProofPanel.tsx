@@ -28,7 +28,7 @@ export function BrokerProofPanel() {
   const { brokerStatus, brokerConnected, brokerFunds, brokerHoldings, brokerPositions, chain, state } = useStore()
   const proof = brokerStatus?.token_proof || {}
   const reload = brokerStatus?.token_reload || {}
-  const required = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
+  const required = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
   const readyChains = required.filter((symbol) => {
     const row = chain?.[symbol]
     return Number(row?.total_contracts || row?.contracts?.length || 0) > 0 && Number(row?.spot || 0) > 0

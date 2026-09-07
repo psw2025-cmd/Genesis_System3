@@ -1,3 +1,4 @@
+type EquityPayload = { scanner?: { top_ce_list?: Record<string, unknown>[]; top_pe_list?: Record<string, unknown>[]; gain_metric_note?: string }; segments?: { equity_options?: { live_chains_ok?: number } }; message?: string }
 import { useEffect, useState } from 'react'
 import { OptionChain } from './OptionChain'
 import { MarketTopCePeTable } from './MarketTopCePeTable'
@@ -58,7 +59,7 @@ function EquityRow({ row }: { row: any }) {
 export function TradeTab() {
   const { gainRank, apiStatus, setChainSymbol, marketTop } = useStore()
   const rankings: any[] = gainRank?.rankings ?? []
-  const [equity, setEquity] = useState<unknown>(null)
+  const [equity, setEquity] = useState<EquityPayload | null>(null)
   const [equityErr, setEquityErr] = useState('')
   const [seedRows, setSeedRows] = useState<any[]>([])
 

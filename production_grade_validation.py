@@ -61,7 +61,7 @@ class ProductionGradeValidator:
         # Base URL: env BACKEND_URL or PORT (e.g. 8000 -> http://localhost:8000)
         base = os.environ.get("BACKEND_URL", "").strip()
         if not base and os.environ.get("PORT"):
-            base = f"http://localhost:{os.environ.get('PORT')}"
+            base = f"http://localhost:{os.environ.get('PORT', '8000')}"
         self.base_url = base or "http://localhost:8000"
         self.test_users = ["trader1", "trader2", "trader3"]
 

@@ -15,7 +15,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import logging
 logger = logging.getLogger(__name__)
 
-INDEX_SEGMENTS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
+INDEX_SEGMENTS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"]
 
 
 def _utc_now() -> str:
@@ -220,7 +220,7 @@ def scan_all_segments_from_chains(
     all_scored: List[Dict[str, Any]] = []
     refreshed_at = _ist_now_str()
 
-    underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
+    underlyings = list(dict.fromkeys([*INDEX_SEGMENTS, *chains]))
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
         contracts = chain.get("contracts") or []

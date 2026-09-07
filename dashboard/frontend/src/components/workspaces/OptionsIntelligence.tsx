@@ -42,7 +42,7 @@ export const OptionsIntelligence: React.FC = () => {
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].map((symbol) => (
+          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX'].map((symbol) => (
             <button key={symbol} type="button" className={`soft-btn ${chainSymbol === symbol ? 'active' : ''}`} onClick={() => setChainSymbol(symbol)}>{symbol}</button>
           ))}
           <button type="button" className="soft-btn" onClick={() => setActiveTab('chain')}>OPEN FULL OPTION CHAIN</button>

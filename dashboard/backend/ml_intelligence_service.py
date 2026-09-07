@@ -9,6 +9,8 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+SUPPORTED_UNDERLYINGS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX")
+
 
 FEATURE_IMPORTANCE_RANKINGS = [
     {"rank": 1, "feature": "delta_momentum_5", "category": "Greeks Momentum", "importance_score": 0.142, "description": "5-period delta rate of change"},
@@ -61,6 +63,8 @@ def get_ml_performance_data() -> Dict[str, Any]:
         "status": "ok",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "live_trading_enabled": False,
+        "supported_underlyings": list(SUPPORTED_UNDERLYINGS),
+        "coverage_note": "Symbol support does not prove a trained or validated model for that symbol.",
         "pipeline": {
             "total_features": 129,
             "core_engineered_features": 40,

@@ -10,7 +10,7 @@ const BASE = API_BASE || window.location.origin
 const TRANSIENT_STATUS = new Set([0, 429, 502, 503, 504, 520, 521, 522, 523, 524])
 const isTransient = (status?: number) => TRANSIENT_STATUS.has(Number(status ?? -1))
 
-const ENABLED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
+const ENABLED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
 const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX', 'RELIANCE', 'HDFCBANK', 'TCS', 'INFY', 'ICICIBANK']
 const isOptionalChain = (sym: string) => OPTIONAL_CHAIN_SYMBOLS.includes(String(sym || '').toUpperCase())
 
@@ -468,12 +468,21 @@ export function useData() {
   }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
   const pollRuntimeFacts = useCallback(async () => {
-    const [deploy, research] = await Promise.allSettled([
+    console.log('[pollRuntimeFacts] starting')
+    const [deploy, research, workspace] = await Promise.allSettled([
       fetchJSON('/api/deploy/info', 12000),
       fetchJSON('/api/research/multibagger', 15000),
+      fetchJSON('/api/multibagger', 12000),
     ])
+    console.log('[pollRuntimeFacts] deploy:', deploy.status, 'research:', research.status, 'workspace:', workspace.status, 'candidates:', workspace.status === 'fulfilled' ? workspace.value?.candidates?.length : null)
     if (deploy.status === 'fulfilled') setDeployInfo(deploy.value)
-    if (research.status === 'fulfilled') setResearch(research.value)
+    if (workspace.status === 'fulfilled' && workspace.value?.candidates?.length > 0) {
+      console.log('[pollRuntimeFacts] setting research to workspace:', workspace.value)
+      setResearch(workspace.value)
+    } else if (research.status === 'fulfilled') {
+      console.log('[pollRuntimeFacts] setting research to research:', research.value)
+      setResearch(research.value)
+    }
   }, [setDeployInfo, setResearch])
 
   const pollSecondary = useCallback(async () => {

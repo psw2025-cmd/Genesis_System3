@@ -4,8 +4,8 @@ import { useStore } from '../store'
 type Status = 'PASS' | 'WAITING' | 'PARTIAL'
 type LayerRow = { layer: string; status: Status; evidence: string; requiredForMoney: boolean }
 
-const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
-const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX']
+const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
+const OPTIONAL_CHAIN_SYMBOLS: string[] = []
 
 function badge(status: Status) {
   const ok = status === 'PASS'

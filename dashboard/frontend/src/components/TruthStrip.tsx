@@ -3,7 +3,7 @@ import { useStore } from '../store'
 import { Activity, ShieldCheck, Zap, Clock, CheckCircle2 } from 'lucide-react'
 
 export function TruthStrip() {
-  const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo } = useStore()
+  const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo, chain } = useStore()
   
   // Authoritative live deployed SHA resolution (never hardcoded fallback)
   const deploySha = deployInfo?.git_sha
@@ -12,6 +12,15 @@ export function TruthStrip() {
     || (health as any)?.git_sha
     || ''
     
+  const requiredSymbols = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
+  const freshCount = requiredSymbols.filter(symbol => {
+    const row = chain?.[symbol]
+    const source = String(row?.data_source || row?.source || '').toLowerCase()
+    const status = String(row?.status || '').toUpperCase()
+    return source.startsWith('dhan') && !/(synthetic|mock|fallback)/.test(source)
+      && !row?.pendingProof && row?.stale === false && Number(row?.spot) > 0
+      && (row?.contracts?.length || 0) > 0 && ['OK', 'MARKET_OPEN'].includes(status)
+  }).length
   const isLive = marketOpen && brokerConnected
 
   return (
@@ -60,7 +69,7 @@ export function TruthStrip() {
         {/* Option Chains */}
         <div className="hidden lg:flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">CHAINS:</span>
-          <span className="text-emerald-400 font-bold">4-of-4 FRESH</span>
+          <span className={`${freshCount === requiredSymbols.length ? 'text-emerald-400' : 'text-amber-400'} font-bold`}>{freshCount}-of-{requiredSymbols.length} FRESH</span>
         </div>
       </div>
 

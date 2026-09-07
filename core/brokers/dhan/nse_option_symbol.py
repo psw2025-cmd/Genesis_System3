@@ -1,9 +1,9 @@
-"""
+﻿"""
 NSE / Dhan F&O option contract symbol resolver.
 
 Conventions (NSE index options, Dhan SEM_TRADING_SYMBOL):
   Monthly / weekly (Dhan compact):  {UNDERLYING}{DDMMMYY}{STRIKE}{CE|PE}
-  Example: NIFTY05FEB2623500CE  →  NIFTY, 05-Feb-2026, strike 23500, Call
+  Example: NIFTY05FEB2623500CE  â†’  NIFTY, 05-Feb-2026, strike 23500, Call
 
 References:
   - NSE contract specs: https://www.nseindia.com/products/content/derivatives/equities/contract_specifitns.htm
@@ -46,7 +46,7 @@ _TRADING_SYMBOL_RE = re.compile(
 
 
 def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
-    """Parse stock OPTSTK symbol — supports YYMMM and DDMMMYY (OpenAlgo/NSE)."""
+    """Parse stock OPTSTK symbol â€” supports YYMMM and DDMMMYY (OpenAlgo/NSE)."""
     m = re.match(
         rf"^(?P<underlying>[A-Z][A-Z0-9&]+?)"
         rf"(?P<yy>\d{{2}})(?P<mon>{_MONTHS})"
@@ -200,9 +200,13 @@ def parse_trading_symbol(trading_symbol: str) -> Optional[Dict[str, Any]]:
         yy = int(g["yy"])
         month = int(g["m"])
         dd = int(g["dd"])
+        try:
+            exp_date = date(2000 + yy, month, dd).isoformat()
+        except (ValueError, OverflowError):
+            exp_date = None
         return {
             "underlying": g["underlying"].upper(),
-            "expiry_date": date(2000 + yy, month, dd).isoformat(),
+            "expiry_date": exp_date,
             "strike": float(g["strike"]),
             "option_type": g["option_type"].upper(),
             "trading_symbol": sym,
@@ -304,7 +308,7 @@ def _lookup_instrument_master(
         "option_type": option_type.upper(),
         "expiry_date": exp_val,
         "lot_size": int(row[lot_col]) if lot_col and row.get(lot_col) is not None else None,
-        "exchange_segment": "NSE_FNO",
+        "exchange_segment": INDEX_FO_DEFAULTS.get(underlying.upper(), {}).get("exchange_segment", "NSE_FNO"),
         "resolved_from": "instrument_master",
     }
 
@@ -417,3 +421,5 @@ def enrich_option_rows(
     default_expiry: Union[str, date, None] = None,
 ) -> List[Dict[str, Any]]:
     return [enrich_option_row(r, default_expiry=default_expiry) for r in rows]
+
+

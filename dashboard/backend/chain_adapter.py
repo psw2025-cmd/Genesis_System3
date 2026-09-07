@@ -16,13 +16,30 @@ from core.brokers.dhan.nse_option_symbol import build_trading_symbol
 
 # Default lot sizes for major Indian indices
 LOT_SIZES = {
-    "NIFTY": 50,
+    "NIFTY": 25,
     "BANKNIFTY": 15,
     "FINNIFTY": 25,
     "MIDCPNIFTY": 50,
     "SENSEX": 10,
     "BANKEX": 15,
 }
+
+
+def normalize_index_chain_exchange(payload: Dict[str, Any], underlying: str) -> Dict[str, Any]:
+    """Migrate legacy snapshot routing without changing prices, IDs or timestamps."""
+    symbol = underlying.upper()
+    if symbol not in LOT_SIZES:
+        return payload
+    exchange = "BSE_FNO" if symbol in {"SENSEX", "BANKEX"} else "NSE_FNO"
+    index = "BSE_INDEX" if exchange == "BSE_FNO" else "NSE_INDEX"
+    out = dict(payload)
+    out["contracts"] = [
+        {**row, "exchange": exchange, "exchange_segment": exchange, "underlying_index": index}
+        for row in payload.get("contracts", [])
+    ]
+    out["exchange_segment"] = exchange
+    out["underlying_index"] = index
+    return out
 
 
 def _configured_chain_limit() -> int:
@@ -221,7 +238,8 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         row_source = _normalize_chain_source(row.get("source", row.get("data_source", "dhan")))
 
         base: Dict[str, Any] = {
-            "exchange": "NSE_FNO",
+            "exchange": "BSE_FNO" if underlying.upper() in {"SENSEX", "BANKEX"} else str(row.get("exchange_segment") or "NSE_FNO"),
+            "underlying_index": ("BSE_INDEX" if underlying.upper() in {"SENSEX", "BANKEX"} else "NSE_INDEX") if underlying.upper() in LOT_SIZES else None,
             "underlying_symbol": underlying.upper(),
             "underlying_type": "INDEX" if underlying.upper() in LOT_SIZES else "EQUITY",
             "expiry": row_expiry or expiry,
@@ -261,7 +279,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             "rho": _optional_float(row.get("rho")),
             "intrinsic_value": round(intrinsic, 2),
             "time_value": round(time_val, 2),
-            "lot_size": lot_size,
+            "lot_size": int(_optional_float(row.get("lot_size")) or _optional_float(row.get("lotsize")) or lot_size),
             "turnover": round(volume * ltp_val, 2),
             "liquidity_score": liquidity_score,
             "buildup_type": buildup,

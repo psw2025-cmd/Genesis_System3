@@ -1,3 +1,5 @@
+type ScannerSegment = { top_ce?: unknown; top_pe?: unknown; top_ce_list?: unknown[]; top_pe_list?: unknown[] }
+type QcPayload = { status?: string; total_contracts?: number; underlyings?: number; failures?: string[]; scanner_segments?: string; no_trade_reasons?: Record<string, number>; qc_failures?: string[] }
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
@@ -36,7 +38,7 @@ function firstCandidateFromScanner(scanner: any): any | null {
     scanner?.market_wide?.top_pe,
   ]
   const bySegment = scanner?.by_segment || {}
-  for (const seg of Object.values(bySegment) as unknown[]) {
+  for (const seg of Object.values(bySegment) as ScannerSegment[]) {
     paths.push(seg?.top_ce, seg?.top_pe)
     if (Array.isArray(seg?.top_ce_list)) paths.push(...seg.top_ce_list)
     if (Array.isArray(seg?.top_pe_list)) paths.push(...seg.top_pe_list)
@@ -96,7 +98,7 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
 
 export default function Signals() {
   const [signal, setSignal] = useState<SignalView | null>(null)
-  const [qc, setQc] = useState<unknown>(null)
+  const [qc, setQc] = useState<QcPayload | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<{endpoint: string, status?: number, message: string} | null>(null)
@@ -110,7 +112,7 @@ export default function Signals() {
       ])
 
       if (stateRes.status === 'rejected') {
-        const status = (stateRes.reason as unknown)?.response?.status || null
+        const status = (stateRes.reason as { response?: { status?: number }; message?: string })?.response?.status || null
         if (status === 401) {
           setAuthRequired(true)
           setError(null)
@@ -149,8 +151,8 @@ export default function Signals() {
       const scannerTotal = Number(scanner?.segments_total || 0)
       const qcFailures = [
         ...(state.qc?.qc_failures || state.qc?.failures || []),
-        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as unknown)?.message || 'unknown'}`] : []),
-        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as unknown)?.message || 'unknown'}`] : []),
+        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as { response?: { status?: number }; message?: string })?.message || 'unknown'}`] : []),
+        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as { response?: { status?: number }; message?: string })?.message || 'unknown'}`] : []),
       ]
 
       const qcData = {

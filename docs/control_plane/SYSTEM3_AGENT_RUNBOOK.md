@@ -1,5 +1,11 @@
 # Genesis System3 Autonomous End-to-End Runbook
 
+**Highest-priority user directive (2026-09-07): LOCAL WINDOWS LAPTOP ONLY.**
+Read `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` before the
+historical ownership and cloud-exit text below. Codex is explicitly authorized
+for the requested audit, local fixes, launcher, smoke tests and GCP retirement.
+GCP is not runtime, token, deployment or acceptance authority.
+
 **Authority marker:** `SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1`
 
 **2026-09-01 authority override:** `docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md` is the current user-directed execution-ownership authority. Claude is the sole controller/executor. Other agents are advisory/forensic/verification only unless Claude delegates a bounded non-overlapping task. This override changes ownership, not the PAPER/zero-order safety locks below.
@@ -72,3 +78,10 @@ A completion claim requires fresh evidence from the actual selected authoritativ
 ## Coordination
 
 GitHub Issue #188 remains the live coordination/status bus. Claude posts task start, material state change, blockers and completion evidence. Other agents may post independent evidence but may not claim execution ownership or start overlapping mutations.
+# Current user override — 2026-09-07
+
+Read `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` first.
+Windows laptop is the only runtime and acceptance target. The user explicitly
+authorized Codex's audit, local implementation and dependency-checked retirement
+work. Earlier conflicting GCP runtime and Claude-only ownership text below is
+superseded. All PAPER/ANALYZE and zero-real-order locks remain mandatory.

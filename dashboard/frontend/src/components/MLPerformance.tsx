@@ -1,3 +1,4 @@
+type ModelPayload = { model?: Record<string, string | number | boolean | null>; best_model?: { name?: string; metrics?: { avg_accuracy?: number } } }
 import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
@@ -44,9 +45,9 @@ function fmtPct(v: number | null | undefined): string {
 }
 
 export default function MLPerformance() {
-  const [state, setState] = useState<unknown>(null)
-  const [performance, setPerformance] = useState<unknown>(null)
-  const [comparison, setComparison] = useState<unknown>(null)
+  const [state, setState] = useState<ModelPayload | null>(null)
+  const [performance, setPerformance] = useState<ModelPayload | null>(null)
+  const [comparison, setComparison] = useState<ModelPayload | null>(null)
   const [status, setStatus] = useState<LoadState>('loading')
   const [message, setMessage] = useState('Checking model artifacts...')
 

@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { useStore } from '../store'
 
-const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
-const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX', 'RELIANCE']
+const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
+const OPTIONAL_CHAIN_SYMBOLS = ['RELIANCE']
 
 function badge(ok: boolean, label?: string, warn = false) {
   const tone = ok ? 'var(--up)' : warn ? 'var(--amber)' : 'var(--down)'
@@ -121,7 +121,7 @@ export function EndToEndProof() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
         <div className="card" style={{ padding: 12 }}>{badge(proof.overall, 'FULL E2E')}<div style={{ marginTop: 8, fontSize: 12 }}>Current shared proof</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.brokerOk, 'BROKER')}<div style={{ marginTop: 8, fontSize: 12 }}>Dhan connectivity</div></div>
-        <div className="card" style={{ padding: 12 }}>{badge(proof.requiredReady === REQUIRED_CHAIN_SYMBOLS.length, '4 CHAINS')}<div style={{ marginTop: 8, fontSize: 12 }}>Required option chains</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(proof.requiredReady === REQUIRED_CHAIN_SYMBOLS.length, `${REQUIRED_CHAIN_SYMBOLS.length} CHAINS`)}<div style={{ marginTop: 8, fontSize: 12 }}>Required option chains</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.cePe, 'CE/PE', !proof.cePe)}<div style={{ marginTop: 8, fontSize: 12 }}>Decision evidence</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.safetyOk, 'SAFETY')}<div style={{ marginTop: 8, fontSize: 12 }}>LIVE/order lock</div></div>
       </div>

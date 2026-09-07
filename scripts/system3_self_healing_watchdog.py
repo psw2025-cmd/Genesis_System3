@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """System3 health watchdog.
 
-This watchdog is observation/housekeeping only.  Dhan token mutation was
-permanently removed; the canonical GCP Cloud Run rotation job is the sole Dhan
-token authority.
+This local watchdog reports health only. It never deletes evidence or mutates
+broker tokens. Recovery belongs to the separately governed local lifecycle.
 """
 from __future__ import annotations
 
 import json
 import shutil
 import sys
-import time
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -54,7 +52,7 @@ def check_broker_token() -> dict:
         return {
             "check": "broker_token",
             "status": "ALERT",
-            "detail": "token invalid; canonical GCP rotation job must recover it",
+            "detail": "token invalid; governed local broker recovery required",
             "mutation_attempted": False,
         }
     except Exception as exc:
@@ -95,15 +93,7 @@ def check_disk_pressure() -> dict:
         total, used, free = shutil.disk_usage(ROOT)
         pct_used = used / total * 100
         if pct_used > 85:
-            archive_dir = REPORTS_DIR / "archive"
-            cleared = 0
-            if archive_dir.exists():
-                cutoff = time.time() - (30 * 86400)
-                for item in archive_dir.rglob("*"):
-                    if item.is_file() and item.stat().st_mtime < cutoff:
-                        item.unlink()
-                        cleared += 1
-            return {"check": "disk_pressure", "status": "AUTO_FIXED", "detail": f"Disk {pct_used:.0f}% used. Cleared {cleared} old archive files."}
+            return {"check": "disk_pressure", "status": "ALERT", "detail": f"Disk {pct_used:.0f}% used. Run the report-only repo cleanup toolkit; no files deleted."}
         return {"check": "disk_pressure", "status": "OK", "detail": f"Disk {pct_used:.0f}% used ({free//1024//1024}MB free)"}
     except Exception as exc:
         return {"check": "disk_pressure", "status": "ERROR", "detail": type(exc).__name__}
@@ -123,7 +113,7 @@ def check_validation_freshness() -> dict:
 def main():
     log("Health watchdog starting (broker token mutation disabled)")
     checks = [check_broker_token(), check_scheduler_config(), check_gain_rank_today(), check_disk_pressure(), check_validation_freshness()]
-    alerts = [c for c in checks if c["status"] in ("CRITICAL", "FAILED", "ALERT")]
+    alerts = [c for c in checks if c["status"] != "OK"]
     fixed = [c for c in checks if c["status"] == "AUTO_FIXED"]
     for check in checks:
         log(f"{check['check']}: {check['status']} — {check['detail']}")

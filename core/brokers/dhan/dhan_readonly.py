@@ -1,11 +1,13 @@
 """
 DhanHQ Read-Only / Analyzer-Only Broker Adapter
-================================================
+
 SAFETY CONTRACT:
 - No order placement, modification, or cancellation.
 - No live trading of any kind.
 - Access token only — never printed or logged.
 - Profile endpoint used for connectivity check.
+- FIX: Profile is REST-only access-token-only per forensic checklist 2026-08-18
+       to avoid DH-906 double-probe recurrence.
 """
 
 import logging
@@ -22,30 +24,24 @@ if ROOT_DIR not in sys.path:
 # Load env (picks up .secrets/dhan.env via env_loader's path list)
 try:
     from core.utils.env_loader import get_dhan_credentials
-
     _ENV_LOADED_VIA = "core.utils.env_loader"
 except ImportError:
-    # Fallback: load .secrets/dhan.env directly
     from dotenv import load_dotenv
-
     _secrets_path = os.path.join(ROOT_DIR, ".secrets", "dhan.env")
     _sys3_env = os.getenv("SYSTEM3_ENV_FILE", "")
     for _p in [_sys3_env, _secrets_path]:
         if _p and os.path.exists(_p):
             load_dotenv(_p, override=False)
             break
-
     def get_dhan_credentials():
         return {
             "client_id": os.getenv("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff"),
             "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff"),
         }
-
     _ENV_LOADED_VIA = "dotenv-fallback"
 
 try:
     import requests as _requests
-
     _REQUESTS_OK = True
 except ImportError:
     _requests = None
@@ -58,7 +54,6 @@ try:
     import dhanhq as _pkg
     from dhanhq import dhanhq as _dhanhq_class
     from dhanhq.dhan_context import DhanContext as _DhanContext
-
     _DHAN_SDK_OK = True
 except Exception:
     pass
@@ -75,14 +70,12 @@ _DHAN_HOLDINGS_URL = "https://api.dhan.co/v2/holdings"
 _DHAN_ORDERS_URL = "https://api.dhan.co/v2/orders"
 
 # Current Dhan taxonomy used consistently by payload and HTTP classifiers.
+# Per checklist: 901,807,808,809=auth, 904,805=rate-limit, 810=client-id, 906=request-rejected
 _TOKEN_AUTH_CODES = {901, 807, 808, 809}
 _RATE_LIMIT_CODES = {904, 805}
 _CLIENT_ID_INVALID_CODES = {810}
 _REQUEST_REJECTED_CODES = {906}
 
-# Broker status endpoint is polled frequently by the dashboard. Auto-refresh must
-# therefore be rate-limited so a genuine auth failure cannot create TOTP/token
-# churn. 180s is the hard safety floor shared with the canonical Cloud rotator.
 try:
     _configured_status_refresh = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "180") or "180")
 except ValueError:
@@ -95,27 +88,18 @@ _STATUS_RESULT_TTL_S = float(os.getenv("DHAN_STATUS_CACHE_TTL_S", "25") or "25")
 
 logger = logging.getLogger("dhan_readonly")
 
-
 def _mask(value: str, keep: int = 4) -> str:
-    """Mask a string, showing only the last `keep` chars."""
     if not value:
         return "<empty>"
     return f"{'*' * max(0, len(value) - keep)}{value[-keep:]}"
 
-
 def _env_truthy(name: str, default: str = "0") -> bool:
     return os.getenv(name, default).strip().lower() in ("1", "true", "yes", "on")
-
 
 def _env_falsey(name: str, default: str = "0") -> bool:
     return os.getenv(name, default).strip().lower() in ("0", "false", "no", "off", "")
 
-
 def _status_auto_refresh_enabled() -> bool:
-    """
-    Safe default: OFF on Cloud Run (mounted SM token must not be invalidated).
-    Local/dev can enable with DHAN_STATUS_AUTO_REFRESH=1.
-    """
     cloud = bool(
         os.getenv("K_SERVICE")
         or os.getenv("CLOUD_MODE")
@@ -124,16 +108,11 @@ def _status_auto_refresh_enabled() -> bool:
     default = "0" if cloud else "1"
     if not _env_truthy("DHAN_STATUS_AUTO_REFRESH", default):
         return False
-
-    # Never allow this read-only adapter to be used as a live-trading bypass.
-    # The refresh is only for profile/fund/position reads in ANALYZER/PAPER mode.
     if not _env_falsey("LIVE_TRADING_ENABLED", "0"):
         return False
     if not _env_falsey("SYSTEM3_LIVE_TRADING_ALLOWED", "0"):
         return False
-
     return True
-
 
 _SUCCESS_SOUNDING = (
     "fully automated",
@@ -141,15 +120,7 @@ _SUCCESS_SOUNDING = (
     "pin + totp",
 )
 
-
 def sanitize_attempt_block(block: dict | None) -> dict:
-    """Strip success-sounding copy from a refresh/rotation block that did not succeed.
-
-    Live /api/state showed: attempted=false, success=false, skipped=...,
-    message="Token generated via PIN + TOTP (fully automated)". That combination
-    is a lie and must never reach the UI. The same payload also kept a stale
-    403 on canonical_rotation while skipped=CANONICAL_SELF_HEAL_DISABLED.
-    """
     if not isinstance(block, dict):
         return {"attempted": False, "success": False}
     out = dict(block)
@@ -177,9 +148,7 @@ def sanitize_attempt_block(block: dict | None) -> dict:
             out["strategy"] = "not_attempted"
     return out
 
-
 def sanitize_status_payload(status: dict | None) -> dict:
-    """Sanitize auto_refresh / canonical_rotation on any broker status dict."""
     if not isinstance(status, dict):
         return {"connected": False, "error": "INVALID_STATUS_PAYLOAD"}
     out = dict(status)
@@ -189,42 +158,27 @@ def sanitize_status_payload(status: dict | None) -> dict:
         out["canonical_rotation"] = sanitize_attempt_block(out.get("canonical_rotation"))
     return out
 
-
 def _safe_refresh_token_for_status(reason: str) -> dict:
-    """
-    Refresh Dhan token from the web backend process when dashboard broker status
-    detects a confirmed expired/missing token. Returns only safe metadata; never
-    returns or logs the raw access token.
-    """
     global _LAST_STATUS_REFRESH_ATTEMPT_AT
-
     meta = {
         "attempted": False,
         "success": False,
         "reason": reason,
         "cooldown_s": _STATUS_REFRESH_COOLDOWN_S,
     }
-
     if not _status_auto_refresh_enabled():
         meta["skipped"] = "AUTO_REFRESH_DISABLED_OR_LIVE_GATE"
         return sanitize_attempt_block(meta)
-
     now = time.time()
     elapsed = now - _LAST_STATUS_REFRESH_ATTEMPT_AT
     if _LAST_STATUS_REFRESH_ATTEMPT_AT and elapsed < _STATUS_REFRESH_COOLDOWN_S:
         meta["skipped"] = "COOLDOWN"
         meta["cooldown_remaining_s"] = int(_STATUS_REFRESH_COOLDOWN_S - elapsed)
         return sanitize_attempt_block(meta)
-
     _LAST_STATUS_REFRESH_ATTEMPT_AT = now
     meta["attempted"] = True
-
     try:
         from core.brokers.dhan.token_manager import refresh_token
-
-        # Never force-generate here. Minting a new token invalidates the Cloud Run
-        # Secret Manager mount. Renew-only; controlled mint stays with canonical
-        # scheduler/manual recovery authority.
         result = refresh_token(force_generate=False)
         meta["success"] = bool(result.get("success"))
         meta["strategy"] = result.get("strategy")
@@ -237,9 +191,7 @@ def _safe_refresh_token_for_status(reason: str) -> dict:
         meta["token_value_printed"] = False
         return sanitize_attempt_block(meta)
 
-
 def get_dhan_credentials_masked() -> dict:
-    """Return credential presence info — never the actual values."""
     creds = get_dhan_credentials()
     cid = creds.get("client_id", "")
     tok = creds.get("access_token", "")
@@ -253,23 +205,14 @@ def get_dhan_credentials_masked() -> dict:
         "token_value_printed": False,
     }
 
-
 def create_dhan_client():
-    """
-    Create and return a dhanhq SDK client instance.
-    Uses DhanContext(client_id, access_token) → dhanhq(ctx) pattern.
-    Returns None if credentials are missing or SDK unavailable.
-    """
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
-
     if not client_id or not access_token:
         return None
-
     if not _DHAN_SDK_OK or _DhanContext is None or _dhanhq_class is None:
         return None
-
     try:
         ctx = _DhanContext(client_id, access_token)
         client = _dhanhq_class(ctx)
@@ -278,9 +221,7 @@ def create_dhan_client():
         logger.warning("DhanHQ SDK client creation failed: %s", type(exc).__name__)
         return None
 
-
 def _safe_upstream_code(value: Any) -> int | None:
-    """Extract a Dhan numeric error code without returning response text."""
     if isinstance(value, dict):
         remarks = value.get("remarks") if isinstance(value.get("remarks"), dict) else {}
         candidates = (
@@ -313,9 +254,7 @@ def _safe_upstream_code(value: Any) -> int | None:
             return None
     return None
 
-
 def _payload_error(data: Any) -> str | None:
-    """Map Dhan response payloads to stable, non-secret error taxonomy."""
     if not isinstance(data, dict):
         return None
     remarks = data.get("remarks") if isinstance(data.get("remarks"), dict) else {}
@@ -330,9 +269,6 @@ def _payload_error(data: Any) -> str | None:
         )
     ).lower()
     code = _safe_upstream_code(data)
-
-    # Numeric Dhan codes are authoritative. DH-906 is a request rejection and
-    # must never be upgraded to an auth failure by ambiguous free text.
     if code in _RATE_LIMIT_CODES:
         return "DHAN_RATE_LIMITED"
     if code in _REQUEST_REJECTED_CODES:
@@ -341,7 +277,6 @@ def _payload_error(data: Any) -> str | None:
         return "CLIENT_ID_INVALID"
     if code in _TOKEN_AUTH_CODES:
         return "TOKEN_EXPIRED_OR_INVALID"
-
     if (
         "invalid token" in message
         or "invalid access token" in message
@@ -355,11 +290,8 @@ def _payload_error(data: Any) -> str | None:
         return "DHAN_UPSTREAM_FAILURE"
     return None
 
-
 def _auth_failure_payload(data: Any) -> bool:
-    """True only for affirmative Dhan authentication/token rejection payloads."""
     return _payload_error(data) == "TOKEN_EXPIRED_OR_INVALID"
-
 
 def _rest_get(
     url: str,
@@ -369,13 +301,6 @@ def _rest_get(
     *,
     include_client_id: bool = True,
 ) -> dict:
-    """Raw REST GET to Dhan API — returns parsed JSON or raises.
-
-    Dhan Profile and Fund Limit are documented access-token-only GETs. Data APIs
-    such as Option Chain have their own helpers and require client-id. The caller
-    therefore chooses header scope explicitly rather than forcing client-id onto
-    every endpoint.
-    """
     if not _REQUESTS_OK or _requests is None:
         raise RuntimeError("requests library not available")
     headers = {
@@ -388,9 +313,7 @@ def _rest_get(
     resp.raise_for_status()
     return resp.json()
 
-
 def _exception_error(exc: Exception) -> str:
-    """Classify an HTTP/network exception without exposing response payload."""
     response = getattr(exc, "response", None)
     status_code = getattr(response, "status_code", None) if response is not None else None
     try:
@@ -399,9 +322,6 @@ def _exception_error(exc: Exception) -> str:
         body = ""
     blob = f"{status_code or ''} {body} {exc}".lower()
     code = _safe_upstream_code(blob)
-
-    # Numeric codes override free text so rate/config/request failures cannot
-    # accidentally authorize token recovery.
     if code in _RATE_LIMIT_CODES or status_code == 429:
         return "DHAN_RATE_LIMITED"
     if code in _REQUEST_REJECTED_CODES:
@@ -424,33 +344,16 @@ def _exception_error(exc: Exception) -> str:
         return f"HTTP_{status_code}"
     return f"NETWORK_ERROR:{type(exc).__name__}"
 
-
 def get_profile() -> dict:
     """
-    Fetch profile from Dhan API.
-    Tries SDK first; falls back to the documented access-token-only REST GET.
-    Returns a safe dict — never includes raw token.
+    FIXED: REST-only, access-token-only per forensic checklist.
+    Single canonical request, no SDK double-probe, no client-id header.
     """
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
-
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
-
-    # Try SDK first.
-    client = create_dhan_client()
-    if client is not None:
-        try:
-            result = client.get_profile() if hasattr(client, "get_profile") else None
-            if result is not None:
-                payload_error = _payload_error(result)
-                if payload_error:
-                    return {"success": False, "error": payload_error, "source": "sdk", "data": _safe_profile(result)}
-                return {"success": True, "source": "sdk", "data": _safe_profile(result)}
-        except Exception as exc:
-            logger.debug("SDK profile fetch failed (%s), trying REST", type(exc).__name__)
-
     try:
         data = _rest_get(
             _DHAN_PROFILE_URL,
@@ -465,52 +368,24 @@ def get_profile() -> dict:
     except Exception as exc:
         return {"success": False, "error": _exception_error(exc), "data": None}
 
-
 def _safe_profile(raw: dict) -> dict:
-    """Return only non-sensitive profile fields."""
     if not isinstance(raw, dict):
         return {}
     safe_keys = {
-        "dhanClientId",
-        "clientName",
-        "dhanClientName",
-        "email",
-        "segment",
-        "activeSegment",
-        "exchangeSegment",
-        "tokenValidity",
-        "ddpi",
-        "mtf",
-        "dataPlan",
-        "dataValidity",
-        "status",
-        "message",
-        "httpStatus",
-        "errorCode",
-        "errorMessage",
+        "dhanClientId", "clientName", "dhanClientName", "email", "segment",
+        "activeSegment", "exchangeSegment", "tokenValidity", "ddpi", "mtf",
+        "dataPlan", "dataValidity", "status", "message", "httpStatus",
+        "errorCode", "errorMessage",
     }
     return {k: v for k, v in raw.items() if k in safe_keys}
 
-
 def get_funds() -> dict:
-    """Fetch fund limits (read-only) using Dhan's canonical header contract."""
+    """FIXED: REST-only access-token-only for canonical header contract."""
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
-
-    client = create_dhan_client()
-    if client is not None and hasattr(client, "get_fund_limits"):
-        try:
-            data = client.get_fund_limits()
-            payload_error = _payload_error(data)
-            if payload_error:
-                return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
-            return {"success": True, "source": "sdk", "data": data}
-        except Exception:
-            pass
-
     try:
         data = _rest_get(
             _DHAN_FUNDS_URL,
@@ -525,15 +400,12 @@ def get_funds() -> dict:
     except Exception as exc:
         return {"success": False, "error": _exception_error(exc), "data": None}
 
-
 def get_positions() -> dict:
-    """Fetch open positions (read-only)."""
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
-
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_positions"):
         try:
@@ -544,7 +416,6 @@ def get_positions() -> dict:
             return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
-
     try:
         data = _rest_get(_DHAN_POSITIONS_URL, access_token, client_id)
         payload_error = _payload_error(data)
@@ -554,15 +425,12 @@ def get_positions() -> dict:
     except Exception as exc:
         return {"success": False, "error": _exception_error(exc), "data": None}
 
-
 def get_holdings() -> dict:
-    """Fetch equity holdings (read-only)."""
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
-
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_holdings"):
         try:
@@ -573,7 +441,6 @@ def get_holdings() -> dict:
             return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
-
     try:
         data = _rest_get(_DHAN_HOLDINGS_URL, access_token, client_id)
         payload_error = _payload_error(data)
@@ -583,15 +450,12 @@ def get_holdings() -> dict:
     except Exception as exc:
         return {"success": False, "error": _exception_error(exc), "data": None}
 
-
 def get_orders_readonly() -> dict:
-    """Fetch order book (read-only — no placement)."""
     creds = get_dhan_credentials()
     client_id = creds.get("client_id", "")
     access_token = creds.get("access_token", "")
     if not client_id or not access_token:
         return {"success": False, "error": "CONFIG_MISSING", "data": None}
-
     client = create_dhan_client()
     if client is not None and hasattr(client, "get_order_list"):
         try:
@@ -602,7 +466,6 @@ def get_orders_readonly() -> dict:
             return {"success": True, "source": "sdk", "data": data}
         except Exception:
             pass
-
     try:
         data = _rest_get(_DHAN_ORDERS_URL, access_token, client_id)
         payload_error = _payload_error(data)
@@ -612,16 +475,8 @@ def get_orders_readonly() -> dict:
     except Exception as exc:
         return {"success": False, "error": _exception_error(exc), "data": None}
 
-
 def get_status() -> dict:
-    """
-    Full broker status check. Safe for API responses.
-    Never includes raw access token.
-    """
     global _STATUS_RESULT_CACHE, _STATUS_RESULT_CACHE_AT
-
-    # Serve recent connected truth fast — prevents UI flap when dashboard polls
-    # health/batch/broker in parallel and Dhan profile latency spikes past timeout.
     now = time.time()
     if (
         _STATUS_RESULT_CACHE
@@ -632,55 +487,34 @@ def get_status() -> dict:
         out["cache_hit"] = True
         out["cache_age_s"] = round(now - _STATUS_RESULT_CACHE_AT, 1)
         return sanitize_status_payload(out)
-
     refresh_meta = {"attempted": False, "success": False}
     masked = get_dhan_credentials_masked()
-
     if not masked["client_id_present"]:
         return sanitize_status_payload({
-            "broker": "dhan",
-            "mode": "ANALYZER",
-            "connected": False,
-            "live_trading_enabled": False,
-            "order_placement_allowed": False,
-            "credentials_present": False,
-            "client_id_present": False,
+            "broker": "dhan", "mode": "ANALYZER", "connected": False,
+            "live_trading_enabled": False, "order_placement_allowed": False,
+            "credentials_present": False, "client_id_present": False,
             "access_token_present": masked["access_token_present"],
-            "error": "CONFIG_MISSING",
-            "auto_refresh": refresh_meta,
-            "sdk_available": _DHAN_SDK_OK,
-            "env_source": _ENV_LOADED_VIA,
+            "error": "CONFIG_MISSING", "auto_refresh": refresh_meta,
+            "sdk_available": _DHAN_SDK_OK, "env_source": _ENV_LOADED_VIA,
         })
-
     if not masked["access_token_present"]:
         refresh_meta = _safe_refresh_token_for_status("CONFIG_MISSING")
         masked = get_dhan_credentials_masked()
         if not masked["access_token_present"]:
             return sanitize_status_payload({
-                "broker": "dhan",
-                "mode": "ANALYZER",
-                "connected": False,
-                "live_trading_enabled": False,
-                "order_placement_allowed": False,
-                "credentials_present": False,
-                "client_id_present": True,
-                "access_token_present": False,
-                "error": "CONFIG_MISSING",
-                "auto_refresh": refresh_meta,
-                "sdk_available": _DHAN_SDK_OK,
+                "broker": "dhan", "mode": "ANALYZER", "connected": False,
+                "live_trading_enabled": False, "order_placement_allowed": False,
+                "credentials_present": False, "client_id_present": True,
+                "access_token_present": False, "error": "CONFIG_MISSING",
+                "auto_refresh": refresh_meta, "sdk_available": _DHAN_SDK_OK,
                 "env_source": _ENV_LOADED_VIA,
             })
-
     t0 = time.time()
     profile_result = get_profile()
     latency_ms = int((time.time() - t0) * 1000)
-
     connected = profile_result.get("success", False)
     error = None if connected else profile_result.get("error", "UNKNOWN")
-
-    # Only affirmative token/auth failures may enter refresh logic. Dhan 805/904,
-    # DH-906, client-id 810, HTTP 429, generic HTTP 400 and transient network
-    # failures are not token evidence and must never trigger token churn.
     should_refresh = (not connected) and error in (
         "TOKEN_EXPIRED_OR_INVALID",
         "CONFIG_MISSING",
@@ -695,22 +529,15 @@ def get_status() -> dict:
             latency_ms = int((time.time() - t0) * 1000)
             connected = profile_result.get("success", False)
             error = None if connected else profile_result.get("error", "UNKNOWN")
-
     result = {
-        "broker": "dhan",
-        "mode": "ANALYZER",
-        "connected": connected,
-        "live_trading_enabled": False,
-        "order_placement_allowed": False,
+        "broker": "dhan", "mode": "ANALYZER", "connected": connected,
+        "live_trading_enabled": False, "order_placement_allowed": False,
         "credentials_present": bool(masked["client_id_present"] and masked["access_token_present"]),
         "client_id_present": masked["client_id_present"],
         "access_token_present": masked["access_token_present"],
-        "latency_ms": latency_ms,
-        "error": error,
+        "latency_ms": latency_ms, "error": error,
         "auto_refresh": sanitize_attempt_block(refresh_meta),
-        "sdk_available": _DHAN_SDK_OK,
-        "env_source": _ENV_LOADED_VIA,
-        "cache_hit": False,
+        "sdk_available": _DHAN_SDK_OK, "env_source": _ENV_LOADED_VIA, "cache_hit": False,
     }
     result = sanitize_status_payload(result)
     if connected:
@@ -718,68 +545,22 @@ def get_status() -> dict:
         _STATUS_RESULT_CACHE_AT = time.time()
     return result
 
-
-# ── BLOCKED ORDER METHODS ──────────────────────────────────────────────────────
-
 class DhanReadOnly:
-    """
-    Safe wrapper around DhanHQ for use as an analyzer-only broker object.
-    All read methods delegate to module-level functions.
-    All write methods raise RuntimeError.
-    """
-
-    def get_profile(self) -> dict:
-        return get_profile()
-
-    def get_funds(self) -> dict:
-        return get_funds()
-
-    def get_positions(self) -> dict:
-        return get_positions()
-
-    def get_holdings(self) -> dict:
-        return get_holdings()
-
-    def get_orders_readonly(self) -> dict:
-        return get_orders_readonly()
-
-    def get_status(self) -> dict:
-        return get_status()
-
-    def get_dhan_credentials_masked(self) -> dict:
-        return get_dhan_credentials_masked()
-
-    # ── BLOCKED ──────────────────────────────────────────────────────────────
-
-    def place_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def modify_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def cancel_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def place_super_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def modify_super_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def cancel_super_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def place_forever(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def modify_forever(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def cancel_forever(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def place_slice_order(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
-
-    def kill_switch(self, *args, **kwargs):
-        raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def get_profile(self) -> dict: return get_profile()
+    def get_funds(self) -> dict: return get_funds()
+    def get_positions(self) -> dict: return get_positions()
+    def get_holdings(self) -> dict: return get_holdings()
+    def get_orders_readonly(self) -> dict: return get_orders_readonly()
+    def get_status(self) -> dict: return get_status()
+    def get_dhan_credentials_masked(self) -> dict: return get_dhan_credentials_masked()
+    def place_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def modify_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def cancel_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def place_super_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def modify_super_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def cancel_super_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def place_forever(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def modify_forever(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def cancel_forever(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def place_slice_order(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)
+    def kill_switch(self, *args, **kwargs): raise RuntimeError(_LIVE_TRADING_BLOCKED_MSG)

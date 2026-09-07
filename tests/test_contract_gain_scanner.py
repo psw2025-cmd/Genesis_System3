@@ -125,8 +125,9 @@ def test_scan_all_segments_implementation_matrix():
         },
     }
     report = scan_all_segments_from_chains(chains)
-    assert report["segments_total"] == 4
+    assert report["segments_total"] == 6
     assert report["segments_implemented"] == 3
     assert "BANKNIFTY" in report["missing_segments"]
     assert report["market_wide"]["top_ce"]["underlying"] == "FINNIFTY"
-    assert len(INDEX_SEGMENTS) == 4
+    assert len(INDEX_SEGMENTS) == 6
+    assert {'SENSEX', 'BANKEX'}.issubset(report['missing_segments'])

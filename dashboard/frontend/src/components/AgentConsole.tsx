@@ -1,3 +1,4 @@
+type AgentPayload = { tasks?: unknown[]; plan_id?: string; status?: string; changes?: unknown[]; run_id?: string; auto_apply?: boolean; passed?: number; failed?: number; last_updated?: string }
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
@@ -6,10 +7,10 @@ import { API_BASE } from '../config'
 declare global {
   interface Window {
     electronAPI?: {
-      getAgentMemory: () => Promise<unknown>
+      getAgentMemory: () => Promise<AgentPayload>
       saveAgentMemory: (tasks: any) => Promise<unknown>
       showNotification: (options: { title: string; body: string }) => Promise<unknown>
-      downloadProofPack: () => Promise<unknown>
+      downloadProofPack: () => Promise<{ success?: boolean }>
       getBackendStatus: () => Promise<unknown>
       controlBackend: (action: string) => Promise<unknown>
     }
@@ -26,9 +27,9 @@ function safeText(value: any, fallback = 'N/A'): string {
 }
 
 export default function AgentConsole() {
-  const [agentMemory, setAgentMemory] = useState<unknown>(null)
-  const [upgradePlan, setUpgradePlan] = useState<unknown>(null)
-  const [testResults, setTestResults] = useState<unknown>(null)
+  const [agentMemory, setAgentMemory] = useState<AgentPayload | null>(null)
+  const [upgradePlan, setUpgradePlan] = useState<AgentPayload | null>(null)
+  const [testResults, setTestResults] = useState<AgentPayload | null>(null)
   const [issues, setIssues] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [lastError, setLastError] = useState<string | null>(null)

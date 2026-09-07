@@ -207,11 +207,17 @@ class DhanFeedClient(BrokerFeedClient):
         import json
 
         instruments = [
-            {"ExchangeSegment": "NSE_FNO", "SecurityId": self.security_ids_by_symbol[s]}
+            {"ExchangeSegment": self._exchange_segment(s), "SecurityId": self.security_ids_by_symbol[s]}
             for s in symbols
             if s in self.security_ids_by_symbol
         ]
         return json.dumps({"RequestCode": 15, "InstrumentCount": len(instruments), "InstrumentList": instruments})
+
+    def _exchange_segment(self, symbol: str) -> str:
+        """Index values and derivative contracts use different Dhan segments."""
+        if self.instrument_type.upper() in {"INDEX", "IDX_I"}:
+            return "IDX_I"
+        return "BSE_FNO" if symbol.upper().startswith(("SENSEX", "BANKEX")) else "NSE_FNO"
 
     def _parse_message(self, raw: str | bytes, receive_ts_utc: datetime) -> MarketDataRecord | None:
         raise NotImplementedError(

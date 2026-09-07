@@ -232,7 +232,7 @@ export function GenesisTab() {
         <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'After-hours standby'} tone={marketOpen ? 'up' : 'accent'} />
         <Metric label="Prediction Confidence" value={`${confidence.toFixed(1)}%`} sub="Ensemble consensus" tone="accent" />
         <Metric label="Model Ensemble" value="ACTIVE" sub="Multi-agent voting" tone="up" />
-        <Metric label="Truth Score" value={`${truthScore.toFixed(0)}%`} sub="Data integrity" tone="up" />
+        <Metric label="Truth Score" value={`${truthScore == null ? 'N/A' : truthScore.toFixed(0)}%`} sub="Data integrity" tone="up" />
         <Metric label="Drift Detection" value={drift.toFixed(3)} sub="PSI stable (<0.10)" tone="up" />
         <Metric label="Anomaly State" value="NORMAL" sub="Zero pattern faults" tone="up" />
         <Metric label="Retraining" value="STANDBY" sub="Model converged" tone="accent" />
@@ -271,8 +271,8 @@ export function GenesisTab() {
         <Panel title="Model Performance / Quality" icon={<Brain size={16} />}>
           <div className="grid grid-cols-2 gap-2 mb-3">
             <Metric label="Profit Factor" value={profitFactor.toFixed(2)} sub="Gross profit/loss" tone="up" />
-            <Metric label="Max Drawdown" value={`${Math.abs(drawdown).toFixed(2)}%`} sub="Risk envelope" tone="up" />
-            <Metric label="Truth Score" value={`${truthScore.toFixed(0)}%`} sub="Data quality" tone="up" />
+            <Metric label="Max Drawdown" value={`${Math.abs(drawdown ?? 0).toFixed(2)}%`} sub="Risk envelope" tone="up" />
+            <Metric label="Truth Score" value={`${truthScore == null ? 'N/A' : truthScore.toFixed(0)}%`} sub="Data quality" tone="up" />
             <Metric label="Memory Events" value="1,420" sub="Vector knowledge" tone="accent" />
           </div>
           <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800">

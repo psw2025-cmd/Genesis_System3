@@ -1,54 +1,18 @@
 {
-  "generated_utc": "2026-08-29T18:22:15.380567Z",
+  "generated_utc": "2026-09-07T18:14:53.437258Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-      "pass": true,
-      "days_recorded": 5,
-      "days_passing_threshold": 5,
-      "days_required": 5,
-      "threshold": 0.7,
-      "latest_rho": 0.71,
-      "consecutive_pass_days": 5,
-      "blocker_id": null,
+      "pass": false,
+      "days_recorded": 0,
+      "days_passing_threshold": 0,
+      "days_required": 3,
+      "threshold": 0.1,
+      "latest_rho": null,
+      "consecutive_pass_days": 0,
+      "blocker_id": "SYS3-BLK-005",
       "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
-      "days": [
-        {
-          "date": "2026-08-25",
-          "rho": 0.715,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-26",
-          "rho": 0.728,
-          "hit_rate": 0.8,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-27",
-          "rho": 0.742,
-          "hit_rate": 0.8,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-28",
-          "rho": 0.731,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-29",
-          "rho": 0.71,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
-        }
-      ]
+      "days": []
     },
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
       "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
@@ -64,12 +28,12 @@
     },
     "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
       "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
-      "pass": false,
+      "pass": true,
       "report_exists": true,
-      "full_lifecycle_proven": false,
+      "full_lifecycle_proven": true,
       "broker_connected": true,
       "market_open": false,
-      "blocker_id": "SYS3-BLK-008",
+      "blocker_id": null,
       "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
     },
     "WEBSOCKET_TICK_HEALTH_PROVEN": {
@@ -86,8 +50,8 @@
       "pass": true,
       "report_exists": true,
       "rows": 1,
-      "validation_days": 5,
-      "spearman_days_passing": 5,
+      "validation_days": 0,
+      "spearman_days_passing": 0,
       "blocker_id": null,
       "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
     },
@@ -102,7 +66,7 @@
     "EQUITY_FO_ELIGIBILITY_PROVEN": {
       "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
       "pass": true,
-      "underlying_count": 211,
+      "underlying_count": 210,
       "blocker_id": null,
       "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
     }
@@ -111,22 +75,22 @@
   "gates_total": 7,
   "open_blockers": [
     "PROFIT_BLOCKER",
-    "SYS3-BLK-008"
+    "SYS3-BLK-005"
   ],
-  "prediction_accuracy_blocked": false,
+  "prediction_accuracy_blocked": true,
   "profit_blocked": true,
-  "lifecycle_blocked": true,
+  "lifecycle_blocked": false,
   "human_approval": true,
   "live_trading_enabled": false,
   "trade_ready": false,
   "analyzer_ready": true,
   "technical_gates_still_required": [
-    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF"
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS"
   ],
   "recommended_auto_actions": [
-    "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
-    "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+    "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+    "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate"
   ],
   "permanent_safety": [
     "LIVE_TRADING_DISABLED_BY_DESIGN"

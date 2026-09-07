@@ -3,62 +3,1170 @@
     {
       "artifacts": [
         {
-          "created_at": "2026-08-24T02:07:45Z",
+          "created_at": "2026-09-05T17:28:49Z",
           "expired": false,
-          "expires_at": "2026-11-22T02:05:49Z",
-          "id": 9504418631,
-          "name": "full-cloud-audit-101-1",
-          "size_in_bytes": 9457
+          "expires_at": "2026-10-05T17:28:49Z",
+          "id": 9973762988,
+          "name": "system3-preflight-after-33980930804-33981078876",
+          "size_in_bytes": 94137
         }
       ],
       "conclusion": "failure",
-      "created_at": "2026-08-24T02:05:49Z",
-      "event": "push",
+      "created_at": "2026-09-05T17:28:40Z",
+      "event": "workflow_run",
       "failed_jobs": [
         {
-          "completed_at": "2026-08-24T02:07:48Z",
+          "completed_at": "2026-09-05T17:28:51Z",
           "conclusion": "failure",
           "failed_steps": [
             {
               "conclusion": "failure",
-              "name": "Enforce unified audit verdict",
-              "number": 15,
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
               "status": "completed"
             }
           ],
-          "id": 97299916279,
-          "name": "Read-only cloud forensic audit",
-          "started_at": "2026-08-24T02:05:51Z"
+          "id": 101346286332,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:28:43Z"
         }
       ],
       "head_branch": "main",
-      "head_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32681901957",
-      "id": 32681901957,
-      "name": "Full Cloud Audit and Forensic Consensus",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981078876",
+      "id": 33981078876,
+      "name": "Workflow Priority Guard",
       "relevant_failure": true,
-      "run_number": 101,
+      "run_number": 6201,
       "status": "completed",
-      "updated_at": "2026-08-24T02:07:49Z",
-      "workflow_id": 334496461
+      "updated_at": "2026-09-05T17:28:52Z",
+      "workflow_id": 328782436
     },
     {
       "artifacts": [
         {
-          "created_at": "2026-08-24T02:06:33Z",
+          "created_at": "2026-09-05T17:28:01Z",
           "expired": false,
-          "expires_at": "2026-09-23T02:06:32Z",
-          "id": 9504399731,
-          "name": "frontend-ui-proof-513",
-          "size_in_bytes": 4423010
+          "expires_at": "2026-10-05T17:28:01Z",
+          "id": 9973751814,
+          "name": "system3-preflight-after-33980927135-33981036762",
+          "size_in_bytes": 94137
         }
       ],
       "conclusion": "failure",
-      "created_at": "2026-08-24T02:05:49Z",
+      "created_at": "2026-09-05T17:27:51Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:28:05Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346177546,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:53Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981036762",
+      "id": 33981036762,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6200,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:28:06Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:54Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:53Z",
+          "id": 9973750043,
+          "name": "system3-preflight-after-33980930814-33981031216",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:44Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:55Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346163115,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:47Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981031216",
+      "id": 33981031216,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6199,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:56Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:54Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:53Z",
+          "id": 9973749975,
+          "name": "system3-preflight-after-33980928868-33981029392",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:42Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:57Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346158561,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:45Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981029392",
+      "id": 33981029392,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6198,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:58Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:34Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:34Z",
+          "id": 9973745550,
+          "name": "system3-preflight-after-33980930875-33981015322",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:26Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:37Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346122166,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:28Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981015322",
+      "id": 33981015322,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6197,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:31Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:31Z",
+          "id": 9973744816,
+          "name": "system3-preflight-after-33980927168-33981010821",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:21Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:33Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346110418,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:23Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981010821",
+      "id": 33981010821,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6196,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:34Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:29Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:28Z",
+          "id": 9973744242,
+          "name": "system3-preflight-after-33980927147-33981009894",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:20Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:32Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346107406,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:22Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33981009894",
+      "id": 33981009894,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6195,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:32Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:16Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:15Z",
+          "id": 9973741358,
+          "name": "system3-preflight-after-33980928867-33980998544",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:05Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:19Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346075339,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:08Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980998544",
+      "id": 33980998544,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6194,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:20Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:14Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:13Z",
+          "id": 9973740947,
+          "name": "system3-preflight-after-33980930823-33980995625",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:27:02Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:17Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346067261,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:27:05Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980995625",
+      "id": 33980995625,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6193,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:17Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:06Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:05Z",
+          "id": 9973739152,
+          "name": "system3-preflight-after-33980928817-33980990788",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:56Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:09Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346053325,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:58Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980990788",
+      "id": 33980990788,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6192,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:10Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:27:05Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:27:05Z",
+          "id": 9973738950,
+          "name": "system3-preflight-after-33980928845-33980990445",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:55Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:27:07Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346052278,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:58Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980990445",
+      "id": 33980990445,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6191,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:27:08Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:26:49Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:26:49Z",
+          "id": 9973735261,
+          "name": "system3-preflight-after-33980927195-33980976857",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:40Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:26:51Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101346016340,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:42Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980976857",
+      "id": 33980976857,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6190,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:26:52Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:26:45Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:26:44Z",
+          "id": 9973734273,
+          "name": "system3-preflight-after-33980930818-33980962156",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:22Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:26:46Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345976628,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:38Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980962156",
+      "id": 33980962156,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6189,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:26:47Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:26:44Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:26:43Z",
+          "id": 9973734055,
+          "name": "system3-preflight-after-33980928818-33980948471",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:06Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:26:45Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345938959,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:38Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980948471",
+      "id": 33980948471,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6188,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:26:46Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:26:30Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:26:30Z",
+          "id": 9973730935,
+          "name": "system3-preflight-after-33980927088-33980947838",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:26:05Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:26:32Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345937274,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:22Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980947838",
+      "id": 33980947838,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6187,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:26:33Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:26:14Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:26:13Z",
+          "id": 9973727068,
+          "name": "system3-preflight-after-33980820743-33980937989",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:25:54Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:26:17Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345911740,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:26:05Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980937989",
+      "id": 33980937989,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6186,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:26:17Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:25:19Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:25:18Z",
+          "id": 9973713560,
+          "name": "system3-preflight-after-33980750392-33980898914",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:25:08Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:25:22Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345806409,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:25:11Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980898914",
+      "id": 33980898914,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6182,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:25:22Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:58Z",
+      "event": "dynamic",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:25:29Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Run Dependabot",
+              "number": 3,
+              "status": "completed"
+            }
+          ],
+          "id": 101345784011,
+          "name": "Dependabot",
+          "started_at": "2026-09-05T17:25:02Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980890389",
+      "id": 33980890389,
+      "name": "github_actions in / for SonarSource/sonarqube-scan-action - Update #1558765099",
+      "relevant_failure": true,
+      "run_number": 112,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:25:29Z",
+      "workflow_id": 334480445
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:25:13Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:25:12Z",
+          "id": 9973712058,
+          "name": "system3-preflight-after-33980820761-33980889434",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:57Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:25:14Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345779415,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:24:59Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980889434",
+      "id": 33980889434,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6181,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:25:15Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:56Z",
+      "event": "dynamic",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:25:32Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Run Dependabot",
+              "number": 3,
+              "status": "completed"
+            }
+          ],
+          "id": 101345779887,
+          "name": "Dependabot",
+          "started_at": "2026-09-05T17:25:00Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980889075",
+      "id": 33980889075,
+      "name": "github_actions in / for actions/setup-node - Update #1558765072",
+      "relevant_failure": true,
+      "run_number": 110,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:25:33Z",
+      "workflow_id": 334480445
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:24:54Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:24:53Z",
+          "id": 9973707736,
+          "name": "system3-preflight-after-33980820833-33980878963",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:43Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:24:58Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345748543,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:24:46Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980878963",
+      "id": 33980878963,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6180,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:24:59Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:24:49Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:24:48Z",
+          "id": 9973706562,
+          "name": "github-event-forensics-6179-1",
+          "size_in_bytes": 907
+        },
+        {
+          "created_at": "2026-09-05T17:24:48Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:24:48Z",
+          "id": 9973706316,
+          "name": "system3-preflight-after-33980820729-33980875280",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:39Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:24:50Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345737630,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:24:41Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980875280",
+      "id": 33980875280,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6179,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:24:52Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:24:12Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:24:11Z",
+          "id": 9973697636,
+          "name": "system3-preflight-after-33980820707-33980843561",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:24:03Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:24:14Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345651743,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:24:05Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980843561",
+      "id": 33980843561,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6178,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:24:15Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821662",
+      "id": 33980821662,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6177,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821633",
+      "id": 33980821633,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6176,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821484",
+      "id": 33980821484,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6175,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821429",
+      "id": 33980821429,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6174,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821426",
+      "id": 33980821426,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6173,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [],
+      "conclusion": "action_required",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821331",
+      "id": 33980821331,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6172,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:37Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:23:46Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:23:45Z",
+          "id": 9973691229,
+          "name": "system3-preflight-after-33980750391-33980821087",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:23:37Z",
+      "event": "workflow_run",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:23:47Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Refresh current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345592161,
+          "name": "FORENSIC - refresh canonical workflow issue artifact snapshot",
+          "started_at": "2026-09-05T17:23:39Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980821087",
+      "id": 33980821087,
+      "name": "Workflow Priority Guard",
+      "relevant_failure": true,
+      "run_number": 6171,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:48Z",
+      "workflow_id": 328782436
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:23:47Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:23:46Z",
+          "id": 9973691433,
+          "name": "system3-preflight-control-plane-33980820702",
+          "size_in_bytes": 94137
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:23:36Z",
       "event": "push",
       "failed_jobs": [
         {
-          "completed_at": "2026-08-24T02:06:36Z",
+          "completed_at": "2026-09-05T17:23:49Z",
+          "conclusion": "failure",
+          "failed_steps": [
+            {
+              "conclusion": "failure",
+              "name": "Build current workflow issue artifact snapshot",
+              "number": 4,
+              "status": "completed"
+            }
+          ],
+          "id": 101345590931,
+          "name": "snapshot",
+          "started_at": "2026-09-05T17:23:39Z"
+        }
+      ],
+      "head_branch": "main",
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980820702",
+      "id": 33980820702,
+      "name": "System3 Preflight Control Plane",
+      "relevant_failure": true,
+      "run_number": 172,
+      "status": "completed",
+      "updated_at": "2026-09-05T17:23:50Z",
+      "workflow_id": 335884256
+    },
+    {
+      "artifacts": [
+        {
+          "created_at": "2026-09-05T17:24:34Z",
+          "expired": false,
+          "expires_at": "2026-09-19T17:24:33Z",
+          "id": 9973702807,
+          "name": "live-production-ui-proof-883",
+          "size_in_bytes": 13530651
+        },
+        {
+          "created_at": "2026-09-05T17:24:32Z",
+          "expired": false,
+          "expires_at": "2026-10-05T17:24:31Z",
+          "id": 9973702349,
+          "name": "frontend-ui-proof-883",
+          "size_in_bytes": 3936267
+        }
+      ],
+      "conclusion": "failure",
+      "created_at": "2026-09-05T17:23:36Z",
+      "event": "push",
+      "failed_jobs": [
+        {
+          "completed_at": "2026-09-05T17:24:36Z",
           "conclusion": "failure",
           "failed_steps": [
             {
@@ -66,33 +1174,183 @@
               "name": "Capture exact-SHA request-scoped read-only live production UI lifecycle proof",
               "number": 11,
               "status": "completed"
-            },
-            {
-              "conclusion": "failure",
-              "name": "Upload live production UI lifecycle proof",
-              "number": 12,
-              "status": "completed"
             }
           ],
-          "id": 97299916163,
+          "id": 101345591467,
           "name": "BLOCKING - frontend browser runtime smoke",
-          "started_at": "2026-08-24T02:05:51Z"
+          "started_at": "2026-09-05T17:23:39Z"
         }
       ],
       "head_branch": "main",
-      "head_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32681901932",
-      "id": 32681901932,
+      "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980820729",
+      "id": 33980820729,
       "name": "Frontend Browser Runtime Smoke",
       "relevant_failure": true,
-      "run_number": 513,
+      "run_number": 883,
       "status": "completed",
-      "updated_at": "2026-08-24T02:06:37Z",
+      "updated_at": "2026-09-05T17:24:37Z",
       "workflow_id": 333489393
     }
   ],
   "active_pr_max_age_h": 72.0,
-  "captured_at_utc": "2026-08-24T06:56:56.812224+00:00",
+  "agent_evidence_catalog": {
+    "catalog_path": "config/system3_agent_evidence_catalog.v1.json",
+    "catalog_sha256": "2672503bc6f31c10da33bebe14be72ed2d83a91a177a4026427712cca5caebb4",
+    "entries": [
+      {
+        "id": "authority",
+        "path": "AGENTS.md",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "runbook",
+        "path": "docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "policy",
+        "path": "agent_policy.yaml",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "policy_schema",
+        "path": "schemas/agent_policy.v4.schema.json",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "github_control_plane",
+        "path": "scripts/system3_preflight_control_plane.py",
+        "requirement": "required",
+        "runner": "python scripts/system3_preflight_control_plane.py",
+        "status": "PRESENT"
+      },
+      {
+        "id": "temporal_truth_guard",
+        "path": "scripts/system3_temporal_truth_guard.py",
+        "requirement": "required",
+        "runner": "python scripts/system3_temporal_truth_guard.py --help",
+        "status": "PRESENT"
+      },
+      {
+        "id": "production_ui_proof",
+        "path": "scripts/gcp_live_ui_snapshot.py",
+        "requirement": "required",
+        "runner": "python scripts/gcp_live_ui_snapshot.py --help",
+        "status": "MISSING_REQUIRED"
+      },
+      {
+        "id": "continuous_closure",
+        "path": "scripts/system3_continuous_closure_orchestrator.py",
+        "requirement": "required",
+        "runner": "python scripts/system3_continuous_closure_orchestrator.py --offline",
+        "status": "PRESENT"
+      },
+      {
+        "id": "proof_ledger",
+        "path": "scripts/system3_proof_ledger.py",
+        "requirement": "required",
+        "runner": "python scripts/system3_proof_ledger.py --verify-only",
+        "status": "PRESENT"
+      },
+      {
+        "id": "issue_ledger",
+        "path": "audit/live_agent_issue_ledger/SYSTEM3_LIVE_UNRESOLVED_ISSUES.csv",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "prediction_benchmark",
+        "path": "docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "runtime_data_map",
+        "path": "docs/runtime/AUTHORITATIVE_RUNTIME_AND_DATA_MAP.md",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "external_ssot_proposal_decision",
+        "path": "docs/control_plane/SYSTEM3_EXTERNAL_SSOT_PROPOSAL_DECISION.md",
+        "requirement": "required",
+        "runner": null,
+        "status": "PRESENT"
+      },
+      {
+        "id": "drive_archive",
+        "path": "scripts/system3_drive_archive_control.py",
+        "requirement": "conditional",
+        "runner": "python scripts/system3_drive_archive_control.py --help",
+        "status": "PRESENT"
+      },
+      {
+        "id": "repo_cleanup",
+        "path": "scripts/system3_repo_clean_forensic_toolkit.py",
+        "requirement": "conditional",
+        "runner": "python scripts/system3_repo_clean_forensic_toolkit.py --help",
+        "status": "PRESENT"
+      },
+      {
+        "activation": "Only when a governed BigQuery audit dataset is discovered and authorized.",
+        "id": "bigquery_audit",
+        "path": null,
+        "requirement": "conditional",
+        "runner": null,
+        "status": "UNVERIFIED_CONDITIONAL"
+      },
+      {
+        "activation": "Only when a governed versioned/retained Cloud Storage target is discovered and authorized.",
+        "id": "immutable_gcs_audit",
+        "path": null,
+        "requirement": "conditional",
+        "runner": null,
+        "status": "UNVERIFIED_CONDITIONAL"
+      },
+      {
+        "activation": "Only when current architecture and benchmark evidence select Vertex AI; never assumed mandatory.",
+        "id": "vertex_training",
+        "path": null,
+        "requirement": "conditional",
+        "runner": null,
+        "status": "UNVERIFIED_CONDITIONAL"
+      },
+      {
+        "activation": "Only when current workload evidence requires Dataflow; absence is not automatically a defect.",
+        "id": "dataflow_pipeline",
+        "path": null,
+        "requirement": "conditional",
+        "runner": null,
+        "status": "UNVERIFIED_CONDITIONAL"
+      },
+      {
+        "activation": "Only if a governed Kubernetes environment exists; Cloud Run does not require Chaos Mesh.",
+        "id": "kubernetes_chaos",
+        "path": null,
+        "requirement": "conditional",
+        "runner": null,
+        "status": "UNVERIFIED_CONDITIONAL"
+      }
+    ],
+    "missing_required": [
+      "production_ui_proof"
+    ],
+    "role": "discovery_index_not_live_truth",
+    "schema": "SYSTEM3_AGENT_EVIDENCE_CATALOG_V1"
+  },
+  "captured_at_utc": "2026-09-06T08:00:16.074839+00:00",
   "coordination_markers": {
     "SYSTEM3_AUTONOMOUS_COORDINATION_V1": {
       "comment_id": 5308486517,
@@ -102,11 +1360,11 @@
       "updated_at": "2026-08-16T16:37:31Z"
     },
     "SYSTEM3_COORDINATION_V1": {
-      "comment_id": 5390665961,
-      "created_at": "2026-08-24T04:18:18Z",
-      "excerpt": "SYSTEM3_COORDINATION_V1\nAGENT=CHATGPT\nMODE=CONTROLLER\nMAIN_SHA=1df24c0b9569cfb2acc4e77343324176f64acb25\nEVIDENCE_TIMESTAMP=2026-08-24T04:18:07Z\nSTATE=WORKING_PROVEN\n\nPREVIOUS_COMMITMENT:\n- Create a durable GitHub handoff so Perplexity can work end-to-end without the user acting as coordination relay.\n\nACTUAL_RESULT:\n- Created dedicated docs-only branch from exact current main.\n- Added `docs/handoffs/PERPLEXITY_INDEPENDENT_FORENSIC_CONTROLLER.md`.\n- Opened DRAFT PR #336, exact head `24ec731ab9f302d9c03638f3642417184f1a5417`, 1 changed file, +475/-0.\n- Perplexity lane is READ_ONLY_FORENSIC. It must refresh main/#188/open PR heads/changed-file ownership every run and may not create competing remediation PRs.\n\nPROOF:\n- PR #336: https://github.com/psw2025-cmd/Genesis_System3/pull/336\n- Handoff path: `docs/handoffs/PERPLEXITY_INDEPENDENT_FORENSIC_CONTROLLER.md`\n- Base: `1df24c0b9569cfb2acc4e77343324176f64acb25`\n- Head: `24ec731ab9f302d9c03638f3642417184f1a5417`\n\nOWNERSHIP:\n- ChatGPT: consoli",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/188#issuecomment-5390665961",
-      "updated_at": "2026-08-24T04:18:18Z"
+      "comment_id": 5498585198,
+      "created_at": "2026-09-01T18:33:54Z",
+      "excerpt": "SYSTEM3_COORDINATION_V1 \u2014 CURRENT-MAIN AUTHORITY + ACTIVE WRITE-LANE CONFLICT HOLD\n\nPREVIOUS_TARGET -> preserve exact-current-main CLOUD-ONLY/GCP authority, one write lane per surface, and require fresh exact-serving GCP API/UI proof before acceptance.\n\nACTUAL_RESULT -> GitHub main remains `e411fb57d576f9e68ab4752e87209859b6f9e11e`. Exact-main `AGENTS.md`, `SYSTEM3_AGENT_RUNBOOK.md`, `USER_ACTION_AUTONOMY_SPEED_POLICY.md`, and `agent_policy.yaml` still define the multi-agent GCP/Cloud Run authority; `agent_policy.yaml` remains v4. PR #448's Claude-only/v5 authority is open, unmerged, and cannot replace current-main governance. It also overlaps PR #444 on `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md`.\n\nFresh changed-file ownership detects three additional collisions:\n1. PR #444 and PR #445 both edit `AutonomousLoopBanner.tsx`, `DeploymentTruthFooter.tsx`, `TruthStrip.tsx`, and built frontend assets.\n2. PR #436 and PR #447 both edit `config/local_scheduler_registry.yaml`.\n3. PR #428 and ",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/188#issuecomment-5498585198",
+      "updated_at": "2026-09-01T18:33:54Z"
     },
     "SYSTEM3_URL_SINGLE_TRUTH_V1": {
       "comment_id": 5354912387,
@@ -116,163 +1374,358 @@
       "updated_at": "2026-08-20T10:54:03Z"
     }
   },
-  "current_relevant_pr_count": 14,
+  "current_relevant_pr_count": 6,
   "current_step": "current workflow failure investigation",
   "issue_188": {
     "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/188",
     "number": 188,
     "state": "open",
     "title": "P0: Broker-data/UI parity \u2014 indices, equities, full option chains, live charts",
-    "updated_at": "2026-08-24T04:21:26Z"
+    "updated_at": "2026-09-06T02:49:40Z"
   },
-  "main_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
+  "main_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
   "next_action": "inspect failed job/step/log/artifact and remediate before proceeding",
   "open_pull_requests": [
     {
-      "age_hours": 0.02,
-      "base_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
+      "age_hours": 11.66,
+      "base_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
       "current_relevance": true,
       "draft": false,
-      "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/337",
+      "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/463",
       "mergeable": true,
       "mergeable_state": "clean",
-      "number": 337,
-      "title": "docs(control-plane): harden autonomous runbook governance",
-      "updated_at": "2026-08-24T06:54:18Z"
+      "number": 463,
+      "title": "fix(gates): calibrate Spearman rho threshold to 0.10 and 3 days (resolves SYS3-BLK-005)",
+      "updated_at": "2026-09-05T20:18:24Z"
     },
     {
-      "age_hours": 2.62,
-      "base_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
+      "age_hours": 74.25,
+      "base_sha": "029f9b0ede0ad201e86b6f47be006465e6d1e4ac",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "ec950efb5655b59fc2b8b0195c24b43442ad7a97",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/458",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 458,
+      "title": "fix(dhan): stop invalidating cached client on every call; add local ops/audit scripts",
+      "updated_at": "2026-09-03T05:42:42Z"
+    },
+    {
+      "age_hours": 91.28,
+      "base_sha": "029f9b0ede0ad201e86b6f47be006465e6d1e4ac",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "e731db01d55153b38c1769d94000577924fb4c35",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/457",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 457,
+      "title": "docs: add architecture blueprint registry and blueprint-first agent rule",
+      "updated_at": "2026-09-02T12:40:54Z"
+    },
+    {
+      "age_hours": 95.96,
+      "base_sha": "029f9b0ede0ad201e86b6f47be006465e6d1e4ac",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "444d8e22d18263e7b31dfab716f4c31a1c2e49a8",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/456",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 456,
+      "title": "docs: local UI Lighthouse performance MRI",
+      "updated_at": "2026-09-02T08:00:00Z"
+    },
+    {
+      "age_hours": 97.44,
+      "base_sha": "5b361aece5afd5364edaf77da3007dcb4486a286",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "8b34e04fed2089ce11ebbc71fe90cc7cb6d9a411",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/453",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 453,
+      "title": "docs(control-plane): local runtime lifecycle, 24h evidence, recovery and no-GCP operations",
+      "updated_at": "2026-09-02T06:31:38Z"
+    },
+    {
+      "age_hours": 111.64,
+      "base_sha": "e411fb57d576f9e68ab4752e87209859b6f9e11e",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "b7e963baed8cb996a0d404e061a483370228f8f4",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/447",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 447,
+      "title": "feat(local-scheduler): full audit + plan + local Dhan token rotation (A-LOCAL-1/A-LOCAL-3)",
+      "updated_at": "2026-09-01T16:19:39Z"
+    },
+    {
+      "age_hours": 112.27,
+      "base_sha": "e411fb57d576f9e68ab4752e87209859b6f9e11e",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "5f9e2c0c97e2dde679a47fc17a31c4d14b2a0110",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/444",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 444,
+      "title": "fix(ui): fail closed on laptop dashboard truth and interrupted proof",
+      "updated_at": "2026-09-01T15:41:28Z"
+    },
+    {
+      "age_hours": 113.73,
+      "base_sha": "b7977596900d5df4e0b3e76cf757c79d1851da65",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "adcc53b3c04e5a241e26212d4fc422de7c6cd833",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/436",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 436,
+      "title": "docs: billing emergency and laptop-first PAPER runtime SSOT",
+      "updated_at": "2026-09-01T14:14:01Z"
+    },
+    {
+      "age_hours": 136.26,
+      "base_sha": "b7977596900d5df4e0b3e76cf757c79d1851da65",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "34db35b98cebefb7becc9c8753c39888b979150b",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/435",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 435,
+      "title": "fix(paper): remove synthetic root PnL from production truth",
+      "updated_at": "2026-08-31T15:42:21Z"
+    },
+    {
+      "age_hours": 14.54,
+      "base_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
       "current_relevance": true,
-      "draft": true,
+      "draft": false,
+      "head_sha": "90626e3480fd761438d4e1c865f17bf69705ccea",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/432",
+      "mergeable": true,
+      "mergeable_state": "clean",
+      "number": 432,
+      "title": "chore(deps): bump actions/checkout from 4 to 7",
+      "updated_at": "2026-09-05T17:25:37Z"
+    },
+    {
+      "age_hours": 106.19,
+      "base_sha": "5853491e327bf72db596d1a49cc44c0529dba7ef",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "dbf73d6ae96544052d2a4e15c966130a62325f3a",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/431",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 431,
+      "title": "chore(deps): bump lucide-react from 0.294.0 to 1.37.0 in /dashboard/frontend",
+      "updated_at": "2026-09-01T21:46:22Z"
+    },
+    {
+      "age_hours": 106.19,
+      "base_sha": "5853491e327bf72db596d1a49cc44c0529dba7ef",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "19242ce25179d70f29657598c795a4a0f2b4c7d9",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/430",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 430,
+      "title": "chore(deps): bump @radix-ui/react-tooltip from 1.2.10 to 1.2.16 in /dashboard/frontend",
+      "updated_at": "2026-09-01T21:46:17Z"
+    },
+    {
+      "age_hours": 152.34,
+      "base_sha": "13b4446902d24a21013f3517aaf006172bdebaec",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "70545f9cd776c25dde7682abe495bc3d5e4d817e",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/428",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 428,
+      "title": "feat(paper): enable fail-closed automated PAPER engine on Cloud Run",
+      "updated_at": "2026-08-30T23:37:20Z"
+    },
+    {
+      "age_hours": 173.54,
+      "base_sha": "5077c8319fa6249f283d7c3ecfd20dbab94420d1",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "a65e7a19c31fa29318cfa1657b41c36b434ed2d4",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/408",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 408,
+      "title": "feat(chronos): add multi-horizon AI fusion engine, validator_spec, mri_policy and chaos_catalog",
+      "updated_at": "2026-08-30T02:25:37Z"
+    },
+    {
+      "age_hours": 181.3,
+      "base_sha": "763dd4b331f298afd3ee472f93dd1ae0b01b20e5",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "b1e63716ad853368f87b7101a5af8bec9f874756",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/401",
+      "mergeable": true,
+      "mergeable_state": "behind",
+      "number": 401,
+      "title": "chore: add deep live MRI forensic collector and runbook",
+      "updated_at": "2026-08-29T18:40:03Z"
+    },
+    {
+      "age_hours": 252.53,
+      "base_sha": "e5272c42788e3abd8bbae9100eacab547bca12fd",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "04a6ec92ebc9f78cdcdf59b79e98bb0a84e59c50",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/353",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 353,
+      "title": "docs(ruhi): publish user recommendation reference pack",
+      "updated_at": "2026-08-26T19:26:10Z"
+    },
+    {
+      "age_hours": 304.6,
+      "base_sha": "e5272c42788e3abd8bbae9100eacab547bca12fd",
+      "current_relevance": false,
+      "draft": false,
+      "head_sha": "120de9c86c1330d05a392e442e4c260ac03e79bc",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/348",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 348,
+      "title": "feat(control-plane): add GitHub closure monitor ledger",
+      "updated_at": "2026-08-24T15:21:54Z"
+    },
+    {
+      "age_hours": 281.93,
+      "base_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
+      "current_relevance": false,
+      "draft": false,
       "head_sha": "24ec731ab9f302d9c03638f3642417184f1a5417",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/336",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 336,
       "title": "docs(coordination): add Perplexity independent forensic controller handoff",
-      "updated_at": "2026-08-24T04:18:07Z"
+      "updated_at": "2026-08-25T14:02:02Z"
     },
     {
-      "age_hours": 6.31,
+      "age_hours": 307.91,
       "base_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": true,
       "head_sha": "7e91b72157e34d52738b1b15c8552d362cfa219e",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/335",
-      "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable": false,
+      "mergeable_state": "dirty",
       "number": 335,
       "title": "test(ui): preserve one hydrated document across semantic tab proof",
-      "updated_at": "2026-08-24T00:36:41Z"
+      "updated_at": "2026-08-24T12:03:23Z"
     },
     {
-      "age_hours": 6.3,
-      "base_sha": "e6da6b469b2a10d7641ac17390d98b62b30340f9",
-      "current_relevance": true,
-      "draft": false,
-      "head_sha": "479f2029421a5fbc044cdca35f7a3aa09843658d",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/330",
-      "mergeable": true,
-      "mergeable_state": "clean",
-      "number": 330,
-      "title": "fix(deploy): retire Render.com; GCP Cloud Run is the only production host",
-      "updated_at": "2026-08-24T00:37:43Z"
-    },
-    {
-      "age_hours": 43.22,
+      "age_hours": 356.26,
       "base_sha": "e4a49dbc180721d879fdc7f3fbab346609c774d6",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": true,
       "head_sha": "92c29464e4f6e9ea5f6e636e514a858879051eaa",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/324",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 324,
       "title": "docs(catalyst): add Catalyst Early Warning Intelligence implementation authority",
       "updated_at": "2026-08-22T11:42:27Z"
     },
     {
-      "age_hours": 43.89,
+      "age_hours": 356.93,
       "base_sha": "e4a49dbc180721d879fdc7f3fbab346609c774d6",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": true,
       "head_sha": "0cb4812f46e073ff53f9f67638a3a777d9ca5434",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/323",
-      "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable": false,
+      "mergeable_state": "dirty",
       "number": 323,
       "title": "docs(ruhi): lock Cursor permanent UI-closure rule",
       "updated_at": "2026-08-22T11:01:51Z"
     },
     {
-      "age_hours": 41.34,
+      "age_hours": 354.38,
       "base_sha": "d3119d669b7bcb871c8dc7b94eabcc44363f8e65",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": true,
       "head_sha": "43e6a478adb5520c4821a033a689ebba8013cf17",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/317",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 317,
       "title": "docs(cursor): enforce multi-agent coordination and proof contract",
       "updated_at": "2026-08-22T13:34:51Z"
     },
     {
-      "age_hours": 54.01,
+      "age_hours": 367.05,
       "base_sha": "e95e3cbd9de937a816245a11508a1beabd9577ab",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": false,
       "head_sha": "e32cab1594c944f873f1fb63b92b8037c82886cb",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/315",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 315,
       "title": "docs: add permanent central multi-agent coordination ledger",
       "updated_at": "2026-08-22T00:54:38Z"
     },
     {
-      "age_hours": 54.83,
+      "age_hours": 367.87,
       "base_sha": "e95e3cbd9de937a816245a11508a1beabd9577ab",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": false,
       "head_sha": "88a327126aacba5f8e223215cf37c41ee7b2cb98",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/314",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 314,
       "title": "chore(env): Cloud Agent dev environment setup for the System3 dashboard",
       "updated_at": "2026-08-22T00:05:51Z"
     },
     {
-      "age_hours": 70.12,
+      "age_hours": 383.16,
       "base_sha": "94d791f709afe2d801d0013da1db3fc871d5f12f",
-      "current_relevance": true,
+      "current_relevance": false,
       "draft": false,
       "head_sha": "9aff2f0135a5ed01758e782981909103105ecc8f",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/304",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 304,
       "title": "docs: add Codex CLI RUHI execution guide",
       "updated_at": "2026-08-21T08:48:27Z"
     },
     {
-      "age_hours": 128.72,
+      "age_hours": 441.76,
       "base_sha": "4ff3d1ad93816ad246cc10f9b29b5936a5e3acbb",
       "current_relevance": false,
       "draft": false,
       "head_sha": "8d1beeb4205b186729f6be2310ed6a5785a3e5be",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/291",
-      "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable": false,
+      "mergeable_state": "dirty",
       "number": 291,
       "title": "feat(cleanup): exact-digest GitHub Actions storage evidence",
       "updated_at": "2026-08-18T22:11:58Z"
     },
     {
-      "age_hours": 122.46,
+      "age_hours": 435.5,
       "base_sha": "a285288f099b153359cbfdd2eaf8adb1b058c9e8",
       "current_relevance": false,
       "draft": true,
@@ -285,7 +1738,7 @@
       "updated_at": "2026-08-19T04:28:05Z"
     },
     {
-      "age_hours": 145.91,
+      "age_hours": 458.95,
       "base_sha": "cabc8eb1217464a0871e06b1a209adbfe6eae032",
       "current_relevance": false,
       "draft": false,
@@ -298,306 +1751,267 @@
       "updated_at": "2026-08-18T05:01:01Z"
     },
     {
-      "age_hours": 47.47,
-      "base_sha": "30676b5a9068515d21f67f6a385993a945fbe890",
+      "age_hours": 14.54,
+      "base_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
       "current_relevance": true,
       "draft": false,
-      "head_sha": "55b34aa178ba33fe059985c0b3f2537fc56ed8b7",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/262",
-      "mergeable": true,
-      "mergeable_state": "clean",
-      "number": 262,
-      "title": "chore(deps): bump actions/checkout from 4 to 7",
-      "updated_at": "2026-08-22T07:27:15Z"
-    },
-    {
-      "age_hours": 21.95,
-      "base_sha": "d7b1de91ac772bd2bc29f9520c398bec20ab6c15",
-      "current_relevance": true,
-      "draft": false,
-      "head_sha": "8076dd03acb81b03d2fc9a038cb27192122e48e8",
+      "head_sha": "0c07c41defd39bd7230a7e593cce49265b91726c",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/261",
       "mergeable": true,
       "mergeable_state": "clean",
       "number": 261,
       "title": "chore(deps): bump actions/upload-artifact from 4 to 7",
-      "updated_at": "2026-08-23T08:58:43Z"
+      "updated_at": "2026-09-05T17:25:41Z"
     },
     {
-      "age_hours": 177.86,
-      "base_sha": "f51b70d36979f175954415dcd737384b8ba00aae",
-      "current_relevance": false,
-      "draft": false,
-      "head_sha": "8cac85a16fc92767473171e1128642b58aaaf98f",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/260",
-      "mergeable": true,
-      "mergeable_state": "clean",
-      "number": 260,
-      "title": "chore(deps): bump @radix-ui/react-dropdown-menu from 2.1.18 to 2.1.24 in /dashboard/frontend",
-      "updated_at": "2026-08-16T21:04:09Z"
-    },
-    {
-      "age_hours": 190.82,
+      "age_hours": 503.86,
       "base_sha": "41f7a80cf0c31711f4c26d46fdc0e3f26fc6a311",
       "current_relevance": false,
       "draft": false,
       "head_sha": "67696e69f370519c5678e254929fb766051a7040",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/242",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 242,
       "title": "docs(audit): full cloud+UI forensic package 20260816T062501Z",
       "updated_at": "2026-08-16T08:06:09Z"
     },
     {
-      "age_hours": 229.31,
+      "age_hours": 542.35,
       "base_sha": "bcce7fb149eba5860989df56b7c98b50b5ff54be",
       "current_relevance": false,
       "draft": false,
       "head_sha": "bf0641a64068eb8c9951c0d4acb8a2cc58e3bab6",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/217",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 217,
       "title": "security: keep Vite Dependabot updates on compatible remediation major",
       "updated_at": "2026-08-14T17:36:59Z"
     },
     {
-      "age_hours": 229.58,
-      "base_sha": "5a8bd306e5f1ebd539b2d449f750a06ea9c14da6",
+      "age_hours": 239.31,
+      "base_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "bf42ebf5dd12482cd581b505d6cf1ed528a03912",
+      "head_sha": "b0c4ffc73f4a6a17f2f28c29697babcf03232a67",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/215",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 215,
-      "title": "build(deps): update statsmodels requirement from >=0.14.2 to >=0.14.6",
-      "updated_at": "2026-08-14T17:20:41Z"
+      "title": "chore(deps): update statsmodels requirement from >=0.14.2 to >=0.14.6",
+      "updated_at": "2026-08-27T08:39:32Z"
     },
     {
-      "age_hours": 229.58,
-      "base_sha": "5a8bd306e5f1ebd539b2d449f750a06ea9c14da6",
+      "age_hours": 239.3,
+      "base_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "157e2e6b84f8c89db46319a892c969f796bb7231",
+      "head_sha": "5e372ce1390bd96779110ea0beede06e5155ff5e",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/214",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 214,
-      "title": "build(deps): bump pyotp from 2.9.0 to 2.10.0",
-      "updated_at": "2026-08-14T17:20:37Z"
+      "title": "chore(deps): bump pyotp from 2.9.0 to 2.10.0",
+      "updated_at": "2026-08-27T08:39:39Z"
     },
     {
-      "age_hours": 229.58,
-      "base_sha": "5a8bd306e5f1ebd539b2d449f750a06ea9c14da6",
+      "age_hours": 239.3,
+      "base_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "dc1fa17d3a712932c63b099ac77f0f211103ab22",
+      "head_sha": "a0c1c50fa7317b6c7dc173bf258351f60618db31",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/213",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 213,
-      "title": "build(deps): bump yamllint from 1.35.1 to 1.38.0",
-      "updated_at": "2026-08-14T17:20:33Z"
+      "title": "chore(deps): bump yamllint from 1.35.1 to 1.38.0",
+      "updated_at": "2026-08-27T08:39:42Z"
     },
     {
-      "age_hours": 229.66,
-      "base_sha": "5a8bd306e5f1ebd539b2d449f750a06ea9c14da6",
+      "age_hours": 239.3,
+      "base_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "28bfdf7d04ac49e8a318496463d76c4277a2cc50",
+      "head_sha": "4a4a93d0d7d751714ac1e0add447f5bb953daed0",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/212",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 212,
-      "title": "build(deps): update jugaad-data requirement from >=0.31.1 to >=0.35.2",
-      "updated_at": "2026-08-14T17:15:44Z"
+      "title": "chore(deps): update jugaad-data requirement from >=0.31.1 to >=0.35.4",
+      "updated_at": "2026-08-27T08:39:41Z"
     },
     {
-      "age_hours": 229.68,
-      "base_sha": "5a8bd306e5f1ebd539b2d449f750a06ea9c14da6",
+      "age_hours": 239.31,
+      "base_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "f2e2982b01641fab2027b5309b4cbf6e4b66c7df",
+      "head_sha": "7500345018da4de5807a861b00ce3e2dde1c3c61",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/211",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 211,
-      "title": "build(deps): update yfinance requirement from >=0.2.38 to >=1.5.2",
-      "updated_at": "2026-08-14T17:14:54Z"
+      "title": "chore(deps): update yfinance requirement from >=0.2.38 to >=1.6.0",
+      "updated_at": "2026-08-27T08:39:31Z"
     },
     {
-      "age_hours": 230.1,
-      "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
-      "current_relevance": false,
-      "draft": false,
-      "head_sha": "c305cfd6cc67fe5ea62f45a9a60bb92fb83e2214",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/209",
-      "mergeable": true,
-      "mergeable_state": "unstable",
-      "number": 209,
-      "title": "build(deps): bump SonarSource/sonarqube-scan-action from 7 to 8",
-      "updated_at": "2026-08-14T16:49:24Z"
-    },
-    {
-      "age_hours": 47.47,
-      "base_sha": "30676b5a9068515d21f67f6a385993a945fbe890",
+      "age_hours": 14.37,
+      "base_sha": "877d7be956e877d0e7af09a9e8e8dc7fe7aa04b5",
       "current_relevance": true,
       "draft": false,
-      "head_sha": "960a5433e3b21f415be0321d68d8028799e05687",
+      "head_sha": "f0f6ef2cb677e1ce3cfa2ac1d64334cf60e3e110",
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/209",
+      "mergeable": false,
+      "mergeable_state": "dirty",
+      "number": 209,
+      "title": "chore(deps): bump SonarSource/sonarqube-scan-action from 7 to 8",
+      "updated_at": "2026-09-05T17:35:29Z"
+    },
+    {
+      "age_hours": 14.54,
+      "base_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+      "current_relevance": true,
+      "draft": false,
+      "head_sha": "243bf87829d6a2beb3b78acf83f822e1bcefc4c3",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/208",
       "mergeable": true,
       "mergeable_state": "clean",
       "number": 208,
       "title": "chore(deps): bump actions/setup-python from 5 to 7",
-      "updated_at": "2026-08-22T07:27:21Z"
+      "updated_at": "2026-09-05T17:25:38Z"
     },
     {
-      "age_hours": 230.1,
+      "age_hours": 543.14,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "8f591f5c5d938863fea503b089abfdbbe078b751",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/207",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 207,
       "title": "build(deps): bump numpy from 2.2.6 to 2.5.2 in /dashboard/backend",
       "updated_at": "2026-08-14T16:49:12Z"
     },
     {
-      "age_hours": 230.11,
+      "age_hours": 543.15,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "db226666472a02212ab5a4fcc866fc18eb5efe21",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/206",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 206,
       "title": "build(deps): bump uvicorn from 0.49.0 to 0.52.1 in /dashboard/backend",
       "updated_at": "2026-08-14T16:49:06Z"
     },
     {
-      "age_hours": 230.11,
+      "age_hours": 543.15,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "0608dacd10fa12600c39781099e603d2550f72c4",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/205",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 205,
       "title": "build(deps): update google-cloud-secret-manager requirement from <3.0.0,>=2.20.0 to >=2.30.0,<3.0.0 in /dashboard/backend",
       "updated_at": "2026-08-14T16:49:01Z"
     },
     {
-      "age_hours": 230.12,
-      "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
+      "age_hours": 106.19,
+      "base_sha": "5853491e327bf72db596d1a49cc44c0529dba7ef",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "f273dd35abf4a455828ec87ccaeb3364bf0483e4",
+      "head_sha": "35abd789ddd20bbbe57e309b80a26fc886157bb4",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/203",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 203,
-      "title": "build(deps): bump recharts from 2.15.4 to 3.10.1 in /dashboard/frontend",
-      "updated_at": "2026-08-14T16:48:32Z"
+      "title": "chore(deps): bump recharts from 2.15.4 to 3.10.1 in /dashboard/frontend",
+      "updated_at": "2026-09-01T21:46:21Z"
     },
     {
-      "age_hours": 230.12,
-      "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
+      "age_hours": 106.19,
+      "base_sha": "5853491e327bf72db596d1a49cc44c0529dba7ef",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "a54ef151168e5f473a97fdfa8fe2daad290faed4",
+      "head_sha": "01984786575c8df92c48ed6b20c7633b637e3fd2",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/202",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 202,
-      "title": "build(deps): bump tailwind-merge from 2.6.1 to 3.6.0 in /dashboard/frontend",
-      "updated_at": "2026-08-14T16:48:24Z"
+      "title": "chore(deps): bump tailwind-merge from 2.6.1 to 3.6.0 in /dashboard/frontend",
+      "updated_at": "2026-09-01T21:46:14Z"
     },
     {
-      "age_hours": 230.12,
-      "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
+      "age_hours": 106.19,
+      "base_sha": "5853491e327bf72db596d1a49cc44c0529dba7ef",
       "current_relevance": false,
       "draft": false,
-      "head_sha": "3ff1ea98525eb34364fb3ae7a26550b773aafc45",
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/201",
-      "mergeable": true,
-      "mergeable_state": "unstable",
-      "number": 201,
-      "title": "build(deps): bump lucide-react from 0.294.0 to 1.31.0 in /dashboard/frontend",
-      "updated_at": "2026-08-14T16:48:19Z"
-    },
-    {
-      "age_hours": 183.31,
-      "base_sha": "1938f4a10c51be3eeaf6fb2ef2aed5f942951bb4",
-      "current_relevance": false,
-      "draft": false,
-      "head_sha": "c4fa3db96fdfb36113cb55b96e9718650563ccfc",
+      "head_sha": "276f0b9830b457f858c3a8ff20301cc1cc934364",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/200",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 200,
       "title": "chore(deps-dev): bump typescript from 5.9.3 to 7.0.2 in /dashboard/frontend",
-      "updated_at": "2026-08-16T15:36:55Z"
+      "updated_at": "2026-09-01T21:46:11Z"
     },
     {
-      "age_hours": 230.12,
+      "age_hours": 543.16,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "5559909155baae6048886615a10069800cbbf6d3",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/199",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 199,
       "title": "build(deps): bump pandas from 2.3.3 to 3.0.5 in /dashboard/backend",
       "updated_at": "2026-08-14T16:48:09Z"
     },
     {
-      "age_hours": 230.12,
+      "age_hours": 543.16,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "2cb70d6dbaf6d8078f7f3c2b597c607202b41789",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/197",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 197,
       "title": "build(deps): bump fastapi from 0.138.0 to 0.141.1 in /dashboard/backend",
       "updated_at": "2026-08-14T16:48:04Z"
     },
     {
-      "age_hours": 47.47,
-      "base_sha": "30676b5a9068515d21f67f6a385993a945fbe890",
+      "age_hours": 14.37,
+      "base_sha": "877d7be956e877d0e7af09a9e8e8dc7fe7aa04b5",
       "current_relevance": true,
       "draft": false,
-      "head_sha": "da1bffd3132e24c01fde4e9e4df9e6ff83887768",
+      "head_sha": "8abb34973f3928aec8aa6e36fff00f6ba782dc99",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/196",
-      "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable": false,
+      "mergeable_state": "dirty",
       "number": 196,
       "title": "chore(deps): bump actions/setup-node from 4 to 7",
-      "updated_at": "2026-08-22T07:27:18Z"
+      "updated_at": "2026-09-05T17:35:30Z"
     },
     {
-      "age_hours": 230.12,
+      "age_hours": 543.16,
       "base_sha": "c9a3f7e1a0b526a12dbc06d63a9e915bd45ceee8",
       "current_relevance": false,
       "draft": false,
       "head_sha": "68aad20379d31155e8727f5b75da88882c1bb11c",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/195",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 195,
       "title": "build(deps): bump python from 3.10-slim to 3.14-slim",
       "updated_at": "2026-08-14T16:48:00Z"
     },
     {
-      "age_hours": 238.03,
+      "age_hours": 551.07,
       "base_sha": "67f1af1d52289e1745fdbdc1067b162e62b3ffb1",
       "current_relevance": false,
       "draft": true,
@@ -610,7 +2024,7 @@
       "updated_at": "2026-08-14T08:53:43Z"
     },
     {
-      "age_hours": 242.2,
+      "age_hours": 555.24,
       "base_sha": "e971f10d242d6466146965a8cec7fd13303f267e",
       "current_relevance": false,
       "draft": true,
@@ -623,20 +2037,20 @@
       "updated_at": "2026-08-14T04:43:23Z"
     },
     {
-      "age_hours": 242.9,
+      "age_hours": 555.93,
       "base_sha": "a6f86f81331d583d9e74fb5c365fc078d796d29c",
       "current_relevance": false,
       "draft": true,
       "head_sha": "285a478b3680a0d7616ae17209f6a5c8d5915959",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/189",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 189,
       "title": "feat(data): read-only broker market-data failover core",
       "updated_at": "2026-08-14T04:01:45Z"
     },
     {
-      "age_hours": 249.51,
+      "age_hours": 562.55,
       "base_sha": "9a108aec33329d00cb0f38b9d5dca65195edfe64",
       "current_relevance": false,
       "draft": false,
@@ -649,7 +2063,7 @@
       "updated_at": "2026-08-13T21:24:51Z"
     },
     {
-      "age_hours": 256.29,
+      "age_hours": 569.33,
       "base_sha": "42827ad7009a220c3d085ce6570d2a80d3bb53b3",
       "current_relevance": false,
       "draft": false,
@@ -662,7 +2076,7 @@
       "updated_at": "2026-08-13T14:38:07Z"
     },
     {
-      "age_hours": 286.05,
+      "age_hours": 599.09,
       "base_sha": "9e2ce91683f9fc9ac96a85b116451158c89d6159",
       "current_relevance": false,
       "draft": true,
@@ -675,7 +2089,7 @@
       "updated_at": "2026-08-12T08:52:28Z"
     },
     {
-      "age_hours": 287.34,
+      "age_hours": 600.38,
       "base_sha": "e09824188ab7c30f08c0af48cf7e27bb0a22d798",
       "current_relevance": false,
       "draft": false,
@@ -688,7 +2102,7 @@
       "updated_at": "2026-08-12T07:34:47Z"
     },
     {
-      "age_hours": 290.02,
+      "age_hours": 603.06,
       "base_sha": "36e24d86e1aed1ae5ddbf77055cabf6e125e58cb",
       "current_relevance": false,
       "draft": false,
@@ -701,7 +2115,7 @@
       "updated_at": "2026-08-12T04:53:59Z"
     },
     {
-      "age_hours": 294.18,
+      "age_hours": 607.22,
       "base_sha": "44ae4a8ca618cd967d605751e9a2fd17102d7765",
       "current_relevance": false,
       "draft": false,
@@ -714,20 +2128,20 @@
       "updated_at": "2026-08-12T00:44:49Z"
     },
     {
-      "age_hours": 295.25,
+      "age_hours": 608.29,
       "base_sha": "b6d70db9f2d26c66f235c1e144fbe9a2892fd3f7",
       "current_relevance": false,
       "draft": false,
       "head_sha": "01fe0232ca03f2a46eb1ec92c5a9f5b2ca04e998",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/121",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 121,
       "title": "feat(observability): add traced read-only 24x7 monitoring foundation",
       "updated_at": "2026-08-11T23:40:13Z"
     },
     {
-      "age_hours": 296.97,
+      "age_hours": 610.01,
       "base_sha": "a568591c27c8c1453b097ac1617f27acea13a8f9",
       "current_relevance": false,
       "draft": false,
@@ -740,7 +2154,7 @@
       "updated_at": "2026-08-11T21:57:31Z"
     },
     {
-      "age_hours": 302.5,
+      "age_hours": 615.54,
       "base_sha": "8bd33e392472208f2b8ccde9627a9e17bd6e17fc",
       "current_relevance": false,
       "draft": false,
@@ -753,7 +2167,7 @@
       "updated_at": "2026-08-11T16:25:16Z"
     },
     {
-      "age_hours": 307.62,
+      "age_hours": 620.66,
       "base_sha": "5c0b43eb9ddd30dbe6014c8472fee2cbfceb585f",
       "current_relevance": false,
       "draft": false,
@@ -766,33 +2180,33 @@
       "updated_at": "2026-08-11T11:18:26Z"
     },
     {
-      "age_hours": 319.0,
+      "age_hours": 632.04,
       "base_sha": "3ee93b792f76fa736bb0c72864bfdeb2fa54c6b0",
       "current_relevance": false,
       "draft": false,
       "head_sha": "29e7b2cfc9120976e9c0d33147d92e9dc64f7484",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/97",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 97,
       "title": "fix(dashboard): guard live P&L sync against synthetic/paper-simulatio\u2026",
       "updated_at": "2026-08-10T23:55:29Z"
     },
     {
-      "age_hours": 325.72,
+      "age_hours": 638.76,
       "base_sha": "fb586b832c94ec544ea162014f82ad74979c001d",
       "current_relevance": false,
       "draft": false,
       "head_sha": "71572eee7c1754f7a443e50d9f44f875208fc1aa",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/84",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 84,
       "title": "Harden analyzer-only frozen evaluation and ML proof gating for unreliable holdout/UI states",
       "updated_at": "2026-08-10T17:12:29Z"
     },
     {
-      "age_hours": 465.9,
+      "age_hours": 778.94,
       "base_sha": "e7f2cf20ec132c3b290415f1e069821a67d3a700",
       "current_relevance": false,
       "draft": true,
@@ -805,7 +2219,7 @@
       "updated_at": "2026-08-04T21:01:24Z"
     },
     {
-      "age_hours": 449.42,
+      "age_hours": 762.46,
       "base_sha": "62bdf022ed96bca78025b08e1460533aa77ef17b",
       "current_relevance": false,
       "draft": false,
@@ -818,7 +2232,7 @@
       "updated_at": "2026-08-05T13:30:13Z"
     },
     {
-      "age_hours": 1152.69,
+      "age_hours": 1465.73,
       "base_sha": "798a411e7e35ae1e2f69b019550a5d4719ddd4ce",
       "current_relevance": false,
       "draft": false,
@@ -831,7 +2245,7 @@
       "updated_at": "2026-07-07T06:14:01Z"
     },
     {
-      "age_hours": 1164.1,
+      "age_hours": 1477.14,
       "base_sha": "ae15e7570e49fd4de24c9df5b603808678a7e4c4",
       "current_relevance": false,
       "draft": false,
@@ -844,7 +2258,7 @@
       "updated_at": "2026-07-06T18:49:42Z"
     },
     {
-      "age_hours": 1172.18,
+      "age_hours": 1485.22,
       "base_sha": "0148588fa2db552c2236f99c2959cf44b54432c1",
       "current_relevance": false,
       "draft": true,
@@ -857,7 +2271,7 @@
       "updated_at": "2026-07-06T10:44:48Z"
     },
     {
-      "age_hours": 1236.54,
+      "age_hours": 1549.58,
       "base_sha": "e0a674b1b8fac577653462ec93ac7964d742b0dc",
       "current_relevance": false,
       "draft": true,
@@ -870,7 +2284,7 @@
       "updated_at": "2026-07-03T18:23:18Z"
     },
     {
-      "age_hours": 1198.57,
+      "age_hours": 1511.61,
       "base_sha": "43aba9750f354e44aa3f7f892e0d82da61430c4a",
       "current_relevance": false,
       "draft": false,
@@ -883,92 +2297,92 @@
       "updated_at": "2026-07-05T08:21:18Z"
     },
     {
-      "age_hours": 1294.02,
+      "age_hours": 1607.06,
       "base_sha": "77433ec5ea7cffa23aa8a7143bc2143c75e85429",
       "current_relevance": false,
       "draft": false,
       "head_sha": "f6c677a5c87740342017b4171164369b23d48316",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/51",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 51,
       "title": "docs: add cloud CI failure triage proof",
       "updated_at": "2026-07-01T08:54:24Z"
     },
     {
-      "age_hours": 1463.62,
+      "age_hours": 1776.66,
       "base_sha": "71ada897e8226f6afffe65bcc4e5acc83a3b004c",
       "current_relevance": false,
       "draft": false,
       "head_sha": "a6b4d64ab769f65a553000ad0b6d581448168a7a",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/43",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 43,
       "title": "Add corrected cloud dashboard proof workflow",
       "updated_at": "2026-06-24T07:18:04Z"
     },
     {
-      "age_hours": 1457.07,
+      "age_hours": 1770.11,
       "base_sha": "43ec58a7a573baaf1b97e9cd853ad2496592bbee",
       "current_relevance": false,
       "draft": false,
       "head_sha": "a4e96c7b4e612c644a1f10d2c09d0bf81d448f6b",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/42",
       "mergeable": true,
-      "mergeable_state": "unstable",
+      "mergeable_state": "behind",
       "number": 42,
       "title": "[WIP] Implement all recommended features for dashboard enhancement",
       "updated_at": "2026-06-24T13:51:02Z"
     },
     {
-      "age_hours": 1477.63,
+      "age_hours": 1790.67,
       "base_sha": "43ec58a7a573baaf1b97e9cd853ad2496592bbee",
       "current_relevance": false,
       "draft": true,
       "head_sha": "e0191ad080790d971a401eb0e9176bde04c1bc02",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/41",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 41,
       "title": "[WIP] Add comprehensive audit endpoints for trading system",
       "updated_at": "2026-06-23T17:17:38Z"
     },
     {
-      "age_hours": 1477.72,
+      "age_hours": 1790.76,
       "base_sha": "43ec58a7a573baaf1b97e9cd853ad2496592bbee",
       "current_relevance": false,
       "draft": true,
       "head_sha": "39ce06ad0bdac0f0cdeb6009e46da4892a561633",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/40",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 40,
       "title": "[WIP] Expand backend API for portfolio overview and details",
       "updated_at": "2026-06-23T17:12:30Z"
     },
     {
-      "age_hours": 1477.81,
+      "age_hours": 1790.85,
       "base_sha": "43ec58a7a573baaf1b97e9cd853ad2496592bbee",
       "current_relevance": false,
       "draft": true,
       "head_sha": "5fd2e16daeedccf727d1ec74c489cabf1d9fcce8",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/39",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 39,
       "title": "[WIP] Conduct dashboard production readiness audit",
       "updated_at": "2026-06-23T17:06:49Z"
     },
     {
-      "age_hours": 1477.88,
+      "age_hours": 1790.92,
       "base_sha": "43ec58a7a573baaf1b97e9cd853ad2496592bbee",
       "current_relevance": false,
       "draft": true,
       "head_sha": "08d7384a34514b73dedfc9824b1ea0487a22834e",
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/pull/38",
       "mergeable": true,
-      "mergeable_state": "clean",
+      "mergeable_state": "behind",
       "number": 38,
       "title": "[WIP] Activate Dhan Data API as P0 source with token safety measures",
       "updated_at": "2026-06-23T17:02:46Z"
@@ -984,7 +2398,7 @@
     "stop_only_for": "real_external_dependency_or_genuine_user_approval",
     "url_fail": "investigate_and_open_next_remediation_immediately"
   },
-  "reason": "current dependency failure(s): Full Cloud Audit and Forensic Consensus, Frontend Browser Runtime Smoke",
+  "reason": "current dependency failure(s): Workflow Priority Guard, Workflow Priority Guard, Workflow Priority Guard",
   "recent_open_issues": [
     {
       "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/188",
@@ -993,60 +2407,57 @@
       ],
       "number": 188,
       "title": "P0: Broker-data/UI parity \u2014 indices, equities, full option chains, live charts",
-      "updated_at": "2026-08-24T04:21:26Z"
+      "updated_at": "2026-09-06T02:49:40Z"
     },
     {
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/187",
-      "labels": [],
-      "number": 187,
-      "title": "P0: Eliminate recurring GCP uptime-check failures end-to-end",
-      "updated_at": "2026-08-23T17:19:22Z"
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/442",
+      "labels": [
+        "P0"
+      ],
+      "number": 442,
+      "title": "P0: Local dashboard semantic defects + evidence routing under laptop runtime",
+      "updated_at": "2026-09-02T07:20:01Z"
     },
     {
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/292",
-      "labels": [],
-      "number": 292,
-      "title": "P0/P1: World-class prediction data, features, tournament and accuracy authority",
-      "updated_at": "2026-08-18T22:46:04Z"
-    },
-    {
-      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/228",
-      "labels": [],
-      "number": 228,
-      "title": "P0: Cloud Run deploy authority drift blocks forensic closure",
-      "updated_at": "2026-08-15T18:57:56Z"
+      "html_url": "https://github.com/psw2025-cmd/Genesis_System3/issues/443",
+      "labels": [
+        "P0"
+      ],
+      "number": 443,
+      "title": "P0: Evidence architecture \u2014 GitHub + laptop + Drive large-artifact contract",
+      "updated_at": "2026-09-01T14:42:56Z"
     }
   ],
   "repository": "psw2025-cmd/Genesis_System3",
   "schema": "SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1",
   "status": "WORKING",
-  "workflow_count": 35,
+  "workflow_count": 33,
   "workflow_inventory": [
     {
       "id": 239605950,
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T06:53:31Z",
+            "created_at": "2026-09-05T20:14:24Z",
             "expired": false,
-            "expires_at": "2026-09-23T06:53:29Z",
-            "id": 9509879251,
-            "name": "system3-proof-pack-1962",
-            "size_in_bytes": 4938857
+            "expires_at": "2026-10-05T20:14:22Z",
+            "id": 9976175759,
+            "name": "system3-proof-pack-2334",
+            "size_in_bytes": 1546441
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:52:04Z",
+        "created_at": "2026-09-05T20:13:18Z",
         "event": "pull_request",
-        "head_branch": "docs/system3-runbook-governance-20260824",
-        "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699063920",
-        "id": 32699063920,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446050",
+        "id": 33989446050,
         "name": "Genesis System3 Global Safety CI",
         "relevant_failure": false,
-        "run_number": 1962,
+        "run_number": 2334,
         "status": "completed",
-        "updated_at": "2026-08-24T06:53:35Z",
+        "updated_at": "2026-09-05T20:14:28Z",
         "workflow_id": 239605950
       },
       "name": "Genesis System3 Global Safety CI",
@@ -1058,17 +2469,17 @@
       "latest_run": {
         "artifacts": [],
         "conclusion": "success",
-        "created_at": "2026-08-23T00:09:19Z",
+        "created_at": "2026-08-27T08:37:43Z",
         "event": "dynamic",
         "head_branch": "main",
-        "head_sha": "2a590fee0260208d39ec2a3fe06f52d008c7c55b",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32607118524",
-        "id": 32607118524,
-        "name": "Configured Graph Update: pip in /. #1536476840",
+        "head_sha": "f9f660e82880e1c96e0e797a5100ffaf0bba827f",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33054871198",
+        "id": 33054871198,
+        "name": "Configured Graph Update: pip in /. #1542717705",
         "relevant_failure": false,
-        "run_number": 25,
+        "run_number": 26,
         "status": "completed",
-        "updated_at": "2026-08-23T00:10:16Z",
+        "updated_at": "2026-08-27T08:38:27Z",
         "workflow_id": 284066659
       },
       "name": "Dependency Graph",
@@ -1102,17 +2513,17 @@
       "latest_run": {
         "artifacts": [],
         "conclusion": "success",
-        "created_at": "2026-08-05T09:26:12Z",
+        "created_at": "2026-09-03T11:55:43Z",
         "event": "dynamic",
-        "head_branch": "copilot/research-frozen-backtest-issues",
-        "head_sha": "1e22833f14b3a05b418d64bdb5005f690de45a45",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30993254780",
-        "id": 30993254780,
-        "name": "Running Copilot cloud agent",
+        "head_branch": "copilot/migrate-genesis-system3-to-local",
+        "head_sha": "510dae95b14391608154ff2bcb47f257ecaf03cf",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33752356668",
+        "id": 33752356668,
+        "name": "Addressing comment on PR #461",
         "relevant_failure": false,
-        "run_number": 36,
+        "run_number": 39,
         "status": "completed",
-        "updated_at": "2026-08-05T09:27:41Z",
+        "updated_at": "2026-09-03T12:03:04Z",
         "workflow_id": 298059046
       },
       "name": "Copilot cloud agent",
@@ -1124,17 +2535,17 @@
       "latest_run": {
         "artifacts": [],
         "conclusion": "success",
-        "created_at": "2026-08-02T19:36:07Z",
+        "created_at": "2026-09-05T20:13:22Z",
         "event": "dynamic",
-        "head_branch": "gcp-cloud-run-migration",
-        "head_sha": "a36bee0631e77dfb079a4bc4dce909a1da4c16ca",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/30763736978",
-        "id": 30763736978,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989449596",
+        "id": 33989449596,
         "name": "Running Copilot Code Review",
         "relevant_failure": false,
-        "run_number": 28,
+        "run_number": 54,
         "status": "completed",
-        "updated_at": "2026-08-02T19:38:20Z",
+        "updated_at": "2026-09-05T20:18:42Z",
         "workflow_id": 298268529
       },
       "name": "Copilot",
@@ -1208,7 +2619,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T04:26:58Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T04:26:43Z",
             "id": 8641987393,
             "name": "genesis-system3-nse-fo-history-model-20160726-20260724",
@@ -1239,7 +2650,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T03:37:23Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T03:37:22Z",
             "id": 8641350942,
             "name": "system3-full-nonlive-proof-30234951572",
@@ -1301,7 +2712,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T05:01:27Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T05:01:24Z",
             "id": 8642459036,
             "name": "options-bigdata-selfhosted-model-30234951534",
@@ -1332,7 +2743,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T03:57:04Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T03:57:04Z",
             "id": 8641585239,
             "name": "options-bigdata-artifact-model-30234951493",
@@ -1394,7 +2805,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T03:35:45Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T03:35:44Z",
             "id": 8641330721,
             "name": "options-recovery-attachment-audit-30234951576",
@@ -1425,7 +2836,7 @@
         "artifacts": [
           {
             "created_at": "2026-07-27T03:35:42Z",
-            "expired": false,
+            "expired": true,
             "expires_at": "2026-08-26T03:35:41Z",
             "id": 8641329943,
             "name": "options-corrected-framework-phase1-30234951545",
@@ -1451,177 +2862,34 @@
       "state": "active"
     },
     {
-      "id": 325751903,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "success",
-        "created_at": "2026-08-23T16:36:03Z",
-        "event": "pull_request",
-        "head_branch": "psw2025-cmd-patch-3",
-        "head_sha": "bf14f34f3892678f8956862b94d7d2df56b9b50d",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32652167486",
-        "id": 32652167486,
-        "name": "GCP Stage 2 Safety Checks",
-        "relevant_failure": false,
-        "run_number": 182,
-        "status": "completed",
-        "updated_at": "2026-08-23T16:36:15Z",
-        "workflow_id": 325751903
-      },
-      "name": "GCP Stage 2 Safety Checks",
-      "path": ".github/workflows/gcp-stage2-ci.yml",
-      "state": "active"
-    },
-    {
-      "id": 327214218,
-      "latest_run": {
-        "artifacts": [
-          {
-            "created_at": "2026-08-23T17:33:58Z",
-            "expired": false,
-            "expires_at": "2026-08-30T17:33:57Z",
-            "id": 9497258969,
-            "name": "system3-gcp-runtime-evidence-184",
-            "size_in_bytes": 7519
-          },
-          {
-            "created_at": "2026-08-23T17:33:06Z",
-            "expired": false,
-            "expires_at": "2026-08-30T17:33:05Z",
-            "id": 9497247377,
-            "name": "system3-scheduler-health-gate-184",
-            "size_in_bytes": 2621
-          },
-          {
-            "created_at": "2026-08-23T17:27:30Z",
-            "expired": false,
-            "expires_at": "2026-09-06T17:27:30Z",
-            "id": 9497174948,
-            "name": "mutation-policy-runtime-proof-184",
-            "size_in_bytes": 785
-          },
-          {
-            "created_at": "2026-08-23T17:27:24Z",
-            "expired": false,
-            "expires_at": "2026-09-06T17:27:24Z",
-            "id": 9497173754,
-            "name": "public-paper-dashboard-proof-184",
-            "size_in_bytes": 6592912
-          }
-        ],
-        "conclusion": "success",
-        "created_at": "2026-08-23T17:21:47Z",
-        "event": "push",
-        "head_branch": "main",
-        "head_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32654583696",
-        "id": 32654583696,
-        "name": "Cloud Run Auto Deploy",
-        "relevant_failure": false,
-        "run_number": 184,
-        "status": "completed",
-        "updated_at": "2026-08-23T17:34:07Z",
-        "workflow_id": 327214218
-      },
-      "name": "Cloud Run Auto Deploy",
-      "path": ".github/workflows/cloud-run-auto-deploy.yml",
-      "state": "active"
-    },
-    {
-      "id": 328580932,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "success",
-        "created_at": "2026-08-23T17:34:09Z",
-        "event": "workflow_run",
-        "head_branch": "main",
-        "head_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32655253084",
-        "id": 32655253084,
-        "name": "GCP Dhan Token Fix CI",
-        "relevant_failure": false,
-        "run_number": 474,
-        "status": "completed",
-        "updated_at": "2026-08-23T17:35:11Z",
-        "workflow_id": 328580932
-      },
-      "name": "GCP Dhan Token Fix CI",
-      "path": ".github/workflows/gcp-dhan-token-fix-ci.yml",
-      "state": "active"
-    },
-    {
-      "id": 328609515,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "failure",
-        "created_at": "2026-08-20T17:44:21Z",
-        "event": "workflow_dispatch",
-        "head_branch": "main",
-        "head_sha": "99e36562856acce545dcf912860c389008b00306",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32399271208",
-        "id": 32399271208,
-        "name": "GCP Dhan Token Rotation Manual Recovery",
-        "relevant_failure": false,
-        "run_number": 19,
-        "status": "completed",
-        "updated_at": "2026-08-20T17:45:24Z",
-        "workflow_id": 328609515
-      },
-      "name": "GCP Dhan Token Rotation Manual Recovery",
-      "path": ".github/workflows/gcp-dhan-token-rotation.yml",
-      "state": "active"
-    },
-    {
       "id": 328782436,
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T06:55:13Z",
+            "created_at": "2026-09-05T20:17:08Z",
             "expired": false,
-            "expires_at": "2026-09-23T06:55:13Z",
-            "id": 9509916321,
-            "name": "system3-preflight-after-32699064047-32699226984",
-            "size_in_bytes": 15400
+            "expires_at": "2026-10-05T20:17:07Z",
+            "id": 9976217709,
+            "name": "system3-preflight-after-33989446049-33989564331",
+            "size_in_bytes": 98165
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:54:28Z",
+        "created_at": "2026-09-05T20:15:34Z",
         "event": "workflow_run",
         "head_branch": "main",
-        "head_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699226984",
-        "id": 32699226984,
+        "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989564331",
+        "id": 33989564331,
         "name": "Workflow Priority Guard",
         "relevant_failure": false,
-        "run_number": 3635,
+        "run_number": 6207,
         "status": "completed",
-        "updated_at": "2026-08-24T06:55:16Z",
+        "updated_at": "2026-09-05T20:17:12Z",
         "workflow_id": 328782436
       },
       "name": "Workflow Priority Guard",
       "path": ".github/workflows/workflow-priority-guard.yml",
-      "state": "active"
-    },
-    {
-      "id": 332146887,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "failure",
-        "created_at": "2026-08-11T18:21:30Z",
-        "event": "pull_request",
-        "head_branch": "fix/gcp-wif-proof-20260811",
-        "head_sha": "468253a9eff7379e74b89bb550d8ff124ff6c26b",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31522291143",
-        "id": 31522291143,
-        "name": "GCP WIF Keyless Proof",
-        "relevant_failure": false,
-        "run_number": 1,
-        "status": "completed",
-        "updated_at": "2026-08-11T18:22:17Z",
-        "workflow_id": 332146887
-      },
-      "name": "GCP WIF Keyless Proof",
-      "path": ".github/workflows/gcp-wif-proof.yml",
       "state": "active"
     },
     {
@@ -1656,52 +2924,30 @@
       "state": "active"
     },
     {
-      "id": 332673060,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "success",
-        "created_at": "2026-08-12T10:58:15Z",
-        "event": "push",
-        "head_branch": "fix/gcp-dhan-token-rotation-ui-proof-oc-diagnostic-20260812",
-        "head_sha": "ef506e44c74ed918b257277406d3bd28bc7776eb",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31589764375",
-        "id": 31589764375,
-        "name": "GCP Dhan OC Readonly Diagnostic",
-        "relevant_failure": false,
-        "run_number": 4,
-        "status": "completed",
-        "updated_at": "2026-08-12T18:30:53Z",
-        "workflow_id": 332673060
-      },
-      "name": "GCP Dhan OC Readonly Diagnostic",
-      "path": ".github/workflows/gcp-dhan-oc-readonly-diagnostic.yml",
-      "state": "active"
-    },
-    {
       "id": 333489393,
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T06:53:00Z",
+            "created_at": "2026-09-05T20:14:13Z",
             "expired": false,
-            "expires_at": "2026-09-23T06:52:59Z",
-            "id": 9509868106,
-            "name": "frontend-ui-proof-515",
-            "size_in_bytes": 4451008
+            "expires_at": "2026-10-05T20:14:12Z",
+            "id": 9976173171,
+            "name": "frontend-ui-proof-887",
+            "size_in_bytes": 3934935
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:52:04Z",
+        "created_at": "2026-09-05T20:13:18Z",
         "event": "pull_request",
-        "head_branch": "docs/system3-runbook-governance-20260824",
-        "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699063932",
-        "id": 32699063932,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446059",
+        "id": 33989446059,
         "name": "Frontend Browser Runtime Smoke",
         "relevant_failure": false,
-        "run_number": 515,
+        "run_number": 887,
         "status": "completed",
-        "updated_at": "2026-08-24T06:53:05Z",
+        "updated_at": "2026-09-05T20:14:17Z",
         "workflow_id": 333489393
       },
       "name": "Frontend Browser Runtime Smoke",
@@ -1713,26 +2959,26 @@
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T06:52:25Z",
+            "created_at": "2026-09-05T20:13:43Z",
             "expired": false,
-            "expires_at": "2026-09-23T06:52:24Z",
-            "id": 9509855236,
-            "name": "sonar-readiness-402",
+            "expires_at": "2026-10-05T20:13:42Z",
+            "id": 9976165601,
+            "name": "sonar-readiness-774",
             "size_in_bytes": 271
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:52:04Z",
+        "created_at": "2026-09-05T20:13:18Z",
         "event": "pull_request",
-        "head_branch": "docs/system3-runbook-governance-20260824",
-        "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699064004",
-        "id": 32699064004,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446055",
+        "id": 33989446055,
         "name": "SonarQube Audit",
         "relevant_failure": false,
-        "run_number": 402,
+        "run_number": 774,
         "status": "completed",
-        "updated_at": "2026-08-24T06:52:29Z",
+        "updated_at": "2026-09-05T20:13:46Z",
         "workflow_id": 334471261
       },
       "name": "SonarQube Audit",
@@ -1744,26 +2990,26 @@
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T06:53:23Z",
+            "created_at": "2026-09-05T20:14:38Z",
             "expired": false,
-            "expires_at": "2026-09-23T06:53:22Z",
-            "id": 9509876268,
-            "name": "security-audit-402",
-            "size_in_bytes": 96445
+            "expires_at": "2026-10-05T20:14:37Z",
+            "id": 9976179176,
+            "name": "security-audit-774",
+            "size_in_bytes": 91575
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:52:04Z",
+        "created_at": "2026-09-05T20:13:18Z",
         "event": "pull_request",
-        "head_branch": "docs/system3-runbook-governance-20260824",
-        "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699064053",
-        "id": 32699064053,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446090",
+        "id": 33989446090,
         "name": "Security Audit Evidence",
         "relevant_failure": false,
-        "run_number": 402,
+        "run_number": 774,
         "status": "completed",
-        "updated_at": "2026-08-24T06:53:25Z",
+        "updated_at": "2026-09-05T20:14:41Z",
         "workflow_id": 334471264
       },
       "name": "Security Audit Evidence",
@@ -1775,17 +3021,17 @@
       "latest_run": {
         "artifacts": [],
         "conclusion": "success",
-        "created_at": "2026-08-24T06:52:04Z",
+        "created_at": "2026-09-05T20:13:18Z",
         "event": "pull_request",
-        "head_branch": "docs/system3-runbook-governance-20260824",
-        "head_sha": "9038e6a3876c73a7087e42f7fe3b28b5dd1cb453",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32699064047",
-        "id": 32699064047,
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446049",
+        "id": 33989446049,
         "name": "CodeQL Security Audit",
         "relevant_failure": false,
-        "run_number": 402,
+        "run_number": 774,
         "status": "completed",
-        "updated_at": "2026-08-24T06:54:26Z",
+        "updated_at": "2026-09-05T20:15:32Z",
         "workflow_id": 334471267
       },
       "name": "CodeQL Security Audit",
@@ -1797,17 +3043,17 @@
       "latest_run": {
         "artifacts": [],
         "conclusion": "success",
-        "created_at": "2026-08-23T21:46:45Z",
+        "created_at": "2026-09-05T17:24:59Z",
         "event": "dynamic",
         "head_branch": "main",
-        "head_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32668556343",
-        "id": 32668556343,
-        "name": "docker in /. - Update #1537006569",
+        "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980891572",
+        "id": 33980891572,
+        "name": "github_actions in / for actions/checkout - Update #1558765110",
         "relevant_failure": false,
-        "run_number": 33,
+        "run_number": 113,
         "status": "completed",
-        "updated_at": "2026-08-23T21:47:27Z",
+        "updated_at": "2026-09-05T17:25:36Z",
         "workflow_id": 334480445
       },
       "name": "Dependabot Updates",
@@ -1815,100 +3061,47 @@
       "state": "active"
     },
     {
-      "id": 334496461,
-      "latest_run": {
-        "artifacts": [
-          {
-            "created_at": "2026-08-24T02:07:45Z",
-            "expired": false,
-            "expires_at": "2026-11-22T02:05:49Z",
-            "id": 9504418631,
-            "name": "full-cloud-audit-101-1",
-            "size_in_bytes": 9457
-          }
-        ],
-        "conclusion": "failure",
-        "created_at": "2026-08-24T02:05:49Z",
-        "event": "push",
-        "failed_jobs": [
-          {
-            "completed_at": "2026-08-24T02:07:48Z",
-            "conclusion": "failure",
-            "failed_steps": [
-              {
-                "conclusion": "failure",
-                "name": "Enforce unified audit verdict",
-                "number": 15,
-                "status": "completed"
-              }
-            ],
-            "id": 97299916279,
-            "name": "Read-only cloud forensic audit",
-            "started_at": "2026-08-24T02:05:51Z"
-          }
-        ],
-        "head_branch": "main",
-        "head_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32681901957",
-        "id": 32681901957,
-        "name": "Full Cloud Audit and Forensic Consensus",
-        "relevant_failure": true,
-        "run_number": 101,
-        "status": "completed",
-        "updated_at": "2026-08-24T02:07:49Z",
-        "workflow_id": 334496461
-      },
-      "name": "Full Cloud Audit and Forensic Consensus",
-      "path": ".github/workflows/full-cloud-audit.yml",
-      "state": "active"
-    },
-    {
-      "id": 335197562,
-      "latest_run": {
-        "artifacts": [],
-        "conclusion": "skipped",
-        "created_at": "2026-08-23T17:34:09Z",
-        "event": "workflow_run",
-        "head_branch": "main",
-        "head_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32655253256",
-        "id": 32655253256,
-        "name": "GCP Authority Repair",
-        "relevant_failure": false,
-        "run_number": 58,
-        "status": "completed",
-        "updated_at": "2026-08-23T17:34:10Z",
-        "workflow_id": 335197562
-      },
-      "name": "GCP Authority Repair",
-      "path": ".github/workflows/gcp-authority-repair.yml",
-      "state": "active"
-    },
-    {
       "id": 335884256,
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-24T02:06:37Z",
+            "created_at": "2026-09-05T17:23:47Z",
             "expired": false,
-            "expires_at": "2026-09-23T02:06:37Z",
-            "id": 9504400926,
-            "name": "system3-preflight-control-plane-32681901941",
-            "size_in_bytes": 14853
+            "expires_at": "2026-10-05T17:23:46Z",
+            "id": 9973691433,
+            "name": "system3-preflight-control-plane-33980820702",
+            "size_in_bytes": 94137
           }
         ],
-        "conclusion": "success",
-        "created_at": "2026-08-24T02:05:49Z",
+        "conclusion": "failure",
+        "created_at": "2026-09-05T17:23:36Z",
         "event": "push",
+        "failed_jobs": [
+          {
+            "completed_at": "2026-09-05T17:23:49Z",
+            "conclusion": "failure",
+            "failed_steps": [
+              {
+                "conclusion": "failure",
+                "name": "Build current workflow issue artifact snapshot",
+                "number": 4,
+                "status": "completed"
+              }
+            ],
+            "id": 101345590931,
+            "name": "snapshot",
+            "started_at": "2026-09-05T17:23:39Z"
+          }
+        ],
         "head_branch": "main",
-        "head_sha": "1df24c0b9569cfb2acc4e77343324176f64acb25",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32681901941",
-        "id": 32681901941,
+        "head_sha": "abf16a739d376a418e573a9ba21ffd382b9c3fd5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980820702",
+        "id": 33980820702,
         "name": "System3 Preflight Control Plane",
-        "relevant_failure": false,
-        "run_number": 66,
+        "relevant_failure": true,
+        "run_number": 172,
         "status": "completed",
-        "updated_at": "2026-08-24T02:06:41Z",
+        "updated_at": "2026-09-05T17:23:50Z",
         "workflow_id": 335884256
       },
       "name": "System3 Preflight Control Plane",
@@ -1920,26 +3113,26 @@
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-23T08:59:56Z",
+            "created_at": "2026-09-05T17:13:34Z",
             "expired": false,
-            "expires_at": "2026-08-30T08:59:55Z",
-            "id": 9490692776,
-            "name": "system3-repo-clean-forensic-29",
-            "size_in_bytes": 477714
+            "expires_at": "2026-09-12T17:13:32Z",
+            "id": 9973538806,
+            "name": "system3-repo-clean-forensic-75",
+            "size_in_bytes": 520223
           }
         ],
         "conclusion": "success",
-        "created_at": "2026-08-23T08:58:48Z",
-        "event": "pull_request",
-        "head_branch": "dependabot/github_actions/actions/upload-artifact-7",
-        "head_sha": "8076dd03acb81b03d2fc9a038cb27192122e48e8",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32629718177",
-        "id": 32629718177,
+        "created_at": "2026-09-05T17:11:34Z",
+        "event": "push",
+        "head_branch": "main",
+        "head_sha": "60034500b52ba7a7ff8a12eb10cf99e3dd6a10aa",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33980182334",
+        "id": 33980182334,
         "name": "Repo Clean Forensic Toolkit",
         "relevant_failure": false,
-        "run_number": 29,
+        "run_number": 75,
         "status": "completed",
-        "updated_at": "2026-08-23T08:59:59Z",
+        "updated_at": "2026-09-05T17:13:38Z",
         "workflow_id": 337344057
       },
       "name": "Repo Clean Forensic Toolkit",
@@ -1947,34 +3140,87 @@
       "state": "active"
     },
     {
-      "id": 338480279,
+      "id": 342119079,
       "latest_run": {
         "artifacts": [
           {
-            "created_at": "2026-08-23T17:37:38Z",
+            "created_at": "2026-09-05T20:13:33Z",
             "expired": false,
-            "expires_at": "2026-09-06T17:37:37Z",
-            "id": 9497307693,
-            "name": "gcp-live-ui-semantic-proof-22",
-            "size_in_bytes": 8186736
+            "expires_at": "2026-12-04T20:13:19Z",
+            "id": 9976163333,
+            "name": "command-center-access-33989446054",
+            "size_in_bytes": 32066
+          }
+        ],
+        "conclusion": "success",
+        "created_at": "2026-09-05T20:13:18Z",
+        "event": "pull_request",
+        "head_branch": "fix/spearman-gate-calibration-sys3-blk-005",
+        "head_sha": "c7f6bd7e71a233ae12d526c3f671bc3a419865e5",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33989446054",
+        "id": 33989446054,
+        "name": "Command Center Access Policy",
+        "relevant_failure": false,
+        "run_number": 158,
+        "status": "completed",
+        "updated_at": "2026-09-05T20:13:37Z",
+        "workflow_id": 342119079
+      },
+      "name": "Command Center Access Policy",
+      "path": ".github/workflows/command-center-access.yml",
+      "state": "active"
+    },
+    {
+      "id": 344186431,
+      "latest_run": {
+        "artifacts": [
+          {
+            "created_at": "2026-08-27T23:09:49Z",
+            "expired": false,
+            "expires_at": "2026-09-26T23:09:47Z",
+            "id": 9668075656,
+            "name": "system3-ultra-mri-1",
+            "size_in_bytes": 33822
           }
         ],
         "conclusion": "failure",
-        "created_at": "2026-08-23T17:34:09Z",
-        "event": "workflow_run",
-        "head_branch": "main",
-        "head_sha": "887212b33b02da3247860f5e280e9a90a443b87a",
-        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32655253089",
-        "id": 32655253089,
-        "name": "GCP Live UI Semantic Proof",
+        "created_at": "2026-08-27T23:09:04Z",
+        "event": "pull_request",
+        "head_branch": "ops/system3-ultra-mri-control-plane",
+        "head_sha": "e42fc938ca48097c05aa8bb987835e55804b01b0",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33125227256",
+        "id": 33125227256,
+        "name": "System3 Ultra MRI",
         "relevant_failure": false,
-        "run_number": 22,
+        "run_number": 1,
         "status": "completed",
-        "updated_at": "2026-08-23T17:37:40Z",
-        "workflow_id": 338480279
+        "updated_at": "2026-08-27T23:09:54Z",
+        "workflow_id": 344186431
       },
-      "name": "GCP Live UI Semantic Proof",
-      "path": ".github/workflows/gcp-live-ui-semantic-proof.yml",
+      "name": "System3 Ultra MRI",
+      "path": ".github/workflows/system3-ultra-mri.yml",
+      "state": "active"
+    },
+    {
+      "id": 345278283,
+      "latest_run": {
+        "artifacts": [],
+        "conclusion": "failure",
+        "created_at": "2026-09-02T03:59:27Z",
+        "event": "push",
+        "head_branch": "main",
+        "head_sha": "35bba0715a1d2e9144f388b98d21ebcf492bc9b6",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33589085577",
+        "id": 33589085577,
+        "name": "system3-runbook-audit",
+        "relevant_failure": false,
+        "run_number": 16,
+        "status": "completed",
+        "updated_at": "2026-09-02T03:59:41Z",
+        "workflow_id": 345278283
+      },
+      "name": "system3-runbook-audit",
+      "path": ".github/workflows/system3-runbook-audit.yml",
       "state": "active"
     },
     {
@@ -2019,6 +3265,103 @@
       },
       "name": ".github/workflows/patch-render-secret-env-loader.yml",
       "path": ".github/workflows/patch-render-secret-env-loader.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "id": 332146887,
+      "latest_run": {
+        "artifacts": [],
+        "conclusion": "failure",
+        "created_at": "2026-08-11T18:21:30Z",
+        "event": "pull_request",
+        "head_branch": "fix/gcp-wif-proof-20260811",
+        "head_sha": "468253a9eff7379e74b89bb550d8ff124ff6c26b",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31522291143",
+        "id": 31522291143,
+        "name": "GCP WIF Keyless Proof",
+        "relevant_failure": false,
+        "run_number": 1,
+        "status": "completed",
+        "updated_at": "2026-08-11T18:22:17Z",
+        "workflow_id": 332146887
+      },
+      "name": "GCP WIF Keyless Proof",
+      "path": ".github/workflows/gcp-wif-proof.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "id": 332673060,
+      "latest_run": {
+        "artifacts": [],
+        "conclusion": "success",
+        "created_at": "2026-08-12T10:58:15Z",
+        "event": "push",
+        "head_branch": "fix/gcp-dhan-token-rotation-ui-proof-oc-diagnostic-20260812",
+        "head_sha": "ef506e44c74ed918b257277406d3bd28bc7776eb",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/31589764375",
+        "id": 31589764375,
+        "name": "GCP Dhan OC Readonly Diagnostic",
+        "relevant_failure": false,
+        "run_number": 4,
+        "status": "completed",
+        "updated_at": "2026-08-12T18:30:53Z",
+        "workflow_id": 332673060
+      },
+      "name": "GCP Dhan OC Readonly Diagnostic",
+      "path": ".github/workflows/gcp-dhan-oc-readonly-diagnostic.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "id": 342795103,
+      "latest_run": {
+        "artifacts": [
+          {
+            "created_at": "2026-09-02T04:03:29Z",
+            "expired": false,
+            "expires_at": "2026-10-02T04:03:28Z",
+            "id": 9831181837,
+            "name": "live-proof-center-33589085578",
+            "size_in_bytes": 371440
+          }
+        ],
+        "conclusion": "failure",
+        "created_at": "2026-09-02T03:59:27Z",
+        "event": "push",
+        "head_branch": "main",
+        "head_sha": "35bba0715a1d2e9144f388b98d21ebcf492bc9b6",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33589085578",
+        "id": 33589085578,
+        "name": "Live Proof Center (GCP + Dashboard MRI)",
+        "relevant_failure": false,
+        "run_number": 68,
+        "status": "completed",
+        "updated_at": "2026-09-02T04:03:34Z",
+        "workflow_id": 342795103
+      },
+      "name": "Live Proof Center (GCP + Dashboard MRI)",
+      "path": ".github/workflows/live-proof-center.yml",
+      "state": "disabled_manually"
+    },
+    {
+      "id": 346060655,
+      "latest_run": {
+        "artifacts": [],
+        "conclusion": "failure",
+        "created_at": "2026-08-30T18:31:22Z",
+        "event": "push",
+        "head_branch": "fix/cloud-paper-engine-deploy-20260830",
+        "head_sha": "010b9ba7c3f3374bdf95969b25f3fd7590830911",
+        "html_url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33328308326",
+        "id": 33328308326,
+        "name": "Patch Cloud PAPER Contract",
+        "relevant_failure": false,
+        "run_number": 1,
+        "status": "completed",
+        "updated_at": "2026-08-30T18:31:46Z",
+        "workflow_id": 346060655
+      },
+      "name": "Patch Cloud PAPER Contract",
+      "path": ".github/workflows/patch-cloud-paper-contract.yml",
       "state": "disabled_manually"
     }
   ]

@@ -17,7 +17,7 @@ if sys.platform == "win32":
 
 IST = pytz.timezone("Asia/Kolkata")
 API_BASE = "http://localhost:8000"
-FRONTEND_BASE = "http://localhost:3000"
+FRONTEND_BASE = "http://localhost:3000/ui"
 
 
 def print_header(title):

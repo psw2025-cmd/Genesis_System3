@@ -2,11 +2,17 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 
-const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
+
+type ChainPayload = {
+  underlying?: string
+  data_source?: string; status?: string; message?: string; total_contracts?: number
+  contracts?: Record<string, unknown>[]; spot?: number; pcr?: number
+}
 
 export default function ChainAnalytics() {
   const [selectedUnderlying, setSelectedUnderlying] = useState('NIFTY')
-  const [chainData, setChainData] = useState<unknown>(null)
+  const [chainData, setChainData] = useState<ChainPayload | null>(null)
   const [filters, setFilters] = useState({
     strikeRange: { min: 0, max: 999999 },
     nearATM: false,

@@ -1,11 +1,12 @@
+type AuditPayload = { total_contracts?: number; underlying_count?: number; qc_passed?: boolean; secrets_found?: number; status?: string; scanned_files?: { file: string; secrets: number }[] }
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 
 export default function ModelBehavior() {
   const [logs, setLogs] = useState<string[]>([])
-  const [secrets, setSecrets] = useState<unknown>(null)
-  const [qc, setQc] = useState<unknown>(null)
+  const [secrets, setSecrets] = useState<AuditPayload | null>(null)
+  const [qc, setQc] = useState<AuditPayload | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {

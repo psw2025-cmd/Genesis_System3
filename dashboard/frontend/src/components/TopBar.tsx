@@ -101,6 +101,8 @@ export function TopBar() {
   const fin = getSpot('FINNIFTY')
   const vix = getSpot('INDIAVIX')
   const mid = getSpot('MIDCPNIFTY')
+  const sensex = getSpot('SENSEX')
+  const bankex = getSpot('BANKEX')
   const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
 
   const vixMissingLabel = vix.spot
@@ -169,11 +171,13 @@ export function TopBar() {
       </div>
 
       {/* Market Tickers (Scrollable with no overlap) */}
-      <div className="hidden lg:flex items-center overflow-x-auto scrollbar-none flex-1 max-w-2xl px-2">
+      <div className="hidden lg:flex min-w-0 flex-nowrap items-center overflow-x-auto scrollbar-none flex-1 max-w-2xl px-2">
         <MarketTicker label="Nifty 50" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
         <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
         <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
         <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Sensex" spot={sensex.spot} chg={sensex.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Bankex" spot={bankex.spot} chg={bankex.chg} marketOpen={marketOpen} />
         <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={vixMissingLabel} />
         <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[70px] shrink-0">
           <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Board</div>
@@ -187,7 +191,7 @@ export function TopBar() {
       <div className="flex items-center gap-2.5 shrink-0">
         <Clock />
 
-        {/* Broker Button */}
+        {/* Broker / System Health Button */}
         <button
           type="button"
           onClick={() => setActiveTab('broker')}
@@ -196,18 +200,19 @@ export function TopBar() {
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
               : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
           }`}
-          title="Open Broker Status"
+          title="System health · Dhan status"
+          aria-label="System health"
         >
           <Shield size={14} />
           <span>Dhan · {brokerLabel}</span>
         </button>
 
         {/* Paper / Live Mode Pill */}
-        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold">
+        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold" title={liveOn ? 'Live on' : 'Live off'}>
           <span className="text-amber-400 font-bold">PAPER</span>
           <span className="text-slate-600">|</span>
           <span className={liveOn ? 'text-rose-400 font-bold' : 'text-slate-400'}>
-            {liveOn ? 'LIVE ON' : 'LIVE OFF'}
+            {liveOn ? 'Live on' : 'Live off'}
           </span>
         </div>
 

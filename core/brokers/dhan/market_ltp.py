@@ -43,6 +43,7 @@ INDEX_SECURITY_IDS: Dict[str, str] = {
     "FINNIFTY": "27",
     "MIDCPNIFTY": "442",
     "SENSEX": "51",
+    "BANKEX": "12",
 }
 
 INDEX_LABELS: Dict[str, str] = {
@@ -52,6 +53,7 @@ INDEX_LABELS: Dict[str, str] = {
     "FINNIFTY": "Fin Nifty",
     "MIDCPNIFTY": "Midcap Nifty",
     "SENSEX": "Sensex",
+    "BANKEX": "Bankex",
 }
 
 DEFAULT_INDEX_BOARD: Tuple[str, ...] = (
@@ -60,6 +62,8 @@ DEFAULT_INDEX_BOARD: Tuple[str, ...] = (
     "FINNIFTY",
     "INDIAVIX",
     "MIDCPNIFTY",
+    "SENSEX",
+    "BANKEX",
 )
 
 

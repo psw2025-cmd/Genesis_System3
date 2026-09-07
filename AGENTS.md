@@ -1,5 +1,12 @@
 # Genesis System3 — Universal Agent Operating Contract
 
+**Highest-priority user directive (2026-09-07): LOCAL WINDOWS LAPTOP ONLY.**
+Read `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` first.
+The user explicitly authorized Codex's forensic audit, local implementation,
+Excel tracker, launcher, smoke tests and dependency-checked GCP retirement.
+Conflicting Cloud Run and Claude-only clauses below are historical and
+superseded; do not use them to restart GCP or block the authorized local work.
+
 **Applies to:** Codex and every generic/unknown AI agent working in this repository.
 
 **Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
@@ -192,3 +199,11 @@ For any request involving prediction accuracy, AI/ML models, ranking, feature en
 8. Treat current foundation models, LOB transformers, alternative data and LLM features as challengers only. Promote only when System3-specific evidence proves incremental net value over simpler baselines.
 9. Self-learning is bounded retraining/recalibration/challenger testing with rollback; it never means uncontrolled code mutation, automatic LIVE enablement or automatic capital deployment.
 10. Keep ANALYZE/PAPER and all LIVE/order safety locks unchanged while accuracy/research gates are incomplete.
+# Current user override — 2026-09-07
+
+**LOCAL WINDOWS LAPTOP ONLY.** Read
+`docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` first.
+The user explicitly retired GCP and authorized Codex to continue the forensic
+audit, Excel tracker, local launcher, smoke tests and dependency-checked GCP
+removal. Conflicting GCP/Claude-only instructions below are superseded by that
+directive. PAPER/ANALYZE and zero-real-order safety remain mandatory.

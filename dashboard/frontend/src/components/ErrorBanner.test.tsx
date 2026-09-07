@@ -1,3 +1,4 @@
+import '@testing-library/jest-dom/vitest'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import ErrorBanner from './ErrorBanner'
@@ -11,7 +12,7 @@ describe('ErrorBanner', () => {
 
   it('shows HTTP status when provided', () => {
     render(<ErrorBanner endpoint="/api/state" status={503} message="Service offline" />)
-    expect(screen.getByText('503')).toBeInTheDocument()
+    expect(screen.getByText('HTTP 503')).toBeInTheDocument()
   })
 
   it('does not render a status line when status is omitted', () => {

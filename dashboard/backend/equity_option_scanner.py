@@ -266,7 +266,7 @@ def build_equity_options_report(top_n: int = 10, priority_only: bool = False) ->
     segments = {
         "index_options": {
             "implemented": True,
-            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "segments": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"],
             "instrument_type": "OPTIDX",
             "api": "/api/scanner/top_contract_gainers",
         },

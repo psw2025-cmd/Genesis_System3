@@ -81,10 +81,10 @@ CATALYSTS_DATABASE = [
         "verified": True,
         "summary": "Highest open interest concentration at 24500 CE and 24300 PE setting up potential directional gamma expansion on monthly expiry rollover week.",
         "linked_entities": {
-            "indices": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"],
+            "indices": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"],
             "holdings": ["RELIANCE", "HDFCBANK", "INFY", "TCS"],
             "multibaggers": [],
-            "option_chains": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"],
+            "option_chains": ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"],
         },
     },
 ]

@@ -3,14 +3,20 @@ import axios from 'axios'
 import { API_BASE } from '../config'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts'
 
-const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
+
+type ChartPayload = {
+  strikes?: number[]; expiries?: string[]; spot?: number; greek?: string
+  heatmap?: { expiry: string; values: number[] }[]
+  values?: number[]; overall_pcr?: number; pcr_by_strike?: number[]
+}
 
 export default function AdvancedCharts() {
   const [selectedUnderlying, setSelectedUnderlying] = useState('NIFTY')
-  const [heatmapData, setHeatmapData] = useState<unknown>(null)
-  const [ivSurface, setIvSurface] = useState<unknown>(null)
-  const [greeksData, setGreeksData] = useState<unknown>(null)
-  const [pcrData, setPcrData] = useState<unknown>(null)
+  const [heatmapData, setHeatmapData] = useState<ChartPayload | null>(null)
+  const [ivSurface, setIvSurface] = useState<ChartPayload | null>(null)
+  const [greeksData, setGreeksData] = useState<ChartPayload | null>(null)
+  const [pcrData, setPcrData] = useState<ChartPayload | null>(null)
   const [selectedMetric, setSelectedMetric] = useState('oi')
   const [selectedGreek, setSelectedGreek] = useState('delta')
 
@@ -230,8 +236,8 @@ export default function AdvancedCharts() {
               <div>
                 <div className="text-sm text-gray-400">Overall PCR</div>
                 <div className={`text-xl font-bold ${
-                  pcrData.overall_pcr > 1.0 ? 'text-red-400' : 
-                  pcrData.overall_pcr > 0.8 ? 'text-yellow-400' : 'text-green-400'
+                  (pcrData.overall_pcr ?? 1) > 1.0 ? 'text-red-400' : 
+                  (pcrData.overall_pcr ?? 1) > 0.8 ? 'text-yellow-400' : 'text-green-400'
                 }`}>
                   {pcrData.overall_pcr?.toFixed(2) || '0.00'}
                 </div>

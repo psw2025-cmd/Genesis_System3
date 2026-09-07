@@ -8,7 +8,7 @@ import { resolveFeedQuality } from '../../lib/feedQuality'
 import { SystemHealthDiagnostics } from '../SystemHealthDiagnostics'
 import { SystemProgressPanel } from '../SystemProgressPanel'
 
-const REQUIRED_OPTION_CHAINS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'] as const
+const REQUIRED_OPTION_CHAINS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX'] as const
 
 function verifiedDhanContracts(chain: Record<string, any> | null | undefined): number {
   return REQUIRED_OPTION_CHAINS.reduce((total, symbol) => {

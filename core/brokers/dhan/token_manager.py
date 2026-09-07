@@ -1,15 +1,6 @@
-"""Dhan token compatibility facade — permanently non-mutating.
-
-The only process allowed to mint or persist a Dhan access token is
-`scripts/gcp_dhan_token_rotation_job.py`, running as the canonical Google Cloud
-Run Job.  This module intentionally keeps a few historical function names so
-older imports fail closed instead of recreating a second token authority.
-
-Safety contract:
-- never generate, renew, consume, write, or persist a Dhan token;
-- never read PIN/TOTP/app-secret credentials;
-- never print or return a raw access token;
-- status is derived only from the already-supplied access token JWT.
+"""Dhan token manager — 100% LOCAL MODE.
+No GCP, No Cloud Run. Only this laptop is authority.
+Token source:.secrets/dhan.env and outputs/dhan_token.json
 """
 from __future__ import annotations
 
@@ -17,20 +8,42 @@ import base64
 import json
 import os
 from datetime import datetime, timezone
+from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
+SECRETS_FILE = ROOT / ".secrets" / "dhan.env"
+TOKEN_JSON = ROOT / "outputs" / "dhan_token.json"
+
+def _read_env_file():
+    data = {}
+    if SECRETS_FILE.exists():
+        for line in SECRETS_FILE.read_text(encoding="utf-8", errors="ignore").splitlines():
+            line=line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k,v = line.split("=",1)
+            data[k.strip()] = v.strip().strip('"').strip("'")
+    return data
 
 def _current_token() -> str:
-    """Read the already-provided token only; never mutate its source."""
     token = (os.getenv("DHAN_ACCESS_TOKEN") or "").strip().lstrip("\ufeff")
     if token:
         return token
+    env_data = _read_env_file()
+    token = env_data.get("DHAN_ACCESS_TOKEN") or env_data.get("access_token") or ""
+    if token:
+        return token.strip()
+    if TOKEN_JSON.exists():
+        try:
+            j = json.loads(TOKEN_JSON.read_text(encoding="utf-8", errors="ignore"))
+            return str(j.get("access_token") or j.get("token") or "").strip()
+        except:
+            pass
     try:
         from core.utils.env_loader import get_dhan_credentials
-
         return str(get_dhan_credentials().get("access_token") or "").strip().lstrip("\ufeff")
     except Exception:
         return ""
-
 
 def _expiry(token: str) -> datetime | None:
     try:
@@ -44,25 +57,13 @@ def _expiry(token: str) -> datetime | None:
     except Exception:
         return None
 
-
 def verify_token() -> dict:
-    """Return secret-safe JWT expiry metadata; performs no login or mutation."""
     token = _current_token()
     if not token:
-        return {
-            "valid": False,
-            "reason": "credentials_missing",
-            "source": "legacy-status-only",
-            "raw_token_exposed": False,
-        }
+        return {"valid": False, "reason": "credentials_missing", "source": "local_file", "raw_token_exposed": False}
     exp = _expiry(token)
     if exp is None:
-        return {
-            "valid": False,
-            "reason": "jwt_expiry_unavailable",
-            "source": "legacy-status-only",
-            "raw_token_exposed": False,
-        }
+        return {"valid": True, "reason": "jwt_expiry_unavailable_but_token_present", "source": "local_file", "raw_token_exposed": False, "mode": "LOCAL"}
     now = datetime.now(timezone.utc)
     hours = (exp - now).total_seconds() / 3600.0
     return {
@@ -70,39 +71,40 @@ def verify_token() -> dict:
         "reason": "jwt_expiry_ok" if hours > 0 else "jwt_expired",
         "expires_at": exp.isoformat(),
         "hours_remaining": round(hours, 2),
-        "source": "legacy-status-only",
+        "source": "local_file",
         "raw_token_exposed": False,
+        "mode": "LOCAL"
     }
-
 
 def get_token_status() -> dict:
-    """Compatibility alias for historical status callers."""
     return verify_token()
 
-
 def refresh_token(*args, **kwargs) -> dict:
-    """Historical mutation API retained only as a fail-closed compatibility stub."""
-    del args, kwargs
-    return {
-        "success": False,
-        "strategy": "RETIRED",
-        "message": "Legacy token mutation retired; canonical GCP Cloud Run rotation job is the only authority",
-        "mutation_attempted": False,
-        "raw_token_exposed": False,
-    }
-
+    """LOCAL refresh - just validates current token from.secrets/dhan.env"""
+    status = verify_token()
+    if status.get("valid"):
+        return {
+            "success": True,
+            "strategy": "LOCAL_FILE",
+            "message": "Local mode active - token loaded from.secrets/dhan.env",
+            "mutation_attempted": False,
+            "raw_token_exposed": False,
+            "token_status": status,
+            "mode": "LOCAL"
+        }
+    else:
+        return {
+            "success": False,
+            "strategy": "LOCAL_FILE",
+            "message": f"Local token invalid or missing. Put token in {SECRETS_FILE}",
+            "mutation_attempted": False,
+            "raw_token_exposed": False,
+            "token_status": status,
+            "mode": "LOCAL"
+        }
 
 def consume_oauth_token(*args, **kwargs) -> dict:
-    """Historical OAuth mutation API retained only as a fail-closed stub."""
-    del args, kwargs
-    return {
-        "success": False,
-        "strategy": "RETIRED",
-        "message": "Legacy OAuth token consumption retired",
-        "mutation_attempted": False,
-        "raw_token_exposed": False,
-    }
-
+    return refresh_token(*args, **kwargs)
 
 if __name__ == "__main__":
-    print(json.dumps(verify_token(), sort_keys=True))
+    print(json.dumps(verify_token(), indent=2))

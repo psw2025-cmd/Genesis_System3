@@ -58,8 +58,8 @@ export function ModelVsMarketComparator() {
         </div>
 
         {/* Symbol Selectors */}
-        <div className="flex items-center gap-2">
-          {['NIFTY', 'BANKNIFTY', 'FINNIFTY'].map((sym) => (
+        <div className="flex flex-wrap items-center gap-2">
+          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX'].map((sym) => (
             <button
               key={sym}
               type="button"
@@ -124,11 +124,11 @@ export function ModelVsMarketComparator() {
       <div className="flex flex-wrap items-center justify-between gap-3 mt-3 pt-3 border-t border-slate-800/80 text-xs">
         {/* Legend */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="w-3 h-1 bg-emerald-400 rounded-sm" />
             <span className="text-slate-200 font-semibold">LIVE MARKET LTP</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="w-3 h-0.5 border-t-2 border-dashed border-sky-400" />
             <span className="text-sky-400 font-semibold">MODEL PREDICTION (AI)</span>
           </div>

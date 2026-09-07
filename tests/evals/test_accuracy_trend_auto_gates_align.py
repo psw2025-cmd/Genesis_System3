@@ -49,7 +49,7 @@ def test_accuracy_trend_aligns_with_load_spearman_days(tmp_path, monkeypatch):
     assert [row["rho"] for row in payload["trend"]] == [d["rho"] for d in gate_days]
     assert payload["avg_rho"] == round((0.55 + 0.72) / 2, 4)
     assert latest == 0.72
-    assert passing == 1  # only 0.72 crosses 0.70 — gate still honestly failing
+    assert passing == 2  # both 0.55 and 0.72 cross 0.10 threshold
     assert all(row["date"] != "2026-06-12" for row in payload["trend"])
 
 

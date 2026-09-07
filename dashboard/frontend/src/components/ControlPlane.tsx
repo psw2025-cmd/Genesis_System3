@@ -1,3 +1,11 @@
+type LearningMetrics = { win_rate?: number; total_trades?: number; best_strategy?: string }
+type ControlPayload = LearningMetrics & {
+  runner?: string; mode?: string; pid?: number; heartbeat_age_seconds?: number; autopilot_running?: boolean
+  status?: string; latest_insights?: LearningMetrics; total_cycles?: number
+  signal_accuracy?: { accuracy: number }; performance_metrics?: LearningMetrics
+  data_integrity?: { issues?: unknown[] }
+  results?: { success_rate: number; tests_passed?: number; total_tests?: number }
+}
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
@@ -7,11 +15,11 @@ import ErrorBanner from './ErrorBanner'
 export default function ControlPlane() {
   const [refreshInterval, setRefreshInterval] = useState(5)
   const [status, setStatus] = useState('')
-  const [runnerStatus, setRunnerStatus] = useState<unknown>(null)
-  const [learningStatus, setLearningStatus] = useState<unknown>(null)
-  const [learningInsights, setLearningInsights] = useState<unknown>(null)
-  const [forensicReport, setForensicReport] = useState<unknown>(null)
-  const [validationStatus, setValidationStatus] = useState<unknown>(null)
+  const [runnerStatus, setRunnerStatus] = useState<ControlPayload | null>(null)
+  const [learningStatus, setLearningStatus] = useState<ControlPayload | null>(null)
+  const [learningInsights, setLearningInsights] = useState<ControlPayload | null>(null)
+  const [forensicReport, setForensicReport] = useState<ControlPayload | null>(null)
+  const [validationStatus, setValidationStatus] = useState<ControlPayload | null>(null)
   const [loading, setLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [errors, setErrors] = useState<Array<{endpoint: string, status?: number, message: string}>>([])
@@ -389,7 +397,7 @@ export default function ControlPlane() {
             <div className="space-y-2 text-sm">
               <div>Signal Accuracy: {(forensicReport.signal_accuracy.accuracy * 100).toFixed(2)}%</div>
               <div>Total Trades: {forensicReport.performance_metrics?.total_trades || 0}</div>
-              <div>Win Rate: {(forensicReport.performance_metrics?.win_rate * 100).toFixed(2)}%</div>
+              <div>Win Rate: {((forensicReport.performance_metrics?.win_rate ?? 0) * 100).toFixed(2)}%</div>
               <div>Data Issues: {forensicReport.data_integrity?.issues?.length || 0}</div>
             </div>
           )}

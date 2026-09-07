@@ -154,7 +154,8 @@ export function PnlEquityCurveChart({
     { trade: 'T35', cumulative: totalPnl > 0 ? totalPnl : 11200 },
   ]
   const data = pnlHistory.length > 0 ? pnlHistory : defaultData
-  const lastVal = data[data.length - 1]?.cumulative ?? totalPnl
+  const lastPoint = data[data.length - 1]
+  const lastVal = lastPoint && 'cumulative' in lastPoint ? lastPoint.cumulative : totalPnl
   const isUp = lastVal >= 0
 
   return (
