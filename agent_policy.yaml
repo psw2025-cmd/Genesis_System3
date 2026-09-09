@@ -1,46 +1,16 @@
-# agent_policy.yaml — Genesis System3 execution authority and permanent safety invariants
-version: 5
+version: 6
 schema_version: 5
 schema_path: schemas/agent_policy.v5.schema.json
-target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
+target_url: http://127.0.0.1:8000/ui
 coordination_bus: https://github.com/psw2025-cmd/Genesis_System3/issues/188
 
 execution_authority:
-  effective_date: 2026-09-01
-  authority_doc: docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md
-  sole_controller: Claude
-  supersedes_conflicting_multi_agent_execution_ownership: true
+  code_authority: github_current_main
+  runtime_authority: authorized_windows_laptop_only
+  local_repo: 'C:\Genesis_System3_Clean'
+  exact_source_provenance_required: true
   other_agents_default_role: advisory_forensic_verification_only
-  other_agents_may_mutate: false
-  delegated_work_requires:
-    - explicit_claude_delegation
-    - bounded_scope
-    - non_overlapping_ownership
-    - issue_188_coordination
-  claude_owns:
-    - architecture
-    - implementation
-    - debugging
-    - testing
-    - ci_remediation
-    - pull_request_and_merge_sequence
-    - gcp_billing_cleanup
-    - gcp_exit
-    - laptop_migration
-    - runtime_takeover_and_recovery
-    - broker_token_lifecycle
-    - state_data_migration_and_backup_restore
-    - scheduler_job_worker_consolidation
-    - logging_monitoring_cost_control
-    - paper_runtime_validation
-    - final_ui_and_end_to_end_proof
-
-mandatory_reads:
-  - docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md
-  - docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md
-  - agent_policy.yaml
-  - latest_issue_188_coordination
-  - active_pr_ownership
+  parallel_overlapping_mutation: forbidden
 
 safety:
   analyze_mode: true
@@ -51,51 +21,19 @@ safety:
   real_order_count_required: 0
   real_order_placement_modification_cancellation_squareoff: forbidden
   broker_secret_payload_exposure: forbidden
-  service_account_json_keys: forbidden
   live_enablement_requires_human_break_glass: true
 
-coordination:
-  github_issue_188_is_live_bus: true
-  claude_posts: [task_start, material_state_change, blocker, completion]
-  parallel_overlapping_mutation: forbidden
-  stale_agent_ownership_yields_to_claude: true
-  advisory_agents_may_report_findings: true
-
 completion:
-  stop_at_code_or_pr_or_ci: false
-  require_runtime_proof: true
-  require_repo_runtime_authority_reconciled: true
-  require_cost_trigger_inventory: true
-  require_state_data_dependency_reconciliation: true
+  require_fresh_laptop_runtime_proof: true
   require_broker_lifecycle_proof: true
-  require_startup_recovery_automation_proof: true
-  require_paper_zero_order_proof: true
-  require_truthful_ui_proof: true
-  genuine_external_or_user_only_blocker_must_be_explicit: true
-
-gcp_exit_billing_control:
-  observed_2026_09_01:
-    asia_south1_scheduler_count: 9
-    schedulers_observed_state: PAUSED
-    prior_collector_cadence: every_minute
-    prior_dhan_rotation_cadence: every_5_minutes
-    containment_is_completion: false
-  required_claude_actions:
-    - preserve_current_high_frequency_scheduler_containment
-    - reconcile_scheduler_contract_with_runtime
-    - prevent_automatic_recreation_of_expensive_triggers
-    - inventory_and_remove_or_migrate_unneeded_gcp_dependencies
-    - reconcile_cloud_run_jobs_services_storage_firestore_pubsub_bigquery_artifacts_logging_monitoring_iam
-    - migrate_required_state_and_secrets_without_exposing_values
-    - prove_backup_and_restore
-    - prove_laptop_runtime_and_broker_recovery
-    - prove_cost_generating_resources_are_absent_or_explicitly_required
-  high_frequency_scheduler_resume_without_reconciled_ssot: forbidden
+  require_four_index_chain_semantic_proof: true
+  require_scheduler_worker_proof: true
+  require_local_db_state_consistency: true
+  require_truthful_22_tab_ui_proof: true
+  require_ui_and_api_parity: true
 
 evidence:
   current_evidence_over_historical_claims: true
   chat_memory_is_not_runtime_proof: true
   exact_source_sha_required: true
-  production_or_selected_runtime_semantic_proof_required: true
-  ui_and_api_parity_required: true
   broker_source_freshness_truth_required: true
