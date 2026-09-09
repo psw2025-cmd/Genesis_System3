@@ -1,21 +1,8 @@
-"""Broker WebSocket market-feed ingestion client.
+"""Broker WebSocket market-feed ingestion client for the local laptop runtime.
 
-Wires together: reconnect-with-backoff, a circuit breaker, and the partitioned
-Parquet writer. Runs as a long-lived asyncio task, intended for containerized
-execution (Cloud Run job / GKE / any long-running container) - never inline
-in a request-handling path.
-
-IMPORTANT - scope of what is verified here:
-This scaffold's connection lifecycle, backoff, circuit-breaker, and
-writer-wiring are real and unit-tested (see tests/test_data_lake_*). The
-*wire message format* of Dhan's live-market-feed WebSocket is NOT verified
-against current Dhan API docs in this repo - there is no prior WebSocket
-integration here to check against (see docs/API_ARCHITECTURE_AND_IMPROVEMENTS.md,
-which documents REST-only polling and a stale Angel/SmartAPI code sample from
-before the broker migration to Dhan). `DhanFeedClient._parse_message` is
-therefore a clearly marked extension point: wire it to Dhan's documented
-packet schema (ticker/quote/full-depth/20-depth packets) before relying on
-this for real ingestion, rather than trusting the placeholder parsing here.
+The lifecycle, retry/backoff, circuit breaker and local partitioned writer are
+real. Dhan wire-message parsing remains deliberately unimplemented until the
+current broker packet schema is verified; no synthetic fallback is allowed.
 """
 from __future__ import annotations
 
@@ -28,7 +15,7 @@ from typing import Iterable
 
 from .backoff import BackoffPolicy
 from .circuit_breaker import CircuitBreaker, CircuitOpenError
-from .gcs_parquet_writer import PartitionedParquetWriter
+from .local_parquet_writer import PartitionedParquetWriter
 from .partitioning import MarketDataRecord
 
 logger = logging.getLogger("system3.data_lake.ws_ingest_client")
@@ -45,12 +32,6 @@ class FeedConfig:
 
 
 class WebSocketConnection(abc.ABC):
-    """Thin seam so tests can inject a fake socket instead of a real
-    `websockets` connection - keeps the reconnect/backoff logic testable
-    without a live network dependency. Concrete subclasses take
-    (ping_interval_s, ping_timeout_s) in __init__ so any subclass is
-    interchangeable via the `connection_factory` callable used below."""
-
     def __init__(self, ping_interval_s: float, ping_timeout_s: float) -> None:
         raise NotImplementedError
 
@@ -71,9 +52,6 @@ class WebSocketConnection(abc.ABC):
 
 
 class WebsocketsConnection(WebSocketConnection):
-    """Real adapter over the `websockets` package (already a project dependency;
-    see requirements_runtime.txt)."""
-
     def __init__(self, ping_interval_s: float, ping_timeout_s: float):
         self._ping_interval_s = ping_interval_s
         self._ping_timeout_s = ping_timeout_s
@@ -81,10 +59,7 @@ class WebsocketsConnection(WebSocketConnection):
 
     async def connect(self, url: str) -> None:
         import websockets
-
-        self._ws = await websockets.connect(
-            url, ping_interval=self._ping_interval_s, ping_timeout=self._ping_timeout_s
-        )
+        self._ws = await websockets.connect(url, ping_interval=self._ping_interval_s, ping_timeout=self._ping_timeout_s)
 
     async def send(self, data: str | bytes) -> None:
         assert self._ws is not None, "send() called before connect()"
@@ -95,7 +70,7 @@ class WebsocketsConnection(WebSocketConnection):
 
     async def __anext__(self) -> str | bytes:
         assert self._ws is not None, "iteration started before connect()"
-        return await self._ws.__anext__()  # type: ignore[attr-defined] - websockets supports `async for` at runtime
+        return await self._ws.__anext__()
 
     async def close(self) -> None:
         if self._ws is not None:
@@ -103,15 +78,7 @@ class WebsocketsConnection(WebSocketConnection):
 
 
 class BrokerFeedClient(abc.ABC):
-    """Generic reconnect/backoff/circuit-breaker loop. Subclasses supply the
-    broker-specific subscribe payload and message parsing."""
-
-    def __init__(
-        self,
-        config: FeedConfig,
-        writer: PartitionedParquetWriter,
-        connection_factory: type[WebSocketConnection] = WebsocketsConnection,
-    ):
+    def __init__(self, config: FeedConfig, writer: PartitionedParquetWriter, connection_factory: type[WebSocketConnection] = WebsocketsConnection):
         self.config = config
         self.writer = writer
         self._connection_factory = connection_factory
@@ -121,8 +88,7 @@ class BrokerFeedClient(abc.ABC):
     def _subscribe_payload(self, symbols: Iterable[str]) -> str | bytes: ...
 
     @abc.abstractmethod
-    def _parse_message(self, raw: str | bytes, receive_ts_utc: datetime) -> MarketDataRecord | None:
-        """Return a MarketDataRecord, or None to skip (e.g. heartbeat frame)."""
+    def _parse_message(self, raw: str | bytes, receive_ts_utc: datetime) -> MarketDataRecord | None: ...
 
     def stop(self) -> None:
         self._stop.set()
@@ -136,12 +102,11 @@ class BrokerFeedClient(abc.ABC):
                 logger.warning("circuit open, waiting before retry: %s", exc)
                 await asyncio.sleep(self.config.circuit_breaker.reset_timeout_s)
                 continue
-
             try:
                 await self._connect_and_consume()
-                attempt = 0  # clean disconnect after a working session resets backoff
+                attempt = 0
                 self.config.circuit_breaker.record_success()
-            except Exception as exc:  # noqa: BLE001 - any failure triggers backoff+breaker
+            except Exception as exc:
                 self.config.circuit_breaker.record_failure()
                 if self.config.backoff.exhausted(attempt):
                     logger.error("backoff attempts exhausted, giving up: %s", exc)
@@ -168,9 +133,6 @@ class BrokerFeedClient(abc.ABC):
 
 
 def _retry_after_hint(exc: Exception) -> float | None:
-    """Best-effort extraction of a Retry-After style hint from an exception
-    raised by the underlying websocket/HTTP layer (e.g. a 429 upgrade
-    rejection). Returns None when no such hint is present."""
     retry_after = getattr(exc, "retry_after", None)
     try:
         return float(retry_after) if retry_after is not None else None
@@ -179,42 +141,15 @@ def _retry_after_hint(exc: Exception) -> float | None:
 
 
 class DhanFeedClient(BrokerFeedClient):
-    """Dhan live-market-feed client scaffold.
-
-    `_subscribe_payload` and `_parse_message` encode Dhan's DOCUMENTED request
-    shape (instrument list keyed by security id + exchange segment) at a high
-    level only; the exact packet/field layout must be verified against Dhan's
-    current API docs before this reads real depth/option-chain data. Treat
-    `_parse_message` below as a placeholder that raises NotImplementedError
-    rather than silently emitting fabricated records - a silent
-    synthetic/demo fallback here would violate issue #376's own acceptance
-    criteria ("no silent synthetic/demo fallback").
-    """
-
-    def __init__(
-        self,
-        config: FeedConfig,
-        writer: PartitionedParquetWriter,
-        instrument_type: str,
-        security_ids_by_symbol: dict[str, str],
-        connection_factory: type[WebSocketConnection] = WebsocketsConnection,
-    ):
+    def __init__(self, config: FeedConfig, writer: PartitionedParquetWriter, instrument_type: str, security_ids_by_symbol: dict[str, str], connection_factory: type[WebSocketConnection] = WebsocketsConnection):
         super().__init__(config, writer, connection_factory)
         self.instrument_type = instrument_type
         self.security_ids_by_symbol = security_ids_by_symbol
 
     def _subscribe_payload(self, symbols: Iterable[str]) -> str:
         import json
-
-        instruments = [
-            {"ExchangeSegment": "NSE_FNO", "SecurityId": self.security_ids_by_symbol[s]}
-            for s in symbols
-            if s in self.security_ids_by_symbol
-        ]
+        instruments = [{"ExchangeSegment": "NSE_FNO", "SecurityId": self.security_ids_by_symbol[s]} for s in symbols if s in self.security_ids_by_symbol]
         return json.dumps({"RequestCode": 15, "InstrumentCount": len(instruments), "InstrumentList": instruments})
 
     def _parse_message(self, raw: str | bytes, receive_ts_utc: datetime) -> MarketDataRecord | None:
-        raise NotImplementedError(
-            "Dhan wire-message parsing is not verified in this scaffold - implement against "
-            "Dhan's current live-market-feed packet schema before use; see module docstring."
-        )
+        raise NotImplementedError("Dhan wire-message parsing is not verified; implement against the current documented packet schema before use")
