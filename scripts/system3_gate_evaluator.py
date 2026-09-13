@@ -14,6 +14,8 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import hashlib
+import tempfile
 import os
 import sys
 from datetime import datetime, timezone, timedelta, date
@@ -407,8 +409,31 @@ def sync_human_technical_gates(root: Path, payload: Dict[str, Any]) -> Dict[str,
 
 
 def write_reports(root: Path, payload: Dict[str, Any]) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
-    (OUT / "summary.json").write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    out = root / 'reports' / 'latest' / 'system3_auto_gates'
+    out.mkdir(parents=True, exist_ok=True)
+    # One atomic file contains both evidence and its generation manifest.
+    # A reader never observes a new manifest paired with an old payload.
+    payload = dict(payload)
+    payload.pop('snapshot_manifest', None)
+    content = json.dumps(payload, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')
+    digest = hashlib.sha256(content).hexdigest()
+    payload['snapshot_manifest'] = {
+        'schema_version': 1, 'snapshot_id': digest, 'payload_sha256': digest,
+        'generated_at': payload['generated_utc'],
+        'producer': 'scripts/system3_gate_evaluator.py',
+        'source': 'local_evidence_evaluator',
+        'evaluator_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+    }
+    fd, temp = tempfile.mkstemp(prefix='.summary-', suffix='.tmp', dir=out)
+    try:
+        with os.fdopen(fd, 'w', encoding='utf-8') as handle:
+            json.dump(payload, handle, indent=2, allow_nan=False)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp, out / 'summary.json')
+    finally:
+        if os.path.exists(temp):
+            os.unlink(temp)
     lines = [
         "# System3 Auto Gates",
         "",
@@ -430,7 +455,7 @@ def write_reports(root: Path, payload: Dict[str, Any]) -> None:
     lines.extend(["", "## Auto actions", ""])
     for a in payload.get("recommended_auto_actions") or []:
         lines.append(f"- {a}")
-    (OUT / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (out / "summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def main() -> int:

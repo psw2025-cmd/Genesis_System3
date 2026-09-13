@@ -38,7 +38,8 @@ def test_auto_gates_service_builds_proof_gates():
     from dashboard.backend.auto_gates_service import build_auto_gates_report
 
     report = build_auto_gates_report(refresh=True)
-    assert report.get("runtime_driven") is True
+    assert report.get("runtime_driven") is False
+    assert report.get("source") == "local_gate_snapshot"
     assert "proof_gates" in report
     assert report.get("live_trading_enabled") is False
 
