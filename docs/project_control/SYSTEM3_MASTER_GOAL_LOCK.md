@@ -1,5 +1,30 @@
 # System3 Master Goal Lock
 
+## User goal refinement — September 2026
+
+The user wants forward prediction of exceptional Indian-market opportunities:
+intraday CE/PE premium acceleration, overnight option gaps identified before the
+previous close, and emerging equity multibaggers with forecasts from one week
+to one year. iCharts uptrends and Moneycontrol option gainers are references
+illustrating desired opportunities, not substitutes for future predictions.
+
+Maintain separate horizon-specific predictions and preserve the original time,
+data cutoff, contract identity, model version, forecast range and uncertainty.
+Compare every forecast with subsequent actual results, including misses and
+losses. Evaluate achievable net returns using entry ask, exit bid, liquidity,
+costs and delays; an eventual historical high is not an executable exit rule.
+
+The engineering agent owns data-history assessment, feature research, model
+comparison, leakage-safe backtests, forward PAPER validation and controlled
+retraining/promotion with rollback. Search existing implementations first.
+Record problems in the tracker and progress through tested solutions; do not
+repeatedly ask the user to select algorithms or explain settled goals.
+
+Windows laptop only is current runtime authority. GitHub main remains code
+authority. Historical cloud-runtime and fixed-tab-count clauses below are
+superseded: derive UI coverage from DASHBOARD_TABS. All real-order safety locks
+remain enforced. Unspecified risk limits do not authorize capital deployment.
+
 Repository: `psw2025-cmd/Genesis_System3`
 Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`
 

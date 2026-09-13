@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import math
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
@@ -55,7 +55,9 @@ def _limit_chain_df(df: pd.DataFrame, spot: Any) -> pd.DataFrame:
 
 def _normalize_chain_source(source: Any) -> str:
     src = str(source or "").strip().lower()
-    if src in ("", "datasource_manager", "real", "dhan_option_chain_live"):
+    if src in ("", "datasource_manager", "real", "unknown"):
+        return "UNKNOWN"
+    if src == "dhan_option_chain_live":
         return "dhan"
     return src
 
@@ -218,7 +220,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
 
         buildup = _classify_buildup(change_rs, oi_change)
         unusual_flag = bool(volume > 5000 and abs(oi_change_pct) > 50.0)
-        row_source = _normalize_chain_source(row.get("source", row.get("data_source", "dhan")))
+        row_source = _normalize_chain_source(row.get("source", row.get("data_source")))
 
         base: Dict[str, Any] = {
             "exchange": "NSE_FNO",
@@ -272,7 +274,10 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             "trading_symbol": row.get("trading_symbol") or row.get("tradingSymbol") or row.get("symbol"),
             "source": row_source,
             "data_source": row_source,
-            "verification_status": "VERIFIED_DHAN" if row_source == "dhan" else "SIMULATED",
+            "source_observed_at": row.get("source_observed_at") or row.get("source_timestamp"),
+            "source_timestamp": row.get("source_timestamp") or row.get("source_observed_at"),
+            "cache_received_at": datetime.now(timezone.utc).isoformat(),
+            "verification_status": "VERIFIED_DHAN" if row_source == "dhan" else "UNKNOWN",
         }
 
         if not base.get("trading_symbol") and chain_expiry:
@@ -309,9 +314,28 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             if c["strike"] == max_ce_strike and c["option_type"] == "CE":
                 c["support_resistance_tag"] = "MAJOR_RESISTANCE"
 
-    source = _normalize_chain_source(contracts[0].get("source", "dhan"))
+    sources = {_normalize_chain_source(c.get("source")) for c in contracts}
+    source = sources.pop() if len(sources) == 1 else "UNKNOWN"
     configured_limit = _configured_chain_limit()
-    is_live = bool(spot_f > 0 and source == "dhan")
+    now = datetime.now(timezone.utc)
+    source_times = []
+    for contract in contracts:
+        try:
+            stamp = datetime.fromisoformat(str(contract.get("source_observed_at") or "").replace("Z", "+00:00"))
+            if stamp.tzinfo is None:
+                raise ValueError("Timezone missing")
+            source_times.append(stamp)
+        except (ValueError, TypeError):
+            break
+    complete_times = len(source_times) == len(contracts)
+    source_asof = min(source_times).isoformat() if complete_times else None
+    freshness_seconds = (now - min(source_times)).total_seconds() if complete_times else None
+    no_future = complete_times and max(source_times) <= now
+    from core.utils.nse_holidays import HOLIDAYS_BY_YEAR, is_trading_day
+    ist = now.astimezone(timezone(timedelta(hours=5, minutes=30)))
+    market_open = ist.year in HOLIDAYS_BY_YEAR and is_trading_day(ist.date())[0] and (9, 15) <= (ist.hour, ist.minute) < (15, 30)
+    # Provenance and freshness are separate. Receipt of a disk cache is not market observation.
+    is_live = bool(market_open and spot_f > 0 and source == "dhan" and no_future and freshness_seconds is not None and 0 <= freshness_seconds <= 60)
 
     return {
         "underlying": underlying.upper(),
@@ -332,11 +356,13 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         "liquidity_filter_reasons": liquidity_counts,
         "liquidity_filter": "oi_gt_0_and_volume_gt_0",
         "data_source": source,
-        "data_mode": "LIVE" if is_live else "SIMULATION",
-        "verification_status": "VERIFIED_LIVE" if is_live else "VERIFIED_SIMULATION",
-        "reason_if_unverified": None if is_live else "Chain normalized from simulation/offline dataset (market closed).",
-        "as_of_utc": datetime.now(timezone.utc).isoformat(),
-        "freshness_seconds": 1.0,
+        "data_mode": "LIVE" if is_live else "UNVERIFIED",
+        "verification_status": "VERIFIED_LIVE" if is_live else "NOT_PROVEN",
+        "reason_if_unverified": None if is_live else "Explicit broker provenance and fresh source timestamps are required.",
+        "as_of_utc": source_asof,
+        "source_observed_at": source_asof,
+        "cache_received_at": now.isoformat(),
+        "freshness_seconds": freshness_seconds,
         "source_priority": "dhan_option_chain_live" if source == "dhan" else source,
         "status": "OK",
         "stale": False,
