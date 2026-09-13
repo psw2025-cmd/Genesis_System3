@@ -14,15 +14,23 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import os
 import re
+import sys
 import urllib.request
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 INDEX_UNDERLYINGS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"}
+BROKER_ACCEPTANCE_REQUIRED = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
+SUPPORTED_INDEX_UNIVERSE = BROKER_ACCEPTANCE_REQUIRED + ("SENSEX", "BANKEX")
 
 
 @dataclass
@@ -45,6 +53,60 @@ class VisibilityRow:
     liquidity_status: str
     paper_trade_allowed: bool
     blocker_reason: str
+    trading_symbol: str = ""
+    source: str = "UNKNOWN"
+    observed_at: str = ""
+    source_timestamp: str = ""
+    freshness_ms: Optional[float] = None
+    market_session: str = "UNKNOWN"
+    provenance_status: str = "UNKNOWN"
+    quote_status: str = "BLOCKED"
+
+
+def quote_proof(quote: Dict[str, Any], now: Optional[datetime] = None) -> Dict[str, Any]:
+    """Validate broker evidence without inventing a price or source timestamp."""
+    now = now or datetime.now(timezone.utc)
+    source = str(quote.get("source") or "UNKNOWN").lower()
+    stamp = str(quote.get("source_timestamp") or quote.get("source_observed_at") or "")
+    reasons = []
+    age = None
+    try:
+        observed = datetime.fromisoformat(stamp.replace('Z', '+00:00'))
+        if observed.tzinfo is None:
+            raise ValueError('timezone required')
+        age = (now - observed).total_seconds() * 1000
+        if not 0 <= age <= 60000:
+            reasons.append('SOURCE_QUOTE_STALE_OR_FUTURE')
+    except (ValueError, TypeError):
+        reasons.append('SOURCE_TIMESTAMP_NOT_PROVEN')
+    provenance = str(quote.get('provenance_status') or quote.get('verification_status') or 'UNKNOWN')
+    if source not in {'dhan', 'dhan_option_chain_live'} or provenance != 'VERIFIED_DHAN':
+        reasons.append('BROKER_PROVENANCE_NOT_PROVEN')
+    values = tuple(as_float(quote.get(k)) for k in ('ltp', 'bid', 'ask'))
+    if any(v is None or not math.isfinite(v) or v <= 0 for v in values):
+        reasons.append('COMPLETE_POSITIVE_QUOTE_REQUIRED')
+    elif values[2] < values[1]:
+        reasons.append('CROSSED_QUOTE')
+    if values == (125.0, 124.5, 125.5):
+        reasons.append('KNOWN_SYNTHETIC_QUOTE_PATTERN')
+    from core.utils.nse_holidays import HOLIDAYS_BY_YEAR, is_trading_day
+    ist = now.astimezone(timezone(timedelta(hours=5, minutes=30)))
+    regular = ist.year in HOLIDAYS_BY_YEAR and is_trading_day(ist.date())[0] and (9,15) <= (ist.hour,ist.minute) < (15,30)
+    session = str(quote.get('market_session') or 'UNKNOWN')
+    if not regular or session not in {'OPEN', 'LIVE_MARKET'}:
+        reasons.append('MARKET_SESSION_NOT_OPEN')
+    for key in ('security_id', 'trading_symbol', 'expiry', 'strike', 'option_type'):
+        if not quote.get(key):
+            reasons.append(key.upper() + '_NOT_PROVEN')
+    try:
+        if datetime.fromisoformat(str(quote.get('expiry'))[:10]).date() < ist.date():
+            reasons.append('CONTRACT_EXPIRED')
+    except ValueError:
+        reasons.append('EXPIRY_INVALID')
+    return dict(source=source, source_timestamp=stamp, freshness_ms=age,
+                observed_at=str(quote.get('observed_at') or ''), market_session=session,
+                provenance_status=provenance, quote_status='BLOCKED' if reasons else 'PASS',
+                reasons=reasons)
 
 
 def repo_root_from_script() -> Path:
@@ -159,11 +221,7 @@ def load_state_signals(root: Path, api_base: Optional[str]) -> Tuple[List[Dict[s
             sig = extract_signals_from_state(data if isinstance(data, dict) else {"items": data})
             if sig:
                 return sig, str(p.relative_to(root))
-    return [
-        {"symbol": "NIFTY", "underlying": "NIFTY", "score": 0.85, "signal": "BUY", "option_type": "CE"},
-        {"symbol": "BANKNIFTY", "underlying": "BANKNIFTY", "score": 0.82, "signal": "BUY", "option_type": "CE"},
-        {"symbol": "RELIANCE", "underlying": "RELIANCE", "score": 0.78, "signal": "BUY", "option_type": "CE"},
-    ], "baseline-index-signals"
+    return [], "NO_SIGNAL_SOURCE"
 
 
 def collect_option_master(root: Path) -> Tuple[Dict[str, List[Dict[str, str]]], str]:
@@ -239,7 +297,9 @@ def pick_contract(
         if option_side in {"CE", "PE"} and option_side not in blob and ("CALL" not in blob if option_side == "CE" else "PUT" not in blob):
             continue
         side_rows.append(r)
-    selected = side_rows[0] if side_rows else rows[0]
+    if not side_rows or option_side not in {'CE', 'PE'}:
+        return "", "", "", None, None, None
+    selected = side_rows[0]
     expiry = (
         selected.get("SEM_EXPIRY_DATE")
         or selected.get("EXPIRY_DATE")
@@ -265,10 +325,6 @@ def pick_contract(
     ltp = as_float(selected.get("LTP") or selected.get("ltp") or selected.get("last_price"))
     bid = as_float(selected.get("BID") or selected.get("bid") or selected.get("best_bid"))
     ask = as_float(selected.get("ASK") or selected.get("ask") or selected.get("best_ask"))
-    if ltp is None and token:
-        ltp = 125.0
-        bid = 124.5
-        ask = 125.5
     return str(expiry), str(strike), str(token), ltp, bid, ask
 
 
@@ -306,6 +362,15 @@ def make_rows(
             blocker.append("LTP_NOT_AVAILABLE")
         if liquidity == "FAIL":
             blocker.append("SPREAD_LIQUIDITY_FAIL")
+        # Instrument master identifies contracts; it does not prove live quotes.
+        # Only the selected security's explicit quote may supply provenance.
+        matching = next((r for r in contracts if str(r.get('security_id') or r.get('SEM_SMST_SECURITY_ID') or r.get('SECURITY_ID') or r.get('token') or r.get('instrument_token') or '') == token), {})
+        evidence = dict(matching)
+        evidence.update(security_id=token, expiry=expiry, strike=strike, option_type=option_side, ltp=ltp, bid=bid, ask=ask)
+        proof = quote_proof(evidence)
+        blocker.extend(proof.pop('reasons'))
+        if liquidity != 'PASS':
+            blocker.append('LIQUIDITY_NOT_PROVEN')
         paper_allowed = not blocker
         rows.append(
             VisibilityRow(
@@ -327,6 +392,8 @@ def make_rows(
                 liquidity_status=liquidity,
                 paper_trade_allowed=paper_allowed,
                 blocker_reason=";".join(blocker) if blocker else "PASS",
+                trading_symbol=str(evidence.get('trading_symbol') or ''),
+                **proof,
             )
         )
     if not rows:

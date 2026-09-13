@@ -13,12 +13,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
-from datetime import datetime, timezone
+import sys
+from datetime import datetime, timezone, timedelta, date
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 OUT = ROOT / "reports" / "latest" / "system3_auto_gates"
 SPEARMAN_THRESHOLD = 0.70
 SPEARMAN_DAYS_REQUIRED = 5
@@ -66,42 +70,40 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         if data.get("error") and _spearman_from_validation(data) in (None, 0.0):
             return
         rho = _spearman_from_validation(data)
-        if rho is None:
+        if rho is None or not math.isfinite(rho):
             return
         day = str(data.get("date") or fallback_date or "").strip()
         if not day:
             return
+        from scripts.system3_option_visibility_audit import BROKER_ACCEPTANCE_REQUIRED
+        from core.utils.nse_holidays import HOLIDAYS_BY_YEAR, is_trading_day
+        try:
+            business_day = date.fromisoformat(day)
+        except ValueError:
+            return
+        coverage = data.get('covered_underlyings')
+        valid_coverage = isinstance(coverage, list) and set(BROKER_ACCEPTANCE_REQUIRED).issubset(coverage)
+        qualifying = (business_day.year in HOLIDAYS_BY_YEAR and is_trading_day(business_day)[0]
+                      and data.get('coverage_complete') is True and valid_coverage
+                      and data.get('source') == 'state/gain_rank_history.json'
+                      and data.get('status') == 'PASS'
+                      and not any(data.get(k) for k in ('is_fixture', 'seeded', 'simulation', 'replay', 'demo')))
         by_date[day] = {
             "date": day,
             "rho": round(rho, 4),
             "hit_rate": data.get("hit_rate", data.get("match_rate_top3")),
             "status": data.get("status") or data.get("grade"),
-            "pass": rho >= SPEARMAN_THRESHOLD,
+            "pass": qualifying and rho >= SPEARMAN_THRESHOLD,
+            "coverage_qualifying": qualifying,
         }
 
     mv_dir = root / "state" / "market_validations"
-    cloud_backend = os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore" or bool(
-        os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("CLOUD_MODE")
-    )
-    # Cloud Run has no durable local state/; prefer Firestore and skip empty laptop paths.
-    if not cloud_backend and mv_dir.exists():
+    if mv_dir.exists():
         for path in sorted(mv_dir.glob("*.json")):
             data = _read_json(path)
             if not data:
                 continue
             _ingest(data, fallback_date=path.stem.replace("market_validation_", ""))
-
-    # Durable production path is authoritative in cloud mode. Avoid contacting
-    # Firestore from explicitly local/offline runs, where state/ is scratch.
-    if cloud_backend:
-        try:
-            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
-
-            for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
-                if isinstance(row, dict):
-                    _ingest(row)
-        except Exception:
-            pass
 
     days = [by_date[k] for k in sorted(by_date)]
     passing = sum(1 for d in days if d["pass"])
@@ -109,15 +111,31 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
     return days, passing, latest_rho
 
 
-def eval_spearman_gate(root: Path) -> Dict[str, Any]:
+def eval_spearman_gate(root: Path, now: Optional[datetime] = None) -> Dict[str, Any]:
     days, passing, latest = load_spearman_days(root)
+    from core.utils.nse_holidays import HOLIDAYS_BY_YEAR, is_trading_day
+    now = now or datetime.now(timezone.utc)
+    ist = now.astimezone(timezone(timedelta(hours=5, minutes=30)))
+    expected = ist.date() if (ist.hour, ist.minute) >= (15, 35) else ist.date() - timedelta(days=1)
+    def previous_session(day):
+        for _ in range(32):
+            if day.year not in HOLIDAYS_BY_YEAR:
+                return None
+            if is_trading_day(day)[0]:
+                return day
+            day -= timedelta(days=1)
+        return None
+    expected = previous_session(expected)
+    latest_required = expected.isoformat() if expected else None
     consecutive_pass = 0
-    for d in reversed(days):
-        if d["pass"]:
-            consecutive_pass += 1
-        else:
+    by_date = {d['date']: d for d in days}
+    while expected is not None:
+        record = by_date.get(expected.isoformat())
+        if not record or not record['pass']:
             break
-    ok = passing >= SPEARMAN_DAYS_REQUIRED
+        consecutive_pass += 1
+        expected = previous_session(expected - timedelta(days=1))
+    ok = consecutive_pass >= SPEARMAN_DAYS_REQUIRED
     return {
         "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
         "pass": ok,
@@ -127,6 +145,7 @@ def eval_spearman_gate(root: Path) -> Dict[str, Any]:
         "threshold": SPEARMAN_THRESHOLD,
         "latest_rho": latest,
         "consecutive_pass_days": consecutive_pass,
+        "latest_required_market_day": latest_required,
         "blocker_id": None if ok else "SYS3-BLK-005",
         "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
         "days": days[-14:],
@@ -257,31 +276,39 @@ def eval_model_accuracy_report(root: Path) -> Dict[str, Any]:
     }
 
 
-def eval_option_visibility(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    md = root / "reports" / "latest" / "option_strike_visibility.md"
+def eval_option_visibility(root: Path, live_state: Optional[Dict[str, Any]] = None, now: Optional[datetime] = None) -> Dict[str, Any]:
+    from scripts.system3_option_visibility_audit import BROKER_ACCEPTANCE_REQUIRED, SUPPORTED_INDEX_UNIVERSE, quote_proof
     js = root / "reports" / "latest" / "option_strike_visibility.json"
-    ok = md.exists() and js.exists()
-    paper_allowed = 0
-    row_count = 0
-    if js.exists():
-        data = _read_json(js) or {}
-        summary = data.get("summary") or {}
-        paper_allowed = int(summary.get("paper_trade_allowed_count") or 0)
-        row_count = int(summary.get("rows") or 0)
-        ok = ok and row_count > 0 and paper_allowed > 0
-    if not ok and live_state and (live_state.get("market") or {}).get("is_open"):
-        positions = live_state.get("positions") or []
-        chain_ok = bool(positions) and any(
-            p.get("strike") and p.get("option_type") for p in positions if isinstance(p, dict)
-        )
-        if chain_ok:
-            ok = True
-            paper_allowed = max(paper_allowed, len(positions))
+    data = _read_json(js) or {}
+    rows = data.get('rows') if isinstance(data.get('rows'), list) else []
+    proven = {}
+    used_ids = set()
+    duplicate_ids = set()
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        quote = dict(row)
+        quote['security_id'] = row.get('security_id') or row.get('instrument_token')
+        quote['option_type'] = row.get('option_type') or row.get('option_side')
+        symbol = str(row.get('underlying') or '').upper()
+        if row.get('paper_trade_allowed') is not True or quote_proof(quote, now)['quote_status'] != 'PASS':
+            continue
+        security_id = str(quote['security_id'])
+        if security_id in used_ids:
+            duplicate_ids.add(security_id)
+        used_ids.add(security_id)
+        proven[symbol] = security_id
+    missing = sorted(set(BROKER_ACCEPTANCE_REQUIRED) - set(proven))
+    ok = not missing and not duplicate_ids
     return {
         "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
         "pass": ok,
-        "rows": row_count,
-        "paper_trade_allowed_count": paper_allowed,
+        "rows": len(rows),
+        "paper_trade_allowed_count": len(proven),
+        "required_symbols": list(BROKER_ACCEPTANCE_REQUIRED),
+        "supported_symbols": list(SUPPORTED_INDEX_UNIVERSE),
+        "missing_required_symbols": missing,
+        "duplicate_security_ids": sorted(duplicate_ids),
         "blocker_id": None if ok else "SYS3-BLK-003",
         "auto_action": "Run scripts/system3_option_visibility_audit.py",
     }
