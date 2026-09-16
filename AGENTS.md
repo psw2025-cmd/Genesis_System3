@@ -3,7 +3,9 @@
 **Canonical checkout:** `C:\Genesis_System3_Clean`  
 **Upstream code:** GitHub `psw2025-cmd/Genesis_System3` (`origin/main`)  
 **Runtime and acceptance:** local Windows laptop at `http://127.0.0.1:8000` (discover the bound port; do not assume a document).  
-**Machine policy:** `agent_policy.yaml` (schema v6)
+**Machine policy:** `agent_policy.yaml` (schema v6)  
+**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`  
+**Broker:** Dhan. Angel and Render hosting are retired and non-authoritative.
 
 This file is the short universal constitution. Domain rules live under `.cursor/rules/00`–`60`. Do not duplicate them here.
 
