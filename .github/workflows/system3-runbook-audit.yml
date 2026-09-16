@@ -1,5 +1,8 @@
 name: system3-runbook-audit
 
+# HISTORICAL_NON_AUTHORITY for local-laptop runtime (2026-09-16 Batch 1).
+# Manual GCP WIF audit only. Not local acceptance authority.
+
 on:
   # GCP-EXIT NOTE (2026-09-01): automatic push trigger removed — this audit
   # calls live GCP; a normal main push must not invoke GCP. Manual only now.

@@ -4,6 +4,10 @@
 
 **Policy marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
+## Local runtime override (2026-09-07+)
+
+Current acceptance authority is the local Windows laptop. For `now` / `live` / `UI now` claims, open a **new** browser session against the proven local URL (default `http://127.0.0.1:8000/ui/`, discover the bound port). GCP Cloud Run `run.app` URLs and `scripts/gcp_live_ui_snapshot.py` below are HISTORICAL_NON_AUTHORITY unless the user explicitly re-authorizes cloud runtime.
+
 ## Core law
 
 `latest` is not the same as `live`.
