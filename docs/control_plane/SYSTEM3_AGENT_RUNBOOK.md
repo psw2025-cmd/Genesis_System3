@@ -2,15 +2,13 @@
 
 **Authority marker:** `SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1`
 
-**2026-09-01 authority override:** `docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md` is the current user-directed execution-ownership authority. Claude is the sole controller/executor. Other agents are advisory/forensic/verification only unless Claude delegates a bounded non-overlapping task. This override changes ownership, not the PAPER/zero-order safety locks below.
+**Current authority:** `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` and `AGENTS.md`. The 2026-09-01 Claude-only override is HISTORICAL_NON_AUTHORITY (`docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md`).
 
-**Role:** Persistent self-instruction and completion ledger contract for Codex,
-ChatGPT, Cursor, Gemini, Claude, and every generic/unknown agent operating in
-this repository.
+**Role:** Persistent self-instruction and completion ledger for every agent in this repository.
 
 ## Mandatory re-read boundary
 
-Re-read this runbook and `docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md` from the current checked-out commit immediately before:
+Re-read this runbook and `AGENTS.md` from the current checked-out commit immediately before:
 
 1. every merge decision;
 2. every deployment or production mutation;
@@ -24,19 +22,16 @@ re-read UTC time in the active completion ledger.
 
 ## Authority order
 
-For execution ownership, `docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md` takes precedence. Safety and evidence requirements remain governed by the narrower applicable authorities below:
-
-1. `docs/control_plane/CLAUDE_SINGLE_EXECUTION_AUTHORITY.md`
-2. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
-3. `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
-4. `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`
-5. `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md`
+1. Latest explicit user instruction
+2. Trading/secret/destructive safety
+3. `AGENTS.md`
+4. `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md`
+5. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
 6. `agent_policy.yaml`
-7. `docs/CONTINUOUS_CLOSURE_SYSTEM.md`
-8. `docs/PREFLIGHT_CONTROL_PLANE.md`
-9. `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`
+7. Scoped `.cursor/rules`
 
-When two sources appear to disagree, fail closed, preserve safety, and route execution-ownership conflicts to Claude. Stale multi-agent ownership must not create parallel mutations.
+GCP Cloud Run, Claude-only ownership, and Issue #188 as a live bus do not
+outrank the local-laptop directive.
 
 ## Permanent safety state
 
@@ -53,22 +48,12 @@ When two sources appear to disagree, fail closed, preserve safety, and route exe
 Only an explicit human break-glass process may authorize LIVE trading or real
 orders. Routine autonomy never broadens that authority.
 
-## Claude-controlled execution cycle
+## Local runtime cycle
 
-Claude owns implementation, debugging, tests, CI remediation, migration, GCP cleanup, deployment sequencing and final acceptance. Every other agent must restrict itself to evidence gathering, independent verification, review or a task explicitly delegated by Claude. Findings go to Issue #188; they do not create competing implementation lanes.
+Verify the symptom on `C:\Genesis_System3_Clean` and `http://127.0.0.1:8000`
+(discover the bound port). Implement on a dedicated branch/worktree from
+`origin/main`. Test. Prove local API/browser/safety. Do not deploy to Cloud Run
+or run `gcloud`.
 
-For each issue or goal Claude must: verify the authoritative symptom; identify root cause and downstream dependencies; implement the smallest durable solution from current main; test it; reconcile concurrent upstream work; prove runtime/serving state; and continue until the user-visible end goal is proven or a genuine external/user-only blocker is demonstrated.
-
-## GCP-exit and billing-control requirement
-
-The 2026-09-01 evidence established a contained configuration conflict: all nine asia-south1 Cloud Scheduler jobs were observed PAUSED, while prior same-day executions showed the scheduler collector firing approximately every minute and Dhan token rotation approximately every five minutes. PR #449 retires the contradictory `infra/rotate-job.yaml` GCP manifest; that deleted file and its 07:30 Asia/Kolkata trigger are historical and non-authoritative.
-
-Claude must keep retired GCP schedules from being recreated while reconciling repository SSOT, laptop runtime, broker token lifecycle, state/data dependencies, backup/restore, background workers, logging/monitoring and cost-generating triggers. A deleted manifest alone is not proof of the selected laptop runtime.
-
-## Production and UI proof
-
-A completion claim requires fresh evidence from the actual selected authoritative runtime. Code, PR, CI, HTTP 200, rendered tabs, or historical screenshots alone are insufficient. Preserve exact source SHA/runtime provenance, broker/source/freshness truth, browser/API semantic parity and zero-real-order evidence.
-
-## Coordination
-
-GitHub Issue #188 remains the live coordination/status bus. Claude posts task start, material state change, blockers and completion evidence. Other agents may post independent evidence but may not claim execution ownership or start overlapping mutations.
+A completion claim requires fresh evidence from the local runtime. Code, PR, CI,
+HTTP 200, rendered tabs, or historical screenshots alone are insufficient.

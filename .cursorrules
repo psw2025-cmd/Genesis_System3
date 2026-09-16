@@ -1,96 +1,11 @@
-# Genesis System3 — Cursor Agent Rules
+# Genesis System3 — Cursor thin pointer
 
-**Highest-priority temporal rule:** `SYSTEM3_TEMPORAL_TRUTH_V1`
+Authoritative constitution: `AGENTS.md`.
+Machine invariants: `agent_policy.yaml`.
+Universal Cursor rule: `.cursor/rules/00-repository-safety.mdc`.
 
-Read first:
-- `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
-- `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md`
-- `AGENTS.md`
+Canonical checkout: `C:\Genesis_System3_Clean`.
+Runtime: local Windows `http://127.0.0.1:8000` (PAPER/ANALYZE).
+GCP Cloud Run, Claude-only ownership, and Issue #188 as a live bus are HISTORICAL_NON_AUTHORITY.
 
-## Production authority
-
-- Repository: `psw2025-cmd/Genesis_System3`.
-- Production runtime: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`.
-- Production UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`.
-- Broker: **Dhan only**. Legacy Angel/Render instructions are retired, non-authoritative, and must not be used as current authority.
-- GitHub Actions -> GCP must use keyless WIF; never create/export service-account JSON keys.
-
-## Absolute live/current truth rule
-
-Do not use `SYSTEM_STATE.md`, `CHANGE_LOG.md`, `reports/latest/`, screenshots, proof packs, PR text, workflow artifacts, or prior API responses as proof of what is happening **now**.
-
-For every request/question containing or implying `live`, `current`, `now`, `present`, `still`, `working now`, `fixed now`, `UI now`, or `connected now`:
-
-1. record the current investigation UTC start time;
-2. perform a new authoritative observation after that time;
-3. for UI, start a **new Chrome/WebDriver session** against the actual GCP production URL;
-4. capture fresh screenshot + visible text + capture timestamp;
-5. query relevant read-only production APIs during the same session;
-6. compare UI and API state;
-7. after any fix/redeploy/recovery, repeat the fresh live capture.
-
-The directory name `reports/latest/` means newest stored artifact only. It does not mean current runtime state.
-
-Use:
-- `scripts/gcp_live_ui_snapshot.py` — fresh full 22-tab production UI lifecycle capture;
-- `scripts/system3_temporal_truth_guard.py` — validate evidence time/class before calling it current.
-
-A green build, HTTP 200, or rendered tab is not a semantic data PASS. Data-bearing UI must visibly contain the expected fresh data/state.
-
-## Safety
-
-- `ANALYZE_MODE=1`.
-- `LIVE_TRADING_ENABLED=0`.
-- `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
-- `AUTO_EXECUTE_TRADES=0`.
-- Never place/modify/cancel/square-off real orders.
-- Never expose broker secret payloads.
-- Read-only production UI/API/market-data verification is allowed.
-- Token minting only through the dedicated bounded Dhan scheduler/recovery authority.
-
-## Engineering workflow
-
-- Inspect current main and relevant open PRs before editing; other agents may work concurrently.
-- Reproduce/verify the current symptom before fixing it.
-- Use a branch and targeted changes.
-- Run focused tests plus mandatory CI gates.
-- Do not merge on an older head's green status.
-- Verify the exact merged/current production result with new live evidence.
-- Never stop at “workflow passed” if actual UI/runtime state is still wrong.
-
-## User-action boundary
-
-Do routine code, CI, deployment, logs, IAM-drift repair, browser proof, broker investigation, and safe recovery through automation. Ask the user for manual steps only for genuine account-level/break-glass blockers that delegated automation cannot perform (LIVE enablement, real orders, billing/org, WIF destruction, broker MFA).
-
-See `.cursor/rules/infinite-gitops-loop.mdc` and `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`.
-
-## Dashboard-impact blocker and owner escalation
-
-**Authority:** `SYSTEM3_USER_ACTION_ESCALATION_V2`
-
-Read `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md` before reporting
-user action. If a safe owner account/access/settings action can directly or
-indirectly accelerate dashboard content, market data, API↔UI parity, broker
-truth, predictions, PAPER records, deployment, proof, or agent throughput:
-
-- continue every safe unblocked task;
-- create a stable `USER_ACTION_ID`;
-- surface the fastest safe least-privilege option first and all materially
-  different safe alternatives;
-- give kid-level `WHY / WHERE / CLICK / SET / DO NOT / RESULT / PROOF /
-  URGENCY`;
-- notify immediately in chat and verified connected mail;
-- track and repeat the smallest unresolved correction until fresh proof closes
-  the action;
-- never guess the recipient, expose secrets, weaken safety, or overlap another
-  write lane.
-
-## Evidence hierarchy
-
-For current production truth:
-1. request-scoped fresh production browser;
-2. same-session fresh production API;
-3. fresh logs/runtime metadata;
-4. current deployed SHA/revision/config;
-5. source code;
-6. old artifacts/history for comparison only.
+Safety: `ANALYZE_MODE=1`, `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`. Never place a real order. Never expose secrets. Never reset a dirty worktree.

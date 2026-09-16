@@ -1,0 +1,13 @@
+---
+description: Dhan read-only, six-index and equity-option PAPER, zero real-order transport
+globs: "{core/broker/**,core/brokers/**,dashboard/backend/**/*broker*,**/paper*,**/dhan*}"
+alwaysApply: false
+---
+
+# Dhan read-only and PAPER
+
+Broker: Dhan only. Analyzer/PAPER. Intercept the final order transport in tests. Required proof: place_order_calls=0, modify_order_calls=0, cancel_order_calls=0, square_off_calls=0, real_broker_order_count=0. Never send an order-shaped request to a live Dhan order endpoint.
+
+PAPER universe: NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX, BANKEX plus every currently eligible equity-option underlying from the authentic instrument master. Derive dynamically. Unavailable contracts are UNKNOWN/NOT_AVAILABLE, never fabricated. After hours, do not treat snapshot ticks as live ticks.
+
+Token rotation is local (`scripts/local_dhan_token_rotate.py`), never GCP Secret Manager.
