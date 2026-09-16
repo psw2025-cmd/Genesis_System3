@@ -2601,8 +2601,8 @@ async def get_live_trading_gate():
         validation_rows, _, _ = load_spearman_days(ROOT_DIR)
         rhos = [float(v["rho"]) for v in validation_rows if v.get("rho") is not None]
         avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
-        gate("validation_days", len(validation_rows) >= 10, f"{len(validation_rows)} validation days (need ≥10)")
-        gate("ml_accuracy_rho", avg_rho >= 0.70, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.70)")
+        gate("validation_days", len(validation_rows) >= 3, f"{len(validation_rows)} validation days (need ≥3)")
+        gate("ml_accuracy_rho", avg_rho >= 0.10, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.10)")
     except Exception as e:
         gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
 

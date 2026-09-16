@@ -33,6 +33,7 @@ export const MultibaggerResearch: React.FC = () => {
   const sections = contract.sections && typeof contract.sections === 'object' ? contract.sections : {}
   const sectionEntries = Object.entries(sections)
   const ready = candidates.length > 0
+  console.log('[MultibaggerResearch render] candidates:', candidates.length, 'ready:', ready)
   const totalPnl = paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? state?.pnl?.total ?? state?.pnl?.unrealized
   const pnlNum = Number(totalPnl)
   const pnlTone = Number.isFinite(pnlNum) ? (pnlNum < 0 ? 'error' : pnlNum > 0 ? 'ok' : 'mut') : 'mut'
@@ -88,14 +89,14 @@ export const MultibaggerResearch: React.FC = () => {
           </div>
           <div className="hero-metrics">
             <div className={`metric-quiet metric-${pnlTone}`}>
-              <div className="metric-label">P&amp;L</div>
+              <div className="metric-label">Paper P&amp;L</div>
               <div className="num metric-strong">{formatInr(totalPnl)}</div>
-              <div className="metric-hint">Read-only portfolio</div>
+              <div className="metric-hint">Global paper account</div>
             </div>
             <div className="metric-quiet">
-              <div className="metric-label">Exposure</div>
+              <div className="metric-label">Paper Exposure</div>
               <div className="num metric-strong">{formatInr(state?.risk?.exposure)}</div>
-              <div className="metric-hint">Current exposure</div>
+              <div className="metric-hint">Active derivative risk</div>
             </div>
             <div className="metric-quiet">
               <div className="metric-label">Updated</div>

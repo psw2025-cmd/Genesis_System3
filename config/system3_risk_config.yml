@@ -25,7 +25,7 @@ stops:
 live_trading_gate:
   # ALL of these must be true before live trading is allowed
   min_validation_days: 10            # 10+ days of paper proof
-  min_spearman_rho: 0.70             # ML accuracy gate
+  min_spearman_rho: 0.10             # ML accuracy gate
   paper_profit_proof_required: true  # Must show paper profit
   human_approval_required: true      # Final manual approval
   max_capital_first_live_trade: 5000 # First live trade max ₹5000

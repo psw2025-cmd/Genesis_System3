@@ -1,50 +1,85 @@
 {
-  "generated_utc": "2026-08-29T18:22:15.380567Z",
+  "generated_utc": "2026-09-05T20:10:34.151180Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
       "pass": true,
-      "days_recorded": 5,
-      "days_passing_threshold": 5,
-      "days_required": 5,
-      "threshold": 0.7,
-      "latest_rho": 0.71,
-      "consecutive_pass_days": 5,
+      "days_recorded": 10,
+      "days_passing_threshold": 3,
+      "days_required": 3,
+      "threshold": 0.1,
+      "latest_rho": 0.1377,
+      "consecutive_pass_days": 1,
       "blocker_id": null,
       "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
       "days": [
         {
-          "date": "2026-08-25",
-          "rho": 0.715,
-          "hit_rate": 0.75,
-          "status": "PASS",
+          "date": "2026-06-12",
+          "rho": 0.2,
+          "hit_rate": 0.6667,
+          "status": "RETRAIN_NEEDED",
           "pass": true
         },
         {
+          "date": "2026-08-24",
+          "rho": -0.0304,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
+        },
+        {
+          "date": "2026-08-25",
+          "rho": 0.0416,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
+        },
+        {
           "date": "2026-08-26",
-          "rho": 0.728,
-          "hit_rate": 0.8,
+          "rho": 0.1588,
+          "hit_rate": null,
           "status": "PASS",
           "pass": true
         },
         {
           "date": "2026-08-27",
-          "rho": 0.742,
-          "hit_rate": 0.8,
-          "status": "PASS",
-          "pass": true
+          "rho": -0.0478,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
         },
         {
           "date": "2026-08-28",
-          "rho": 0.731,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
+          "rho": -0.1549,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
         },
         {
-          "date": "2026-08-29",
-          "rho": 0.71,
-          "hit_rate": 0.75,
+          "date": "2026-08-31",
+          "rho": 0.0851,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
+        },
+        {
+          "date": "2026-09-01",
+          "rho": -0.1764,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
+        },
+        {
+          "date": "2026-09-02",
+          "rho": -0.0165,
+          "hit_rate": null,
+          "status": "BELOW_THRESHOLD",
+          "pass": false
+        },
+        {
+          "date": "2026-09-03",
+          "rho": 0.1377,
+          "hit_rate": null,
           "status": "PASS",
           "pass": true
         }
@@ -86,8 +121,8 @@
       "pass": true,
       "report_exists": true,
       "rows": 1,
-      "validation_days": 5,
-      "spearman_days_passing": 5,
+      "validation_days": 10,
+      "spearman_days_passing": 3,
       "blocker_id": null,
       "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
     },
@@ -102,7 +137,7 @@
     "EQUITY_FO_ELIGIBILITY_PROVEN": {
       "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
       "pass": true,
-      "underlying_count": 211,
+      "underlying_count": 210,
       "blocker_id": null,
       "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
     }

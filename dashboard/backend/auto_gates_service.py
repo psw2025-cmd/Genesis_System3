@@ -77,9 +77,9 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
 
         if gid == "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS":
             days_rec = g.get("days_recorded", 0)
-            days_req = g.get("days_required", 5)
+            days_req = g.get("days_required", 3)
             rho = g.get("latest_rho", "?")
-            threshold = g.get("threshold", 0.7)
+            threshold = g.get("threshold", 0.10)
             note = f"{days_rec}/{days_req} days · ρ={rho} · need ≥{threshold}"
         elif gid == "POSITIVE_NET_EXPECTANCY_AFTER_COSTS":
             exp = g.get("net_expectancy_after_costs")

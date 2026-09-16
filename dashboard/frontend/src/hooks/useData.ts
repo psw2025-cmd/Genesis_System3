@@ -468,12 +468,21 @@ export function useData() {
   }, [applyChainPayload, pollChain, markFailure, markSuccess])
 
   const pollRuntimeFacts = useCallback(async () => {
-    const [deploy, research] = await Promise.allSettled([
+    console.log('[pollRuntimeFacts] starting')
+    const [deploy, research, workspace] = await Promise.allSettled([
       fetchJSON('/api/deploy/info', 12000),
       fetchJSON('/api/research/multibagger', 15000),
+      fetchJSON('/api/multibagger', 12000),
     ])
+    console.log('[pollRuntimeFacts] deploy:', deploy.status, 'research:', research.status, 'workspace:', workspace.status, 'candidates:', workspace.status === 'fulfilled' ? workspace.value?.candidates?.length : null)
     if (deploy.status === 'fulfilled') setDeployInfo(deploy.value)
-    if (research.status === 'fulfilled') setResearch(research.value)
+    if (workspace.status === 'fulfilled' && workspace.value?.candidates?.length > 0) {
+      console.log('[pollRuntimeFacts] setting research to workspace:', workspace.value)
+      setResearch(workspace.value)
+    } else if (research.status === 'fulfilled') {
+      console.log('[pollRuntimeFacts] setting research to research:', research.value)
+      setResearch(research.value)
+    }
   }, [setDeployInfo, setResearch])
 
   const pollSecondary = useCallback(async () => {
