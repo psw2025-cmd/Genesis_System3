@@ -5,6 +5,7 @@ Auto gates service — production-grade prediction/profit/lifecycle blocker trut
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,27 +33,6 @@ def _read(path: Path) -> Optional[Dict[str, Any]]:
         return None
 
 
-def _evaluate_inline(
-    live_state: Optional[Dict[str, Any]] = None,
-    skip_proofs: bool = False,
-) -> Dict[str, Any]:
-    from scripts.system3_gate_evaluator import evaluate_all, write_reports
-
-    if not skip_proofs:
-        from scripts.runtime_gate_proofs import ensure_runtime_proofs
-
-        try:
-            ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=True)
-        except Exception:
-            pass
-    payload = evaluate_all(ROOT, live_state=live_state)
-    try:
-        write_reports(ROOT, payload)
-    except Exception:
-        pass
-    return payload
-
-
 def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Adapt evaluator gates for UI without inventing PASS states.
 
@@ -73,7 +53,7 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
     out: List[Dict[str, Any]] = []
     for gid, label in mapping:
         g = gates.get(gid) or {}
-        ok = bool(g.get("pass"))
+        ok = g.get("pass") is True
 
         if gid == "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS":
             days_rec = g.get("days_recorded", 0)
@@ -124,107 +104,77 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
 
 
 def build_auto_gates_report(
-    refresh: bool = True,
+    refresh: bool = False,
     live_state: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    import os
+    """Pure snapshot read. Compatibility arguments never generate evidence."""
+    from scripts.system3_gate_evaluator import GATE_IDS
 
-    cloud_mode = (
-        os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore"
-        or bool(os.environ.get("SYSTEM3_FIRESTORE_PROJECT"))
-        or os.environ.get("CLOUD_MODE", "").strip() in {"1", "true", "yes", "on"}
-    )
-    payload: Dict[str, Any] = {}
-    # Cloud web: never run laptop-oriented local proof generators; evaluate from Firestore + live state.
-    if cloud_mode:
-        try:
-            payload = _evaluate_inline(live_state, skip_proofs=True)
-        except Exception:
-            payload = _read(GATES_JSON) or {}
-    elif refresh or not GATES_JSON.exists():
-        try:
-            from scripts.runtime_gate_proofs import ensure_runtime_proofs
-
-            ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=refresh)
-        except Exception:
-            pass
-        try:
-            payload = _evaluate_inline(live_state, skip_proofs=True)
-        except Exception:
-            payload = _read(GATES_JSON) or {}
+    payload = _read(GATES_JSON) or {}
+    if not isinstance(payload, dict):
+        payload = {}
+    manifest = payload.get('snapshot_manifest') or {}
+    if not isinstance(manifest, dict):
+        manifest = {}
+    evidence = {k: v for k, v in payload.items() if k != 'snapshot_manifest'}
+    reason = None
+    age = None
+    try:
+        digest = hashlib.sha256(json.dumps(evidence, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')).hexdigest()
+        if manifest.get('schema_version') != 1 or manifest.get('payload_sha256') != digest or manifest.get('snapshot_id') != digest:
+            reason = 'SNAPSHOT_INTEGRITY_NOT_PROVEN'
+        elif manifest.get('producer') != 'scripts/system3_gate_evaluator.py':
+            reason = 'SNAPSHOT_PRODUCER_NOT_PROVEN'
+        stamp = datetime.fromisoformat(str(manifest.get('generated_at') or '').replace('Z', '+00:00'))
+        if stamp.tzinfo is None:
+            raise ValueError('Timezone missing')
+        age = (datetime.now(timezone.utc) - stamp).total_seconds()
+        if age < 0 or age > 300:
+            reason = 'SNAPSHOT_STALE_OR_FUTURE'
+    except (ValueError, TypeError, OverflowError):
+        reason = 'SNAPSHOT_INVALID_OR_MISSING'
+    raw_gates = evidence.get('gates')
+    if not isinstance(raw_gates, dict) or set(raw_gates) != set(GATE_IDS):
+        reason = reason or 'SNAPSHOT_GATE_SET_INCOMPLETE'
+    if reason:
+        gates = {gid: {'gate_id': gid, 'pass': False, 'status': 'UNKNOWN', 'blocker_id': reason} for gid in GATE_IDS}
     else:
-        age = datetime.now(timezone.utc).timestamp() - GATES_JSON.stat().st_mtime
-        if age > 300:
-            try:
-                from scripts.runtime_gate_proofs import ensure_runtime_proofs
-
-                ensure_runtime_proofs(ROOT, live_state=live_state, include_lifecycle=False)
-            except Exception:
-                pass
-            try:
-                payload = _evaluate_inline(live_state, skip_proofs=True)
-            except Exception:
-                payload = _read(GATES_JSON) or {}
-        else:
-            payload = _read(GATES_JSON) or {}
-
-    if not payload.get("gates"):
-        try:
-            if not cloud_mode:
-                from scripts.runtime_gate_proofs import ensure_runtime_proofs
-
-                ensure_runtime_proofs(ROOT, live_state=live_state, force=True, include_lifecycle=True)
-            payload = _evaluate_inline(live_state, skip_proofs=True)
-        except Exception:
-            pass
-
-    friction = _read(FRICTION_JSON) or {}
-    viability = _read(VIABILITY_JSON) or {}
-    proof_gates = _proof_gates_from_payload(payload)
-    payload_passing = payload.get("gates_passing")
-    if payload_passing is None:
-        payload_passing = sum(1 for p in proof_gates if p.get("pass"))
-
-    market = (live_state or {}).get("market") or {}
-    broker_connected = bool((live_state or {}).get("broker", {}).get("connected", False))
-
-    gates_by_id = {p["gate_id"]: p for p in proof_gates}
-    gates_passing_actual = sum(1 for p in proof_gates if p.get("pass"))
-
+        gates = {}
+        for gid in GATE_IDS:
+            row = raw_gates[gid]
+            if not isinstance(row, dict):
+                row = {}
+            gates[gid] = {**row, 'gate_id': gid, 'pass': row.get('pass') is True}
+    proof = _proof_gates_from_payload({'gates': gates})
+    for row in proof:
+        if reason:
+            row['status'] = 'UNKNOWN'
+    passing = sum(row['pass'] is True for row in gates.values())
+    blockers = sorted({row.get('blocker_id') or gid for gid, row in gates.items() if row['pass'] is not True})
     return {
-        "generated_utc": payload.get("generated_utc") or _utc(),
-        "status": "ok",
-        "source": "cloud_gate_evaluator" if cloud_mode else "inline_gate_evaluator",
-        "runtime_driven": True,
-        "evidence_plane": "firestore" if cloud_mode else "local_reports",
-        "market_open": market.get("is_open"),
-        "market_reason": market.get("reason"),
-        "broker_connected": broker_connected,
-        "gates": payload.get("gates") or {},
-        "gates_passing": gates_passing_actual if proof_gates else payload_passing,
-        "gates_total": payload.get("gates_total") or len(proof_gates),
-        "proof_gates": proof_gates,
-        "open_blockers": payload.get("open_blockers") or [],
-        "prediction_accuracy_blocked": not gates_by_id.get(
-            "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS", {}
-        ).get("pass", False),
-        "profit_blocked": not gates_by_id.get(
-            "POSITIVE_NET_EXPECTANCY_AFTER_COSTS", {}
-        ).get("pass", False),
-        "lifecycle_blocked": not gates_by_id.get(
-            "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF", {}
-        ).get("pass", False),
-        # PAPER trade readiness also fails closed when option visibility evidence is absent.
-        "trade_ready": broker_connected
-        and gates_by_id.get("OPTION_STRIKE_VISIBILITY_PROVEN", {}).get("pass", False),
-        "analyzer_ready": True,
-        "technical_gates_still_required": payload.get("technical_gates_still_required") or [],
-        "recommended_auto_actions": payload.get("recommended_auto_actions") or [],
-        "friction_expectancy": friction.get("evidence") or {},
-        "strategy_quarantined": (viability.get("summary") or {}).get(
-            "strategy_quarantined_for_live", True
-        ),
-        "production_live_ready": False,
-        "live_trading_enabled": False,
-        "permanent_safety": ["LIVE_TRADING_DISABLED_BY_DESIGN"],
+        'generated_utc': manifest.get('generated_at'),
+        'observed_at': _utc(),
+        'data_asof': evidence.get('data_asof'),
+        'source': 'local_gate_snapshot', 'evidence_plane': 'local_reports',
+        'snapshot_id': manifest.get('snapshot_id'),
+        'ssot_version': manifest.get('snapshot_id'),
+        'snapshot_sha256': manifest.get('payload_sha256'),
+        'snapshot_manifest': manifest,
+        'snapshot_age_sec': age,
+        'status': 'UNKNOWN' if reason else 'ok',
+        'stale': bool(reason), 'stale_reason': reason,
+        'runtime_driven': False,
+        'gates': gates, 'proof_gates': proof,
+        'gates_passing': passing, 'gates_total': len(GATE_IDS),
+        'open_blockers': blockers,
+        'trade_ready': not reason and passing == len(GATE_IDS),
+        'analyzer_ready': not reason and evidence.get('analyzer_ready') is True,
+        'prediction_accuracy_blocked': not gates[GATE_IDS[0]]['pass'],
+        'profit_blocked': not gates['POSITIVE_NET_EXPECTANCY_AFTER_COSTS']['pass'],
+        'lifecycle_blocked': not gates['REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF']['pass'],
+        'technical_gates_still_required': [gid for gid, row in gates.items() if not row['pass']],
+        'recommended_auto_actions': evidence.get('recommended_auto_actions') or [],
+        'production_live_ready': False,
+        'live_trading_enabled': False, 'order_placement_allowed': False,
+        'permanent_safety': ['LIVE_TRADING_DISABLED_BY_DESIGN'],
     }

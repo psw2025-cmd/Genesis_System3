@@ -2092,28 +2092,9 @@ async def get_accuracy_trend():
 
 @app.get("/api/auto_gates")
 async def get_auto_gates(refresh: bool = False):
-    """Runtime-driven production/prediction/profit blocker gates (replaces static dashboard proof matrix)."""
-    _hit = _cache_get("auto_gates", _TTL_AUTO_GATES)
-    if _hit is not None:
-        return _hit
-
-    try:
-        try:
-            from dashboard.backend.auto_gates_service import build_auto_gates_report
-        except ImportError:
-            from auto_gates_service import build_auto_gates_report
-        live_state = None
-        if SSOT_AVAILABLE and state_store is not None:
-            live_state = state_store.get_state()
-        return build_auto_gates_report(refresh=refresh, live_state=live_state)
-    except Exception as e:
-        return {
-            "status": "error",
-            "error": str(e)[:200],
-            "runtime_driven": False,
-            "proof_gates": [],
-            "live_trading_enabled": False,
-        }
+    """Read the same atomic gate snapshot used by batch aggregation."""
+    from dashboard.backend.auto_gates_service import build_auto_gates_report
+    return build_auto_gates_report()
 
 
 @app.get("/api/continuous_closure")
@@ -3402,7 +3383,7 @@ def _slim_pnl(p: Any) -> Dict[str, Any]:
 
 def _slim_gates(g: Any) -> Dict[str, Any]:
     if not isinstance(g, dict):
-        return {"proof_gates": [], "gates_passing": 0, "gates_total": 0}
+        return {"status": "UNKNOWN", "stale": True, "stale_reason": "INVALID_SNAPSHOT", "proof_gates": [], "gates_passing": None, "gates_total": None, "trade_ready": False}
     gates = g.get("proof_gates") or []
     slim_gates = []
     if isinstance(gates, list):
@@ -3419,10 +3400,20 @@ def _slim_gates(g: Any) -> Dict[str, Any]:
                 }
             )
     return {
-        "status": g.get("status", "ok"),
+        "status": g.get("status", "UNKNOWN"),
+        "snapshot_id": g.get("snapshot_id"),
+        "snapshot_sha256": g.get("snapshot_sha256"),
+        "ssot_version": g.get("ssot_version"),
+        "source": g.get("source"),
+        "data_asof": g.get("data_asof"),
+        "observed_at": g.get("observed_at"),
+        "generated_utc": g.get("generated_utc"),
+        "stale": g.get("stale", True),
+        "stale_reason": g.get("stale_reason"),
+        "trade_ready": g.get("trade_ready") is True,
         "proof_gates": slim_gates,
-        "gates_passing": g.get("gates_passing", sum(1 for x in slim_gates if x.get("pass") or str(x.get("status")).upper() == "PASS")),
-        "gates_total": g.get("gates_total", len(slim_gates)),
+        "gates_passing": g.get("gates_passing"),
+        "gates_total": g.get("gates_total"),
         "live_trading_enabled": False,
     }
 
@@ -3538,6 +3529,7 @@ async def batch_market_data():
     if hit is not None:
         out = dict(hit)
         out["cache_hit"] = True
+        out["auto_gates"] = _slim_gates(await get_auto_gates())
         return out
 
     async def _bounded(coro, timeout_s: float, fallback: Dict[str, Any]):
@@ -3554,7 +3546,7 @@ async def batch_market_data():
         _bounded(get_gain_rank(), 9.0, {}),
         _bounded(get_pnl(), 4.0, {}),
         _bounded(get_recent_alerts(limit=20), 4.0, {"alerts": []}),
-        _bounded(get_auto_gates(), 5.0, {"proof_gates": []}),
+        _bounded(get_auto_gates(), 5.0, {"status": "UNKNOWN", "stale": True, "stale_reason": "TIMEOUT", "snapshot_id": None, "gates_passing": None, "gates_total": None, "trade_ready": False, "live_trading_enabled": False, "proof_gates": []}),
     )
 
     health = results[0] if isinstance(results[0], dict) else {"status": "error"}
