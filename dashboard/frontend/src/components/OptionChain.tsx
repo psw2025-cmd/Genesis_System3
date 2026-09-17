@@ -3,6 +3,7 @@ import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
 import { PriceCell } from './ui/PriceCell'
 import { fmt, cn } from '../lib/utils'
+import { isAcceptableDhanChain } from '../lib/sourceQuality'
 
 const CORE_INDICES = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
 
@@ -113,14 +114,22 @@ function volumeChangePct(c: Contract | undefined) {
 function buildup(c: Contract | undefined) {
   if (!c) return '--'
   const explicit = String(c.buildup || '').trim()
-  if (explicit) return explicit
+  if (explicit && explicit !== '--') return explicit
   const dOi = oiChange(c)
   const dPx = num(c.change ?? c.change_percent ?? c.ltp_change_percent)
-  if (dOi == null || dPx == null) return '--'
-  if (dPx > 0 && dOi > 0) return 'Long Buildup'
-  if (dPx < 0 && dOi > 0) return 'Short Buildup'
-  if (dPx > 0 && dOi < 0) return 'Short Covering'
-  if (dPx < 0 && dOi < 0) return 'Long Unwinding'
+  if (dOi != null && dPx != null && (dOi !== 0 || dPx !== 0)) {
+    if (dPx > 0 && dOi > 0) return 'Long Buildup'
+    if (dPx < 0 && dOi > 0) return 'Short Buildup'
+    if (dPx > 0 && dOi < 0) return 'Short Covering'
+    if (dPx < 0 && dOi < 0) return 'Long Unwinding'
+    if (dPx > 0 && dOi === 0) return 'Bullish Bias'
+    if (dPx < 0 && dOi === 0) return 'Bearish Bias'
+  }
+  if (dPx != null && dPx !== 0) {
+    return dPx > 0 ? 'Bullish Bias' : 'Bearish Bias'
+  }
+  if (c.oi && c.oi > 100000) return 'High Open Interest'
+  if (c.oi && c.oi > 0) return 'Accumulation'
   return 'Neutral'
 }
 
@@ -185,7 +194,7 @@ function SymbolControls({ chainSymbol, setChainSymbol, universe, discovery, disc
 }
 
 export function OptionChain() {
-  const { chainSymbol, setChainSymbol, chain, marketOpen, state } = useStore()
+  const { chainSymbol, setChainSymbol, chain, marketOpen, state, wsStatus, liveBoard } = useStore()
   const atmRef = useRef<HTMLTableRowElement>(null)
   const [range, setRange] = useState(10)
   const [discovery, setDiscovery] = useState<UnderlyingDiscovery | null>(null)
@@ -230,6 +239,24 @@ export function OptionChain() {
   }, [chainSymbol])
 
   useEffect(() => {
+    if (selectedExpiry) return
+    const existing = (useStore.getState().chain as any)?.[chainSymbol]
+    if (isAcceptableDhanChain(existing)) return
+    let cancelled = false
+    apiJSON(`/api/chain/${encodeURIComponent(chainSymbol)}`, 20000).then(payload => {
+      if (cancelled) return
+      if (!isAcceptableDhanChain(payload)) return
+      useStore.getState().setChain(chainSymbol, {
+        ...payload,
+        pendingProof: false,
+        verified_live_dhan: false,
+        verified_dhan_snapshot: true,
+      })
+    }).catch(() => {})
+    return () => { cancelled = true }
+  }, [chainSymbol, selectedExpiry])
+
+  useEffect(() => {
     if (!selectedExpiry) {
       setExpiryData(null)
       return
@@ -248,6 +275,8 @@ export function OptionChain() {
     return () => { cancelled = true }
   }, [chainSymbol, selectedExpiry])
 
+  const [showGreeks, setShowGreeks] = useState(false)
+
   const universe = useMemo(() => Array.from(new Set([
     ...CORE_INDICES,
     ...(discovery?.underlyings || []),
@@ -261,8 +290,10 @@ export function OptionChain() {
   const pcrValue = !mismatch ? num(data?.pcr) : null
   const status = mismatch ? 'CHAIN_SYMBOL_MISMATCH' : String(data?.status || (selectedExpiry ? 'LOADING_EXPIRY' : 'LOADING'))
   const sourceValue = String(data?.source ?? data?.source_priority ?? data?.data_source ?? discovery?.source ?? '--').trim().toLowerCase()
-  const fetchedAt = data?.fetched_at_utc ?? data?.snapshot_time ?? data?.generated_at ?? data?.stream_tick_at ?? '--'
-  const stale = Boolean(data?.stale) || /stale|synthetic|mock|fake/.test(`${status} ${sourceValue}`.toLowerCase())
+  const fetchedAt = data?.stream_tick_at ?? data?.fetched_at_utc ?? data?.snapshot_time ?? data?.generated_at ?? '--'
+  const csvPoison = /csv|fallback|synthetic|mock|fake/.test(`${status} ${sourceValue}`)
+  const quotesLive = wsStatus === 'live' && (liveBoard?.indices || []).some((row: any) => Number(row?.ltp) > 0)
+  const stale = csvPoison || (Boolean(data?.stale) && !quotesLive)
   const completeChain = data?.complete_chain === true
 
   const harvestedExpiries = useMemo(() => {
@@ -293,6 +324,24 @@ export function OptionChain() {
 
   const noDataReason = String(data?.message || expiryError || state?.market?.reason || (marketOpen ? 'Waiting for verified Dhan option-chain rows.' : 'Market closed; no verified broker chain snapshot is available.'))
 
+  function ltpChangePct(c: Contract | undefined) {
+    if (!c) return null
+    return num(c.change_percent ?? c.ltp_change_percent ?? c.change)
+  }
+
+  function buildupBadge(c: Contract | undefined) {
+    const b = buildup(c)
+    if (b === 'Long Buildup') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Long Buildup">LB</span>
+    if (b === 'Short Buildup') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20" title="Short Buildup">SB</span>
+    if (b === 'Short Covering') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20" title="Short Covering">SC</span>
+    if (b === 'Long Unwinding') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber/10 text-amber border border-amber/20" title="Long Unwinding">LU</span>
+    if (b === 'Bullish Bias') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Bullish Bias">BULL</span>
+    if (b === 'Bearish Bias') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20" title="Bearish Bias">BEAR</span>
+    if (b === 'High Open Interest') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-500/10 text-purple-400 border border-purple-500/20" title="High Open Interest">OI</span>
+    if (b === 'Accumulation') return <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20" title="Accumulation">ACC</span>
+    return <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-surface-2 text-text-muted border border-border" title="Neutral">N</span>
+  }
+
   return <div className="flex flex-col h-full">
     <SymbolControls chainSymbol={chainSymbol} setChainSymbol={setChainSymbol} universe={universe} discovery={discovery} discoveryError={discoveryError} />
     <div className="flex flex-wrap items-center gap-3 px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
@@ -303,28 +352,116 @@ export function OptionChain() {
       <div><span className="text-text-muted text-xs"> PCR </span><span className="num text-sm font-semibold">{pcrValue != null ? pcrValue.toFixed(2) : '--'}</span></div>
       <div><span className="text-text-muted text-xs"> CONTRACTS </span><span className="num text-xs">{contracts.length}</span></div>
       <div><span className="text-text-muted text-xs"> STRIKES </span><span className="num text-xs">{strikes.length}</span></div>
+      <button onClick={() => setShowGreeks(!showGreeks)} className={cn('px-2.5 py-1 rounded text-xs font-mono font-semibold transition-colors border', showGreeks ? 'bg-accent text-white border-accent' : 'bg-surface-2 text-text-secondary border-border')}>
+        {showGreeks ? '📊 GREEKS VIEW' : '📈 STANDARD VIEW'}
+      </button>
       <div className="ml-auto flex items-center gap-2"><span className="text-text-muted text-[10px]">VISIBLE</span><select aria-label="Strike visibility" value={range} onChange={event => setRange(Number(event.target.value))} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value={0}>ALL STRIKES ({strikes.length})</option>{[5, 10, 20, 40].map(value => <option key={value} value={value}>+/-{value} ATM</option>)}</select></div>
     </div>
     <div className={cn('px-4 py-2 border-b border-border text-[10px] font-mono', stale || contracts.length === 0 ? 'text-amber bg-amber/5' : 'text-text-muted')}>
       symbol {chainSymbol} · source={sourceValue || '--'} · status={status}{completeChain ? ' · complete_chain=true' : ''}{fetchedAt !== '--' ? ` · fetched=${String(fetchedAt)}` : ''}{selectedExpiry ? ` · selected_expiry=${selectedExpiry}` : ''}
     </div>
     {mismatch && <div className="px-4 py-2 bg-down/5 text-down text-xs border-b border-border">Backend returned {String(data?.underlying)} while UI selected {chainSymbol}. Wrong-symbol rows are hidden.</div>}
+    {Boolean(data?.live_board_conflict) && <div className="px-4 py-2 bg-amber/5 text-amber text-xs border-b border-border">live_board LTP {String(data?.live_board_ltp ?? '--')} disagrees with Dhan chain spot {spot != null ? fmt(spot, 2) : '--'}. Chain ATM is used. Do not treat a FINNIFTY quote as NIFTY.</div>}
     {contracts.length === 0 ? <div className="flex-1 overflow-auto p-4"><div className="card p-4"><div className="panel-title">Option Chain</div><div className="mt-3 text-amber font-semibold">NO VERIFIED BROKER CHAIN ROWS</div><div className="mt-2 text-xs text-text-muted">{noDataReason}</div><div className="mt-3 text-xs text-text-muted">Safety: ANALYZER / PAPER · LIVE OFF. No synthetic prices, strikes, OI, IV or Greeks are generated.</div></div></div> : <div className="flex-1 overflow-auto">
       <table className="w-full border-collapse text-[10px]">
-        <thead className="sticky top-0 z-10 bg-surface-1"><tr><th className="thead border-b border-border text-right px-2 py-2">CE OI</th><th className="thead border-b border-border text-right px-2 py-2">CE OI%</th><th className="thead border-b border-border text-right px-2 py-2">CE VOL%</th><th className="thead border-b border-border text-right px-2 py-2">CE LTP</th><th className="thead border-b border-border text-right px-2 py-2">CE IV</th><th className="thead border-b border-border text-right px-2 py-2">CE BID</th><th className="thead border-b border-border text-center bg-surface-2 px-3 py-2">STRIKE</th><th className="thead border-b border-border text-left px-2 py-2">PE ASK</th><th className="thead border-b border-border text-left px-2 py-2">PE IV</th><th className="thead border-b border-border text-left px-2 py-2">PE LTP</th><th className="thead border-b border-border text-left px-2 py-2">PE VOL%</th><th className="thead border-b border-border text-left px-2 py-2">PE OI%</th><th className="thead border-b border-border text-left px-2 py-2">PE OI</th></tr></thead>
+        <thead className="sticky top-0 z-10 bg-surface-1">
+          {showGreeks ? (
+            <tr>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Δ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Γ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Θ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE V</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE OI</th>
+              <th className="thead border-b border-border text-right px-2 py-2">LTP CHG%</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE LTP</th>
+              <th className="thead border-b border-border text-center bg-surface-2 px-3 py-2">STRIKE</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE LTP</th>
+              <th className="thead border-b border-border text-left px-2 py-2">LTP CHG%</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE OI</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Δ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Γ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Θ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE V</th>
+            </tr>
+          ) : (
+            <tr>
+              <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE OI</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE OI%</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE VOL%</th>
+              <th className="thead border-b border-border text-right px-2 py-2">LTP CHG%</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE LTP</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE IV</th>
+              <th className="thead border-b border-border text-right px-2 py-2">CE BID</th>
+              <th className="thead border-b border-border text-center bg-surface-2 px-3 py-2">STRIKE</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE ASK</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE IV</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE LTP</th>
+              <th className="thead border-b border-border text-left px-2 py-2">LTP CHG%</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE VOL%</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE OI%</th>
+              <th className="thead border-b border-border text-left px-2 py-2">PE OI</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
+            </tr>
+          )}
+        </thead>
         <tbody>{visible.map(strike => {
           const row = strikeMap.get(strike) || {}
           const ce = row.CE
           const pe = row.PE
           const isAtm = spot != null && strikes.length > 1 && Math.abs(strike - spot) < Math.abs(strikes[1] - strikes[0]) / 2
-          return <tr key={strike} ref={isAtm ? atmRef : undefined} className={cn('trow', isAtm && 'atm-row')}>
-            <td className="tcell text-right">{formatOI(ce?.oi)}</td><td className="tcell text-right">{pct(oiChangePct(ce))}</td><td className="tcell text-right">{pct(volumeChangePct(ce))}</td><td className="tcell text-right">{ce ? <PriceCell value={Number(ce.ltp || 0)} /> : '--'}</td><td className="tcell text-right">{num(ce?.iv) != null ? Number(ce!.iv).toFixed(2) : '--'}</td><td className="tcell text-right">{quotePrice(ce, 'bid') != null ? fmt(quotePrice(ce, 'bid')!, 2) : '--'}</td>
-            <td className={cn('tcell text-center font-bold text-sm px-3', isAtm ? 'text-accent bg-surface-2' : 'text-text-primary bg-surface-1')}>{fmt(strike, 2)}{isAtm && <span className="ml-1 text-[9px] text-accent font-mono">ATM</span>}</td>
-            <td className="tcell text-left">{quotePrice(pe, 'ask') != null ? fmt(quotePrice(pe, 'ask')!, 2) : '--'}</td><td className="tcell text-left">{num(pe?.iv) != null ? Number(pe!.iv).toFixed(2) : '--'}</td><td className="tcell text-left">{pe ? <PriceCell value={Number(pe.ltp || 0)} /> : '--'}</td><td className="tcell text-left">{pct(volumeChangePct(pe))}</td><td className="tcell text-left">{pct(oiChangePct(pe))}</td><td className="tcell text-left">{formatOI(pe?.oi)}</td>
-          </tr>
+          const ceChg = ltpChangePct(ce)
+          const peChg = ltpChangePct(pe)
+
+          return (
+            <tr key={strike} ref={isAtm ? atmRef : undefined} className={cn('trow', isAtm && 'atm-row')}>
+              {showGreeks ? (
+                <>
+                  <td className="tcell text-center font-mono text-cyan-400">{ce?.delta != null ? Number(ce.delta).toFixed(2) : '--'}</td>
+                  <td className="tcell text-center font-mono text-cyan-400">{ce?.gamma != null ? Number(ce.gamma).toFixed(4) : '--'}</td>
+                  <td className="tcell text-center font-mono text-cyan-400">{ce?.theta != null ? Number(ce.theta).toFixed(1) : '--'}</td>
+                  <td className="tcell text-center font-mono text-cyan-400">{ce?.vega != null ? Number(ce.vega).toFixed(2) : '--'}</td>
+                  <td className="tcell text-center">{buildupBadge(ce)}</td>
+                  <td className="tcell text-right">{formatOI(ce?.oi)}</td>
+                  <td className={cn('tcell text-right font-mono font-semibold', (ceChg ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400')}>{pct(ceChg)}</td>
+                  <td className="tcell text-right">{ce ? <PriceCell value={Number(ce.ltp || 0)} /> : '--'}</td>
+                  <td className={cn('tcell text-center font-bold text-sm px-3', isAtm ? 'text-accent bg-surface-2' : 'text-text-primary bg-surface-1')}>{fmt(strike, 2)}{isAtm && <span className="ml-1 text-[9px] text-accent font-mono">ATM</span>}</td>
+                  <td className="tcell text-left">{pe ? <PriceCell value={Number(pe.ltp || 0)} /> : '--'}</td>
+                  <td className={cn('tcell text-left font-mono font-semibold', (peChg ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400')}>{pct(peChg)}</td>
+                  <td className="tcell text-left">{formatOI(pe?.oi)}</td>
+                  <td className="tcell text-center">{buildupBadge(pe)}</td>
+                  <td className="tcell text-center font-mono text-purple-400">{pe?.delta != null ? Number(pe.delta).toFixed(2) : '--'}</td>
+                  <td className="tcell text-center font-mono text-purple-400">{pe?.gamma != null ? Number(pe.gamma).toFixed(4) : '--'}</td>
+                  <td className="tcell text-center font-mono text-purple-400">{pe?.theta != null ? Number(pe.theta).toFixed(1) : '--'}</td>
+                  <td className="tcell text-center font-mono text-purple-400">{pe?.vega != null ? Number(pe.vega).toFixed(2) : '--'}</td>
+                </>
+              ) : (
+                <>
+                  <td className="tcell text-center">{buildupBadge(ce)}</td>
+                  <td className="tcell text-right">{formatOI(ce?.oi)}</td>
+                  <td className="tcell text-right">{pct(oiChangePct(ce))}</td>
+                  <td className="tcell text-right">{pct(volumeChangePct(ce))}</td>
+                  <td className={cn('tcell text-right font-mono font-semibold', (ceChg ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400')}>{pct(ceChg)}</td>
+                  <td className="tcell text-right">{ce ? <PriceCell value={Number(ce.ltp || 0)} /> : '--'}</td>
+                  <td className="tcell text-right">{num(ce?.iv) != null ? Number(ce!.iv).toFixed(2) : '--'}</td>
+                  <td className="tcell text-right">{quotePrice(ce, 'bid') != null ? fmt(quotePrice(ce, 'bid')!, 2) : '--'}</td>
+                  <td className={cn('tcell text-center font-bold text-sm px-3', isAtm ? 'text-accent bg-surface-2' : 'text-text-primary bg-surface-1')}>{fmt(strike, 2)}{isAtm && <span className="ml-1 text-[9px] text-accent font-mono">ATM</span>}</td>
+                  <td className="tcell text-left">{quotePrice(pe, 'ask') != null ? fmt(quotePrice(pe, 'ask')!, 2) : '--'}</td>
+                  <td className="tcell text-left">{num(pe?.iv) != null ? Number(pe!.iv).toFixed(2) : '--'}</td>
+                  <td className="tcell text-left">{pe ? <PriceCell value={Number(pe.ltp || 0)} /> : '--'}</td>
+                  <td className={cn('tcell text-left font-mono font-semibold', (peChg ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400')}>{pct(peChg)}</td>
+                  <td className="tcell text-left">{pct(volumeChangePct(pe))}</td>
+                  <td className="tcell text-left">{pct(oiChangePct(pe))}</td>
+                  <td className="tcell text-left">{formatOI(pe?.oi)}</td>
+                  <td className="tcell text-center">{buildupBadge(pe)}</td>
+                </>
+              )}
+            </tr>
+          )
         })}</tbody>
       </table>
-      <div className="hidden">{contracts.map((contract, index) => <span key={index}>{buildup(contract)} {num(contract.delta) ?? '--'} {num(contract.gamma) ?? '--'} {num(contract.theta) ?? '--'} {num(contract.vega) ?? '--'}</span>)}</div>
     </div>}
   </div>
 }
