@@ -1,0 +1,79 @@
+schema_version: 1
+authority_marker: SYSTEM3_LOCAL_RUNTIME_CONTRACT_V1
+status: target_contract_pending_runtime_reconciliation
+
+code:
+  repository: psw2025-cmd/Genesis_System3
+  authority: github_remote_main
+  canonical_checkout: 'C:\Genesis_System3_Clean'
+
+runtime:
+  authority: laptop_local
+  root: 'C:\Genesis_System3_Runtime'
+  env_var: SYSTEM3_RUNTIME_ROOT
+  state: 'C:\Genesis_System3_Runtime\state'
+  db: 'C:\Genesis_System3_Runtime\db'
+  logs: 'C:\Genesis_System3_Runtime\logs'
+  evidence: 'C:\Genesis_System3_Runtime\evidence'
+  backups: 'C:\Genesis_System3_Runtime\backups'
+  models: 'C:\Genesis_System3_Runtime\models'
+  market_data: 'C:\Genesis_System3_Runtime\market_data'
+  cache: 'C:\Genesis_System3_Runtime\cache'
+  tmp: 'C:\Genesis_System3_Runtime\tmp'
+  browser: 'C:\Genesis_System3_Runtime\browser'
+  locks: 'C:\Genesis_System3_Runtime\locks'
+
+secrets:
+  target_root: '%USERPROFILE%\.genesis_vault'
+  plaintext_env_allowed: false
+  github_secret_payload_allowed: false
+  normal_runtime_gcp_secret_manager_allowed: false
+
+safety:
+  analyze_mode: 1
+  live_trading_enabled: 0
+  system3_live_trading_allowed: 0
+  auto_execute_trades: 0
+  real_broker_order_count_target: 0
+
+dashboard:
+  url_source: runtime_config_discovery
+  hardcoded_port_allowed: false
+  required_runtime_states:
+    - RUNNING
+    - OFFLINE
+    - RECOVERING
+    - INCOMPLETE_GAP
+  canonical_tab_count: 22
+
+retention:
+  raw_logs_days: 7
+  incident_summary_days: 30
+  latest_verified_backups: 2
+  temp_cleanup: same_work_cycle
+  high_frequency_git_commits_allowed: false
+  raw_logs_in_git_allowed: false
+  raw_db_in_git_allowed: false
+
+latest_github_snapshots:
+  - reports/runtime/latest/runtime_status.json
+  - reports/runtime/latest/runtime_status.md
+  - reports/runtime/latest/dashboard_semantic_summary.json
+  - reports/runtime/latest/scheduler_status.json
+  - reports/runtime/latest/latest_mri_summary.json
+  - reports/runtime/latest/latest_mri_summary.md
+  - reports/runtime/latest/gcp_exit_status.json
+
+coordination:
+  ssot: docs/control_plane/GENESIS_SYSTEM3_BILLING_LAPTOP_FIRST_SSOT.md
+  operating_standard: docs/control_plane/SYSTEM3_LOCAL_LAPTOP_GITHUB_OPERATING_STANDARD.md
+  live_queue: docs/control_plane/GENESIS_SYSTEM3_AGENT_LIVE_QUEUE.md
+  runbook: docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md
+  issue_bus: 188
+
+migration_rules:
+  exactly_one_writable_runtime_state_root: true
+  historical_roots_read_only_until_reconciled: true
+  delete_unknown_state_without_classification: false
+  fabricate_gap_or_paper_history: false
+  gcp_steady_state_allowed: false
