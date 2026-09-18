@@ -1,0 +1,115 @@
+version: "1.0"
+created_by: ChatGPT
+last_edited_by: ChatGPT
+purpose: "Machine-readable architecture registry backing the human blueprint, BAT audit, agent work queue, and visual graph."
+authorities:
+  code: "GitHub main"
+  blueprint: "Google Drive SYSTEM3_ARCHITECTURE_BLUEPRINT_SSOT"
+  runtime: "local laptop"
+  evidence: "Google Drive sanitized evidence"
+safety:
+  mode: "PAPER/ANALYZER"
+  live_trading: false
+  real_broker_order_count: 0
+  gcp_runtime_allowed: false
+retention_classes:
+  PERMANENT: "core code/config/schema/migration/controller SSOT/current model metadata"
+  LATEST_REPLACE: "current status; overwrite same canonical file"
+  DAILY_7D: "one DAY_YYYY-MM-DD folder; same-day reruns replace; keep latest 7 days"
+  TEMP_DELETE: "scratch/test artifacts deleted after proof summarized"
+  MILESTONE_KEEP: "accepted milestone proof only"
+phase_gate_rule: "A downstream phase cannot PASS while a required upstream phase is not proven."
+blueprint_first_rule: "If a discovered component/field/path/dependency is absent from the blueprint, add a NEW/AUDIT_REQUIRED entry before implementation."
+lineage_contract:
+  - source
+  - source_field
+  - local_path
+  - producer
+  - store_type
+  - db_or_dataset
+  - table
+  - column_or_header
+  - data_type
+  - unit
+  - primary_key
+  - foreign_or_join_key
+  - timestamp_field
+  - freshness_threshold
+  - formula_or_transform
+  - feature
+  - model
+  - scanner
+  - strategy
+  - ranker
+  - signal
+  - risk_gate
+  - paper_trade_stage
+  - api_endpoint
+  - json_field
+  - ui_tab
+  - ui_widget
+  - evidence_path
+  - backup_rule
+  - retention_class
+  - failure_state
+  - recovery_rule
+phases:
+  - {id: 1, key: authority_sha, name: "Authority / Git SHA"}
+  - {id: 2, key: machine_env_paths, name: "Machine / Environment / Paths"}
+  - {id: 3, key: broker_auth_session, name: "Broker Auth / Session / Local Vault"}
+  - {id: 4, key: security_master_universe, name: "Security Master / All-Symbol Universe"}
+  - {id: 5, key: broker_gateway, name: "Broker Gateway / Rate Limit / Retry / 429 Controls"}
+  - {id: 6, key: live_market_state, name: "Live Market State / Price / Depth / Feed"}
+  - {id: 7, key: option_chain_qc, name: "Option Chain / Expiry / Contract / QC / Greeks / IV"}
+  - {id: 8, key: live_storage, name: "Live Storage / DB / CSV / Cache"}
+  - {id: 9, key: historical_data, name: "Historical Data / OHLCV / OI / Candles / Corporate Actions"}
+  - {id: 10, key: features, name: "Feature Catalog / Formula / Unit / Null / Train-Infer Parity"}
+  - {id: 11, key: model_registry, name: "Model Registry / Artifact / Hash / Meta / Features / Metrics"}
+  - {id: 12, key: model_training, name: "Training / Teachers / Labels / Dataset / Split / Retrain / Promotion"}
+  - {id: 13, key: scanners, name: "All Scanners / Parameters / Filters / Rejection Reasons"}
+  - {id: 14, key: strategies, name: "All Strategies / Entry / Exit / SL / TP / Trailing / Timeframe"}
+  - {id: 15, key: ranker, name: "Ranker / Factors / Weights / History / Expected Move"}
+  - {id: 16, key: signal_generator, name: "Signal Generator / Confidence / Duplicate Control"}
+  - {id: 17, key: risk_manager, name: "Risk Manager / Capital / Position Size / DD / Exposure / Kill Switch"}
+  - {id: 18, key: paper_lifecycle, name: "PAPER Candidate→Gate→Fill→Position→Exit→P&L"}
+  - {id: 19, key: backtest_research, name: "Backtest / Walk-Forward / Costs / Slippage / Leakage / Results"}
+  - {id: 20, key: news_catalyst, name: "News / Catalyst / Calendar / Corporate Actions / Sentiment"}
+  - {id: 21, key: api_layer, name: "Backend API / REST / WebSocket / Caching / Rate Limit"}
+  - {id: 22, key: ui_22_tabs, name: "All 22 UI Tabs / Field-Level Lineage"}
+  - {id: 23, key: monitoring_logs, name: "Monitoring / Alerts / Logs / Audit / Freshness"}
+  - {id: 24, key: scheduler_automation, name: "Windows Task Scheduler / Local Scheduler / Automation"}
+  - {id: 25, key: process_recovery, name: "PID / Ports / Start-Stop / Crash / Power / Internet Recovery"}
+  - {id: 26, key: safety_gcp_exit, name: "Security / PAPER Safety / Zero Real Orders / No GCP"}
+  - {id: 27, key: drive_sync, name: "Drive Evidence Sync / Heartbeat / Backlog / Retry"}
+  - {id: 28, key: hygiene_retention, name: "Folder Hygiene / Duplicates / Retention / Backup / Restore / Cleanup"}
+  - {id: 29, key: reconciliation, name: "DB↔API↔UI / SHA / Source / Timestamp / P&L Reconciliation"}
+  - {id: 30, key: acceptance, name: "Final Acceptance / Gap Queue / Independent Verification"}
+required_foundation_blocks:
+  historical_data:
+    status: AUDIT_REQUIRED
+    requirement: "Prove intended multi-year history store, exact symbol universe, fields, dates, automation, backfill, dedupe, adjustment rules, training/backtest consumers."
+  paper_store:
+    status: AUDIT_REQUIRED
+    requirement: "One canonical PAPER trade/fill/exit/P&L store with DB=API=UI reconciliation and no fixture/synthetic current truth."
+  holdings:
+    status: AUDIT_REQUIRED
+    requirement: "Read-only broker holdings source, local persistence/history if required, analytics, API/UI lineage."
+  multibagger:
+    status: AUDIT_REQUIRED
+    requirement: "Source→storage→features→ranking/model→history→API→UI automation or explicit gap."
+  news_catalyst:
+    status: AUDIT_REQUIRED
+    requirement: "Source→storage→normalization→symbol/event linking→feature/strategy consumers→API/UI or explicit gap."
+agent_workflow:
+  - "read blueprint + registry"
+  - "discover current repo/runtime truth"
+  - "record missing blueprint row first"
+  - "reproduce"
+  - "write failing regression"
+  - "implement root fix"
+  - "restart"
+  - "verify DB/API/UI"
+  - "rerun same-day BAT"
+  - "update same blueprint row"
+  - "publish sanitized evidence"
+  - "continue highest upstream dependency gap"
