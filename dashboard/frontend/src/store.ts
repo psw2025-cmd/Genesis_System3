@@ -165,3 +165,7 @@ export const useStore = create<DashboardState>((set) => ({
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   setCommandQuery: (commandQuery) => set({ commandQuery }),
 }))
+
+if (typeof window !== 'undefined') {
+  (window as any).useStore = useStore
+}

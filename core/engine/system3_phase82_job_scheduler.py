@@ -13,6 +13,8 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from datetime import date as _date_cls
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -295,24 +297,93 @@ def _now_ist() -> datetime:
     return datetime.now(_IST)
 
 
+def _local_api_base() -> str:
+    for key in ("SYSTEM3_API_BASE", "WEB_SERVICE_URL", "SYSTEM3_PUBLIC_BACKEND_URL"):
+        raw = (os.environ.get(key) or "").strip().rstrip("/")
+        if raw.lower().startswith(("http://", "https://")):
+            return raw
+    if (os.environ.get("SYSTEM3_LOCAL") or "").strip().lower() in {"1", "true"}:
+        return "http://127.0.0.1:8000"
+    return ""
+
+
 def _check_web_service_health(timeout_s: float = 5.0) -> bool:
     """Best-effort check that the web service is reachable, used only to
     gate the post_market_api_running catch-up condition. Fails closed
     (returns False) on any error — a catch-up job that needs the API
     running must never fire just because we couldn't tell."""
-    web_url = os.environ.get("WEB_SERVICE_URL", "").strip().rstrip("/")
-    if not web_url.lower().startswith(("http://", "https://")):
-        # Reject file:// and any other scheme outright — this must only
-        # ever reach the configured web service over HTTP(S).
+    web_url = _local_api_base()
+    if not web_url:
         return False
     try:
-        import urllib.request
-
         req = urllib.request.Request(f"{web_url}/api/health", method="GET")
-        with urllib.request.urlopen(req, timeout=timeout_s) as resp:  # nosec B310 - scheme validated above
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(req, timeout=timeout_s) as resp:
             return resp.status == 200
     except Exception:
         return False
+
+
+def interval_job_due(last_run, now, minutes: int) -> bool:
+    """True when an interval job should fire. Bad timestamps do not force due."""
+    if minutes <= 0:
+        return False
+    if not last_run:
+        return True
+    try:
+        last_dt = datetime.fromisoformat(str(last_run).replace("Z", "+00:00"))
+        if last_dt.tzinfo is None:
+            last_dt = last_dt.replace(tzinfo=getattr(now, "tzinfo", None))
+        return (now.replace(tzinfo=None) - last_dt.replace(tzinfo=None)).total_seconds() >= minutes * 60
+    except Exception:
+        return False
+
+
+def _push_scheduler_health(state: Dict[str, Any], timeout_s: float = 20.0) -> None:
+    """Push daemon heartbeat to the local API. Local launcher sets WORKER_PUSH_TOKEN."""
+    base = _local_api_base()
+    if not base:
+        return
+    payload = {
+        "daemon_heartbeat": state.get("daemon_heartbeat"),
+        "daemon_pid": state.get("daemon_pid"),
+        "jobs": state.get("jobs", {}),
+        "config_alert": state.get("config_alert"),
+        "config_jobs_total": state.get("config_jobs_total"),
+        "config_jobs_enabled": state.get("config_jobs_enabled"),
+        "jobs_status_today": state.get("jobs_status_today", {}),
+        "fired_keys_today": state.get("fired_keys_today", []),
+        "source": "local-phase82-daemon",
+    }
+    body = json.dumps(payload).encode("utf-8")
+    headers = {"Content-Type": "application/json"}
+
+    token = (os.environ.get("WORKER_PUSH_TOKEN") or "").strip()
+    if not token:
+        _tok_file = PROJECT_ROOT / "state" / "local_worker_push_token"
+        if _tok_file.is_file():
+            try:
+                token = _tok_file.read_text(encoding="utf-8").strip()
+            except Exception:
+                pass
+    if token:
+        headers["X-Worker-Token"] = token
+
+
+    try:
+        req = urllib.request.Request(
+            f"{base}/api/scheduler/health/push",
+            data=body,
+            headers=headers,
+            method="POST",
+        )
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(req, timeout=timeout_s):
+            pass
+    except urllib.error.HTTPError as exc:
+        print(f"[PH82-Daemon] health push failed: HTTPError {exc.code}")
+    except Exception as exc:
+        print(f"[PH82-Daemon] health push failed: {type(exc).__name__}")
 
 
 def _append_daemon_log(message: str) -> None:
@@ -362,6 +433,7 @@ def run_daemon() -> None:
     from core.engine.system3_scheduler_catchup import (
         FireStatus,
         evaluate_job_fire,
+        get_job_policy,
         load_policy,
     )
 
@@ -377,6 +449,7 @@ def run_daemon() -> None:
     state["daemon_heartbeat"] = now_ist_str
     state["daemon_pid"] = os.getpid()
     save_state(state)
+    _push_scheduler_health(state)
 
     while not _stop["flag"]:
         now = _now_ist()
@@ -421,8 +494,20 @@ def run_daemon() -> None:
         state["jobs_status_today"] = state.get("jobs_status_today", {})
 
         save_state(state)
+        _push_scheduler_health(state)
 
-        for job in config.get("jobs", []):
+        jobs_this_tick = list(enumerate(config.get("jobs", [])))
+
+        def _catchup_sort_key(pair):
+            idx, job = pair
+            try:
+                prio = int(get_job_policy(str(job.get("id") or ""), catchup_policy).get("catchup_priority", 100))
+            except Exception:
+                prio = 100
+            return prio, idx
+
+        jobs_this_tick.sort(key=_catchup_sort_key)
+        for _, job in jobs_this_tick:
             if not job.get("enabled", False):
                 continue
             job_id = job["id"]
@@ -465,7 +550,19 @@ def run_daemon() -> None:
                     save_state(state)
                 continue
 
-            if sched.lower() == "daily":
+            if str(job.get("type") or "").lower() == "interval":
+                minutes = int(job.get("interval_minutes") or 0)
+                if minutes <= 0:
+                    continue
+                last_run = (state.get("jobs") or {}).get(job_id, {}).get("last_run_time")
+                if not interval_job_due(last_run, now, minutes):
+                    continue
+                should_fire, fire_status, fire_key = (
+                    True,
+                    FireStatus.ON_TIME,
+                    f"{today_str}|interval|{job_id}|{now.strftime('%H%M')}",
+                )
+            elif sched.lower() == "daily":
                 daily_key = f"{today_str}|daily|{job_id}"
                 if daily_key in fired_keys_today:
                     continue
@@ -496,6 +593,13 @@ def run_daemon() -> None:
                     f"[PH82-Daemon] {now.strftime('%H:%M:%S')} IST — FIRING ({fire_status}): "
                     f"{job.get('name', job_id)}"
                 )
+                if str(job.get("type") or "").lower() == "interval":
+                    state.setdefault("jobs", {})[job_id] = {
+                        "last_run_time": now.isoformat(),
+                        "last_status": "RUNNING",
+                        "last_error": None,
+                    }
+                    save_state(state)
                 result = run_job(job)
                 result["fire_status"] = fire_status
                 state["jobs"][job_id] = result
@@ -505,12 +609,14 @@ def run_daemon() -> None:
                 fired_keys_today.add(fire_key)
                 state["fired_keys_today"] = sorted(fired_keys_today)
                 save_state(state)
+                _push_scheduler_health(state)
                 _append_daemon_log(
                     f"[{now.strftime('%Y-%m-%d %H:%M')} IST] [Scheduler-Daemon] "
                     f"JOB FIRED ({fire_status}): {job_id} — status={result.get('last_status', 'UNKNOWN')}"
                 )
                 print(f"[PH82-Daemon] {job_id} done — {result.get('last_status')}")
 
+        _push_scheduler_health(state)
         if _stop["flag"]:
             break
         time.sleep(60)
