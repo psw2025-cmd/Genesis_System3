@@ -1,0 +1,44 @@
+{
+  "chaos_scenarios": [
+    {
+      "id": "network_partition",
+      "description": "Simulate network partition between model service and feature store",
+      "duration_seconds": 60,
+      "expected_outcome": "validators should detect operational degradation; self-heal should retry and restore",
+      "evidence": ["chaos_report_network_partition.json"]
+    },
+    {
+      "id": "corrupted_artifact",
+      "description": "Simulate corrupted run_manifest or model snapshot",
+      "duration_seconds": 30,
+      "expected_outcome": "cryptographic validator fails (MRI-001); rollback triggered",
+      "evidence": ["chaos_report_corrupted_artifact.json"]
+    },
+    {
+      "id": "stale_secret",
+      "description": "Rotate secret to invalid value to simulate expired token",
+      "duration_seconds": 30,
+      "expected_outcome": "operational validator fails; auto-retry with rotated secret or escalate",
+      "evidence": ["chaos_report_stale_secret.json"]
+    },
+    {
+      "id": "broker_latency",
+      "description": "Introduce artificial latency in broker/exchange simulator",
+      "duration_seconds": 60,
+      "expected_outcome": "execution latency metrics spike; circuit breaker may open",
+      "evidence": ["chaos_report_broker_latency.json"]
+    },
+    {
+      "id": "liquidity_drop",
+      "description": "Simulate sudden liquidity drop for top symbols",
+      "duration_seconds": 120,
+      "expected_outcome": "execution engine reduces exposure; RL agent adapts or halts",
+      "evidence": ["chaos_report_liquidity_drop.json"]
+    }
+  ],
+  "runner_config": {
+    "parallel": false,
+    "max_retries": 2,
+    "evidence_bucket_write": true
+  }
+}
