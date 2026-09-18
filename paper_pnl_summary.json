@@ -1,13 +1,15 @@
 {
-  "total_trades": 9,
-  "winning_trades": 3,
-  "losing_trades": 6,
-  "win_rate": 0.3333,
-  "total_realized_pnl": -1806.07,
+  "total_trades": 0,
+  "winning_trades": 0,
+  "losing_trades": 0,
+  "win_rate": null,
+  "total_realized_pnl": 0.0,
   "total_unrealized_pnl": 0.0,
-  "total_pnl": -1806.07,
-  "avg_pnl_per_trade": -200.67,
+  "total_pnl": 0.0,
+  "avg_pnl_per_trade": null,
   "open_positions": 0,
-  "note": "Feb 1 2026 paper session \u2014 9 synthetic trades, 3W/6L",
-  "data_source": "paper_simulation"
+  "verification_status": "NO_VERIFIED_TRADES",
+  "is_fixture": false,
+  "note": "No verified production PAPER trades recorded in the root fallback summary. Test fixtures are not production PnL truth.",
+  "data_source": "none"
 }
