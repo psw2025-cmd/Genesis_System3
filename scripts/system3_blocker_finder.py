@@ -13,6 +13,7 @@ Fix:
 5. Integrate with CI/CD to run on each deploy
 """
 
+import os
 import json
 import subprocess
 from datetime import datetime
@@ -63,7 +64,7 @@ class SystemBlockerFinder:
         
         known = {}
         try:
-            content = register_file.read_text()
+            content = register_file.read_text(encoding="utf-8", errors="replace")
             # Parse markdown table rows
             for line in content.split("\n"):
                 if line.startswith("|") and "SYS3-BLK-" in line:
@@ -83,35 +84,115 @@ class SystemBlockerFinder:
     
     def scan_repo_for_blockers(self) -> List[Dict]:
         """
-        Recursively scan repo for blocker patterns in Python/Markdown/JSON files.
-        
-        Returns: List of {file, line_no, pattern_type, snippet, ...}
+        Scan tracked source/docs for blocker patterns.
+
+        Prefer `git ls-files` so historical `reports/` / `storage/` trees cannot
+        hang the post-market pipeline on Windows.
         """
         findings = []
-        skip_parts = {".git", "node_modules", ".venv", "venv", "__pycache__", "dist", "build"}
+        skip_parts = {
+            ".git",
+            "node_modules",
+            ".venv",
+            "venv",
+            "__pycache__",
+            "dist",
+            "build",
+            "reports",
+            "storage",
+            "logs",
+            "state",
+            "outputs",
+            ".cursor",
+            ".idea",
+            ".vscode",
+            "agent-transcripts",
+            "coverage",
+            "htmlcov",
+        }
+        compiled = [
+            (re.compile(pattern, re.IGNORECASE), pattern_type)
+            for pattern, pattern_type in self.BLOCKER_PATTERNS
+        ]
         try:
-            files = []
-            for pattern in ("*.py", "*.md", "*.json"):
-                files.extend(self.repo_root.rglob(pattern))
-            for path in files:
-                if any(part in skip_parts for part in path.parts):
-                    continue
+            for path in self._candidate_scan_files(skip_parts):
                 try:
+                    if path.stat().st_size > 1_000_000:
+                        continue
                     with open(path, "r", encoding="utf-8", errors="ignore") as f:
                         for line_no, line in enumerate(f, 1):
-                            for pattern, pattern_type in self.BLOCKER_PATTERNS:
-                                if re.search(pattern, line, re.IGNORECASE):
+                            if line_no > 5000:
+                                break
+                            for regex, pattern_type in compiled:
+                                if regex.search(line):
                                     findings.append({
                                         "file": str(path.relative_to(self.repo_root)),
                                         "line": line_no,
                                         "pattern": pattern_type,
                                         "snippet": line.strip()[:100],
                                     })
+                                    break
                 except Exception:
                     pass
         except Exception as e:
             print(f"Warning: Repo scan failed: {e}")
         return findings
+
+    def _candidate_scan_files(self, skip_parts: Set[str]) -> List[Path]:
+        """Tracked source files first; fall back to a bounded walk."""
+        suffixes = {".py", ".md", ".json"}
+        tracked: List[Path] = []
+        try:
+            result = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(self.repo_root),
+                    "ls-files",
+                    "-z",
+                    "*.py",
+                    "*.md",
+                    "*.json",
+                ],
+                capture_output=True,
+                timeout=60,
+                check=False,
+            )
+            if result.returncode == 0 and result.stdout:
+                for raw in result.stdout.split(b"\0"):
+                    if not raw:
+                        continue
+                    rel = raw.decode("utf-8", errors="replace").replace("\\", "/")
+                    parts = Path(rel).parts
+                    if any(part in skip_parts for part in parts):
+                        continue
+                    path = self.repo_root / rel
+                    if path.is_file() and path.suffix.lower() in suffixes:
+                        tracked.append(path)
+                if tracked:
+                    return tracked
+        except Exception:
+            pass
+
+        files: List[Path] = []
+        try:
+            for root, dirs, names in os.walk(self.repo_root):
+                dirs[:] = [d for d in dirs if d not in skip_parts]
+                for name in names:
+                    if Path(name).suffix.lower() not in suffixes:
+                        continue
+                    path = Path(root) / name
+                    try:
+                        if path.stat().st_size > 1_000_000:
+                            continue
+                        files.append(path)
+                        if len(files) >= 4000:
+                            return files
+                    except Exception:
+                        pass
+        except Exception:
+            pass
+        return files
     
     def check_runtime_state(self, api_url: Optional[str] = None) -> List[Dict]:
         """
@@ -167,7 +248,7 @@ class SystemBlockerFinder:
         
         return issues
     
-    def generate_report(self, output_file: Optional[Path] = None) -> Dict:
+    def generate_report(self, output_file: Optional[Path] = None, api_url: Optional[str] = None) -> Dict:
         """
         Generate blocker report combining repo scan + runtime checks.
         
@@ -177,7 +258,7 @@ class SystemBlockerFinder:
         
         # Run scans
         repo_findings = self.scan_repo_for_blockers()
-        runtime_issues = self.check_runtime_state()
+        runtime_issues = self.check_runtime_state(api_url)
         
         # Categorize findings
         new_blockers = []
@@ -237,16 +318,62 @@ class SystemBlockerFinder:
         return recs
 
 
-def run_automated_scan(repo_root: str, output_dir: str = "/tmp/genesis_blockers"):
+def _configure_stdio() -> None:
+    """Windows consoles are often cp1252; never crash the post-market pipeline on print."""
+    import sys
+
+    for stream in (sys.stdout, sys.stderr):
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
+def parse_blocker_finder_args(argv: Optional[List[str]] = None):
+    """Parse CLI. --api-base is accepted for pipeline compatibility; never treat flags as paths."""
+    import argparse
+    import sys
+
+    parser = argparse.ArgumentParser(description="Automated System3 blocker scan")
+    parser.add_argument(
+        "repo_root",
+        nargs="?",
+        default=str(Path(__file__).resolve().parents[1]),
+        help="Repository root (default: checkout containing this script)",
+    )
+    parser.add_argument(
+        "output_dir",
+        nargs="?",
+        default=None,
+        help="Report output directory (default: <repo>/reports/blockers)",
+    )
+    parser.add_argument(
+        "--api-base",
+        default=None,
+        help="Optional runtime API base URL (reserved for runtime checks)",
+    )
+    args = parser.parse_args(sys.argv[1:] if argv is None else argv)
+    if args.output_dir is None:
+        args.output_dir = str(Path(args.repo_root) / "reports" / "blockers")
+    return args
+
+
+def run_automated_scan(
+    repo_root: str,
+    output_dir: str = "/tmp/genesis_blockers",
+    api_base: Optional[str] = None,
+):
     """
     CLI entry point for automated blocker scan.
     
     Designed to run from CI/CD pipeline or cron job.
     """
-    print(f"🔍 Starting automated blocker scan at {datetime.now(IST)}...")
+    print(f"[SCAN] Starting automated blocker scan at {datetime.now(IST)}...")
     
     finder = SystemBlockerFinder(Path(repo_root), Path(output_dir))
-    report = finder.generate_report(Path(output_dir) / "blocker_report.json")
+    report = finder.generate_report(Path(output_dir) / "blocker_report.json", api_url=api_base)
     
     print("\n" + "="*60)
     print("BLOCKER SCAN SUMMARY")
@@ -258,19 +385,22 @@ def run_automated_scan(repo_root: str, output_dir: str = "/tmp/genesis_blockers"
     print(f"NEW blockers:   {report['summary']['new_potential_blockers']}")
     
     if report["recommendations"]:
-        print("\n📋 Recommendations:")
+        print("\nRecommendations:")
         for rec in report["recommendations"]:
-            print(f"  • {rec}")
+            print(f"  - {rec}")
     
-    print("\n✓ Report saved to " + str(Path(output_dir) / "blocker_report.json"))
+    print("\n[OK] Report saved to " + str(Path(output_dir) / "blocker_report.json"))
     return report
 
 
 if __name__ == "__main__":
     import sys
-    
-    repo_root = sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).resolve().parents[1])
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else str(Path(repo_root) / "reports" / "blockers")
-    
-    report = run_automated_scan(repo_root, output_dir)
-    print(f"\n🎯 Exit code: {'0 (no new blockers)' if not report['summary']['new_potential_blockers'] else '1 (new blockers found)'}")
+
+    _configure_stdio()
+    args = parse_blocker_finder_args()
+    report = run_automated_scan(args.repo_root, args.output_dir, api_base=args.api_base)
+    # Scan completion is success for the post-market pipeline. New findings are reported,
+    # not a hard process failure — otherwise Windows/local daily runs fail on emoji/noise.
+    new_count = int(report["summary"].get("new_potential_blockers") or 0)
+    print(f"\n[DONE] Exit code 0 (scan complete; new_potential_blockers={new_count})")
+    raise SystemExit(0)

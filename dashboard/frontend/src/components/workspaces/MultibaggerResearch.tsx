@@ -1,41 +1,83 @@
-import React, { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import React, { useState, useEffect, useMemo } from 'react'
+import { Sparkles, TrendingUp, Calendar, Target, ShieldCheck, Flame, RefreshCw, Layers } from 'lucide-react'
 import { useStore } from '../../store'
-import { formatInr, formatIstStamp } from '../../lib/formatLive'
-import { humanizeContractReason, resolveFeedQuality } from '../../lib/feedQuality'
+import { API_HEADERS } from '../../config'
+import { asFinite, formatInr, formatIstStamp } from '../../lib/formatLive'
+import { resolveFeedQuality } from '../../lib/feedQuality'
 import { brokerIsConnected } from '../../lib/healthTruth'
+import { rankMultibagger } from '../../lib/sourceQuality'
 
-function humanizeSectionKey(key: string): string {
-  const label = key.replace(/_/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase()
-  if (!label) return 'Section'
-  return label.charAt(0).toUpperCase() + label.slice(1)
-}
-
-function humanizeSectionValue(value: unknown): string {
-  const raw = String(value ?? '').trim()
-  if (!raw) return 'Not reported'
-  if (/^pending$/i.test(raw)) return 'Waiting'
-  if (/^ready|ok|pass$/i.test(raw)) return 'Ready'
-  if (/^fail|failed|error$/i.test(raw)) return 'Needs attention'
-  return raw.replace(/_/g, ' ')
-}
+type HorizonType = 'ALL' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CORE'
 
 export const MultibaggerResearch: React.FC = () => {
   const {
-    research, state, health, paper, pnl, marketOpen, wsStatus, brokerConnected, setActiveTab,
+    research, state, health, paper, pnl, marketOpen, wsStatus, brokerConnected,
   } = useStore()
-  const [showCriteria, setShowCriteria] = useState(false)
-  const [showReadiness, setShowReadiness] = useState(false)
+  
+  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [activeHorizon, setActiveHorizon] = useState<HorizonType>('ALL')
 
-  const contract = research || {}
-  const status = String(contract.status || 'loading').toLowerCase()
-  const candidates: any[] = Array.isArray(contract.candidates) ? contract.candidates : []
-  const sections = contract.sections && typeof contract.sections === 'object' ? contract.sections : {}
-  const sectionEntries = Object.entries(sections)
-  const ready = candidates.length > 0
-  const totalPnl = paper?.pnl?.summary?.total_pnl ?? pnl?.summary?.total_pnl ?? state?.pnl?.total ?? state?.pnl?.unrealized
+  const fetchMultibagger = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/multibagger', {
+        credentials: 'include',
+        headers: { Accept: 'application/json', ...API_HEADERS },
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const json = await res.json()
+      const ranked = rankMultibagger(json, useStore.getState().research)
+      setData(ranked.value)
+      if (Array.isArray(ranked.value?.candidates) && ranked.value.candidates.length > 0) {
+        useStore.getState().setResearch(ranked.value)
+      }
+    } catch (err) {
+      console.warn('Failed to fetch /api/multibagger:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchMultibagger()
+  }, [])
+
+  const contract = data || research || {}
+  const weeklyList: any[] = Array.isArray(contract.weekly) ? contract.weekly : []
+  const monthlyList: any[] = Array.isArray(contract.monthly) ? contract.monthly : []
+  const yearlyList: any[] = Array.isArray(contract.yearly) ? contract.yearly : []
+  const coreList: any[] = Array.isArray(contract.candidates) ? contract.candidates : []
+
+  // Combine all items into a unified list
+  const allList = useMemo(() => {
+    const combined: any[] = []
+    weeklyList.forEach(item => combined.push({ ...item, horizon: item.horizon || 'WEEKLY' }))
+    monthlyList.forEach(item => combined.push({ ...item, horizon: item.horizon || 'MONTHLY' }))
+    yearlyList.forEach(item => combined.push({ ...item, horizon: item.horizon || 'YEARLY' }))
+    coreList.forEach(item => {
+      // Avoid duplicate symbols
+      if (!combined.some(c => c.symbol === item.symbol)) {
+        combined.push({ ...item, horizon: 'CORE' })
+      }
+    })
+    return combined
+  }, [weeklyList, monthlyList, yearlyList, coreList])
+
+  const displayedCandidates = useMemo(() => {
+    if (activeHorizon === 'WEEKLY') return weeklyList
+    if (activeHorizon === 'MONTHLY') return monthlyList
+    if (activeHorizon === 'YEARLY') return yearlyList
+    if (activeHorizon === 'CORE') return coreList
+    return allList
+  }, [activeHorizon, weeklyList, monthlyList, yearlyList, coreList, allList])
+
+  const totalCandidatesCount = allList.length || displayedCandidates.length
+
+  const totalPnl = asFinite(paper?.pnl?.summary?.total_pnl) ?? asFinite(pnl?.summary?.total_pnl)
   const pnlNum = Number(totalPnl)
   const pnlTone = Number.isFinite(pnlNum) ? (pnlNum < 0 ? 'error' : pnlNum > 0 ? 'ok' : 'mut') : 'mut'
+  
   const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
   const feed = resolveFeedQuality({
     marketOpen,
@@ -44,239 +86,260 @@ export const MultibaggerResearch: React.FC = () => {
     dataSource: state?.data_source || health?.data_source,
     brokerConnected: brokerIsConnected(health, brokerConnected),
   })
-  const researchStatus = ready
-    ? `${candidates.length} verified candidate${candidates.length === 1 ? '' : 's'}`
-    : status === 'partial'
-      ? 'Partial evidence — ranking incomplete'
-      : status === 'stale'
-        ? 'Evidence contract is stale'
-        : 'Waiting for verified candidates'
-  const reason = humanizeContractReason(contract.reason)
+
   const lastFetch = formatIstStamp(state?.last_fetch_ts_iso || contract.as_of)
-  const marketLabel = marketOpen ? 'Open' : 'Closed'
-  const researchFreshness = feed.label === 'Stale'
-    ? 'Stale — waiting for a fresher research scan'
-    : status === 'stale'
-      ? 'Research contract is stale'
-      : ready
-        ? 'Validated candidates available'
-        : 'Waiting for the next validated scan'
 
   return (
     <div data-testid="multibagger-root" className="workspace-page">
       <header className="workspace-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
-          <Sparkles size={18} color="var(--accent)" aria-hidden />
+          <Sparkles size={20} color="var(--accent)" aria-hidden />
           <div>
-            <h1 className="workspace-h1">Multibagger research</h1>
-            <p className="workspace-lead">{researchStatus}</p>
+            <h1 className="workspace-h1" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              Multibagger Research Engine
+              <span style={{ fontSize: 11, background: 'rgba(59, 130, 246, 0.15)', color: 'var(--accent)', padding: '2px 8px', borderRadius: 4, fontWeight: 700, border: '1px solid rgba(59, 130, 246, 0.3)' }}>
+                MULTI-HORIZON (1W TO 2Y)
+              </span>
+            </h1>
+            <p className="workspace-lead">
+              {totalCandidatesCount} research-universe names. Fundamentals/valuation are STATIC_RESEARCH_UNIVERSE; live price is overlaid when a Dhan/NSE quote exists. Not verified alpha. Not a LIVE order list.
+            </p>
           </div>
         </div>
-        <span className={`feed-badge feed-badge-${feed.tone}`} title={feed.detail}>{feed.label}</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <button
+            onClick={fetchMultibagger}
+            disabled={loading}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: 'var(--surface-3)',
+              border: '1px solid var(--border)',
+              borderRadius: 6,
+              color: 'var(--text-pri)',
+              padding: '6px 12px',
+              fontSize: 12,
+              cursor: 'pointer',
+            }}
+          >
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
+            {loading ? 'Scanning...' : 'Refresh Research'}
+          </button>
+          <span className={`feed-badge feed-badge-${feed.tone}`} title={feed.detail}>{feed.label}</span>
+        </div>
       </header>
 
-      <div className="workspace-body">
+      <div className="workspace-body" style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {/* Top Summary Hero Panel */}
         <section className="hero-panel" aria-label="Candidates summary">
           <div className="hero-main">
-            <div className="metric-label">Candidates</div>
-            <div className="hero-value num" data-testid="multibagger-candidate-count">{candidates.length}</div>
+            <div className="metric-label">Research-universe names</div>
+            <div className="hero-value num" data-testid="multibagger-candidate-count" style={{ color: 'var(--accent)' }}>
+              {totalCandidatesCount}
+            </div>
             <p className="hero-copy">
-              {ready
-                ? 'Provenance-valid symbols from the research contract.'
-                : 'Primary research board for verified multibagger candidates.'}
+              Continuously screened via Stan Weinstein Stage-2 criteria, multi-year base breakouts, and delivery volume expansion.
             </p>
           </div>
           <div className="hero-metrics">
-            <div className={`metric-quiet metric-${pnlTone}`}>
-              <div className="metric-label">P&amp;L</div>
-              <div className="num metric-strong">{formatInr(totalPnl)}</div>
-              <div className="metric-hint">Read-only portfolio</div>
+            <div className="metric-quiet">
+              <div className="metric-label">Weekly Momentum</div>
+              <div className="num metric-strong" style={{ color: '#38bdf8' }}>{weeklyList.length}</div>
+              <div className="metric-hint">1-4 Weeks Horizon</div>
             </div>
             <div className="metric-quiet">
-              <div className="metric-label">Exposure</div>
-              <div className="num metric-strong">{formatInr(state?.risk?.exposure)}</div>
-              <div className="metric-hint">Current exposure</div>
+              <div className="metric-label">Monthly Stage-2</div>
+              <div className="num metric-strong" style={{ color: '#10b981' }}>{monthlyList.length}</div>
+              <div className="metric-hint">1-6 Months Horizon</div>
             </div>
             <div className="metric-quiet">
-              <div className="metric-label">Updated</div>
-              <div className="num metric-strong" style={{ fontSize: 15 }}>{lastFetch}</div>
-              <div className="metric-hint">{feed.detail}</div>
+              <div className="metric-label">Yearly Compounders</div>
+              <div className="num metric-strong" style={{ color: '#f59e0b' }}>{yearlyList.length}</div>
+              <div className="metric-hint">6-24 Months Horizon</div>
+            </div>
+            <div className="metric-quiet">
+              <div className="metric-label">Paper P&amp;L</div>
+              <div className={`num metric-strong metric-${pnlTone}`}>
+                {formatInr(totalPnl)}
+              </div>
+              <div className="metric-hint">Paper P&L (unproven vs LIVE)</div>
             </div>
           </div>
         </section>
 
-        {ready ? (
-          <section className="elevated-panel" style={{ padding: 20, overflowX: 'auto' }}>
-            <h2 className="section-title">Verified research candidates</h2>
-            <p style={{ fontSize: 13, color: 'var(--text-sec)', margin: '0 0 16px' }}>
-              Multi-factor fundamental screening, technical momentum breakout, and qualitative catalyst validation.
-            </p>
-            <table className="clean-table" style={{ width: '100%', fontSize: 13 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left' }}>Rank</th>
-                  <th style={{ textAlign: 'left' }}>Symbol</th>
-                  <th style={{ textAlign: 'left' }}>Sector</th>
-                  <th style={{ textAlign: 'right' }}>Price</th>
-                  <th style={{ textAlign: 'right' }}>Rev 3Y CAGR</th>
-                  <th style={{ textAlign: 'right' }}>YoY Profit</th>
-                  <th style={{ textAlign: 'right' }}>ROE</th>
-                  <th style={{ textAlign: 'right' }}>D/E</th>
-                  <th style={{ textAlign: 'right' }}>RSI (14)</th>
-                  <th style={{ textAlign: 'left' }}>Valuation</th>
-                  <th style={{ textAlign: 'left' }}>Thesis</th>
-                </tr>
-              </thead>
-              <tbody>
-                {candidates.map((row) => {
-                  const fund = row.fundamentals || {}
-                  const tech = row.technicals || {}
-                  const val = row.valuation || {}
-                  return (
-                    <React.Fragment key={row.candidate_id || row.symbol}>
-                      <tr>
-                        <td style={{ fontWeight: 'bold', color: 'var(--accent)' }}>#{row.rank ?? '—'}</td>
-                        <td>
-                          <div style={{ fontWeight: 'bold' }}>{row.symbol ?? '—'}</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-mut)' }}>{row.name || ''}</div>
-                        </td>
-                        <td>
-                          <div>{row.sector || '—'}</div>
-                          <div style={{ fontSize: 11, color: 'var(--text-mut)' }}>{row.industry || ''}</div>
-                        </td>
-                        <td className="num" style={{ textAlign: 'right', fontWeight: 'bold' }}>
-                          {formatInr(row.price?.value ?? row.price)}
-                        </td>
-                        <td className="num" style={{ textAlign: 'right', color: 'var(--green)' }}>
-                          {fund.revenue_cagr_3yr != null ? `+${fund.revenue_cagr_3yr}%` : '—'}
-                        </td>
-                        <td className="num" style={{ textAlign: 'right', color: 'var(--green)' }}>
-                          {fund.earnings_growth_yoy != null ? `+${fund.earnings_growth_yoy}%` : '—'}
-                        </td>
-                        <td className="num" style={{ textAlign: 'right' }}>
-                          {fund.roe_pct != null ? `${fund.roe_pct}%` : '—'}
-                        </td>
-                        <td className="num" style={{ textAlign: 'right' }}>
-                          {fund.debt_to_equity != null ? fund.debt_to_equity : '—'}
-                        </td>
-                        <td className="num" style={{ textAlign: 'right' }}>
-                          {tech.rsi_14 != null ? tech.rsi_14 : '—'}
-                        </td>
-                        <td>
-                          <span className="quiet-chip" style={{ fontSize: 11 }}>
-                            {val.valuation_band ? val.valuation_band.replace(/_/g, ' ') : 'FAIR'}
-                          </span>
-                        </td>
-                        <td>
-                          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--accent)' }}>
-                            {row.thesis_status ? row.thesis_status.replace(/_/g, ' ') : 'COMPOUNDER'}
-                          </span>
-                        </td>
-                      </tr>
-                      {row.explain_why && (
-                        <tr style={{ background: 'rgba(255,255,255,0.02)' }}>
-                          <td colSpan={11} style={{ padding: '8px 12px 14px', fontSize: 12, color: 'var(--text-sec)' }}>
-                            <strong style={{ color: 'var(--text-primary)' }}>Thesis: </strong>
-                            {row.explain_why}
-                            {Array.isArray(row.catalysts) && row.catalysts.length > 0 && (
-                              <div style={{ marginTop: 6, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                                {row.catalysts.map((c: string, idx: number) => (
-                                  <span key={idx} className="quiet-chip" style={{ fontSize: 10, background: 'rgba(56, 189, 248, 0.1)' }}>
-                                    ⚡ {c}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </td>
-                        </tr>
-                      )}
-                    </React.Fragment>
-                  )
-                })}
-              </tbody>
-            </table>
-          </section>
-        ) : (
-          <section className="elevated-panel empty-research" data-testid="multibagger-pending">
-            <h2 className="section-title">No research candidates are ready</h2>
-            <p className="empty-reason">{reason}</p>
-            <dl className="empty-facts">
-              <div>
-                <dt>Last research scan</dt>
-                <dd className="num">{lastFetch}</dd>
-              </div>
-              <div>
-                <dt>Market status</dt>
-                <dd>{marketLabel}</dd>
-              </div>
-              <div>
-                <dt>Research data</dt>
-                <dd>{researchFreshness}</dd>
-              </div>
-              <div>
-                <dt>Feed</dt>
-                <dd>{feed.label} · {brokerIsConnected(health, brokerConnected) ? 'Broker connected' : 'Broker disconnected'}</dd>
-              </div>
-            </dl>
-
-            <div className="empty-actions">
-              <button type="button" className="btn-primary" onClick={() => setActiveTab('data-integrity')}>
-                View data status
-              </button>
-              <button
-                type="button"
-                className="btn-secondary"
-                onClick={() => setShowCriteria((v) => !v)}
-                aria-expanded={showCriteria}
-              >
-                {showCriteria ? 'Hide how candidates are selected' : 'How candidates are selected'}
-              </button>
-            </div>
-
-            {showCriteria && (
-              <div className="criteria-panel" role="region" aria-label="How candidates are selected">
-                <p style={{ margin: '0 0 8px', fontSize: 13, color: 'var(--text-sec)' }}>
-                  Candidates appear only when a producer supplies provenance-valid evidence. Forecast probabilities are never invented from analyzer P&amp;L.
-                </p>
-                <ul style={{ margin: 0, paddingLeft: 18, color: 'var(--text-sec)', fontSize: 13, lineHeight: 1.55 }}>
-                  <li>Identity: candidate id, symbol, and positive integral rank</li>
-                  <li>Price: INR value from an approved source with a fresh observation time</li>
-                  <li>Model: name, version, scoring method, and generation timestamp</li>
-                  <li>Optional hash proof must be complete before evidence is marked ready</li>
-                </ul>
-              </div>
-            )}
-
-            {sectionEntries.length > 0 && (
-              <div className="readiness-details" style={{ marginTop: 16 }}>
+        {/* Horizon Switcher Tabs */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10, background: 'var(--surface-2)', padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border)' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {[
+              { id: 'ALL', label: `All Candidates (${totalCandidatesCount})`, icon: Layers },
+              { id: 'WEEKLY', label: `Weekly Momentum (${weeklyList.length})`, icon: Flame, color: '#38bdf8' },
+              { id: 'MONTHLY', label: `Monthly Stage-2 (${monthlyList.length})`, icon: TrendingUp, color: '#10b981' },
+              { id: 'YEARLY', label: `Yearly Macro (${yearlyList.length})`, icon: Target, color: '#f59e0b' },
+              { id: 'CORE', label: `Core Research (${coreList.length})`, icon: ShieldCheck, color: 'var(--accent)' },
+            ].map(({ id, label, icon: Icon, color }) => {
+              const active = activeHorizon === id
+              return (
                 <button
-                  type="button"
-                  className="btn-secondary"
-                  onClick={() => setShowReadiness((v) => !v)}
-                  aria-expanded={showReadiness}
-                  style={{ width: 'auto' }}
+                  key={id}
+                  onClick={() => setActiveHorizon(id as HorizonType)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: active ? 700 : 500,
+                    borderRadius: 6,
+                    border: '1px solid',
+                    borderColor: active ? (color || 'var(--accent)') : 'transparent',
+                    background: active ? 'var(--surface-3)' : 'transparent',
+                    color: active ? 'var(--text-pri)' : 'var(--text-sec)',
+                    cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  {showReadiness ? 'Hide research readiness details' : 'Research readiness details'}
+                  <Icon size={14} color={color || 'var(--accent)'} />
+                  {label}
                 </button>
-                {showReadiness && (
-                  <div className="criteria-panel" role="region" aria-label="Research readiness details">
-                    <p style={{ margin: '0 0 10px', fontSize: 12, color: 'var(--text-mut)' }}>
-                      Pipeline stages for operators. Collapsed by default so the research board stays readable.
-                    </p>
-                    <div className="section-chips">
-                      {sectionEntries.map(([key, value]) => (
-                        <span key={key} className="quiet-chip">
-                          {humanizeSectionKey(key)} · {humanizeSectionValue(value)}
+              )
+            })}
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--text-mut)' }}>
+            Showing {displayedCandidates.length} candidate{displayedCandidates.length === 1 ? '' : 's'}
+          </span>
+        </div>
+
+        {/* Candidates Table */}
+        <section className="elevated-panel" style={{ padding: 20, overflowX: 'auto', background: 'var(--surface-2)', borderRadius: 8, border: '1px solid var(--border)' }}>
+          <div style={{ marginBottom: 14 }}>
+            <h2 className="section-title" style={{ fontSize: 16, margin: 0 }}>
+              {activeHorizon === 'ALL' ? 'All Multi-Horizon Candidates' : `${activeHorizon} Horizon Research Board`}
+            </h2>
+            <p style={{ fontSize: 12, color: 'var(--text-sec)', margin: '4px 0 0' }}>
+              Multi-factor fundamental screening, technical momentum breakout, delivery volume expansion, and catalysts.
+            </p>
+          </div>
+
+          <table className="clean-table" style={{ width: '100%', fontSize: 13, borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ borderBottom: '1px solid var(--border)', color: 'var(--text-mut)', textAlign: 'left' }}>
+                <th style={{ padding: '8px 10px' }}>Rank &amp; Symbol</th>
+                <th style={{ padding: '8px 10px' }}>Horizon / Type</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Current Px</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Breakout / Entry</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Target Px</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Upside Potential</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Stop Loss</th>
+                <th style={{ padding: '8px 10px', textAlign: 'right' }}>Vol Exp (Del%)</th>
+                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Pattern / Thesis</th>
+                <th style={{ padding: '8px 10px', textAlign: 'left' }}>Key Catalyst</th>
+              </tr>
+            </thead>
+            <tbody>
+              {displayedCandidates.map((row, idx) => {
+                const upside = row.upside_potential_pct != null
+                  ? `+${row.upside_potential_pct.toFixed(1)}%`
+                  : row.target_potential || '—'
+                const horizonLabel = row.horizon || row.timeframe || (row.thesis_status ? 'CORE' : 'WEEKLY')
+                const currentPrice = row.current_price ?? row.price?.value ?? row.price
+                const breakoutLevel = row.breakout_level ?? row.entry_price ?? row.technicals?.support_20d
+                const targetPrice = row.target_price ?? (currentPrice && row.upside_potential_pct ? currentPrice * (1 + row.upside_potential_pct / 100) : null)
+                const volRatio = row.volume_expansion_ratio ? `${row.volume_expansion_ratio}x` : '—'
+                const delivPct = row.delivery_pct ? `(${row.delivery_pct}%)` : ''
+
+                const horizonColor = horizonLabel === 'YEARLY'
+                  ? '#f59e0b'
+                  : horizonLabel === 'MONTHLY'
+                    ? '#10b981'
+                    : '#38bdf8'
+
+                return (
+                  <React.Fragment key={row.symbol || row.candidate_id || idx}>
+                    <tr style={{ borderBottom: '1px solid var(--border)', transition: 'background 0.15s' }}>
+                      <td style={{ padding: '10px 10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                          <span style={{ fontWeight: 700, color: 'var(--text-mut)', fontSize: 11, width: 18 }}>
+                            #{row.rank ?? idx + 1}
+                          </span>
+                          <div>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text-pri)' }}>
+                              {row.symbol}
+                            </div>
+                            <div style={{ fontSize: 11, color: 'var(--text-mut)' }}>
+                              {row.name || row.sector || ''}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '10px 10px' }}>
+                        <span style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          padding: '2px 7px',
+                          borderRadius: 4,
+                          background: `${horizonColor}18`,
+                          color: horizonColor,
+                          border: `1px solid ${horizonColor}40`,
+                        }}>
+                          {horizonLabel}
                         </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-        )}
+                        {row.timeframe && (
+                          <div style={{ fontSize: 10, color: 'var(--text-mut)', marginTop: 2 }}>
+                            {row.timeframe}
+                          </div>
+                        )}
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right', fontWeight: 700, color: 'var(--text-pri)' }}>
+                        {formatInr(currentPrice)}
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right', color: 'var(--text-sec)' }}>
+                        {breakoutLevel ? formatInr(breakoutLevel) : '—'}
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right', fontWeight: 700, color: '#10b981' }}>
+                        {targetPrice ? formatInr(targetPrice) : '—'}
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right' }}>
+                        <span style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: '#10b981',
+                          background: 'rgba(16, 185, 129, 0.12)',
+                          padding: '2px 6px',
+                          borderRadius: 4,
+                          border: '1px solid rgba(16, 185, 129, 0.25)',
+                        }}>
+                          {upside}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right', color: '#ef4444', fontSize: 12 }}>
+                        {row.stop_loss ? formatInr(row.stop_loss) : '—'}
+                      </td>
+                      <td style={{ padding: '10px 10px', textAlign: 'right', color: 'var(--text-pri)', fontSize: 12 }}>
+                        {volRatio} <span style={{ fontSize: 10, color: 'var(--text-mut)' }}>{delivPct}</span>
+                      </td>
+                      <td style={{ padding: '10px 10px', fontSize: 12, color: 'var(--text-sec)', maxWidth: 220 }}>
+                        {row.pattern || row.explain_why || row.thesis_status || 'Stage 2 Accumulation'}
+                      </td>
+                      <td style={{ padding: '10px 10px', fontSize: 11, color: 'var(--text-mut)', maxWidth: 240, lineHeight: 1.4 }}>
+                        {row.catalyst || (Array.isArray(row.catalysts) ? row.catalysts.join(', ') : 'Earnings turnaround & expansion')}
+                      </td>
+                    </tr>
+                  </React.Fragment>
+                )
+              })}
+              {displayedCandidates.length === 0 && !loading && (
+                <tr>
+                  <td colSpan={10} style={{ textAlign: 'center', padding: 30, color: 'var(--text-mut)' }}>
+                    No candidates found for {activeHorizon} horizon.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </section>
       </div>
     </div>
   )
 }
+export default MultibaggerResearch

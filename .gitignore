@@ -1,3 +1,7 @@
+# Windows Explorer folder metadata must never become git refs or objects
+desktop.ini
+**/desktop.ini
+
 # Ignore vscode AI rules
 .github/instructions/codacy.instructions.md
 
