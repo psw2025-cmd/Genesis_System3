@@ -11,7 +11,7 @@ type HorizonType = 'ALL' | 'WEEKLY' | 'MONTHLY' | 'YEARLY' | 'CORE'
 
 export const MultibaggerResearch: React.FC = () => {
   const {
-    research, state, health, paper, pnl, marketOpen, wsStatus, brokerConnected,
+    state, health, paper, pnl, marketOpen, wsStatus, brokerConnected,
   } = useStore()
   
   const [data, setData] = useState<any>(null)
@@ -29,11 +29,10 @@ export const MultibaggerResearch: React.FC = () => {
       const json = await res.json()
       const ranked = rankMultibagger(json, useStore.getState().research)
       setData(ranked.value)
-      if (Array.isArray(ranked.value?.candidates) && ranked.value.candidates.length > 0) {
-        useStore.getState().setResearch(ranked.value)
-      }
+
     } catch (err) {
       console.warn('Failed to fetch /api/multibagger:', err)
+      setData({ status: 'pending', reason: 'RESEARCH_API_UNAVAILABLE', candidates: [] })
     } finally {
       setLoading(false)
     }
@@ -43,7 +42,7 @@ export const MultibaggerResearch: React.FC = () => {
     fetchMultibagger()
   }, [])
 
-  const contract = data || research || {}
+  const contract = data || { status: 'pending', reason: 'RESEARCH_API_UNAVAILABLE', candidates: [] }
   const weeklyList: any[] = Array.isArray(contract.weekly) ? contract.weekly : []
   const monthlyList: any[] = Array.isArray(contract.monthly) ? contract.monthly : []
   const yearlyList: any[] = Array.isArray(contract.yearly) ? contract.yearly : []
@@ -102,7 +101,7 @@ export const MultibaggerResearch: React.FC = () => {
               </span>
             </h1>
             <p className="workspace-lead">
-              {totalCandidatesCount} research-universe names. Fundamentals/valuation are STATIC_RESEARCH_UNIVERSE; live price is overlaid when a Dhan/NSE quote exists. Not verified alpha. Not a LIVE order list.
+              {totalCandidatesCount} candidates with source-gated identity and price evidence. Status: {contract.status || 'pending'}. Model proof and prediction outcomes remain unverified until independently reconciled. No LIVE orders.
             </p>
           </div>
         </div>
@@ -139,7 +138,7 @@ export const MultibaggerResearch: React.FC = () => {
               {totalCandidatesCount}
             </div>
             <p className="hero-copy">
-              Continuously screened via Stan Weinstein Stage-2 criteria, multi-year base breakouts, and delivery volume expansion.
+              {contract.reason || 'Candidate ranking and outcomes await independently checked evidence.'}
             </p>
           </div>
           <div className="hero-metrics">
@@ -217,7 +216,7 @@ export const MultibaggerResearch: React.FC = () => {
               {activeHorizon === 'ALL' ? 'All Multi-Horizon Candidates' : `${activeHorizon} Horizon Research Board`}
             </h2>
             <p style={{ fontSize: 12, color: 'var(--text-sec)', margin: '4px 0 0' }}>
-              Multi-factor fundamental screening, technical momentum breakout, delivery volume expansion, and catalysts.
+              Only source-gated records appear here. A candidate is research, not a verified return prediction or trade instruction.
             </p>
           </div>
 
@@ -238,13 +237,11 @@ export const MultibaggerResearch: React.FC = () => {
             </thead>
             <tbody>
               {displayedCandidates.map((row, idx) => {
-                const upside = row.upside_potential_pct != null
-                  ? `+${row.upside_potential_pct.toFixed(1)}%`
-                  : row.target_potential || '—'
+                const upside = '—'
                 const horizonLabel = row.horizon || row.timeframe || (row.thesis_status ? 'CORE' : 'WEEKLY')
                 const currentPrice = row.current_price ?? row.price?.value ?? row.price
                 const breakoutLevel = row.breakout_level ?? row.entry_price ?? row.technicals?.support_20d
-                const targetPrice = row.target_price ?? (currentPrice && row.upside_potential_pct ? currentPrice * (1 + row.upside_potential_pct / 100) : null)
+                const targetPrice = null
                 const volRatio = row.volume_expansion_ratio ? `${row.volume_expansion_ratio}x` : '—'
                 const delivPct = row.delivery_pct ? `(${row.delivery_pct}%)` : ''
 
@@ -319,10 +316,10 @@ export const MultibaggerResearch: React.FC = () => {
                         {volRatio} <span style={{ fontSize: 10, color: 'var(--text-mut)' }}>{delivPct}</span>
                       </td>
                       <td style={{ padding: '10px 10px', fontSize: 12, color: 'var(--text-sec)', maxWidth: 220 }}>
-                        {row.pattern || row.explain_why || row.thesis_status || 'Stage 2 Accumulation'}
+                        {row.pattern || row.explain_why || row.thesis_status || 'Unverified'}
                       </td>
                       <td style={{ padding: '10px 10px', fontSize: 11, color: 'var(--text-mut)', maxWidth: 240, lineHeight: 1.4 }}>
-                        {row.catalyst || (Array.isArray(row.catalysts) ? row.catalysts.join(', ') : 'Earnings turnaround & expansion')}
+                        {row.catalyst || (Array.isArray(row.catalysts) ? row.catalysts.join(', ') : '—')}
                       </td>
                     </tr>
                   </React.Fragment>
@@ -331,7 +328,7 @@ export const MultibaggerResearch: React.FC = () => {
               {displayedCandidates.length === 0 && !loading && (
                 <tr>
                   <td colSpan={10} style={{ textAlign: 'center', padding: 30, color: 'var(--text-mut)' }}>
-                    No candidates found for {activeHorizon} horizon.
+                    No provenance-qualified candidates for {activeHorizon} horizon. {contract.reason || 'Evidence pending.'}
                   </td>
                 </tr>
               )}
