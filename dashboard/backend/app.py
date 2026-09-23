@@ -6663,24 +6663,16 @@ async def get_multibagger_predictions(horizon: str = "all"):
 
 @app.get("/api/multibagger/backtest")
 async def get_multibagger_backtest():
-    """Multibagger backtest evidence (PEND-013)."""
-    try:
-        from dashboard.backend.backtest_service import get_backtest_results, BACKTEST_STRATEGIES
-        results = get_backtest_results()
-        return {
-            "status": results.get("status", "NOT_RUN"),
-            "strategies": BACKTEST_STRATEGIES,
-            "latest": results,
-            "live_trading_enabled": False,
-        }
-    except Exception as e:
-        return {
-            "status": "pending",
-            "error": str(e),
-            "strategies": [],
-            "latest": {},
-            "live_trading_enabled": False,
-        }
+    """Return an honest pending state until an equity-specific, point-in-time audit exists."""
+    return {
+        "status": "pending",
+        "passed": False,
+        "reason": "NO_EQUITY_MULTIBAGGER_WALK_FORWARD_EVIDENCE",
+        "strategies": [],
+        "latest": {},
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
 
 
 @app.get("/api/opportunity-gap")
