@@ -27,7 +27,7 @@ export const MultibaggerResearch: React.FC = () => {
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const json = await res.json()
-      const ranked = rankMultibagger(json, useStore.getState().research)
+      const ranked = rankMultibagger(json, null)
       setData(ranked.value)
 
     } catch (err) {
