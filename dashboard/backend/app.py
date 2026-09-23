@@ -6634,12 +6634,8 @@ async def get_charts_index(symbol: str = "NIFTY"):
 
 @app.get("/api/multibagger")
 async def get_multibagger_workspace_endpoint():
-    """Multibagger research workspace endpoint (PEND-013)."""
-    try:
-        from dashboard.backend.multibagger_service import get_multibagger_research_data
-    except ImportError:
-        from multibagger_service import get_multibagger_research_data
-    return get_multibagger_research_data()
+    """Expose the same provenance-gated research contract as /api/research/multibagger."""
+    return await get_multibagger_research()
 
 
 @app.get("/api/multibagger/predictions")
@@ -6656,7 +6652,7 @@ async def get_multibagger_predictions(horizon: str = "all"):
     else:
         predictions = horizons.get(horizon, [])
     return {
-        "status": data.get("status", "READY"),
+        "status": data.get("status", "pending"),
         "horizon": horizon,
         "predictions": predictions,
         "count": len(predictions),
