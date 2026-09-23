@@ -129,6 +129,14 @@ def test_multibagger_workspace_does_not_promote_static_candidates(app):
     assert predictions["predictions"] == []
     assert predictions["count"] == 0
 
+    status, _, body = call(app, "GET", "/api/multibagger/backtest")
+    assert status == 200
+    backtest = json.loads(body)
+    assert backtest["status"] == "pending"
+    assert backtest["passed"] is False
+    assert backtest["strategies"] == []
+    assert backtest["reason"] == "NO_EQUITY_MULTIBAGGER_WALK_FORWARD_EVIDENCE"
+
 
 def test_multibagger_contract_requires_price_and_model_provenance(app):
     endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
