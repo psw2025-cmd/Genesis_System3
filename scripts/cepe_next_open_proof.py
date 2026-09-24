@@ -16,15 +16,15 @@ def _rows(raw: bytes, trade_date: date) -> dict[tuple[str, str, str, str], dict]
     text = raw.decode("utf-8-sig")
     reader = csv.DictReader(StringIO(text))
     names = set(reader.fieldnames or ())
-    modern = {"TckrSymb", "XpryDt", "OptnTp", "StrkPric", "OpnPric", "ClsPric", "TradDt"}
-    old = {"SYMBOL", "EXPIRY_DT", "OPTION_TYP", "STRIKE_PR", "OPEN", "CLOSE", "TIMESTAMP"}
+    modern = {"TckrSymb", "XpryDt", "OptnTp", "StrkPric", "OpnPric", "ClsPric", "TradDt", "TtlTradgVol"}
+    old = {"SYMBOL", "EXPIRY_DT", "OPTION_TYP", "STRIKE_PR", "OPEN", "CLOSE", "TIMESTAMP", "CONTRACTS"}
     if modern <= names:
-        cols = ("TckrSymb", "XpryDt", "OptnTp", "StrkPric", "OpnPric", "ClsPric", "TradDt")
+        cols = ("TckrSymb", "XpryDt", "OptnTp", "StrkPric", "OpnPric", "ClsPric", "TradDt", "TtlTradgVol")
     elif old <= names:
-        cols = ("SYMBOL", "EXPIRY_DT", "OPTION_TYP", "STRIKE_PR", "OPEN", "CLOSE", "TIMESTAMP")
+        cols = ("SYMBOL", "EXPIRY_DT", "OPTION_TYP", "STRIKE_PR", "OPEN", "CLOSE", "TIMESTAMP", "CONTRACTS")
     else:
         raise ValueError("Unsupported bhavcopy schema")
-    sym, expiry, kind, strike, opening, closing, dated = cols
+    sym, expiry, kind, strike, opening, closing, dated, volume = cols
     for row in reader:
         if row[kind] not in {"CE", "PE"}:
             continue
@@ -38,7 +38,7 @@ def _rows(raw: bytes, trade_date: date) -> dict[tuple[str, str, str, str], dict]
                format(float(row[strike]), ".4f"), row[kind])
         if key in table:
             raise ValueError("Duplicate contract row")
-        table[key] = {"open": float(row[opening]), "close": float(row[closing])}
+        table[key] = {"open": float(row[opening]), "close": float(row[closing]), "volume": float(row[volume])}
     return table
 
 
@@ -52,14 +52,14 @@ def _date(value: str) -> date:
     raise ValueError("Unknown date format")
 
 
-def compare(previous: bytes, following: bytes, previous_day: date, following_day: date) -> dict:
+def compare(previous: bytes, following: bytes, previous_day: date, following_day: date, *, min_volume: float = 100, min_previous_close: float = 1) -> dict:
     if following_day <= previous_day or (following_day - previous_day).days > 5:
         raise ValueError("Dates are not adjacent trading sessions")
     before, after = _rows(previous, previous_day), _rows(following, following_day)
     matches = []
     for key in sorted(before.keys() & after.keys()):
         close, opening = before[key]["close"], after[key]["open"]
-        if close <= 0 or opening <= 0:
+        if close < min_previous_close or opening <= 0 or min(before[key]["volume"], after[key]["volume"]) < min_volume:
             continue
         matches.append({"symbol": key[0], "expiry": key[1], "strike": key[2],
                         "type": key[3], "previous_close": close, "next_open": opening,
@@ -67,7 +67,8 @@ def compare(previous: bytes, following: bytes, previous_day: date, following_day
     return {"previous_day": previous_day.isoformat(), "following_day": following_day.isoformat(),
             "previous_sha256": sha256(previous).hexdigest(),
             "following_sha256": sha256(following).hexdigest(),
-            "matched_contracts": len(matches),
+            "matched_contracts": len(matches), "minimum_volume_each_day": min_volume,
+            "minimum_previous_close": min_previous_close,
             "highest_multiple": max((x["multiple"] for x in matches), default=None),
             "top_moves": sorted(matches, key=lambda x: x["multiple"], reverse=True)[:20],
             "example_threshold_counts": {str(n): sum(x["multiple"] >= n for x in matches) for n in (3, 10, 20, 30)},
@@ -83,6 +84,9 @@ if __name__ == "__main__":
     parser.add_argument("following_csv", type=Path)
     parser.add_argument("previous_day", type=date.fromisoformat)
     parser.add_argument("following_day", type=date.fromisoformat)
+    parser.add_argument("--min-volume", type=float, default=100)
+    parser.add_argument("--min-previous-close", type=float, default=1)
     args = parser.parse_args()
     print(json.dumps(compare(args.previous_csv.read_bytes(), args.following_csv.read_bytes(),
-                             args.previous_day, args.following_day), indent=2))
+                             args.previous_day, args.following_day, min_volume=args.min_volume,
+                             min_previous_close=args.min_previous_close), indent=2))
