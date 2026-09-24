@@ -1,11 +1,14 @@
 """Numerical checks for the equity outcome contract; no claims about model skill."""
 from datetime import datetime, timezone
+from hashlib import sha256
 
 from dashboard.backend.multibagger_outcome import reconcile
 
 
-ENTRY_SHA = "0" * 64
-OUTCOME_SHA = "1" * 64
+ENTRY_BYTES = b"NSE,2026-09-01,RAYMOND,100.00"
+OUTCOME_BYTES = b"NSE,2026-09-08,RAYMOND,110.00"
+ENTRY_SHA = sha256(ENTRY_BYTES).hexdigest()
+OUTCOME_SHA = sha256(OUTCOME_BYTES).hexdigest()
 PREDICTION = {
     "prediction_id": "p-1",
     "symbol": "RAYMOND",
@@ -16,6 +19,7 @@ PREDICTION = {
     "predicted_return_pct": 20.0,
     "entry_source": "NSE",
     "entry_source_hash": ENTRY_SHA,
+    "entry_source_snapshot": ENTRY_BYTES,
     "adjustment_basis": "corporate-action-series-v1",
 }
 OUTCOME = {
@@ -24,6 +28,7 @@ OUTCOME = {
     "adjusted_close": 110.0,
     "source": "NSE",
     "source_hash": OUTCOME_SHA,
+    "source_snapshot": OUTCOME_BYTES,
     "adjustment_basis": "corporate-action-series-v1",
 }
 NOW = datetime(2026, 9, 24, tzinfo=timezone.utc)
@@ -126,3 +131,21 @@ def test_rejects_naive_evaluation_clock():
     )
     assert result["status"] == "NOT_PROVEN"
     assert result["reason"] == "NOW_TIMEZONE_REQUIRED"
+
+
+def test_requires_actual_retained_source_bytes_and_matching_digest():
+    assert reconcile(
+        {**PREDICTION, "entry_source_snapshot": b"tampered"},
+        OUTCOME,
+        now=NOW,
+    )["reason"] == "ENTRY_SNAPSHOT_HASH_MISMATCH"
+    assert reconcile(
+        PREDICTION,
+        {**OUTCOME, "source_snapshot": b"tampered"},
+        now=NOW,
+    )["reason"] == "OUTCOME_SNAPSHOT_HASH_MISMATCH"
+    assert reconcile(
+        {key: value for key, value in PREDICTION.items() if key != "entry_source_snapshot"},
+        OUTCOME,
+        now=NOW,
+    )["reason"] == "ENTRY_SNAPSHOT_REQUIRED"
