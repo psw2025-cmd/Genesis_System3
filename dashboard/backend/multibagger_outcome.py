@@ -5,9 +5,14 @@ price is evidence of an observed outcome, not proof the model predicted it well.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from math import isfinite
+import re
 from typing import Any
+
+
+_APPROVED_PRICE_SOURCES = {"NSE", "BSE", "DHAN"}
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _timestamp(value: Any) -> datetime:
@@ -34,7 +39,26 @@ def _price(value: Any) -> float:
     return result
 
 
-def reconcile(prediction: dict[str, Any], outcome: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
+def _source(value: Any, *, field: str) -> str:
+    source = str(value).strip().upper()
+    if source not in _APPROVED_PRICE_SOURCES:
+        raise ValueError(f"{field}_UNVERIFIED")
+    return source
+
+
+def _sha256(value: Any, *, field: str) -> str:
+    digest = str(value).strip().lower()
+    if not _SHA256_RE.fullmatch(digest):
+        raise ValueError(f"{field}_INVALID_SHA256")
+    return digest
+
+
+def reconcile(
+    prediction: dict[str, Any],
+    outcome: dict[str, Any],
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any]:
     """Evaluate one issued equity prediction against a later adjusted close.
 
     Returns NOT_PROVEN with a reason for missing or contradictory evidence.
@@ -46,32 +70,47 @@ def reconcile(prediction: dict[str, Any], outcome: dict[str, Any], *, now: datet
         due = _timestamp(prediction["due_at"])
         entry_at = _timestamp(prediction["entry_observed_at"])
         exit_at = _timestamp(outcome["observed_at"])
-        current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+        current = now or datetime.now(timezone.utc)
+        if current.tzinfo is None or current.utcoffset() is None:
+            raise ValueError("NOW_TIMEZONE_REQUIRED")
+        current = current.astimezone(timezone.utc)
         if not entry_at <= issued < due <= exit_at <= current:
             raise ValueError("INVALID_TIME_ORDER")
         if exit_at > due + timedelta(days=7):
             raise ValueError("OUTCOME_TOO_LATE")
+
         symbol = str(prediction["symbol"]).strip().upper()
         if not symbol or symbol != str(outcome["symbol"]).strip().upper():
             raise ValueError("SYMBOL_MISMATCH")
         pred_id = str(prediction["prediction_id"]).strip()
         if not pred_id:
             raise ValueError("PREDICTION_ID_REQUIRED")
-        source = str(outcome["source"]).strip().upper()
-        if source not in {"NSE", "BSE", "DHAN"}:
-            raise ValueError("OUTCOME_SOURCE_UNVERIFIED")
-        if not str(prediction["entry_source_hash"]).strip() or not str(outcome["source_hash"]).strip():
-            raise ValueError("SOURCE_HASH_REQUIRED")
+
+        entry_source = _source(prediction["entry_source"], field="ENTRY_SOURCE")
+        outcome_source = _source(outcome["source"], field="OUTCOME_SOURCE")
+        entry_hash = _sha256(
+            prediction["entry_source_hash"], field="ENTRY_SOURCE_HASH"
+        )
+        outcome_hash = _sha256(outcome["source_hash"], field="OUTCOME_SOURCE_HASH")
+
         basis = str(prediction["adjustment_basis"]).strip()
         if not basis or basis != str(outcome["adjustment_basis"]).strip():
             raise ValueError("CORPORATE_ACTION_BASIS_MISMATCH")
+
         entry = _price(prediction["entry_adjusted_close"])
         exit_price = _price(outcome["adjusted_close"])
-        forecast = float(prediction["predicted_return_pct"])
+        forecast_value = prediction["predicted_return_pct"]
+        if isinstance(forecast_value, bool):
+            raise ValueError("INVALID_FORECAST")
+        forecast = float(forecast_value)
         if not isfinite(forecast):
             raise ValueError("INVALID_FORECAST")
     except (KeyError, TypeError, ValueError, OverflowError) as exc:
-        reason = str(exc) if isinstance(exc, ValueError) else "REQUIRED_EVIDENCE_MISSING"
+        reason = (
+            str(exc)
+            if isinstance(exc, ValueError)
+            else "REQUIRED_EVIDENCE_MISSING"
+        )
         return {"status": "NOT_PROVEN", "reason": reason}
 
     actual = (exit_price / entry - 1.0) * 100.0
@@ -85,10 +124,16 @@ def reconcile(prediction: dict[str, Any], outcome: dict[str, Any], *, now: datet
         "predicted_return_pct": round(forecast, 6),
         "actual_return_pct": round(actual, 6),
         "absolute_error_pp": round(abs(forecast - actual), 6),
-        "direction_correct": (forecast > 0) == (actual > 0) if forecast != 0 and actual != 0 else forecast == actual,
-        "entry_source_hash": prediction["entry_source_hash"],
-        "outcome_source_hash": outcome["source_hash"],
-        "outcome_source": source,
+        "direction_correct": (
+            (forecast > 0) == (actual > 0)
+            if forecast != 0 and actual != 0
+            else forecast == actual
+        ),
+        "entry_source": entry_source,
+        "entry_source_hash": entry_hash,
+        "outcome_source": outcome_source,
+        "outcome_source_hash": outcome_hash,
         "adjustment_basis": basis,
         "live_trading_enabled": False,
+        "order_placement_allowed": False,
     }
