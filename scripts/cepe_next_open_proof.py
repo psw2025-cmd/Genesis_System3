@@ -68,7 +68,9 @@ def compare(previous: bytes, following: bytes, previous_day: date, following_day
             "previous_sha256": sha256(previous).hexdigest(),
             "following_sha256": sha256(following).hexdigest(),
             "matched_contracts": len(matches),
-            "counts": {str(n): sum(x["multiple"] >= n for x in matches) for n in (3, 10, 20, 30)},
+            "highest_multiple": max((x["multiple"] for x in matches), default=None),
+            "top_moves": sorted(matches, key=lambda x: x["multiple"], reverse=True)[:20],
+            "example_threshold_counts": {str(n): sum(x["multiple"] >= n for x in matches) for n in (3, 10, 20, 30)},
             "matches": matches, "status": "HISTORICAL_MOVES_ONLY",
             "prediction_accuracy_proven": False, "orders_allowed": False}
 
