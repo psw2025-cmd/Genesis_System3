@@ -6,6 +6,7 @@ price is evidence of an observed outcome, not proof the model predicted it well.
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 from math import isfinite
 import re
 from typing import Any
@@ -53,6 +54,15 @@ def _sha256(value: Any, *, field: str) -> str:
     return digest
 
 
+def _verified_snapshot(record: dict[str, Any], key: str, digest: str, field: str) -> None:
+    """Bind a declared digest to retained exact source bytes."""
+    raw = record.get(key)
+    if not isinstance(raw, bytes) or not raw:
+        raise ValueError(f"{field}_SNAPSHOT_REQUIRED")
+    if sha256(raw).hexdigest() != digest:
+        raise ValueError(f"{field}_SNAPSHOT_HASH_MISMATCH")
+
+
 def reconcile(
     prediction: dict[str, Any],
     outcome: dict[str, Any],
@@ -92,6 +102,8 @@ def reconcile(
             prediction["entry_source_hash"], field="ENTRY_SOURCE_HASH"
         )
         outcome_hash = _sha256(outcome["source_hash"], field="OUTCOME_SOURCE_HASH")
+        _verified_snapshot(prediction, "entry_source_snapshot", entry_hash, "ENTRY")
+        _verified_snapshot(outcome, "source_snapshot", outcome_hash, "OUTCOME")
 
         basis = str(prediction["adjustment_basis"]).strip()
         if not basis or basis != str(outcome["adjustment_basis"]).strip():
