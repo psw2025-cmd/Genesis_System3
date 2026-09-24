@@ -42,6 +42,7 @@ def run(files: list[tuple[date, bytes]], *, top_k: int = 100,
             key=lambda item: (-item[0], item[1])
         )
         selected = {key for _, key in ranked[:top_k]}
+        selected_digest = sha256(json.dumps(sorted(selected), separators=(",", ":")).encode()).hexdigest()
         actual = {(row["symbol"], row["expiry"], row["strike"], row["type"]): row
                   for row in observed["matches"]}
         hits = sum(actual[key]["multiple"] >= target_multiple
@@ -51,7 +52,7 @@ def run(files: list[tuple[date, bytes]], *, top_k: int = 100,
             "previous_day": day.isoformat(), "next_day": next_day.isoformat(),
             "previous_sha256": sha256(raw).hexdigest(),
             "following_sha256": sha256(subsequent).hexdigest(),
-            "selected": len(selected), "scorable_selected": len(selected & actual.keys()),
+            "selected": len(selected), "selected_keys_sha256": selected_digest, "scorable_selected": len(selected & actual.keys()),
             "unscorable_selected": len(selected - actual.keys()),
             "matched_contracts": len(actual), "winners": winners, "hits": hits,
             "false_picks": len(selected & actual.keys()) - hits,
