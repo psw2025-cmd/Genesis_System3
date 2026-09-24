@@ -20,8 +20,10 @@ FOLLOWING = (
 
 def test_contract_identity_and_opening_multiplier():
     result = compare(PREVIOUS, FOLLOWING, date(2026, 9, 22), date(2026, 9, 23))
-    assert result["counts"] == {"3": 1, "10": 1, "20": 0, "30": 0}
+    assert result["example_threshold_counts"] == {"3": 1, "10": 1, "20": 0, "30": 0}
     assert result["matched_contracts"] == 2
+    assert result["highest_multiple"] == 11.0
+    assert result["top_moves"][0]["type"] == "CE"
     assert result["following_sha256"] == sha256(FOLLOWING).hexdigest()
     assert result["prediction_accuracy_proven"] is False
 
