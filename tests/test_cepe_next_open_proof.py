@@ -7,14 +7,14 @@ from scripts.cepe_next_open_proof import compare
 
 
 PREVIOUS = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt\n"
-    b"NIFTY,2026-09-30,CE,25000,8,10,2026-09-22\n"
-    b"NIFTY,2026-09-30,PE,25000,20,15,2026-09-22\n"
+    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"NIFTY,2026-09-30,CE,25000,8,10,2026-09-22,200\n"
+    b"NIFTY,2026-09-30,PE,25000,20,15,2026-09-22,200\n"
 )
 FOLLOWING = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt\n"
-    b"NIFTY,2026-09-30,CE,25000,110,80,2026-09-23\n"
-    b"NIFTY,2026-09-30,PE,25000,3,7,2026-09-23\n"
+    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"NIFTY,2026-09-30,CE,25000,110,80,2026-09-23,200\n"
+    b"NIFTY,2026-09-30,PE,25000,3,7,2026-09-23,200\n"
 )
 
 
@@ -34,3 +34,10 @@ def test_wrong_date_and_duplicate_contract_fail_closed():
     duplicated = PREVIOUS + PREVIOUS.split(b"\n")[1] + b"\n"
     with pytest.raises(ValueError, match="Duplicate"):
         compare(duplicated, FOLLOWING, date(2026, 9, 22), date(2026, 9, 23))
+
+
+def test_illiquid_previous_close_is_excluded():
+    stale = PREVIOUS.replace(b"10,2026-09-22,200", b"10,2026-09-22,0")
+    result = compare(stale, FOLLOWING, date(2026, 9, 22), date(2026, 9, 23))
+    assert result["matched_contracts"] == 1
+    assert result["highest_multiple"] == 0.2
