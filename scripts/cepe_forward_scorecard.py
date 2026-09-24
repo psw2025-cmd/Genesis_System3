@@ -6,7 +6,7 @@ selected after the open cannot enter this scorecard.
 """
 from __future__ import annotations
 
-from datetime import date, datetime, time, timezone
+from datetime import date, datetime, time, timezone, timedelta
 from math import isfinite
 from typing import Any
 
@@ -41,9 +41,8 @@ def score(
         raise ValueError("Target multiple must exceed one")
     following = date.fromisoformat(comparison["following_day"])
     if issued_cutoff.astimezone(timezone.utc) >= datetime.combine(
-        following, time(9, 15), tzinfo=timezone.utc
+        following, time(9, 15), tzinfo=timezone(timedelta(hours=5, minutes=30))
     ):
-        # Conservative UTC boundary: a cutoff on/after opening is unusable.
         raise ValueError("Cutoff is not before next opening")
     if comparison.get("distribution_scope") != "FULL_MATCHED_CONTRACT_SET_UNCAPPED":
         raise ValueError("Comparison must cover all eligible matched contracts")
