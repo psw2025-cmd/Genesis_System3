@@ -28,3 +28,14 @@ def test_discontinuous_history_rejected():
     second = (date(2026, 9, 18), snapshot("2026-09-18", 40, 10, 10, 10))
     with pytest.raises(ValueError, match="Gap"):
         run([first, second])
+
+
+def test_next_day_prices_cannot_change_previous_day_picks():
+    first = (date(2026, 9, 17), snapshot("2026-09-17", 5, 10, 10, 10))
+    following = (date(2026, 9, 18), snapshot("2026-09-18", 40, 10, 10, 10))
+    changed_following = (date(2026, 9, 18),
+                         snapshot("2026-09-18", 10, 10, 40, 10))
+    original = run([first, following], top_k=1)["holdout_pair"]
+    modified = run([first, changed_following], top_k=1)["holdout_pair"]
+    assert original["selected_keys_sha256"] == modified["selected_keys_sha256"]
+    assert original["hits"] != modified["hits"]
