@@ -1,0 +1,125 @@
+{
+  "schema_version": "research-experiment-registry-v1",
+  "updated_at": "2026-09-24T08:30:00Z",
+  "governance": {
+    "target_config": "config/quant_alpha_targets.json",
+    "evaluation": "chronological_train_validation_untouched_test",
+    "multiple_testing_control": "required_before_promotion",
+    "survivorship_and_corporate_action_guards": "required",
+    "costs_and_slippage": "required",
+    "fixture_or_in_sample_promotion_allowed": false,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false
+  },
+  "lanes": {
+    "equity_weekly": {
+      "instrument": "NSE cash equity",
+      "horizon": "7 calendar days with exchange-session outcome matching",
+      "status": "NOT_PROVEN",
+      "feature_groups": [
+        "fundamentals",
+        "valuation",
+        "financial_quality",
+        "sector_regime",
+        "price_volume",
+        "liquidity",
+        "breadth",
+        "news_catalysts",
+        "corporate_actions",
+        "execution_costs"
+      ]
+    },
+    "cepe_next_open": {
+      "instrument": "dated NSE F&O option contract",
+      "horizon": "prior close to next session opening observation",
+      "status": "NOT_PROVEN",
+      "feature_groups": [
+        "price_volume",
+        "liquidity",
+        "derivatives_iv_oi_greeks",
+        "breadth",
+        "news_catalysts",
+        "execution_costs"
+      ],
+      "note": "Opening observation is not represented as an executable fill."
+    },
+    "catalyst_ablation": {
+      "instrument": "matched equity or option lane instrument",
+      "horizon": "must equal parent lane horizon",
+      "status": "NOT_PROVEN",
+      "comparison": "same frozen strategy with versus without eligible pre-issue catalyst features",
+      "causal_attribution": "NOT_CLAIMED"
+    }
+  },
+  "feature_contract": {
+    "required_fields": [
+      "feature_id",
+      "group",
+      "lane",
+      "source_requirement",
+      "observed_at",
+      "missingness_policy",
+      "transformation_version",
+      "reason",
+      "promotion_status"
+    ],
+    "promotion_status_allowed": [
+      "CANDIDATE_NOT_PROVEN",
+      "REJECTED",
+      "OOS_VALIDATED"
+    ]
+  },
+  "candidate_features": [
+    {
+      "feature_id": "catalyst.official_category.v1",
+      "group": "news_catalysts",
+      "lane": [
+        "equity_weekly",
+        "cepe_next_open",
+        "catalyst_ablation"
+      ],
+      "source_requirement": "raw timestamped NSE/BSE filing bytes plus official URL and SHA-256",
+      "observed_at": "first_observed_at",
+      "missingness_policy": "missing; never impute post-issue knowledge",
+      "transformation_version": "official-category-one-hot-v1",
+      "reason": "Test whether point-in-time filing category adds OOS value after a no-catalyst baseline.",
+      "promotion_status": "CANDIDATE_NOT_PROVEN"
+    },
+    {
+      "feature_id": "catalyst.age_minutes_at_issue.v1",
+      "group": "news_catalysts",
+      "lane": [
+        "equity_weekly",
+        "cepe_next_open",
+        "catalyst_ablation"
+      ],
+      "source_requirement": "published, disseminated, first-observed, and prediction-issued timestamps with timezone",
+      "observed_at": "first_observed_at",
+      "missingness_policy": "missing or inconsistent timestamps make the feature ineligible",
+      "transformation_version": "nonnegative-log1p-minutes-v1",
+      "reason": "Measure information freshness without backfilling later announcements.",
+      "promotion_status": "CANDIDATE_NOT_PROVEN"
+    },
+    {
+      "feature_id": "execution.round_trip_cost_bps.v1",
+      "group": "execution_costs",
+      "lane": [
+        "equity_weekly",
+        "cepe_next_open"
+      ],
+      "source_requirement": "dated fee schedule plus observed spread/slippage inputs",
+      "observed_at": "prediction_issued_at",
+      "missingness_policy": "strategy result NOT_PROVEN until conservative costs are supplied",
+      "transformation_version": "all-in-cost-bps-v1",
+      "reason": "Prevent gross-return promotion that disappears after realistic costs.",
+      "promotion_status": "CANDIDATE_NOT_PROVEN"
+    }
+  ],
+  "measured_counts": {
+    "real_official_catalyst_records": 0,
+    "eligible_pre_issue_catalysts": 0,
+    "catalyst_linked_predictions": 0,
+    "catalyst_linked_outcomes": 0,
+    "note": "Only fixture arithmetic is covered by tests; historical validation is not yet present."
+  }
+}
