@@ -279,6 +279,12 @@ jobs:
             tests/test_health_qc_fail_closed.py \
             -o addopts="" -v --tb=short
 
+      - name: Equity instrument provenance regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest -q tests/test_equity_instrument_scope.py tests/test_equity_horizon_replay.py
+
       - name: Classify quantitative AlphaTruth evidence
         shell: bash
         run: |

@@ -78,6 +78,8 @@ def replay(snapshots: list[tuple[date, bytes]], *, top_k: int = 20,
                           "selected_keys_sha256": picks_hash, "selected_count": len(selected),
                           "horizons": outcomes})
     return {"rule": "DECISION_DAY_VOLUME_TOP_K_RESEARCH_BASELINE",
+            "instrument_scope": "NSE_EQ_SERIES_MIXED_INSTRUMENTS",
+            "company_equity_classification_proven": False,
             "horizon_days": list(horizons), "decisions": decisions,
             "adjusted_return_proven": False, "forecast_accuracy_proven": False,
             "orders_allowed": False}

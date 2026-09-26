@@ -29,4 +29,6 @@ def test_report_never_calls_raw_prices_adjusted_performance():
     result = replay([first, last], top_k=1)
     assert result["adjusted_return_proven"] is False
     assert result["forecast_accuracy_proven"] is False
+    assert result["company_equity_classification_proven"] is False
+    assert result["instrument_scope"] == "NSE_EQ_SERIES_MIXED_INSTRUMENTS"
     assert result["decisions"][0]["horizons"]["7"]["status"] == "UNADJUSTED_RESEARCH_ONLY"
