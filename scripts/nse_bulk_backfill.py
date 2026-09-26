@@ -139,6 +139,16 @@ def backfill(start: date, end: date, segments: list[str], output: Path,
             if progress is not None:
                 progress(len(results), len(jobs), result)
     results.sort(key=lambda row: (row["date"], row["segment"]))
+    # Seal a complete manifest from the in-memory results, not only an open
+    # progress-file handle. Snapshot/restore of an execution workspace can
+    # leave that handle pointing at a superseded inode between tool calls.
+    sealed = manifest.with_suffix(".complete.part")
+    with sealed.open("x") as stream:
+        for row in results:
+            stream.write(json.dumps(row, sort_keys=True) + "\n")
+        stream.flush()
+        os.fsync(stream.fileno())
+    sealed.replace(manifest)
     totals = {status: sum(row["status"] == status for row in results)
               for status in ("downloaded", "already_present", "source_404", "error", "existing_unverified")}
     return {"requested": len(jobs), "results": totals, "manifest": str(manifest),

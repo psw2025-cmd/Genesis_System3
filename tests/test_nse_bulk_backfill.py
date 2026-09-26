@@ -70,3 +70,20 @@ def test_manifest_history_is_not_rewritten(tmp_path, monkeypatch):
 def test_empty_segment_request_rejected(tmp_path):
     with pytest.raises(ValueError):
         bulk.backfill(date(2026, 9, 25), date(2026, 9, 25), [], tmp_path)
+
+
+def test_final_manifest_recovers_when_progress_inode_is_replaced(tmp_path, monkeypatch):
+    monkeypatch.setattr(bulk, "fetch", lambda day, segment, output:
+                        dict(date=day.isoformat(), segment=segment, status="source_404"))
+    def checkpoint(done, total, row):
+        if done == 1:
+            original = next(tmp_path.glob("manifest-*.jsonl"))
+            replacement = tmp_path / "restored.part"
+            replacement.write_text(original.read_text())
+            replacement.replace(original)
+    result = bulk.backfill(date(2026,9,25),date(2026,9,28),["FO"],tmp_path,progress=checkpoint)
+    from pathlib import Path
+    rows = [json.loads(line) for line in Path(result["manifest"]).read_text().splitlines()]
+    assert len(rows) == result["requested"] == 4
+    assert len({r["date"] for r in rows}) == 4
+    assert result["coverage_complete"] is False
