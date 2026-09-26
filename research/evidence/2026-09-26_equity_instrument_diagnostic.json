@@ -1,0 +1,94 @@
+{
+  "task_id": "EQ-DATA-005",
+  "evidence_at": "2026-09-26T11:38:23.070728+00:00",
+  "previous_day": "2026-09-24",
+  "following_day": "2026-09-25",
+  "source_previous_sha256": "8b09a3e30b3683e0f16799d503b50575a8eee956dc0ee843e284815f8760d7e1",
+  "source_following_sha256": "4f77b81b0df764a95376a997c1fd6524d8a6f1c5ae44604d553bebbdbca8f5f8",
+  "retrieval": [
+    {
+      "source_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260925_F_0000.csv.zip",
+      "final_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260925_F_0000.csv.zip",
+      "first_observed_at": "2026-09-26T11:35:36.598251+00:00",
+      "sha256": "a1c9395c531f6fe6246cfb1dcf0d83c0474741f581b3f6d71757af5f0b87a3d0",
+      "bytes": 204425,
+      "content_type": "application/zip",
+      "filename": "20260925_CM.zip",
+      "status": "DOWNLOADED",
+      "csv_member": "BhavCopy_NSE_CM_0_0_0_20260925_F_0000.csv",
+      "csv_sha256": "4f77b81b0df764a95376a997c1fd6524d8a6f1c5ae44604d553bebbdbca8f5f8",
+      "csv_bytes": 629557
+    }
+  ],
+  "eq_series_rows_previous": 2664,
+  "eq_series_rows_following": 2660,
+  "diagnostic_rows": [
+    {
+      "symbol": "ATL",
+      "isin": "INE0NN701020",
+      "instrument_type": "STK",
+      "series": "EQ",
+      "previous_close": 25.18,
+      "following_close": 25.6,
+      "raw_return_pct": 1.6679904686258906,
+      "status": "POST_HOC_ONE_DAY_RAW_DIAGNOSTIC",
+      "forecast": false,
+      "adjustment_status": "NOT_PROVEN"
+    },
+    {
+      "symbol": "POLICYBZR",
+      "isin": "INE417T01026",
+      "instrument_type": "STK",
+      "series": "EQ",
+      "previous_close": 1207.2,
+      "following_close": 1166.0,
+      "raw_return_pct": -3.4128561961563997,
+      "status": "POST_HOC_ONE_DAY_RAW_DIAGNOSTIC",
+      "forecast": false,
+      "adjustment_status": "NOT_PROVEN"
+    },
+    {
+      "symbol": "PAISALO",
+      "isin": "INE420C01059",
+      "instrument_type": "STK",
+      "series": "EQ",
+      "previous_close": 89.45,
+      "following_close": 89.02,
+      "raw_return_pct": -0.4807154835103522,
+      "status": "POST_HOC_ONE_DAY_RAW_DIAGNOSTIC",
+      "forecast": false,
+      "adjustment_status": "NOT_PROVEN"
+    },
+    {
+      "symbol": "GOLDBEES",
+      "isin": "INF204KB17I5",
+      "instrument_type": "STK",
+      "series": "EQ",
+      "previous_close": 123.43,
+      "following_close": 124.43,
+      "raw_return_pct": 0.8101758081503707,
+      "status": "POST_HOC_ONE_DAY_RAW_DIAGNOSTIC",
+      "forecast": false,
+      "adjustment_status": "NOT_PROVEN"
+    },
+    {
+      "symbol": "SILVERBEES",
+      "isin": "INF204KC1402",
+      "instrument_type": "STK",
+      "series": "EQ",
+      "previous_close": 215.95,
+      "following_close": 218.8,
+      "raw_return_pct": 1.3197499421162329,
+      "status": "POST_HOC_ONE_DAY_RAW_DIAGNOSTIC",
+      "forecast": false,
+      "adjustment_status": "NOT_PROVEN"
+    }
+  ],
+  "selection": "User-requested POLICYBZR and existing research diagnostics; no strategy selection",
+  "new_weekly_predictions": 0,
+  "new_weekly_outcomes": 0,
+  "company_equity_universe_status": "NOT_PROVEN",
+  "finding": "FinInstrmTp=STK and EQ series include GOLDBEES and SILVERBEES; neither is a sufficient company-equity classifier.",
+  "next_target": "Source historical instrument classification before clean-equity rule evaluation; never retrospectively remove observed losers.",
+  "orders_allowed": false
+}
