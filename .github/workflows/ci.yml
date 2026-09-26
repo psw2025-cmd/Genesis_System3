@@ -290,6 +290,7 @@ jobs:
             tests/test_cepe_walkforward_baseline.py \
             tests/test_cepe_session_scope.py \
             tests/test_nse_option_gainers.py \
+            tests/test_nse_bulk_backfill.py \
             -o addopts="" -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence
