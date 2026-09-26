@@ -10,7 +10,7 @@ the next market open. A local receipt alone is not proof of advance issuance.
 from __future__ import annotations
 
 import argparse
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from hashlib import sha256
 import json
 import os
@@ -19,6 +19,7 @@ from typing import Any
 
 from scripts.cepe_forward_scorecard import _identity, score
 from scripts.cepe_next_open_proof import _rows, compare
+from scripts.cepe_session_scope import require_session_alignment, session_scope
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -36,12 +37,15 @@ def _canonical(payload: dict[str, Any]) -> bytes:
 
 def issue(previous: bytes, previous_day: date, following_day: date,
           candidates: list[dict[str, Any]], cutoff: datetime,
-          *, now: datetime | None = None, target_multiple: float = 3.0) -> dict[str, Any]:
+          *, now: datetime | None = None, target_multiple: float = 3.0,
+          session_calendar: bytes | None = None) -> dict[str, Any]:
     """Create an unmodifiable on-disk receipt from available prior-day data."""
     issued = now or datetime.now(timezone.utc)
     if issued.tzinfo is None or cutoff.tzinfo is None:
         raise ValueError("Timestamps require timezones")
-    next_open = datetime.combine(following_day, time(9, 15), tzinfo=IST)
+    scope = session_scope(previous_day, following_day, session_calendar, known_by=issued)
+    require_session_alignment(scope)
+    next_open = _iso(scope["following_open_at"])
     if not previous_day < following_day or not previous_day <= issued.astimezone(IST).date():
         raise ValueError("Previous and following dates conflict with issuance")
     if issued > cutoff or cutoff >= next_open:
@@ -54,6 +58,8 @@ def issue(previous: bytes, previous_day: date, following_day: date,
     source_hash = sha256(previous).hexdigest()
     for item in candidates:
         key = _identity(item)
+        if date.fromisoformat(key[1]) < following_day:
+            raise ValueError("Candidate expires before following session")
         if key not in rows:
             raise ValueError("Candidate absent from previous market snapshot")
         if key in selected:
@@ -65,6 +71,8 @@ def issue(previous: bytes, previous_day: date, following_day: date,
                   following_day=following_day.isoformat(), previous_sha256=source_hash,
                   issued_at=issued.isoformat(), cutoff=cutoff.isoformat(),
                   target_multiple=target_multiple, predictions=picks,
+                  session_calendar_utf8=session_calendar.decode("utf-8") if session_calendar else None,
+                  session_calendar_sha256=scope["session_calendar_sha256"],
                   orders_allowed=False)
     return {"record": record, "record_sha256": sha256(_canonical(record)).hexdigest()}
 
@@ -81,14 +89,21 @@ def settle(previous: bytes, following: bytes, receipt: dict[str, Any],
         raise ValueError("Previous source bytes changed")
     cutoff = _iso(record["cutoff"])
     issued = _iso(record["issued_at"])
+    calendar_text = record.get("session_calendar_utf8")
+    calendar = calendar_text.encode("utf-8") if calendar_text is not None else None
+    previous_day, following_day = date.fromisoformat(record["previous_day"]), date.fromisoformat(record["following_day"])
+    scope = session_scope(previous_day, following_day, calendar, known_by=issued)
+    require_session_alignment(scope)
+    if record.get("session_calendar_sha256") != scope["session_calendar_sha256"]:
+        raise ValueError("Receipt calendar hash mismatch")
+    if cutoff >= _iso(scope["following_open_at"]):
+        raise ValueError("Receipt cutoff is not before next opening")
     if issued > cutoff:
         raise ValueError("Receipt was issued after cutoff")
-    compared = compare(previous, following, date.fromisoformat(record["previous_day"]),
-                       date.fromisoformat(record["following_day"]))
+    compared = compare(previous, following, previous_day, following_day, session_calendar=calendar)
     result = score(record["predictions"], compared, target_multiple=record["target_multiple"],
-                   issued_cutoff=cutoff)
+                   issued_cutoff=cutoff, session_calendar=calendar)
     result["receipt_sha256"] = receipt["record_sha256"]
-    next_open = datetime.combine(date.fromisoformat(record["following_day"]), time(9, 15), tzinfo=IST)
     if publication_time is not None:
         if publication_time.tzinfo is None or not issued <= publication_time <= cutoff:
             raise ValueError("Independent publication must fall between issuance and cutoff")
@@ -123,6 +138,7 @@ def main() -> None:
             command.add_argument("--candidates", required=True, type=Path)
             command.add_argument("--cutoff", required=True, type=_iso)
             command.add_argument("--target-multiple", type=float, default=3.0)
+            command.add_argument("--session-calendar", type=Path)
         else:
             command.add_argument("--following", required=True, type=Path)
             command.add_argument("--receipt", required=True, type=Path)
@@ -131,7 +147,8 @@ def main() -> None:
     if args.mode == "issue":
         output = issue(before, args.previous_day, args.following_day,
                        json.loads(args.candidates.read_text()), args.cutoff,
-                       target_multiple=args.target_multiple)
+                       target_multiple=args.target_multiple,
+                       session_calendar=args.session_calendar.read_bytes() if args.session_calendar else None)
     else:
         output = settle(before, args.following.read_bytes(),
                         json.loads(args.receipt.read_text()))

@@ -14,7 +14,10 @@ def snapshot(day: str, a_open: int, a_close: int, b_open: int, b_close: int):
 
 def test_preceding_session_rank_and_holdout_accounting():
     first = (date(2026, 9, 16), snapshot("2026-09-16", 5, 10, 10, 10))
-    second = (date(2026, 9, 17), snapshot("2026-09-17", 40, 10, 10, 10))
+    # A's prior score .25 exceeds B's .125. A is therefore selected before
+    # the next snapshot, where only B reaches 3x. The old B open=10 fixture
+    # ranked B first and contradicted this test's intended missed-winner case.
+    second = (date(2026, 9, 17), snapshot("2026-09-17", 40, 10, 80, 10))
     third = (date(2026, 9, 18), snapshot("2026-09-18", 10, 10, 40, 10))
     result = run([first, second, third], top_k=1)
     assert result["train_pairs"][0]["hits"] == 1
@@ -26,7 +29,7 @@ def test_preceding_session_rank_and_holdout_accounting():
 def test_discontinuous_history_rejected():
     first = (date(2026, 9, 1), snapshot("2026-09-01", 5, 10, 10, 10))
     second = (date(2026, 9, 18), snapshot("2026-09-18", 40, 10, 10, 10))
-    with pytest.raises(ValueError, match="Gap"):
+    with pytest.raises(ValueError, match="Session gap"):
         run([first, second])
 
 

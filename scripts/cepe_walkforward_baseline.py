@@ -18,23 +18,22 @@ from pathlib import Path
 from typing import Any
 
 from scripts.cepe_next_open_proof import _rows, compare
+from scripts.cepe_session_scope import require_session_alignment
 
 
 def run(files: list[tuple[date, bytes]], *, top_k: int = 100,
         target_multiple: float = 3, min_volume: float = 100,
-        min_close: float = 1) -> dict[str, Any]:
+        min_close: float = 1, session_calendar: bytes | None = None) -> dict[str, Any]:
     if top_k <= 0 or len(files) < 2:
         raise ValueError("Need positive top_k and at least two dated snapshots")
     if [day for day, _ in files] != sorted({day for day, _ in files}):
         raise ValueError("Snapshot dates must be unique and sorted")
     output = []
     for (day, raw), (next_day, subsequent) in zip(files, files[1:]):
-        if (next_day - day).days > 5:
-            # Don't imply a missing market day is an adjacent session.
-            raise ValueError("Gap exceeds five days: confirm intervening sessions")
         prior = _rows(raw, day)
         observed = compare(raw, subsequent, day, next_day, min_volume=min_volume,
-                           min_previous_close=min_close)
+                           min_previous_close=min_close, session_calendar=session_calendar)
+        require_session_alignment(observed)
         ranked = sorted(
             ((prices["close"] / prices["open"], key) for key, prices in prior.items()
              if prices["open"] > 0 and prices["close"] >= min_close
@@ -49,6 +48,8 @@ def run(files: list[tuple[date, bytes]], *, top_k: int = 100,
                    for key in selected & actual.keys())
         winners = sum(row["multiple"] >= target_multiple for row in actual.values())
         output.append({
+            "session_alignment_status": observed["session_alignment_status"],
+            "session_calendar_sha256": observed["session_calendar_sha256"],
             "previous_day": day.isoformat(), "next_day": next_day.isoformat(),
             "previous_sha256": sha256(raw).hexdigest(),
             "following_sha256": sha256(subsequent).hexdigest(),
@@ -79,10 +80,12 @@ def main() -> None:
     parser.add_argument("folder", type=Path)
     parser.add_argument("--top-k", type=int, default=100)
     parser.add_argument("--target-multiple", type=float, default=3)
+    parser.add_argument("--session-calendar", type=Path)
     args = parser.parse_args()
     files = sorted((date.fromisoformat(p.name[:4] + "-" + p.name[4:6] + "-" + p.name[6:8]),
                     p.read_bytes()) for p in args.folder.glob("????????_fo_bhavcopy.csv"))
-    print(json.dumps(run(files, top_k=args.top_k, target_multiple=args.target_multiple),
+    print(json.dumps(run(files, top_k=args.top_k, target_multiple=args.target_multiple,
+                         session_calendar=args.session_calendar.read_bytes() if args.session_calendar else None),
                      indent=2))
 
 

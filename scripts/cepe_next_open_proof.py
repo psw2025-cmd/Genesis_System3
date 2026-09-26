@@ -13,6 +13,8 @@ from math import isfinite
 from pathlib import Path
 from typing import Any
 
+from scripts.cepe_session_scope import session_scope
+
 
 def _number(value: Any, field: str) -> float:
     try:
@@ -127,22 +129,22 @@ def compare(
     *,
     min_volume: float = 100,
     min_previous_close: float = 1,
+    session_calendar: bytes | None = None,
 ) -> dict[str, Any]:
     """Return the full gross reference distribution for liquid matched contracts."""
     minimum_volume = _number(min_volume, "minimum volume")
     minimum_close = _number(min_previous_close, "minimum previous close")
-    if following_day <= previous_day or (following_day - previous_day).days > 5:
-        raise ValueError("Dates are not adjacent trading sessions")
-
     before = _rows(previous, previous_day)
     after = _rows(following, following_day)
+    scope = session_scope(previous_day, following_day, session_calendar)
+    aligned = scope["session_alignment_status"] != "NOT_PROVEN"
     matches = []
     excluded_illiquid = 0
     for key in sorted(before.keys() & after.keys()):
         close = before[key]["close"]
         opening = after[key]["open"]
         liquid = (
-            close >= minimum_close
+            close > 0 and close >= minimum_close
             and opening > 0
             and min(before[key]["volume"], after[key]["volume"])
             >= minimum_volume
@@ -158,7 +160,8 @@ def compare(
                 "strike": key[2],
                 "type": key[3],
                 "previous_close": close,
-                "next_open": opening,
+                "next_open": opening if aligned else None,
+                "observed_open": opening,
                 "multiple": multiple,
                 "gross_reference_multiple": multiple,
                 "opening_fill_proven": False,
@@ -169,6 +172,7 @@ def compare(
     multiples = [row["multiple"] for row in matches]
     ordered = sorted(matches, key=lambda row: row["multiple"], reverse=True)
     return {
+        **scope,
         "previous_day": previous_day.isoformat(),
         "following_day": following_day.isoformat(),
         "previous_sha256": sha256(previous).hexdigest(),
@@ -185,10 +189,11 @@ def compare(
         },
         "matches": matches,
         "distribution_scope": "FULL_MATCHED_CONTRACT_SET_UNCAPPED",
-        "metric_basis": "GROSS_NEXT_OPEN_OVER_PREVIOUS_CLOSE_REFERENCE",
+        "metric_basis": ("GROSS_NEXT_OPEN_OVER_PREVIOUS_CLOSE_REFERENCE" if aligned
+                         else "GROSS_LATER_OPEN_OVER_PREVIOUS_CLOSE_REFERENCE"),
         "fees_slippage_status": "NOT_APPLIED",
         "opening_fill_proven": False,
-        "status": "HISTORICAL_MOVES_ONLY",
+        "status": "HISTORICAL_MOVES_ONLY" if aligned else "HISTORICAL_INTERVAL_ONLY",
         "prediction_accuracy_proven": False,
         "orders_allowed": False,
     }
@@ -205,6 +210,7 @@ if __name__ == "__main__":
     parser.add_argument("following_day", type=date.fromisoformat)
     parser.add_argument("--min-volume", type=float, default=100)
     parser.add_argument("--min-previous-close", type=float, default=1)
+    parser.add_argument("--session-calendar", type=Path)
     args = parser.parse_args()
     print(
         json.dumps(
@@ -215,6 +221,7 @@ if __name__ == "__main__":
                 args.following_day,
                 min_volume=args.min_volume,
                 min_previous_close=args.min_previous_close,
+                session_calendar=args.session_calendar.read_bytes() if args.session_calendar else None,
             ),
             indent=2,
         )

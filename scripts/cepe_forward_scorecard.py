@@ -6,9 +6,11 @@ selected after the open cannot enter this scorecard.
 """
 from __future__ import annotations
 
-from datetime import date, datetime, time, timezone, timedelta
+from datetime import date, datetime
 from math import isfinite
 from typing import Any
+
+from scripts.cepe_session_scope import IST, require_session_alignment, session_scope
 
 
 def _identity(row: dict[str, Any]) -> tuple[str, str, str, str]:
@@ -27,6 +29,7 @@ def score(
     *,
     target_multiple: float,
     issued_cutoff: datetime,
+    session_calendar: bytes | None = None,
 ) -> dict[str, Any]:
     """Count hits, false picks, missed movers and uncovered selections.
 
@@ -40,9 +43,12 @@ def score(
     if not isfinite(target) or target <= 1:
         raise ValueError("Target multiple must exceed one")
     following = date.fromisoformat(comparison["following_day"])
-    if issued_cutoff.astimezone(timezone.utc) >= datetime.combine(
-        following, time(9, 15), tzinfo=timezone(timedelta(hours=5, minutes=30))
-    ):
+    previous = date.fromisoformat(comparison["previous_day"])
+    scope = session_scope(previous, following, session_calendar, known_by=issued_cutoff)
+    require_session_alignment(scope)
+    if comparison.get("session_calendar_sha256") != scope["session_calendar_sha256"]:
+        raise ValueError("Comparison calendar differs from prediction calendar")
+    if issued_cutoff >= datetime.fromisoformat(scope["following_open_at"]):
         raise ValueError("Cutoff is not before next opening")
     if comparison.get("distribution_scope") != "FULL_MATCHED_CONTRACT_SET_UNCAPPED":
         raise ValueError("Comparison must cover all eligible matched contracts")
@@ -53,7 +59,10 @@ def score(
         key = _identity(row)
         if key in actual:
             raise ValueError("Duplicate actual contract")
-        actual[key] = float(row["multiple"])
+        multiple = float(row["multiple"])
+        if not isfinite(multiple) or multiple <= 0:
+            raise ValueError("Invalid actual multiple")
+        actual[key] = multiple
     selected: set[tuple[str, str, str, str]] = set()
     for prediction in predictions:
         timestamp = datetime.fromisoformat(str(prediction["issued_at"]).replace("Z", "+00:00"))
@@ -61,8 +70,9 @@ def score(
             raise ValueError("Prediction timestamp needs timezone")
         if timestamp > issued_cutoff:
             raise ValueError("Prediction issued after registered cutoff")
-        if timestamp.date() < date.fromisoformat(comparison["previous_day"]):
+        if timestamp.astimezone(IST).date() < previous:
             raise ValueError("Prediction predates previous session")
+        session_scope(previous, following, session_calendar, known_by=timestamp)
         if prediction.get("source_sha256") != comparison["previous_sha256"]:
             raise ValueError("Prediction is not bound to previous source bytes")
         key = _identity(prediction)
@@ -76,6 +86,7 @@ def score(
     missed = len(winners - selected)
     uncovered = len(selected - actual.keys())
     return {
+        **scope,
         "status": "SCORED_PREISSUED_REFERENCES" if selected and covered else "NOT_PROVEN",
         "target_multiple": target,
         "predictions": len(selected),
