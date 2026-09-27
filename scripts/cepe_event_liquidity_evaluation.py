@@ -210,6 +210,7 @@ def run(
         "summary": summary,
         "uncertainty": uncertainty,
         "population_distribution": distribution(population),
+        "daily": daily,
         "validation_promotion_checks": promotion_checks,
         "validation_promoted": validation_promoted,
         "frozen_test_opened": False,
