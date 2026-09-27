@@ -1,0 +1,41 @@
+{
+  "task_id": "EQ-HISTORY-006",
+  "scope": "EXISTING_BASELINE_DESCRIPTIVE_REPLAY_NOT_NEW_STRATEGY_VALIDATION",
+  "baseline_implementation": "bd74880c2cb0f1dde7d6c24c41a621fdc1de5d1c",
+  "selection": "Decision-day EQ-series volume top 20, minimum price 10 and volume 10000; exact ISIN matching",
+  "horizons_calendar_days": [
+    7,
+    14,
+    365
+  ],
+  "outcome_rule": "First provided date on/after target, maximum 4 calendar days; missing and identity changes remain explicit",
+  "descriptive_event": "Raw close multiple >= 2; this is not an adjusted company multibagger qualification",
+  "contamination_disclosure": "Previously inspected dates stay development/research. New retrospective computation cannot create a pre-issued forecast. No fitted model or claimed untouched equity test.",
+  "prospective_weekly_target_definition": {
+    "unit": "Source-qualified company-equity prediction issued before entry, with frozen direction, expected adjusted return range and probability; seven calendar-day target rolled with a verified session calendar",
+    "direction_event": "Positive corporate-action-adjusted return after documented costs",
+    "top_decile_precision": "Fraction of positive cost-adjusted outcomes among prior-ranked top decile",
+    "horizon_days": 7,
+    "cross_horizon_pooling_allowed": false
+  },
+  "project_gates": {
+    "directional_accuracy_pct": 65,
+    "top_decile_precision_pct": 70,
+    "minimum_qualified_oos_trades": 100,
+    "minimum_qualified_oos_days": 60,
+    "minimum_sharpe": 2.5,
+    "maximum_drawdown_pct": 10,
+    "minimum_deflated_sharpe_probability": 0.95
+  },
+  "current_qualified_oos_trades": 0,
+  "gap_to_100_trades": 100,
+  "current_qualified_oos_days": 0,
+  "gap_to_60_days": 60,
+  "directional_accuracy": "NOT_PROVEN",
+  "top_decile_precision": "NOT_PROVEN",
+  "sharpe": "NOT_PROVEN",
+  "drawdown": "NOT_PROVEN",
+  "deflated_sharpe": "NOT_PROVEN",
+  "next_hypothesis": "Verify historical company membership and corporate-action identities before testing whether dated price-volume features improve a cost-aware no-catalyst baseline. Freeze a distinct chronological evaluation protocol before model fitting.",
+  "orders_allowed": false
+}

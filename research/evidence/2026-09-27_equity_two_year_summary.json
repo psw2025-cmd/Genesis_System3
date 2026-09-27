@@ -1,0 +1,108 @@
+{
+  "task_id": "EQ-HISTORY-006",
+  "evidence_at": "2026-09-27T04:59:19.120830+00:00",
+  "implementation_commit": "bd74880c2cb0f1dde7d6c24c41a621fdc1de5d1c",
+  "source_dates": [
+    "2024-09-26",
+    "2026-09-25"
+  ],
+  "source_files": 496,
+  "action_receipt": {
+    "source_url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=26-09-2024&to_date=25-09-2026",
+    "raw_sha256": "7afffd33ea0a87eb8f3c8993cf769463ceb669855511de7256ec12b14f1ad34d",
+    "first_observed_at": "2026-09-26T23:41:28.218931+00:00",
+    "bytes": 1221217
+  },
+  "action_records": 4027,
+  "summary": {
+    "7": {
+      "scored_decision_dates": 491,
+      "selected": 9820,
+      "matched": 9767,
+      "unmatched": 53,
+      "raw_at_least_2x": 0,
+      "positive_references": 4419,
+      "negative_references": 5327,
+      "unchanged_references": 21,
+      "matched_with_corporate_action_events": 205,
+      "unmatched_with_events": 1,
+      "identity_reviews": 94,
+      "missing_target_session_decisions": 5,
+      "raw_mean_return_pct": -0.25851987059583365,
+      "raw_multiple_quantiles": {
+        "0": 0.3124357656731757,
+        "0.05": 0.9005225041319334,
+        "0.25": 0.960196952495736,
+        "0.5": 0.9938608458390178,
+        "0.75": 1.0300447035450608,
+        "0.95": 1.1077443192751717,
+        "1": 1.4810379241516967
+      },
+      "raw_multiples_sha256": "bab6d79eee43ad632079c5a10878208a99b3d728c18d46a3253cee29c679b295"
+    },
+    "14": {
+      "scored_decision_dates": 487,
+      "selected": 9740,
+      "matched": 9646,
+      "unmatched": 94,
+      "raw_at_least_2x": 0,
+      "positive_references": 4345,
+      "negative_references": 5287,
+      "unchanged_references": 14,
+      "matched_with_corporate_action_events": 324,
+      "unmatched_with_events": 2,
+      "identity_reviews": 135,
+      "missing_target_session_decisions": 9,
+      "raw_mean_return_pct": -0.268038485169297,
+      "raw_multiple_quantiles": {
+        "0": 0.30318602261048305,
+        "0.05": 0.8667817337173349,
+        "0.25": 0.9439155305416248,
+        "0.5": 0.9917220988960216,
+        "0.75": 1.0417103112342172,
+        "0.95": 1.15563989609499,
+        "1": 1.6843840131850023
+      },
+      "raw_multiples_sha256": "e412be48d681cb3d31ed1cb01db4309e12feaf20a587b7d4a7df8438a32fee43"
+    },
+    "365": {
+      "scored_decision_dates": 249,
+      "selected": 4980,
+      "matched": 4875,
+      "unmatched": 105,
+      "raw_at_least_2x": 57,
+      "positive_references": 2364,
+      "negative_references": 2509,
+      "unchanged_references": 2,
+      "matched_with_corporate_action_events": 2467,
+      "unmatched_with_events": 31,
+      "identity_reviews": 1051,
+      "missing_target_session_decisions": 247,
+      "raw_mean_return_pct": -0.24478847689244415,
+      "raw_multiple_quantiles": {
+        "0": 0.20822138635142398,
+        "0.05": 0.4632696662221577,
+        "0.25": 0.7374933469042815,
+        "0.5": 0.9901098901098901,
+        "0.75": 1.192537498276411,
+        "0.95": 1.61374424609959,
+        "1": 3.5467748825288337
+      },
+      "raw_multiples_sha256": "44f34f4937aafaa9f0ec23c6efa5041916176a90d4642d125503a42bf1d3c9e9"
+    }
+  },
+  "qualified_candidates": 0,
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "adjusted_multibagger_results": "NOT_PROVEN",
+  "source_scope": "Mixed EQ-series raw research, not company-only equity validation",
+  "classification_and_actions_complete": false,
+  "source_available_at_historical_issue": "NOT_PROVEN",
+  "executable_cost_net_performance": "NOT_PROVEN",
+  "qualified_oos_trades": 0,
+  "qualified_oos_days": 0,
+  "orders_allowed": false,
+  "full_replay_file": "2026-09-27_equity_two_year_replay.json.gz",
+  "full_replay_gzip_sha256": "b62f5ceb08ad84c68dd9b0a0bc1804cc9497c7ceb55ae224f81d43e775023fa6",
+  "full_replay_json_sha256": "6deb1fc1dca5c83206b6efe5077da432ef5d39f6d9a7efd5718323a015ebdc24"
+}
