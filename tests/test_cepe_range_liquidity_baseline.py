@@ -1,4 +1,6 @@
 from datetime import date
+import json
+import pytest
 
 from scripts.cepe_range_liquidity_baseline import rank, evaluate
 
@@ -40,3 +42,25 @@ def test_missing_open_interest_is_counted_and_never_imputed():
     result = rank(snapshot("2026-01-05",missing_oi=True),date(2026,1,5),date(2026,1,6))
     assert len(result["eligible"]) == 19 and len(result["selected"]) == 1
     assert result["rejected"]["MISSING_OR_INVALID_FEATURE"] == 1
+
+
+def test_friday_to_monday_requires_and_accepts_source_bound_calendar():
+    before,after = date(2026,1,9),date(2026,1,12)
+    with pytest.raises(ValueError,match="complete sourced calendar"):
+        evaluate(snapshot(before.isoformat()),snapshot(after.isoformat(),future_open=60),before,after)
+    calendar = json.dumps({
+        "schema":"nse-session-calendar-v2","segment":"FO",
+        "start":before.isoformat(),"end":after.isoformat(),
+        "available_at":"2026-09-27T00:00:00Z",
+        "sources":[{"circular":"NSE/FAOP/71777",
+            "url":"https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf",
+            "sha256":"a"*64}],
+        "days":{"2026-01-09":"2026-01-09T09:15:00+05:30",
+            "2026-01-10":None,"2026-01-11":None,
+            "2026-01-12":"2026-01-12T09:15:00+05:30"},
+    },sort_keys=True,separators=(",",":")).encode()
+    result = evaluate(snapshot(before.isoformat()),snapshot(after.isoformat(),future_open=60),
+                      before,after,session_calendar=calendar)
+    assert result["session_alignment_status"] == "DECLARED_CALENDAR_ALIGNED"
+    assert result["calendar_source_count"] == 1
+    assert result["session_calendar_sha256"] is not None

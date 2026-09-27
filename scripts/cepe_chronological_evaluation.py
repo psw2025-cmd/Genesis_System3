@@ -1,7 +1,7 @@
 """Frozen CEPE-NEXT-005 retrospective splits, with all uncapped outcomes.
 
-No parameter tuning or forward prediction. Multi-date gaps need an official
-session calendar, so only adjacent calendar dates are evaluated here.
+No parameter tuning or forward prediction. A source-qualified NSE F&O session
+calendar is required before joining observations across calendar-day gaps.
 """
 from __future__ import annotations
 
@@ -33,8 +33,17 @@ def distribution(values: list[float]) -> dict:
         full_uncapped_distribution_sha256=sha256(json.dumps(ordered,separators=(",", ":")).encode()).hexdigest())
 
 
-def split_pairs(files: list[Path], start: date, end: date):
+def split_pairs(
+    files: list[Path], start: date, end: date, session_dates: list[date] | None = None
+):
     dated = sorted((datetime.strptime(p.name[:8], "%Y%m%d").date(),p) for p in files)
+    if session_dates is not None:
+        expected = [day for day in session_dates if start <= day <= end]
+        paths = {day:path for day,path in dated if start <= day <= end}
+        if set(paths) != set(expected):
+            raise ValueError("Archived FO dates differ from official session calendar")
+        return [(before,paths[before],after,paths[after])
+                for before,after in zip(expected,expected[1:])],[]
     pairs, gaps = [], []
     for (before,a),(after,b) in zip(dated,dated[1:]):
         if not (start <= before < after <= end):
@@ -45,6 +54,112 @@ def split_pairs(files: list[Path], start: date, end: date):
             gaps.append(dict(previous_day=before.isoformat(),following_day=after.isoformat(),
                              status="NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"))
     return pairs,gaps
+
+
+def _date_set(values: list[str], field: str) -> set[date]:
+    try:
+        parsed = {date.fromisoformat(value) for value in values}
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid {field} date") from exc
+    if len(parsed) != len(values):
+        raise ValueError(f"Duplicate {field} date")
+    return parsed
+
+
+def session_calendar(path: Path, start: date, end: date) -> tuple[list[date], dict]:
+    """Load immutable, exact-hash-bound NSE F&O calendar evidence."""
+    raw = path.read_bytes()
+    evidence = json.loads(raw)
+    if evidence.get("schema_version") != 1 or evidence.get("segment") != "FO":
+        raise ValueError("Unsupported session-calendar evidence")
+    scope_start = date.fromisoformat(evidence["scope"]["start"])
+    scope_end = date.fromisoformat(evidence["scope"]["end"])
+    if not (scope_start <= start <= end <= scope_end):
+        raise ValueError("Session calendar does not cover requested phase")
+    sources = evidence.get("official_sources") or []
+    if not sources:
+        raise ValueError("Session calendar has no official sources")
+    for source in sources:
+        url = source.get("url", "")
+        circular = source.get("circular", "")
+        if (not url.startswith("https://nsearchives.nseindia.com/content/circulars/FAOP")
+                or not url.endswith(".pdf") or not circular.startswith("NSE/FAOP/")):
+            raise ValueError("Session calendar includes a non-official source")
+        raw_hash = source.get("raw_pdf_sha256")
+        if (not isinstance(raw_hash,str) or len(raw_hash) != 64
+                or any(char not in "0123456789abcdef" for char in raw_hash)):
+            raise ValueError("Official source requires raw PDF SHA-256")
+        year = source.get("calendar_year")
+        overrides = source.get("override_dates", [])
+        if year is None and not overrides:
+            raise ValueError("Official source has no calendar coverage declaration")
+        if year is not None and (not isinstance(year,int) or year < scope_start.year
+                                 or year > scope_end.year):
+            raise ValueError("Official source calendar year is outside scope")
+        _date_set(overrides,"source override")
+    holidays = _date_set(evidence.get("holidays", []),"holiday")
+    special = _date_set(evidence.get("special_live_sessions", []),"special session")
+    if any(day < scope_start or day > scope_end for day in holidays | special):
+        raise ValueError("Calendar override falls outside scope")
+    all_sessions = []
+    day = scope_start
+    while day <= scope_end:
+        if (day.weekday() < 5 and day not in holidays) or day in special:
+            all_sessions.append(day)
+        day += timedelta(days=1)
+    digest = sha256("\n".join(day.isoformat() for day in all_sessions).encode()).hexdigest()
+    if digest != evidence.get("session_dates_sha256"):
+        raise ValueError("Session calendar digest mismatch")
+    selected = [day for day in all_sessions if start <= day <= end]
+    return selected,{
+        "status":"OFFICIAL_NSE_FO_CALENDAR_DERIVED",
+        "evidence_file":path.name,
+        "evidence_sha256":sha256(raw).hexdigest(),
+        "session_dates":len(selected),
+        "first_session":selected[0].isoformat() if selected else None,
+        "last_session":selected[-1].isoformat() if selected else None,
+        "official_source_count":len(sources),
+        "raw_pdf_hashes_complete":True,
+        "first_observed_at":evidence["first_observed_at"],
+        "official_sources":[{key:source.get(key) for key in
+            ("circular","url","raw_pdf_sha256","calendar_year","override_dates")}
+            for source in sources],
+    }
+
+
+def pair_session_calendar(
+    previous: date, following: date, sessions: list[date], calendar_receipt: dict
+) -> bytes:
+    """Build the exact source-bound interval consumed by the outcome scorer."""
+    if following <= previous:
+        raise ValueError("Following session must be after previous session")
+    years = {previous.year,following.year}
+    sources = calendar_receipt["official_sources"]
+    selected = [source for source in sources if source.get("calendar_year") in years]
+    for source in sources:
+        overrides = {date.fromisoformat(value) for value in source.get("override_dates", [])}
+        if any(previous <= day <= following for day in overrides) and source not in selected:
+            selected.append(source)
+    if not selected:
+        raise ValueError("No raw official source covers pair")
+    session_set = set(sessions)
+    if previous not in session_set or following not in session_set:
+        raise ValueError("Pair endpoints are not declared sessions")
+    days = {}
+    day = previous
+    while day <= following:
+        days[day.isoformat()] = (f"{day.isoformat()}T09:15:00+05:30"
+                                  if day in session_set else None)
+        day += timedelta(days=1)
+    payload = {
+        "schema":"nse-session-calendar-v2","segment":"FO",
+        "start":previous.isoformat(),"end":following.isoformat(),
+        "available_at":calendar_receipt["first_observed_at"],
+        "sources":[{"circular":source["circular"],"url":source["url"],
+                    "sha256":source["raw_pdf_sha256"]} for source in selected],
+        "days":days,
+    }
+    return json.dumps(payload,sort_keys=True,separators=(",",":")).encode()
 
 
 def verified(path: Path) -> bytes:
@@ -59,24 +174,39 @@ def verified(path: Path) -> bytes:
     return raw
 
 
-def source_scope(folder: Path, start: date, end: date, manifest: Path | None = None) -> dict:
-    """Bind requested dates to archived receipts before a full-period replay.
+def _manifest_rows(manifests: list[Path]) -> tuple[list[dict],list[dict]]:
+    rows,receipts = [],[]
+    for manifest in manifests:
+        raw = manifest.read_bytes()
+        decoded = gzip.decompress(raw) if manifest.suffix == ".gz" else raw
+        text = decoded.decode()
+        parsed = json.loads(text) if text.lstrip().startswith("[") else [
+            json.loads(line) for line in text.splitlines() if line.strip()
+        ]
+        rows.extend(parsed)
+        receipts.append({"file":manifest.name,"sha256":sha256(raw).hexdigest()})
+    return rows,receipts
 
-    Directory-only runs remain useful subsets but cannot claim full acquisition
-    coverage. A 404 is retained as a missing source, never inferred as a holiday.
-    """
-    files = {datetime.strptime(p.name[:8], "%Y%m%d").date(): p
+
+def source_scope(
+    folder: Path, start: date, end: date,
+    manifest: Path | list[Path] | None = None, *,
+    official_sessions: list[date] | None = None,
+    calendar_receipt: dict | None = None,
+) -> dict:
+    """Bind every requested date to archived bytes, 404, and official sessions."""
+    files = {datetime.strptime(p.name[:8],"%Y%m%d").date():p
              for p in folder.glob("????????_fo_bhavcopy.csv")
-             if start <= datetime.strptime(p.name[:8], "%Y%m%d").date() <= end}
-    scope = dict(source_files=len(files), first_available_date=min(files).isoformat() if files else None,
-                 last_available_date=max(files).isoformat() if files else None,
-                 status="UNVERIFIED_DIRECTORY_SUBSET", acquisition_manifest_verified=False,
-                 market_calendar_complete=False, missing_dates_are_holidays=False)
+             if start <= datetime.strptime(p.name[:8],"%Y%m%d").date() <= end}
+    scope = dict(source_files=len(files),first_available_date=min(files).isoformat() if files else None,
+        last_available_date=max(files).isoformat() if files else None,
+        status="UNVERIFIED_DIRECTORY_SUBSET",acquisition_manifest_verified=False,
+        market_calendar_complete=False,missing_dates_are_holidays=False)
     if manifest is None:
         return scope
-    raw = manifest.read_bytes()
-    entries = json.loads(gzip.decompress(raw) if manifest.suffix == ".gz" else raw)
-    requested = {start + timedelta(days=i) for i in range((end-start).days+1)}
+    manifests = [manifest] if isinstance(manifest,Path) else list(manifest)
+    entries,manifest_receipts = _manifest_rows(manifests)
+    requested = {start+timedelta(days=index) for index in range((end-start).days+1)}
     rows = {}
     for row in entries:
         day = date.fromisoformat(row["date"])
@@ -86,30 +216,57 @@ def source_scope(folder: Path, start: date, end: date, manifest: Path | None = N
             rows[day] = row
     if set(rows) != requested:
         raise ValueError("Source manifest does not account for every requested date")
-    expected = {day for day,r in rows.items() if r["status"] in {"downloaded", "already_present"}}
-    if any(r["status"] not in {"downloaded", "already_present", "source_404"} for r in rows.values()):
+    if any(row["status"] not in {"downloaded","already_present","source_404"}
+           for row in rows.values()):
         raise ValueError("Unresolved acquisition error in source manifest")
+    expected = {day for day,row in rows.items()
+                if row["status"] in {"downloaded","already_present"}}
     if set(files) != expected:
         raise ValueError("Directory differs from acquisition manifest; missing or unexpected source files")
     for day,path in files.items():
         if sha256(verified(path)).hexdigest() != rows[day]["csv_sha256"]:
             raise ValueError("Source bytes differ from acquisition manifest")
-    return dict(scope, status="ARCHIVED_ACQUISITION_SCOPE_VERIFIED", acquisition_manifest_verified=True,
-                manifest_sha256=sha256(raw).hexdigest(), requested_calendar_dates=len(requested),
-                source_404_dates=sum(r["status"] == "source_404" for r in rows.values()))
+    result = dict(scope,status="ARCHIVED_ACQUISITION_SCOPE_VERIFIED",
+        acquisition_manifest_verified=True,manifest_receipts=manifest_receipts,
+        manifest_set_sha256=sha256(json.dumps(manifest_receipts,sort_keys=True,
+                                              separators=(",",":")).encode()).hexdigest(),
+        requested_calendar_dates=len(requested),
+        source_404_dates=sum(row["status"] == "source_404" for row in rows.values()))
+    if official_sessions is not None:
+        if set(files) != set(official_sessions):
+            raise ValueError("Archived FO dates differ from official session calendar")
+        result.update(status="ARCHIVED_SOURCE_AND_OFFICIAL_SESSION_CALENDAR_VERIFIED",
+            market_calendar_complete=True,missing_dates_are_holidays=False,
+            source_404_dates_are_official_non_sessions=True,
+            session_calendar=calendar_receipt)
+    return result
 
 
-def run(folder: Path, start: date, end: date, phase: str, *, source_manifest: Path | None = None) -> dict:
-    scope = source_scope(folder, start, end, source_manifest)
-    pairs,gaps = split_pairs(list(folder.glob("????????_fo_bhavcopy.csv")),start,end)
+def run(
+    folder: Path, start: date, end: date, phase: str, *,
+    source_manifest: Path | list[Path] | None = None,
+    session_calendar_path: Path | None = None,
+) -> dict:
+    sessions,calendar_receipt = None,None
+    if session_calendar_path is not None:
+        sessions,calendar_receipt = session_calendar(session_calendar_path,start,end)
+    scope = source_scope(folder,start,end,source_manifest,official_sessions=sessions,
+                         calendar_receipt=calendar_receipt)
+    pairs,gaps = split_pairs(list(folder.glob("????????_fo_bhavcopy.csv")),start,end,sessions)
     daily,errors,population = [],[],[]
+    supplied_pair_calendars = 0
     samples = {key:[] for key in ("variant","same_universe_momentum")}
     counts = {key:Counter() for key in samples}
     count_keys = ("selected","scoreable","unscoreable","hits","false_picks","missed_events",
                   "positive_returns","negative_returns","unchanged_returns")
     for index,(before,a,after,b) in enumerate(pairs):
         try:
-            result = evaluate(verified(a),verified(b),before,after)
+            pair_calendar = (pair_session_calendar(before,after,sessions,calendar_receipt)
+                             if sessions is not None and calendar_receipt is not None else None)
+            if pair_calendar is not None:
+                supplied_pair_calendars += 1
+            result = evaluate(verified(a),verified(b),before,after,
+                              session_calendar=pair_calendar)
         except (ValueError,KeyError,OSError) as exc:
             errors.append(dict(previous_day=before.isoformat(),following_day=after.isoformat(),
                                error=str(exc),status="EXCLUDED_SOURCE_OR_IDENTITY_ERROR"))
@@ -146,7 +303,8 @@ def run(folder: Path, start: date, end: date, phase: str, *, source_manifest: Pa
         generated_at=datetime.now(timezone.utc).isoformat(),
         registration_commit="1cf0f9d731e3d3bebaa2f496484c0cb56646732f",
         strategy_implementation_commit="85e1c444c6c247aa468f009e83a61dc97929b287",
-        evaluated_session_pairs=len(daily),source_scope=scope,skipped_calendar_gaps=gaps,excluded_errors=errors,
+        evaluated_session_pairs=len(daily),supplied_pair_calendars=supplied_pair_calendars,
+        source_scope=scope,skipped_calendar_gaps=gaps,excluded_errors=errors,
         summary=summary,uncertainty=uncertainty,population_distribution=distribution(population),daily=daily,
         multiple_precision="Six decimal reference multiples from frozen comparator; no capping",
         negative_forecasts_issued=0,forward_predictions=0,forward_outcomes=0,
@@ -163,12 +321,15 @@ def main():
     p.add_argument("folder",type=Path)
     p.add_argument("phase",choices=["development","validation","frozen_retrospective_test"])
     p.add_argument("output",type=Path)
-    p.add_argument("--source-manifest",type=Path,
-                   help="Require a complete acquisition manifest and every archived FO source in the phase")
+    p.add_argument("--source-manifest",type=Path,action="append",
+                   help="Repeat for each acquisition manifest covering the phase")
+    p.add_argument("--session-calendar",type=Path,
+                   help="Exact-hash-bound official NSE F&O calendar evidence")
     args = p.parse_args()
     registry = json.loads(Path("research/experiments/cepe_range_liquidity_v1.json").read_text())
     start,end = map(date.fromisoformat,registry["data_plan"][args.phase])
-    result = run(args.folder,start,end,args.phase,source_manifest=args.source_manifest)
+    result = run(args.folder,start,end,args.phase,source_manifest=args.source_manifest,
+                 session_calendar_path=args.session_calendar)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,indent=2)+"\n")
     print(json.dumps({k:v for k,v in result.items() if k not in {"daily","skipped_calendar_gaps"}},indent=2))

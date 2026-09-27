@@ -42,6 +42,7 @@ def session_scope(previous: date, following: date, calendar: bytes | None = None
         "session_alignment_status": status,
         "session_calendar_sha256": None,
         "calendar_source_status": "NOT_PROVEN",
+        "calendar_source_count": 0,
         "following_open_at": None,
         "opening_time_basis": "NOT_PROVEN",
     }
@@ -55,7 +56,8 @@ def session_scope(previous: date, following: date, calendar: bytes | None = None
         return result
     try:
         data = json.loads(calendar.decode("utf-8"), object_pairs_hook=_unique)
-        if data["schema"] != "nse-session-calendar-v1" or data["segment"] != "FO":
+        schema = data["schema"]
+        if schema not in {"nse-session-calendar-v1","nse-session-calendar-v2"} or data["segment"] != "FO":
             raise ValueError("Unsupported session calendar")
         start, end = date.fromisoformat(data["start"]), date.fromisoformat(data["end"])
         if not start <= previous < following <= end or (end - start).days > 3660:
@@ -64,13 +66,25 @@ def session_scope(previous: date, following: date, calendar: bytes | None = None
         if known_by is not None:
             if known_by.tzinfo is None or known_by.utcoffset() is None or available > known_by:
                 raise ValueError("Calendar was not available at prediction issue time")
-        source = urlsplit(data["source_url"])
-        if (source.scheme != "https" or source.hostname not in
-                {"nseindia.com", "www.nseindia.com", "nsearchives.nseindia.com"}
-                or source.username or source.password or source.fragment or source.port not in (None, 443)):
-            raise ValueError("Calendar requires an official NSE source URL")
-        if not re.fullmatch(r"[0-9a-f]{64}", data["source_sha256"]):
-            raise ValueError("Calendar requires raw source SHA-256")
+        sources = ([{"url":data["source_url"],"sha256":data["source_sha256"]}]
+                   if schema == "nse-session-calendar-v1" else data["sources"])
+        if not isinstance(sources,list) or not sources:
+            raise ValueError("Calendar requires at least one official NSE source")
+        seen_sources = set()
+        for item in sources:
+            if not isinstance(item,dict) or set(item)-{"url","sha256","circular"}:
+                raise ValueError("Invalid calendar source declaration")
+            source = urlsplit(item["url"])
+            if (source.scheme != "https" or source.hostname not in
+                    {"nseindia.com","www.nseindia.com","nsearchives.nseindia.com"}
+                    or source.username or source.password or source.fragment
+                    or source.port not in (None,443)):
+                raise ValueError("Calendar requires an official NSE source URL")
+            if not re.fullmatch(r"[0-9a-f]{64}",item["sha256"]):
+                raise ValueError("Calendar requires raw source SHA-256")
+            if item["url"] in seen_sources:
+                raise ValueError("Duplicate calendar source URL")
+            seen_sources.add(item["url"])
         days = data["days"]
         expected = {(start + timedelta(days=i)).isoformat()
                     for i in range((end - start).days + 1)}
@@ -87,7 +101,10 @@ def session_scope(previous: date, following: date, calendar: bytes | None = None
         result.update(
             session_alignment_status="DECLARED_CALENDAR_ALIGNED",
             session_calendar_sha256=sha256(calendar).hexdigest(),
-            calendar_source_status="DECLARED_SOURCE_NOT_INDEPENDENTLY_VERIFIED",
+            calendar_source_status=("DECLARED_SOURCE_NOT_INDEPENDENTLY_VERIFIED"
+                if schema == "nse-session-calendar-v1" else
+                "DECLARED_SOURCE_SET_NOT_INDEPENDENTLY_VERIFIED"),
+            calendar_source_count=len(sources),
             following_open_at=days[following.isoformat()],
             opening_time_basis="DECLARED_SESSION_CALENDAR",
         )
