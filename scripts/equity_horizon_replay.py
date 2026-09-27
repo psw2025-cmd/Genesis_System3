@@ -16,6 +16,8 @@ from math import isfinite
 from pathlib import Path
 from typing import Any
 
+from scripts.equity_corporate_action_scope import review as review_actions
+
 
 def parse(raw: bytes, day: date) -> dict[str, dict[str, Any]]:
     reader = csv.DictReader(StringIO(raw.decode("utf-8-sig")))
@@ -40,7 +42,8 @@ def parse(raw: bytes, day: date) -> dict[str, dict[str, Any]]:
 def replay(snapshots: list[tuple[date, bytes]], *, top_k: int = 20,
            minimum_volume: float = 10000, minimum_price: float = 10,
            horizons: tuple[int, ...] = (7, 14, 365),
-           max_outcome_lag_days: int = 4) -> dict[str, Any]:
+           max_outcome_lag_days: int = 4,
+           corporate_action_scope: dict | None = None) -> dict[str, Any]:
     if top_k < 1 or not snapshots or [d for d, _ in snapshots] != sorted({d for d, _ in snapshots}):
         raise ValueError("Require sorted unique dated files and top_k >= 1")
     if any(h < 1 for h in horizons):
@@ -74,6 +77,18 @@ def replay(snapshots: list[tuple[date, bytes]], *, top_k: int = 20,
                 "at_least_2x": sum(mult >= 2 for _, mult in matched),
                 "highest_raw_multiple": max((mult for _, mult in matched), default=None),
             }
+            if corporate_action_scope is not None:
+                reviews = {isin:review_actions(corporate_action_scope,before[isin]["symbol"],isin,day,next_day)
+                           for isin in selected}
+                outcomes[str(horizon)]["corporate_action_review"] = {
+                    "selected_with_events": sum(r["action_count"] > 0 for r in reviews.values()),
+                    "matched_with_events": sum(reviews[isin]["action_count"] > 0 for isin,_ in matched),
+                    "unmatched_with_events": sum(r["action_count"] > 0 for isin,r in reviews.items() if isin not in after),
+                    "identity_links_requiring_review": sum(r["identity_link_review_required"] for r in reviews.values()),
+                    "source_sha256": corporate_action_scope["source_sha256"],
+                    "complete_action_coverage": False,
+                    "adjusted_return_proven": False,
+                }
         decisions.append({"decision_date": day.isoformat(), "source_sha256": source_hash,
                           "selected_keys_sha256": picks_hash, "selected_count": len(selected),
                           "horizons": outcomes})

@@ -283,7 +283,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m pytest -q tests/test_equity_instrument_scope.py tests/test_equity_horizon_replay.py
+          python -m pytest -q tests/test_equity_instrument_scope.py tests/test_equity_horizon_replay.py tests/test_equity_corporate_action_scope.py
 
       - name: Classify quantitative AlphaTruth evidence
         shell: bash
