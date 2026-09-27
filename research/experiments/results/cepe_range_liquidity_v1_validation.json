@@ -64,5 +64,8 @@
   "frozen_2026Q2_option_outcome_test": "UNSCORED_PRESERVED",
   "next_target": "Investigate earlier development data integrity, contract cost and liquidity features; preregister a distinct candidate before any untouched evaluation. Do not tune the frozen test.",
   "auto_promotion": false,
-  "orders_allowed": false
+  "orders_allowed": false,
+  "additional_development_evidence": "research/evidence/2026-09-27_cepe_development_summary.json",
+  "additional_development_scored_references": 36680,
+  "additional_development_pairs": 236
 }
