@@ -7,7 +7,8 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
+import gzip
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -58,7 +59,48 @@ def verified(path: Path) -> bytes:
     return raw
 
 
-def run(folder: Path, start: date, end: date, phase: str) -> dict:
+def source_scope(folder: Path, start: date, end: date, manifest: Path | None = None) -> dict:
+    """Bind requested dates to archived receipts before a full-period replay.
+
+    Directory-only runs remain useful subsets but cannot claim full acquisition
+    coverage. A 404 is retained as a missing source, never inferred as a holiday.
+    """
+    files = {datetime.strptime(p.name[:8], "%Y%m%d").date(): p
+             for p in folder.glob("????????_fo_bhavcopy.csv")
+             if start <= datetime.strptime(p.name[:8], "%Y%m%d").date() <= end}
+    scope = dict(source_files=len(files), first_available_date=min(files).isoformat() if files else None,
+                 last_available_date=max(files).isoformat() if files else None,
+                 status="UNVERIFIED_DIRECTORY_SUBSET", acquisition_manifest_verified=False,
+                 market_calendar_complete=False, missing_dates_are_holidays=False)
+    if manifest is None:
+        return scope
+    raw = manifest.read_bytes()
+    entries = json.loads(gzip.decompress(raw) if manifest.suffix == ".gz" else raw)
+    requested = {start + timedelta(days=i) for i in range((end-start).days+1)}
+    rows = {}
+    for row in entries:
+        day = date.fromisoformat(row["date"])
+        if row["segment"] == "FO" and day in requested:
+            if day in rows:
+                raise ValueError("Duplicate date in source manifest")
+            rows[day] = row
+    if set(rows) != requested:
+        raise ValueError("Source manifest does not account for every requested date")
+    expected = {day for day,r in rows.items() if r["status"] in {"downloaded", "already_present"}}
+    if any(r["status"] not in {"downloaded", "already_present", "source_404"} for r in rows.values()):
+        raise ValueError("Unresolved acquisition error in source manifest")
+    if set(files) != expected:
+        raise ValueError("Directory differs from acquisition manifest; missing or unexpected source files")
+    for day,path in files.items():
+        if sha256(verified(path)).hexdigest() != rows[day]["csv_sha256"]:
+            raise ValueError("Source bytes differ from acquisition manifest")
+    return dict(scope, status="ARCHIVED_ACQUISITION_SCOPE_VERIFIED", acquisition_manifest_verified=True,
+                manifest_sha256=sha256(raw).hexdigest(), requested_calendar_dates=len(requested),
+                source_404_dates=sum(r["status"] == "source_404" for r in rows.values()))
+
+
+def run(folder: Path, start: date, end: date, phase: str, *, source_manifest: Path | None = None) -> dict:
+    scope = source_scope(folder, start, end, source_manifest)
     pairs,gaps = split_pairs(list(folder.glob("????????_fo_bhavcopy.csv")),start,end)
     daily,errors,population = [],[],[]
     samples = {key:[] for key in ("variant","same_universe_momentum")}
@@ -104,7 +146,7 @@ def run(folder: Path, start: date, end: date, phase: str) -> dict:
         generated_at=datetime.now(timezone.utc).isoformat(),
         registration_commit="1cf0f9d731e3d3bebaa2f496484c0cb56646732f",
         strategy_implementation_commit="85e1c444c6c247aa468f009e83a61dc97929b287",
-        evaluated_session_pairs=len(daily),skipped_calendar_gaps=gaps,excluded_errors=errors,
+        evaluated_session_pairs=len(daily),source_scope=scope,skipped_calendar_gaps=gaps,excluded_errors=errors,
         summary=summary,uncertainty=uncertainty,population_distribution=distribution(population),daily=daily,
         multiple_precision="Six decimal reference multiples from frozen comparator; no capping",
         negative_forecasts_issued=0,forward_predictions=0,forward_outcomes=0,
@@ -121,10 +163,12 @@ def main():
     p.add_argument("folder",type=Path)
     p.add_argument("phase",choices=["development","validation","frozen_retrospective_test"])
     p.add_argument("output",type=Path)
+    p.add_argument("--source-manifest",type=Path,
+                   help="Require a complete acquisition manifest and every archived FO source in the phase")
     args = p.parse_args()
     registry = json.loads(Path("research/experiments/cepe_range_liquidity_v1.json").read_text())
     start,end = map(date.fromisoformat,registry["data_plan"][args.phase])
-    result = run(args.folder,start,end,args.phase)
+    result = run(args.folder,start,end,args.phase,source_manifest=args.source_manifest)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,indent=2)+"\n")
     print(json.dumps({k:v for k,v in result.items() if k not in {"daily","skipped_calendar_gaps"}},indent=2))
