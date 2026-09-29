@@ -1,0 +1,86 @@
+{
+  "task_id": "CEPE-NEXT-007-MODEL-SELECTION",
+  "evidence_date_ist": "2026-09-30",
+  "evidence_cutoff": "2026-03-31",
+  "parent_head": "25d7a9fd4f5928fb4b0d0bd64db1748c0d3d4452",
+  "q2_opened": false,
+  "source_scope": {
+    "development_pairs": 312,
+    "development_eligible": 488676,
+    "development_scoreable": 487929,
+    "q1_official_sessions": 60,
+    "q1_pairs": 59,
+    "q1_eligible": 103828,
+    "q1_scoreable": 103778,
+    "first_pair": {
+      "previous_date": "2024-09-27",
+      "previous_sha256": "20c15c4eb1e18a027be72ced6e39403f87821fea1c065fed21905be974dbad8e",
+      "following_date": "2024-09-30",
+      "following_sha256": "542aab98699d1a205675cffe23d351cbbe541ea08e49402fd385bbbebba78ca5"
+    },
+    "last_model_selection_pair": {
+      "previous_date": "2026-03-27",
+      "previous_sha256": "8fc718db3ea66cf14ea27989de4b4fc16b8d8bd81f8730f2d490910c034922f9",
+      "following_date": "2026-03-30",
+      "following_sha256": "4ff1109b7edecb26dc00961fa4537d377572491ea4cb2e8d55156c142b7919c4"
+    },
+    "official_calendar": "research/evidence/2026-09-27_nse_fo_session_calendar.json",
+    "raw_file_receipts_and_acquisition_manifests": "Previously committed and hash-bound CEPE-CALENDAR-006 source scope"
+  },
+  "inspected_family": [
+    {"name": "ridge_a1", "directional_pct": 55.44217687074829, "mean_return_pct": 7.269596398021572, "three_x": 1, "paired_excess_pct": 1.2896017885854936},
+    {"name": "ridge_a10", "directional_pct": 55.44217687074829, "mean_return_pct": 7.285144569174849, "three_x": 1, "paired_excess_pct": 1.3065063222183364},
+    {"name": "ridge_a100", "directional_pct": 55.44217687074829, "mean_return_pct": 7.277177818576804, "three_x": 1, "paired_excess_pct": 1.2984410437105056},
+    {"name": "direction_c005", "directional_pct": 57.6271186440678, "mean_return_pct": 6.816989719157464, "three_x": 1, "paired_excess_pct": 0.776195952854955},
+    {"name": "direction_c02", "directional_pct": 57.79661016949152, "mean_return_pct": 6.969675508310667, "three_x": 1, "paired_excess_pct": 0.9288817420081588},
+    {"name": "direction_c1", "directional_pct": 57.6271186440678, "mean_return_pct": 6.786792059890495, "three_x": 1, "paired_excess_pct": 0.7459982935879874},
+    {"name": "event_c005", "directional_pct": 43.050847457627114, "mean_return_pct": 36.00515371982796, "three_x": 15, "paired_excess_pct": 29.964359953525456},
+    {"name": "event_c02", "directional_pct": 43.12393887945671, "mean_return_pct": 36.071244412681104, "three_x": 15, "paired_excess_pct": 29.97718940266285},
+    {"name": "event_c1", "directional_pct": 42.95415959252971, "mean_return_pct": 35.97090228079067, "three_x": 15, "paired_excess_pct": 29.877017342182395}
+  ],
+  "selection_sizes_inspected": [1, 3, 5, 10],
+  "frozen_heads": {
+    "directional": "direction_c02_top10",
+    "rare_tail": "event_c02_top10"
+  },
+  "q1_directional": {
+    "selected_scoreable": [590, 590],
+    "positive_negative_unchanged": [341, 207, 42],
+    "directional_pct": 57.79661016949152,
+    "mean_return_pct": 6.969675508310667,
+    "median_return_pct": 2.029773676115132,
+    "thresholds": {"3": 1, "10": 0, "20": 0, "30": 0},
+    "paired_excess_pct": 0.9288817420081588,
+    "bootstrap_95pct": [-8.962784099359641, 8.361371816143386],
+    "multiple_sha256": "39450401e2baad801b36ae47ac3210dbe7e666aa579fe6bccbaf5b754e2478a9"
+  },
+  "q1_rare_tail": {
+    "selected_scoreable": [590, 589],
+    "positive_negative_unchanged": [254, 299, 36],
+    "directional_pct": 43.12393887945671,
+    "mean_return_pct": 36.071244412681104,
+    "median_return_pct": -0.6289308176100628,
+    "thresholds": {"3": 15, "10": 7, "20": 6, "30": 2},
+    "event_precision_pct": 2.5466893039049237,
+    "paired_excess_pct": 29.97718940266285,
+    "bootstrap_95pct": [-9.08892973471049, 100.66234254371324],
+    "multiple_sha256": "549a63ccf6c4b8f73341325f801869f7db220858e7d823743219506375f9fa55"
+  },
+  "q1_raw_momentum_comparator": {
+    "selected_scoreable": [590, 590],
+    "positive_negative_unchanged": [286, 268, 36],
+    "directional_pct": 48.47457627118644,
+    "mean_return_pct": 6.040793766302504,
+    "median_return_pct": 0.0,
+    "thresholds": {"3": 9, "10": 0, "20": 0, "30": 0},
+    "event_precision_pct": 1.5254237288135595,
+    "multiple_sha256": "66dca23003b49e8dcbd57d4358d4bc05c6cab47c9c9745adab3f230a1437baad"
+  },
+  "classification": "RETROSPECTIVE_MODEL_SELECTION_ONLY",
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "opening_fill_proven": false,
+  "actual_cost_net_performance": "NOT_PROVEN",
+  "project_gate_status": "NOT_PROVEN",
+  "orders_allowed": false
+}

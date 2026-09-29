@@ -1,0 +1,196 @@
+{
+  "experiment_id": "CEPE-NEXT-007",
+  "status": "PREREGISTERED_BEFORE_FROZEN_Q2",
+  "registered_date_ist": "2026-09-30",
+  "parent_commit": "25d7a9fd4f5928fb4b0d0bd64db1748c0d3d4452",
+  "registration_commit": null,
+  "registration_note": "The commit containing this file is the authoritative pre-Q2 registration. Its SHA is recorded in the later result evidence; Q2 bytes must not be read before that commit exists.",
+  "instrument": "Exact NSE F&O option symbol, expiry, strike and CE/PE side",
+  "horizon": "Verified current official NSE F&O session close to the immediately following official NSE F&O session opening reference",
+  "objective_separation": {
+    "directional": "Rank contracts for positive next-opening gross reference movement.",
+    "rare_tail": "Rank contracts for a gross next-opening reference multiple of at least 3x.",
+    "email_or_ui_rule": "Keep the two heads labelled separately. A rare-tail rank is not a positive-direction probability and neither score is a calibrated probability or executable fill."
+  },
+  "data_plan": {
+    "development": ["2024-09-27", "2025-12-31"],
+    "model_selection": ["2026-01-01", "2026-03-31"],
+    "frozen_retrospective_test": ["2026-04-01", "2026-06-30"],
+    "session_source": "research/evidence/2026-09-27_nse_fo_session_calendar.json",
+    "development_pairs": 312,
+    "development_eligible_rows": 488676,
+    "development_scoreable_rows": 487929,
+    "model_selection_official_sessions": 60,
+    "model_selection_pairs": 59,
+    "model_selection_eligible_rows": 103828,
+    "model_selection_scoreable_rows": 103778,
+    "frozen_test_access_rule": "No Q2 source CSV may be read until this exact registry and candidate implementation are committed. Evaluate each frozen head once, preserve all results, and never retune from Q2.",
+    "forward_issuance_claim_allowed_for_retrospective_data": false
+  },
+  "eligibility": {
+    "minimum_previous_close": 5,
+    "minimum_prior_volume": 1000,
+    "required_positive": [
+      "OpnPric", "PrvsClsgPric", "UndrlygPric", "OpnIntrst",
+      "TtlTrfVal", "TtlNbOfTxsExctd", "NewBrdLotQty", "StrkPric"
+    ],
+    "price_range": "HghPric > LwPric >= 0 and prior open/close must be within the range.",
+    "expiry_rule": "Expiry must be on or after the following official session.",
+    "outcome_scoreable_rule": "Exact identity exists on following session with positive opening and volume >=1. Following-session volume is outcome availability only and never a selection feature.",
+    "missing_prior_underlying_or_exact_volume": "Use frozen neutral raw value 0 before cross-sectional percentile ranking and record missingness; never use later data.",
+    "implied_volatility_and_greeks": "Zero coverage in archived UDiFF files; excluded, never imputed."
+  },
+  "feature_order": [
+    "premium_return",
+    "intraday_momentum",
+    "close_location",
+    "volume",
+    "transactions",
+    "oi_change",
+    "near_expiry",
+    "lower_premium",
+    "atm_proximity",
+    "signed_moneyness",
+    "signed_underlying_return",
+    "volume_surprise",
+    "turnover_per_contract",
+    "oi_level"
+  ],
+  "feature_transform": "Within-current-session deterministic average percentile ranks in (0,1], followed by a frozen linear logit score. Ranking uses the linear score; it is not exposed as a calibrated probability.",
+  "selection_count_per_session": 10,
+  "frozen_heads": {
+    "directional": {
+      "intercept": -0.29962959274860024,
+      "coefficients": {
+        "premium_return": 0.3572764058773491,
+        "intraday_momentum": 0.31674057376847264,
+        "close_location": 0.0525726843914491,
+        "volume": -0.09291907008231548,
+        "transactions": 0.10584696900393065,
+        "oi_change": 0.07691832673540601,
+        "near_expiry": -0.29767090401872165,
+        "lower_premium": -0.1679356756573878,
+        "atm_proximity": 0.15415595629952533,
+        "signed_moneyness": -0.10459986772484024,
+        "signed_underlying_return": 0.09569600088749793,
+        "volume_surprise": -0.01756607795592747,
+        "turnover_per_contract": -0.1441899177876584,
+        "oi_level": 0.11330736905541013
+      }
+    },
+    "rare_tail": {
+      "intercept": -3.8741081745737356,
+      "coefficients": {
+        "premium_return": 0.5319846509427568,
+        "intraday_momentum": -0.6234557746448749,
+        "close_location": 2.0225197189414637,
+        "volume": 0.6422895777269116,
+        "transactions": 0.5506102879766136,
+        "oi_change": -0.13614310781807298,
+        "near_expiry": 3.354748770313934,
+        "lower_premium": 1.6761165390325548,
+        "atm_proximity": 1.532249499919177,
+        "signed_moneyness": -3.527966620182274,
+        "signed_underlying_return": 0.8289524920227197,
+        "volume_surprise": 0.41334783574580414,
+        "turnover_per_contract": 0.017473614523446312,
+        "oi_level": -1.0154109074997577
+      }
+    }
+  },
+  "model_family_search": {
+    "variant_count": 9,
+    "targets": ["clipped_log_multiple_ridge", "positive_direction_l2_logistic", "three_x_event_l2_logistic"],
+    "regularization_values": {
+      "ridge_alpha": [1, 10, 100],
+      "logistic_C": [0.05, 0.2, 1]
+    },
+    "selection_sizes_inspected": [1, 3, 5, 10],
+    "multiple_testing_note": "Every inspected model and selection size is retained in the model-selection evidence. Q1 is model-selection data and supplies no untouched-performance claim."
+  },
+  "q1_model_selection": {
+    "directional": {
+      "variant": "direction_c02",
+      "selected": 590,
+      "scoreable": 590,
+      "positive": 341,
+      "negative": 207,
+      "unchanged": 42,
+      "directional_pct": 57.79661016949152,
+      "mean_return_pct": 6.969675508310667,
+      "median_return_pct": 2.029773676115132,
+      "thresholds": {"3": 1, "10": 0, "20": 0, "30": 0},
+      "paired_mean_excess_pct": 0.9288817420081588,
+      "paired_bootstrap_95pct": [-8.962784099359641, 8.361371816143386],
+      "positive_excess_sessions": 32,
+      "negative_excess_sessions": 27
+    },
+    "rare_tail": {
+      "variant": "event_c02",
+      "selected": 590,
+      "scoreable": 589,
+      "positive": 254,
+      "negative": 299,
+      "unchanged": 36,
+      "directional_pct": 43.12393887945671,
+      "mean_return_pct": 36.071244412681104,
+      "median_return_pct": -0.6289308176100628,
+      "thresholds": {"3": 15, "10": 7, "20": 6, "30": 2},
+      "event_precision_pct": 2.5466893039049237,
+      "paired_mean_excess_pct": 29.97718940266285,
+      "paired_bootstrap_95pct": [-9.08892973471049, 100.66234254371324],
+      "positive_excess_sessions": 26,
+      "negative_excess_sessions": 33
+    },
+    "same_universe_raw_momentum_comparator": {
+      "selected": 590,
+      "scoreable": 590,
+      "positive": 286,
+      "negative": 268,
+      "unchanged": 36,
+      "directional_pct": 48.47457627118644,
+      "mean_return_pct": 6.040793766302504,
+      "median_return_pct": 0.0,
+      "thresholds": {"3": 9, "10": 0, "20": 0, "30": 0},
+      "event_precision_pct": 1.5254237288135595
+    },
+    "classification": "MODEL_SELECTION_ONLY_NOT_OOS_NOT_FORWARD"
+  },
+  "q2_frozen_evaluation": {
+    "comparators": [
+      "Identical eligible universe top-10 raw ClsPric/OpnPric momentum",
+      "CEPE-NEXT-006 fixed top-decile event-liquidity score"
+    ],
+    "report_for_each_head": [
+      "selected and scoreable counts",
+      "positive negative unchanged",
+      "mean median and uncapped return distribution hash",
+      "3x 10x 20x 30x counts",
+      "directional and 3x-event precision",
+      "paired-session comparator excess and bootstrap interval",
+      "100 bps cost-stress scenario",
+      "source hashes and missingness"
+    ],
+    "directional_head_research_success": "At least 100 scoreable selections over at least 60 official sessions, directional accuracy >=65%, positive median gross reference return, positive paired mean excess versus raw momentum, and zero source/identity errors.",
+    "rare_tail_head_research_success": "At least 100 scoreable selections over at least 60 official sessions, 3x-event precision above raw momentum with positive paired mean excess, and zero source/identity errors.",
+    "familywise_alpha": 0.05,
+    "per_head_alpha_bonferroni": 0.025,
+    "retuning_allowed": false,
+    "opening_price_is_fill": false
+  },
+  "project_gates": {
+    "directional_accuracy_pct": 65,
+    "top_decile_precision_pct": 70,
+    "oos_trades": 100,
+    "oos_days": 60,
+    "sharpe": 2.5,
+    "maximum_drawdown_pct": 10,
+    "deflated_sharpe_probability": 0.95,
+    "note": "Frozen retrospective success does not by itself satisfy forward OOS, fill, cost, Sharpe or real-money readiness gates."
+  },
+  "expected_range": null,
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}
