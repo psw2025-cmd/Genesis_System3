@@ -293,6 +293,7 @@ jobs:
             tests/test_nse_bulk_backfill.py \
             tests/test_cepe_range_liquidity_baseline.py tests/test_cepe_chronological_evaluation.py \
             tests/test_cepe_event_liquidity_candidate.py \
+            tests/test_cepe_regularized_regime_candidate.py \
             -o addopts="" -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence
