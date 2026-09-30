@@ -20,6 +20,9 @@ from dashboard.backend.multibagger_ledger import (
 
 NOW = datetime(2026, 9, 1, 13, tzinfo=timezone.utc)
 SOURCE_BYTES = b"NSE,2026-09-01,RAYMOND,100.00"
+ADJUSTMENT_BYTES = (
+    b"NSE_CORPORATE_ACTIONS,observed=2026-09-01,RAYMOND,NONE"
+)
 FORECAST = {
     "prediction_id": "equity-20260901-raymond-7d-v1",
     "symbol": "RAYMOND",
@@ -39,6 +42,13 @@ FORECAST = {
         "snapshots/nse/2026-09-01/RAYMOND-equity.csv"
     ),
     "adjustment_basis": "corporate-action-series-v1",
+    "adjustment_observed_at": "2026-09-01T10:30:00+00:00",
+    "adjustment_source": "NSE",
+    "adjustment_source_hash": sha256(ADJUSTMENT_BYTES).hexdigest(),
+    "adjustment_source_snapshot": ADJUSTMENT_BYTES,
+    "adjustment_snapshot_uri": (
+        "snapshots/nse/2026-09-01/RAYMOND-corporate-actions.csv"
+    ),
 }
 
 
@@ -49,7 +59,9 @@ def test_builds_deterministic_fail_closed_equity_event():
     assert first["previous_hash"] == GENESIS_HASH
     assert len(first["event_hash"]) == 64
     assert first["entry_source_size_bytes"] == len(SOURCE_BYTES)
+    assert first["adjustment_source_size_bytes"] == len(ADJUSTMENT_BYTES)
     assert "entry_source_snapshot" not in first
+    assert "adjustment_source_snapshot" not in first
     assert first["live_trading_enabled"] is False
     assert first["order_placement_allowed"] is False
     assert verify_chain([first])["record_count"] == 1
@@ -159,5 +171,42 @@ def test_declared_source_hash_must_match_retained_exact_bytes():
     with pytest.raises(LedgerError, match="ENTRY_SOURCE_SNAPSHOT_HASH_MISMATCH"):
         build_issued_forecast(
             {**FORECAST, "entry_source_snapshot": b"different NSE bytes"},
+            now=NOW,
+        )
+
+
+def test_adjustment_basis_requires_point_in_time_exact_source_bytes():
+    without_bytes = dict(FORECAST)
+    without_bytes.pop("adjustment_source_snapshot")
+    with pytest.raises(
+        LedgerError,
+        match="ADJUSTMENT_SOURCE_SNAPSHOT_REQUIRED",
+    ):
+        build_issued_forecast(without_bytes, now=NOW)
+
+    with pytest.raises(
+        LedgerError,
+        match="ADJUSTMENT_SOURCE_SNAPSHOT_HASH_MISMATCH",
+    ):
+        build_issued_forecast(
+            {
+                **FORECAST,
+                "adjustment_source_snapshot": b"different adjustment bytes",
+            },
+            now=NOW,
+        )
+
+    with pytest.raises(LedgerError, match="ADJUSTMENT_SOURCE_UNVERIFIED"):
+        build_issued_forecast(
+            {**FORECAST, "adjustment_source": "BLOG"},
+            now=NOW,
+        )
+
+    with pytest.raises(LedgerError, match="ADJUSTMENT_LOOKAHEAD_FORBIDDEN"):
+        build_issued_forecast(
+            {
+                **FORECAST,
+                "adjustment_observed_at": "2026-09-01T12:01:00+00:00",
+            },
             now=NOW,
         )

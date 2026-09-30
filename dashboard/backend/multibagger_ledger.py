@@ -16,7 +16,7 @@ import re
 from typing import Any, Iterable, Iterator
 
 
-SCHEMA_VERSION = "equity-forecast-ledger-v1"
+SCHEMA_VERSION = "equity-forecast-ledger-v2"
 GENESIS_HASH = "0" * 64
 _APPROVED_SOURCES = {"NSE", "BSE", "DHAN"}
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -91,8 +91,14 @@ def build_issued_forecast(
     issued = _timestamp(forecast.get("issued_at"), "ISSUED_AT")
     due = _timestamp(forecast.get("due_at"), "DUE_AT")
     observed = _timestamp(forecast.get("entry_observed_at"), "ENTRY_OBSERVED_AT")
+    adjustment_observed = _timestamp(
+        forecast.get("adjustment_observed_at"),
+        "ADJUSTMENT_OBSERVED_AT",
+    )
     if not observed <= issued <= current < due:
         raise LedgerError("INVALID_FORECAST_TIME_ORDER")
+    if adjustment_observed > issued:
+        raise LedgerError("ADJUSTMENT_LOOKAHEAD_FORBIDDEN")
 
     prediction_id = str(forecast.get("prediction_id", "")).strip()
     symbol = str(forecast.get("symbol", "")).strip().upper()
@@ -100,6 +106,9 @@ def build_issued_forecast(
     model_version = str(forecast.get("model_version", "")).strip()
     snapshot_uri = str(forecast.get("entry_snapshot_uri", "")).strip()
     adjustment_basis = str(forecast.get("adjustment_basis", "")).strip()
+    adjustment_snapshot_uri = str(
+        forecast.get("adjustment_snapshot_uri", "")
+    ).strip()
     if not prediction_id:
         raise LedgerError("PREDICTION_ID_REQUIRED")
     if not symbol:
@@ -110,10 +119,17 @@ def build_issued_forecast(
         raise LedgerError("ENTRY_SNAPSHOT_URI_REQUIRED")
     if not adjustment_basis:
         raise LedgerError("ADJUSTMENT_BASIS_REQUIRED")
+    if not adjustment_snapshot_uri:
+        raise LedgerError("ADJUSTMENT_SNAPSHOT_URI_REQUIRED")
 
     source = str(forecast.get("entry_source", "")).strip().upper()
     if source not in _APPROVED_SOURCES:
         raise LedgerError("ENTRY_SOURCE_UNVERIFIED")
+    adjustment_source = str(
+        forecast.get("adjustment_source", "")
+    ).strip().upper()
+    if adjustment_source not in _APPROVED_SOURCES:
+        raise LedgerError("ADJUSTMENT_SOURCE_UNVERIFIED")
 
     horizon_days = forecast.get("horizon_days")
     if isinstance(horizon_days, bool) or not isinstance(horizon_days, int):
@@ -133,6 +149,15 @@ def build_issued_forecast(
         entry_source_hash,
         "ENTRY_SOURCE",
     )
+    adjustment_source_hash = _sha256(
+        forecast.get("adjustment_source_hash"),
+        "ADJUSTMENT_SOURCE_HASH",
+    )
+    adjustment_source_snapshot = _verified_snapshot_bytes(
+        forecast.get("adjustment_source_snapshot"),
+        adjustment_source_hash,
+        "ADJUSTMENT_SOURCE",
+    )
 
     sealed = {
         "schema_version": SCHEMA_VERSION,
@@ -143,6 +168,7 @@ def build_issued_forecast(
         "issued_at": issued.isoformat(),
         "due_at": due.isoformat(),
         "entry_observed_at": observed.isoformat(),
+        "adjustment_observed_at": adjustment_observed.isoformat(),
         "entry_adjusted_close": _finite_number(
             forecast.get("entry_adjusted_close"),
             "ENTRY_ADJUSTED_CLOSE",
@@ -160,6 +186,10 @@ def build_issued_forecast(
         "entry_source_size_bytes": len(entry_source_snapshot),
         "entry_snapshot_uri": snapshot_uri,
         "adjustment_basis": adjustment_basis,
+        "adjustment_source": adjustment_source,
+        "adjustment_source_hash": adjustment_source_hash,
+        "adjustment_source_size_bytes": len(adjustment_source_snapshot),
+        "adjustment_snapshot_uri": adjustment_snapshot_uri,
         "previous_hash": _sha256(previous_hash, "PREVIOUS_HASH"),
         "live_trading_enabled": False,
         "order_placement_allowed": False,
