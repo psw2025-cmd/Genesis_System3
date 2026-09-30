@@ -45,6 +45,14 @@ def _sha256(value: Any, field: str) -> str:
     return digest
 
 
+def _verified_snapshot_bytes(value: Any, digest: str, field: str) -> bytes:
+    if not isinstance(value, bytes) or not value:
+        raise LedgerError(f"{field}_SNAPSHOT_REQUIRED")
+    if sha256(value).hexdigest() != digest:
+        raise LedgerError(f"{field}_SNAPSHOT_HASH_MISMATCH")
+    return value
+
+
 def _finite_number(value: Any, field: str, *, positive: bool = False) -> float:
     if isinstance(value, bool):
         raise LedgerError(f"{field}_INVALID")
@@ -116,6 +124,16 @@ def build_issued_forecast(
     if abs(elapsed_days - horizon_days) > 1:
         raise LedgerError("HORIZON_DUE_MISMATCH")
 
+    entry_source_hash = _sha256(
+        forecast.get("entry_source_hash"),
+        "ENTRY_SOURCE_HASH",
+    )
+    entry_source_snapshot = _verified_snapshot_bytes(
+        forecast.get("entry_source_snapshot"),
+        entry_source_hash,
+        "ENTRY_SOURCE",
+    )
+
     sealed = {
         "schema_version": SCHEMA_VERSION,
         "event_type": "EQUITY_FORECAST_ISSUED",
@@ -138,10 +156,8 @@ def build_issued_forecast(
         "model_version": model_version,
         "feature_hash": _sha256(forecast.get("feature_hash"), "FEATURE_HASH"),
         "entry_source": source,
-        "entry_source_hash": _sha256(
-            forecast.get("entry_source_hash"),
-            "ENTRY_SOURCE_HASH",
-        ),
+        "entry_source_hash": entry_source_hash,
+        "entry_source_size_bytes": len(entry_source_snapshot),
         "entry_snapshot_uri": snapshot_uri,
         "adjustment_basis": adjustment_basis,
         "previous_hash": _sha256(previous_hash, "PREVIOUS_HASH"),

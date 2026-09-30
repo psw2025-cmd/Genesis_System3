@@ -34,6 +34,7 @@ FORECAST = {
     "feature_hash": "2" * 64,
     "entry_source": "NSE",
     "entry_source_hash": sha256(SOURCE_BYTES).hexdigest(),
+    "entry_source_snapshot": SOURCE_BYTES,
     "entry_snapshot_uri": (
         "snapshots/nse/2026-09-01/RAYMOND-equity.csv"
     ),
@@ -47,6 +48,8 @@ def test_builds_deterministic_fail_closed_equity_event():
     assert first == second
     assert first["previous_hash"] == GENESIS_HASH
     assert len(first["event_hash"]) == 64
+    assert first["entry_source_size_bytes"] == len(SOURCE_BYTES)
+    assert "entry_source_snapshot" not in first
     assert first["live_trading_enabled"] is False
     assert first["order_placement_allowed"] is False
     assert verify_chain([first])["record_count"] == 1
@@ -143,5 +146,18 @@ def test_lookahead_backfill_and_bad_provenance_fail_closed():
     with pytest.raises(LedgerError, match="HORIZON_DUE_MISMATCH"):
         build_issued_forecast(
             {**FORECAST, "horizon_days": 30},
+            now=NOW,
+        )
+
+
+def test_declared_source_hash_must_match_retained_exact_bytes():
+    without_bytes = dict(FORECAST)
+    without_bytes.pop("entry_source_snapshot")
+    with pytest.raises(LedgerError, match="ENTRY_SOURCE_SNAPSHOT_REQUIRED"):
+        build_issued_forecast(without_bytes, now=NOW)
+
+    with pytest.raises(LedgerError, match="ENTRY_SOURCE_SNAPSHOT_HASH_MISMATCH"):
+        build_issued_forecast(
+            {**FORECAST, "entry_source_snapshot": b"different NSE bytes"},
             now=NOW,
         )
