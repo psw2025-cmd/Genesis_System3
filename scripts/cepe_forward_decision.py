@@ -1,0 +1,201 @@
+"""Validate immutable CE/PE forward decision records.
+
+The first supported decision is ``NO_VERIFIED_SIGNAL``.  It is a real
+point-in-time research decision, not a forecast and not a trading instruction.
+The contract deliberately rejects hidden recommendations, non-zero candidate
+counts, stale-source promotion and claims that an inaccessible source is absent.
+"""
+from __future__ import annotations
+
+from datetime import date, datetime
+from hashlib import sha256
+import json
+from typing import Any
+from urllib.parse import urlsplit
+
+
+SCHEMA = "cepe-forward-decision-v1"
+TASK_ID = "CEPE-NEXT-009"
+EXPECTED_KEYS = {
+    "schema",
+    "task_id",
+    "evidence_class",
+    "session_date",
+    "following_open_at",
+    "issued_at",
+    "source_cutoff_at",
+    "decision",
+    "reason_codes",
+    "source_checks",
+    "candidate_count",
+    "prediction_count",
+    "expected_premium_move_range",
+    "highest_gap_up_contract",
+    "forecast_issued",
+    "forward_decision_issued",
+    "retrospective",
+    "opening_price_is_executable_fill",
+    "verified_forecast_accuracy",
+    "real_money_ready",
+    "live_trading_enabled",
+    "orders_allowed",
+}
+REQUIRED_REASONS = {
+    "FRESH_OFFICIAL_PREVIOUS_SESSION_FO_BYTES_NOT_OBTAINED",
+    "NO_SOURCE_QUALIFIED_EXACT_CONTRACT_CANDIDATE",
+    "NO_CALIBRATED_FORWARD_PROBABILITY",
+}
+
+
+def _instant(value: Any, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid {field}") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError(f"{field} must include timezone")
+    return parsed
+
+
+def _day(value: Any, field: str) -> date:
+    try:
+        return date.fromisoformat(str(value))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid {field}") from exc
+
+
+def _sha(value: Any, field: str) -> str:
+    text = str(value).lower()
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise ValueError(f"Invalid {field}")
+    return text
+
+
+def _official_url(value: Any, field: str) -> str:
+    text = str(value)
+    parsed = urlsplit(text)
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname
+        not in {"nseindia.com", "www.nseindia.com", "nsearchives.nseindia.com"}
+        or parsed.username
+        or parsed.password
+        or parsed.fragment
+        or parsed.port not in (None, 443)
+    ):
+        raise ValueError(f"Invalid {field}")
+    return text
+
+
+def _canonical(payload: dict[str, Any]) -> bytes:
+    return json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")
+
+
+def validate(
+    payload: dict[str, Any], *, externally_published_at: datetime | None = None
+) -> dict[str, Any]:
+    """Return a compact proof summary or fail closed on any hidden claim."""
+    if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
+        raise ValueError("Decision record fields do not match the locked schema")
+    if payload["schema"] != SCHEMA or payload["task_id"] != TASK_ID:
+        raise ValueError("Unsupported decision schema or task")
+    if payload["evidence_class"] != "FORWARD_NO_SIGNAL_DECISION":
+        raise ValueError("Invalid evidence class")
+
+    session_day = _day(payload["session_date"], "session_date")
+    following_open = _instant(payload["following_open_at"], "following_open_at")
+    issued = _instant(payload["issued_at"], "issued_at")
+    source_cutoff = _instant(payload["source_cutoff_at"], "source_cutoff_at")
+    if following_open.date() != session_day:
+        raise ValueError("Following opening date does not match session_date")
+    if not source_cutoff <= issued < following_open:
+        raise ValueError("Decision must be issued after its source cutoff and before opening")
+
+    if payload["decision"] != "NO_VERIFIED_SIGNAL":
+        raise ValueError("Only the fail-closed no-signal decision is supported")
+    reasons = payload["reason_codes"]
+    if (
+        not isinstance(reasons, list)
+        or len(reasons) != len(set(reasons))
+        or set(reasons) != REQUIRED_REASONS
+    ):
+        raise ValueError("No-signal reasons are incomplete or duplicated")
+
+    checks = payload["source_checks"]
+    if not isinstance(checks, list) or len(checks) != 3:
+        raise ValueError("Exactly three source roles are required")
+    by_role: dict[str, dict[str, Any]] = {}
+    for check in checks:
+        if not isinstance(check, dict):
+            raise ValueError("Source check must be an object")
+        role = str(check.get("source_role", ""))
+        if not role or role in by_role:
+            raise ValueError("Missing or duplicate source role")
+        by_role[role] = check
+
+    primary = by_role.get("PRIMARY_FO_PREVIOUS_SESSION")
+    cached = by_role.get("CACHED_HISTORICAL_CHECKPOINT")
+    secondary = by_role.get("SECONDARY_DISCOVERY_ONLY")
+    if not all((primary, cached, secondary)):
+        raise ValueError("Required source role missing")
+    _official_url(primary.get("url"), "primary source URL")
+    if primary.get("result") != "NOT_OBTAINED" or primary.get("interpretation") != "NOT_PROVEN":
+        raise ValueError("Unobtainable primary bytes cannot be promoted to an absence claim")
+    if "not evidence" not in str(primary.get("note", "")).lower():
+        raise ValueError("Primary-source limitation must remain explicit")
+
+    _sha(cached.get("archive_sha256"), "archive_sha256")
+    _sha(cached.get("latest_fo_csv_sha256"), "latest_fo_csv_sha256")
+    _sha(cached.get("latest_fo_zip_sha256"), "latest_fo_zip_sha256")
+    if _day(cached.get("latest_fo_observation_date"), "latest_fo_observation_date") >= session_day:
+        raise ValueError("Cached evidence is not stale for the stated session")
+    if cached.get("result") != "HISTORICAL_ONLY_STALE_FOR_SESSION":
+        raise ValueError("Cached evidence must remain historical-only")
+
+    if secondary.get("result") != "ACCESS_DENIED_NOT_USED":
+        raise ValueError("Secondary source access state changed")
+    if secondary.get("interpretation") != "NOT_A_PRIMARY_CONTRACT_SOURCE":
+        raise ValueError("Secondary discovery cannot qualify a contract")
+
+    null_fields = (
+        "expected_premium_move_range",
+        "highest_gap_up_contract",
+        "verified_forecast_accuracy",
+    )
+    if any(payload[field] is not None for field in null_fields):
+        raise ValueError("No-signal decision cannot contain forecast or performance values")
+    if payload["candidate_count"] != 0 or payload["prediction_count"] != 0:
+        raise ValueError("No-signal decision must have zero candidates and predictions")
+    if payload["forecast_issued"] is not False or payload["forward_decision_issued"] is not True:
+        raise ValueError("Decision/forecast state is inconsistent")
+    for field in (
+        "retrospective",
+        "opening_price_is_executable_fill",
+        "real_money_ready",
+        "live_trading_enabled",
+        "orders_allowed",
+    ):
+        if payload[field] is not False:
+            raise ValueError(f"Unsafe or dishonest flag: {field}")
+
+    published_before_open = None
+    if externally_published_at is not None:
+        if externally_published_at.tzinfo is None or externally_published_at.utcoffset() is None:
+            raise ValueError("externally_published_at must include timezone")
+        if not issued <= externally_published_at < following_open:
+            raise ValueError("External publication did not occur between issue and opening")
+        published_before_open = True
+
+    return {
+        "task_id": TASK_ID,
+        "status": "FORWARD_NO_SIGNAL_SEALED",
+        "session_date": session_day.isoformat(),
+        "decision_record_sha256": sha256(_canonical(payload)).hexdigest(),
+        "candidate_count": 0,
+        "prediction_count": 0,
+        "published_before_open": published_before_open,
+        "real_money_ready": False,
+        "orders_allowed": False,
+    }

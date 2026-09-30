@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta, timezone
+from hashlib import sha256
 import json
 from pathlib import Path
 
 import pytest
 
 from scripts.cepe_forward_calibration import report
+from scripts.cepe_forward_decision import validate as validate_decision
 
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -141,3 +143,61 @@ def test_registry_matches_code_governance_and_has_no_performance_claim():
     assert registry["forward_predictions"] == 0
     assert registry["forward_outcomes"] == 0
     assert registry["orders_allowed"] is False
+
+
+def test_real_forward_no_signal_record_was_sealed_before_open():
+    path = Path("research/forward/cepe/2026-09-30_no_verified_signal.json")
+    raw = path.read_bytes()
+    assert sha256(raw).hexdigest() == (
+        "1a273996c1f150ccfecef2f380c8beea3cc85162bb11dfa1e7ad255963e3f9c3"
+    )
+    result = validate_decision(
+        json.loads(raw),
+        externally_published_at=datetime(2026, 9, 30, 9, 9, 59, tzinfo=IST),
+    )
+    assert result["status"] == "FORWARD_NO_SIGNAL_SEALED"
+    assert result["published_before_open"] is True
+    assert result["candidate_count"] == result["prediction_count"] == 0
+    assert result["real_money_ready"] is False
+    assert result["orders_allowed"] is False
+
+
+@pytest.mark.parametrize(
+    "field,value,match",
+    [
+        ("candidate_count", 1, "zero candidates"),
+        ("prediction_count", 1, "zero candidates"),
+        ("highest_gap_up_contract", {"symbol": "ABC"}, "forecast or performance"),
+        ("forecast_issued", True, "inconsistent"),
+        ("retrospective", True, "retrospective"),
+        ("orders_allowed", True, "orders_allowed"),
+        ("issued_at", "2026-09-30T09:15:00+05:30", "before opening"),
+    ],
+)
+def test_no_signal_contract_rejects_hindsight_or_hidden_trade_claims(field, value, match):
+    record = json.loads(
+        Path("research/forward/cepe/2026-09-30_no_verified_signal.json").read_text()
+    )
+    record[field] = value
+    with pytest.raises(ValueError, match=match):
+        validate_decision(record)
+
+
+def test_no_signal_contract_rejects_absence_claim_unknown_field_and_late_publication():
+    path = Path("research/forward/cepe/2026-09-30_no_verified_signal.json")
+    record = json.loads(path.read_text())
+    record["source_checks"][0]["interpretation"] = "OFFICIAL_FILE_ABSENT"
+    with pytest.raises(ValueError, match="absence claim"):
+        validate_decision(record)
+
+    record = json.loads(path.read_text())
+    record["trade_action"] = "BUY"
+    with pytest.raises(ValueError, match="locked schema"):
+        validate_decision(record)
+
+    record = json.loads(path.read_text())
+    with pytest.raises(ValueError, match="between issue and opening"):
+        validate_decision(
+            record,
+            externally_published_at=datetime(2026, 9, 30, 9, 15, tzinfo=IST),
+        )
