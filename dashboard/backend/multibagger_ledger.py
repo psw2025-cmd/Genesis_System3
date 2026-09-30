@@ -13,6 +13,7 @@ from math import isfinite
 import os
 from pathlib import Path
 import re
+import stat
 from typing import Any, Iterable, Iterator
 
 
@@ -100,7 +101,7 @@ def build_issued_forecast(
     previous_hash: str = GENESIS_HASH,
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Validate and seal one forecast that existed before its due time."""
+    """Build an unpersisted event; append additionally verifies retained files."""
     current = now or datetime.now(timezone.utc)
     if current.tzinfo is None or current.utcoffset() is None:
         raise LedgerError("NOW_TIMEZONE_REQUIRED")
@@ -243,11 +244,89 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
         count += 1
     return {
         "status": "VERIFIED" if count else "EMPTY",
+        "verification_scope": "HASH_CHAIN_ONLY",
         "record_count": count,
         "head_hash": previous,
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }
+
+
+def _retained_snapshot_digest(root: Path, reference: str, field: str) -> tuple[str, int]:
+    """Hash a regular retained file, rejecting links and replacement during read."""
+    parts = _snapshot_reference(reference, f"{field}_SNAPSHOT_URI").split("/")
+
+    def checked_path() -> Path:
+        candidate = root
+        for part in parts:
+            candidate = candidate / part
+            info = candidate.lstat()
+            reparse = getattr(info, "st_file_attributes", 0) & getattr(
+                stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0
+            )
+            if stat.S_ISLNK(info.st_mode) or reparse:
+                raise LedgerError(f"{field}_RETAINED_LINK_FORBIDDEN")
+        candidate.resolve(strict=True).relative_to(root)
+        return candidate
+
+    try:
+        path = checked_path()
+        before = path.stat()
+        if not stat.S_ISREG(before.st_mode):
+            raise LedgerError(f"{field}_RETAINED_NOT_REGULAR")
+        flags = (
+            os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0)
+        )
+        descriptor = os.open(path, flags)
+        with os.fdopen(descriptor, "rb") as handle:
+            opened = os.fstat(handle.fileno())
+            if not stat.S_ISREG(opened.st_mode) or (before.st_dev, before.st_ino) != (
+                opened.st_dev, opened.st_ino
+            ):
+                raise LedgerError(f"{field}_RETAINED_CHANGED_DURING_READ")
+            digest = sha256()
+            size = 0
+            for chunk in iter(lambda: handle.read(65536), b""):
+                digest.update(chunk)
+                size += len(chunk)
+            after = os.fstat(handle.fileno())
+            retained = checked_path().stat()
+            def identity(info: os.stat_result) -> tuple[int, ...]:
+                return (
+                    info.st_dev, info.st_ino, info.st_size,
+                    info.st_mtime_ns, info.st_ctime_ns,
+                )
+            if identity(opened) != identity(after) or identity(after) != identity(retained):
+                raise LedgerError(f"{field}_RETAINED_CHANGED_DURING_READ")
+        return digest.hexdigest(), size
+    except LedgerError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise LedgerError(f"{field}_RETAINED_UNAVAILABLE") from exc
+
+
+def verify_retained_evidence(record: dict[str, Any], *, evidence_root: Path) -> None:
+    """Recheck both source files under the caller's explicitly approved archive root.
+
+    This proves byte retention at verification time, not exchange authenticity,
+    publication timing, or permanent immutability of the underlying filesystem.
+    """
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        if not root.is_dir():
+            raise LedgerError("EVIDENCE_ROOT_NOT_DIRECTORY")
+    except (OSError, TypeError, ValueError) as exc:
+        raise LedgerError("EVIDENCE_ROOT_UNAVAILABLE") from exc
+    for source in ("entry", "adjustment"):
+        field = source.upper()
+        expected_hash = _sha256(record.get(f"{source}_source_hash"), f"{field}_SOURCE_HASH")
+        expected_size = record.get(f"{source}_source_size_bytes")
+        if isinstance(expected_size, bool) or not isinstance(expected_size, int) or expected_size <= 0:
+            raise LedgerError(f"{field}_RETAINED_SIZE_INVALID")
+        digest, size = _retained_snapshot_digest(root, record.get(f"{source}_snapshot_uri"), field)
+        if digest != expected_hash or size != expected_size:
+            raise LedgerError(f"{field}_RETAINED_HASH_OR_SIZE_MISMATCH")
 
 
 @contextmanager
@@ -286,7 +365,7 @@ def _ledger_lock(path: Path, *, exclusive: bool) -> Iterator[None]:
                 fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
-def _read_ledger_unlocked(path: Path) -> list[dict[str, Any]]:
+def _read_ledger_unlocked(path: Path, *, evidence_root: Path) -> list[dict[str, Any]]:
     """Load and verify NDJSON while the caller holds the ledger lock."""
     if not path.exists():
         return []
@@ -298,24 +377,27 @@ def _read_ledger_unlocked(path: Path) -> list[dict[str, Any]]:
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise LedgerError("LEDGER_INVALID_JSON") from exc
     verify_chain(records)
+    for record in records:
+        verify_retained_evidence(record, evidence_root=evidence_root)
     return records
 
 
-def read_ledger(path: Path) -> list[dict[str, Any]]:
-    """Load a verified snapshot while excluding concurrent writers."""
+def read_ledger(path: Path, *, evidence_root: Path) -> list[dict[str, Any]]:
+    """Verify the chain and retained bytes while excluding concurrent writers."""
     with _ledger_lock(path, exclusive=False):
-        return _read_ledger_unlocked(path)
+        return _read_ledger_unlocked(path, evidence_root=evidence_root)
 
 
 def append_issued_forecast(
     path: Path,
     forecast: dict[str, Any],
     *,
+    evidence_root: Path,
     now: datetime | None = None,
 ) -> dict[str, Any]:
     """Append one fsync'd forecast in a serialized read-build-write section."""
     with _ledger_lock(path, exclusive=True):
-        records = _read_ledger_unlocked(path)
+        records = _read_ledger_unlocked(path, evidence_root=evidence_root)
         prediction_id = str(forecast.get("prediction_id", "")).strip()
         if any(row["prediction_id"] == prediction_id for row in records):
             raise LedgerError("PREDICTION_ID_DUPLICATE")
@@ -325,6 +407,7 @@ def append_issued_forecast(
             previous_hash=previous_hash,
             now=now,
         )
+        verify_retained_evidence(sealed, evidence_root=evidence_root)
         payload = json.dumps(
             sealed,
             sort_keys=True,

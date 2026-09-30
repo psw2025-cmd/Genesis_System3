@@ -52,6 +52,16 @@ FORECAST = {
 }
 
 
+@pytest.fixture
+def evidence_root(tmp_path):
+    root = tmp_path / "evidence"
+    for key, payload in (("entry", SOURCE_BYTES), ("adjustment", ADJUSTMENT_BYTES)):
+        path = root / FORECAST[f"{key}_snapshot_uri"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+    return root
+
+
 def test_builds_deterministic_fail_closed_equity_event():
     first = build_issued_forecast(FORECAST, now=NOW)
     second = build_issued_forecast(FORECAST, now=NOW)
@@ -67,25 +77,25 @@ def test_builds_deterministic_fail_closed_equity_event():
     assert verify_chain([first])["record_count"] == 1
 
 
-def test_append_preserves_chain_and_rejects_duplicate(tmp_path):
+def test_append_preserves_chain_and_rejects_duplicate(tmp_path, evidence_root):
     ledger = tmp_path / "equity_forecasts.ndjson"
-    first = append_issued_forecast(ledger, FORECAST, now=NOW)
+    first = append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
     later = {
         **FORECAST,
         "prediction_id": "equity-20260901-raymond-30d-v1",
         "horizon_days": 30,
         "due_at": "2026-10-01T12:00:00+00:00",
     }
-    second = append_issued_forecast(ledger, later, now=NOW)
-    records = read_ledger(ledger)
+    second = append_issued_forecast(ledger, later, evidence_root=evidence_root, now=NOW)
+    records = read_ledger(ledger, evidence_root=evidence_root)
     assert len(records) == 2
     assert second["previous_hash"] == first["event_hash"]
     assert verify_chain(records)["head_hash"] == second["event_hash"]
     with pytest.raises(LedgerError, match="PREDICTION_ID_DUPLICATE"):
-        append_issued_forecast(ledger, FORECAST, now=NOW)
+        append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
 
 
-def test_exclusive_lock_serializes_a_competing_writer(tmp_path):
+def test_exclusive_lock_serializes_a_competing_writer(tmp_path, evidence_root):
     ledger = tmp_path / "equity_forecasts.ndjson"
     with ThreadPoolExecutor(max_workers=1) as pool:
         with _ledger_lock(ledger, exclusive=True):
@@ -93,18 +103,19 @@ def test_exclusive_lock_serializes_a_competing_writer(tmp_path):
                 append_issued_forecast,
                 ledger,
                 FORECAST,
+                evidence_root=evidence_root,
                 now=NOW,
             )
             with pytest.raises(FutureTimeout):
                 pending.result(timeout=0.05)
         sealed = pending.result(timeout=2)
 
-    records = read_ledger(ledger)
+    records = read_ledger(ledger, evidence_root=evidence_root)
     assert records == [sealed]
     assert verify_chain(records)["status"] == "VERIFIED"
 
 
-def test_concurrent_unique_forecasts_preserve_every_record_and_hash_link(tmp_path):
+def test_concurrent_unique_forecasts_preserve_every_record_and_hash_link(tmp_path, evidence_root):
     ledger = tmp_path / "equity_forecasts.ndjson"
     forecasts = [
         {**FORECAST, "prediction_id": f"equity-concurrent-{index:02d}"}
@@ -116,13 +127,14 @@ def test_concurrent_unique_forecasts_preserve_every_record_and_hash_link(tmp_pat
                 lambda forecast: append_issued_forecast(
                     ledger,
                     forecast,
+                    evidence_root=evidence_root,
                     now=NOW,
                 ),
                 forecasts,
             )
         )
 
-    records = read_ledger(ledger)
+    records = read_ledger(ledger, evidence_root=evidence_root)
     assert len(sealed) == len(records) == 16
     assert {row["prediction_id"] for row in records} == {
         row["prediction_id"] for row in forecasts
@@ -130,9 +142,9 @@ def test_concurrent_unique_forecasts_preserve_every_record_and_hash_link(tmp_pat
     assert verify_chain(records)["head_hash"] == records[-1]["event_hash"]
 
 
-def test_tampering_and_truncation_are_detected(tmp_path):
+def test_tampering_and_truncation_are_detected(tmp_path, evidence_root):
     ledger = tmp_path / "equity_forecasts.ndjson"
-    sealed = append_issued_forecast(ledger, FORECAST, now=NOW)
+    sealed = append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
 
     tampered = deepcopy(sealed)
     tampered["predicted_return_pct"] = 99.0
@@ -141,7 +153,7 @@ def test_tampering_and_truncation_are_detected(tmp_path):
 
     ledger.write_text(json.dumps(sealed), encoding="utf-8")
     with pytest.raises(LedgerError, match="LEDGER_TRUNCATED"):
-        read_ledger(ledger)
+        read_ledger(ledger, evidence_root=evidence_root)
 
 
 def test_lookahead_backfill_and_bad_provenance_fail_closed():
@@ -244,3 +256,68 @@ def test_snapshot_references_reject_spoofing_and_path_traversal(
 ):
     with pytest.raises(LedgerError, match=f"{field.upper()}_{error}"):
         build_issued_forecast({**FORECAST, field: value}, now=NOW)
+
+
+@pytest.mark.parametrize("source", ["entry", "adjustment"])
+@pytest.mark.parametrize("change", ["missing", "replaced", "directory"])
+def test_append_rejects_unretained_source_without_writing(tmp_path, evidence_root, source, change):
+    path = evidence_root / FORECAST[f"{source}_snapshot_uri"]
+    path.unlink()
+    if change == "replaced":
+        path.write_bytes(b"replacement")
+    elif change == "directory":
+        path.mkdir()
+    ledger = tmp_path / "equity.ndjson"
+    with pytest.raises(LedgerError, match=f"{source.upper()}_RETAINED_"):
+        append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
+    assert not ledger.exists()
+
+
+@pytest.mark.parametrize("source", ["entry", "adjustment"])
+@pytest.mark.parametrize("change", ["missing", "replaced"])
+def test_read_and_later_append_recheck_every_retained_source(tmp_path, evidence_root, source, change):
+    ledger = tmp_path / "equity.ndjson"
+    sealed = append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
+    original = ledger.read_bytes()
+    path = evidence_root / FORECAST[f"{source}_snapshot_uri"]
+    path.unlink()
+    if change == "replaced":
+        path.write_bytes(b"replacement")
+    assert verify_chain([sealed])["verification_scope"] == "HASH_CHAIN_ONLY"
+    with pytest.raises(LedgerError, match=f"{source.upper()}_RETAINED_"):
+        read_ledger(ledger, evidence_root=evidence_root)
+    with pytest.raises(LedgerError, match=f"{source.upper()}_RETAINED_"):
+        append_issued_forecast(
+            ledger, {**FORECAST, "prediction_id": "later"}, evidence_root=evidence_root, now=NOW
+        )
+    assert ledger.read_bytes() == original
+
+
+@pytest.mark.parametrize("link_parent", [False, True])
+def test_retained_links_rejected_even_with_matching_bytes(tmp_path, evidence_root, link_parent):
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    target = outside / "source.csv"
+    target.write_bytes(SOURCE_BYTES)
+    path = evidence_root / FORECAST["entry_snapshot_uri"]
+    path.unlink()
+    if link_parent:
+        link = evidence_root / "snapshots" / "linked"
+        link.symlink_to(outside, target_is_directory=True)
+        forecast = {**FORECAST, "entry_snapshot_uri": "snapshots/linked/source.csv"}
+    else:
+        path.symlink_to(target)
+        forecast = FORECAST
+    with pytest.raises(LedgerError, match="ENTRY_RETAINED_LINK_FORBIDDEN"):
+        append_issued_forecast(tmp_path / "equity.ndjson", forecast, evidence_root=evidence_root, now=NOW)
+
+
+def test_evidence_root_is_mandatory_and_cannot_be_replaced_by_another_archive(tmp_path, evidence_root):
+    ledger = tmp_path / "equity.ndjson"
+    with pytest.raises(TypeError, match="evidence_root"):
+        append_issued_forecast(ledger, FORECAST, now=NOW)
+    append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
+    with pytest.raises(TypeError, match="evidence_root"):
+        read_ledger(ledger)
+    with pytest.raises(LedgerError, match="EVIDENCE_ROOT_UNAVAILABLE"):
+        read_ledger(ledger, evidence_root=tmp_path / "absent")
