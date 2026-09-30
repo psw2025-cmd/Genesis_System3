@@ -5,6 +5,7 @@ fetch market data, evaluate alpha, or place broker orders.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from hashlib import sha256
 import json
@@ -12,7 +13,7 @@ from math import isfinite
 import os
 from pathlib import Path
 import re
-from typing import Any, Iterable
+from typing import Any, Iterable, Iterator
 
 
 SCHEMA_VERSION = "equity-forecast-ledger-v1"
@@ -185,8 +186,44 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def read_ledger(path: Path) -> list[dict[str, Any]]:
-    """Load and verify an NDJSON ledger."""
+@contextmanager
+def _ledger_lock(path: Path, *, exclusive: bool) -> Iterator[None]:
+    """Hold a process-safe lock without deleting its stable lock inode.
+
+    POSIX readers share the lock; Windows readers use the same exclusive byte
+    lock as writers because the standard library exposes no shared equivalent.
+    Keeping the lock file avoids an unlink/recreate race between processes.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_name(f".{path.name}.lock")
+    with lock_path.open("a+b") as handle:
+        if os.name == "nt":
+            import msvcrt
+
+            handle.seek(0, os.SEEK_END)
+            if handle.tell() == 0:
+                handle.write(b"\0")
+                handle.flush()
+            handle.seek(0)
+            msvcrt.locking(handle.fileno(), msvcrt.LK_LOCK, 1)
+            try:
+                yield
+            finally:
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+
+            operation = fcntl.LOCK_EX if exclusive else fcntl.LOCK_SH
+            fcntl.flock(handle.fileno(), operation)
+            try:
+                yield
+            finally:
+                fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def _read_ledger_unlocked(path: Path) -> list[dict[str, Any]]:
+    """Load and verify NDJSON while the caller holds the ledger lock."""
     if not path.exists():
         return []
     raw = path.read_bytes()
@@ -200,34 +237,40 @@ def read_ledger(path: Path) -> list[dict[str, Any]]:
     return records
 
 
+def read_ledger(path: Path) -> list[dict[str, Any]]:
+    """Load a verified snapshot while excluding concurrent writers."""
+    with _ledger_lock(path, exclusive=False):
+        return _read_ledger_unlocked(path)
+
+
 def append_issued_forecast(
     path: Path,
     forecast: dict[str, Any],
     *,
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Append one fsync'd forecast after validating the full existing chain."""
-    records = read_ledger(path)
-    prediction_id = str(forecast.get("prediction_id", "")).strip()
-    if any(row["prediction_id"] == prediction_id for row in records):
-        raise LedgerError("PREDICTION_ID_DUPLICATE")
-    previous_hash = records[-1]["event_hash"] if records else GENESIS_HASH
-    sealed = build_issued_forecast(
-        forecast,
-        previous_hash=previous_hash,
-        now=now,
-    )
-    path.parent.mkdir(parents=True, exist_ok=True)
-    payload = json.dumps(
-        sealed,
-        sort_keys=True,
-        separators=(",", ":"),
-        ensure_ascii=True,
-        allow_nan=False,
-    )
-    with path.open("a", encoding="utf-8", newline="\n") as handle:
-        handle.write(payload + "\n")
-        handle.flush()
-        os.fsync(handle.fileno())
-    verify_chain([*records, sealed])
-    return sealed
+    """Append one fsync'd forecast in a serialized read-build-write section."""
+    with _ledger_lock(path, exclusive=True):
+        records = _read_ledger_unlocked(path)
+        prediction_id = str(forecast.get("prediction_id", "")).strip()
+        if any(row["prediction_id"] == prediction_id for row in records):
+            raise LedgerError("PREDICTION_ID_DUPLICATE")
+        previous_hash = records[-1]["event_hash"] if records else GENESIS_HASH
+        sealed = build_issued_forecast(
+            forecast,
+            previous_hash=previous_hash,
+            now=now,
+        )
+        payload = json.dumps(
+            sealed,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        verify_chain([*records, sealed])
+        return sealed
