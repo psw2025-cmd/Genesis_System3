@@ -20,6 +20,8 @@ SCHEMA_VERSION = "equity-forecast-ledger-v2"
 GENESIS_HASH = "0" * 64
 _APPROVED_SOURCES = {"NSE", "BSE", "DHAN"}
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_SNAPSHOT_REF_RE = re.compile(r"^[A-Za-z0-9._/-]+$")
+_SNAPSHOT_PREFIXES = ("snapshots/", "research/evidence/")
 
 
 class LedgerError(ValueError):
@@ -50,6 +52,22 @@ def _verified_snapshot_bytes(value: Any, digest: str, field: str) -> bytes:
         raise LedgerError(f"{field}_SNAPSHOT_REQUIRED")
     if sha256(value).hexdigest() != digest:
         raise LedgerError(f"{field}_SNAPSHOT_HASH_MISMATCH")
+    return value
+
+
+def _snapshot_reference(value: Any, field: str) -> str:
+    """Accept only repository-style references to retained immutable bytes."""
+    if not isinstance(value, str) or not value:
+        raise LedgerError(f"{field}_REQUIRED")
+    if value != value.strip():
+        raise LedgerError(f"{field}_INVALID")
+    if len(value) > 512 or not _SNAPSHOT_REF_RE.fullmatch(value):
+        raise LedgerError(f"{field}_INVALID")
+    segments = value.split("/")
+    if any(segment in {"", ".", ".."} for segment in segments):
+        raise LedgerError(f"{field}_INVALID")
+    if not value.startswith(_SNAPSHOT_PREFIXES):
+        raise LedgerError(f"{field}_UNAPPROVED_PREFIX")
     return value
 
 
@@ -104,23 +122,23 @@ def build_issued_forecast(
     symbol = str(forecast.get("symbol", "")).strip().upper()
     model_name = str(forecast.get("model_name", "")).strip()
     model_version = str(forecast.get("model_version", "")).strip()
-    snapshot_uri = str(forecast.get("entry_snapshot_uri", "")).strip()
+    snapshot_uri = _snapshot_reference(
+        forecast.get("entry_snapshot_uri"),
+        "ENTRY_SNAPSHOT_URI",
+    )
     adjustment_basis = str(forecast.get("adjustment_basis", "")).strip()
-    adjustment_snapshot_uri = str(
-        forecast.get("adjustment_snapshot_uri", "")
-    ).strip()
+    adjustment_snapshot_uri = _snapshot_reference(
+        forecast.get("adjustment_snapshot_uri"),
+        "ADJUSTMENT_SNAPSHOT_URI",
+    )
     if not prediction_id:
         raise LedgerError("PREDICTION_ID_REQUIRED")
     if not symbol:
         raise LedgerError("SYMBOL_REQUIRED")
     if not model_name or not model_version:
         raise LedgerError("MODEL_IDENTITY_REQUIRED")
-    if not snapshot_uri:
-        raise LedgerError("ENTRY_SNAPSHOT_URI_REQUIRED")
     if not adjustment_basis:
         raise LedgerError("ADJUSTMENT_BASIS_REQUIRED")
-    if not adjustment_snapshot_uri:
-        raise LedgerError("ADJUSTMENT_SNAPSHOT_URI_REQUIRED")
 
     source = str(forecast.get("entry_source", "")).strip().upper()
     if source not in _APPROVED_SOURCES:

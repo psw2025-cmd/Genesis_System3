@@ -210,3 +210,37 @@ def test_adjustment_basis_requires_point_in_time_exact_source_bytes():
             },
             now=NOW,
         )
+
+
+@pytest.mark.parametrize(
+    "field,value,error",
+    [
+        ("entry_snapshot_uri", "../../tmp/source.csv", "INVALID"),
+        ("entry_snapshot_uri", "/tmp/source.csv", "INVALID"),
+        ("entry_snapshot_uri", "https://nse.example/file.csv", "INVALID"),
+        ("entry_snapshot_uri", r"snapshots\nse\file.csv", "INVALID"),
+        ("entry_snapshot_uri", "snapshots/nse/../file.csv", "INVALID"),
+        (
+            "adjustment_snapshot_uri",
+            "research/evidence/%2e%2e/file.csv",
+            "INVALID",
+        ),
+        (
+            "adjustment_snapshot_uri",
+            "other/archive/file.csv",
+            "UNAPPROVED_PREFIX",
+        ),
+        (
+            "adjustment_snapshot_uri",
+            " snapshots/nse/file.csv",
+            "INVALID",
+        ),
+    ],
+)
+def test_snapshot_references_reject_spoofing_and_path_traversal(
+    field,
+    value,
+    error,
+):
+    with pytest.raises(LedgerError, match=f"{field.upper()}_{error}"):
+        build_issued_forecast({**FORECAST, field: value}, now=NOW)
