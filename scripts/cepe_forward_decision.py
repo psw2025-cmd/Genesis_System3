@@ -16,6 +16,10 @@ from urllib.parse import urlsplit
 
 SCHEMA = "cepe-forward-decision-v1"
 TASK_ID = "CEPE-NEXT-009"
+GITHUB_OWNER = "psw2025-cmd"
+GITHUB_REPOSITORY = "Genesis_System3"
+GITHUB_PR_NUMBER = 472
+GITHUB_APP_SLUG = "chatgpt-codex-connector"
 EXPECTED_KEYS = {
     "schema",
     "task_id",
@@ -69,6 +73,32 @@ def _sha(value: Any, field: str) -> str:
     if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
         raise ValueError(f"Invalid {field}")
     return text
+
+
+def _git_sha(value: Any, field: str) -> str:
+    text = str(value).lower()
+    if len(text) != 40 or any(char not in "0123456789abcdef" for char in text):
+        raise ValueError(f"Invalid {field}")
+    return text
+
+
+def _unique_object(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError(f"Duplicate publication receipt key: {key}")
+        result[key] = value
+    return result
+
+
+def _json_object(raw: bytes, field: str) -> dict[str, Any]:
+    try:
+        parsed = json.loads(raw.decode("utf-8"), object_pairs_hook=_unique_object)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Invalid {field}") from exc
+    if not isinstance(parsed, dict):
+        raise ValueError(f"{field} must be a JSON object")
+    return parsed
 
 
 def _official_url(value: Any, field: str) -> str:
@@ -199,3 +229,87 @@ def validate(
         "real_money_ready": False,
         "orders_allowed": False,
     }
+
+
+def validate_github_publication(
+    payload: dict[str, Any],
+    *,
+    decision_bytes: bytes,
+    publication_receipt_bytes: bytes,
+    expected_commit_sha: str,
+) -> dict[str, Any]:
+    """Bind a decision to an unedited GitHub API comment receipt.
+
+    The receipt is stored as the exact API response bytes.  This validates its
+    repository/PR identity, GitHub server timestamp window, author/app identity,
+    and body bindings to the exact decision bytes and original decision commit.
+    It does not turn a no-signal decision into a forecast or performance claim.
+    """
+    summary = validate(payload)
+    stored_decision = _json_object(decision_bytes, "decision bytes")
+    if stored_decision != payload:
+        raise ValueError("Decision bytes do not match the validated payload")
+
+    decision_sha = sha256(decision_bytes).hexdigest()
+    commit_sha = _git_sha(expected_commit_sha, "expected_commit_sha")
+    receipt = _json_object(publication_receipt_bytes, "publication receipt")
+
+    comment_id = receipt.get("id")
+    if type(comment_id) is not int or comment_id <= 0:
+        raise ValueError("Invalid publication comment id")
+    api_base = (
+        f"https://api.github.com/repos/{GITHUB_OWNER}/{GITHUB_REPOSITORY}"
+    )
+    expected_locations = {
+        "url": f"{api_base}/issues/comments/{comment_id}",
+        "issue_url": f"{api_base}/issues/{GITHUB_PR_NUMBER}",
+        "html_url": (
+            f"https://github.com/{GITHUB_OWNER}/{GITHUB_REPOSITORY}/pull/"
+            f"{GITHUB_PR_NUMBER}#issuecomment-{comment_id}"
+        ),
+    }
+    if any(receipt.get(key) != value for key, value in expected_locations.items()):
+        raise ValueError("Publication receipt does not identify the locked PR comment")
+
+    user = receipt.get("user")
+    app = receipt.get("performed_via_github_app")
+    if not isinstance(user, dict) or user.get("login") != GITHUB_OWNER:
+        raise ValueError("Publication receipt owner does not match")
+    if receipt.get("author_association") != "OWNER":
+        raise ValueError("Publication receipt is not owner-authored")
+    if not isinstance(app, dict) or app.get("slug") != GITHUB_APP_SLUG:
+        raise ValueError("Publication receipt app does not match")
+
+    created = _instant(receipt.get("created_at"), "publication created_at")
+    updated = _instant(receipt.get("updated_at"), "publication updated_at")
+    if updated != created:
+        raise ValueError("Publication receipt was modified after creation")
+    issued = _instant(payload["issued_at"], "issued_at")
+    following_open = _instant(payload["following_open_at"], "following_open_at")
+    if not issued <= created < following_open:
+        raise ValueError("GitHub publication did not occur between issue and opening")
+
+    body = receipt.get("body")
+    required_bindings = (
+        f"`{commit_sha}`",
+        f"`{decision_sha}`",
+        "qualified candidates **0**; forecasts **0**; outcomes **0**",
+        "Decision: **NO VERIFIED SIGNAL**",
+    )
+    if not isinstance(body, str) or any(item not in body for item in required_bindings):
+        raise ValueError("Publication receipt body does not bind the decision proof")
+
+    summary.update(
+        {
+            "published_before_open": True,
+            "publication_status": "GITHUB_SERVER_TIMESTAMP_RECEIPT_VERIFIED",
+            "publication_comment_id": comment_id,
+            "published_at": created.isoformat(),
+            "publication_receipt_sha256": sha256(
+                publication_receipt_bytes
+            ).hexdigest(),
+            "decision_file_sha256": decision_sha,
+            "publication_commit_sha": commit_sha,
+        }
+    )
+    return summary

@@ -6,7 +6,10 @@ from pathlib import Path
 import pytest
 
 from scripts.cepe_forward_calibration import report
-from scripts.cepe_forward_decision import validate as validate_decision
+from scripts.cepe_forward_decision import (
+    validate as validate_decision,
+    validate_github_publication,
+)
 
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -148,18 +151,98 @@ def test_registry_matches_code_governance_and_has_no_performance_claim():
 def test_real_forward_no_signal_record_was_sealed_before_open():
     path = Path("research/forward/cepe/2026-09-30_no_verified_signal.json")
     raw = path.read_bytes()
+    receipt = Path(
+        "research/evidence/cepe/2026-09-30_no_signal_publication_comment.json"
+    ).read_bytes()
     assert sha256(raw).hexdigest() == (
         "1a273996c1f150ccfecef2f380c8beea3cc85162bb11dfa1e7ad255963e3f9c3"
     )
-    result = validate_decision(
+    assert sha256(receipt).hexdigest() == (
+        "47d224edaf8879e717c1b0edb07bca81339fb47313e6cdc987c5309d78817aa7"
+    )
+    result = validate_github_publication(
         json.loads(raw),
-        externally_published_at=datetime(2026, 9, 30, 9, 9, 59, tzinfo=IST),
+        decision_bytes=raw,
+        publication_receipt_bytes=receipt,
+        expected_commit_sha="ce9a1327321691e474fdfefa853a08fd499959cf",
     )
     assert result["status"] == "FORWARD_NO_SIGNAL_SEALED"
     assert result["published_before_open"] is True
+    assert result["publication_status"] == (
+        "GITHUB_SERVER_TIMESTAMP_RECEIPT_VERIFIED"
+    )
+    assert result["publication_comment_id"] == 5903586616
+    assert result["published_at"] == "2026-09-30T03:40:25+00:00"
     assert result["candidate_count"] == result["prediction_count"] == 0
     assert result["real_money_ready"] is False
     assert result["orders_allowed"] is False
+
+
+def _real_decision_and_receipt():
+    decision = Path(
+        "research/forward/cepe/2026-09-30_no_verified_signal.json"
+    ).read_bytes()
+    receipt = Path(
+        "research/evidence/cepe/2026-09-30_no_signal_publication_comment.json"
+    ).read_bytes()
+    return decision, json.loads(receipt)
+
+
+@pytest.mark.parametrize(
+    "mutation,match",
+    [
+        (
+            lambda receipt: receipt.update(updated_at="2026-09-30T03:41:25Z"),
+            "modified after creation",
+        ),
+        (
+            lambda receipt: receipt.update(
+                created_at="2026-09-30T03:45:00Z",
+                updated_at="2026-09-30T03:45:00Z",
+            ),
+            "between issue and opening",
+        ),
+        (
+            lambda receipt: receipt.update(body=receipt["body"].replace(
+                "1a273996c1f150ccfecef2f380c8beea3cc85162bb11dfa1e7ad255963e3f9c3",
+                "0" * 64,
+            )),
+            "does not bind",
+        ),
+    ],
+)
+def test_publication_receipt_rejects_tampering_late_release_or_unbound_body(
+    mutation, match
+):
+    decision, receipt = _real_decision_and_receipt()
+    mutation(receipt)
+    with pytest.raises(ValueError, match=match):
+        validate_github_publication(
+            json.loads(decision),
+            decision_bytes=decision,
+            publication_receipt_bytes=json.dumps(receipt).encode(),
+            expected_commit_sha="ce9a1327321691e474fdfefa853a08fd499959cf",
+        )
+
+
+def test_publication_receipt_rejects_wrong_commit_and_duplicate_json_keys():
+    decision, receipt = _real_decision_and_receipt()
+    with pytest.raises(ValueError, match="does not bind"):
+        validate_github_publication(
+            json.loads(decision),
+            decision_bytes=decision,
+            publication_receipt_bytes=json.dumps(receipt).encode(),
+            expected_commit_sha="0" * 40,
+        )
+
+    duplicate = json.dumps(receipt)[:-1] + ',"id":5903586616}'
+    with pytest.raises(ValueError, match="Duplicate publication receipt key"):
+        validate_github_publication(
+            json.loads(decision),
+            decision_bytes=decision,
+            publication_receipt_bytes=duplicate.encode(),
+            expected_commit_sha="ce9a1327321691e474fdfefa853a08fd499959cf",
+        )
 
 
 @pytest.mark.parametrize(
