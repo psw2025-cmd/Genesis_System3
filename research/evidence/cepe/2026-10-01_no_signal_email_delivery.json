@@ -1,0 +1,74 @@
+{
+  "schema": "cepe-email-delivery-v1",
+  "task_id": "CEPE-DELIVERY-014",
+  "lane": "CEPE_NEXT_OPEN",
+  "report_date_ist": "2026-10-01",
+  "target_open_at": "2026-10-02T09:15:00+05:30",
+  "decision_issued_at": "2026-10-01T19:06:18+05:30",
+  "decision": "NO_VERIFIED_SIGNAL",
+  "reason_codes": [
+    "FRESH_OFFICIAL_SESSION_FO_BYTES_NOT_OBTAINED",
+    "NO_SOURCE_QUALIFIED_EXACT_CONTRACT_CANDIDATE",
+    "NO_STRATEGY_PASSED_FORWARD_GATES"
+  ],
+  "source_check": {
+    "source_role": "PRIMARY_FO_SESSION_CLOSE",
+    "url": "https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261001_F_0000.csv.zip",
+    "observed_at": "2026-10-01T19:06:18+05:30",
+    "http_status": 404,
+    "response_bytes": 3425,
+    "response_sha256": "41fd81290608a684e8c2e9912890d5e77734a2f4f631ab9e4298274e485fa4e1",
+    "content_type": "text/html;charset=UTF-8",
+    "result": "NOT_OBTAINED",
+    "absence_proven": false
+  },
+  "strategy": {
+    "id": "CEPE-NEXT-008",
+    "version": "forward-only-v1",
+    "qualification_gate_passed": false,
+    "frozen_retro_directional_accuracy": 0.586441,
+    "target_directional_accuracy": 0.65,
+    "accuracy_gap_percentage_points": 6.3559,
+    "evaluated_outcome_days": 59,
+    "target_outcome_days": 60,
+    "retuned_after_frozen_test": false
+  },
+  "counts": {
+    "qualified_candidates": 0,
+    "issued_contract_forecasts": 0,
+    "matured_forward_outcomes": 0,
+    "positive_forecasts": 0,
+    "negative_forecasts": 0
+  },
+  "expected_premium_move_range": null,
+  "uncertainty": "NOT_PROVEN",
+  "previous_issued_forecasts_vs_next_open_actuals": {
+    "issued_contract_forecasts": 0,
+    "scored_next_open_outcomes": 0,
+    "abstention_counted_as_hit": false
+  },
+  "duplicate_guard": {
+    "gmail_query": "in:sent to:warghade2012@gmail.com after:2026/10/01 before:2026/10/02 (subject:\"System3 CE/PE\" OR subject:\"NO VERIFIED SIGNAL\")",
+    "gmail_sent_matches_before": 0,
+    "durable_record_matches_before": 0,
+    "gmail_sent_matches_after": 1
+  },
+  "recipient": {
+    "address": "warghade2012@gmail.com",
+    "authenticated_profile_address": "warghade2012@gmail.com",
+    "verified_own_address": true
+  },
+  "delivery": {
+    "subject": "System3 CE/PE — NO VERIFIED SIGNAL — 1 Oct 2026",
+    "gmail_message_id": "1a0f7ae95163cc3e",
+    "gmail_thread_id": "1a0f7ae95163cc3e",
+    "rfc_message_id": "<CAAqfyouBjQCTKHt4uS-LJb3UxHS8VcXgh6RukMBDjkdco_R-RQ@mail.gmail.com>",
+    "sent_at": "2026-10-01T19:06:49+05:30",
+    "sent_label_confirmed": true
+  },
+  "opening_price_is_executable_fill": false,
+  "fees_slippage_proven": false,
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}
