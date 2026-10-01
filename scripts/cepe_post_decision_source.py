@@ -15,6 +15,9 @@ ARCHIVE_URL = (
     "https://nsearchives.nseindia.com/content/fo/"
     "BhavCopy_NSE_FO_0_0_0_20261001_F_0000.csv.zip"
 )
+TARGET_OPEN_AT = "2026-10-05T09:15:00+05:30"
+CALENDAR_URL = "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf"
+CALENDAR_SHA256 = "5a2079cd78b2e6b536ef0d28300e63b645721bed22cc82a91facf5945f3296ea"
 EXPECTED_TOP_LEVEL = {
     "schema",
     "task_id",
@@ -22,6 +25,7 @@ EXPECTED_TOP_LEVEL = {
     "evidence_as_of",
     "source_session_date",
     "target_open_at",
+    "target_session",
     "prior_decision_lock",
     "availability_timeline",
     "official_archive",
@@ -95,6 +99,66 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
     target_open = _instant(payload["target_open_at"], "target_open_at")
     if not source_day < target_open.date() or not evidence_as_of < target_open:
         raise ValueError("Source session and target opening are not chronological")
+    if payload["target_open_at"] != TARGET_OPEN_AT:
+        raise ValueError("Target opening is not the next eligible NSE F&O session")
+
+    target_session = payload["target_session"]
+    expected_target_session_fields = {
+        "segment",
+        "calendar_source_url",
+        "calendar_source_sha256",
+        "calendar_source_first_observed_at",
+        "calendar_source_published_date",
+        "calendar_source_circular",
+        "official_holiday_date",
+        "official_holiday_reason",
+        "weekend_dates",
+        "next_eligible_session_date",
+        "opening_time_basis",
+    }
+    if not isinstance(target_session, dict) or set(target_session) != expected_target_session_fields:
+        raise ValueError("Target-session evidence is incomplete")
+    if target_session["segment"] != "FO":
+        raise ValueError("Target-session calendar is not for NSE F&O")
+    calendar_url = str(target_session["calendar_source_url"])
+    calendar_source = urlsplit(calendar_url)
+    if (
+        calendar_url != CALENDAR_URL
+        or calendar_source.scheme != "https"
+        or calendar_source.hostname != "nsearchives.nseindia.com"
+        or calendar_source.username
+        or calendar_source.password
+        or calendar_source.fragment
+        or calendar_source.port not in (None, 443)
+    ):
+        raise ValueError("Target-session calendar source is not the exact official NSE circular")
+    if _sha(target_session["calendar_source_sha256"], 64, "calendar source") != CALENDAR_SHA256:
+        raise ValueError("Target-session calendar source hash changed")
+    calendar_observed = _instant(
+        target_session["calendar_source_first_observed_at"],
+        "calendar_source_first_observed_at",
+    )
+    if calendar_observed >= evidence_as_of:
+        raise ValueError("Target-session calendar was not observed before the source receipt")
+    if (
+        target_session["calendar_source_published_date"] != "2025-12-12"
+        or target_session["calendar_source_circular"] != "NSE/FAOP/71777"
+    ):
+        raise ValueError("Target-session circular identity changed")
+    if (
+        target_session["official_holiday_date"] != "2026-10-02"
+        or target_session["official_holiday_reason"] != "Mahatma Gandhi Jayanti"
+    ):
+        raise ValueError("Official F&O holiday evidence changed")
+    if target_session["weekend_dates"] != ["2026-10-03", "2026-10-04"]:
+        raise ValueError("Intervening weekend dates changed")
+    if (
+        target_session["next_eligible_session_date"] != "2026-10-05"
+        or target_open.date().isoformat() != target_session["next_eligible_session_date"]
+    ):
+        raise ValueError("Next eligible F&O session does not match target opening")
+    if target_session["opening_time_basis"] != "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL":
+        raise ValueError("Target opening basis was overstated")
 
     lock = payload["prior_decision_lock"]
     if not isinstance(lock, dict):
@@ -305,6 +369,7 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
         "task_id": TASK_ID,
         "status": "OFFICIAL_SOURCE_CAPTURED_AFTER_LOCKED_ABSTENTION",
         "source_session_date": source_day.isoformat(),
+        "target_open_at": target_open.isoformat(),
         "first_successfully_observed_at": times[2].isoformat(),
         "zip_sha256": archive["zip_sha256"],
         "csv_sha256": archive["csv_sha256"],

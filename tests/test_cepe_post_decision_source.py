@@ -27,11 +27,15 @@ class PostDecisionSourceTests(unittest.TestCase):
         self.assertEqual(result["qualified_candidates"], 0)
         self.assertEqual(result["issued_contract_forecasts"], 0)
         self.assertEqual(result["matured_forward_outcomes"], 0)
+        self.assertEqual(result["target_open_at"], "2026-10-05T09:15:00+05:30")
         self.assertFalse(result["second_email_allowed"])
         self.assertFalse(result["orders_allowed"])
 
     def test_rejects_lookahead_source_inflation_and_unsafe_mutations(self):
         cases = [
+            (("target_open_at",), "2026-10-02T09:15:00+05:30", "next eligible NSE F&O session"),
+            (("target_session", "calendar_source_url"), "https://nsearchives.nseindia.com/content/circulars/wrong.pdf", "exact official NSE circular"),
+            (("target_session", "official_holiday_date"), "2026-10-03", "holiday evidence"),
             (("evidence_as_of",), "2026-10-01T18:00:00+05:30", "completed repeat observation"),
             (("prior_decision_lock", "second_email_allowed"), True, "second email"),
             (("prior_decision_lock", "decision_rewrite_allowed"), True, "rewrite"),
