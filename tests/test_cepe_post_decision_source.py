@@ -32,13 +32,19 @@ class PostDecisionSourceTests(unittest.TestCase):
 
     def test_rejects_lookahead_source_inflation_and_unsafe_mutations(self):
         cases = [
+            (("evidence_as_of",), "2026-10-01T18:00:00+05:30", "completed repeat observation"),
             (("prior_decision_lock", "second_email_allowed"), True, "second email"),
             (("prior_decision_lock", "decision_rewrite_allowed"), True, "rewrite"),
+            (("availability_timeline", 3, "request_started_at"), "2026-10-01T20:00:00+05:30", "retrieval chronology"),
             (("official_archive", "exchange_publication_time"), "2026-10-01T19:00:00+05:30", "invent"),
+            (("official_archive", "url"), "https://nsearchives.nseindia.com/content/fo/wrong.zip", "exact official session source"),
+            (("official_archive", "member"), "wrong.csv", "member name"),
             (("mechanical_universe", "screen_is_prediction"), True, "prediction"),
             (("forward_state", "qualified_candidates"), 1, "cannot create a forecast"),
             (("forward_state", "expected_premium_move_range"), [1.0, 3.0], "premium range"),
             (("feature_registry", 11, "missing_count"), 0, "silently imputed"),
+            (("gate_status", "minimum_oos_days"), 1, "Project gate thresholds"),
+            (("gate_status", "directional_accuracy"), 1.0, "must remain null"),
             (("gate_status", "strategy_promoted"), True, "promoted or retuned"),
             (("orders_allowed",), True, "Unsafe or dishonest"),
         ]

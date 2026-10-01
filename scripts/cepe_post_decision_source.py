@@ -11,6 +11,10 @@ from urllib.parse import urlsplit
 
 SCHEMA = "cepe-post-decision-source-v1"
 TASK_ID = "CEPE-SOURCE-015"
+ARCHIVE_URL = (
+    "https://nsearchives.nseindia.com/content/fo/"
+    "BhavCopy_NSE_FO_0_0_0_20261001_F_0000.csv.zip"
+)
 EXPECTED_TOP_LEVEL = {
     "schema",
     "task_id",
@@ -112,11 +116,29 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
     timeline = payload["availability_timeline"]
     if not isinstance(timeline, list) or len(timeline) != 4:
         raise ValueError("Exactly four availability observations are required")
+    if any(not isinstance(item, dict) for item in timeline):
+        raise ValueError("Availability observations must be objects")
     times = [_instant(item.get("observed_at"), "availability observed_at") for item in timeline]
     if times != sorted(times):
         raise ValueError("Availability timeline is not chronological")
+    if evidence_as_of != times[-1]:
+        raise ValueError("evidence_as_of must equal the completed repeat observation")
+    repeat_started = _instant(
+        timeline[3].get("request_started_at"), "repeat request_started_at"
+    )
+    if not times[2] < repeat_started <= times[3]:
+        raise ValueError("Repeat retrieval chronology is invalid")
     if [item.get("http_status") for item in timeline] != [404, 404, 200, 200]:
         raise ValueError("Availability status sequence changed")
+    if [item.get("response_bytes") for item in timeline] != [3425, 3425, 1048928, 1048928]:
+        raise ValueError("Availability response byte counts changed")
+    if [item.get("content_type") for item in timeline] != [
+        "text/html;charset=UTF-8",
+        "text/html;charset=UTF-8",
+        "application/zip",
+        "application/zip",
+    ]:
+        raise ValueError("Availability content types changed")
     for item in timeline:
         _sha(item.get("response_sha256"), 64, "response_sha256")
     if not times[1] < email_at < times[2]:
@@ -131,7 +153,8 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
     archive = payload["official_archive"]
     if not isinstance(archive, dict):
         raise ValueError("official_archive must be an object")
-    parsed = urlsplit(str(archive.get("url", "")))
+    archive_url = str(archive.get("url", ""))
+    parsed = urlsplit(archive_url)
     if (
         parsed.scheme != "https"
         or parsed.hostname != "nsearchives.nseindia.com"
@@ -141,6 +164,8 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
         or parsed.port not in (None, 443)
     ):
         raise ValueError("Archive URL is not the official NSE archive host")
+    if archive_url != ARCHIVE_URL:
+        raise ValueError("Archive URL is not the exact official session source")
     _sha(archive.get("zip_sha256"), 64, "zip_sha256")
     _sha(archive.get("csv_sha256"), 64, "csv_sha256")
     _sha(archive.get("raw_zip_git_blob_sha"), 40, "raw_zip_git_blob_sha")
@@ -148,6 +173,10 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Archive hash is not bound to the successful retrieval")
     if archive.get("zip_bytes") != 1048928 or archive.get("csv_bytes") != 6044690:
         raise ValueError("Archive or CSV byte count changed")
+    if archive.get("raw_zip_path") != "research/evidence/cepe/raw/fo_20261001.zip":
+        raise ValueError("Raw archive path changed")
+    if archive.get("member") != "BhavCopy_NSE_FO_0_0_0_20261001_F_0000.csv":
+        raise ValueError("Archive member name changed")
     if archive.get("source_rows") != 33250:
         raise ValueError("Unexpected source row count")
     if archive.get("trade_date") != source_day.isoformat() or archive.get("segment") != "FO":
@@ -162,6 +191,8 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Server header was promoted to exchange dissemination time")
     if archive.get("member_timestamp_used_as_availability_proof") is not False:
         raise ValueError("ZIP member timestamp cannot prove availability")
+    if _instant(archive.get("server_date_header"), "server date") != times[3]:
+        raise ValueError("Server date is not bound to the repeat observation")
     if not email_at < _instant(archive.get("server_last_modified_header"), "last-modified") < times[2]:
         raise ValueError("Server last-modified chronology is inconsistent")
 
@@ -233,8 +264,30 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
     gates = payload["gate_status"]
     if not isinstance(gates, dict):
         raise ValueError("gate_status must be an object")
+    expected_targets = {
+        "minimum_oos_trades": 100,
+        "minimum_oos_days": 60,
+        "minimum_directional_accuracy": 0.65,
+        "minimum_top_decile_precision": 0.70,
+        "minimum_sharpe": 2.5,
+        "maximum_drawdown": 0.10,
+        "minimum_deflated_sharpe_probability": 0.95,
+    }
+    if any(gates.get(field) != value for field, value in expected_targets.items()):
+        raise ValueError("Project gate thresholds changed")
     if gates.get("valid_forward_trades") != 0 or gates.get("valid_forward_days") != 0:
         raise ValueError("Forward sample was fabricated")
+    if any(
+        gates.get(field) is not None
+        for field in (
+            "directional_accuracy",
+            "top_decile_precision",
+            "sharpe",
+            "max_drawdown",
+            "deflated_sharpe_probability",
+        )
+    ):
+        raise ValueError("Unevaluated forward metrics must remain null")
     if gates.get("strategy_promoted") is not False or gates.get("frozen_test_retuned") is not False:
         raise ValueError("Failed strategy cannot be promoted or retuned")
 
