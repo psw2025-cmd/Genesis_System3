@@ -1,6 +1,6 @@
 {
   "schema_version": "research-experiment-registry-v1",
-  "updated_at": "2026-09-24T08:30:00Z",
+  "updated_at": "2026-10-01T02:42:00Z",
   "governance": {
     "target_config": "config/quant_alpha_targets.json",
     "evaluation": "chronological_train_validation_untouched_test",
@@ -113,13 +113,52 @@
       "transformation_version": "all-in-cost-bps-v1",
       "reason": "Prevent gross-return promotion that disappears after realistic costs.",
       "promotion_status": "CANDIDATE_NOT_PROVEN"
+    },
+    {
+      "feature_id": "catalyst.subsidiary_capital_infusion_amount.v1",
+      "group": "news_catalysts",
+      "lane": [
+        "equity_weekly",
+        "cepe_next_open",
+        "catalyst_ablation"
+      ],
+      "source_requirement": "Exact retained official issuer filing bytes, exchange dissemination timestamp and first-observed timestamp; currency and amount parsed explicitly.",
+      "observed_at": "2026-09-30T22:47:16.959373+00:00",
+      "missingness_policy": "Missing or ineligible before max(exchange dissemination, first observation); do not infer zero from an absent filing, backdate knowledge, or substitute a document date for publication time.",
+      "transformation_version": "log1p-nonnegative-inr-v1",
+      "reason": "Pre-register whether disclosed subsidiary capital infusion adds incremental predictive information beyond the frozen no-catalyst baseline. Company scale is a required control before interpreting absolute amounts; no bullish sign or usefulness is presumed.",
+      "promotion_status": "CANDIDATE_NOT_PROVEN",
+      "source_example": {
+        "symbol": "POLICYBZR",
+        "isin": "INE417T01026",
+        "amount_inr": 10000000,
+        "url": "https://nsearchives.nseindia.com/corporate/POLICYBZR_30092026200702_DisclosurePBFAAInfusion30092026.pdf",
+        "raw_sha256": "17ac3d571b7f3215f63ee74540156a138a492f35860ce1c86149e83989a49c95",
+        "exchange_disseminated_at": "2026-09-30T20:07:17+05:30",
+        "first_observed_at": "2026-09-30T22:47:16.959373+00:00",
+        "author_publication_time": null,
+        "record_path": "research/evidence/catalyst/2026-10-01_POLICYBZR_capital_infusion.json"
+      },
+      "experiment_contract": {
+        "experiment_id": "CAT-EXP-002",
+        "status": "PREREGISTERED_NOT_EVALUATED",
+        "evaluation": "Separate chronological train/validation/new untouched test for each instrument and horizon; paired with/without-catalyst ablation on the identical cohort and cost assumptions.",
+        "company_scale_control_status": "MISSING_NOT_PROVEN",
+        "frozen_previous_test_reuse_allowed": false,
+        "directional_effect": "UNSPECIFIED",
+        "multiple_testing_control": "Count this as an additional candidate experiment in the promotion family; include deflated-Sharpe and required multiplicity controls before promotion.",
+        "valid_forward_predictions": 0,
+        "valid_forward_outcomes": 0
+      }
     }
   ],
   "measured_counts": {
-    "real_official_catalyst_records": 0,
+    "real_official_catalyst_records": 4,
     "eligible_pre_issue_catalysts": 0,
     "catalyst_linked_predictions": 0,
     "catalyst_linked_outcomes": 0,
-    "note": "Only fixture arithmetic is covered by tests; historical validation is not yet present."
+    "evidence_as_of": "2026-10-01",
+    "evidence_record": "research/evidence/catalyst/2026-10-01_POLICYBZR_capital_infusion.json",
+    "note": "Four unique official filing PDFs inspected cumulatively; this does not establish any pre-issued prediction or measured catalyst contribution. Fixtures are excluded; later measured return remains NOT_PROVEN."
   }
 }
