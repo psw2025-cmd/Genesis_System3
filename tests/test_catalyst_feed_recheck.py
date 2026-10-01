@@ -41,10 +41,18 @@ class CatalystFeedRecheckTests(unittest.TestCase):
 
     def test_rejects_backfill_absence_outcome_and_causality_mutations(self):
         cases = [
+            (("prediction_id",), "EQ7D-2026-10-01-OTHER-V1", "prediction ID"),
+            (("prediction_event_hash",), "0" * 64, "prediction event hash"),
+            (("source_url",), "https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=02-10-2026&to_date=02-10-2026", "exact official session query"),
+            (("current_capture", "raw_gzip_path"), "research/evidence/catalyst/raw/wrong.json.gz", "artifact path"),
+            (("current_capture", "raw_bytes"), 1, "byte counts"),
             (("feed_progression", "prior_exact_rows_removed"), 1, "not an exact superset"),
             (("feed_progression", "new_rows_with_dissemination_at_or_before_prediction"), 1, "pre-issue rows"),
+            (("feed_progression", "dissemination_timezone_basis"), "UTC", "timezone basis"),
+            (("feed_progression", "last_new_exchdisstime_raw"), "01-Oct-2026 18:18:26", "dissemination bounds"),
             (("feature_record", "feature_eligible"), True, "prediction feature"),
             (("feature_record", "promotion_status"), "IMPUTED", "silently imputed"),
+            (("feature_record", "transformation"), "contains(symbol, 'MOL')", "exact-match transformation"),
             (("published_at",), "2026-10-01T18:00:00+05:30", "invent"),
             (("interpretation",), "NO_MATCH_MEANS_ABSENT", "limitation"),
             (("later_measured_return",), 0.25, "return"),
@@ -67,7 +75,7 @@ class CatalystFeedRecheckTests(unittest.TestCase):
         payload = _payload()
         payload["current_capture"]["captured_feed_rows"] = 999
         with self.assertRaisesRegex(
-            ValueError, "sequence IDs|do not reconcile|hash mismatch"
+            ValueError, "row count|sequence IDs|do not reconcile|hash mismatch"
         ):
             validate(payload)
 

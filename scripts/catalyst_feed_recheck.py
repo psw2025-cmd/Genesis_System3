@@ -11,6 +11,18 @@ from urllib.parse import urlsplit
 
 SCHEMA = "catalyst-feed-recheck-v1"
 TASK_ID = "CAT-LINK-012"
+PREDICTION_ID = "EQ7D-2026-10-01-MOLBIO-V1"
+PREDICTION_EVENT_HASH = (
+    "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f"
+)
+SOURCE_URL = (
+    "https://www.nseindia.com/api/corporate-announcements?"
+    "index=equities&from_date=01-10-2026&to_date=01-10-2026"
+)
+RAW_GZIP_PATH = (
+    "research/evidence/catalyst/raw/"
+    "nse_announcements_20261001_observed_20261002T001025IST.json.gz"
+)
 EXPECTED_KEYS = {
     "schema",
     "task_id",
@@ -76,7 +88,10 @@ def validate(record: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Catalyst evidence cannot be mixed with another lane")
     if record["symbol"] != "MOLBIO" or record["isin"] != "INE869T01028":
         raise ValueError("Unexpected issuer identity")
-    _digest(record["prediction_event_hash"], 64, "prediction_event_hash")
+    if record["prediction_id"] != PREDICTION_ID:
+        raise ValueError("Unexpected linked prediction ID")
+    if _digest(record["prediction_event_hash"], 64, "prediction_event_hash") != PREDICTION_EVENT_HASH:
+        raise ValueError("Unexpected linked prediction event hash")
 
     parsed = urlsplit(record["source_url"])
     if (
@@ -89,6 +104,8 @@ def validate(record: dict[str, Any]) -> dict[str, Any]:
         or parsed.port not in (None, 443)
     ):
         raise ValueError("Invalid official announcement source URL")
+    if record["source_url"] != SOURCE_URL:
+        raise ValueError("Announcement URL is not the exact official session query")
 
     issued = _instant(record["prediction_issued_at"], "prediction_issued_at")
     prior = record["prior_capture"]
@@ -106,8 +123,18 @@ def validate(record: dict[str, Any]) -> dict[str, Any]:
     request_started = _instant(current.get("request_started_at"), "request_started_at")
     if not issued < prior_observed < request_started <= current_observed:
         raise ValueError("Prediction and source observations are not chronological")
+    if prior.get("path") != "research/evidence/catalyst/2026-10-01_MOLBIO_feed_inspection.json":
+        raise ValueError("Prior capture path changed")
+    if prior.get("raw_bytes") != 381617 or prior.get("captured_feed_rows") != 531:
+        raise ValueError("Prior capture size or row count changed")
     if current.get("http_status") != 200 or current.get("content_type") != "application/json":
         raise ValueError("Current official feed receipt is invalid")
+    if current.get("raw_bytes") != 574305 or current.get("raw_gzip_bytes") != 86119:
+        raise ValueError("Current raw artifact byte counts changed")
+    if current.get("raw_gzip_path") != RAW_GZIP_PATH:
+        raise ValueError("Current raw artifact path changed")
+    if current.get("captured_feed_rows") != 805:
+        raise ValueError("Current feed row count changed")
     if prior.get("exact_symbol_or_isin_matches") != 0 or current.get("exact_symbol_or_isin_matches") != 0:
         raise ValueError("No-match recheck contains an exact match")
     if current.get("captured_feed_rows") != current.get("unique_sequence_ids"):
@@ -138,6 +165,13 @@ def validate(record: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Full-feed dissemination counts do not reconcile")
     if progression.get("timezone_independently_proven") is not False:
         raise ValueError("NSE API display timezone was overstated")
+    if progression.get("dissemination_timezone_basis") != "NSE_API_DISPLAY_ASSUMED_ASIA_KOLKATA":
+        raise ValueError("Dissemination timezone basis changed")
+    if (
+        progression.get("first_new_exchdisstime_raw") != "01-Oct-2026 18:18:26"
+        or progression.get("last_new_exchdisstime_raw") != "01-Oct-2026 23:54:45"
+    ):
+        raise ValueError("Added-row dissemination bounds changed")
 
     feature = record["feature_record"]
     expected_feature_keys = {
@@ -151,6 +185,16 @@ def validate(record: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Feature is not bound to the current source observation")
     if feature["known_by_prediction_issue_time"] is not False or feature["feature_eligible"] is not False:
         raise ValueError("Post-issue no-match cannot become a prediction feature")
+    if feature["feature_id"] != "exact_issuer_catalyst_match":
+        raise ValueError("Catalyst feature identity changed")
+    if feature["source_fields"] != ["symbol", "sm_isin"]:
+        raise ValueError("Catalyst exact-match source fields changed")
+    if feature["missingness"] != "NO_EXACT_MATCH_IN_CAPTURED_FEED":
+        raise ValueError("Catalyst missingness state changed")
+    if feature["transformation"] != (
+        "upper(trim(symbol)) == MOLBIO OR upper(trim(sm_isin)) == INE869T01028"
+    ):
+        raise ValueError("Catalyst exact-match transformation changed")
     if feature["promotion_status"] != "MISSING_NOT_IMPUTED":
         raise ValueError("Missing catalyst feature was silently imputed")
     if feature["version"] != "catalyst-link-v1" or not feature["reason"]:
