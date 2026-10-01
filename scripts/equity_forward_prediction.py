@@ -1,0 +1,463 @@
+"""Build and validate prospective NSE equity PAPER prediction records.
+
+This module deliberately separates a forward research observation from a
+qualified signal.  It consumes only source bytes observed before issuance,
+uses a fixed deterministic rank, and never places orders.
+"""
+from __future__ import annotations
+
+import csv
+from datetime import date, datetime, time, timedelta, timezone
+from decimal import Decimal, InvalidOperation
+from hashlib import sha256
+from io import StringIO
+import json
+from typing import Any
+from urllib.parse import urlsplit
+from zoneinfo import ZoneInfo
+
+from scripts.equity_observation_packet import build_packet
+
+
+SCHEMA = "equity-forward-paper-prediction-v1"
+EVENT_TYPE = "EQUITY_FORWARD_PREDICTION_ISSUED"
+GENESIS_HASH = "0" * 64
+IST = ZoneInfo("Asia/Kolkata")
+INDEX_URL_PREFIX = "https://nsearchives.nseindia.com/content/indices/ind_close_all_"
+HOLIDAY_URL = "https://www.nseindia.com/api/holiday-master?type=trading"
+EXPECTED_KEYS = {
+    "schema",
+    "event_type",
+    "task_id",
+    "evidence_class",
+    "prediction_id",
+    "issued_at",
+    "source_cutoff_at",
+    "entry_session_date",
+    "due_session_date",
+    "due_at",
+    "horizon",
+    "strategy",
+    "counts",
+    "prediction",
+    "benchmark",
+    "source_receipts",
+    "action_policy",
+    "current_metrics",
+    "safety",
+    "previous_event_hash",
+    "event_hash",
+}
+
+
+def _instant(value: Any, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid {field}") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError(f"{field} requires timezone")
+    return parsed.astimezone(timezone.utc)
+
+
+def _decimal(value: Any, field: str, *, positive: bool = False) -> Decimal:
+    try:
+        result = Decimal(str(value))
+    except InvalidOperation as exc:
+        raise ValueError(f"Invalid {field}") from exc
+    if not result.is_finite() or (positive and result <= 0):
+        raise ValueError(f"Invalid {field}")
+    return result
+
+
+def _canonical(value: Any) -> bytes:
+    return json.dumps(
+        value, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode("utf-8")
+
+
+def _sha(value: Any, field: str) -> str:
+    text = str(value).lower()
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise ValueError(f"Invalid {field}")
+    return text
+
+
+def _verify_receipt(raw: bytes, receipt: dict[str, Any], *, url: str) -> datetime:
+    parsed = urlsplit(url)
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname not in {"www.nseindia.com", "nsearchives.nseindia.com"}
+        or parsed.username
+        or parsed.password
+        or parsed.fragment
+        or parsed.port not in (None, 443)
+        or receipt.get("url") != url
+        or receipt.get("final_url") != url
+        or receipt.get("http_status") != 200
+        or receipt.get("raw_sha256") != sha256(raw).hexdigest()
+        or receipt.get("bytes") != len(raw)
+    ):
+        raise ValueError("Official source receipt mismatch")
+    return _instant(receipt.get("first_observed_at"), "first_observed_at")
+
+
+def _percent_rank(values: list[Decimal], value: Decimal) -> Decimal:
+    if len(values) == 1:
+        return Decimal(1)
+    lower = sum(candidate < value for candidate in values)
+    equal = sum(candidate == value for candidate in values)
+    return (Decimal(lower) + Decimal(equal - 1) / 2) / Decimal(len(values) - 1)
+
+
+def _index_reference(raw: bytes, receipt: dict[str, Any], session: date) -> tuple[dict, datetime]:
+    url = f"{INDEX_URL_PREFIX}{session.strftime('%d%m%Y')}.csv"
+    observed = _verify_receipt(raw, receipt, url=url)
+    reader = csv.DictReader(StringIO(raw.decode("utf-8-sig")))
+    required = {
+        "Index Name",
+        "Index Date",
+        "Open Index Value",
+        "High Index Value",
+        "Low Index Value",
+        "Closing Index Value",
+    }
+    if not required.issubset(reader.fieldnames or []):
+        raise ValueError("Unsupported index schema")
+    matches = [row for row in reader if row["Index Name"] == "Nifty 50"]
+    if len(matches) != 1 or matches[0]["Index Date"] != session.strftime("%d-%m-%Y"):
+        raise ValueError("Nifty 50 session row missing or duplicated")
+    row = matches[0]
+    values = {
+        key: _decimal(row[key], key, positive=True)
+        for key in (
+            "Open Index Value",
+            "High Index Value",
+            "Low Index Value",
+            "Closing Index Value",
+        )
+    }
+    if not values["Low Index Value"] <= min(
+        values["Open Index Value"], values["Closing Index Value"]
+    ) <= max(
+        values["Open Index Value"], values["Closing Index Value"]
+    ) <= values["High Index Value"]:
+        raise ValueError("Inconsistent Nifty 50 OHLC")
+    return {
+        "name": "Nifty 50",
+        "entry_session_date": session.isoformat(),
+        "entry_reference_close": str(values["Closing Index Value"]),
+        "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+        "source_sha256": sha256(raw).hexdigest(),
+        "source_url": url,
+    }, observed
+
+
+def _due_session(
+    raw: bytes, receipt: dict[str, Any], *, entry: date, calendar_days: int
+) -> tuple[date, datetime]:
+    observed = _verify_receipt(raw, receipt, url=HOLIDAY_URL)
+    try:
+        payload = json.loads(raw)
+        rows = payload["CM"]
+    except (json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise ValueError("Unsupported CM holiday source") from exc
+    if not isinstance(rows, list) or not rows:
+        raise ValueError("Empty CM holiday source")
+    holidays = set()
+    for row in rows:
+        try:
+            holidays.add(datetime.strptime(row["tradingDate"], "%d-%b-%Y").date())
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ValueError("Invalid CM holiday row") from exc
+    result = entry + timedelta(days=calendar_days)
+    while result.weekday() >= 5 or result in holidays:
+        result += timedelta(days=1)
+    return result, observed
+
+
+def _model(raw: bytes) -> tuple[dict[str, Any], str]:
+    try:
+        model = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError("Invalid model specification") from exc
+    required = {
+        "schema": "equity-forward-experiment-v1",
+        "experiment_id": "EQ-FWD-RANK-001",
+        "strategy_id": "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY",
+        "strategy_version": "1.0.0",
+        "status": "EXPLORATORY_FORWARD_ONLY",
+    }
+    if not isinstance(model, dict) or any(model.get(k) != v for k, v in required.items()):
+        raise ValueError("Unsupported model specification")
+    if model.get("selection", {}).get("score") != "0.5*intraday_return_percent_rank + 0.5*liquidity_proxy_percent_rank":
+        raise ValueError("Model score changed")
+    return model, sha256(raw).hexdigest()
+
+
+def build_prediction(
+    *,
+    equity_sources: dict[str, bytes],
+    equity_receipts: dict[str, dict[str, Any]],
+    index_raw: bytes,
+    index_receipt: dict[str, Any],
+    holiday_raw: bytes,
+    holiday_receipt: dict[str, Any],
+    model_spec_raw: bytes,
+    issued_at: str,
+    now: datetime | None = None,
+    previous_event_hash: str = GENESIS_HASH,
+) -> dict[str, Any]:
+    """Build one deterministic exploratory prediction from current-session sources."""
+    issued = _instant(issued_at, "issued_at")
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None or current.utcoffset() is None or issued > current.astimezone(timezone.utc):
+        raise ValueError("issued_at cannot be in the future")
+    model, model_sha = _model(model_spec_raw)
+    packet = build_packet(
+        equity_sources,
+        equity_receipts,
+        as_of=issued.isoformat(),
+        now=current,
+    )
+    entry = date.fromisoformat(packet["trade_date"])
+    if issued.astimezone(IST).date() != entry or issued.astimezone(IST).time() < time(15, 30):
+        raise ValueError("Prediction must use a completed same-day cash session")
+    benchmark, index_observed = _index_reference(index_raw, index_receipt, entry)
+    due, holiday_observed = _due_session(
+        holiday_raw,
+        holiday_receipt,
+        entry=entry,
+        calendar_days=model["horizon"]["calendar_days"],
+    )
+    source_times = [
+        _instant(receipt["first_observed_at"], "first_observed_at")
+        for receipt in equity_receipts.values()
+    ] + [index_observed, holiday_observed]
+    cutoff = max(source_times)
+    if cutoff > issued:
+        raise ValueError("Prediction source observed after issuance")
+
+    minimum_close = _decimal(model["universe"]["minimum_close_inr"], "minimum_close", positive=True)
+    minimum_liquidity = _decimal(
+        model["universe"]["minimum_close_times_volume_inr"],
+        "minimum_liquidity",
+        positive=True,
+    )
+    candidates = []
+    for row in packet["observations"]:
+        close = _decimal(row["close"], "close", positive=True)
+        opening = _decimal(row["open"], "open", positive=True)
+        volume = Decimal(row["volume"])
+        intraday_return = close / opening - 1
+        liquidity = close * volume
+        if (
+            row["action_review"]["action_count"] == 0
+            and close >= minimum_close
+            and liquidity >= minimum_liquidity
+            and intraday_return > 0
+        ):
+            candidates.append((row, intraday_return, liquidity))
+    if not candidates:
+        raise ValueError("No exploratory candidate")
+    momenta = [row[1] for row in candidates]
+    liquidities = [row[2] for row in candidates]
+    ranked = []
+    for observation, momentum, liquidity in candidates:
+        momentum_rank = _percent_rank(momenta, momentum)
+        liquidity_rank = _percent_rank(liquidities, liquidity)
+        score = (momentum_rank + liquidity_rank) / 2
+        ranked.append((score, observation["symbol"], observation["isin"], observation,
+                       momentum, liquidity, momentum_rank, liquidity_rank))
+    ranked.sort(key=lambda row: (-row[0], row[1], row[2]))
+    score, symbol, isin, selected, momentum, liquidity, momentum_rank, liquidity_rank = ranked[0]
+    features = {
+        "open": selected["open"],
+        "close": selected["close"],
+        "volume": selected["volume"],
+        "intraday_return": str(momentum.quantize(Decimal("0.0000000001"))),
+        "close_times_volume_inr": str(liquidity.quantize(Decimal("0.01"))),
+        "intraday_return_percent_rank": str(momentum_rank.quantize(Decimal("0.0000000001"))),
+        "liquidity_proxy_percent_rank": str(liquidity_rank.quantize(Decimal("0.0000000001"))),
+        "selection_score": str(score.quantize(Decimal("0.0000000001"))),
+        "source_row_sha256": selected["canonical_source_row_sha256"],
+    }
+    due_at = datetime.combine(due, time(15, 30), IST).astimezone(timezone.utc)
+    source_receipts = {
+        role: {
+            "url": receipt["url"],
+            "first_observed_at": _instant(receipt["first_observed_at"], "first_observed_at").isoformat(),
+            "sha256": receipt["raw_sha256"],
+            "bytes": receipt["bytes"],
+        }
+        for role, receipt in {
+            **equity_receipts,
+            "index": index_receipt,
+            "holiday_calendar": holiday_receipt,
+        }.items()
+    }
+    payload = {
+        "schema": SCHEMA,
+        "event_type": EVENT_TYPE,
+        "task_id": "EQ-ADJUST-008",
+        "evidence_class": "EXPLORATORY_FORWARD_PAPER_PREDICTION",
+        "prediction_id": f"EQ7D-{entry.isoformat()}-{symbol}-V1",
+        "issued_at": issued.isoformat(),
+        "source_cutoff_at": cutoff.isoformat(),
+        "entry_session_date": entry.isoformat(),
+        "due_session_date": due.isoformat(),
+        "due_at": due_at.isoformat(),
+        "horizon": {
+            "calendar_days": model["horizon"]["calendar_days"],
+            "outcome_reference": "OFFICIAL_CLOSE_FIRST_CM_SESSION_ON_OR_AFTER_CALENDAR_HORIZON",
+        },
+        "strategy": {
+            "experiment_id": model["experiment_id"],
+            "strategy_id": model["strategy_id"],
+            "strategy_version": model["strategy_version"],
+            "model_spec_sha256": model_sha,
+            "qualification_status": "EXPLORATORY_NOT_GATE_QUALIFIED",
+        },
+        "counts": {
+            "source_company_eq_observations": packet["company_eq_observation_count"],
+            "screened_candidates": len(candidates),
+            "selected_candidates": 1,
+            "qualified_current_candidates": 0,
+            "forward_predictions": 1,
+            "matured_outcomes": 0,
+            "positive_forecasts": 1,
+            "negative_forecasts": 0,
+        },
+        "prediction": {
+            "symbol": symbol,
+            "isin": isin,
+            "series": "EQ",
+            "direction": "POSITIVE",
+            "entry_reference_close": selected["close"],
+            "entry_reference_is_executable_fill": False,
+            "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+            "adjusted_entry_price": None,
+            "expected_return_range": None,
+            "calibrated_probability": None,
+            "features": features,
+            "feature_hash": sha256(_canonical(features)).hexdigest(),
+            "forward_evaluation_status": "PENDING",
+        },
+        "benchmark": benchmark,
+        "source_receipts": source_receipts,
+        "action_policy": {
+            "capture_interval_start": packet["action_scope"]["start"],
+            "capture_interval_end": packet["action_scope"]["end"],
+            "selected_action_count_at_issue": selected["action_review"]["action_count"],
+            "complete_action_coverage_at_issue": False,
+            "maturity_recheck_required": True,
+            "score_if_action_or_identity_change": "NOT_PROVEN_UNTIL_ADJUSTMENT_RESOLVED",
+        },
+        "current_metrics": {
+            "valid_outcomes": 0,
+            "oos_days": 0,
+            "directional_accuracy": None,
+            "top_decile_precision": None,
+            "sharpe": None,
+            "max_drawdown": None,
+            "deflated_sharpe_probability": None,
+            "benchmark_excess_return": None,
+            "calibration_error": None,
+            "target_gaps": {
+                "valid_outcomes": 100,
+                "oos_days": 60,
+                "directional_accuracy": None,
+                "top_decile_precision": None,
+                "sharpe": None,
+                "max_drawdown": None,
+                "deflated_sharpe_probability": None,
+            },
+        },
+        "safety": {
+            "retrospective": False,
+            "catalyst_feature_included": False,
+            "real_money_ready": False,
+            "live_trading_enabled": False,
+            "orders_allowed": False,
+        },
+        "previous_event_hash": _sha(previous_event_hash, "previous_event_hash"),
+    }
+    payload["event_hash"] = sha256(_canonical(payload)).hexdigest()
+    validate_prediction(payload, now=current)
+    return payload
+
+
+def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
+    """Fail closed if a stored forward record overstates its evidence."""
+    if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
+        raise ValueError("Prediction record fields do not match locked schema")
+    if payload["schema"] != SCHEMA or payload["event_type"] != EVENT_TYPE:
+        raise ValueError("Unsupported prediction schema or event")
+    if payload["task_id"] != "EQ-ADJUST-008" or payload["evidence_class"] != "EXPLORATORY_FORWARD_PAPER_PREDICTION":
+        raise ValueError("Invalid task or evidence class")
+    issued = _instant(payload["issued_at"], "issued_at")
+    cutoff = _instant(payload["source_cutoff_at"], "source_cutoff_at")
+    due = _instant(payload["due_at"], "due_at")
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None or current.utcoffset() is None:
+        raise ValueError("now requires timezone")
+    if not cutoff <= issued < due:
+        raise ValueError("Invalid source/issue/outcome chronology")
+    entry_day = date.fromisoformat(payload["entry_session_date"])
+    due_day = date.fromisoformat(payload["due_session_date"])
+    if due.astimezone(IST).date() != due_day or due_day < entry_day + timedelta(days=7):
+        raise ValueError("Invalid due session")
+    counts = payload["counts"]
+    expected_counts = {
+        "selected_candidates": 1,
+        "qualified_current_candidates": 0,
+        "forward_predictions": 1,
+        "matured_outcomes": 0,
+        "positive_forecasts": 1,
+        "negative_forecasts": 0,
+    }
+    if any(counts.get(key) != value for key, value in expected_counts.items()):
+        raise ValueError("Prediction counts overstate the evidence")
+    prediction = payload["prediction"]
+    if prediction.get("direction") != "POSITIVE" or prediction.get("forward_evaluation_status") != "PENDING":
+        raise ValueError("Unsupported prediction state")
+    if prediction.get("expected_return_range") is not None or prediction.get("calibrated_probability") is not None:
+        raise ValueError("Uncalibrated prediction cannot claim range or probability")
+    if prediction.get("adjusted_entry_price") is not None or prediction.get("price_basis") != "UNADJUSTED_EXCHANGE_REFERENCE":
+        raise ValueError("Raw entry reference mislabeled as adjusted")
+    if prediction.get("entry_reference_is_executable_fill") is not False:
+        raise ValueError("Closing reference cannot be an executable fill")
+    features = prediction.get("features")
+    if prediction.get("feature_hash") != sha256(_canonical(features)).hexdigest():
+        raise ValueError("Feature hash mismatch")
+    if payload["strategy"].get("qualification_status") != "EXPLORATORY_NOT_GATE_QUALIFIED":
+        raise ValueError("Exploratory strategy was promoted")
+    if payload["action_policy"].get("maturity_recheck_required") is not True:
+        raise ValueError("Corporate-action maturity recheck required")
+    safety = payload["safety"]
+    if set(safety) != {
+        "retrospective",
+        "catalyst_feature_included",
+        "real_money_ready",
+        "live_trading_enabled",
+        "orders_allowed",
+    } or any(safety.values()):
+        raise ValueError("Unsafe prediction flags")
+    stored_hash = _sha(payload["event_hash"], "event_hash")
+    unhashed = {key: value for key, value in payload.items() if key != "event_hash"}
+    if stored_hash != sha256(_canonical(unhashed)).hexdigest():
+        raise ValueError("Prediction event hash mismatch")
+    _sha(payload["previous_event_hash"], "previous_event_hash")
+    return {
+        "status": "FORWARD_PAPER_PREDICTION_SEALED",
+        "prediction_id": payload["prediction_id"],
+        "symbol": prediction["symbol"],
+        "due_session_date": payload["due_session_date"],
+        "screened_candidates": counts["screened_candidates"],
+        "qualified_current_candidates": 0,
+        "forward_predictions": 1,
+        "matured_outcomes": 0,
+        "event_hash": stored_hash,
+        "real_money_ready": False,
+        "orders_allowed": False,
+    }
