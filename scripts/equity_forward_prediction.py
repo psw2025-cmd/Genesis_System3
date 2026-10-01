@@ -12,6 +12,7 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import StringIO
 import json
+import re
 from typing import Any
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
@@ -48,6 +49,8 @@ EXPECTED_KEYS = {
     "previous_event_hash",
     "event_hash",
 }
+_ISIN_RE = re.compile(r"^IN[A-Z0-9]{10}$")
+_PREDICTION_ID_RE = re.compile(r"^EQ7D-\d{4}-\d{2}-\d{2}-[A-Z0-9&-]+-V1$")
 
 
 def _instant(value: Any, field: str) -> datetime:
@@ -407,7 +410,46 @@ def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None)
     due_day = date.fromisoformat(payload["due_session_date"])
     if due.astimezone(IST).date() != due_day or due_day < entry_day + timedelta(days=7):
         raise ValueError("Invalid due session")
+
+    horizon = payload["horizon"]
+    if set(horizon) != {"calendar_days", "outcome_reference"} or horizon != {
+        "calendar_days": 7,
+        "outcome_reference": "OFFICIAL_CLOSE_FIRST_CM_SESSION_ON_OR_AFTER_CALENDAR_HORIZON",
+    }:
+        raise ValueError("Horizon contract changed")
+    if not _PREDICTION_ID_RE.fullmatch(str(payload["prediction_id"])):
+        raise ValueError("Invalid prediction id")
+
+    strategy = payload["strategy"]
+    if set(strategy) != {
+        "experiment_id",
+        "strategy_id",
+        "strategy_version",
+        "model_spec_sha256",
+        "qualification_status",
+    }:
+        raise ValueError("Strategy fields changed")
+    if (
+        strategy["experiment_id"] != "EQ-FWD-RANK-001"
+        or strategy["strategy_id"] != "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY"
+        or strategy["strategy_version"] != "1.0.0"
+        or strategy["qualification_status"] != "EXPLORATORY_NOT_GATE_QUALIFIED"
+    ):
+        raise ValueError("Exploratory strategy was promoted")
+    _sha(strategy["model_spec_sha256"], "model_spec_sha256")
+
     counts = payload["counts"]
+    if set(counts) != {
+        "source_company_eq_observations",
+        "screened_candidates",
+        "selected_candidates",
+        "qualified_current_candidates",
+        "forward_predictions",
+        "matured_outcomes",
+        "positive_forecasts",
+        "negative_forecasts",
+    }:
+        raise ValueError("Prediction count fields changed")
     expected_counts = {
         "selected_candidates": 1,
         "qualified_current_candidates": 0,
@@ -418,7 +460,38 @@ def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None)
     }
     if any(counts.get(key) != value for key, value in expected_counts.items()):
         raise ValueError("Prediction counts overstate the evidence")
+    if (
+        type(counts["source_company_eq_observations"]) is not int
+        or type(counts["screened_candidates"]) is not int
+        or not 1 <= counts["screened_candidates"] <= counts["source_company_eq_observations"]
+    ):
+        raise ValueError("Invalid source or screening counts")
+
     prediction = payload["prediction"]
+    if set(prediction) != {
+        "symbol",
+        "isin",
+        "series",
+        "direction",
+        "entry_reference_close",
+        "entry_reference_is_executable_fill",
+        "price_basis",
+        "adjusted_entry_price",
+        "expected_return_range",
+        "calibrated_probability",
+        "features",
+        "feature_hash",
+        "forward_evaluation_status",
+    }:
+        raise ValueError("Prediction fields changed")
+    symbol = str(prediction.get("symbol", ""))
+    if not symbol or symbol != symbol.upper() or not _ISIN_RE.fullmatch(str(prediction.get("isin", ""))):
+        raise ValueError("Invalid prediction identity")
+    if payload["prediction_id"] != f"EQ7D-{entry_day.isoformat()}-{symbol}-V1":
+        raise ValueError("Prediction id does not bind identity")
+    if prediction.get("series") != "EQ":
+        raise ValueError("Prediction series changed")
+    _decimal(prediction.get("entry_reference_close"), "entry_reference_close", positive=True)
     if prediction.get("direction") != "POSITIVE" or prediction.get("forward_evaluation_status") != "PENDING":
         raise ValueError("Unsupported prediction state")
     if prediction.get("expected_return_range") is not None or prediction.get("calibrated_probability") is not None:
@@ -428,12 +501,153 @@ def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None)
     if prediction.get("entry_reference_is_executable_fill") is not False:
         raise ValueError("Closing reference cannot be an executable fill")
     features = prediction.get("features")
+    if not isinstance(features, dict) or set(features) != {
+        "open",
+        "close",
+        "volume",
+        "intraday_return",
+        "close_times_volume_inr",
+        "intraday_return_percent_rank",
+        "liquidity_proxy_percent_rank",
+        "selection_score",
+        "source_row_sha256",
+    }:
+        raise ValueError("Feature fields changed")
+    if features["close"] != prediction["entry_reference_close"]:
+        raise ValueError("Feature close does not bind entry reference")
+    if type(features["volume"]) is not int or features["volume"] <= 0:
+        raise ValueError("Invalid feature volume")
+    for field in (
+        "open",
+        "close",
+        "close_times_volume_inr",
+        "intraday_return",
+        "selection_score",
+    ):
+        _decimal(features[field], field, positive=True)
+    for field in (
+        "intraday_return_percent_rank",
+        "liquidity_proxy_percent_rank",
+    ):
+        rank = _decimal(features[field], field)
+        if not Decimal(0) <= rank <= Decimal(1):
+            raise ValueError(f"Invalid {field}")
+    _sha(features["source_row_sha256"], "source_row_sha256")
     if prediction.get("feature_hash") != sha256(_canonical(features)).hexdigest():
         raise ValueError("Feature hash mismatch")
-    if payload["strategy"].get("qualification_status") != "EXPLORATORY_NOT_GATE_QUALIFIED":
-        raise ValueError("Exploratory strategy was promoted")
-    if payload["action_policy"].get("maturity_recheck_required") is not True:
+
+    benchmark = payload["benchmark"]
+    if set(benchmark) != {
+        "name",
+        "entry_session_date",
+        "entry_reference_close",
+        "price_basis",
+        "source_sha256",
+        "source_url",
+    }:
+        raise ValueError("Benchmark fields changed")
+    if (
+        benchmark["name"] != "Nifty 50"
+        or benchmark["entry_session_date"] != entry_day.isoformat()
+        or benchmark["price_basis"] != "UNADJUSTED_EXCHANGE_REFERENCE"
+    ):
+        raise ValueError("Benchmark contract changed")
+    _decimal(benchmark["entry_reference_close"], "benchmark_close", positive=True)
+    _sha(benchmark["source_sha256"], "benchmark_source_sha256")
+
+    source_receipts = payload["source_receipts"]
+    if not isinstance(source_receipts, dict) or set(source_receipts) != {
+        "cash",
+        "company",
+        "etf",
+        "actions",
+        "index",
+        "holiday_calendar",
+    }:
+        raise ValueError("Source receipt roles changed")
+    observed_times = []
+    for role, receipt in source_receipts.items():
+        if not isinstance(receipt, dict) or set(receipt) != {
+            "url",
+            "first_observed_at",
+            "sha256",
+            "bytes",
+        }:
+            raise ValueError("Source receipt fields changed")
+        parsed_url = urlsplit(str(receipt["url"]))
+        if (
+            parsed_url.scheme != "https"
+            or parsed_url.hostname not in {"www.nseindia.com", "nsearchives.nseindia.com"}
+            or parsed_url.username
+            or parsed_url.password
+            or parsed_url.fragment
+            or parsed_url.port not in (None, 443)
+        ):
+            raise ValueError("Unapproved stored source URL")
+        observed_times.append(_instant(receipt["first_observed_at"], "first_observed_at"))
+        _sha(receipt["sha256"], f"{role}_source_sha256")
+        if type(receipt["bytes"]) is not int or receipt["bytes"] <= 0:
+            raise ValueError("Invalid stored source size")
+    if max(observed_times) != cutoff or max(observed_times) > issued:
+        raise ValueError("Stored source cutoff mismatch")
+    if (
+        benchmark["source_sha256"] != source_receipts["index"]["sha256"]
+        or benchmark["source_url"] != source_receipts["index"]["url"]
+    ):
+        raise ValueError("Benchmark source receipt mismatch")
+
+    action_policy = payload["action_policy"]
+    if set(action_policy) != {
+        "capture_interval_start",
+        "capture_interval_end",
+        "selected_action_count_at_issue",
+        "complete_action_coverage_at_issue",
+        "maturity_recheck_required",
+        "score_if_action_or_identity_change",
+    }:
+        raise ValueError("Action policy fields changed")
+    if (
+        action_policy["selected_action_count_at_issue"] != 0
+        or action_policy["complete_action_coverage_at_issue"] is not False
+        or action_policy["maturity_recheck_required"] is not True
+        or action_policy["score_if_action_or_identity_change"] != "NOT_PROVEN_UNTIL_ADJUSTMENT_RESOLVED"
+    ):
         raise ValueError("Corporate-action maturity recheck required")
+    if not (
+        date.fromisoformat(action_policy["capture_interval_start"]) <= entry_day
+        and due_day <= date.fromisoformat(action_policy["capture_interval_end"])
+    ):
+        raise ValueError("Action capture does not cover the requested horizon")
+
+    metrics = payload["current_metrics"]
+    metric_fields = {
+        "valid_outcomes",
+        "oos_days",
+        "directional_accuracy",
+        "top_decile_precision",
+        "sharpe",
+        "max_drawdown",
+        "deflated_sharpe_probability",
+        "benchmark_excess_return",
+        "calibration_error",
+        "target_gaps",
+    }
+    if set(metrics) != metric_fields or metrics["valid_outcomes"] != 0 or metrics["oos_days"] != 0:
+        raise ValueError("Current metric fields overstate evidence")
+    pending_metrics = metric_fields - {"valid_outcomes", "oos_days", "target_gaps"}
+    if any(metrics[field] is not None for field in pending_metrics):
+        raise ValueError("Pending record cannot contain performance metrics")
+    if metrics["target_gaps"] != {
+        "valid_outcomes": 100,
+        "oos_days": 60,
+        "directional_accuracy": None,
+        "top_decile_precision": None,
+        "sharpe": None,
+        "max_drawdown": None,
+        "deflated_sharpe_probability": None,
+    }:
+        raise ValueError("Research gate gaps changed")
+
     safety = payload["safety"]
     if set(safety) != {
         "retrospective",

@@ -50,13 +50,13 @@ def zipped(rows):
 
 def fixture():
     rows = [
-        dict(zip(FIELDS, ["2026-10-01", "2026-10-01", "CM", "NSE", "STK", "INEAAA", "AAA", "EQ", "F1", "100", "115", "99", "110", "2000000"])),
-        dict(zip(FIELDS, ["2026-10-01", "2026-10-01", "CM", "NSE", "STK", "INEBBB", "BBB", "EQ", "F1", "100", "106", "99", "105", "3000000"])),
+        dict(zip(FIELDS, ["2026-10-01", "2026-10-01", "CM", "NSE", "STK", "INE000A01001", "AAA", "EQ", "F1", "100", "115", "99", "110", "2000000"])),
+        dict(zip(FIELDS, ["2026-10-01", "2026-10-01", "CM", "NSE", "STK", "INE000B01009", "BBB", "EQ", "F1", "100", "106", "99", "105", "3000000"])),
     ]
     cash = zipped(rows)
-    company = b"SYMBOL,ISIN NUMBER,SERIES\nAAA,INEAAA,EQ\nBBB,INEBBB,EQ\n"
+    company = b"SYMBOL,ISIN NUMBER,SERIES\nAAA,INE000A01001,EQ\nBBB,INE000B01009,EQ\n"
     etf = b"Symbol,ISINNumber\nTRACK,INETRACK\n"
-    actions = json.dumps([{"symbol": "ZZZ", "isin": "INEZZZ", "exDate": "05-Oct-2026", "subject": "Dividend"}]).encode()
+    actions = json.dumps([{"symbol": "ZZZ", "isin": "INE000Z01003", "exDate": "05-Oct-2026", "subject": "Dividend"}]).encode()
     equity_sources = {"cash": cash, "company": company, "etf": etf, "actions": actions}
     action_url = "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=01-10-2026&to_date=09-10-2026"
     equity_receipts = {
@@ -137,7 +137,32 @@ def test_event_and_feature_hashes_are_immutable():
         validate_prediction(result, now=NOW)
     result = build_prediction(**fixture())
     result["prediction"]["symbol"] = "BBB"
-    with pytest.raises(ValueError, match="event hash"):
+    with pytest.raises(ValueError, match="identity|event hash"):
+        validate_prediction(result, now=NOW)
+
+
+def rehash(result):
+    payload = {key: value for key, value in result.items() if key != "event_hash"}
+    result["event_hash"] = sha256(json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode()).hexdigest()
+
+
+@pytest.mark.parametrize(
+    "mutate,match",
+    [
+        (lambda row: row["prediction"].update(broker_order="BUY"), "Prediction fields"),
+        (lambda row: row["source_receipts"].update(secret_feed={}), "receipt roles"),
+        (lambda row: row["source_receipts"]["cash"].update(url="https://example.com/a"), "source URL"),
+        (lambda row: row["current_metrics"].update(directional_accuracy=1), "performance metrics"),
+        (lambda row: row["action_policy"].update(maturity_recheck_required=False), "recheck"),
+    ],
+)
+def test_rehashed_hidden_claims_and_source_changes_fail_closed(mutate, match):
+    result = build_prediction(**fixture())
+    mutate(result)
+    rehash(result)
+    with pytest.raises(ValueError, match=match):
         validate_prediction(result, now=NOW)
 
 
@@ -154,7 +179,7 @@ def test_rejects_source_observed_after_issue_and_wrong_hash():
 
 def test_selected_symbol_with_future_action_is_excluded():
     args = fixture()
-    actions = json.dumps([{"symbol": "AAA", "isin": "INEAAA", "exDate": "05-Oct-2026", "subject": "Dividend"}]).encode()
+    actions = json.dumps([{"symbol": "AAA", "isin": "INE000A01001", "exDate": "05-Oct-2026", "subject": "Dividend"}]).encode()
     args["equity_sources"]["actions"] = actions
     args["equity_receipts"]["actions"].update(raw_sha256=sha256(actions).hexdigest(), bytes=len(actions))
     result = build_prediction(**args)
