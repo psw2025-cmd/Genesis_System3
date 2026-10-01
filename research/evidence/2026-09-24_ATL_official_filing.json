@@ -1,0 +1,23 @@
+{
+  "task_id": "CAT-SOURCE-002",
+  "symbol": "ATL",
+  "isin": "INE0NN701020",
+  "source_url": "https://nsearchives.nseindia.com/corporate/ALLCARGOTERMINALS_24092026183814_Seupload.pdf",
+  "feed_source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=24-09-2026&to_date=24-09-2026",
+  "feed_sha256": "62206f38abce43ddbee9ea2bc8647e5ab22d10c5a1ef8dbc346d5b6c46c2b73c",
+  "source_sha256": "25a6796b7e3be41bc8141f06414e1fe8d4e92f80142e4519f44afb2ed29cb3c8",
+  "feed_rows": 784,
+  "exchange_received_at": "24-Sep-2026 18:38:25",
+  "disseminated_at": "24-Sep-2026 18:38:27",
+  "timezone": "Asia/Kolkata",
+  "first_observed_at": "2026-09-24T13:28:16.843959+00:00",
+  "first_observed_basis": "conservative timestamp after completed fetch and PDF inspection",
+  "category": "ACQUISITION_RELATED_PARTY_RIGHTS_SUBSCRIPTION",
+  "summary": "Board approved proportional subscription to associate AGSPL rights issue, up to INR 10610400; existing 25 percent stake.",
+  "prediction_issued_at": null,
+  "known_by_prediction_issue_time": null,
+  "feature_eligible": false,
+  "later_return": null,
+  "causal_attribution": "NOT_CLAIMED",
+  "orders_allowed": false
+}
