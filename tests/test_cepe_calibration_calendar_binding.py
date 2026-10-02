@@ -3,7 +3,7 @@
 All rows here are contract fixtures, not forecasts or market-performance proof.
 """
 from copy import deepcopy
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 import unittest
 
 from scripts.cepe_forward_calibration import report
@@ -65,7 +65,7 @@ def row():
 class CalibrationCalendarBindingTests(unittest.TestCase):
     def test_authenticated_fixture_is_accepted_without_readiness_claim(self):
         result = report([row()], as_of=AS_OF)
-        self.assertEqual(result["version"], "forward-calibration-v3")
+        self.assertEqual(result["version"], "forward-calibration-v4")
         self.assertEqual(result["matured_outcomes"], 1)
         self.assertFalse(result["real_money_ready"])
         self.assertFalse(result["orders_allowed"])
@@ -131,6 +131,50 @@ class CalibrationCalendarBindingTests(unittest.TestCase):
         weekend["session_calendar_evidence"]["session_date"] = "2026-09-28"
         with self.assertRaisesRegex(ValueError, "immediately preceding eligible"):
             report([weekend], as_of=AS_OF)
+
+    def test_perfect_fixture_cannot_pass_missing_cost_and_risk_gates(self):
+        sessions = []
+        cursor = date(2026, 1, 2)
+        holidays = {
+            date(2026, 1, 26), date(2026, 3, 3), date(2026, 3, 26),
+            date(2026, 3, 31), date(2026, 4, 3), date(2026, 4, 14),
+            date(2026, 5, 1), date(2026, 5, 28), date(2026, 6, 26),
+            date(2026, 9, 14), date(2026, 10, 2), date(2026, 10, 20),
+            date(2026, 11, 10), date(2026, 11, 24), date(2026, 12, 25),
+        }
+        while len(sessions) < 101:
+            if cursor.weekday() < 5 and cursor not in holidays:
+                sessions.append(cursor)
+            cursor += timedelta(days=1)
+        rows = []
+        for index, (previous, following) in enumerate(zip(sessions, sessions[1:])):
+            item = row()
+            item.update(
+                prediction_id=f"fixture-{index}",
+                previous_day=previous.isoformat(),
+                following_day=following.isoformat(),
+                issued_at=f"{previous.isoformat()}T16:00:00+05:30",
+                published_at=f"{previous.isoformat()}T16:01:00+05:30",
+                cutoff_at=f"{previous.isoformat()}T18:00:00+05:30",
+                following_open_at=f"{following.isoformat()}T09:15:00+05:30",
+                outcome_observed_at=f"{following.isoformat()}T09:16:00+05:30",
+            )
+            item["session_calendar_evidence"]["session_date"] = following.isoformat()
+            item["session_calendar_evidence"]["source_first_observed_at"] = (
+                "2025-12-12T00:00:00+05:30"
+            )
+            rows.append(item)
+        result = report(rows, as_of=datetime(2026, 12, 31, tzinfo=IST))
+        self.assertEqual(result["status"], "MEASURED_BELOW_RESEARCH_GATE")
+        self.assertTrue(result["research_gates"]["minimum_100_matured"])
+        self.assertTrue(result["research_gates"]["minimum_60_oos_days"])
+        self.assertTrue(
+            result["research_gates"]["directional_accuracy_at_least_65pct"]
+        )
+        self.assertFalse(result["research_gates"]["fees_and_slippage_applied"])
+        self.assertFalse(result["research_gates"]["sharpe_at_least_2_5"])
+        self.assertIsNone(result["metrics"]["net_sharpe"])
+        self.assertEqual(result["cost_evidence_status"], "NOT_PROVEN")
 
 
 if __name__ == "__main__":

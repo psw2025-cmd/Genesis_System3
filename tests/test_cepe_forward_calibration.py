@@ -192,9 +192,20 @@ def test_project_sample_and_accuracy_gates_use_forward_rows_only():
         )
         rows.append(row)
     result = report(rows, as_of=datetime(2026, 12, 31, tzinfo=IST))
-    assert result["status"] == "RESEARCH_CALIBRATION_GATE_PASS"
-    assert all(result["research_gates"].values())
+    assert result["status"] == "MEASURED_BELOW_RESEARCH_GATE"
+    assert result["research_gates"]["minimum_100_matured"] is True
+    assert result["research_gates"]["minimum_60_oos_days"] is True
+    assert result["research_gates"]["directional_accuracy_at_least_65pct"] is True
+    assert result["research_gates"]["top_decile_precision_at_least_70pct"] is True
+    assert result["research_gates"]["fees_and_slippage_applied"] is False
+    assert result["research_gates"]["sharpe_at_least_2_5"] is False
+    assert result["research_gates"]["max_drawdown_at_most_10pct"] is False
+    assert result["research_gates"]["deflated_sharpe_probability_at_least_0_95"] is False
     assert result["metrics"]["directional_accuracy"] == 1
+    assert result["metrics"]["top_decile_precision"] == 1
+    assert result["metrics"]["net_sharpe"] is None
+    assert result["metrics"]["net_max_drawdown"] is None
+    assert result["metrics"]["deflated_sharpe_probability"] is None
     assert result["real_money_ready"] is False
 
 
@@ -206,6 +217,27 @@ def test_registry_matches_code_governance_and_has_no_performance_claim():
     assert registry["forward_predictions"] == 0
     assert registry["forward_outcomes"] == 0
     assert registry["orders_allowed"] is False
+
+    project_registry = json.loads(
+        Path("research/experiments/cepe_forward_calibration_v2.json").read_text()
+    )
+    assert project_registry["parent_commit"] == (
+        "ed2697cf47e8a1aabd7d0a421cd8c2cb11c339aa"
+    )
+    assert project_registry["targets"] == {
+        "minimum_oos_trades": 100,
+        "minimum_oos_days": 60,
+        "minimum_directional_accuracy": 0.65,
+        "minimum_top_decile_precision": 0.7,
+        "minimum_sharpe": 2.5,
+        "maximum_drawdown": 0.1,
+        "minimum_deflated_sharpe_probability": 0.95,
+    }
+    assert project_registry["cost_evidence"]["status"] == (
+        "NOT_PROVEN_MISSING_COST_INPUTS"
+    )
+    assert project_registry["fixture_results_are_market_validation"] is False
+    assert project_registry["automatic_model_promotion"] is False
 
 
 def test_real_forward_no_signal_record_was_sealed_before_open():

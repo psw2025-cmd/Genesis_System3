@@ -29,10 +29,14 @@ from scripts.cepe_forward_decision import (
 
 
 TASK_ID = "CEPE-NEXT-008"
-VERSION = "forward-calibration-v3"
+VERSION = "forward-calibration-v4"
 MIN_MATURED_OUTCOMES = 100
 MIN_OOS_DAYS = 60
 MIN_DIRECTIONAL_ACCURACY = 0.65
+MIN_TOP_DECILE_PRECISION = 0.70
+MIN_SHARPE = 2.5
+MAX_DRAWDOWN = 0.10
+MIN_DEFLATED_SHARPE_PROBABILITY = 0.95
 EVENT_TYPES = {"positive_next_open", "at_least_3x"}
 FORECAST_KEYS = {
     "prediction_id",
@@ -118,6 +122,20 @@ def _canonical(value: Any) -> bytes:
     return json.dumps(
         value, sort_keys=True, separators=(",", ":"), allow_nan=False
     ).encode("utf-8")
+
+
+def _top_decile_precision(
+    probabilities: list[float], outcomes: list[bool]
+) -> tuple[float, int]:
+    """Return inclusive-boundary precision without arbitrary tie breaking."""
+    rank = max(1, (len(probabilities) + 9) // 10)
+    cutoff = sorted(probabilities, reverse=True)[rank - 1]
+    selected = [
+        outcome
+        for probability, outcome in zip(probabilities, outcomes)
+        if probability >= cutoff
+    ]
+    return sum(selected) / len(selected), len(selected)
 
 
 def _validate_common(record: dict[str, Any]) -> dict[str, Any]:
@@ -300,8 +318,34 @@ def report(records: list[dict[str, Any]], *, as_of: datetime) -> dict[str, Any]:
                 "minimum_100_matured": False,
                 "minimum_60_oos_days": False,
                 "directional_accuracy_at_least_65pct": False,
+                "top_decile_precision_at_least_70pct": False,
+                "fees_and_slippage_applied": False,
+                "sharpe_at_least_2_5": False,
+                "max_drawdown_at_most_10pct": False,
+                "deflated_sharpe_probability_at_least_0_95": False,
                 "zero_overdue_missing_outcomes": overdue == 0,
             },
+            "gate_blockers": [
+                "minimum_100_matured",
+                "minimum_60_oos_days",
+                "directional_accuracy_at_least_65pct",
+                "top_decile_precision_at_least_70pct",
+                "fees_and_slippage_applied",
+                "sharpe_at_least_2_5",
+                "max_drawdown_at_most_10pct",
+                "deflated_sharpe_probability_at_least_0_95",
+            ]
+            + ([] if overdue == 0 else ["zero_overdue_missing_outcomes"]),
+            "target_gaps": {
+                "matured_outcomes": MIN_MATURED_OUTCOMES,
+                "oos_days": MIN_OOS_DAYS,
+                "directional_accuracy_percentage_points": None,
+                "top_decile_precision_percentage_points": None,
+                "sharpe": None,
+                "max_drawdown": None,
+                "deflated_sharpe_probability": None,
+            },
+            "cost_evidence_status": "NOT_PROVEN",
             "real_money_ready": False,
             "orders_allowed": False,
         }
@@ -347,10 +391,20 @@ def report(records: list[dict[str, Any]], *, as_of: datetime) -> dict[str, Any]:
     successes = sum(correct)
     oos_days = len({item["following_day"] for item in normalized})
     accuracy = successes / len(normalized)
+    top_decile_precision, top_decile_count = _top_decile_precision(
+        probabilities, outcomes
+    )
     gates = {
         "minimum_100_matured": len(normalized) >= MIN_MATURED_OUTCOMES,
         "minimum_60_oos_days": oos_days >= MIN_OOS_DAYS,
         "directional_accuracy_at_least_65pct": accuracy >= MIN_DIRECTIONAL_ACCURACY,
+        "top_decile_precision_at_least_70pct": (
+            top_decile_precision >= MIN_TOP_DECILE_PRECISION
+        ),
+        "fees_and_slippage_applied": False,
+        "sharpe_at_least_2_5": False,
+        "max_drawdown_at_most_10pct": False,
+        "deflated_sharpe_probability_at_least_0_95": False,
         "zero_overdue_missing_outcomes": overdue == 0,
     }
     status = (
@@ -383,14 +437,36 @@ def report(records: list[dict[str, Any]], *, as_of: datetime) -> dict[str, Any]:
             "log_loss": log_loss,
             "expected_calibration_error_10_bin": ece,
             "reliability_bins": bins,
+            "top_decile_precision": top_decile_precision,
+            "top_decile_observations_including_boundary_ties": top_decile_count,
             "mean_gross_reference_return_pct": mean(returns),
             "median_gross_reference_return_pct": median(returns),
+            "fees_and_slippage_applied": False,
+            "net_sharpe": None,
+            "net_max_drawdown": None,
+            "deflated_sharpe_probability": None,
             "threshold_counts": {
                 str(level): sum(item["outcome_multiple"] >= level for item in normalized)
                 for level in (3, 10, 20, 30)
             },
         },
         "research_gates": gates,
+        "gate_blockers": [name for name, passed in gates.items() if not passed],
+        "target_gaps": {
+            "matured_outcomes": max(0, MIN_MATURED_OUTCOMES - len(normalized)),
+            "oos_days": max(0, MIN_OOS_DAYS - oos_days),
+            "directional_accuracy_percentage_points": max(
+                0.0, (MIN_DIRECTIONAL_ACCURACY - accuracy) * 100
+            ),
+            "top_decile_precision_percentage_points": max(
+                0.0,
+                (MIN_TOP_DECILE_PRECISION - top_decile_precision) * 100,
+            ),
+            "sharpe": None,
+            "max_drawdown": None,
+            "deflated_sharpe_probability": None,
+        },
+        "cost_evidence_status": "NOT_PROVEN",
         "observation_set_sha256": sha256(_canonical(normalized)).hexdigest(),
         "opening_price_is_executable_fill": False,
         "real_money_ready": False,
