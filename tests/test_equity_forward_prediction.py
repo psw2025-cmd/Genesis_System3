@@ -96,7 +96,8 @@ def fixture():
 
 
 def test_builds_one_unqualified_forward_paper_prediction():
-    result = build_prediction(**fixture())
+    args = fixture()
+    result = build_prediction(**args)
     assert result["prediction"]["symbol"] == "AAA"
     assert result["prediction"]["direction"] == "POSITIVE"
     assert result["prediction"]["entry_reference_close"] == "110"
@@ -107,7 +108,11 @@ def test_builds_one_unqualified_forward_paper_prediction():
     assert result["counts"]["qualified_current_candidates"] == 0
     assert result["counts"]["forward_predictions"] == 1
     assert result["due_session_date"] == "2026-10-08"
-    assert validate_prediction(result, now=NOW)["orders_allowed"] is False
+    assert validate_prediction(
+        result,
+        now=NOW,
+        holiday_calendar_raw=args["holiday_raw"],
+    )["orders_allowed"] is False
 
 
 @pytest.mark.parametrize(
@@ -121,24 +126,39 @@ def test_builds_one_unqualified_forward_paper_prediction():
     ],
 )
 def test_stored_record_fails_closed(path, value, match):
-    result = build_prediction(**fixture())
+    args = fixture()
+    result = build_prediction(**args)
     target = result
     for key in path[:-1]:
         target = target[key]
     target[path[-1]] = value
     with pytest.raises(ValueError, match=match):
-        validate_prediction(result, now=NOW)
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
 
 
 def test_event_and_feature_hashes_are_immutable():
-    result = build_prediction(**fixture())
+    args = fixture()
+    result = build_prediction(**args)
     result["prediction"]["features"]["volume"] += 1
     with pytest.raises(ValueError, match="Feature hash"):
-        validate_prediction(result, now=NOW)
-    result = build_prediction(**fixture())
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+    args = fixture()
+    result = build_prediction(**args)
     result["prediction"]["symbol"] = "BBB"
     with pytest.raises(ValueError, match="identity|event hash"):
-        validate_prediction(result, now=NOW)
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
 
 
 def rehash(result):
@@ -159,11 +179,61 @@ def rehash(result):
     ],
 )
 def test_rehashed_hidden_claims_and_source_changes_fail_closed(mutate, match):
-    result = build_prediction(**fixture())
+    args = fixture()
+    result = build_prediction(**args)
     mutate(result)
     rehash(result)
     with pytest.raises(ValueError, match=match):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+
+
+@pytest.mark.parametrize(
+    "mutate,match",
+    [
+        (
+            lambda row: row.update(due_at="2026-10-08T03:45:00+00:00"),
+            "due close timestamp",
+        ),
+        (
+            lambda row: row.update(
+                due_session_date="2026-10-09",
+                due_at="2026-10-09T10:00:00+00:00",
+            ),
+            "retained official calendar",
+        ),
+    ],
+)
+def test_rehashed_horizon_timestamp_or_session_substitution_fails_closed(
+    mutate,
+    match,
+):
+    args = fixture()
+    result = build_prediction(**args)
+    mutate(result)
+    rehash(result)
+    with pytest.raises(ValueError, match=match):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+
+
+def test_stored_prediction_requires_exact_retained_calendar_bytes():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="calendar bytes required"):
         validate_prediction(result, now=NOW)
+    with pytest.raises(ValueError, match="retained bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=b'{"CM":[]}',
+        )
 
 
 def test_rejects_source_observed_after_issue_and_wrong_hash():

@@ -156,10 +156,7 @@ def _index_reference(raw: bytes, receipt: dict[str, Any], session: date) -> tupl
     }, observed
 
 
-def _due_session(
-    raw: bytes, receipt: dict[str, Any], *, entry: date, calendar_days: int
-) -> tuple[date, datetime]:
-    observed = _verify_receipt(raw, receipt, url=HOLIDAY_URL)
+def _cm_holidays(raw: bytes) -> set[date]:
     try:
         payload = json.loads(raw)
         rows = payload["CM"]
@@ -173,6 +170,14 @@ def _due_session(
             holidays.add(datetime.strptime(row["tradingDate"], "%d-%b-%Y").date())
         except (KeyError, TypeError, ValueError) as exc:
             raise ValueError("Invalid CM holiday row") from exc
+    return holidays
+
+
+def _due_session(
+    raw: bytes, receipt: dict[str, Any], *, entry: date, calendar_days: int
+) -> tuple[date, datetime]:
+    observed = _verify_receipt(raw, receipt, url=HOLIDAY_URL)
+    holidays = _cm_holidays(raw)
     result = entry + timedelta(days=calendar_days)
     while result.weekday() >= 5 or result in holidays:
         result += timedelta(days=1)
@@ -386,11 +391,20 @@ def build_prediction(
         "previous_event_hash": _sha(previous_event_hash, "previous_event_hash"),
     }
     payload["event_hash"] = sha256(_canonical(payload)).hexdigest()
-    validate_prediction(payload, now=current)
+    validate_prediction(
+        payload,
+        now=current,
+        holiday_calendar_raw=holiday_raw,
+    )
     return payload
 
 
-def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None) -> dict[str, Any]:
+def validate_prediction(
+    payload: dict[str, Any],
+    *,
+    now: datetime | None = None,
+    holiday_calendar_raw: bytes | None = None,
+) -> dict[str, Any]:
     """Fail closed if a stored forward record overstates its evidence."""
     if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
         raise ValueError("Prediction record fields do not match locked schema")
@@ -408,7 +422,10 @@ def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None)
         raise ValueError("Invalid source/issue/outcome chronology")
     entry_day = date.fromisoformat(payload["entry_session_date"])
     due_day = date.fromisoformat(payload["due_session_date"])
-    if due.astimezone(IST).date() != due_day or due_day < entry_day + timedelta(days=7):
+    due_local = due.astimezone(IST)
+    if due_local.date() != due_day or due_local.time() != time(15, 30):
+        raise ValueError("Invalid due close timestamp")
+    if due_day < entry_day + timedelta(days=7):
         raise ValueError("Invalid due session")
 
     horizon = payload["horizon"]
@@ -595,6 +612,23 @@ def validate_prediction(payload: dict[str, Any], *, now: datetime | None = None)
         or benchmark["source_url"] != source_receipts["index"]["url"]
     ):
         raise ValueError("Benchmark source receipt mismatch")
+
+    calendar_receipt = source_receipts["holiday_calendar"]
+    if calendar_receipt["url"] != HOLIDAY_URL:
+        raise ValueError("Holiday calendar source changed")
+    if not isinstance(holiday_calendar_raw, bytes) or not holiday_calendar_raw:
+        raise ValueError("Official holiday calendar bytes required")
+    if (
+        sha256(holiday_calendar_raw).hexdigest() != calendar_receipt["sha256"]
+        or len(holiday_calendar_raw) != calendar_receipt["bytes"]
+    ):
+        raise ValueError("Holiday calendar retained bytes mismatch")
+    expected_due = entry_day + timedelta(days=horizon["calendar_days"])
+    holidays = _cm_holidays(holiday_calendar_raw)
+    while expected_due.weekday() >= 5 or expected_due in holidays:
+        expected_due += timedelta(days=1)
+    if due_day != expected_due:
+        raise ValueError("Due session does not match retained official calendar")
 
     action_policy = payload["action_policy"]
     if set(action_policy) != {
