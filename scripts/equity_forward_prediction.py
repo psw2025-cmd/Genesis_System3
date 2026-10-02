@@ -418,10 +418,16 @@ def validate_prediction(
     current = now or datetime.now(timezone.utc)
     if current.tzinfo is None or current.utcoffset() is None:
         raise ValueError("now requires timezone")
+    current_utc = current.astimezone(timezone.utc)
+    if issued > current_utc:
+        raise ValueError("Prediction issue is in the future")
     if not cutoff <= issued < due:
         raise ValueError("Invalid source/issue/outcome chronology")
     entry_day = date.fromisoformat(payload["entry_session_date"])
     due_day = date.fromisoformat(payload["due_session_date"])
+    issued_local = issued.astimezone(IST)
+    if issued_local.date() != entry_day or issued_local.time() < time(15, 30):
+        raise ValueError("Prediction must be issued after the completed entry-session close")
     due_local = due.astimezone(IST)
     if due_local.date() != due_day or due_local.time() != time(15, 30):
         raise ValueError("Invalid due close timestamp")
