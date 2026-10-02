@@ -161,6 +161,31 @@ def test_event_and_feature_hashes_are_immutable():
         )
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("intraday_return", "9.0000000000"),
+        ("close_times_volume_inr", "1.00"),
+        ("selection_score", "0.0100000000"),
+    ],
+)
+def test_rehashed_fabricated_feature_arithmetic_fails_closed(field, value):
+    args = fixture()
+    result = build_prediction(**args)
+    features = result["prediction"]["features"]
+    features[field] = value
+    result["prediction"]["feature_hash"] = sha256(json.dumps(
+        features, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode()).hexdigest()
+    rehash(result)
+    with pytest.raises(ValueError, match="Feature arithmetic mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+
+
 def rehash(result):
     payload = {key: value for key, value in result.items() if key != "event_hash"}
     result["event_hash"] = sha256(json.dumps(
