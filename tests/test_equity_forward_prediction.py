@@ -236,6 +236,49 @@ def test_stored_prediction_requires_exact_retained_calendar_bytes():
         )
 
 
+def test_stored_prediction_cannot_validate_before_issuance():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="issue is in the future"):
+        validate_prediction(
+            result,
+            now=datetime(2026, 9, 30, 12, tzinfo=timezone.utc),
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+
+
+@pytest.mark.parametrize(
+    "issued_at,now,match",
+    [
+        (
+            "2026-10-07T12:45:00+00:00",
+            datetime(2026, 10, 2, 0, tzinfo=timezone.utc),
+            "issue is in the future",
+        ),
+        (
+            "2026-10-02T12:45:00+00:00",
+            datetime(2026, 10, 2, 13, tzinfo=timezone.utc),
+            "completed entry-session close",
+        ),
+    ],
+)
+def test_rehashed_issuance_must_be_observed_and_bind_entry_session(
+    issued_at,
+    now,
+    match,
+):
+    args = fixture()
+    result = build_prediction(**args)
+    result["issued_at"] = issued_at
+    rehash(result)
+    with pytest.raises(ValueError, match=match):
+        validate_prediction(
+            result,
+            now=now,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+
+
 def test_rejects_source_observed_after_issue_and_wrong_hash():
     args = fixture()
     args["index_receipt"]["first_observed_at"] = "2026-10-01T12:46:00Z"
