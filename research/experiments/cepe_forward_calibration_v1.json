@@ -1,0 +1,56 @@
+{
+  "experiment_id": "CEPE-NEXT-008",
+  "status": "PREREGISTERED_FORWARD_ONLY",
+  "registered_date_ist": "2026-09-30",
+  "parent_commit": "f1ea5da805e8db236d49c4afc93d4b2541696944",
+  "objective": "Measure calibration of independently timestamped, source-qualified forward CE/PE event probabilities without admitting retrospective selections.",
+  "cohort_rule": "One strategy_id, strategy_version and event_type per report; mixing is rejected.",
+  "allowed_events": [
+    "positive_next_open",
+    "at_least_3x"
+  ],
+  "chronology": "issued_at <= independently verified published_at <= cutoff_at < following_open_at <= outcome_observed_at <= report as_of",
+  "required_prediction_provenance": [
+    "exact symbol expiry strike CE/PE identity",
+    "strategy id and immutable version",
+    "prediction source SHA-256",
+    "official session calendar SHA-256 and verified-session flag",
+    "independent publication receipt SHA-256",
+    "source_qualified=true",
+    "forward_issued=true and retrospective=false",
+    "independent publication verified before opening"
+  ],
+  "required_outcome_provenance": [
+    "positive finite next-opening reference multiple",
+    "outcome observation timestamp no earlier than following opening",
+    "outcome source SHA-256"
+  ],
+  "metrics": [
+    "positive and negative event counts",
+    "directional accuracy with Wilson 95 percent interval",
+    "Brier score and skill versus a fixed 0.5 probability",
+    "log loss",
+    "fixed ten-bin expected calibration error and reliability table",
+    "mean median and 3x 10x 20x 30x historical outcome distribution"
+  ],
+  "research_gates": {
+    "minimum_matured_outcomes": 100,
+    "minimum_oos_days": 60,
+    "minimum_directional_accuracy": 0.65,
+    "overdue_missing_outcomes": 0
+  },
+  "honesty_guards": {
+    "pending_records_are_scored": false,
+    "overdue_missing_outcome_pass_allowed": false,
+    "retrospective_rows_allowed": false,
+    "unverified_publication_allowed": false,
+    "opening_price_is_executable_fill": false,
+    "research_gate_implies_real_money_ready": false
+  },
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "expected_range": null,
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}

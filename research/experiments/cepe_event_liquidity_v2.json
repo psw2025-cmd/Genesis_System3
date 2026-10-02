@@ -1,0 +1,181 @@
+{
+  "experiment_id": "CEPE-NEXT-006",
+  "status": "PREREGISTERED_NOT_VALIDATION_EVALUATED",
+  "registered_date_ist": "2026-09-28",
+  "parent_commit": "bdf0b9753ecc8327701b4f89d96e90a36adfc984",
+  "hypothesis": "A fixed cross-sectional score combining prior premium persistence, close location, observable liquidity, open-interest change and expiry regime may improve next-opening gross reference return and 3x-event retrieval over same-universe raw intraday momentum. Improvement is a hypothesis until chronological validation; it is not a forecast or fill claim.",
+  "instrument": "Exact NSE F&O option symbol, expiry, strike and CE/PE side",
+  "horizon": "Verified prior NSE F&O session close to the immediately following official NSE F&O session opening reference",
+  "eligibility": {
+    "required_fields": [
+      "TradDt",
+      "TckrSymb",
+      "XpryDt",
+      "StrkPric",
+      "OptnTp",
+      "OpnPric",
+      "HghPric",
+      "LwPric",
+      "ClsPric",
+      "PrvsClsgPric",
+      "UndrlygPric",
+      "OpnIntrst",
+      "ChngInOpnIntrst",
+      "TtlTradgVol",
+      "TtlTrfVal",
+      "TtlNbOfTxsExctd",
+      "NewBrdLotQty"
+    ],
+    "numeric_validity": "Every required numeric field must be finite; open and close must be positive and inside high/low; high must exceed low; previous close, underlying, OI, transfer value, transactions and lot size must be positive.",
+    "minimum_previous_close": 5,
+    "minimum_prior_volume": 1000,
+    "expiry_rule": "Expiry date must be on or after the following official session.",
+    "missingness": "Exclude and count; never impute from following-session or later data.",
+    "implied_volatility": "NOT_AVAILABLE_IN_ARCHIVED_UDIFF_BHAVCOPY; excluded rather than estimated with unverified rates or post-issue inputs. Coverage is reported as zero."
+  },
+  "features": [
+    {
+      "name": "prior_premium_return_rank",
+      "formula": "percentile_rank(ClsPric / PrvsClsgPric)",
+      "weight": 0.35
+    },
+    {
+      "name": "close_location_rank",
+      "formula": "percentile_rank((ClsPric - LwPric) / (HghPric - LwPric))",
+      "weight": 0.15
+    },
+    {
+      "name": "log_volume_rank",
+      "formula": "percentile_rank(log1p(TtlTradgVol))",
+      "weight": 0.15
+    },
+    {
+      "name": "log_transaction_rank",
+      "formula": "percentile_rank(log1p(TtlNbOfTxsExctd))",
+      "weight": 0.1
+    },
+    {
+      "name": "open_interest_change_rank",
+      "formula": "percentile_rank(ChngInOpnIntrst / OpnIntrst)",
+      "weight": 0.1
+    },
+    {
+      "name": "near_expiry_regime_rank",
+      "formula": "percentile_rank(-(XpryDt - following_session_date).days)",
+      "weight": 0.1
+    },
+    {
+      "name": "lower_premium_rank",
+      "formula": "percentile_rank(-ClsPric)",
+      "weight": 0.05
+    }
+  ],
+  "ranking": {
+    "score": "Weighted sum of the seven prior-only percentile ranks; weights are fixed above and sum to 1.0.",
+    "percentile_ties": "Average rank divided by eligible count, ascending value; deterministic exact-identity lexicographic tie break after descending score.",
+    "selection": "Top floor(10% of eligible contracts) separately for each prior session.",
+    "following_session_fields_allowed_for_selection": false,
+    "expected_multiple_or_range_before_calibration": null,
+    "version": "event-liquidity-expiry-v2"
+  },
+  "data_plan": {
+    "development": [
+      "2024-09-26",
+      "2025-12-31"
+    ],
+    "validation": [
+      "2026-01-01",
+      "2026-03-31"
+    ],
+    "frozen_retrospective_test": [
+      "2026-04-01",
+      "2026-06-30"
+    ],
+    "session_source": "research/evidence/2026-09-27_nse_fo_session_calendar.json",
+    "validation_may_begin_after_this_registration_commit": true,
+    "frozen_test_access_rule": "Do not evaluate unless the candidate first passes the preregistered validation promotion rule; do not retune on frozen results.",
+    "known_inspected_dates_excluded_from_untouched_test": "All July and September 2026 diagnostics and September 2024/2025 annual endpoints",
+    "forward_issuance_claim_allowed_for_retrospective_data": false
+  },
+  "development_screen": {
+    "purpose": "Feature-family selection only; excluded from out-of-sample claims.",
+    "official_session_pairs": 313,
+    "selected": 48871,
+    "scoreable": 48816,
+    "gross_reference_mean_return_pct": 5.776235184381542,
+    "raw_reference_directional_hit_pct": 56.31964929531301,
+    "three_x_hits": 227,
+    "three_x_event_precision_pct": 0.4650114716486398,
+    "same_universe_raw_momentum_comparator": {
+      "scoreable": 48797,
+      "gross_reference_mean_return_pct": 4.084580015588918,
+      "raw_reference_directional_hit_pct": 55.78211775314056,
+      "three_x_hits": 148,
+      "three_x_event_precision_pct": 0.30329733385249097
+    },
+    "variants_recorded": [
+      "range_momentum_existing",
+      "raw_intraday_momentum_comparator",
+      "prior_premium_return",
+      "quality_momentum",
+      "quality_cost",
+      "event_hunter_selected",
+      "mean_reversion_quality_rejected",
+      "underlying_trend_event_rejected",
+      "underlying_trend_quality_rejected"
+    ],
+    "variant_count": 9,
+    "multiple_testing_note": "All inspected variants are recorded. Development improvement does not qualify the candidate and supplies no nominal significance claim."
+  },
+  "comparators": [
+    "Top-decile raw ClsPric/OpnPric momentum on the identical prior-qualified universe and selection count",
+    "CEPE-NEXT-005 range-liquidity candidate",
+    "Prior-qualified full-universe event prevalence"
+  ],
+  "evaluation": {
+    "primary_event": "Gross following-session open / prior-session close reference multiple >= 3",
+    "additional_thresholds": [
+      10,
+      20,
+      30
+    ],
+    "return_basis": "Gross opening reference, not an executable fill",
+    "cost_stress_bps_round_trip": [
+      0,
+      25,
+      50,
+      100
+    ],
+    "actual_fees_and_slippage": "NOT_PROVEN without point-in-time bid/ask, fill, tax and broker schedules; stress deductions are scenarios only.",
+    "report_all": [
+      "selected",
+      "scoreable",
+      "unscoreable",
+      "positive_negative_unchanged",
+      "3x_10x_20x_30x_counts",
+      "full_uncapped_distribution_hash",
+      "directional_hit_rate",
+      "event_precision",
+      "paired-session comparator excess",
+      "bootstrap_uncertainty",
+      "source_and_feature_missingness"
+    ],
+    "validation_promotion_rule": "Require positive paired-session mean gross excess versus raw-momentum comparator with bootstrap 95% interval lower bound above zero, at least 100 scoreable selections and 60 official validation sessions, plus no source/identity errors. Project gates remain separately mandatory.",
+    "validation_retuning_allowed": false,
+    "catalyst_version": "NO_CATALYST_BASELINE_ONLY"
+  },
+  "project_gates": {
+    "source": "config/quant_alpha_targets.json on main 76e82be543f61b1a319b8f949f50604236ec11a3",
+    "directional_accuracy_pct": 65,
+    "top_decile_precision_pct": 70,
+    "oos_trades": 100,
+    "oos_days": 60,
+    "sharpe": 2.5,
+    "maximum_drawdown_pct": 10,
+    "deflated_sharpe_probability": 0.95,
+    "forward_predictions": 0,
+    "forward_outcomes": 0
+  },
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}

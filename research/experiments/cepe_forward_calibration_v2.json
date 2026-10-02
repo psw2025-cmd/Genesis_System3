@@ -1,0 +1,52 @@
+{
+  "schema": "cepe-forward-calibration-registry-v2",
+  "experiment_id": "CEPE-NEXT-008",
+  "registered_date_ist": "2026-10-02",
+  "parent_commit": "ed2697cf47e8a1aabd7d0a421cd8c2cb11c339aa",
+  "supersedes": "research/experiments/cepe_forward_calibration_v1.json",
+  "instrument": "Exact NSE F&O CE/PE contract",
+  "horizon": "Previous eligible session close reference to next eligible regular-session 09:15 IST open reference",
+  "opening_price_is_executable_fill": false,
+  "targets_source": "config/quant_alpha_targets.json@main:76e82be543f61b1a319b8f949f50604236ec11a3",
+  "targets": {
+    "minimum_oos_trades": 100,
+    "minimum_oos_days": 60,
+    "minimum_directional_accuracy": 0.65,
+    "minimum_top_decile_precision": 0.7,
+    "minimum_sharpe": 2.5,
+    "maximum_drawdown": 0.1,
+    "minimum_deflated_sharpe_probability": 0.95
+  },
+  "current_values": {
+    "valid_forward_trades": 0,
+    "valid_forward_days": 0,
+    "directional_accuracy": null,
+    "top_decile_precision": null,
+    "net_sharpe": null,
+    "net_max_drawdown": null,
+    "deflated_sharpe_probability": null
+  },
+  "numerical_gaps": {
+    "oos_trades": 100,
+    "oos_days": 60,
+    "directional_accuracy_percentage_points": null,
+    "top_decile_precision_percentage_points": null,
+    "sharpe": null,
+    "max_drawdown": null,
+    "deflated_sharpe_probability": null
+  },
+  "cost_evidence": {
+    "fees_available": false,
+    "bid_ask_available": false,
+    "slippage_available": false,
+    "status": "NOT_PROVEN_MISSING_COST_INPUTS",
+    "missing_values_are_imputed": false
+  },
+  "hypothesis": "Authenticated forward rows may support calibrated event probabilities, but no research gate may pass until costs and all project risk metrics are measured on chronological OOS outcomes.",
+  "next_experiment": "After genuine pre-issued forecasts mature, retain source-qualified fee and liquidity inputs, compute net returns, and evaluate the complete project gate set without tuning the frozen outcomes.",
+  "fixture_results_are_market_validation": false,
+  "automatic_model_promotion": false,
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}

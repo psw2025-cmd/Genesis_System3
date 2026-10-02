@@ -1,0 +1,172 @@
+{
+  "task_id": "CEPE-NEXT-005",
+  "phase": "development",
+  "start": "2024-09-26",
+  "end": "2025-12-31",
+  "generated_at": "2026-09-27T10:42:08.862000+00:00",
+  "registration_commit": "1cf0f9d731e3d3bebaa2f496484c0cb56646732f",
+  "strategy_implementation_commit": "85e1c444c6c247aa468f009e83a61dc97929b287",
+  "evaluated_session_pairs": 236,
+  "source_scope": {
+    "source_files": 314,
+    "first_available_date": "2024-09-26",
+    "last_available_date": "2025-12-31",
+    "status": "ARCHIVED_ACQUISITION_SCOPE_VERIFIED",
+    "acquisition_manifest_verified": true,
+    "market_calendar_complete": false,
+    "missing_dates_are_holidays": false,
+    "manifest_sha256": "79ed9a2bcd7e394b89feae1f86827b252521a04013aac9b721cca88b09553420",
+    "requested_calendar_dates": 462,
+    "source_404_dates": 148
+  },
+  "excluded_errors": [],
+  "summary": {
+    "variant": {
+      "selected": 36738,
+      "scoreable": 36680,
+      "unscoreable": 58,
+      "hits": 30,
+      "false_picks": 36650,
+      "missed_events": 231,
+      "positive_returns": 21059,
+      "negative_returns": 13861,
+      "unchanged_returns": 1760,
+      "distribution": {
+        "count": 36680,
+        "mean": 1.0258693507906216,
+        "quantiles": {
+          "0": 0.045896,
+          "0.01": 0.62443081,
+          "0.05": 0.82243,
+          "0.25": 0.96544025,
+          "0.5": 1.012821,
+          "0.75": 1.074627,
+          "0.95": 1.2406962,
+          "0.99": 1.5371274299999975,
+          "1": 5.80303
+        },
+        "thresholds": {
+          "3": 30,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "8a6eee2b1cdee3e3d0a88b17618c4e23873f49f9f6db1d3e8a13a5d211ad7215"
+      },
+      "gross_reference_mean_return_pct": 2.586935079062159,
+      "assumed_cost_stress_mean_return_pct": {
+        "0": 2.586935079062159,
+        "25": 2.336935079062159,
+        "50": 2.086935079062159,
+        "100": 1.5869350790621592
+      },
+      "raw_reference_directional_hit_pct": 57.41275899672846,
+      "raw_3x_event_precision_pct": 0.08178844056706652,
+      "reference_gap_to_65pct_directional_gate": 7.5872410032715365,
+      "reference_gap_to_70pct_3x_precision_gate": 69.91821155943293
+    },
+    "same_universe_momentum": {
+      "selected": 36738,
+      "scoreable": 36681,
+      "unscoreable": 57,
+      "hits": 52,
+      "false_picks": 36629,
+      "missed_events": 209,
+      "positive_returns": 20676,
+      "negative_returns": 14163,
+      "unchanged_returns": 1842,
+      "distribution": {
+        "count": 36681,
+        "mean": 1.030127218396445,
+        "quantiles": {
+          "0": 0.003802,
+          "0.01": 0.5101902,
+          "0.05": 0.764331,
+          "0.25": 0.952281,
+          "0.5": 1.011925,
+          "0.75": 1.08747,
+          "0.95": 1.310401,
+          "0.99": 1.764382799999995,
+          "1": 7.893805
+        },
+        "thresholds": {
+          "3": 52,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "897d02fb749224815c75118382e75121a66b758432af1f92f6441cd4674f309f"
+      },
+      "gross_reference_mean_return_pct": 3.0127218396445024,
+      "assumed_cost_stress_mean_return_pct": {
+        "0": 3.0127218396445024,
+        "25": 2.7627218396445024,
+        "50": 2.5127218396445024,
+        "100": 2.0127218396445024
+      },
+      "raw_reference_directional_hit_pct": 56.367056514271695,
+      "raw_3x_event_precision_pct": 0.14176276546440936,
+      "reference_gap_to_65pct_directional_gate": 8.632943485728305,
+      "reference_gap_to_70pct_3x_precision_gate": 69.8582372345356
+    }
+  },
+  "uncertainty": {
+    "paired_session_mean_excess_pct": -0.40129099046679356,
+    "paired_day_bootstrap_95pct_interval": [
+      -0.9493738531120881,
+      0.10185113990520267
+    ],
+    "positive_excess_days": 116,
+    "negative_excess_days": 120,
+    "bootstrap_seed": 20260926,
+    "resamples": 10000,
+    "limitations": "Day bootstrap does not correct serial dependence or selection across earlier experiments. Contract observations are not independent."
+  },
+  "population_distribution": {
+    "count": 367901,
+    "mean": 0.9999773517875733,
+    "quantiles": {
+      "0": 0.000393,
+      "0.01": 0.504854,
+      "0.05": 0.747312,
+      "0.25": 0.934113,
+      "0.5": 1.0,
+      "0.75": 1.058266,
+      "0.95": 1.22449,
+      "0.99": 1.547389,
+      "1": 11.413613
+    },
+    "thresholds": {
+      "3": 261,
+      "10": 3,
+      "20": 0,
+      "30": 0
+    },
+    "full_uncapped_distribution_sha256": "d249e7341bf34936dedf3f4d1ae51f1b6b6ca817f01d9af17b2a120af1d9909c"
+  },
+  "multiple_precision": "Six decimal reference multiples from frozen comparator; no capping",
+  "negative_forecasts_issued": 0,
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "calibrated_expected_range": null,
+  "source_availability_at_historical_issue": "NOT_PROVEN",
+  "executable_cost_net_performance": "NOT_PROVEN",
+  "project_qualified_oos_trades": 0,
+  "project_qualified_oos_days": 0,
+  "gap_to_100_qualified_oos_trades": 100,
+  "gap_to_60_qualified_oos_days": 60,
+  "project_sharpe": "NOT_PROVEN",
+  "project_max_drawdown": "NOT_PROVEN",
+  "project_deflated_sharpe": "NOT_PROVEN",
+  "numeric_reference_metrics_are_project_gate_pass": false,
+  "catalyst_ablation": "NO_CATALYST_BASELINE_ONLY",
+  "orders_allowed": false,
+  "status": "RETROSPECTIVE_REFERENCE_ONLY",
+  "skipped_calendar_gap_count": 77,
+  "full_evidence_file": "2026-09-27_cepe_development_full.json.gz",
+  "full_json_sha256": "033993fca49eab34d016f92a9dbd2264fcc03862c0386cf72c899dc10e6d47cc",
+  "full_gzip_sha256": "8ea5edac163d7c601194600f29209932e885e861b8be1d2af963b62e56750f72",
+  "evaluator_commit": "5fbc647dd9deb5395e1441ba1d929eae5a597c45",
+  "decision": "REJECTED_FOR_PROMOTION_DEVELOPMENT_AND_VALIDATION_UNDERPERFORM_COMPARATOR",
+  "frozen_2026Q2_option_outcome_test": "UNSCORED_PRESERVED"
+}
