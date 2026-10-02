@@ -12,12 +12,17 @@ from urllib.parse import urlsplit
 SCHEMA = "cepe-email-delivery-v1"
 TASK_ID = "CEPE-DELIVERY-014"
 EXPECTED_RECIPIENT = "warghade2012@gmail.com"
+AS_SENT_TARGET_OPEN_AT = "2026-10-02T09:15:00+05:30"
+CORRECTED_TARGET_OPEN_AT = "2026-10-05T09:15:00+05:30"
+CALENDAR_URL = "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf"
+CALENDAR_SHA256 = "5a2079cd78b2e6b536ef0d28300e63b645721bed22cc82a91facf5945f3296ea"
 EXPECTED_KEYS = {
     "schema",
     "task_id",
     "lane",
     "report_date_ist",
     "target_open_at",
+    "target_session_correction",
     "decision_issued_at",
     "decision",
     "reason_codes",
@@ -91,6 +96,79 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("Report date/source cutoff does not match decision time")
     if not observed_at <= sent_at < target_open:
         raise ValueError("Delivery must follow its source check and precede target open")
+    if payload["target_open_at"] != AS_SENT_TARGET_OPEN_AT:
+        raise ValueError("Historical receipt must preserve the as-sent target opening")
+
+    correction = payload["target_session_correction"]
+    expected_correction_fields = {
+        "identified_at",
+        "as_sent_target_open_at",
+        "as_sent_target_date_valid",
+        "corrected_next_eligible_open_at",
+        "calendar_source_url",
+        "calendar_source_sha256",
+        "calendar_source_first_observed_at",
+        "calendar_source_circular",
+        "calendar_source_published_date",
+        "official_holiday_date",
+        "official_holiday_reason",
+        "weekend_dates",
+        "opening_time_basis",
+        "email_content_mutable",
+        "correction_email_sent",
+        "duplicate_guard_preserved",
+    }
+    if not isinstance(correction, dict) or set(correction) != expected_correction_fields:
+        raise ValueError("Target-session correction is incomplete")
+    identified_at = _instant(correction["identified_at"], "correction identified_at")
+    corrected_open = _instant(
+        correction["corrected_next_eligible_open_at"], "corrected next eligible open"
+    )
+    calendar_observed = _instant(
+        correction["calendar_source_first_observed_at"], "calendar source first observed"
+    )
+    if correction["as_sent_target_open_at"] != payload["target_open_at"]:
+        raise ValueError("Correction is not bound to the as-sent target opening")
+    if correction["as_sent_target_date_valid"] is not False:
+        raise ValueError("Invalid holiday target was not marked false")
+    if correction["corrected_next_eligible_open_at"] != CORRECTED_TARGET_OPEN_AT:
+        raise ValueError("Corrected target is not the next eligible NSE F&O session")
+    if not calendar_observed < decision_at <= sent_at < identified_at < corrected_open:
+        raise ValueError("Calendar correction chronology is invalid")
+    calendar_url = str(correction["calendar_source_url"])
+    calendar_source = urlsplit(calendar_url)
+    if (
+        calendar_url != CALENDAR_URL
+        or calendar_source.scheme != "https"
+        or calendar_source.hostname != "nsearchives.nseindia.com"
+        or calendar_source.username
+        or calendar_source.password
+        or calendar_source.fragment
+        or calendar_source.port not in (None, 443)
+    ):
+        raise ValueError("Calendar correction is not bound to the exact official NSE circular")
+    if _sha256(correction["calendar_source_sha256"], "calendar source SHA-256") != CALENDAR_SHA256:
+        raise ValueError("Calendar correction source hash changed")
+    if (
+        correction["calendar_source_circular"] != "NSE/FAOP/71777"
+        or correction["calendar_source_published_date"] != "2025-12-12"
+    ):
+        raise ValueError("Calendar correction circular identity changed")
+    if (
+        correction["official_holiday_date"] != "2026-10-02"
+        or correction["official_holiday_reason"] != "Mahatma Gandhi Jayanti"
+    ):
+        raise ValueError("Calendar correction holiday evidence changed")
+    if correction["weekend_dates"] != ["2026-10-03", "2026-10-04"]:
+        raise ValueError("Calendar correction weekend gap changed")
+    if correction["opening_time_basis"] != "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL":
+        raise ValueError("Corrected opening basis was overstated")
+    if correction["email_content_mutable"] is not False:
+        raise ValueError("Historical email content cannot be rewritten")
+    if correction["correction_email_sent"] is not False:
+        raise ValueError("Calendar correction cannot authorize a duplicate email")
+    if correction["duplicate_guard_preserved"] is not True:
+        raise ValueError("Exactly-once guard was not preserved by the correction")
 
     if payload["decision"] != "NO_VERIFIED_SIGNAL":
         raise ValueError("Only a fail-closed no-signal delivery is supported")
@@ -182,8 +260,10 @@ def validate(payload: dict[str, Any]) -> dict[str, Any]:
 
     return {
         "task_id": TASK_ID,
-        "status": "NO_SIGNAL_EMAIL_DELIVERED_EXACTLY_ONCE",
+        "status": "NO_SIGNAL_EMAIL_DELIVERED_EXACTLY_ONCE_CALENDAR_CORRECTED",
         "report_date_ist": report_day.isoformat(),
+        "as_sent_target_open_at": target_open.isoformat(),
+        "corrected_target_open_at": corrected_open.isoformat(),
         "gmail_message_id": delivery["gmail_message_id"],
         "receipt_sha256": sha256(_canonical(payload)).hexdigest(),
         "qualified_candidates": 0,
