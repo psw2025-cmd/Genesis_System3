@@ -295,6 +295,7 @@ jobs:
             tests/test_cepe_event_liquidity_candidate.py \
             tests/test_cepe_regularized_regime_candidate.py \
             tests/test_cepe_forward_calibration.py \
+            tests/test_cepe_forward_session_calendar.py \
             -o addopts="" -v --tb=short
 
       - name: Classify quantitative AlphaTruth evidence

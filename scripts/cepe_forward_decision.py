@@ -7,15 +7,44 @@ counts, stale-source promotion and claims that an inaccessible source is absent.
 """
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, time, timedelta, timezone
 from hashlib import sha256
 import json
+import re
 from typing import Any
 from urllib.parse import urlsplit
 
 
-SCHEMA = "cepe-forward-decision-v1"
+LEGACY_SCHEMA = "cepe-forward-decision-v1"
+SCHEMA = "cepe-forward-decision-v2"
 TASK_ID = "CEPE-NEXT-009"
+LEGACY_CANONICAL_SHA256 = (
+    "0f2dabcc1f60c2891c216bd1314079f0870af8c2c70f4d3a88e60b0ddc84cc54"
+)
+CALENDAR_URL = "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf"
+CALENDAR_SHA256 = (
+    "5a2079cd78b2e6b536ef0d28300e63b645721bed22cc82a91facf5945f3296ea"
+)
+CALENDAR_CIRCULAR = "NSE/FAOP/71777"
+CALENDAR_PUBLISHED_DATE = "2025-12-12"
+NSE_IST = timezone(timedelta(hours=5, minutes=30))
+NSE_FO_2026_WEEKDAY_HOLIDAYS = {
+    date(2026, 1, 26),
+    date(2026, 3, 3),
+    date(2026, 3, 26),
+    date(2026, 3, 31),
+    date(2026, 4, 3),
+    date(2026, 4, 14),
+    date(2026, 5, 1),
+    date(2026, 5, 28),
+    date(2026, 6, 26),
+    date(2026, 9, 14),
+    date(2026, 10, 2),
+    date(2026, 10, 20),
+    date(2026, 11, 10),
+    date(2026, 11, 24),
+    date(2026, 12, 25),
+}
 GITHUB_OWNER = "psw2025-cmd"
 GITHUB_REPOSITORY = "Genesis_System3"
 GITHUB_PR_NUMBER = 472
@@ -43,6 +72,18 @@ EXPECTED_KEYS = {
     "real_money_ready",
     "live_trading_enabled",
     "orders_allowed",
+}
+V2_EXPECTED_KEYS = EXPECTED_KEYS | {"session_calendar_evidence"}
+CALENDAR_EXPECTED_KEYS = {
+    "segment",
+    "source_url",
+    "source_sha256",
+    "source_first_observed_at",
+    "source_published_date",
+    "source_circular",
+    "session_date",
+    "session_status",
+    "opening_time_basis",
 }
 REQUIRED_REASONS = {
     "FRESH_OFFICIAL_PREVIOUS_SESSION_FO_BYTES_NOT_OBTAINED",
@@ -123,13 +164,42 @@ def _canonical(payload: dict[str, Any]) -> bytes:
     ).encode("utf-8")
 
 
+def _is_regular_fo_session(day: date) -> bool:
+    return day.weekday() < 5 and day not in NSE_FO_2026_WEEKDAY_HOLIDAYS
+
+
+def _next_regular_open_after(issued: datetime) -> datetime:
+    issued_ist = issued.astimezone(NSE_IST)
+    candidate = issued_ist.date()
+    opening = datetime.combine(candidate, time(9, 15), tzinfo=NSE_IST)
+    if issued_ist >= opening:
+        candidate += timedelta(days=1)
+    while not _is_regular_fo_session(candidate):
+        candidate += timedelta(days=1)
+    return datetime.combine(candidate, time(9, 15), tzinfo=NSE_IST)
+
+
 def validate(
     payload: dict[str, Any], *, externally_published_at: datetime | None = None
 ) -> dict[str, Any]:
     """Return a compact proof summary or fail closed on any hidden claim."""
-    if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
+    if not isinstance(payload, dict):
         raise ValueError("Decision record fields do not match the locked schema")
-    if payload["schema"] != SCHEMA or payload["task_id"] != TASK_ID:
+    schema = payload.get("schema")
+    expected_keys = (
+        EXPECTED_KEYS
+        if schema == LEGACY_SCHEMA
+        else V2_EXPECTED_KEYS
+        if schema == SCHEMA
+        else None
+    )
+    if expected_keys is None or set(payload) != expected_keys:
+        raise ValueError("Decision record fields do not match the locked schema")
+    if schema == LEGACY_SCHEMA and payload["task_id"] != TASK_ID:
+        raise ValueError("Unsupported decision schema or task")
+    if schema == SCHEMA and not re.fullmatch(
+        r"CEPE-NEXT-[0-9]{3,}", str(payload["task_id"])
+    ):
         raise ValueError("Unsupported decision schema or task")
     if payload["evidence_class"] != "FORWARD_NO_SIGNAL_DECISION":
         raise ValueError("Invalid evidence class")
@@ -142,6 +212,62 @@ def validate(
         raise ValueError("Following opening date does not match session_date")
     if not source_cutoff <= issued < following_open:
         raise ValueError("Decision must be issued after its source cutoff and before opening")
+
+    calendar_status = "LEGACY_EXACT_PAYLOAD"
+    if schema == SCHEMA:
+        calendar = payload["session_calendar_evidence"]
+        if not isinstance(calendar, dict) or set(calendar) != CALENDAR_EXPECTED_KEYS:
+            raise ValueError("Session-calendar evidence is incomplete")
+        if calendar["segment"] != "FO":
+            raise ValueError("Session calendar is not for NSE F&O")
+        calendar_url = _official_url(calendar["source_url"], "calendar source URL")
+        if calendar_url != CALENDAR_URL:
+            raise ValueError("Session calendar is not bound to the exact official circular")
+        if _sha(calendar["source_sha256"], "calendar source SHA-256") != CALENDAR_SHA256:
+            raise ValueError("Session calendar source hash changed")
+        if (
+            calendar["source_circular"] != CALENDAR_CIRCULAR
+            or calendar["source_published_date"] != CALENDAR_PUBLISHED_DATE
+        ):
+            raise ValueError("Session calendar circular identity changed")
+        calendar_observed = _instant(
+            calendar["source_first_observed_at"],
+            "calendar source_first_observed_at",
+        )
+        calendar_published = _day(
+            calendar["source_published_date"], "calendar source_published_date"
+        )
+        calendar_session = _day(calendar["session_date"], "calendar session_date")
+        if not calendar_published <= calendar_observed.date():
+            raise ValueError("Session calendar was observed before publication")
+        if not calendar_observed <= source_cutoff:
+            raise ValueError("Session calendar was not known by the decision cutoff")
+        if calendar_session != session_day:
+            raise ValueError("Session calendar date does not match the declared opening")
+        if session_day.year != 2026:
+            raise ValueError("Official calendar source does not cover the session year")
+        if session_day.weekday() >= 5:
+            raise ValueError("Declared following opening is on a weekend")
+        if session_day in NSE_FO_2026_WEEKDAY_HOLIDAYS:
+            raise ValueError("Declared following opening is an official NSE F&O holiday")
+        if calendar["session_status"] != "SCHEDULED_REGULAR_SESSION_AS_OF_SOURCE":
+            raise ValueError("Session calendar status is not fail-closed")
+        if (
+            calendar["opening_time_basis"]
+            != "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL"
+        ):
+            raise ValueError("Following opening basis was overstated")
+        if (
+            following_open.utcoffset() != timedelta(hours=5, minutes=30)
+            or following_open.hour != 9
+            or following_open.minute != 15
+            or following_open.second != 0
+            or following_open.microsecond != 0
+        ):
+            raise ValueError("Following opening is not the declared regular NSE session time")
+        if following_open != _next_regular_open_after(issued):
+            raise ValueError("Following opening is not the next eligible NSE F&O session")
+        calendar_status = "OFFICIAL_2026_FO_CALENDAR_BOUND"
 
     if payload["decision"] != "NO_VERIFIED_SIGNAL":
         raise ValueError("Only the fail-closed no-signal decision is supported")
@@ -210,6 +336,12 @@ def validate(
         if payload[field] is not False:
             raise ValueError(f"Unsafe or dishonest flag: {field}")
 
+    if (
+        schema == LEGACY_SCHEMA
+        and sha256(_canonical(payload)).hexdigest() != LEGACY_CANONICAL_SHA256
+    ):
+        raise ValueError("Legacy v1 is restricted to the exact sealed historical payload")
+
     published_before_open = None
     if externally_published_at is not None:
         if externally_published_at.tzinfo is None or externally_published_at.utcoffset() is None:
@@ -219,9 +351,14 @@ def validate(
         published_before_open = True
 
     return {
-        "task_id": TASK_ID,
-        "status": "FORWARD_NO_SIGNAL_SEALED",
+        "task_id": payload["task_id"],
+        "status": (
+            "FORWARD_NO_SIGNAL_SEALED"
+            if schema == LEGACY_SCHEMA
+            else "FORWARD_NO_SIGNAL_CALENDAR_SEALED"
+        ),
         "session_date": session_day.isoformat(),
+        "session_calendar_status": calendar_status,
         "decision_record_sha256": sha256(_canonical(payload)).hexdigest(),
         "candidate_count": 0,
         "prediction_count": 0,
