@@ -536,18 +536,27 @@ def validate_prediction(
         "source_row_sha256",
     }:
         raise ValueError("Feature fields changed")
+    _sha(features["source_row_sha256"], "source_row_sha256")
+    if prediction.get("feature_hash") != sha256(_canonical(features)).hexdigest():
+        raise ValueError("Feature hash mismatch")
     if features["close"] != prediction["entry_reference_close"]:
         raise ValueError("Feature close does not bind entry reference")
     if type(features["volume"]) is not int or features["volume"] <= 0:
         raise ValueError("Invalid feature volume")
-    for field in (
-        "open",
-        "close",
+    feature_open = _decimal(features["open"], "open", positive=True)
+    feature_close = _decimal(features["close"], "close", positive=True)
+    feature_return = _decimal(
+        features["intraday_return"], "intraday_return", positive=True
+    )
+    feature_liquidity = _decimal(
+        features["close_times_volume_inr"],
         "close_times_volume_inr",
-        "intraday_return",
-        "selection_score",
-    ):
-        _decimal(features[field], field, positive=True)
+        positive=True,
+    )
+    selection_score = _decimal(
+        features["selection_score"], "selection_score", positive=True
+    )
+    ranks = {}
     for field in (
         "intraday_return_percent_rank",
         "liquidity_proxy_percent_rank",
@@ -555,9 +564,26 @@ def validate_prediction(
         rank = _decimal(features[field], field)
         if not Decimal(0) <= rank <= Decimal(1):
             raise ValueError(f"Invalid {field}")
-    _sha(features["source_row_sha256"], "source_row_sha256")
-    if prediction.get("feature_hash") != sha256(_canonical(features)).hexdigest():
-        raise ValueError("Feature hash mismatch")
+        ranks[field] = rank
+    expected_return = (feature_close / feature_open - 1).quantize(
+        Decimal("0.0000000001")
+    )
+    expected_liquidity = (feature_close * features["volume"]).quantize(
+        Decimal("0.01")
+    )
+    expected_score = (
+        (
+            ranks["intraday_return_percent_rank"]
+            + ranks["liquidity_proxy_percent_rank"]
+        )
+        / 2
+    ).quantize(Decimal("0.0000000001"))
+    if (
+        feature_return != expected_return
+        or feature_liquidity != expected_liquidity
+        or abs(selection_score - expected_score) > Decimal("0.0000000001")
+    ):
+        raise ValueError("Feature arithmetic mismatch")
 
     benchmark = payload["benchmark"]
     if set(benchmark) != {
