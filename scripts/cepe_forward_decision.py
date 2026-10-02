@@ -179,6 +179,69 @@ def _next_regular_open_after(issued: datetime) -> datetime:
     return datetime.combine(candidate, time(9, 15), tzinfo=NSE_IST)
 
 
+def validate_session_calendar_evidence(
+    evidence: dict[str, Any],
+    *,
+    session_day: date,
+    following_open: datetime,
+    known_by: datetime,
+    issued_at: datetime,
+) -> str:
+    """Authenticate a regular 2026 NSE F&O session used before publication."""
+    if not isinstance(evidence, dict) or set(evidence) != CALENDAR_EXPECTED_KEYS:
+        raise ValueError("Session-calendar evidence is incomplete")
+    if evidence["segment"] != "FO":
+        raise ValueError("Session calendar is not for NSE F&O")
+    calendar_url = _official_url(evidence["source_url"], "calendar source URL")
+    if calendar_url != CALENDAR_URL:
+        raise ValueError("Session calendar is not bound to the exact official circular")
+    if _sha(evidence["source_sha256"], "calendar source SHA-256") != CALENDAR_SHA256:
+        raise ValueError("Session calendar source hash changed")
+    if (
+        evidence["source_circular"] != CALENDAR_CIRCULAR
+        or evidence["source_published_date"] != CALENDAR_PUBLISHED_DATE
+    ):
+        raise ValueError("Session calendar circular identity changed")
+    calendar_observed = _instant(
+        evidence["source_first_observed_at"],
+        "calendar source_first_observed_at",
+    )
+    calendar_published = _day(
+        evidence["source_published_date"], "calendar source_published_date"
+    )
+    calendar_session = _day(evidence["session_date"], "calendar session_date")
+    if not calendar_published <= calendar_observed.date():
+        raise ValueError("Session calendar was observed before publication")
+    if not calendar_observed <= known_by:
+        raise ValueError("Session calendar was not known by the decision cutoff")
+    if calendar_session != session_day:
+        raise ValueError("Session calendar date does not match the declared opening")
+    if session_day.year != 2026:
+        raise ValueError("Official calendar source does not cover the session year")
+    if session_day.weekday() >= 5:
+        raise ValueError("Declared following opening is on a weekend")
+    if session_day in NSE_FO_2026_WEEKDAY_HOLIDAYS:
+        raise ValueError("Declared following opening is an official NSE F&O holiday")
+    if evidence["session_status"] != "SCHEDULED_REGULAR_SESSION_AS_OF_SOURCE":
+        raise ValueError("Session calendar status is not fail-closed")
+    if (
+        evidence["opening_time_basis"]
+        != "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL"
+    ):
+        raise ValueError("Following opening basis was overstated")
+    if (
+        following_open.utcoffset() != timedelta(hours=5, minutes=30)
+        or following_open.hour != 9
+        or following_open.minute != 15
+        or following_open.second != 0
+        or following_open.microsecond != 0
+    ):
+        raise ValueError("Following opening is not the declared regular NSE session time")
+    if following_open != _next_regular_open_after(issued_at):
+        raise ValueError("Following opening is not the next eligible NSE F&O session")
+    return "OFFICIAL_2026_FO_CALENDAR_BOUND"
+
+
 def validate(
     payload: dict[str, Any], *, externally_published_at: datetime | None = None
 ) -> dict[str, Any]:
@@ -215,59 +278,13 @@ def validate(
 
     calendar_status = "LEGACY_EXACT_PAYLOAD"
     if schema == SCHEMA:
-        calendar = payload["session_calendar_evidence"]
-        if not isinstance(calendar, dict) or set(calendar) != CALENDAR_EXPECTED_KEYS:
-            raise ValueError("Session-calendar evidence is incomplete")
-        if calendar["segment"] != "FO":
-            raise ValueError("Session calendar is not for NSE F&O")
-        calendar_url = _official_url(calendar["source_url"], "calendar source URL")
-        if calendar_url != CALENDAR_URL:
-            raise ValueError("Session calendar is not bound to the exact official circular")
-        if _sha(calendar["source_sha256"], "calendar source SHA-256") != CALENDAR_SHA256:
-            raise ValueError("Session calendar source hash changed")
-        if (
-            calendar["source_circular"] != CALENDAR_CIRCULAR
-            or calendar["source_published_date"] != CALENDAR_PUBLISHED_DATE
-        ):
-            raise ValueError("Session calendar circular identity changed")
-        calendar_observed = _instant(
-            calendar["source_first_observed_at"],
-            "calendar source_first_observed_at",
+        calendar_status = validate_session_calendar_evidence(
+            payload["session_calendar_evidence"],
+            session_day=session_day,
+            following_open=following_open,
+            known_by=source_cutoff,
+            issued_at=issued,
         )
-        calendar_published = _day(
-            calendar["source_published_date"], "calendar source_published_date"
-        )
-        calendar_session = _day(calendar["session_date"], "calendar session_date")
-        if not calendar_published <= calendar_observed.date():
-            raise ValueError("Session calendar was observed before publication")
-        if not calendar_observed <= source_cutoff:
-            raise ValueError("Session calendar was not known by the decision cutoff")
-        if calendar_session != session_day:
-            raise ValueError("Session calendar date does not match the declared opening")
-        if session_day.year != 2026:
-            raise ValueError("Official calendar source does not cover the session year")
-        if session_day.weekday() >= 5:
-            raise ValueError("Declared following opening is on a weekend")
-        if session_day in NSE_FO_2026_WEEKDAY_HOLIDAYS:
-            raise ValueError("Declared following opening is an official NSE F&O holiday")
-        if calendar["session_status"] != "SCHEDULED_REGULAR_SESSION_AS_OF_SOURCE":
-            raise ValueError("Session calendar status is not fail-closed")
-        if (
-            calendar["opening_time_basis"]
-            != "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL"
-        ):
-            raise ValueError("Following opening basis was overstated")
-        if (
-            following_open.utcoffset() != timedelta(hours=5, minutes=30)
-            or following_open.hour != 9
-            or following_open.minute != 15
-            or following_open.second != 0
-            or following_open.microsecond != 0
-        ):
-            raise ValueError("Following opening is not the declared regular NSE session time")
-        if following_open != _next_regular_open_after(issued):
-            raise ValueError("Following opening is not the next eligible NSE F&O session")
-        calendar_status = "OFFICIAL_2026_FO_CALENDAR_BOUND"
 
     if payload["decision"] != "NO_VERIFIED_SIGNAL":
         raise ValueError("Only the fail-closed no-signal decision is supported")

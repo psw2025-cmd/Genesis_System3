@@ -20,9 +20,15 @@ from pathlib import Path
 from statistics import mean, median
 from typing import Any
 
+from scripts.cepe_forward_decision import (
+    CALENDAR_SHA256,
+    NSE_IST,
+    validate_session_calendar_evidence,
+)
+
 
 TASK_ID = "CEPE-NEXT-008"
-VERSION = "forward-calibration-v1"
+VERSION = "forward-calibration-v2"
 MIN_MATURED_OUTCOMES = 100
 MIN_OOS_DAYS = 60
 MIN_DIRECTIONAL_ACCURACY = 0.65
@@ -105,6 +111,30 @@ def _validate_common(record: dict[str, Any]) -> dict[str, Any]:
     following_open_at = _instant(record.get("following_open_at"), "following_open_at")
     if not issued_at <= published_at <= cutoff_at < following_open_at:
         raise ValueError("Forecast was not published before following opening")
+    if following_open_at.date() != following_day:
+        raise ValueError("Following opening timestamp does not match following_day")
+    issued_ist = issued_at.astimezone(NSE_IST)
+    if issued_ist.date() != previous_day or (issued_ist.hour, issued_ist.minute) < (
+        15,
+        30,
+    ):
+        raise ValueError("Forecast must be issued after the stated previous-session close")
+
+    calendar_evidence = record.get("session_calendar_evidence")
+    calendar_status = validate_session_calendar_evidence(
+        calendar_evidence,
+        session_day=following_day,
+        following_open=following_open_at,
+        known_by=issued_at,
+        issued_at=issued_at,
+    )
+    calendar_sha = _sha(
+        record.get("session_calendar_sha256"), "session_calendar_sha256"
+    )
+    if calendar_sha != CALENDAR_SHA256 or calendar_sha != calendar_evidence.get(
+        "source_sha256"
+    ):
+        raise ValueError("Forecast calendar hash is not bound to the authenticated source")
 
     probability = _number(record.get("probability"), "probability")
     if not 0 < probability < 1:
@@ -147,9 +177,11 @@ def _validate_common(record: dict[str, Any]) -> dict[str, Any]:
         "publication_receipt_sha256": _sha(
             record.get("publication_receipt_sha256"), "publication_receipt_sha256"
         ),
-        "session_calendar_sha256": _sha(
-            record.get("session_calendar_sha256"), "session_calendar_sha256"
-        ),
+        "session_calendar_sha256": calendar_sha,
+        "session_calendar_evidence_sha256": sha256(
+            _canonical(calendar_evidence)
+        ).hexdigest(),
+        "session_calendar_status": calendar_status,
     }
 
 

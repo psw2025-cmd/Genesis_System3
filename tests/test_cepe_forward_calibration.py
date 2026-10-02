@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -7,6 +7,8 @@ import pytest
 
 from scripts.cepe_forward_calibration import report
 from scripts.cepe_forward_decision import (
+    CALENDAR_SHA256,
+    NSE_FO_2026_WEEKDAY_HOLIDAYS,
     validate as validate_decision,
     validate_github_publication,
 )
@@ -19,7 +21,13 @@ HASH_B = "b" * 64
 
 
 def observation(
-    prediction_id="p1", probability=.8, multiple=1.2, *, day="2026-09-30"
+    prediction_id="p1",
+    probability=.8,
+    multiple=1.2,
+    *,
+    day="2026-09-30",
+    previous="2026-09-29",
+    calendar_observed="2026-09-27T15:47:09Z",
 ):
     return {
         "prediction_id": prediction_id,
@@ -31,15 +39,30 @@ def observation(
         "expiry": "2026-10-29",
         "strike": 100,
         "type": "CE",
-        "previous_day": "2026-09-29",
+        "previous_day": previous,
         "following_day": day,
-        "issued_at": "2026-09-29T16:00:00+05:30",
-        "published_at": "2026-09-29T16:01:00+05:30",
-        "cutoff_at": "2026-09-29T18:00:00+05:30",
+        "issued_at": f"{previous}T16:00:00+05:30",
+        "published_at": f"{previous}T16:01:00+05:30",
+        "cutoff_at": f"{previous}T18:00:00+05:30",
         "following_open_at": f"{day}T09:15:00+05:30",
         "prediction_source_sha256": HASH_A,
         "publication_receipt_sha256": "c" * 64,
-        "session_calendar_sha256": "d" * 64,
+        "session_calendar_sha256": CALENDAR_SHA256,
+        "session_calendar_evidence": {
+            "segment": "FO",
+            "source_url": (
+                "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf"
+            ),
+            "source_sha256": CALENDAR_SHA256,
+            "source_first_observed_at": calendar_observed,
+            "source_published_date": "2025-12-12",
+            "source_circular": "NSE/FAOP/71777",
+            "session_date": day,
+            "session_status": "SCHEDULED_REGULAR_SESSION_AS_OF_SOURCE",
+            "opening_time_basis": (
+                "REGULAR_SESSION_ASSUMPTION_NOT_EXECUTABLE_FILL"
+            ),
+        },
         "outcome_multiple": multiple,
         "outcome_observed_at": f"{day}T09:16:00+05:30",
         "outcome_source_sha256": HASH_B,
@@ -56,13 +79,10 @@ def observation(
 def test_empty_or_pending_records_never_claim_calibration():
     assert report([], as_of=AS_OF)["status"] == "NOT_PROVEN"
     pending = observation()
-    pending["following_day"] = "2026-10-02"
-    pending["following_open_at"] = "2026-10-02T09:15:00+05:30"
-    pending["expiry"] = "2026-10-29"
     pending.pop("outcome_multiple")
     pending.pop("outcome_observed_at")
     pending.pop("outcome_source_sha256")
-    result = report([pending], as_of=AS_OF)
+    result = report([pending], as_of=datetime(2026, 9, 29, 18, 30, tzinfo=IST))
     assert (result["pending_outcomes"], result["matured_outcomes"]) == (1, 0)
     assert result["metrics"] is None
 
@@ -119,19 +139,59 @@ def test_rejects_hindsight_partial_outcomes_and_duplicate_ids():
         report([row], as_of=AS_OF)
 
 
+def test_calibration_rejects_self_attested_or_horizon_mismatched_calendars():
+    substituted = observation()
+    substituted["session_calendar_sha256"] = "d" * 64
+    substituted["session_calendar_evidence"]["source_sha256"] = "d" * 64
+    with pytest.raises(ValueError, match="source hash changed"):
+        report([substituted], as_of=AS_OF)
+
+    late = observation()
+    late["session_calendar_evidence"]["source_first_observed_at"] = (
+        "2026-09-29T16:00:01+05:30"
+    )
+    with pytest.raises(ValueError, match="not known by the decision cutoff"):
+        report([late], as_of=AS_OF)
+
+    mismatched = observation()
+    mismatched["following_day"] = "2026-10-01"
+    with pytest.raises(ValueError, match="does not match following_day"):
+        report([mismatched], as_of=AS_OF)
+
+    skipped = observation()
+    skipped["following_day"] = "2026-10-01"
+    skipped["following_open_at"] = "2026-10-01T09:15:00+05:30"
+    skipped["session_calendar_evidence"]["session_date"] = "2026-10-01"
+    skipped["outcome_observed_at"] = "2026-10-01T09:16:00+05:30"
+    with pytest.raises(ValueError, match="next eligible NSE F&O session"):
+        report([skipped], as_of=AS_OF)
+
+    before_close = observation()
+    before_close["issued_at"] = "2026-09-29T15:29:00+05:30"
+    with pytest.raises(ValueError, match="after the stated previous-session close"):
+        report([before_close], as_of=AS_OF)
+
+
 def test_project_sample_and_accuracy_gates_use_forward_rows_only():
     rows = []
-    start = datetime(2026, 1, 1, 9, 15, tzinfo=IST)
+    sessions = []
+    cursor = date(2026, 1, 2)
+    while len(sessions) < 101:
+        if cursor.weekday() < 5 and cursor not in NSE_FO_2026_WEEKDAY_HOLIDAYS:
+            sessions.append(cursor)
+        cursor += timedelta(days=1)
     for index in range(100):
-        following = (start + timedelta(days=index)).date()
-        previous = following - timedelta(days=1)
-        row = observation(f"p{index}", .8, 1.1, day=following.isoformat())
-        row["previous_day"] = previous.isoformat()
-        row["issued_at"] = f"{previous.isoformat()}T16:00:00+05:30"
-        row["published_at"] = f"{previous.isoformat()}T16:01:00+05:30"
-        row["cutoff_at"] = f"{previous.isoformat()}T18:00:00+05:30"
+        previous, following = sessions[index : index + 2]
+        row = observation(
+            f"p{index}",
+            .8,
+            1.1,
+            day=following.isoformat(),
+            previous=previous.isoformat(),
+            calendar_observed="2025-12-12T00:00:00+05:30",
+        )
         rows.append(row)
-    result = report(rows, as_of=datetime(2026, 5, 1, tzinfo=IST))
+    result = report(rows, as_of=datetime(2026, 12, 31, tzinfo=IST))
     assert result["status"] == "RESEARCH_CALIBRATION_GATE_PASS"
     assert all(result["research_gates"].values())
     assert result["metrics"]["directional_accuracy"] == 1
