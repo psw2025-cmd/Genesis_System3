@@ -23,16 +23,50 @@ from typing import Any
 from scripts.cepe_forward_decision import (
     CALENDAR_SHA256,
     NSE_IST,
+    previous_regular_fo_session_before,
     validate_session_calendar_evidence,
 )
 
 
 TASK_ID = "CEPE-NEXT-008"
-VERSION = "forward-calibration-v2"
+VERSION = "forward-calibration-v3"
 MIN_MATURED_OUTCOMES = 100
 MIN_OOS_DAYS = 60
 MIN_DIRECTIONAL_ACCURACY = 0.65
 EVENT_TYPES = {"positive_next_open", "at_least_3x"}
+FORECAST_KEYS = {
+    "prediction_id",
+    "strategy_id",
+    "strategy_version",
+    "event_type",
+    "probability",
+    "symbol",
+    "expiry",
+    "strike",
+    "type",
+    "previous_day",
+    "following_day",
+    "issued_at",
+    "published_at",
+    "cutoff_at",
+    "following_open_at",
+    "prediction_source_sha256",
+    "publication_receipt_sha256",
+    "session_calendar_sha256",
+    "session_calendar_evidence",
+    "forward_issued",
+    "retrospective",
+    "source_qualified",
+    "official_session_verified",
+    "publication_verified",
+    "opening_fill_proven",
+    "orders_allowed",
+}
+OUTCOME_KEYS = {
+    "outcome_multiple",
+    "outcome_observed_at",
+    "outcome_source_sha256",
+}
 
 
 def _instant(value: Any, field: str) -> datetime:
@@ -87,6 +121,12 @@ def _canonical(value: Any) -> bytes:
 
 
 def _validate_common(record: dict[str, Any]) -> dict[str, Any]:
+    missing = sorted(FORECAST_KEYS - set(record))
+    unknown = sorted(set(record) - FORECAST_KEYS - OUTCOME_KEYS)
+    if missing or unknown:
+        raise ValueError(
+            f"Calibration row schema mismatch; missing={missing}; unknown={unknown}"
+        )
     prediction_id = str(record.get("prediction_id", "")).strip()
     strategy_id = str(record.get("strategy_id", "")).strip()
     strategy_version = str(record.get("strategy_version", "")).strip()
@@ -128,6 +168,10 @@ def _validate_common(record: dict[str, Any]) -> dict[str, Any]:
         known_by=issued_at,
         issued_at=issued_at,
     )
+    if previous_day != previous_regular_fo_session_before(following_day):
+        raise ValueError(
+            "previous_day is not the immediately preceding eligible NSE F&O session"
+        )
     calendar_sha = _sha(
         record.get("session_calendar_sha256"), "session_calendar_sha256"
     )

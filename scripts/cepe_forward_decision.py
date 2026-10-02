@@ -168,6 +168,18 @@ def _is_regular_fo_session(day: date) -> bool:
     return day.weekday() < 5 and day not in NSE_FO_2026_WEEKDAY_HOLIDAYS
 
 
+def previous_regular_fo_session_before(session_day: date) -> date:
+    """Return the preceding session covered by the authenticated 2026 calendar."""
+    if session_day.year != 2026:
+        raise ValueError("Official calendar source does not cover the session year")
+    candidate = session_day - timedelta(days=1)
+    while candidate.year == 2026 and not _is_regular_fo_session(candidate):
+        candidate -= timedelta(days=1)
+    if candidate.year != 2026:
+        raise ValueError("Previous session is outside the authenticated calendar year")
+    return candidate
+
+
 def _next_regular_open_after(issued: datetime) -> datetime:
     issued_ist = issued.astimezone(NSE_IST)
     candidate = issued_ist.date()

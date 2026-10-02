@@ -65,7 +65,7 @@ def row():
 class CalibrationCalendarBindingTests(unittest.TestCase):
     def test_authenticated_fixture_is_accepted_without_readiness_claim(self):
         result = report([row()], as_of=AS_OF)
-        self.assertEqual(result["version"], "forward-calibration-v2")
+        self.assertEqual(result["version"], "forward-calibration-v3")
         self.assertEqual(result["matured_outcomes"], 1)
         self.assertFalse(result["real_money_ready"])
         self.assertFalse(result["orders_allowed"])
@@ -104,6 +104,33 @@ class CalibrationCalendarBindingTests(unittest.TestCase):
         candidate["issued_at"] = "2026-09-29T15:29:00+05:30"
         with self.assertRaisesRegex(ValueError, "after the stated previous-session close"):
             report([candidate], as_of=AS_OF)
+
+    def test_schema_rejects_hidden_trade_fields_and_missing_provenance(self):
+        hidden = row()
+        hidden["trade_action"] = "BUY"
+        hidden["recommended_quantity"] = 50
+        with self.assertRaisesRegex(ValueError, "schema mismatch.*unknown"):
+            report([hidden], as_of=AS_OF)
+
+        missing = row()
+        del missing["publication_receipt_sha256"]
+        with self.assertRaisesRegex(ValueError, "schema mismatch.*missing"):
+            report([missing], as_of=AS_OF)
+
+    def test_previous_day_must_be_an_actual_immediately_preceding_session(self):
+        weekend = row()
+        weekend.update(
+            previous_day="2026-09-27",
+            following_day="2026-09-28",
+            issued_at="2026-09-27T22:00:00+05:30",
+            published_at="2026-09-27T22:01:00+05:30",
+            cutoff_at="2026-09-27T23:00:00+05:30",
+            following_open_at="2026-09-28T09:15:00+05:30",
+            outcome_observed_at="2026-09-28T09:16:00+05:30",
+        )
+        weekend["session_calendar_evidence"]["session_date"] = "2026-09-28"
+        with self.assertRaisesRegex(ValueError, "immediately preceding eligible"):
+            report([weekend], as_of=AS_OF)
 
 
 if __name__ == "__main__":
