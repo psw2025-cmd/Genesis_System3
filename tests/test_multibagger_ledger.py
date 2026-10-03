@@ -222,6 +222,72 @@ def test_rehashed_undeclared_or_missing_fields_fail_closed(mutation):
         verify_chain([sealed])
 
 
+@pytest.mark.parametrize(
+    "mutation,error",
+    [
+        (
+            lambda record: record.update(
+                due_at="2026-09-15T12:00:00+00:00"
+            ),
+            "ROW_0_HORIZON_DUE_MISMATCH",
+        ),
+        (
+            lambda record: record.update(
+                due_at="2026-09-01T11:59:59+00:00"
+            ),
+            "ROW_0_INVALID_FORECAST_TIME_ORDER",
+        ),
+        (
+            lambda record: record.update(
+                entry_observed_at="2026-09-01T12:00:01+00:00"
+            ),
+            "ROW_0_INVALID_FORECAST_TIME_ORDER",
+        ),
+        (
+            lambda record: record.update(
+                adjustment_observed_at="2026-09-01T12:00:01+00:00"
+            ),
+            "ROW_0_ADJUSTMENT_LOOKAHEAD_FORBIDDEN",
+        ),
+        (
+            lambda record: record.update(horizon_days=True),
+            "ROW_0_HORIZON_DAYS_INVALID",
+        ),
+    ],
+)
+def test_rehashed_temporal_contract_bypass_fails_closed(mutation, error):
+    sealed = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    mutation(sealed)
+    sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
+    with pytest.raises(LedgerError, match=error):
+        verify_chain([sealed])
+
+
+def test_read_rejects_rehashed_horizon_mismatch(
+    tmp_path,
+    evidence_root,
+):
+    sealed = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    sealed["due_at"] = "2026-09-15T12:00:00+00:00"
+    sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
+    ledger = tmp_path / "equity_forecasts.ndjson"
+    ledger.write_text(
+        json.dumps(sealed, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(LedgerError, match="ROW_0_HORIZON_DUE_MISMATCH"):
+        read_ledger(ledger, evidence_root=evidence_root)
+
+
 def test_lookahead_backfill_and_bad_provenance_fail_closed():
     with pytest.raises(LedgerError, match="INVALID_FORECAST_TIME_ORDER"):
         build_issued_forecast(

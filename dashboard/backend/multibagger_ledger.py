@@ -115,6 +115,45 @@ def _finite_number(value: Any, field: str, *, positive: bool = False) -> float:
     return number
 
 
+def _validate_forecast_timing(
+    record: dict[str, Any],
+    *,
+    current: datetime | None = None,
+    prefix: str = "",
+) -> tuple[datetime, datetime, datetime, datetime, int]:
+    """Validate the temporal contract shared by issuance and stored records."""
+    issued = _timestamp(record.get("issued_at"), f"{prefix}ISSUED_AT")
+    due = _timestamp(record.get("due_at"), f"{prefix}DUE_AT")
+    observed = _timestamp(
+        record.get("entry_observed_at"),
+        f"{prefix}ENTRY_OBSERVED_AT",
+    )
+    adjustment_observed = _timestamp(
+        record.get("adjustment_observed_at"),
+        f"{prefix}ADJUSTMENT_OBSERVED_AT",
+    )
+    valid_order = observed <= issued < due
+    if current is not None:
+        valid_order = valid_order and issued <= current < due
+    if not valid_order:
+        raise LedgerError(f"{prefix}INVALID_FORECAST_TIME_ORDER")
+    if adjustment_observed > issued:
+        raise LedgerError(f"{prefix}ADJUSTMENT_LOOKAHEAD_FORBIDDEN")
+
+    horizon_days = record.get("horizon_days")
+    if (
+        isinstance(horizon_days, bool)
+        or not isinstance(horizon_days, int)
+        or horizon_days <= 0
+        or horizon_days > 730
+    ):
+        raise LedgerError(f"{prefix}HORIZON_DAYS_INVALID")
+    elapsed_days = (due - issued).total_seconds() / 86400
+    if abs(elapsed_days - horizon_days) > 1:
+        raise LedgerError(f"{prefix}HORIZON_DUE_MISMATCH")
+    return issued, due, observed, adjustment_observed, horizon_days
+
+
 def _canonical(record: dict[str, Any]) -> bytes:
     payload = {key: value for key, value in record.items() if key != "event_hash"}
     return json.dumps(
@@ -143,17 +182,9 @@ def build_issued_forecast(
         raise LedgerError("NOW_TIMEZONE_REQUIRED")
     current = current.astimezone(timezone.utc)
 
-    issued = _timestamp(forecast.get("issued_at"), "ISSUED_AT")
-    due = _timestamp(forecast.get("due_at"), "DUE_AT")
-    observed = _timestamp(forecast.get("entry_observed_at"), "ENTRY_OBSERVED_AT")
-    adjustment_observed = _timestamp(
-        forecast.get("adjustment_observed_at"),
-        "ADJUSTMENT_OBSERVED_AT",
+    issued, due, observed, adjustment_observed, horizon_days = (
+        _validate_forecast_timing(forecast, current=current)
     )
-    if not observed <= issued <= current < due:
-        raise LedgerError("INVALID_FORECAST_TIME_ORDER")
-    if adjustment_observed > issued:
-        raise LedgerError("ADJUSTMENT_LOOKAHEAD_FORBIDDEN")
 
     prediction_id = str(forecast.get("prediction_id", "")).strip()
     symbol = str(forecast.get("symbol", "")).strip().upper()
@@ -185,15 +216,6 @@ def build_issued_forecast(
     ).strip().upper()
     if adjustment_source not in _APPROVED_SOURCES:
         raise LedgerError("ADJUSTMENT_SOURCE_UNVERIFIED")
-
-    horizon_days = forecast.get("horizon_days")
-    if isinstance(horizon_days, bool) or not isinstance(horizon_days, int):
-        raise LedgerError("HORIZON_DAYS_INVALID")
-    if horizon_days <= 0 or horizon_days > 730:
-        raise LedgerError("HORIZON_DAYS_INVALID")
-    elapsed_days = (due - issued).total_seconds() / 86400
-    if abs(elapsed_days - horizon_days) > 1:
-        raise LedgerError("HORIZON_DUE_MISMATCH")
 
     entry_source_hash = _sha256(
         forecast.get("entry_source_hash"),
@@ -266,7 +288,10 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
             raise LedgerError(f"ROW_{index}_SCHEMA_INVALID")
         if record.get("event_type") != "EQUITY_FORECAST_ISSUED":
             raise LedgerError(f"ROW_{index}_EVENT_TYPE_INVALID")
-        issued = _timestamp(record.get("issued_at"), f"ROW_{index}_ISSUED_AT")
+        issued, _, _, _, _ = _validate_forecast_timing(
+            record,
+            prefix=f"ROW_{index}_",
+        )
         if previous_issued is not None and issued < previous_issued:
             raise LedgerError(f"ROW_{index}_ISSUED_ORDER_INVALID")
         prediction_id = str(record.get("prediction_id", "")).strip()
