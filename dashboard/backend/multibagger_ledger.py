@@ -256,6 +256,7 @@ def build_issued_forecast(
 def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
     """Verify ordering, uniqueness and every content hash in a ledger."""
     previous = GENESIS_HASH
+    previous_issued: datetime | None = None
     seen: set[str] = set()
     count = 0
     for index, record in enumerate(records):
@@ -265,6 +266,9 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
             raise LedgerError(f"ROW_{index}_SCHEMA_INVALID")
         if record.get("event_type") != "EQUITY_FORECAST_ISSUED":
             raise LedgerError(f"ROW_{index}_EVENT_TYPE_INVALID")
+        issued = _timestamp(record.get("issued_at"), f"ROW_{index}_ISSUED_AT")
+        if previous_issued is not None and issued < previous_issued:
+            raise LedgerError(f"ROW_{index}_ISSUED_ORDER_INVALID")
         prediction_id = str(record.get("prediction_id", "")).strip()
         if not prediction_id or prediction_id in seen:
             raise LedgerError(f"ROW_{index}_PREDICTION_ID_DUPLICATE")
@@ -279,6 +283,7 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
             raise LedgerError(f"ROW_{index}_ORDER_FLAG_INVALID")
         seen.add(prediction_id)
         previous = expected
+        previous_issued = issued
         count += 1
     return {
         "status": "VERIFIED" if count else "EMPTY",
@@ -446,6 +451,7 @@ def append_issued_forecast(
             now=now,
         )
         verify_retained_evidence(sealed, evidence_root=evidence_root)
+        verify_chain([*records, sealed])
         payload = json.dumps(
             sealed,
             sort_keys=True,
@@ -457,5 +463,4 @@ def append_issued_forecast(
             handle.write(payload + "\n")
             handle.flush()
             os.fsync(handle.fileno())
-        verify_chain([*records, sealed])
         return sealed

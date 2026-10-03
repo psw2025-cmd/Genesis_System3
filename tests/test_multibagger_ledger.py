@@ -109,6 +109,37 @@ def test_append_preserves_chain_and_rejects_duplicate(tmp_path, evidence_root):
         append_issued_forecast(ledger, FORECAST, evidence_root=evidence_root, now=NOW)
 
 
+def test_append_rejects_chronological_backfill_without_writing(
+    tmp_path,
+    evidence_root,
+):
+    ledger = tmp_path / "equity_forecasts.ndjson"
+    first = append_issued_forecast(
+        ledger,
+        FORECAST,
+        evidence_root=evidence_root,
+        now=NOW,
+    )
+    original = ledger.read_bytes()
+    backfill = {
+        **FORECAST,
+        "prediction_id": "equity-20260901-raymond-backfill-v1",
+        "issued_at": "2026-09-01T11:00:00+00:00",
+        "due_at": "2026-09-08T11:00:00+00:00",
+    }
+
+    with pytest.raises(LedgerError, match="ROW_1_ISSUED_ORDER_INVALID"):
+        append_issued_forecast(
+            ledger,
+            backfill,
+            evidence_root=evidence_root,
+            now=NOW,
+        )
+
+    assert ledger.read_bytes() == original
+    assert read_ledger(ledger, evidence_root=evidence_root) == [first]
+
+
 def test_exclusive_lock_serializes_a_competing_writer(tmp_path, evidence_root):
     ledger = tmp_path / "equity_forecasts.ndjson"
     with ThreadPoolExecutor(max_workers=1) as pool:
