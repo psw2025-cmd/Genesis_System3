@@ -114,6 +114,7 @@ def test_builds_one_unqualified_forward_paper_prediction():
         now=NOW,
         holiday_calendar_raw=args["holiday_raw"],
         model_spec_raw=args["model_spec_raw"],
+        expected_previous_event_hash=args["previous_event_hash"],
     )["orders_allowed"] is False
 
 
@@ -197,6 +198,29 @@ def rehash(result):
     result["event_hash"] = sha256(json.dumps(
         payload, sort_keys=True, separators=(",", ":"), allow_nan=False
     ).encode()).hexdigest()
+
+
+def test_stored_prediction_requires_trusted_predecessor_anchor():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="previous event hash evidence required"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+        )
+
+    result["previous_event_hash"] = "1" * 64
+    rehash(result)
+    with pytest.raises(ValueError, match="trusted predecessor"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=GENESIS_HASH,
+        )
 
 
 @pytest.mark.parametrize(

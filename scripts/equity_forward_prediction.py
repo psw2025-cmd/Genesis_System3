@@ -399,6 +399,7 @@ def build_prediction(
         now=current,
         holiday_calendar_raw=holiday_raw,
         model_spec_raw=model_spec_raw,
+        expected_previous_event_hash=previous_event_hash,
     )
     return payload
 
@@ -409,6 +410,7 @@ def validate_prediction(
     now: datetime | None = None,
     holiday_calendar_raw: bytes | None = None,
     model_spec_raw: bytes | None = None,
+    expected_previous_event_hash: str | None = None,
 ) -> dict[str, Any]:
     """Fail closed if a stored forward record overstates its evidence."""
     if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
@@ -735,11 +737,20 @@ def validate_prediction(
         "orders_allowed",
     } or any(safety.values()):
         raise ValueError("Unsafe prediction flags")
+    stored_previous_hash = _sha(
+        payload["previous_event_hash"], "previous_event_hash"
+    )
+    if expected_previous_event_hash is None:
+        raise ValueError("Trusted previous event hash evidence required")
+    expected_previous_hash = _sha(
+        expected_previous_event_hash, "expected_previous_event_hash"
+    )
+    if stored_previous_hash != expected_previous_hash:
+        raise ValueError("Previous event hash does not match trusted predecessor")
     stored_hash = _sha(payload["event_hash"], "event_hash")
     unhashed = {key: value for key, value in payload.items() if key != "event_hash"}
     if stored_hash != sha256(_canonical(unhashed)).hexdigest():
         raise ValueError("Prediction event hash mismatch")
-    _sha(payload["previous_event_hash"], "previous_event_hash")
     return {
         "status": "FORWARD_PAPER_PREDICTION_SEALED",
         "prediction_id": payload["prediction_id"],
