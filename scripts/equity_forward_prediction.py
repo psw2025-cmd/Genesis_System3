@@ -222,6 +222,9 @@ def build_prediction(
     if current.tzinfo is None or current.utcoffset() is None or issued > current.astimezone(timezone.utc):
         raise ValueError("issued_at cannot be in the future")
     model, model_sha = _model(model_spec_raw)
+    model_registered = _instant(model.get("registered_at"), "model registered_at")
+    if model_registered > issued:
+        raise ValueError("Model specification registered after prediction issue")
     packet = build_packet(
         equity_sources,
         equity_receipts,
@@ -395,6 +398,7 @@ def build_prediction(
         payload,
         now=current,
         holiday_calendar_raw=holiday_raw,
+        model_spec_raw=model_spec_raw,
     )
     return payload
 
@@ -404,6 +408,7 @@ def validate_prediction(
     *,
     now: datetime | None = None,
     holiday_calendar_raw: bytes | None = None,
+    model_spec_raw: bytes | None = None,
 ) -> dict[str, Any]:
     """Fail closed if a stored forward record overstates its evidence."""
     if not isinstance(payload, dict) or set(payload) != EXPECTED_KEYS:
@@ -460,6 +465,13 @@ def validate_prediction(
     ):
         raise ValueError("Exploratory strategy was promoted")
     _sha(strategy["model_spec_sha256"], "model_spec_sha256")
+    if not isinstance(model_spec_raw, bytes) or not model_spec_raw:
+        raise ValueError("Registered model specification bytes required")
+    retained_model, retained_model_sha = _model(model_spec_raw)
+    if retained_model_sha != strategy["model_spec_sha256"]:
+        raise ValueError("Model specification retained bytes mismatch")
+    if _instant(retained_model.get("registered_at"), "model registered_at") > issued:
+        raise ValueError("Model specification registered after prediction issue")
 
     counts = payload["counts"]
     if set(counts) != {
