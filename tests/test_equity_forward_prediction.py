@@ -77,6 +77,7 @@ def fixture():
         "strategy_id": "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY",
         "strategy_version": "1.0.0",
         "status": "EXPLORATORY_FORWARD_ONLY",
+        "registered_at": "2026-10-01T12:41:00Z",
         "horizon": {"calendar_days": 7},
         "universe": {"minimum_close_inr": "10", "minimum_close_times_volume_inr": "100000000"},
         "selection": {"score": "0.5*intraday_return_percent_rank + 0.5*liquidity_proxy_percent_rank"},
@@ -112,6 +113,7 @@ def test_builds_one_unqualified_forward_paper_prediction():
         result,
         now=NOW,
         holiday_calendar_raw=args["holiday_raw"],
+        model_spec_raw=args["model_spec_raw"],
     )["orders_allowed"] is False
 
 
@@ -137,6 +139,7 @@ def test_stored_record_fails_closed(path, value, match):
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -149,6 +152,7 @@ def test_event_and_feature_hashes_are_immutable():
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
     args = fixture()
     result = build_prediction(**args)
@@ -158,6 +162,7 @@ def test_event_and_feature_hashes_are_immutable():
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -183,6 +188,7 @@ def test_rehashed_fabricated_feature_arithmetic_fails_closed(field, value):
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -213,6 +219,7 @@ def test_rehashed_hidden_claims_and_source_changes_fail_closed(mutate, match):
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -245,6 +252,53 @@ def test_rehashed_horizon_timestamp_or_session_substitution_fails_closed(
             result,
             now=NOW,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+        )
+
+
+def test_stored_prediction_requires_exact_registered_model_bytes():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="model specification bytes required"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+        )
+    with pytest.raises(ValueError, match="retained bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"] + b"\n",
+        )
+    result["strategy"]["model_spec_sha256"] = "0" * 64
+    rehash(result)
+    with pytest.raises(ValueError, match="retained bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+        )
+
+
+def test_model_registration_after_issue_fails_builder_and_stored_record():
+    args = fixture()
+    result = build_prediction(**args)
+    future_model = json.loads(args["model_spec_raw"])
+    future_model["registered_at"] = "2026-10-01T12:46:00Z"
+    future_raw = json.dumps(future_model, sort_keys=True).encode()
+    with pytest.raises(ValueError, match="registered after prediction issue"):
+        build_prediction(**{**args, "model_spec_raw": future_raw})
+    result["strategy"]["model_spec_sha256"] = sha256(future_raw).hexdigest()
+    rehash(result)
+    with pytest.raises(ValueError, match="registered after prediction issue"):
+        validate_prediction(
+            result,
+            now=NOW,
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=future_raw,
         )
 
 
@@ -252,12 +306,17 @@ def test_stored_prediction_requires_exact_retained_calendar_bytes():
     args = fixture()
     result = build_prediction(**args)
     with pytest.raises(ValueError, match="calendar bytes required"):
-        validate_prediction(result, now=NOW)
+        validate_prediction(
+            result,
+            now=NOW,
+            model_spec_raw=args["model_spec_raw"],
+        )
     with pytest.raises(ValueError, match="retained bytes mismatch"):
         validate_prediction(
             result,
             now=NOW,
             holiday_calendar_raw=b'{"CM":[]}',
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -269,6 +328,7 @@ def test_stored_prediction_cannot_validate_before_issuance():
             result,
             now=datetime(2026, 9, 30, 12, tzinfo=timezone.utc),
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
@@ -301,6 +361,7 @@ def test_rehashed_issuance_must_be_observed_and_bind_entry_session(
             result,
             now=now,
             holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
         )
 
 
