@@ -51,6 +51,7 @@ EXPECTED_KEYS = {
 }
 _ISIN_RE = re.compile(r"^IN[A-Z0-9]{10}$")
 _PREDICTION_ID_RE = re.compile(r"^EQ7D-\d{4}-\d{2}-\d{2}-[A-Z0-9&-]+-V1$")
+_EQUITY_SOURCE_ROLES = {"cash", "company", "etf", "actions"}
 
 
 def _instant(value: Any, field: str) -> datetime:
@@ -203,6 +204,100 @@ def _model(raw: bytes) -> tuple[dict[str, Any], str]:
     return model, sha256(raw).hexdigest()
 
 
+def _select_candidate(packet: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:
+    """Replay the frozen screen and rank from an authenticated source packet."""
+    minimum_close = _decimal(
+        model["universe"]["minimum_close_inr"],
+        "minimum_close",
+        positive=True,
+    )
+    minimum_liquidity = _decimal(
+        model["universe"]["minimum_close_times_volume_inr"],
+        "minimum_liquidity",
+        positive=True,
+    )
+    candidates = []
+    for row in packet["observations"]:
+        close = _decimal(row["close"], "close", positive=True)
+        opening = _decimal(row["open"], "open", positive=True)
+        volume = Decimal(row["volume"])
+        intraday_return = close / opening - 1
+        liquidity = close * volume
+        if (
+            row["action_review"]["action_count"] == 0
+            and close >= minimum_close
+            and liquidity >= minimum_liquidity
+            and intraday_return > 0
+        ):
+            candidates.append((row, intraday_return, liquidity))
+    if not candidates:
+        raise ValueError("No exploratory candidate")
+    momenta = [row[1] for row in candidates]
+    liquidities = [row[2] for row in candidates]
+    ranked = []
+    for observation, momentum, liquidity in candidates:
+        momentum_rank = _percent_rank(momenta, momentum)
+        liquidity_rank = _percent_rank(liquidities, liquidity)
+        score = (momentum_rank + liquidity_rank) / 2
+        ranked.append(
+            (
+                score,
+                observation["symbol"],
+                observation["isin"],
+                observation,
+                momentum,
+                liquidity,
+                momentum_rank,
+                liquidity_rank,
+            )
+        )
+    ranked.sort(key=lambda row: (-row[0], row[1], row[2]))
+    (
+        score,
+        symbol,
+        isin,
+        selected,
+        momentum,
+        liquidity,
+        momentum_rank,
+        liquidity_rank,
+    ) = ranked[0]
+    features = {
+        "open": selected["open"],
+        "close": selected["close"],
+        "volume": selected["volume"],
+        "intraday_return": str(momentum.quantize(Decimal("0.0000000001"))),
+        "close_times_volume_inr": str(liquidity.quantize(Decimal("0.01"))),
+        "intraday_return_percent_rank": str(
+            momentum_rank.quantize(Decimal("0.0000000001"))
+        ),
+        "liquidity_proxy_percent_rank": str(
+            liquidity_rank.quantize(Decimal("0.0000000001"))
+        ),
+        "selection_score": str(score.quantize(Decimal("0.0000000001"))),
+        "source_row_sha256": selected["canonical_source_row_sha256"],
+    }
+    return {
+        "screened_candidates": len(candidates),
+        "symbol": symbol,
+        "isin": isin,
+        "selected": selected,
+        "features": features,
+    }
+
+
+def _replay_receipt(stored: dict[str, Any]) -> dict[str, Any]:
+    """Restore the builder receipt fields after authenticating stored metadata."""
+    return {
+        "url": stored["url"],
+        "final_url": stored["url"],
+        "http_status": 200,
+        "raw_sha256": stored["sha256"],
+        "bytes": stored["bytes"],
+        "first_observed_at": stored["first_observed_at"],
+    }
+
+
 def build_prediction(
     *,
     equity_sources: dict[str, bytes],
@@ -249,50 +344,11 @@ def build_prediction(
     if cutoff > issued:
         raise ValueError("Prediction source observed after issuance")
 
-    minimum_close = _decimal(model["universe"]["minimum_close_inr"], "minimum_close", positive=True)
-    minimum_liquidity = _decimal(
-        model["universe"]["minimum_close_times_volume_inr"],
-        "minimum_liquidity",
-        positive=True,
-    )
-    candidates = []
-    for row in packet["observations"]:
-        close = _decimal(row["close"], "close", positive=True)
-        opening = _decimal(row["open"], "open", positive=True)
-        volume = Decimal(row["volume"])
-        intraday_return = close / opening - 1
-        liquidity = close * volume
-        if (
-            row["action_review"]["action_count"] == 0
-            and close >= minimum_close
-            and liquidity >= minimum_liquidity
-            and intraday_return > 0
-        ):
-            candidates.append((row, intraday_return, liquidity))
-    if not candidates:
-        raise ValueError("No exploratory candidate")
-    momenta = [row[1] for row in candidates]
-    liquidities = [row[2] for row in candidates]
-    ranked = []
-    for observation, momentum, liquidity in candidates:
-        momentum_rank = _percent_rank(momenta, momentum)
-        liquidity_rank = _percent_rank(liquidities, liquidity)
-        score = (momentum_rank + liquidity_rank) / 2
-        ranked.append((score, observation["symbol"], observation["isin"], observation,
-                       momentum, liquidity, momentum_rank, liquidity_rank))
-    ranked.sort(key=lambda row: (-row[0], row[1], row[2]))
-    score, symbol, isin, selected, momentum, liquidity, momentum_rank, liquidity_rank = ranked[0]
-    features = {
-        "open": selected["open"],
-        "close": selected["close"],
-        "volume": selected["volume"],
-        "intraday_return": str(momentum.quantize(Decimal("0.0000000001"))),
-        "close_times_volume_inr": str(liquidity.quantize(Decimal("0.01"))),
-        "intraday_return_percent_rank": str(momentum_rank.quantize(Decimal("0.0000000001"))),
-        "liquidity_proxy_percent_rank": str(liquidity_rank.quantize(Decimal("0.0000000001"))),
-        "selection_score": str(score.quantize(Decimal("0.0000000001"))),
-        "source_row_sha256": selected["canonical_source_row_sha256"],
-    }
+    selection = _select_candidate(packet, model)
+    symbol = selection["symbol"]
+    isin = selection["isin"]
+    selected = selection["selected"]
+    features = selection["features"]
     due_at = datetime.combine(due, time(15, 30), IST).astimezone(timezone.utc)
     source_receipts = {
         role: {
@@ -331,7 +387,7 @@ def build_prediction(
         },
         "counts": {
             "source_company_eq_observations": packet["company_eq_observation_count"],
-            "screened_candidates": len(candidates),
+            "screened_candidates": selection["screened_candidates"],
             "selected_candidates": 1,
             "qualified_current_candidates": 0,
             "forward_predictions": 1,
@@ -397,6 +453,8 @@ def build_prediction(
     validate_prediction(
         payload,
         now=current,
+        equity_source_bytes=equity_sources,
+        index_source_raw=index_raw,
         holiday_calendar_raw=holiday_raw,
         model_spec_raw=model_spec_raw,
         expected_previous_event_hash=previous_event_hash,
@@ -408,6 +466,8 @@ def validate_prediction(
     payload: dict[str, Any],
     *,
     now: datetime | None = None,
+    equity_source_bytes: dict[str, bytes] | None = None,
+    index_source_raw: bytes | None = None,
     holiday_calendar_raw: bytes | None = None,
     model_spec_raw: bytes | None = None,
     expected_previous_event_hash: str | None = None,
@@ -659,6 +719,67 @@ def validate_prediction(
     ):
         raise ValueError("Benchmark source receipt mismatch")
 
+    if (
+        not isinstance(equity_source_bytes, dict)
+        or set(equity_source_bytes) != _EQUITY_SOURCE_ROLES
+    ):
+        raise ValueError("Exact retained equity source bytes required")
+    replay_receipts = {}
+    for role in sorted(_EQUITY_SOURCE_ROLES):
+        raw = equity_source_bytes[role]
+        receipt = source_receipts[role]
+        if (
+            not isinstance(raw, bytes)
+            or not raw
+            or sha256(raw).hexdigest() != receipt["sha256"]
+            or len(raw) != receipt["bytes"]
+        ):
+            raise ValueError(f"{role} retained source bytes mismatch")
+        replay_receipts[role] = _replay_receipt(receipt)
+    replay_packet = build_packet(
+        equity_source_bytes,
+        replay_receipts,
+        as_of=issued.isoformat(),
+        now=current_utc,
+    )
+    replay_selection = _select_candidate(replay_packet, retained_model)
+    if (
+        replay_packet["trade_date"] != entry_day.isoformat()
+        or counts["source_company_eq_observations"]
+        != replay_packet["company_eq_observation_count"]
+        or counts["screened_candidates"]
+        != replay_selection["screened_candidates"]
+    ):
+        raise ValueError("Prediction counts do not match retained source replay")
+    if (
+        prediction["symbol"] != replay_selection["symbol"]
+        or prediction["isin"] != replay_selection["isin"]
+        or prediction["features"] != replay_selection["features"]
+        or prediction["entry_reference_close"]
+        != replay_selection["selected"]["close"]
+    ):
+        raise ValueError("Prediction does not match retained source replay")
+
+    if not isinstance(index_source_raw, bytes) or not index_source_raw:
+        raise ValueError("Exact retained index source bytes required")
+    index_receipt = source_receipts["index"]
+    if (
+        sha256(index_source_raw).hexdigest() != index_receipt["sha256"]
+        or len(index_source_raw) != index_receipt["bytes"]
+    ):
+        raise ValueError("index retained source bytes mismatch")
+    replay_benchmark, replay_index_observed = _index_reference(
+        index_source_raw,
+        _replay_receipt(index_receipt),
+        entry_day,
+    )
+    if (
+        replay_benchmark != benchmark
+        or replay_index_observed
+        != _instant(index_receipt["first_observed_at"], "first_observed_at")
+    ):
+        raise ValueError("Benchmark does not match retained index replay")
+
     calendar_receipt = source_receipts["holiday_calendar"]
     if calendar_receipt["url"] != HOLIDAY_URL:
         raise ValueError("Holiday calendar source changed")
@@ -698,6 +819,15 @@ def validate_prediction(
         and due_day <= date.fromisoformat(action_policy["capture_interval_end"])
     ):
         raise ValueError("Action capture does not cover the requested horizon")
+    if (
+        action_policy["capture_interval_start"]
+        != replay_packet["action_scope"]["start"]
+        or action_policy["capture_interval_end"]
+        != replay_packet["action_scope"]["end"]
+        or action_policy["selected_action_count_at_issue"]
+        != replay_selection["selected"]["action_review"]["action_count"]
+    ):
+        raise ValueError("Action policy does not match retained source replay")
 
     metrics = payload["current_metrics"]
     metric_fields = {

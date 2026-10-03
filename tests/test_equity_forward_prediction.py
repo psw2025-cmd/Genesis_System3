@@ -96,6 +96,13 @@ def fixture():
     )
 
 
+def retained_sources(args):
+    return {
+        "equity_source_bytes": args["equity_sources"],
+        "index_source_raw": args["index_raw"],
+    }
+
+
 def test_builds_one_unqualified_forward_paper_prediction():
     args = fixture()
     result = build_prediction(**args)
@@ -112,6 +119,7 @@ def test_builds_one_unqualified_forward_paper_prediction():
     assert validate_prediction(
         result,
         now=NOW,
+        **retained_sources(args),
         holiday_calendar_raw=args["holiday_raw"],
         model_spec_raw=args["model_spec_raw"],
         expected_previous_event_hash=args["previous_event_hash"],
@@ -123,6 +131,119 @@ def test_builder_requires_explicit_predecessor_anchor():
     args.pop("previous_event_hash")
     with pytest.raises(TypeError, match="previous_event_hash"):
         build_prediction(**args)
+
+
+def test_stored_prediction_requires_external_primary_source_bytes():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="retained equity source bytes required"):
+        validate_prediction(
+            result,
+            now=NOW,
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+    with pytest.raises(ValueError, match="retained index source bytes required"):
+        validate_prediction(
+            result,
+            now=NOW,
+            equity_source_bytes=args["equity_sources"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+
+
+@pytest.mark.parametrize("role", ["cash", "company", "etf", "actions"])
+def test_stored_prediction_rejects_substituted_equity_source_bytes(role):
+    args = fixture()
+    result = build_prediction(**args)
+    substituted = dict(args["equity_sources"])
+    substituted[role] += b"\n"
+    with pytest.raises(ValueError, match=rf"{role} retained source bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            equity_source_bytes=substituted,
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+
+
+def test_stored_prediction_rejects_substituted_index_source_bytes():
+    args = fixture()
+    result = build_prediction(**args)
+    with pytest.raises(ValueError, match="index retained source bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            equity_source_bytes=args["equity_sources"],
+            index_source_raw=args["index_raw"] + b"\n",
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+
+
+def test_rehashed_fabricated_cash_receipt_fails_external_replay():
+    args = fixture()
+    result = build_prediction(**args)
+    result["source_receipts"]["cash"].update(
+        url="https://nsearchives.nseindia.com/content/cm/fabricated.zip",
+        sha256="f" * 64,
+        bytes=1,
+    )
+    rehash(result)
+    with pytest.raises(ValueError, match="cash retained source bytes mismatch"):
+        validate_prediction(
+            result,
+            now=NOW,
+            **retained_sources(args),
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+
+
+def test_rehashed_row_or_benchmark_substitution_fails_source_replay():
+    args = fixture()
+    result = build_prediction(**args)
+    result["prediction"]["features"]["source_row_sha256"] = "f" * 64
+    result["prediction"]["feature_hash"] = sha256(
+        json.dumps(
+            result["prediction"]["features"],
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode()
+    ).hexdigest()
+    rehash(result)
+    with pytest.raises(ValueError, match="retained source replay"):
+        validate_prediction(
+            result,
+            now=NOW,
+            **retained_sources(args),
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
+
+    result = build_prediction(**args)
+    result["benchmark"]["entry_reference_close"] = "99999"
+    rehash(result)
+    with pytest.raises(ValueError, match="retained index replay"):
+        validate_prediction(
+            result,
+            now=NOW,
+            **retained_sources(args),
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+        )
 
 
 @pytest.mark.parametrize(
@@ -146,6 +267,7 @@ def test_stored_record_fails_closed(path, value, match):
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -159,6 +281,7 @@ def test_event_and_feature_hashes_are_immutable():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -169,6 +292,7 @@ def test_event_and_feature_hashes_are_immutable():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -195,6 +319,7 @@ def test_rehashed_fabricated_feature_arithmetic_fails_closed(field, value):
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -214,6 +339,7 @@ def test_stored_prediction_requires_trusted_predecessor_anchor():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -224,6 +350,7 @@ def test_stored_prediction_requires_trusted_predecessor_anchor():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
             expected_previous_event_hash=GENESIS_HASH,
@@ -249,6 +376,7 @@ def test_rehashed_hidden_claims_and_source_changes_fail_closed(mutate, match):
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -282,6 +410,7 @@ def test_rehashed_horizon_timestamp_or_session_substitution_fails_closed(
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -294,12 +423,14 @@ def test_stored_prediction_requires_exact_registered_model_bytes():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
         )
     with pytest.raises(ValueError, match="retained bytes mismatch"):
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"] + b"\n",
         )
@@ -309,6 +440,7 @@ def test_stored_prediction_requires_exact_registered_model_bytes():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -328,6 +460,7 @@ def test_model_registration_after_issue_fails_builder_and_stored_record():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=future_raw,
         )
@@ -340,12 +473,14 @@ def test_stored_prediction_requires_exact_retained_calendar_bytes():
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             model_spec_raw=args["model_spec_raw"],
         )
     with pytest.raises(ValueError, match="retained bytes mismatch"):
         validate_prediction(
             result,
             now=NOW,
+            **retained_sources(args),
             holiday_calendar_raw=b'{"CM":[]}',
             model_spec_raw=args["model_spec_raw"],
         )
@@ -358,6 +493,7 @@ def test_stored_prediction_cannot_validate_before_issuance():
         validate_prediction(
             result,
             now=datetime(2026, 9, 30, 12, tzinfo=timezone.utc),
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
@@ -391,6 +527,7 @@ def test_rehashed_issuance_must_be_observed_and_bind_entry_session(
         validate_prediction(
             result,
             now=now,
+            **retained_sources(args),
             holiday_calendar_raw=args["holiday_raw"],
             model_spec_raw=args["model_spec_raw"],
         )
