@@ -98,10 +98,15 @@ def _canonical(record: dict[str, Any]) -> bytes:
 def build_issued_forecast(
     forecast: dict[str, Any],
     *,
-    previous_hash: str = GENESIS_HASH,
+    previous_hash: str,
     now: datetime | None = None,
 ) -> dict[str, Any]:
-    """Build an unpersisted event; append additionally verifies retained files."""
+    """Build an unpersisted event against an explicit trusted chain anchor.
+
+    ``append_issued_forecast`` derives that anchor while holding the ledger lock.
+    Direct callers must make the genesis decision explicit instead of silently
+    starting a second valid-looking chain when predecessor state is unavailable.
+    """
     current = now or datetime.now(timezone.utc)
     if current.tzinfo is None or current.utcoffset() is None:
         raise LedgerError("NOW_TIMEZONE_REQUIRED")

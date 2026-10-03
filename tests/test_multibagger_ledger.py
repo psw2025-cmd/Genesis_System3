@@ -63,8 +63,16 @@ def evidence_root(tmp_path):
 
 
 def test_builds_deterministic_fail_closed_equity_event():
-    first = build_issued_forecast(FORECAST, now=NOW)
-    second = build_issued_forecast(FORECAST, now=NOW)
+    first = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    second = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
     assert first == second
     assert first["previous_hash"] == GENESIS_HASH
     assert len(first["event_hash"]) == 64
@@ -75,6 +83,11 @@ def test_builds_deterministic_fail_closed_equity_event():
     assert first["live_trading_enabled"] is False
     assert first["order_placement_allowed"] is False
     assert verify_chain([first])["record_count"] == 1
+
+
+def test_builder_requires_explicit_trusted_predecessor_anchor():
+    with pytest.raises(TypeError, match="previous_hash"):
+        build_issued_forecast(FORECAST, now=NOW)
 
 
 def test_append_preserves_chain_and_rejects_duplicate(tmp_path, evidence_root):
@@ -160,16 +173,19 @@ def test_lookahead_backfill_and_bad_provenance_fail_closed():
     with pytest.raises(LedgerError, match="INVALID_FORECAST_TIME_ORDER"):
         build_issued_forecast(
             FORECAST,
+            previous_hash=GENESIS_HASH,
             now=datetime(2026, 9, 9, tzinfo=timezone.utc),
         )
     with pytest.raises(LedgerError, match="ENTRY_SOURCE_UNVERIFIED"):
         build_issued_forecast(
             {**FORECAST, "entry_source": "BLOG"},
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
     with pytest.raises(LedgerError, match="HORIZON_DUE_MISMATCH"):
         build_issued_forecast(
             {**FORECAST, "horizon_days": 30},
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
 
@@ -178,11 +194,16 @@ def test_declared_source_hash_must_match_retained_exact_bytes():
     without_bytes = dict(FORECAST)
     without_bytes.pop("entry_source_snapshot")
     with pytest.raises(LedgerError, match="ENTRY_SOURCE_SNAPSHOT_REQUIRED"):
-        build_issued_forecast(without_bytes, now=NOW)
+        build_issued_forecast(
+            without_bytes,
+            previous_hash=GENESIS_HASH,
+            now=NOW,
+        )
 
     with pytest.raises(LedgerError, match="ENTRY_SOURCE_SNAPSHOT_HASH_MISMATCH"):
         build_issued_forecast(
             {**FORECAST, "entry_source_snapshot": b"different NSE bytes"},
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
 
@@ -194,7 +215,11 @@ def test_adjustment_basis_requires_point_in_time_exact_source_bytes():
         LedgerError,
         match="ADJUSTMENT_SOURCE_SNAPSHOT_REQUIRED",
     ):
-        build_issued_forecast(without_bytes, now=NOW)
+        build_issued_forecast(
+            without_bytes,
+            previous_hash=GENESIS_HASH,
+            now=NOW,
+        )
 
     with pytest.raises(
         LedgerError,
@@ -205,12 +230,14 @@ def test_adjustment_basis_requires_point_in_time_exact_source_bytes():
                 **FORECAST,
                 "adjustment_source_snapshot": b"different adjustment bytes",
             },
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
 
     with pytest.raises(LedgerError, match="ADJUSTMENT_SOURCE_UNVERIFIED"):
         build_issued_forecast(
             {**FORECAST, "adjustment_source": "BLOG"},
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
 
@@ -220,6 +247,7 @@ def test_adjustment_basis_requires_point_in_time_exact_source_bytes():
                 **FORECAST,
                 "adjustment_observed_at": "2026-09-01T12:01:00+00:00",
             },
+            previous_hash=GENESIS_HASH,
             now=NOW,
         )
 
@@ -255,7 +283,11 @@ def test_snapshot_references_reject_spoofing_and_path_traversal(
     error,
 ):
     with pytest.raises(LedgerError, match=f"{field.upper()}_{error}"):
-        build_issued_forecast({**FORECAST, field: value}, now=NOW)
+        build_issued_forecast(
+            {**FORECAST, field: value},
+            previous_hash=GENESIS_HASH,
+            now=NOW,
+        )
 
 
 @pytest.mark.parametrize("source", ["entry", "adjustment"])
