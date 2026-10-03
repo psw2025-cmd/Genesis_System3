@@ -1,0 +1,99 @@
+{
+  "schema": "equity-forward-experiment-v1",
+  "experiment_id": "EQ-FWD-RANK-001",
+  "strategy_id": "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY",
+  "strategy_version": "1.0.0",
+  "status": "EXPLORATORY_FORWARD_ONLY",
+  "registered_at": "2026-10-01T12:41:00Z",
+  "parent_commit": "85800b8c14cf79c4e5263b9db2569c08de7bf8cc",
+  "instrument": "NSE cash company EQ",
+  "horizon": {
+    "calendar_days": 7,
+    "outcome_reference": "official close of first CM session on or after seven calendar days",
+    "opening_or_closing_reference_is_executable_fill": false
+  },
+  "universe": {
+    "identity": "current NSE company EQ master at issue time",
+    "etfs_excluded": true,
+    "positive_same_session_intraday_return_required": true,
+    "minimum_close_inr": "10",
+    "minimum_close_times_volume_inr": "100000000",
+    "known_action_between_entry_and_due_excluded": true,
+    "survivorship_guard": "current-master identity is not historical universe proof"
+  },
+  "features": [
+    {
+      "name": "intraday_return_percent_rank",
+      "family": "price_volume",
+      "source": "official NSE CM bhavcopy",
+      "timestamp": "same completed entry session; source first-observed before issue",
+      "missingness": "exclude invalid or non-positive OHLC rows",
+      "transformation": "cross-sectional percent rank of close/open minus one",
+      "version": "1.0.0",
+      "reason": "freeze a simple momentum baseline without outcome-driven tuning"
+    },
+    {
+      "name": "liquidity_proxy_percent_rank",
+      "family": "liquidity",
+      "source": "official NSE CM close and traded volume",
+      "timestamp": "same completed entry session; source first-observed before issue",
+      "missingness": "exclude rows below the fixed close-times-volume threshold",
+      "transformation": "cross-sectional percent rank of close times volume",
+      "version": "1.0.0",
+      "reason": "reduce thin-instrument selection without claiming executable capacity"
+    }
+  ],
+  "selection": {
+    "score": "0.5*intraday_return_percent_rank + 0.5*liquidity_proxy_percent_rank",
+    "tie_break": "symbol then ISIN ascending",
+    "selected_count_per_issue": 1,
+    "weights_were_fit_to_outcomes": false
+  },
+  "target": {
+    "direction": "positive corporate-action-resolved close-to-close return",
+    "benchmark": "Nifty 50 same-reference close-to-close return",
+    "cost_assumption": "no executable return claimed; execution costs remain NOT_PROVEN",
+    "action_policy": "recapture actions at maturity; do not score until any action is resolved"
+  },
+  "research_gates": {
+    "minimum_oos_directional_accuracy": 0.65,
+    "minimum_top_decile_precision": 0.70,
+    "minimum_oos_trades": 100,
+    "minimum_oos_days": 60,
+    "minimum_sharpe": 2.5,
+    "maximum_drawdown": 0.10,
+    "minimum_deflated_sharpe_probability": 0.95
+  },
+  "current_values": {
+    "matured_outcomes": 0,
+    "oos_days": 0,
+    "directional_accuracy": null,
+    "top_decile_precision": null,
+    "sharpe": null,
+    "max_drawdown": null,
+    "deflated_sharpe_probability": null
+  },
+  "numerical_gaps": {
+    "oos_trades": 100,
+    "oos_days": 60,
+    "directional_accuracy": null,
+    "top_decile_precision": null,
+    "sharpe": null,
+    "max_drawdown": null,
+    "deflated_sharpe_probability": null
+  },
+  "next_experiment": "At maturity, fetch official close and action sources without changing this version; score direction and benchmark excess only if provenance and adjustment checks pass.",
+  "multiple_testing": {
+    "strategy_versions_in_this_forward_cohort": 1,
+    "frozen_test_retuning_allowed": false,
+    "feature_promotion_from_this_single_prediction_allowed": false
+  },
+  "catalyst_ablation": {
+    "this_version": "NO_CATALYST_BASELINE",
+    "catalyst_feature_included": false,
+    "future_comparison_requires_identical_cohort_and_selection_logic": true
+  },
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}

@@ -113,6 +113,31 @@ def test_multibagger_contract_is_truthful_pending_without_evidence(app):
     assert data["safety"] == {"read_only": True, "orders_enabled": False}
 
 
+def test_multibagger_workspace_does_not_promote_static_candidates(app):
+    status, _, body = call(app, "GET", "/api/multibagger")
+    assert status == 200
+    data = json.loads(body)
+    assert data["status"] == "pending"
+    assert data["candidates"] == []
+    assert data["as_of"] is None
+    assert data["safety"]["orders_enabled"] is False
+
+    status, _, body = call(app, "GET", "/api/multibagger/predictions")
+    assert status == 200
+    predictions = json.loads(body)
+    assert predictions["status"] == "pending"
+    assert predictions["predictions"] == []
+    assert predictions["count"] == 0
+
+    status, _, body = call(app, "GET", "/api/multibagger/backtest")
+    assert status == 200
+    backtest = json.loads(body)
+    assert backtest["status"] == "pending"
+    assert backtest["passed"] is False
+    assert backtest["strategies"] == []
+    assert backtest["reason"] == "NO_EQUITY_MULTIBAGGER_WALK_FORWARD_EVIDENCE"
+
+
 def test_multibagger_contract_requires_price_and_model_provenance(app):
     endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
     now = datetime.now(timezone.utc).isoformat()
