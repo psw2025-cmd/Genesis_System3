@@ -118,6 +118,13 @@ def test_builds_one_unqualified_forward_paper_prediction():
     )["orders_allowed"] is False
 
 
+def test_builder_requires_explicit_predecessor_anchor():
+    args = fixture()
+    args.pop("previous_event_hash")
+    with pytest.raises(TypeError, match="previous_event_hash"):
+        build_prediction(**args)
+
+
 @pytest.mark.parametrize(
     "path,value,match",
     [

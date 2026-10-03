@@ -213,8 +213,8 @@ def build_prediction(
     holiday_receipt: dict[str, Any],
     model_spec_raw: bytes,
     issued_at: str,
+    previous_event_hash: str,
     now: datetime | None = None,
-    previous_event_hash: str = GENESIS_HASH,
 ) -> dict[str, Any]:
     """Build one deterministic exploratory prediction from current-session sources."""
     issued = _instant(issued_at, "issued_at")

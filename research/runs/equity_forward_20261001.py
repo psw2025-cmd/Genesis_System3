@@ -11,7 +11,7 @@ from hashlib import sha256
 import json
 from pathlib import Path
 
-from scripts.equity_forward_prediction import build_prediction
+from scripts.equity_forward_prediction import GENESIS_HASH, build_prediction
 
 
 FILES = {
@@ -47,6 +47,7 @@ def main() -> None:
         holiday_receipt=receipts[FILES["holiday_calendar"]],
         model_spec_raw=args.model_spec.read_bytes(),
         issued_at=args.issued_at,
+        previous_event_hash=GENESIS_HASH,
         now=datetime.now(timezone.utc),
     )
     args.output_dir.mkdir(parents=True, exist_ok=False)
