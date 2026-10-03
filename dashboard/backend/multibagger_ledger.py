@@ -23,6 +23,37 @@ _APPROVED_SOURCES = {"NSE", "BSE", "DHAN"}
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 _SNAPSHOT_REF_RE = re.compile(r"^[A-Za-z0-9._/-]+$")
 _SNAPSHOT_PREFIXES = ("snapshots/", "research/evidence/")
+_SEALED_FORECAST_FIELDS = frozenset(
+    {
+        "schema_version",
+        "event_type",
+        "prediction_id",
+        "symbol",
+        "horizon_days",
+        "issued_at",
+        "due_at",
+        "entry_observed_at",
+        "adjustment_observed_at",
+        "entry_adjusted_close",
+        "predicted_return_pct",
+        "model_name",
+        "model_version",
+        "feature_hash",
+        "entry_source",
+        "entry_source_hash",
+        "entry_source_size_bytes",
+        "entry_snapshot_uri",
+        "adjustment_basis",
+        "adjustment_source",
+        "adjustment_source_hash",
+        "adjustment_source_size_bytes",
+        "adjustment_snapshot_uri",
+        "previous_hash",
+        "live_trading_enabled",
+        "order_placement_allowed",
+        "event_hash",
+    }
+)
 
 
 class LedgerError(ValueError):
@@ -228,6 +259,8 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
     seen: set[str] = set()
     count = 0
     for index, record in enumerate(records):
+        if not isinstance(record, dict) or set(record) != _SEALED_FORECAST_FIELDS:
+            raise LedgerError(f"ROW_{index}_FIELDS_INVALID")
         if record.get("schema_version") != SCHEMA_VERSION:
             raise LedgerError(f"ROW_{index}_SCHEMA_INVALID")
         if record.get("event_type") != "EQUITY_FORECAST_ISSUED":

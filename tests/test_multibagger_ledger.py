@@ -10,6 +10,7 @@ import pytest
 from dashboard.backend.multibagger_ledger import (
     GENESIS_HASH,
     LedgerError,
+    _canonical,
     _ledger_lock,
     append_issued_forecast,
     build_issued_forecast,
@@ -167,6 +168,27 @@ def test_tampering_and_truncation_are_detected(tmp_path, evidence_root):
     ledger.write_text(json.dumps(sealed), encoding="utf-8")
     with pytest.raises(LedgerError, match="LEDGER_TRUNCATED"):
         read_ledger(ledger, evidence_root=evidence_root)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        lambda record: record.update(trade_action="BUY"),
+        lambda record: record.update(quantity=100),
+        lambda record: record.update(entry_reference_is_executable_fill=True),
+        lambda record: record.pop("model_version"),
+    ],
+)
+def test_rehashed_undeclared_or_missing_fields_fail_closed(mutation):
+    sealed = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    mutation(sealed)
+    sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
+    with pytest.raises(LedgerError, match="ROW_0_FIELDS_INVALID"):
+        verify_chain([sealed])
 
 
 def test_lookahead_backfill_and_bad_provenance_fail_closed():
