@@ -11,7 +11,6 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import BytesIO, StringIO
 import json
-from math import isfinite
 import re
 from typing import Any
 from zipfile import BadZipFile, ZipFile
@@ -125,6 +124,7 @@ def _nse_close_from_snapshot(
     *,
     source_url: Any,
     symbol: str,
+    isin: str,
     price_as_of: datetime,
     field: str,
 ) -> tuple[Decimal, str]:
@@ -135,7 +135,10 @@ def _nse_close_from_snapshot(
     if not match:
         raise ValueError(f"{field}_NSE_SOURCE_URL_INVALID")
     member, stamp = match.groups()
-    trade_date = datetime.strptime(stamp, "%Y%m%d").date()
+    try:
+        trade_date = datetime.strptime(stamp, "%Y%m%d").date()
+    except ValueError as exc:
+        raise ValueError(f"{field}_NSE_SOURCE_URL_INVALID") from exc
     local_price_time = price_as_of.astimezone(ZoneInfo("Asia/Kolkata"))
     if (
         local_price_time.date() != trade_date
@@ -174,6 +177,8 @@ def _nse_close_from_snapshot(
             raise ValueError(f"{field}_NSE_ROW_INVALID")
         if row["TckrSymb"].strip().upper() != symbol:
             continue
+        if row["ISIN"].strip().upper() != isin:
+            raise ValueError(f"{field}_NSE_ISIN_MISMATCH")
         if (
             row["FinInstrmTp"] != "STK"
             or row["SctySrs"] != "EQ"
@@ -214,6 +219,7 @@ def _close_from_snapshot(
     source: str,
     source_url: Any,
     symbol: str,
+    isin: str,
     price_as_of: datetime,
     field: str,
 ) -> tuple[Decimal, str]:
@@ -222,6 +228,7 @@ def _close_from_snapshot(
             raw,
             source_url=source_url,
             symbol=symbol,
+            isin=isin,
             price_as_of=price_as_of,
             field=field,
         )
@@ -265,6 +272,9 @@ def reconcile(
         symbol = str(prediction["symbol"]).strip().upper()
         if not symbol or symbol != str(outcome["symbol"]).strip().upper():
             raise ValueError("SYMBOL_MISMATCH")
+        isin = str(prediction["isin"]).strip().upper()
+        if not isin or isin != str(outcome["isin"]).strip().upper():
+            raise ValueError("ISIN_MISMATCH")
         pred_id = str(prediction["prediction_id"]).strip()
         if not pred_id:
             raise ValueError("PREDICTION_ID_REQUIRED")
@@ -302,6 +312,7 @@ def reconcile(
             source=entry_source,
             source_url=prediction["entry_source_url"],
             symbol=symbol,
+            isin=isin,
             price_as_of=entry_at,
             field="ENTRY",
         )
@@ -310,6 +321,7 @@ def reconcile(
             source=outcome_source,
             source_url=outcome["source_url"],
             symbol=symbol,
+            isin=isin,
             price_as_of=price_as_of,
             field="OUTCOME",
         )
@@ -331,6 +343,7 @@ def reconcile(
         "status": "EVALUATED",
         "prediction_id": pred_id,
         "symbol": symbol,
+        "isin": isin,
         "issued_at": issued.isoformat(),
         "due_at": due.isoformat(),
         "outcome_price_as_of_at": price_as_of.isoformat(),

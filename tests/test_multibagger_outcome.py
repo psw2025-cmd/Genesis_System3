@@ -15,12 +15,18 @@ HEADERS = (
 )
 
 
-def _nse_archive(trade_date: str, symbol: str, close: str) -> tuple[bytes, str]:
+def _nse_archive(
+    trade_date: str,
+    symbol: str,
+    close: str,
+    *,
+    isin: str = "INE301R01014",
+) -> tuple[bytes, str]:
     stamp = trade_date.replace("-", "")
     member = f"BhavCopy_NSE_CM_0_0_0_{stamp}_F_0000.csv"
     numeric_close = float(close)
     row = (
-        f"{trade_date},{trade_date},CM,NSE,STK,INE301R01014,{symbol},EQ,F1,"
+        f"{trade_date},{trade_date},CM,NSE,STK,{isin},{symbol},EQ,F1,"
         f"{numeric_close - 1:.2f},{numeric_close + 1:.2f},"
         f"{numeric_close - 2:.2f},{close},1000\n"
     )
@@ -43,6 +49,7 @@ OUTCOME_SHA = sha256(OUTCOME_BYTES).hexdigest()
 PREDICTION = {
     "prediction_id": "p-1",
     "symbol": "RAYMOND",
+    "isin": "INE301R01014",
     "issued_at": "2026-09-01T12:00:00+00:00",
     "due_at": "2026-09-08T10:00:00+00:00",
     "entry_observed_at": "2026-09-01T10:00:00+00:00",
@@ -57,6 +64,7 @@ PREDICTION = {
 }
 OUTCOME = {
     "symbol": "RAYMOND",
+    "isin": "INE301R01014",
     "price_as_of_at": "2026-09-08T10:00:00+00:00",
     "source_published_at": "2026-09-08T10:05:00+00:00",
     "source_first_observed_at": "2026-09-08T10:06:00+00:00",
@@ -88,6 +96,7 @@ def test_reconciles_signed_point_in_time_prices_without_claiming_target_hit():
     assert len(result["entry_source_row_hash"]) == 64
     assert len(result["outcome_source_row_hash"]) == 64
     assert result["price_basis"] == "UNADJUSTED_EXCHANGE_REFERENCE"
+    assert result["isin"] == "INE301R01014"
     assert result["market_validation_claimed"] is False
     assert result["live_trading_enabled"] is False
     assert result["order_placement_allowed"] is False
@@ -277,6 +286,26 @@ def test_rejects_rehashed_archive_with_wrong_symbol():
     )
     assert result["status"] == "NOT_PROVEN"
     assert result["reason"] == "OUTCOME_NSE_PRICE_ROW_NOT_FOUND"
+
+
+def test_rejects_rehashed_archive_with_wrong_isin():
+    wrong_bytes, _ = _nse_archive(
+        "2026-09-08",
+        "RAYMOND",
+        "110.00",
+        isin="INE000X01000",
+    )
+    result = reconcile(
+        PREDICTION,
+        {
+            **OUTCOME,
+            "source_snapshot": wrong_bytes,
+            "source_hash": sha256(wrong_bytes).hexdigest(),
+        },
+        now=NOW,
+    )
+    assert result["status"] == "NOT_PROVEN"
+    assert result["reason"] == "OUTCOME_NSE_ISIN_MISMATCH"
 
 
 def test_binds_official_url_date_member_and_close_timestamp():
