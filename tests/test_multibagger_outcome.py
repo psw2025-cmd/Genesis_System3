@@ -2,6 +2,8 @@
 from datetime import datetime, timezone
 from hashlib import sha256
 
+import pytest
+
 from dashboard.backend.multibagger_outcome import reconcile
 
 
@@ -24,7 +26,9 @@ PREDICTION = {
 }
 OUTCOME = {
     "symbol": "RAYMOND",
-    "observed_at": "2026-09-08T12:00:00+00:00",
+    "price_as_of_at": "2026-09-08T12:00:00+00:00",
+    "source_published_at": "2026-09-08T12:05:00+00:00",
+    "source_first_observed_at": "2026-09-08T12:06:00+00:00",
     "adjusted_close": 110.0,
     "source": "NSE",
     "source_hash": OUTCOME_SHA,
@@ -40,6 +44,12 @@ def test_reconciles_signed_point_in_time_prices_without_claiming_target_hit():
     assert result["actual_return_pct"] == 10.0
     assert result["absolute_error_pp"] == 10.0
     assert result["direction_correct"] is True
+    assert result["outcome_price_as_of_at"] == PREDICTION["due_at"]
+    assert result["outcome_source_published_at"] == OUTCOME["source_published_at"]
+    assert (
+        result["outcome_source_first_observed_at"]
+        == OUTCOME["source_first_observed_at"]
+    )
     assert result["entry_source_hash"] == ENTRY_SHA
     assert result["outcome_source_hash"] == OUTCOME_SHA
     assert result["live_trading_enabled"] is False
@@ -50,7 +60,7 @@ def test_rejects_future_outcome_or_missing_provenance():
     assert (
         reconcile(
             PREDICTION,
-            {**OUTCOME, "observed_at": "2026-09-25T12:00:00+00:00"},
+            {**OUTCOME, "source_first_observed_at": "2026-09-25T12:00:00+00:00"},
             now=NOW,
         )["status"]
         == "NOT_PROVEN"
@@ -100,10 +110,10 @@ def test_rejects_outcome_before_horizon_and_invalid_numbers():
     assert (
         reconcile(
             PREDICTION,
-            {**OUTCOME, "observed_at": "2026-09-07T12:00:00+00:00"},
+            {**OUTCOME, "price_as_of_at": "2026-09-07T12:00:00+00:00"},
             now=NOW,
         )["reason"]
-        == "INVALID_TIME_ORDER"
+        == "OUTCOME_HORIZON_MISMATCH"
     )
     assert (
         reconcile(
@@ -121,6 +131,47 @@ def test_rejects_outcome_before_horizon_and_invalid_numbers():
         )["reason"]
         == "INVALID_FORECAST"
     )
+
+
+@pytest.mark.parametrize(
+    "mutation,error",
+    [
+        (
+            lambda record: record.update(
+                price_as_of_at="2026-09-09T12:00:00+00:00",
+                source_published_at="2026-09-09T12:05:00+00:00",
+                source_first_observed_at="2026-09-09T12:06:00+00:00",
+                adjusted_close=200.0,
+            ),
+            "OUTCOME_HORIZON_MISMATCH",
+        ),
+        (
+            lambda record: record.update(
+                source_published_at="2026-09-08T11:59:59+00:00"
+            ),
+            "INVALID_SOURCE_TIME_ORDER",
+        ),
+        (
+            lambda record: record.update(
+                source_first_observed_at="2026-09-08T12:04:59+00:00"
+            ),
+            "INVALID_SOURCE_TIME_ORDER",
+        ),
+        (
+            lambda record: record.pop("price_as_of_at"),
+            "REQUIRED_EVIDENCE_MISSING",
+        ),
+    ],
+)
+def test_horizon_and_source_availability_timestamps_fail_closed(
+    mutation,
+    error,
+):
+    outcome = dict(OUTCOME)
+    mutation(outcome)
+    result = reconcile(PREDICTION, outcome, now=NOW)
+    assert result["status"] == "NOT_PROVEN"
+    assert result["reason"] == error
 
 
 def test_rejects_naive_evaluation_clock():

@@ -288,7 +288,8 @@ jobs:
             tests/test_equity_horizon_replay.py \
             tests/test_equity_corporate_action_scope.py \
             tests/test_equity_forward_prediction.py \
-            tests/test_multibagger_ledger.py
+            tests/test_multibagger_ledger.py \
+            tests/test_multibagger_outcome.py
 
       - name: Classify quantitative AlphaTruth evidence
         shell: bash

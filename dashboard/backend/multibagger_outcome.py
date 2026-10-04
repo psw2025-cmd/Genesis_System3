@@ -5,7 +5,7 @@ price is evidence of an observed outcome, not proof the model predicted it well.
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from hashlib import sha256
 from math import isfinite
 import re
@@ -72,22 +72,28 @@ def reconcile(
     """Evaluate one issued equity prediction against a later adjusted close.
 
     Returns NOT_PROVEN with a reason for missing or contradictory evidence.
-    The seven-day tolerance covers non-trading days but cannot choose a more
-    favorable distant exit. Both prices must share an adjustment basis.
+    The due timestamp must already name the official horizon close. Scoring
+    requires an exact price timestamp match; source publication and first-
+    observed times stay separate so a later favorable close cannot be chosen.
+    Both prices must share an adjustment basis.
     """
     try:
         issued = _timestamp(prediction["issued_at"])
         due = _timestamp(prediction["due_at"])
         entry_at = _timestamp(prediction["entry_observed_at"])
-        exit_at = _timestamp(outcome["observed_at"])
+        price_as_of = _timestamp(outcome["price_as_of_at"])
+        published_at = _timestamp(outcome["source_published_at"])
+        first_observed_at = _timestamp(outcome["source_first_observed_at"])
         current = now or datetime.now(timezone.utc)
         if current.tzinfo is None or current.utcoffset() is None:
             raise ValueError("NOW_TIMEZONE_REQUIRED")
         current = current.astimezone(timezone.utc)
-        if not entry_at <= issued < due <= exit_at <= current:
+        if not entry_at <= issued < due <= current:
             raise ValueError("INVALID_TIME_ORDER")
-        if exit_at > due + timedelta(days=7):
-            raise ValueError("OUTCOME_TOO_LATE")
+        if price_as_of != due:
+            raise ValueError("OUTCOME_HORIZON_MISMATCH")
+        if not price_as_of <= published_at <= first_observed_at <= current:
+            raise ValueError("INVALID_SOURCE_TIME_ORDER")
 
         symbol = str(prediction["symbol"]).strip().upper()
         if not symbol or symbol != str(outcome["symbol"]).strip().upper():
@@ -132,7 +138,9 @@ def reconcile(
         "symbol": symbol,
         "issued_at": issued.isoformat(),
         "due_at": due.isoformat(),
-        "outcome_observed_at": exit_at.isoformat(),
+        "outcome_price_as_of_at": price_as_of.isoformat(),
+        "outcome_source_published_at": published_at.isoformat(),
+        "outcome_source_first_observed_at": first_observed_at.isoformat(),
         "predicted_return_pct": round(forecast, 6),
         "actual_return_pct": round(actual, 6),
         "absolute_error_pp": round(abs(forecast - actual), 6),
