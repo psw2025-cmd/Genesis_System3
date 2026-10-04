@@ -11,10 +11,20 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import BytesIO, StringIO
 import json
+import os
+from pathlib import Path
 import re
-from typing import Any
+from typing import Any, Iterable, Mapping
+from urllib.parse import urlsplit
 from zipfile import BadZipFile, ZipFile
 from zoneinfo import ZoneInfo
+
+from dashboard.backend.multibagger_ledger import (
+    LedgerError as ForecastLedgerError,
+    _ledger_lock,
+    _retained_snapshot_digest,
+    _snapshot_reference,
+)
 
 
 _APPROVED_PRICE_SOURCES = {"NSE", "BSE", "DHAN"}
@@ -369,3 +379,557 @@ def reconcile(
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }
+
+
+OUTCOME_SCHEMA_VERSION = "equity-outcome-ledger-v1"
+OUTCOME_GENESIS_HASH = "0" * 64
+_OUTCOME_EVENT_TYPE = "EQUITY_OUTCOME_RECORDED"
+_ISIN_RE = re.compile(r"^IN[A-Z0-9]{10}$")
+_SEALED_OUTCOME_FIELDS = frozenset(
+    {
+        "schema_version",
+        "event_type",
+        "prediction_id",
+        "prediction_event_hash",
+        "symbol",
+        "isin",
+        "issued_at",
+        "due_at",
+        "recorded_at",
+        "outcome_price_as_of_at",
+        "outcome_source_published_at",
+        "outcome_source_first_observed_at",
+        "entry_reference_close",
+        "outcome_reference_close",
+        "predicted_return_pct",
+        "actual_return_pct",
+        "absolute_error_pp",
+        "direction_correct",
+        "entry_source",
+        "entry_source_url",
+        "entry_source_hash",
+        "entry_source_size_bytes",
+        "entry_source_row_hash",
+        "entry_snapshot_uri",
+        "outcome_source",
+        "outcome_source_url",
+        "outcome_source_hash",
+        "outcome_source_size_bytes",
+        "outcome_source_row_hash",
+        "outcome_snapshot_uri",
+        "price_basis",
+        "adjustment_basis",
+        "previous_hash",
+        "market_validation_claimed",
+        "reference_prices_are_executable_fills",
+        "performance_gate_passed",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+        "event_hash",
+    }
+)
+
+
+class OutcomeLedgerError(ValueError):
+    """Raised when an outcome event is detached, mutable, or incomplete."""
+
+
+def _outcome_sha(value: Any, field: str) -> str:
+    digest = str(value).strip().lower()
+    if not _SHA256_RE.fullmatch(digest):
+        raise OutcomeLedgerError(f"{field}_INVALID_SHA256")
+    return digest
+
+
+def _outcome_time(value: Any, field: str) -> datetime:
+    try:
+        return _timestamp(value)
+    except ValueError as exc:
+        raise OutcomeLedgerError(f"{field}_{exc}") from exc
+
+
+def _outcome_reference(value: Any, field: str) -> str:
+    try:
+        return _snapshot_reference(value, field)
+    except ForecastLedgerError as exc:
+        raise OutcomeLedgerError(str(exc)) from exc
+
+
+def _official_source_url(value: Any, source: str, field: str) -> str:
+    if not isinstance(value, str) or value != value.strip():
+        raise OutcomeLedgerError(f"{field}_INVALID")
+    parsed = urlsplit(value)
+    approved_hosts = {
+        "NSE": {"nsearchives.nseindia.com", "www.nseindia.com"},
+        "BSE": {"www.bseindia.com", "api.bseindia.com"},
+        "DHAN": {"api.dhan.co"},
+    }
+    if (
+        parsed.scheme != "https"
+        or parsed.hostname not in approved_hosts[source]
+        or parsed.username
+        or parsed.password
+        or parsed.fragment
+        or parsed.port not in (None, 443)
+    ):
+        raise OutcomeLedgerError(f"{field}_UNAPPROVED")
+    return value
+
+
+def _canonical_outcome_event(record: dict[str, Any]) -> bytes:
+    payload = {key: value for key, value in record.items() if key != "event_hash"}
+    return json.dumps(
+        payload,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode("utf-8")
+
+
+def _validate_sealed_outcome_semantics(
+    record: dict[str, Any],
+    *,
+    prefix: str = "",
+    allow_unhashed: bool = False,
+) -> datetime:
+    expected_fields = (
+        _SEALED_OUTCOME_FIELDS - {"event_hash"}
+        if allow_unhashed
+        else _SEALED_OUTCOME_FIELDS
+    )
+    if not isinstance(record, dict) or set(record) != expected_fields:
+        raise OutcomeLedgerError(f"{prefix}FIELDS_INVALID")
+    if record.get("schema_version") != OUTCOME_SCHEMA_VERSION:
+        raise OutcomeLedgerError(f"{prefix}SCHEMA_INVALID")
+    if record.get("event_type") != _OUTCOME_EVENT_TYPE:
+        raise OutcomeLedgerError(f"{prefix}EVENT_TYPE_INVALID")
+
+    prediction_id = record.get("prediction_id")
+    symbol = record.get("symbol")
+    isin = record.get("isin")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+    ):
+        raise OutcomeLedgerError(f"{prefix}PREDICTION_ID_INVALID")
+    if (
+        not isinstance(symbol, str)
+        or not symbol
+        or symbol != symbol.strip().upper()
+    ):
+        raise OutcomeLedgerError(f"{prefix}SYMBOL_INVALID")
+    if not isinstance(isin, str) or not _ISIN_RE.fullmatch(isin):
+        raise OutcomeLedgerError(f"{prefix}ISIN_INVALID")
+
+    issued = _outcome_time(record.get("issued_at"), f"{prefix}ISSUED_AT")
+    due = _outcome_time(record.get("due_at"), f"{prefix}DUE_AT")
+    recorded = _outcome_time(record.get("recorded_at"), f"{prefix}RECORDED_AT")
+    price_as_of = _outcome_time(
+        record.get("outcome_price_as_of_at"),
+        f"{prefix}OUTCOME_PRICE_AS_OF_AT",
+    )
+    published = _outcome_time(
+        record.get("outcome_source_published_at"),
+        f"{prefix}OUTCOME_SOURCE_PUBLISHED_AT",
+    )
+    observed = _outcome_time(
+        record.get("outcome_source_first_observed_at"),
+        f"{prefix}OUTCOME_SOURCE_FIRST_OBSERVED_AT",
+    )
+    if not issued < due == price_as_of <= published <= observed <= recorded:
+        raise OutcomeLedgerError(f"{prefix}TIME_ORDER_INVALID")
+
+    prediction_hash = _outcome_sha(
+        record.get("prediction_event_hash"),
+        f"{prefix}PREDICTION_EVENT_HASH",
+    )
+    if record.get("prediction_event_hash") != prediction_hash:
+        raise OutcomeLedgerError(f"{prefix}PREDICTION_EVENT_HASH_INVALID_SHA256")
+    previous_hash = _outcome_sha(
+        record.get("previous_hash"),
+        f"{prefix}PREVIOUS_HASH",
+    )
+    if record.get("previous_hash") != previous_hash:
+        raise OutcomeLedgerError(f"{prefix}PREVIOUS_HASH_INVALID_SHA256")
+    for field in (
+        "entry_source_hash",
+        "entry_source_row_hash",
+        "outcome_source_hash",
+        "outcome_source_row_hash",
+    ):
+        digest = _outcome_sha(record.get(field), f"{prefix}{field.upper()}")
+        if record.get(field) != digest:
+            raise OutcomeLedgerError(f"{prefix}{field.upper()}_INVALID_SHA256")
+
+    try:
+        entry_source = _source(
+            record.get("entry_source"),
+            field=f"{prefix}ENTRY_SOURCE",
+        )
+        outcome_source = _source(
+            record.get("outcome_source"),
+            field=f"{prefix}OUTCOME_SOURCE",
+        )
+    except ValueError as exc:
+        raise OutcomeLedgerError(str(exc)) from exc
+    if record.get("entry_source") != entry_source:
+        raise OutcomeLedgerError(f"{prefix}ENTRY_SOURCE_INVALID")
+    if record.get("outcome_source") != outcome_source:
+        raise OutcomeLedgerError(f"{prefix}OUTCOME_SOURCE_INVALID")
+    _official_source_url(
+        record.get("entry_source_url"),
+        entry_source,
+        f"{prefix}ENTRY_SOURCE_URL",
+    )
+    _official_source_url(
+        record.get("outcome_source_url"),
+        outcome_source,
+        f"{prefix}OUTCOME_SOURCE_URL",
+    )
+
+    for field in ("entry_source_size_bytes", "outcome_source_size_bytes"):
+        value = record.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise OutcomeLedgerError(f"{prefix}{field.upper()}_INVALID")
+    _outcome_reference(
+        record.get("entry_snapshot_uri"),
+        f"{prefix}ENTRY_SNAPSHOT_URI",
+    )
+    _outcome_reference(
+        record.get("outcome_snapshot_uri"),
+        f"{prefix}OUTCOME_SNAPSHOT_URI",
+    )
+
+    if record.get("price_basis") != _UNADJUSTED_EXCHANGE_REFERENCE:
+        raise OutcomeLedgerError(f"{prefix}PRICE_BASIS_INVALID")
+    adjustment_basis = record.get("adjustment_basis")
+    if (
+        not isinstance(adjustment_basis, str)
+        or not adjustment_basis
+        or adjustment_basis != adjustment_basis.strip()
+    ):
+        raise OutcomeLedgerError(f"{prefix}ADJUSTMENT_BASIS_INVALID")
+
+    entry = _price(record.get("entry_reference_close"))
+    exit_price = _price(record.get("outcome_reference_close"))
+    forecast = _forecast(record.get("predicted_return_pct"))
+    actual = (exit_price / entry - Decimal("1")) * Decimal("100")
+    expected_actual = round(float(actual), 6)
+    expected_error = round(float(abs(forecast - actual)), 6)
+    expected_direction = (
+        (forecast > 0) == (actual > 0)
+        if forecast != 0 and actual != 0
+        else forecast == actual
+    )
+    if (
+        record.get("actual_return_pct") != expected_actual
+        or record.get("absolute_error_pp") != expected_error
+        or record.get("direction_correct") is not expected_direction
+    ):
+        raise OutcomeLedgerError(f"{prefix}ARITHMETIC_MISMATCH")
+    if record.get("market_validation_claimed") is not False:
+        raise OutcomeLedgerError(f"{prefix}MARKET_VALIDATION_FLAG_INVALID")
+    if record.get("reference_prices_are_executable_fills") is not False:
+        raise OutcomeLedgerError(
+            f"{prefix}REFERENCE_PRICE_EXECUTION_FLAG_INVALID"
+        )
+    if record.get("performance_gate_passed") is not False:
+        raise OutcomeLedgerError(f"{prefix}PERFORMANCE_GATE_FLAG_INVALID")
+    if record.get("real_money_ready") is not False:
+        raise OutcomeLedgerError(f"{prefix}REAL_MONEY_FLAG_INVALID")
+    if record.get("live_trading_enabled") is not False:
+        raise OutcomeLedgerError(f"{prefix}LIVE_FLAG_INVALID")
+    if record.get("order_placement_allowed") is not False:
+        raise OutcomeLedgerError(f"{prefix}ORDER_FLAG_INVALID")
+    return recorded
+
+
+def build_outcome_event(
+    prediction: dict[str, Any],
+    outcome: dict[str, Any],
+    *,
+    trusted_prediction_event_hash: str,
+    previous_hash: str,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Build one source-replayed outcome event against explicit trusted anchors."""
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None or current.utcoffset() is None:
+        raise OutcomeLedgerError("NOW_TIMEZONE_REQUIRED")
+    current = current.astimezone(timezone.utc)
+
+    trusted_prediction_hash = _outcome_sha(
+        trusted_prediction_event_hash,
+        "TRUSTED_PREDICTION_EVENT_HASH",
+    )
+    stored_prediction_hash = _outcome_sha(
+        prediction.get("event_hash"),
+        "PREDICTION_EVENT_HASH",
+    )
+    if stored_prediction_hash != trusted_prediction_hash:
+        raise OutcomeLedgerError("PREDICTION_EVENT_HASH_TRUST_MISMATCH")
+
+    result = reconcile(prediction, outcome, now=current)
+    if result.get("status") != "EVALUATED":
+        raise OutcomeLedgerError(
+            f"OUTCOME_RECONCILIATION_{result.get('reason', 'NOT_PROVEN')}"
+        )
+    try:
+        entry_raw = prediction["entry_source_snapshot"]
+        outcome_raw = outcome["source_snapshot"]
+        isin = str(prediction["isin"]).strip().upper()
+        if isin != str(outcome["isin"]).strip().upper():
+            raise OutcomeLedgerError("ISIN_MISMATCH")
+        sealed = {
+            "schema_version": OUTCOME_SCHEMA_VERSION,
+            "event_type": _OUTCOME_EVENT_TYPE,
+            "prediction_id": result["prediction_id"],
+            "prediction_event_hash": trusted_prediction_hash,
+            "symbol": result["symbol"],
+            "isin": isin,
+            "issued_at": result["issued_at"],
+            "due_at": result["due_at"],
+            "recorded_at": current.isoformat(),
+            "outcome_price_as_of_at": result["outcome_price_as_of_at"],
+            "outcome_source_published_at": result[
+                "outcome_source_published_at"
+            ],
+            "outcome_source_first_observed_at": result[
+                "outcome_source_first_observed_at"
+            ],
+            "entry_reference_close": str(
+                _price(prediction["entry_reference_close"])
+            ),
+            "outcome_reference_close": str(
+                _price(outcome["reference_close"])
+            ),
+            "predicted_return_pct": result["predicted_return_pct"],
+            "actual_return_pct": result["actual_return_pct"],
+            "absolute_error_pp": result["absolute_error_pp"],
+            "direction_correct": result["direction_correct"],
+            "entry_source": result["entry_source"],
+            "entry_source_url": prediction["entry_source_url"],
+            "entry_source_hash": result["entry_source_hash"],
+            "entry_source_size_bytes": len(entry_raw),
+            "entry_source_row_hash": result["entry_source_row_hash"],
+            "entry_snapshot_uri": _outcome_reference(
+                prediction["entry_snapshot_uri"],
+                "ENTRY_SNAPSHOT_URI",
+            ),
+            "outcome_source": result["outcome_source"],
+            "outcome_source_url": outcome["source_url"],
+            "outcome_source_hash": result["outcome_source_hash"],
+            "outcome_source_size_bytes": len(outcome_raw),
+            "outcome_source_row_hash": result["outcome_source_row_hash"],
+            "outcome_snapshot_uri": _outcome_reference(
+                outcome["source_snapshot_uri"],
+                "OUTCOME_SNAPSHOT_URI",
+            ),
+            "price_basis": result["price_basis"],
+            "adjustment_basis": result["adjustment_basis"],
+            "previous_hash": _outcome_sha(previous_hash, "PREVIOUS_HASH"),
+            "market_validation_claimed": False,
+            "reference_prices_are_executable_fills": False,
+            "performance_gate_passed": False,
+            "real_money_ready": False,
+            "live_trading_enabled": False,
+            "order_placement_allowed": False,
+        }
+    except (KeyError, TypeError) as exc:
+        raise OutcomeLedgerError("REQUIRED_OUTCOME_EVENT_EVIDENCE_MISSING") from exc
+    _validate_sealed_outcome_semantics(sealed, allow_unhashed=True)
+    sealed["event_hash"] = sha256(_canonical_outcome_event(sealed)).hexdigest()
+    _validate_sealed_outcome_semantics(sealed)
+    return sealed
+
+
+def verify_outcome_chain(
+    records: Iterable[dict[str, Any]],
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+) -> dict[str, Any]:
+    """Verify every outcome hash, predecessor and independent forecast anchor."""
+    if not isinstance(trusted_prediction_hashes, Mapping):
+        raise OutcomeLedgerError("TRUSTED_PREDICTION_HASHES_REQUIRED")
+    previous = OUTCOME_GENESIS_HASH
+    previous_recorded: datetime | None = None
+    seen: set[str] = set()
+    count = 0
+    for index, record in enumerate(records):
+        recorded = _validate_sealed_outcome_semantics(
+            record,
+            prefix=f"ROW_{index}_",
+        )
+        prediction_id = record["prediction_id"]
+        if prediction_id in seen:
+            raise OutcomeLedgerError(f"ROW_{index}_PREDICTION_ID_DUPLICATE")
+        trusted = trusted_prediction_hashes.get(prediction_id)
+        if trusted is None:
+            raise OutcomeLedgerError(
+                f"ROW_{index}_TRUSTED_PREDICTION_HASH_MISSING"
+            )
+        if record["prediction_event_hash"] != _outcome_sha(
+            trusted,
+            f"ROW_{index}_TRUSTED_PREDICTION_HASH",
+        ):
+            raise OutcomeLedgerError(
+                f"ROW_{index}_PREDICTION_EVENT_HASH_TRUST_MISMATCH"
+            )
+        if previous_recorded is not None and recorded < previous_recorded:
+            raise OutcomeLedgerError(f"ROW_{index}_RECORDED_ORDER_INVALID")
+        if record["previous_hash"] != previous:
+            raise OutcomeLedgerError(f"ROW_{index}_CHAIN_BROKEN")
+        expected = sha256(_canonical_outcome_event(record)).hexdigest()
+        if record.get("event_hash") != expected:
+            raise OutcomeLedgerError(f"ROW_{index}_HASH_MISMATCH")
+        previous = expected
+        previous_recorded = recorded
+        seen.add(prediction_id)
+        count += 1
+    return {
+        "status": "VERIFIED" if count else "EMPTY",
+        "verification_scope": (
+            "HASH_CHAIN_SEMANTICS_RETAINED_SOURCE_AND_PREDICTION_ANCHOR"
+        ),
+        "record_count": count,
+        "head_hash": previous,
+        "market_validation_claimed": False,
+        "reference_prices_are_executable_fills": False,
+        "performance_gate_passed": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+
+
+def verify_retained_outcome_evidence(
+    record: dict[str, Any],
+    *,
+    evidence_root: Path,
+) -> None:
+    """Recheck entry and outcome files against the sealed hashes and sizes."""
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        if not root.is_dir():
+            raise OutcomeLedgerError("EVIDENCE_ROOT_NOT_DIRECTORY")
+    except (OSError, TypeError, ValueError) as exc:
+        raise OutcomeLedgerError("EVIDENCE_ROOT_UNAVAILABLE") from exc
+
+    for role in ("entry", "outcome"):
+        field = role.upper()
+        try:
+            digest, size = _retained_snapshot_digest(
+                root,
+                record[f"{role}_snapshot_uri"],
+                field,
+            )
+        except (KeyError, ForecastLedgerError) as exc:
+            raise OutcomeLedgerError(
+                f"{field}_RETAINED_UNAVAILABLE"
+            ) from exc
+        if (
+            digest != record.get(f"{role}_source_hash")
+            or size != record.get(f"{role}_source_size_bytes")
+        ):
+            raise OutcomeLedgerError(
+                f"{field}_RETAINED_HASH_OR_SIZE_MISMATCH"
+            )
+
+
+def _read_outcome_ledger_unlocked(
+    path: Path,
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    raw = path.read_bytes()
+    if raw and not raw.endswith(b"\n"):
+        raise OutcomeLedgerError("LEDGER_TRUNCATED")
+    try:
+        records = [json.loads(line) for line in raw.splitlines() if line.strip()]
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise OutcomeLedgerError("LEDGER_INVALID_JSON") from exc
+    verify_outcome_chain(
+        records,
+        trusted_prediction_hashes=trusted_prediction_hashes,
+    )
+    for record in records:
+        verify_retained_outcome_evidence(
+            record,
+            evidence_root=evidence_root,
+        )
+    return records
+
+
+def read_outcome_ledger(
+    path: Path,
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    """Read a fully verified outcome ledger while excluding concurrent writes."""
+    with _ledger_lock(path, exclusive=False):
+        return _read_outcome_ledger_unlocked(
+            path,
+            trusted_prediction_hashes=trusted_prediction_hashes,
+            evidence_root=evidence_root,
+        )
+
+
+def append_outcome_event(
+    path: Path,
+    prediction: dict[str, Any],
+    outcome: dict[str, Any],
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    evidence_root: Path,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Validate the prospective full chain before one fsync'd append."""
+    with _ledger_lock(path, exclusive=True):
+        records = _read_outcome_ledger_unlocked(
+            path,
+            trusted_prediction_hashes=trusted_prediction_hashes,
+            evidence_root=evidence_root,
+        )
+        prediction_id = str(prediction.get("prediction_id", "")).strip()
+        if any(row["prediction_id"] == prediction_id for row in records):
+            raise OutcomeLedgerError("PREDICTION_ID_DUPLICATE")
+        trusted_prediction_hash = trusted_prediction_hashes.get(prediction_id)
+        if trusted_prediction_hash is None:
+            raise OutcomeLedgerError("TRUSTED_PREDICTION_HASH_MISSING")
+        previous_hash = (
+            records[-1]["event_hash"] if records else OUTCOME_GENESIS_HASH
+        )
+        sealed = build_outcome_event(
+            prediction,
+            outcome,
+            trusted_prediction_event_hash=trusted_prediction_hash,
+            previous_hash=previous_hash,
+            now=now,
+        )
+        verify_retained_outcome_evidence(
+            sealed,
+            evidence_root=evidence_root,
+        )
+        verify_outcome_chain(
+            [*records, sealed],
+            trusted_prediction_hashes=trusted_prediction_hashes,
+        )
+        payload = json.dumps(
+            sealed,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        return sealed

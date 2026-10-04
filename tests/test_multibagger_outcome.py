@@ -1,12 +1,23 @@
 """Numerical checks for the equity outcome contract; no claims about model skill."""
+from copy import deepcopy
 from datetime import datetime, timezone
 from hashlib import sha256
+import json
 from io import BytesIO
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import pytest
 
-from dashboard.backend.multibagger_outcome import reconcile
+from dashboard.backend.multibagger_outcome import (
+    OUTCOME_GENESIS_HASH,
+    OutcomeLedgerError,
+    _canonical_outcome_event,
+    append_outcome_event,
+    build_outcome_event,
+    read_outcome_ledger,
+    reconcile,
+    verify_outcome_chain,
+)
 
 
 HEADERS = (
@@ -48,6 +59,7 @@ ENTRY_SHA = sha256(ENTRY_BYTES).hexdigest()
 OUTCOME_SHA = sha256(OUTCOME_BYTES).hexdigest()
 PREDICTION = {
     "prediction_id": "p-1",
+    "event_hash": "a" * 64,
     "symbol": "RAYMOND",
     "isin": "INE301R01014",
     "issued_at": "2026-09-01T12:00:00+00:00",
@@ -59,6 +71,7 @@ PREDICTION = {
     "entry_source_url": ENTRY_URL,
     "entry_source_hash": ENTRY_SHA,
     "entry_source_snapshot": ENTRY_BYTES,
+    "entry_snapshot_uri": "snapshots/nse/entry-raymond.zip",
     "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
     "adjustment_basis": "fixture-no-action-series-v1",
 }
@@ -73,6 +86,7 @@ OUTCOME = {
     "source_url": OUTCOME_URL,
     "source_hash": OUTCOME_SHA,
     "source_snapshot": OUTCOME_BYTES,
+    "source_snapshot_uri": "snapshots/nse/outcome-raymond.zip",
     "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
     "adjustment_basis": "fixture-no-action-series-v1",
 }
@@ -330,3 +344,238 @@ def test_binds_official_url_date_member_and_close_timestamp():
         reconcile(shifted_prediction, shifted, now=NOW)["reason"]
         == "OUTCOME_NSE_PRICE_TIMESTAMP_MISMATCH"
     )
+
+
+
+TRUSTED_PREDICTION_HASHES = {"p-1": "a" * 64}
+
+
+@pytest.fixture
+def outcome_evidence_root(tmp_path):
+    root = tmp_path / "evidence"
+    for reference, payload in (
+        (PREDICTION["entry_snapshot_uri"], ENTRY_BYTES),
+        (OUTCOME["source_snapshot_uri"], OUTCOME_BYTES),
+    ):
+        path = root / reference
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(payload)
+    return root
+
+
+def _rehash_outcome_event(record):
+    record["event_hash"] = sha256(_canonical_outcome_event(record)).hexdigest()
+
+
+def test_builds_deterministic_outcome_event_bound_to_trusted_prediction():
+    first = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    second = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    assert first == second
+    assert first["prediction_event_hash"] == "a" * 64
+    assert first["actual_return_pct"] == 10.0
+    assert first["entry_source_row_hash"]
+    assert first["outcome_source_row_hash"]
+    assert first["market_validation_claimed"] is False
+    assert first["reference_prices_are_executable_fills"] is False
+    assert first["performance_gate_passed"] is False
+    assert first["real_money_ready"] is False
+    assert first["live_trading_enabled"] is False
+    assert first["order_placement_allowed"] is False
+    verified = verify_outcome_chain(
+        [first],
+        trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+    )
+    assert verified["record_count"] == 1
+    assert verified["performance_gate_passed"] is False
+    assert verified["real_money_ready"] is False
+
+
+def test_outcome_builder_requires_both_explicit_chain_anchors():
+    with pytest.raises(TypeError, match="trusted_prediction_event_hash"):
+        build_outcome_event(
+            PREDICTION,
+            OUTCOME,
+            previous_hash=OUTCOME_GENESIS_HASH,
+            now=NOW,
+        )
+    with pytest.raises(TypeError, match="previous_hash"):
+        build_outcome_event(
+            PREDICTION,
+            OUTCOME,
+            trusted_prediction_event_hash="a" * 64,
+            now=NOW,
+        )
+
+
+def test_append_is_durable_and_duplicate_prediction_fails_closed(
+    tmp_path,
+    outcome_evidence_root,
+):
+    ledger = tmp_path / "equity_outcomes.ndjson"
+    sealed = append_outcome_event(
+        ledger,
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        evidence_root=outcome_evidence_root,
+        now=NOW,
+    )
+    assert read_outcome_ledger(
+        ledger,
+        trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        evidence_root=outcome_evidence_root,
+    ) == [sealed]
+    original = ledger.read_bytes()
+    with pytest.raises(OutcomeLedgerError, match="PREDICTION_ID_DUPLICATE"):
+        append_outcome_event(
+            ledger,
+            PREDICTION,
+            OUTCOME,
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+            evidence_root=outcome_evidence_root,
+            now=NOW,
+        )
+    assert ledger.read_bytes() == original
+
+
+def test_rehashed_prediction_anchor_substitution_is_rejected():
+    event = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    event["prediction_event_hash"] = "b" * 64
+    _rehash_outcome_event(event)
+    with pytest.raises(
+        OutcomeLedgerError,
+        match="PREDICTION_EVENT_HASH_TRUST_MISMATCH",
+    ):
+        verify_outcome_chain(
+            [event],
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        )
+
+
+def test_rehashed_outcome_arithmetic_substitution_is_rejected():
+    event = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    event["actual_return_pct"] = 999.0
+    _rehash_outcome_event(event)
+    with pytest.raises(OutcomeLedgerError, match="ARITHMETIC_MISMATCH"):
+        verify_outcome_chain(
+            [event],
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        )
+
+
+def test_execution_claims_are_rejected_even_when_rehashed():
+    event = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    event["reference_prices_are_executable_fills"] = True
+    _rehash_outcome_event(event)
+    with pytest.raises(
+        OutcomeLedgerError,
+        match="REFERENCE_PRICE_EXECUTION_FLAG_INVALID",
+    ):
+        verify_outcome_chain(
+            [event],
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        )
+
+    event = build_outcome_event(
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_event_hash="a" * 64,
+        previous_hash=OUTCOME_GENESIS_HASH,
+        now=NOW,
+    )
+    event["quantity"] = 100
+    _rehash_outcome_event(event)
+    with pytest.raises(OutcomeLedgerError, match="FIELDS_INVALID"):
+        verify_outcome_chain(
+            [event],
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        )
+
+
+def test_retained_outcome_replacement_is_detected(
+    tmp_path,
+    outcome_evidence_root,
+):
+    ledger = tmp_path / "equity_outcomes.ndjson"
+    append_outcome_event(
+        ledger,
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        evidence_root=outcome_evidence_root,
+        now=NOW,
+    )
+    outcome_path = outcome_evidence_root / OUTCOME["source_snapshot_uri"]
+    outcome_path.write_bytes(b"replaced")
+    with pytest.raises(
+        OutcomeLedgerError,
+        match="OUTCOME_RETAINED_HASH_OR_SIZE_MISMATCH",
+    ):
+        read_outcome_ledger(
+            ledger,
+            trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+            evidence_root=outcome_evidence_root,
+        )
+
+
+def test_chronological_backfill_rejection_preserves_ledger_bytes(
+    tmp_path,
+    outcome_evidence_root,
+):
+    ledger = tmp_path / "equity_outcomes.ndjson"
+    append_outcome_event(
+        ledger,
+        PREDICTION,
+        OUTCOME,
+        trusted_prediction_hashes=TRUSTED_PREDICTION_HASHES,
+        evidence_root=outcome_evidence_root,
+        now=NOW,
+    )
+    original = ledger.read_bytes()
+    second_prediction = {
+        **PREDICTION,
+        "prediction_id": "p-2",
+        "event_hash": "b" * 64,
+    }
+    trusted = {**TRUSTED_PREDICTION_HASHES, "p-2": "b" * 64}
+    earlier = datetime(2026, 9, 23, tzinfo=timezone.utc)
+    with pytest.raises(OutcomeLedgerError, match="RECORDED_ORDER_INVALID"):
+        append_outcome_event(
+            ledger,
+            second_prediction,
+            OUTCOME,
+            trusted_prediction_hashes=trusted,
+            evidence_root=outcome_evidence_root,
+            now=earlier,
+        )
+    assert ledger.read_bytes() == original
