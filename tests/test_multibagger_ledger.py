@@ -267,6 +267,90 @@ def test_rehashed_temporal_contract_bypass_fails_closed(mutation, error):
         verify_chain([sealed])
 
 
+@pytest.mark.parametrize(
+    "mutation,error",
+    [
+        (
+            lambda record: record.update(prediction_id=7),
+            "ROW_0_PREDICTION_ID_INVALID",
+        ),
+        (
+            lambda record: record.update(symbol=""),
+            "ROW_0_SYMBOL_INVALID",
+        ),
+        (
+            lambda record: record.update(model_version=""),
+            "ROW_0_MODEL_IDENTITY_INVALID",
+        ),
+        (
+            lambda record: record.update(adjustment_basis=""),
+            "ROW_0_ADJUSTMENT_BASIS_INVALID",
+        ),
+        (
+            lambda record: record.update(entry_source="BLOG"),
+            "ROW_0_ENTRY_SOURCE_UNVERIFIED",
+        ),
+        (
+            lambda record: record.update(adjustment_source="BLOG"),
+            "ROW_0_ADJUSTMENT_SOURCE_UNVERIFIED",
+        ),
+        (
+            lambda record: record.update(entry_adjusted_close=0),
+            "ROW_0_ENTRY_ADJUSTED_CLOSE_INVALID",
+        ),
+        (
+            lambda record: record.update(predicted_return_pct=True),
+            "ROW_0_PREDICTED_RETURN_PCT_INVALID",
+        ),
+        (
+            lambda record: record.update(feature_hash="f" * 63),
+            "ROW_0_FEATURE_HASH_INVALID_SHA256",
+        ),
+        (
+            lambda record: record.update(entry_source_size_bytes=True),
+            "ROW_0_ENTRY_SOURCE_SIZE_BYTES_INVALID",
+        ),
+        (
+            lambda record: record.update(
+                entry_snapshot_uri="other/archive/file.csv"
+            ),
+            "ROW_0_ENTRY_SNAPSHOT_URI_UNAPPROVED_PREFIX",
+        ),
+    ],
+)
+def test_rehashed_semantic_contract_bypass_fails_closed(mutation, error):
+    sealed = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    mutation(sealed)
+    sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
+    with pytest.raises(LedgerError, match=error):
+        verify_chain([sealed])
+
+
+def test_read_rejects_rehashed_unapproved_source_with_matching_retained_bytes(
+    tmp_path,
+    evidence_root,
+):
+    sealed = build_issued_forecast(
+        FORECAST,
+        previous_hash=GENESIS_HASH,
+        now=NOW,
+    )
+    sealed["entry_source"] = "BLOG"
+    sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
+    ledger = tmp_path / "equity_forecasts.ndjson"
+    ledger.write_text(
+        json.dumps(sealed, sort_keys=True, separators=(",", ":")) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(LedgerError, match="ROW_0_ENTRY_SOURCE_UNVERIFIED"):
+        read_ledger(ledger, evidence_root=evidence_root)
+
+
 def test_read_rejects_rehashed_horizon_mismatch(
     tmp_path,
     evidence_root,
@@ -434,7 +518,7 @@ def test_read_and_later_append_recheck_every_retained_source(tmp_path, evidence_
     path.unlink()
     if change == "replaced":
         path.write_bytes(b"replacement")
-    assert verify_chain([sealed])["verification_scope"] == "HASH_CHAIN_ONLY"
+    assert verify_chain([sealed])["verification_scope"] == "HASH_CHAIN_AND_SEMANTICS"
     with pytest.raises(LedgerError, match=f"{source.upper()}_RETAINED_"):
         read_ledger(ledger, evidence_root=evidence_root)
     with pytest.raises(LedgerError, match=f"{source.upper()}_RETAINED_"):

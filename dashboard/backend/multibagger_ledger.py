@@ -115,6 +115,85 @@ def _finite_number(value: Any, field: str, *, positive: bool = False) -> float:
     return number
 
 
+def _validate_sealed_forecast_semantics(
+    record: dict[str, Any],
+    *,
+    prefix: str = "",
+) -> None:
+    """Revalidate semantic fields that must survive storage unchanged."""
+    prediction_id = record.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+    ):
+        raise LedgerError(f"{prefix}PREDICTION_ID_INVALID")
+
+    symbol = record.get("symbol")
+    if (
+        not isinstance(symbol, str)
+        or not symbol
+        or symbol != symbol.strip()
+        or symbol != symbol.upper()
+    ):
+        raise LedgerError(f"{prefix}SYMBOL_INVALID")
+
+    model_name = record.get("model_name")
+    model_version = record.get("model_version")
+    if any(
+        not isinstance(value, str) or not value or value != value.strip()
+        for value in (model_name, model_version)
+    ):
+        raise LedgerError(f"{prefix}MODEL_IDENTITY_INVALID")
+
+    adjustment_basis = record.get("adjustment_basis")
+    if (
+        not isinstance(adjustment_basis, str)
+        or not adjustment_basis
+        or adjustment_basis != adjustment_basis.strip()
+    ):
+        raise LedgerError(f"{prefix}ADJUSTMENT_BASIS_INVALID")
+
+    for field in ("entry_source", "adjustment_source"):
+        value = record.get(field)
+        if (
+            not isinstance(value, str)
+            or value != value.strip().upper()
+            or value not in _APPROVED_SOURCES
+        ):
+            raise LedgerError(f"{prefix}{field.upper()}_UNVERIFIED")
+
+    for field in (
+        "feature_hash",
+        "entry_source_hash",
+        "adjustment_source_hash",
+    ):
+        value = record.get(field)
+        digest = _sha256(value, f"{prefix}{field.upper()}")
+        if value != digest:
+            raise LedgerError(f"{prefix}{field.upper()}_INVALID_SHA256")
+
+    for field, positive in (
+        ("entry_adjusted_close", True),
+        ("predicted_return_pct", False),
+    ):
+        value = record.get(field)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise LedgerError(f"{prefix}{field.upper()}_INVALID")
+        _finite_number(value, f"{prefix}{field.upper()}", positive=positive)
+
+    for field in ("entry_source_size_bytes", "adjustment_source_size_bytes"):
+        value = record.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+            raise LedgerError(f"{prefix}{field.upper()}_INVALID")
+
+    for field in ("entry_snapshot_uri", "adjustment_snapshot_uri"):
+        value = record.get(field)
+        reference = _snapshot_reference(value, f"{prefix}{field.upper()}")
+        if value != reference:
+            raise LedgerError(f"{prefix}{field.upper()}_INVALID")
+
+
 def _validate_forecast_timing(
     record: dict[str, Any],
     *,
@@ -271,12 +350,13 @@ def build_issued_forecast(
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }
+    _validate_sealed_forecast_semantics(sealed)
     sealed["event_hash"] = sha256(_canonical(sealed)).hexdigest()
     return sealed
 
 
 def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
-    """Verify ordering, uniqueness and every content hash in a ledger."""
+    """Verify schema, semantics, ordering, uniqueness and every content hash."""
     previous = GENESIS_HASH
     previous_issued: datetime | None = None
     seen: set[str] = set()
@@ -288,6 +368,7 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
             raise LedgerError(f"ROW_{index}_SCHEMA_INVALID")
         if record.get("event_type") != "EQUITY_FORECAST_ISSUED":
             raise LedgerError(f"ROW_{index}_EVENT_TYPE_INVALID")
+        _validate_sealed_forecast_semantics(record, prefix=f"ROW_{index}_")
         issued, _, _, _, _ = _validate_forecast_timing(
             record,
             prefix=f"ROW_{index}_",
@@ -312,7 +393,7 @@ def verify_chain(records: Iterable[dict[str, Any]]) -> dict[str, Any]:
         count += 1
     return {
         "status": "VERIFIED" if count else "EMPTY",
-        "verification_scope": "HASH_CHAIN_ONLY",
+        "verification_scope": "HASH_CHAIN_AND_SEMANTICS",
         "record_count": count,
         "head_hash": previous,
         "live_trading_enabled": False,
