@@ -1,39 +1,72 @@
 """Numerical checks for the equity outcome contract; no claims about model skill."""
 from datetime import datetime, timezone
 from hashlib import sha256
+from io import BytesIO
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 import pytest
 
 from dashboard.backend.multibagger_outcome import reconcile
 
 
-ENTRY_BYTES = b"NSE,2026-09-01,RAYMOND,100.00"
-OUTCOME_BYTES = b"NSE,2026-09-08,RAYMOND,110.00"
+HEADERS = (
+    "TradDt,BizDt,Sgmt,Src,FinInstrmTp,ISIN,TckrSymb,SctySrs,SsnId,"
+    "OpnPric,HghPric,LwPric,ClsPric,TtlTradgVol\n"
+)
+
+
+def _nse_archive(trade_date: str, symbol: str, close: str) -> tuple[bytes, str]:
+    stamp = trade_date.replace("-", "")
+    member = f"BhavCopy_NSE_CM_0_0_0_{stamp}_F_0000.csv"
+    numeric_close = float(close)
+    row = (
+        f"{trade_date},{trade_date},CM,NSE,STK,INE301R01014,{symbol},EQ,F1,"
+        f"{numeric_close - 1:.2f},{numeric_close + 1:.2f},"
+        f"{numeric_close - 2:.2f},{close},1000\n"
+    )
+    buffer = BytesIO()
+    info = ZipInfo(member, date_time=(2026, 1, 1, 0, 0, 0))
+    info.compress_type = ZIP_DEFLATED
+    with ZipFile(buffer, "w") as archive:
+        archive.writestr(info, (HEADERS + row).encode("utf-8"))
+    url = (
+        "https://nsearchives.nseindia.com/content/cm/"
+        f"{member}.zip"
+    )
+    return buffer.getvalue(), url
+
+
+ENTRY_BYTES, ENTRY_URL = _nse_archive("2026-09-01", "RAYMOND", "100.00")
+OUTCOME_BYTES, OUTCOME_URL = _nse_archive("2026-09-08", "RAYMOND", "110.00")
 ENTRY_SHA = sha256(ENTRY_BYTES).hexdigest()
 OUTCOME_SHA = sha256(OUTCOME_BYTES).hexdigest()
 PREDICTION = {
     "prediction_id": "p-1",
     "symbol": "RAYMOND",
     "issued_at": "2026-09-01T12:00:00+00:00",
-    "due_at": "2026-09-08T12:00:00+00:00",
+    "due_at": "2026-09-08T10:00:00+00:00",
     "entry_observed_at": "2026-09-01T10:00:00+00:00",
-    "entry_adjusted_close": 100.0,
+    "entry_reference_close": 100.0,
     "predicted_return_pct": 20.0,
     "entry_source": "NSE",
+    "entry_source_url": ENTRY_URL,
     "entry_source_hash": ENTRY_SHA,
     "entry_source_snapshot": ENTRY_BYTES,
-    "adjustment_basis": "corporate-action-series-v1",
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "adjustment_basis": "fixture-no-action-series-v1",
 }
 OUTCOME = {
     "symbol": "RAYMOND",
-    "price_as_of_at": "2026-09-08T12:00:00+00:00",
-    "source_published_at": "2026-09-08T12:05:00+00:00",
-    "source_first_observed_at": "2026-09-08T12:06:00+00:00",
-    "adjusted_close": 110.0,
+    "price_as_of_at": "2026-09-08T10:00:00+00:00",
+    "source_published_at": "2026-09-08T10:05:00+00:00",
+    "source_first_observed_at": "2026-09-08T10:06:00+00:00",
+    "reference_close": 110.0,
     "source": "NSE",
+    "source_url": OUTCOME_URL,
     "source_hash": OUTCOME_SHA,
     "source_snapshot": OUTCOME_BYTES,
-    "adjustment_basis": "corporate-action-series-v1",
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "adjustment_basis": "fixture-no-action-series-v1",
 }
 NOW = datetime(2026, 9, 24, tzinfo=timezone.utc)
 
@@ -52,6 +85,10 @@ def test_reconciles_signed_point_in_time_prices_without_claiming_target_hit():
     )
     assert result["entry_source_hash"] == ENTRY_SHA
     assert result["outcome_source_hash"] == OUTCOME_SHA
+    assert len(result["entry_source_row_hash"]) == 64
+    assert len(result["outcome_source_row_hash"]) == 64
+    assert result["price_basis"] == "UNADJUSTED_EXCHANGE_REFERENCE"
+    assert result["market_validation_claimed"] is False
     assert result["live_trading_enabled"] is False
     assert result["order_placement_allowed"] is False
 
@@ -110,7 +147,7 @@ def test_rejects_outcome_before_horizon_and_invalid_numbers():
     assert (
         reconcile(
             PREDICTION,
-            {**OUTCOME, "price_as_of_at": "2026-09-07T12:00:00+00:00"},
+            {**OUTCOME, "price_as_of_at": "2026-09-07T10:00:00+00:00"},
             now=NOW,
         )["reason"]
         == "OUTCOME_HORIZON_MISMATCH"
@@ -118,7 +155,7 @@ def test_rejects_outcome_before_horizon_and_invalid_numbers():
     assert (
         reconcile(
             PREDICTION,
-            {**OUTCOME, "adjusted_close": float("nan")},
+            {**OUTCOME, "reference_close": float("nan")},
             now=NOW,
         )["reason"]
         == "INVALID_PRICE"
@@ -138,22 +175,22 @@ def test_rejects_outcome_before_horizon_and_invalid_numbers():
     [
         (
             lambda record: record.update(
-                price_as_of_at="2026-09-09T12:00:00+00:00",
-                source_published_at="2026-09-09T12:05:00+00:00",
-                source_first_observed_at="2026-09-09T12:06:00+00:00",
-                adjusted_close=200.0,
+                price_as_of_at="2026-09-09T10:00:00+00:00",
+                source_published_at="2026-09-09T10:05:00+00:00",
+                source_first_observed_at="2026-09-09T10:06:00+00:00",
+                reference_close=200.0,
             ),
             "OUTCOME_HORIZON_MISMATCH",
         ),
         (
             lambda record: record.update(
-                source_published_at="2026-09-08T11:59:59+00:00"
+                source_published_at="2026-09-08T09:59:59+00:00"
             ),
             "INVALID_SOURCE_TIME_ORDER",
         ),
         (
             lambda record: record.update(
-                source_first_observed_at="2026-09-08T12:04:59+00:00"
+                source_first_observed_at="2026-09-08T10:04:59+00:00"
             ),
             "INVALID_SOURCE_TIME_ORDER",
         ),
@@ -200,3 +237,67 @@ def test_requires_actual_retained_source_bytes_and_matching_digest():
         OUTCOME,
         now=NOW,
     )["reason"] == "ENTRY_SNAPSHOT_REQUIRED"
+
+
+@pytest.mark.parametrize(
+    "prediction,outcome,error",
+    [
+        (
+            {**PREDICTION, "entry_reference_close": 999.0},
+            OUTCOME,
+            "ENTRY_PRICE_EVIDENCE_MISMATCH",
+        ),
+        (
+            PREDICTION,
+            {**OUTCOME, "reference_close": 999.0},
+            "OUTCOME_PRICE_EVIDENCE_MISMATCH",
+        ),
+    ],
+)
+def test_declared_prices_are_bound_to_exact_retained_nse_rows(
+    prediction,
+    outcome,
+    error,
+):
+    result = reconcile(prediction, outcome, now=NOW)
+    assert result["status"] == "NOT_PROVEN"
+    assert result["reason"] == error
+
+
+def test_rejects_rehashed_archive_with_wrong_symbol():
+    wrong_bytes, _ = _nse_archive("2026-09-08", "NOTRAYMOND", "110.00")
+    result = reconcile(
+        PREDICTION,
+        {
+            **OUTCOME,
+            "source_snapshot": wrong_bytes,
+            "source_hash": sha256(wrong_bytes).hexdigest(),
+        },
+        now=NOW,
+    )
+    assert result["status"] == "NOT_PROVEN"
+    assert result["reason"] == "OUTCOME_NSE_PRICE_ROW_NOT_FOUND"
+
+
+def test_binds_official_url_date_member_and_close_timestamp():
+    assert reconcile(
+        PREDICTION,
+        {
+            **OUTCOME,
+            "source_url": OUTCOME_URL.replace("20260908", "20260909"),
+        },
+        now=NOW,
+    )["reason"] == "OUTCOME_NSE_PRICE_TIMESTAMP_MISMATCH"
+
+    shifted = {
+        **OUTCOME,
+        "price_as_of_at": "2026-09-08T10:01:00+00:00",
+    }
+    shifted_prediction = {
+        **PREDICTION,
+        "due_at": shifted["price_as_of_at"],
+    }
+    assert (
+        reconcile(shifted_prediction, shifted, now=NOW)["reason"]
+        == "OUTCOME_NSE_PRICE_TIMESTAMP_MISMATCH"
+    )
