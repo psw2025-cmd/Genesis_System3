@@ -6,10 +6,17 @@ from io import BytesIO
 import csv
 import io
 import json
+from pathlib import Path
 from zipfile import ZipFile
 
 import pytest
 
+from dashboard.backend.multibagger_outcome import (
+    OutcomeLedgerError,
+    build_directional_outcome_projection,
+    validate_directional_outcome_projection,
+    verify_directional_projection_evidence,
+)
 from scripts.equity_forward_prediction import (
     GENESIS_HASH,
     HOLIDAY_URL,
@@ -101,6 +108,48 @@ def retained_sources(args):
         "equity_source_bytes": args["equity_sources"],
         "index_source_raw": args["index_raw"],
     }
+
+
+def retained_uris():
+    return {
+        role: f"snapshots/fixture/{role}.bin"
+        for role in (
+            "cash",
+            "company",
+            "etf",
+            "actions",
+            "index",
+            "holiday_calendar",
+            "model_spec",
+        )
+    }
+
+
+def build_projection(args=None):
+    args = args or fixture()
+    prediction = build_prediction(**args)
+    projection = build_directional_outcome_projection(
+        prediction,
+        equity_source_bytes=args["equity_sources"],
+        index_source_raw=args["index_raw"],
+        holiday_calendar_raw=args["holiday_raw"],
+        model_spec_raw=args["model_spec_raw"],
+        expected_previous_event_hash=args["previous_event_hash"],
+        retained_source_uris=retained_uris(),
+        now=NOW,
+    )
+    return args, prediction, projection
+
+
+def rehash_projection(projection):
+    payload = {
+        key: value
+        for key, value in projection.items()
+        if key != "projection_hash"
+    }
+    projection["projection_hash"] = sha256(json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), allow_nan=False
+    ).encode()).hexdigest()
 
 
 def test_builds_one_unqualified_forward_paper_prediction():
@@ -560,3 +609,230 @@ def test_holiday_rolls_due_session_forward():
     args["holiday_receipt"] = receipt(holiday, HOLIDAY_URL)
     result = build_prediction(**args)
     assert result["due_session_date"] == "2026-10-09"
+
+
+def test_direction_only_projection_preserves_pending_honest_state():
+    _, prediction, projection = build_projection()
+    assert projection["prediction_event_hash"] == prediction["event_hash"]
+    assert projection["forecast_kind"] == "DIRECTION_ONLY"
+    assert projection["forecast_direction"] == "POSITIVE"
+    assert projection["predicted_return_pct"] is None
+    assert projection["expected_return_range"] is None
+    assert projection["calibrated_probability"] is None
+    assert projection["adjusted_entry_price"] is None
+    assert projection["adjustment_status"] == "PENDING_MATURITY_RECHECK"
+    assert projection["adjustment_basis"] is None
+    assert projection["outcome_status"] == "PENDING"
+    assert projection["reference_prices_are_executable_fills"] is False
+    assert projection["performance_metrics_available"] is False
+    assert projection["real_money_ready"] is False
+    assert projection["live_trading_enabled"] is False
+    assert projection["order_placement_allowed"] is False
+    status = validate_directional_outcome_projection(projection)
+    assert status["status"] == (
+        "DIRECTIONAL_FORECAST_PROJECTED_PENDING_MATURITY"
+    )
+    assert status["matured_outcomes"] == 0
+    assert status["predicted_return_pct"] is None
+
+
+@pytest.mark.parametrize(
+    "mutate,match",
+    [
+        (
+            lambda row: row.update(predicted_return_pct=20),
+            "NUMERIC_FORECAST_INVENTED",
+        ),
+        (
+            lambda row: row.update(
+                reference_prices_are_executable_fills=True
+            ),
+            "REFERENCE_PRICES_ARE_EXECUTABLE_FILLS_INVALID",
+        ),
+        (
+            lambda row: row.update(performance_metrics_available=True),
+            "PERFORMANCE_METRICS_AVAILABLE_INVALID",
+        ),
+        (
+            lambda row: row.update(adjustment_basis="assumed-none"),
+            "ADJUSTMENT_BASIS_PREMATURE",
+        ),
+    ],
+)
+def test_rehashed_direction_projection_rejects_invented_claims(mutate, match):
+    _, _, projection = build_projection()
+    mutate(projection)
+    rehash_projection(projection)
+    with pytest.raises(OutcomeLedgerError, match=match):
+        validate_directional_outcome_projection(projection)
+
+
+def test_direction_projection_rejects_substituted_source_and_predecessor():
+    args = fixture()
+    prediction = build_prediction(**args)
+    substituted = dict(args["equity_sources"])
+    substituted["cash"] += b"\n"
+    with pytest.raises(OutcomeLedgerError, match="cash retained source bytes"):
+        build_directional_outcome_projection(
+            prediction,
+            equity_source_bytes=substituted,
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+            retained_source_uris=retained_uris(),
+            now=NOW,
+        )
+    with pytest.raises(OutcomeLedgerError, match="trusted predecessor"):
+        build_directional_outcome_projection(
+            prediction,
+            equity_source_bytes=args["equity_sources"],
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash="1" * 64,
+            retained_source_uris=retained_uris(),
+            now=NOW,
+        )
+
+
+def test_direction_projection_rejects_missing_or_traversing_source_uri():
+    args = fixture()
+    prediction = build_prediction(**args)
+    missing = retained_uris()
+    missing.pop("model_spec")
+    with pytest.raises(OutcomeLedgerError, match="URI_ROLES"):
+        build_directional_outcome_projection(
+            prediction,
+            equity_source_bytes=args["equity_sources"],
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+            retained_source_uris=missing,
+            now=NOW,
+        )
+    traversing = retained_uris()
+    traversing["cash"] = "snapshots/fixture/../cash.zip"
+    with pytest.raises(OutcomeLedgerError, match="SNAPSHOT_URI_INVALID"):
+        build_directional_outcome_projection(
+            prediction,
+            equity_source_bytes=args["equity_sources"],
+            index_source_raw=args["index_raw"],
+            holiday_calendar_raw=args["holiday_raw"],
+            model_spec_raw=args["model_spec_raw"],
+            expected_previous_event_hash=args["previous_event_hash"],
+            retained_source_uris=traversing,
+            now=NOW,
+        )
+
+
+def test_direction_projection_rechecks_all_retained_source_bytes(tmp_path):
+    args, _, projection = build_projection()
+    raw_by_role = {
+        **args["equity_sources"],
+        "index": args["index_raw"],
+        "holiday_calendar": args["holiday_raw"],
+        "model_spec": args["model_spec_raw"],
+    }
+    for role, raw in raw_by_role.items():
+        path = tmp_path / projection["source_bindings"][role]["snapshot_uri"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    verify_directional_projection_evidence(
+        projection,
+        evidence_root=tmp_path,
+    )
+    cash_path = (
+        tmp_path / projection["source_bindings"]["cash"]["snapshot_uri"]
+    )
+    cash_path.write_bytes(cash_path.read_bytes() + b"\n")
+    with pytest.raises(OutcomeLedgerError, match="HASH_OR_SIZE_MISMATCH"):
+        verify_directional_projection_evidence(
+            projection,
+            evidence_root=tmp_path,
+        )
+
+
+def test_real_molbio_direction_only_prediction_projects_without_magnitude():
+    root = Path(__file__).resolve().parents[1]
+    raw_root = root / "research/evidence/equity/raw/2026-10-01-forward"
+    prediction = json.loads(
+        (
+            root
+            / "research/forward/equity/2026-10-01/"
+            "2026-10-01_equity_forward_prediction.json"
+        ).read_text(encoding="utf-8")
+    )
+    equity_sources = {
+        "cash": (raw_root / "cm_20261001.zip").read_bytes(),
+        "company": (raw_root / "EQUITY_L.csv").read_bytes(),
+        "etf": (raw_root / "eq_etfseclist.csv").read_bytes(),
+        "actions": (raw_root / "corporate_actions.json").read_bytes(),
+    }
+    index_raw = (raw_root / "index_close_20261001.csv").read_bytes()
+    holiday_raw = (raw_root / "trading_holidays.json").read_bytes()
+    model_raw = (
+        root / "research/experiments/equity_forward_rank_v1.json"
+    ).read_bytes()
+    retained_source_uris = {
+        "cash": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "cm_20261001.zip"
+        ),
+        "company": (
+            "research/evidence/equity/raw/2026-10-01-forward/EQUITY_L.csv"
+        ),
+        "etf": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "eq_etfseclist.csv"
+        ),
+        "actions": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "corporate_actions.json"
+        ),
+        "index": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "index_close_20261001.csv"
+        ),
+        "holiday_calendar": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "trading_holidays.json"
+        ),
+        "model_spec": (
+            "research/evidence/equity/raw/2026-10-01-forward/"
+            "equity_forward_rank_v1.json"
+        ),
+    }
+    kwargs = dict(
+        equity_source_bytes=equity_sources,
+        index_source_raw=index_raw,
+        holiday_calendar_raw=holiday_raw,
+        model_spec_raw=model_raw,
+        expected_previous_event_hash=GENESIS_HASH,
+        retained_source_uris=retained_source_uris,
+        now=datetime(2026, 10, 7, 9, 30, tzinfo=timezone.utc),
+    )
+    projection = build_directional_outcome_projection(
+        prediction,
+        **kwargs,
+    )
+    duplicate = build_directional_outcome_projection(
+        prediction,
+        **kwargs,
+    )
+    assert projection == duplicate
+    assert projection["prediction_event_hash"] == (
+        "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f"
+    )
+    assert projection["symbol"] == "MOLBIO"
+    assert projection["isin"] == "INE869T01028"
+    assert projection["forecast_direction"] == "POSITIVE"
+    assert projection["entry_reference_close"] == "1513.10"
+    assert projection["predicted_return_pct"] is None
+    assert projection["due_at"] == "2026-10-08T10:00:00+00:00"
+    assert projection["outcome_status"] == "PENDING"
+    verify_directional_projection_evidence(
+        projection,
+        evidence_root=root,
+    )
