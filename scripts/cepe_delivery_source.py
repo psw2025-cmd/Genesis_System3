@@ -89,7 +89,7 @@ def _canonical(payload: dict[str, Any]) -> bytes:
 
 def _git_blob_sha(raw: bytes) -> str:
     header = f"blob {len(raw)}\0".encode("ascii")
-    return sha1(header + raw).hexdigest()
+    return sha1(header + raw, usedforsecurity=False).hexdigest()
 
 
 def _safe_file(repo_root: Path, relative: Any) -> Path:
