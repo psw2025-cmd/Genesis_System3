@@ -499,6 +499,22 @@ _DIRECTIONAL_PROJECTION_FIELDS = frozenset(
         "projection_hash",
     }
 )
+_DIRECTIONAL_REFERENCE_OUTCOME_FIELDS = frozenset(
+    {
+        "symbol",
+        "isin",
+        "price_as_of_at",
+        "source_exchange_published_at",
+        "source_first_observed_at",
+        "reference_close",
+        "source",
+        "source_url",
+        "source_hash",
+        "source_snapshot",
+        "source_snapshot_uri",
+        "price_basis",
+    }
+)
 
 
 def _outcome_sha(value: Any, field: str) -> str:
@@ -938,6 +954,211 @@ def verify_directional_projection_evidence(
             raise OutcomeLedgerError(
                 f"{field}_RETAINED_HASH_OR_SIZE_MISMATCH"
             )
+
+
+def reconcile_directional_reference(
+    projection: dict[str, Any],
+    outcome: dict[str, Any],
+    *,
+    entry_source_snapshot: bytes,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Replay exact closes for a direction-only forecast without scoring it.
+
+    This deliberately records only a raw, unadjusted reference observation.
+    Corporate-action and current-identity evidence must still be recaptured at
+    maturity before a direction result can be sealed in the outcome ledger.
+    Unknown exchange publication time stays null; first observation is not
+    relabelled as publication or dissemination time.
+    """
+    try:
+        _validate_directional_projection_semantics(projection)
+        if not isinstance(outcome, dict) or set(outcome) != (
+            _DIRECTIONAL_REFERENCE_OUTCOME_FIELDS
+        ):
+            raise OutcomeLedgerError("OUTCOME_FIELDS_INVALID")
+
+        current = now or datetime.now(timezone.utc)
+        if current.tzinfo is None or current.utcoffset() is None:
+            raise OutcomeLedgerError("NOW_TIMEZONE_REQUIRED")
+        current = current.astimezone(timezone.utc)
+        due = _outcome_time(projection["due_at"], "DUE_AT")
+        if current < due:
+            raise OutcomeLedgerError("OUTCOME_NOT_MATURED")
+
+        price_as_of = _outcome_time(
+            outcome["price_as_of_at"],
+            "OUTCOME_PRICE_AS_OF_AT",
+        )
+        observed = _outcome_time(
+            outcome["source_first_observed_at"],
+            "OUTCOME_SOURCE_FIRST_OBSERVED_AT",
+        )
+        published_raw = outcome["source_exchange_published_at"]
+        published = (
+            None
+            if published_raw is None
+            else _outcome_time(
+                published_raw,
+                "OUTCOME_SOURCE_EXCHANGE_PUBLISHED_AT",
+            )
+        )
+        if price_as_of != due:
+            raise OutcomeLedgerError("OUTCOME_HORIZON_MISMATCH")
+        if not due <= observed <= current:
+            raise OutcomeLedgerError("OUTCOME_SOURCE_TIME_ORDER_INVALID")
+        if published is not None and not due <= published <= observed:
+            raise OutcomeLedgerError("OUTCOME_SOURCE_TIME_ORDER_INVALID")
+
+        symbol = str(outcome["symbol"]).strip().upper()
+        isin = str(outcome["isin"]).strip().upper()
+        if symbol != projection["symbol"]:
+            raise OutcomeLedgerError("SYMBOL_MISMATCH")
+        if isin != projection["isin"]:
+            raise OutcomeLedgerError("ISIN_MISMATCH")
+
+        try:
+            outcome_source = _source(
+                outcome["source"],
+                field="OUTCOME_SOURCE",
+            )
+        except ValueError as exc:
+            raise OutcomeLedgerError(str(exc)) from exc
+        if outcome_source != "NSE" or outcome["source"] != outcome_source:
+            raise OutcomeLedgerError("OUTCOME_SOURCE_INVALID")
+        _official_source_url(
+            outcome["source_url"],
+            outcome_source,
+            "OUTCOME_SOURCE_URL",
+        )
+        outcome_hash = _outcome_sha(
+            outcome["source_hash"],
+            "OUTCOME_SOURCE_HASH",
+        )
+        outcome_raw = _verified_snapshot(
+            outcome,
+            "source_snapshot",
+            outcome_hash,
+            "OUTCOME",
+        )
+        outcome_uri = _outcome_reference(
+            outcome["source_snapshot_uri"],
+            "OUTCOME_SNAPSHOT_URI",
+        )
+        if outcome["price_basis"] != _UNADJUSTED_EXCHANGE_REFERENCE:
+            raise OutcomeLedgerError("PRICE_BASIS_INVALID")
+
+        if not isinstance(entry_source_snapshot, bytes) or not entry_source_snapshot:
+            raise OutcomeLedgerError("ENTRY_SNAPSHOT_REQUIRED")
+        if (
+            sha256(entry_source_snapshot).hexdigest()
+            != projection["entry_source_hash"]
+            or len(entry_source_snapshot)
+            != projection["entry_source_size_bytes"]
+        ):
+            raise OutcomeLedgerError("ENTRY_SNAPSHOT_HASH_OR_SIZE_MISMATCH")
+
+        entry_at = _outcome_time(
+            projection["entry_price_as_of_at"],
+            "ENTRY_PRICE_AS_OF_AT",
+        )
+        entry_close, entry_row_hash = _close_from_snapshot(
+            entry_source_snapshot,
+            source=projection["entry_source"],
+            source_url=projection["entry_source_url"],
+            symbol=symbol,
+            isin=isin,
+            price_as_of=entry_at,
+            field="ENTRY",
+        )
+        if (
+            str(entry_close) != projection["entry_reference_close"]
+            or entry_row_hash != projection["entry_source_row_hash"]
+        ):
+            raise OutcomeLedgerError("ENTRY_PRICE_EVIDENCE_MISMATCH")
+
+        outcome_close, outcome_row_hash = _close_from_snapshot(
+            outcome_raw,
+            source=outcome_source,
+            source_url=outcome["source_url"],
+            symbol=symbol,
+            isin=isin,
+            price_as_of=price_as_of,
+            field="OUTCOME",
+        )
+        declared_outcome_close = _price(outcome["reference_close"])
+        if declared_outcome_close != outcome_close:
+            raise OutcomeLedgerError("OUTCOME_PRICE_EVIDENCE_MISMATCH")
+    except (
+        KeyError,
+        TypeError,
+        ValueError,
+        OverflowError,
+        OutcomeLedgerError,
+    ) as exc:
+        reason = str(exc) if str(exc) else "REQUIRED_EVIDENCE_MISSING"
+        return {"status": "NOT_PROVEN", "reason": reason}
+
+    raw_actual = (
+        declared_outcome_close / entry_close - Decimal("1")
+    ) * Decimal("100")
+    raw_direction = (
+        "POSITIVE"
+        if raw_actual > 0
+        else "NEGATIVE" if raw_actual < 0 else "FLAT"
+    )
+    return {
+        "status": "RAW_REFERENCE_OBSERVED_ADJUSTMENT_REVIEW_PENDING",
+        "prediction_id": projection["prediction_id"],
+        "prediction_event_hash": projection["prediction_event_hash"],
+        "projection_hash": projection["projection_hash"],
+        "symbol": symbol,
+        "isin": isin,
+        "forecast_kind": "DIRECTION_ONLY",
+        "forecast_direction": projection["forecast_direction"],
+        "issued_at": projection["issued_at"],
+        "due_at": projection["due_at"],
+        "outcome_price_as_of_at": price_as_of.isoformat(),
+        "outcome_source_exchange_published_at": (
+            published.isoformat() if published is not None else None
+        ),
+        "outcome_source_first_observed_at": observed.isoformat(),
+        "source_availability_status": (
+            "EXCHANGE_PUBLICATION_TIMESTAMP_RETAINED"
+            if published is not None
+            else "FIRST_OBSERVED_ONLY_EXCHANGE_PUBLICATION_NOT_PROVEN"
+        ),
+        "entry_reference_close": str(entry_close),
+        "outcome_reference_close": str(declared_outcome_close),
+        "predicted_return_pct": None,
+        "expected_return_range": None,
+        "calibrated_probability": None,
+        "raw_actual_return_pct": round(float(raw_actual), 6),
+        "raw_reference_direction": raw_direction,
+        "actual_return_pct": None,
+        "absolute_error_pp": None,
+        "direction_correct": None,
+        "entry_source_hash": projection["entry_source_hash"],
+        "entry_source_row_hash": entry_row_hash,
+        "entry_snapshot_uri": projection["entry_snapshot_uri"],
+        "outcome_source": outcome_source,
+        "outcome_source_url": outcome["source_url"],
+        "outcome_source_hash": outcome_hash,
+        "outcome_source_size_bytes": len(outcome_raw),
+        "outcome_source_row_hash": outcome_row_hash,
+        "outcome_snapshot_uri": outcome_uri,
+        "price_basis": _UNADJUSTED_EXCHANGE_REFERENCE,
+        "adjustment_status": "PENDING_MATURITY_RECHECK",
+        "adjustment_basis": None,
+        "matured_outcomes": 0,
+        "market_validation_claimed": False,
+        "reference_prices_are_executable_fills": False,
+        "performance_metrics_available": False,
+        "performance_gate_passed": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
 
 
 def _canonical_outcome_event(record: dict[str, Any]) -> bytes:

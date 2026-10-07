@@ -14,6 +14,7 @@ import pytest
 from dashboard.backend.multibagger_outcome import (
     OutcomeLedgerError,
     build_directional_outcome_projection,
+    reconcile_directional_reference,
     validate_directional_outcome_projection,
     verify_directional_projection_evidence,
 )
@@ -53,6 +54,48 @@ def zipped(rows):
     with ZipFile(raw, "w") as archive:
         archive.writestr(MEMBER, text.getvalue())
     return raw.getvalue()
+
+
+def outcome_archive(
+    trade_date="2026-10-08",
+    symbol="AAA",
+    isin="INE000A01001",
+    close="121",
+):
+    stamp = trade_date.replace("-", "")
+    member = f"BhavCopy_NSE_CM_0_0_0_{stamp}_F_0000.csv"
+    row = dict(
+        zip(
+            FIELDS,
+            [
+                trade_date,
+                trade_date,
+                "CM",
+                "NSE",
+                "STK",
+                isin,
+                symbol,
+                "EQ",
+                "F1",
+                "120",
+                "122",
+                "119",
+                close,
+                "2000000",
+            ],
+        )
+    )
+    text = io.StringIO()
+    writer = csv.DictWriter(text, fieldnames=FIELDS)
+    writer.writeheader()
+    writer.writerow(row)
+    raw = BytesIO()
+    with ZipFile(raw, "w") as archive:
+        archive.writestr(member, text.getvalue())
+    return (
+        raw.getvalue(),
+        "https://nsearchives.nseindia.com/content/cm/" + member + ".zip",
+    )
 
 
 def fixture():
@@ -752,6 +795,116 @@ def test_direction_projection_rechecks_all_retained_source_bytes(tmp_path):
             projection,
             evidence_root=tmp_path,
         )
+
+
+def directional_outcome(close="121"):
+    raw, url = outcome_archive(close=close)
+    return {
+        "symbol": "AAA",
+        "isin": "INE000A01001",
+        "price_as_of_at": "2026-10-08T10:00:00+00:00",
+        "source_exchange_published_at": None,
+        "source_first_observed_at": "2026-10-08T10:05:00+00:00",
+        "reference_close": close,
+        "source": "NSE",
+        "source_url": url,
+        "source_hash": sha256(raw).hexdigest(),
+        "source_snapshot": raw,
+        "source_snapshot_uri": "snapshots/fixture/outcome_cash.zip",
+        "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    }
+
+
+def test_directional_reference_replays_raw_close_without_scoring_outcome():
+    args, _, projection = build_projection()
+    result = reconcile_directional_reference(
+        projection,
+        directional_outcome(),
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        now=datetime(2026, 10, 8, 10, 6, tzinfo=timezone.utc),
+    )
+    assert result["status"] == (
+        "RAW_REFERENCE_OBSERVED_ADJUSTMENT_REVIEW_PENDING"
+    )
+    assert result["raw_actual_return_pct"] == 10.0
+    assert result["raw_reference_direction"] == "POSITIVE"
+    assert result["predicted_return_pct"] is None
+    assert result["actual_return_pct"] is None
+    assert result["absolute_error_pp"] is None
+    assert result["direction_correct"] is None
+    assert result["matured_outcomes"] == 0
+    assert result["adjustment_basis"] is None
+    assert result["source_availability_status"] == (
+        "FIRST_OBSERVED_ONLY_EXCHANGE_PUBLICATION_NOT_PROVEN"
+    )
+    assert result["reference_prices_are_executable_fills"] is False
+    assert result["performance_metrics_available"] is False
+    assert result["real_money_ready"] is False
+    assert result["order_placement_allowed"] is False
+
+
+def test_directional_reference_rejects_before_exact_horizon():
+    args, _, projection = build_projection()
+    result = reconcile_directional_reference(
+        projection,
+        directional_outcome(),
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        now=datetime(2026, 10, 7, 14, 0, tzinfo=timezone.utc),
+    )
+    assert result == {"status": "NOT_PROVEN", "reason": "OUTCOME_NOT_MATURED"}
+
+
+@pytest.mark.parametrize(
+    "mutate,reason",
+    [
+        (
+            lambda row: row.update(reference_close="999"),
+            "OUTCOME_PRICE_EVIDENCE_MISMATCH",
+        ),
+        (
+            lambda row: row.update(price_as_of_at="2026-10-09T10:00:00+00:00"),
+            "OUTCOME_HORIZON_MISMATCH",
+        ),
+        (
+            lambda row: row.update(
+                source_exchange_published_at="2026-10-08T10:06:00+00:00"
+            ),
+            "OUTCOME_SOURCE_TIME_ORDER_INVALID",
+        ),
+        (
+            lambda row: row.update(adjustment_basis="assumed-none"),
+            "OUTCOME_FIELDS_INVALID",
+        ),
+    ],
+)
+def test_directional_reference_rejects_unbound_or_premature_claims(
+    mutate,
+    reason,
+):
+    args, _, projection = build_projection()
+    outcome = directional_outcome()
+    mutate(outcome)
+    result = reconcile_directional_reference(
+        projection,
+        outcome,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        now=datetime(2026, 10, 8, 10, 6, tzinfo=timezone.utc),
+    )
+    assert result == {"status": "NOT_PROVEN", "reason": reason}
+
+
+def test_directional_reference_rejects_replaced_entry_bytes():
+    _, _, projection = build_projection()
+    result = reconcile_directional_reference(
+        projection,
+        directional_outcome(),
+        entry_source_snapshot=b"replaced",
+        now=datetime(2026, 10, 8, 10, 6, tzinfo=timezone.utc),
+    )
+    assert result == {
+        "status": "NOT_PROVEN",
+        "reason": "ENTRY_SNAPSHOT_HASH_OR_SIZE_MISMATCH",
+    }
 
 
 def test_real_molbio_direction_only_prediction_projects_without_magnitude():
