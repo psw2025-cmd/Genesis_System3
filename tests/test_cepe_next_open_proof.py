@@ -36,6 +36,12 @@ def test_contract_identity_and_opening_multiplier():
     assert result["matched_contracts"] == 2
     assert result["highest_multiple"] == 11.0
     assert result["top_moves"][0]["type"] == "CE"
+    assert result["top_moves"][0]["instrument_id"] == "1"
+    assert result["top_moves"][0]["instrument_id_match_proven"] is True
+    assert result["instrument_id_proven_matches"] == 2
+    assert result["instrument_identity_status"] == (
+        "PROVEN_FOR_ALL_MATCHED_CONTRACTS"
+    )
     assert result["following_sha256"] == sha256(FOLLOWING).hexdigest()
     assert result["distribution_scope"] == "FULL_MATCHED_CONTRACT_SET_UNCAPPED"
     assert result["fees_slippage_status"] == "NOT_APPLIED"
@@ -148,6 +154,35 @@ def test_modern_schema_requires_provenance_and_business_date():
         compare(
             invalid_business_date,
             FOLLOWING,
+            date(2026, 9, 22),
+            date(2026, 9, 23),
+        )
+
+
+def test_modern_contract_requires_same_nse_instrument_id_across_sessions():
+    substituted = FOLLOWING.replace(
+        b"IDO,1,F1,NIFTY",
+        b"IDO,999,F1,NIFTY",
+        1,
+    )
+    with pytest.raises(ValueError, match="instrument identifier changed"):
+        compare(
+            PREVIOUS,
+            substituted,
+            date(2026, 9, 22),
+            date(2026, 9, 23),
+        )
+
+
+def test_mixed_modern_and_legacy_identity_fails_closed():
+    legacy = (
+        b"SYMBOL,EXPIRY_DT,OPTION_TYP,STRIKE_PR,OPEN,CLOSE,TIMESTAMP,CONTRACTS\n"
+        b"NIFTY,30-Sep-2026,CE,25000,110,80,23-Sep-2026,200\n"
+    )
+    with pytest.raises(ValueError, match="Cannot prove NSE instrument identity"):
+        compare(
+            PREVIOUS,
+            legacy,
             date(2026, 9, 22),
             date(2026, 9, 23),
         )
