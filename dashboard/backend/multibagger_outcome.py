@@ -995,21 +995,14 @@ def reconcile_directional_reference(
             "OUTCOME_SOURCE_FIRST_OBSERVED_AT",
         )
         published_raw = outcome["source_exchange_published_at"]
-        published = (
-            None
-            if published_raw is None
-            else _outcome_time(
-                published_raw,
-                "OUTCOME_SOURCE_EXCHANGE_PUBLISHED_AT",
+        if published_raw is not None:
+            raise OutcomeLedgerError(
+                "OUTCOME_EXCHANGE_PUBLICATION_TIME_NOT_PROVEN"
             )
-        )
         if price_as_of != due:
             raise OutcomeLedgerError("OUTCOME_HORIZON_MISMATCH")
         if not due <= observed <= current:
             raise OutcomeLedgerError("OUTCOME_SOURCE_TIME_ORDER_INVALID")
-        if published is not None and not due <= published <= observed:
-            raise OutcomeLedgerError("OUTCOME_SOURCE_TIME_ORDER_INVALID")
-
         symbol = str(outcome["symbol"]).strip().upper()
         isin = str(outcome["isin"]).strip().upper()
         if symbol != projection["symbol"]:
@@ -1119,14 +1112,10 @@ def reconcile_directional_reference(
         "issued_at": projection["issued_at"],
         "due_at": projection["due_at"],
         "outcome_price_as_of_at": price_as_of.isoformat(),
-        "outcome_source_exchange_published_at": (
-            published.isoformat() if published is not None else None
-        ),
+        "outcome_source_exchange_published_at": None,
         "outcome_source_first_observed_at": observed.isoformat(),
         "source_availability_status": (
-            "EXCHANGE_PUBLICATION_TIMESTAMP_RETAINED"
-            if published is not None
-            else "FIRST_OBSERVED_ONLY_EXCHANGE_PUBLICATION_NOT_PROVEN"
+            "FIRST_OBSERVED_ONLY_EXCHANGE_PUBLICATION_NOT_PROVEN"
         ),
         "entry_reference_close": str(entry_close),
         "outcome_reference_close": str(declared_outcome_close),
