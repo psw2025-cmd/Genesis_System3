@@ -1,0 +1,71 @@
+{
+  "experiment_id": "CEPE-NEXT-005",
+  "registration_commit": "1cf0f9d731e3d3bebaa2f496484c0cb56646732f",
+  "strategy_commit": "85e1c444c6c247aa468f009e83a61dc97929b287",
+  "evaluation_commit": "2c2c28d06b6c9d44ea28c594d7ff045714fc2e60",
+  "evaluated_at": "2026-09-26T23:43:34.544444+00:00",
+  "status": "REJECTED_FOR_PROMOTION_AFTER_VALIDATION",
+  "phase": "2026-01-01..2026-03-31",
+  "scoreable_references": 7515,
+  "session_pairs": 43,
+  "gates": {
+    "raw_reference_directional_hit_pct": {
+      "value": 51.37724550898204,
+      "target": 65,
+      "gap": 13.622754491017957,
+      "qualified_performance": false
+    },
+    "raw_3x_top_decile_precision_pct": {
+      "value": 0.5322687957418496,
+      "target": 70,
+      "gap": 69.46773120425814,
+      "qualified_performance": false
+    },
+    "qualified_oos_trades": {
+      "value": 0,
+      "target": 100,
+      "gap": 100
+    },
+    "qualified_oos_days": {
+      "value": 0,
+      "target": 60,
+      "gap": 60
+    },
+    "sharpe": {
+      "value": null,
+      "target": 2.5,
+      "status": "NOT_PROVEN"
+    },
+    "max_drawdown_pct": {
+      "value": null,
+      "target": 10,
+      "status": "NOT_PROVEN"
+    },
+    "deflated_sharpe_probability": {
+      "value": null,
+      "target": 0.95,
+      "status": "NOT_PROVEN"
+    }
+  },
+  "gross_reference_mean_pct": 3.421965375914837,
+  "comparator_gross_reference_mean_pct": 3.8469627461415645,
+  "uncertainty": {
+    "paired_session_mean_excess_pct": -0.4358654814032064,
+    "paired_day_bootstrap_95pct_interval": [
+      -2.1507647631545033,
+      1.1933386312380092
+    ],
+    "positive_excess_days": 19,
+    "negative_excess_days": 24,
+    "bootstrap_seed": 20260926,
+    "resamples": 10000,
+    "limitations": "Day bootstrap does not correct serial dependence or selection across earlier experiments. Contract observations are not independent."
+  },
+  "frozen_2026Q2_option_outcome_test": "UNSCORED_PRESERVED",
+  "next_target": "Investigate earlier development data integrity, contract cost and liquidity features; preregister a distinct candidate before any untouched evaluation. Do not tune the frozen test.",
+  "auto_promotion": false,
+  "orders_allowed": false,
+  "additional_development_evidence": "research/evidence/2026-09-27_cepe_development_summary.json",
+  "additional_development_scored_references": 36680,
+  "additional_development_pairs": 236
+}
