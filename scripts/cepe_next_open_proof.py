@@ -29,8 +29,8 @@ def _number(value: Any, field: str) -> float:
 def _rows(
     raw: bytes,
     trade_date: date,
-) -> dict[tuple[str, str, str, str], dict[str, float]]:
-    table: dict[tuple[str, str, str, str], dict[str, float]] = {}
+) -> dict[tuple[str, str, str, str], dict[str, Any]]:
+    table: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     try:
         text = raw.decode("utf-8-sig")
     except UnicodeDecodeError as exc:
@@ -109,6 +109,7 @@ def _rows(
         observed = _date(row[dated])
         if observed != trade_date:
             raise ValueError("Trade date differs from requested date")
+        instrument_id: str | None = None
         if modern_schema:
             business_day = _date(row["BizDt"])
             if business_day != trade_date:
@@ -123,7 +124,8 @@ def _rows(
                 raise ValueError(
                     "Row is not an NSE F&O regular-session option"
                 )
-            if not str(row["FinInstrmId"]).strip():
+            instrument_id = str(row["FinInstrmId"]).strip()
+            if not instrument_id:
                 raise ValueError("Missing NSE instrument identifier")
         expiry_day = _date(row[expiry])
         if expiry_day < trade_date:
@@ -140,6 +142,7 @@ def _rows(
         if key in table:
             raise ValueError("Duplicate contract row")
         table[key] = {
+            "instrument_id": instrument_id,
             "open": _number(row.get(opening), "opening price"),
             "close": _number(row.get(closing), "closing price"),
             "volume": _number(row.get(volume), "traded volume"),
@@ -176,6 +179,19 @@ def compare(
     matches = []
     excluded_illiquid = 0
     for key in sorted(before.keys() & after.keys()):
+        before_instrument_id = before[key]["instrument_id"]
+        after_instrument_id = after[key]["instrument_id"]
+        if (before_instrument_id is None) != (after_instrument_id is None):
+            raise ValueError(
+                "Cannot prove NSE instrument identity across bhavcopy schemas"
+            )
+        if (
+            before_instrument_id is not None
+            and before_instrument_id != after_instrument_id
+        ):
+            raise ValueError(
+                "NSE instrument identifier changed for matched contract"
+            )
         close = before[key]["close"]
         opening = after[key]["open"]
         liquid = (
@@ -194,6 +210,8 @@ def compare(
                 "expiry": key[1],
                 "strike": key[2],
                 "type": key[3],
+                "instrument_id": before_instrument_id,
+                "instrument_id_match_proven": before_instrument_id is not None,
                 "previous_close": close,
                 "next_open": opening if aligned else None,
                 "observed_open": opening,
@@ -206,6 +224,9 @@ def compare(
 
     multiples = [row["multiple"] for row in matches]
     ordered = sorted(matches, key=lambda row: row["multiple"], reverse=True)
+    instrument_id_proven_matches = sum(
+        row["instrument_id_match_proven"] for row in matches
+    )
     return {
         **scope,
         "previous_day": previous_day.isoformat(),
@@ -213,6 +234,14 @@ def compare(
         "previous_sha256": sha256(previous).hexdigest(),
         "following_sha256": sha256(following).hexdigest(),
         "matched_contracts": len(matches),
+        "instrument_id_proven_matches": instrument_id_proven_matches,
+        "instrument_identity_status": (
+            "PROVEN_FOR_ALL_MATCHED_CONTRACTS"
+            if matches and instrument_id_proven_matches == len(matches)
+            else "NOT_PROVEN_FOR_LEGACY_MATCHES"
+            if matches
+            else "NOT_APPLICABLE_NO_MATCHES"
+        ),
         "excluded_illiquid_contracts": excluded_illiquid,
         "minimum_volume_each_day": minimum_volume,
         "minimum_previous_close": minimum_close,
