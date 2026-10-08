@@ -7,14 +7,16 @@ from scripts.cepe_next_open_proof import compare
 
 
 PREVIOUS = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
-    b"NIFTY,2026-09-30,CE,25000,8,10,2026-09-22,200\n"
-    b"NIFTY,2026-09-30,PE,25000,20,15,2026-09-22,200\n"
+    b"BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    b"StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"2026-09-22,FO,NSE,IDO,1,F1,NIFTY,2026-09-30,CE,25000,8,10,2026-09-22,200\n"
+    b"2026-09-22,FO,NSE,IDO,2,F1,NIFTY,2026-09-30,PE,25000,20,15,2026-09-22,200\n"
 )
 FOLLOWING = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
-    b"NIFTY,2026-09-30,CE,25000,110,80,2026-09-23,200\n"
-    b"NIFTY,2026-09-30,PE,25000,3,7,2026-09-23,200\n"
+    b"BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    b"StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"2026-09-23,FO,NSE,IDO,1,F1,NIFTY,2026-09-30,CE,25000,110,80,2026-09-23,200\n"
+    b"2026-09-23,FO,NSE,IDO,2,F1,NIFTY,2026-09-30,PE,25000,3,7,2026-09-23,200\n"
 )
 
 
@@ -61,8 +63,8 @@ def test_wrong_date_and_duplicate_contract_fail_closed():
 
 def test_illiquid_previous_close_is_excluded():
     stale = PREVIOUS.replace(
-        b"10,2026-09-22,200",
-        b"10,2026-09-22,0",
+        b"25000,8,10,2026-09-22,200",
+        b"25000,8,10,2026-09-22,0",
     )
     result = compare(
         stale,
@@ -85,8 +87,8 @@ def test_illiquid_previous_close_is_excluded():
 )
 def test_non_finite_or_negative_market_values_fail_closed(bad_value, field):
     invalid = FOLLOWING.replace(
-        b"110,80,2026-09-23,200",
-        bad_value + b",80,2026-09-23,200",
+        b"25000,110,80,2026-09-23,200",
+        b"25000," + bad_value + b",80,2026-09-23,200",
     )
     with pytest.raises(ValueError, match=field):
         compare(
@@ -105,4 +107,47 @@ def test_invalid_liquidity_thresholds_fail_closed():
             date(2026, 9, 22),
             date(2026, 9, 23),
             min_volume=float("nan"),
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    [
+        (b"FO", b"CM"),
+        (b"NSE", b"BSE"),
+        (b"IDO", b"STK"),
+        (b"F1", b"F2"),
+    ],
+)
+def test_modern_source_identity_mismatch_fails_closed(field, bad_value):
+    invalid = PREVIOUS.replace(field, bad_value, 1)
+    with pytest.raises(ValueError, match="NSE F&O regular-session option"):
+        compare(
+            invalid,
+            FOLLOWING,
+            date(2026, 9, 22),
+            date(2026, 9, 23),
+        )
+
+
+def test_modern_schema_requires_provenance_and_business_date():
+    minimal = (
+        b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+        b"NIFTY,2026-09-30,CE,25000,8,10,2026-09-22,200\n"
+    )
+    with pytest.raises(ValueError, match="missing NSE F&O provenance"):
+        compare(
+            minimal,
+            FOLLOWING,
+            date(2026, 9, 22),
+            date(2026, 9, 23),
+        )
+
+    invalid_business_date = PREVIOUS.replace(b"2026-09-22", b"2026-09-21", 1)
+    with pytest.raises(ValueError, match="Business date"):
+        compare(
+            invalid_business_date,
+            FOLLOWING,
+            date(2026, 9, 22),
+            date(2026, 9, 23),
         )

@@ -12,7 +12,8 @@ from scripts.cepe_event_liquidity_candidate import (
 
 
 HEADER = (
-    "TradDt,TckrSymb,XpryDt,StrkPric,OptnTp,OpnPric,HghPric,LwPric,ClsPric,"
+    "BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TradDt,TckrSymb,XpryDt,"
+    "StrkPric,OptnTp,OpnPric,HghPric,LwPric,ClsPric,"
     "PrvsClsgPric,UndrlygPric,OpnIntrst,ChngInOpnIntrst,TtlTradgVol,TtlTrfVal,"
     "TtlNbOfTxsExctd,NewBrdLotQty\n"
 )
@@ -26,7 +27,8 @@ def snapshot(day: str, *, following: bool = False, missing_previous_close: bool 
         previous_close = "" if missing_previous_close and index == 0 else str(10 + index / 20)
         high = max(25, opening)
         rows.append(
-            f"{day},A{index:02d},2026-01-29,100,CE,{opening},{high},5,{close},"
+            f"{day},FO,NSE,STO,{index + 1},F1,{day},A{index:02d},"
+            f"2026-01-29,100,CE,{opening},{high},5,{close},"
             f"{previous_close},100,2000,{index - 5},2000,{200000 + index},"
             f"{100 + index},50\n"
         )

@@ -6,14 +6,16 @@ from scripts.cepe_prediction_ledger import issue, settle
 
 IST = timezone(timedelta(hours=5, minutes=30))
 BEFORE = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
-    b"ABC,2026-09-29,CE,100,8,10,2026-09-17,200\n"
-    b"XYZ,2026-09-29,PE,200,8,10,2026-09-17,200\n"
+    b"BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    b"StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"2026-09-17,FO,NSE,STO,1,F1,ABC,2026-09-29,CE,100,8,10,2026-09-17,200\n"
+    b"2026-09-17,FO,NSE,STO,2,F1,XYZ,2026-09-29,PE,200,8,10,2026-09-17,200\n"
 )
 AFTER = (
-    b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
-    b"ABC,2026-09-29,CE,100,40,25,2026-09-18,200\n"
-    b"XYZ,2026-09-29,PE,200,30,20,2026-09-18,200\n"
+    b"BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    b"StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+    b"2026-09-18,FO,NSE,STO,1,F1,ABC,2026-09-29,CE,100,40,25,2026-09-18,200\n"
+    b"2026-09-18,FO,NSE,STO,2,F1,XYZ,2026-09-29,PE,200,30,20,2026-09-18,200\n"
 )
 ISSUED = datetime(2026, 9, 17, 17, 0, tzinfo=IST)
 CUTOFF = datetime(2026, 9, 17, 18, 0, tzinfo=IST)

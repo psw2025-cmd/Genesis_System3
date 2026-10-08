@@ -4,7 +4,10 @@ import pytest
 
 from scripts.cepe_range_liquidity_baseline import rank, evaluate
 
-HEADER = "TradDt,TckrSymb,XpryDt,StrkPric,OptnTp,OpnPric,ClsPric,HghPric,LwPric,TtlTradgVol,OpnIntrst\n"
+HEADER = (
+    "BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TradDt,TckrSymb,XpryDt,"
+    "StrkPric,OptnTp,OpnPric,ClsPric,HghPric,LwPric,TtlTradgVol,OpnIntrst\n"
+)
 
 
 def snapshot(day, *, future_open=20, missing_oi=False):
@@ -16,7 +19,10 @@ def snapshot(day, *, future_open=20, missing_oi=False):
         close = 20 if i == 0 else 15
         high = 100 if i == 0 else max(20, opening)
         oi = "" if missing_oi and i == 0 else "2000"
-        rows.append(f"{day},A{i:02d},2026-01-29,100,CE,{opening},{close},{high},5,1000,{oi}\n")
+        rows.append(
+            f"{day},FO,NSE,STO,{i + 1},F1,{day},A{i:02d},2026-01-29,"
+            f"100,CE,{opening},{close},{high},5,1000,{oi}\n"
+        )
     return (HEADER + "".join(rows)).encode()
 
 

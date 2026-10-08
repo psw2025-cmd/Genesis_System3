@@ -11,11 +11,18 @@ from scripts.cepe_prediction_ledger import issue, settle
 from scripts.cepe_session_scope import IST, session_scope
 from scripts.cepe_walkforward_baseline import run
 
-HEADER = "TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+HEADER = (
+    "BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    "StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+)
 
 
 def snapshot(day, opening=8, close=10):
-    return (HEADER + f"ABC,2026-09-29,CE,100,{opening},{close},{day},200\n").encode()
+    return (
+        HEADER
+        + f"{day},FO,NSE,STO,1,F1,ABC,2026-09-29,CE,100,"
+        + f"{opening},{close},{day},200\n"
+    ).encode()
 
 
 def calendar(start="2026-09-18", end="2026-09-21", *, closed=("2026-09-19", "2026-09-20")):

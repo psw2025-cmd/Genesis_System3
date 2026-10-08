@@ -3,13 +3,18 @@ from datetime import date
 import pytest
 from scripts.cepe_walkforward_baseline import run
 
-HEADER = b"TckrSymb,XpryDt,OptnTp,StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+HEADER = (
+    b"BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,SsnId,TckrSymb,XpryDt,OptnTp,"
+    b"StrkPric,OpnPric,ClsPric,TradDt,TtlTradgVol\n"
+)
 
 
 def snapshot(day: str, a_open: int, a_close: int, b_open: int, b_close: int):
     return (HEADER +
-            (f"A,2026-09-29,CE,100,{a_open},{a_close},{day},200\n"
-             f"B,2026-09-29,PE,200,{b_open},{b_close},{day},200\n").encode())
+            (f"{day},FO,NSE,STO,1,F1,A,2026-09-29,CE,100,"
+             f"{a_open},{a_close},{day},200\n"
+             f"{day},FO,NSE,STO,2,F1,B,2026-09-29,PE,200,"
+             f"{b_open},{b_close},{day},200\n").encode())
 
 
 def test_preceding_session_rank_and_holdout_accounting():

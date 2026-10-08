@@ -36,7 +36,10 @@ def _rows(
     except UnicodeDecodeError as exc:
         raise ValueError("Bhavcopy is not UTF-8 CSV") from exc
     reader = csv.DictReader(StringIO(text))
-    names = set(reader.fieldnames or ())
+    fieldnames = reader.fieldnames or []
+    names = set(fieldnames)
+    if len(fieldnames) != len(names):
+        raise ValueError("Duplicate bhavcopy header field")
     modern = {
         "TckrSymb",
         "XpryDt",
@@ -46,6 +49,14 @@ def _rows(
         "ClsPric",
         "TradDt",
         "TtlTradgVol",
+    }
+    modern_provenance = {
+        "BizDt",
+        "Sgmt",
+        "Src",
+        "FinInstrmTp",
+        "FinInstrmId",
+        "SsnId",
     }
     old = {
         "SYMBOL",
@@ -58,6 +69,10 @@ def _rows(
         "CONTRACTS",
     }
     if modern <= names:
+        if not modern_provenance <= names:
+            raise ValueError(
+                "Modern bhavcopy is missing NSE F&O provenance fields"
+            )
         cols = (
             "TckrSymb",
             "XpryDt",
@@ -68,6 +83,7 @@ def _rows(
             "TradDt",
             "TtlTradgVol",
         )
+        modern_schema = True
     elif old <= names:
         cols = (
             "SYMBOL",
@@ -79,17 +95,36 @@ def _rows(
             "TIMESTAMP",
             "CONTRACTS",
         )
+        modern_schema = False
     else:
         raise ValueError("Unsupported bhavcopy schema")
 
     sym, expiry, kind, strike, opening, closing, dated, volume = cols
     for row in reader:
+        if None in row:
+            raise ValueError("Bhavcopy row has overflow columns")
         option_type = str(row.get(kind, "")).strip().upper()
         if option_type not in {"CE", "PE"}:
             continue
         observed = _date(row[dated])
         if observed != trade_date:
             raise ValueError("Trade date differs from requested date")
+        if modern_schema:
+            business_day = _date(row["BizDt"])
+            if business_day != trade_date:
+                raise ValueError("Business date differs from requested date")
+            if (
+                str(row["Sgmt"]).strip().upper() != "FO"
+                or str(row["Src"]).strip().upper() != "NSE"
+                or str(row["FinInstrmTp"]).strip().upper()
+                not in {"IDO", "STO"}
+                or str(row["SsnId"]).strip().upper() != "F1"
+            ):
+                raise ValueError(
+                    "Row is not an NSE F&O regular-session option"
+                )
+            if not str(row["FinInstrmId"]).strip():
+                raise ValueError("Missing NSE instrument identifier")
         expiry_day = _date(row[expiry])
         if expiry_day < trade_date:
             continue
