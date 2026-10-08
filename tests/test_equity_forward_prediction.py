@@ -867,7 +867,7 @@ def test_directional_reference_rejects_before_exact_horizon():
         ),
         (
             lambda row: row.update(
-                source_exchange_published_at="2026-10-08T10:06:00+00:00"
+                source_first_observed_at="2026-10-08T09:59:00+00:00"
             ),
             "OUTCOME_SOURCE_TIME_ORDER_INVALID",
         ),
@@ -891,6 +891,24 @@ def test_directional_reference_rejects_unbound_or_premature_claims(
         now=datetime(2026, 10, 8, 10, 6, tzinfo=timezone.utc),
     )
     assert result == {"status": "NOT_PROVEN", "reason": reason}
+
+
+def test_directional_reference_rejects_unproven_exchange_publication_time():
+    args, _, projection = build_projection()
+    outcome = directional_outcome()
+    outcome["source_exchange_published_at"] = (
+        "2026-10-08T10:01:00+00:00"
+    )
+    result = reconcile_directional_reference(
+        projection,
+        outcome,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        now=datetime(2026, 10, 8, 10, 6, tzinfo=timezone.utc),
+    )
+    assert result == {
+        "status": "NOT_PROVEN",
+        "reason": "OUTCOME_EXCHANGE_PUBLICATION_TIME_NOT_PROVEN",
+    }
 
 
 def test_directional_reference_rejects_replaced_entry_bytes():
