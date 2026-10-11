@@ -13,13 +13,16 @@ from decimal import Decimal, InvalidOperation
 from hashlib import sha256
 from io import StringIO
 import json
+import os
 from pathlib import Path
 import re
+import stat
 from typing import Any, Mapping
 from urllib.parse import parse_qs, urlsplit
 
 from dashboard.backend.multibagger_ledger import (
     LedgerError,
+    _ledger_lock,
     _retained_snapshot_digest,
     _snapshot_reference,
 )
@@ -45,6 +48,8 @@ INDEX_URL_PREFIX = (
 CM_URL_PREFIX = "https://nsearchives.nseindia.com/content/cm/"
 SOURCE_ROLES = {"outcome_cash", "company", "etf", "actions", "index"}
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_OBSERVATION_URI_RE = re.compile(r"^[A-Za-z0-9._/-]+$")
+_OBSERVATION_URI_PREFIX = "research/forward/equity/"
 _ISIN_RE = re.compile(r"^IN[A-Z0-9]{10}$")
 _SYMBOL_RE = re.compile(r"^[A-Z0-9][A-Z0-9&.-]{0,39}$")
 _RECEIPT_FIELDS = {
@@ -167,6 +172,37 @@ RECORD_FIELDS = {
     "order_placement_allowed",
     "record_hash",
 }
+MATURITY_LEDGER_SCHEMA_VERSION = "equity-maturity-observation-ledger-v1"
+MATURITY_LEDGER_GENESIS_HASH = "0" * 64
+_MATURITY_LEDGER_EVENT_TYPE = "EQUITY_MATURITY_OBSERVATION_RECORDED"
+_MAX_MATURITY_OBSERVATION_BYTES = 2 * 1024 * 1024
+_MATURITY_LEDGER_FIELDS = {
+    "schema_version",
+    "event_type",
+    "prediction_id",
+    "prediction_event_hash",
+    "projection_hash",
+    "observation_record_hash",
+    "observation_file_sha256",
+    "observation_size_bytes",
+    "observation_uri",
+    "recorded_at",
+    "source_cutoff_at",
+    "final_outcome_status",
+    "raw_reference_observations",
+    "matured_adjusted_outcomes",
+    "adjusted_actual_return_pct",
+    "direction_correct",
+    "calibration_error",
+    "previous_hash",
+    "market_validation_claimed",
+    "performance_metrics_available",
+    "performance_gate_passed",
+    "real_money_ready",
+    "live_trading_enabled",
+    "order_placement_allowed",
+    "event_hash",
+}
 
 
 class MaturityObservationError(ValueError):
@@ -222,6 +258,23 @@ def _sha(value: Any, field: str) -> str:
 
 def _rehash_without(record: Mapping[str, Any], field: str) -> str:
     return sha256(_canonical({key: value for key, value in record.items() if key != field})).hexdigest()
+
+
+def _observation_reference(value: Any, field: str) -> str:
+    """Accept only a repository-relative retained equity observation path."""
+    if (
+        not isinstance(value, str)
+        or not value
+        or value != value.strip()
+        or len(value) > 512
+        or not _OBSERVATION_URI_RE.fullmatch(value)
+    ):
+        raise MaturityObservationError(f"{field}_INVALID")
+    if any(segment in {"", ".", ".."} for segment in value.split("/")):
+        raise MaturityObservationError(f"{field}_INVALID")
+    if not value.startswith(_OBSERVATION_URI_PREFIX):
+        raise MaturityObservationError(f"{field}_UNAPPROVED_PREFIX")
+    return value
 
 
 def _verify_receipt(
@@ -975,3 +1028,525 @@ def verify_maturity_evidence(
             raise MaturityObservationError(
                 f"{role.upper()}_RETAINED_HASH_OR_SIZE_MISMATCH"
             )
+
+
+def _canonical_maturity_ledger_event(record: Mapping[str, Any]) -> bytes:
+    return _canonical(
+        {key: value for key, value in record.items() if key != "event_hash"}
+    )
+
+
+def _strict_json_object(raw: bytes, field: str) -> dict[str, Any]:
+    if not isinstance(raw, bytes) or not raw:
+        raise MaturityObservationError(f"{field}_BYTES_REQUIRED")
+
+    def pairs_hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise MaturityObservationError(f"{field}_DUPLICATE_KEY")
+            result[key] = value
+        return result
+
+    try:
+        parsed = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook)
+    except MaturityObservationError:
+        raise
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise MaturityObservationError(f"{field}_INVALID_JSON") from exc
+    if not isinstance(parsed, dict):
+        raise MaturityObservationError(f"{field}_OBJECT_REQUIRED")
+    return parsed
+
+
+def _validate_maturity_ledger_event(
+    event: Mapping[str, Any],
+    *,
+    prefix: str = "",
+    allow_unhashed: bool = False,
+) -> tuple[datetime, datetime]:
+    expected_fields = (
+        _MATURITY_LEDGER_FIELDS - {"event_hash"}
+        if allow_unhashed
+        else _MATURITY_LEDGER_FIELDS
+    )
+    if not isinstance(event, dict) or set(event) != expected_fields:
+        raise MaturityObservationError(f"{prefix}LEDGER_FIELDS_INVALID")
+    if event.get("schema_version") != MATURITY_LEDGER_SCHEMA_VERSION:
+        raise MaturityObservationError(f"{prefix}LEDGER_SCHEMA_INVALID")
+    if event.get("event_type") != _MATURITY_LEDGER_EVENT_TYPE:
+        raise MaturityObservationError(f"{prefix}LEDGER_EVENT_TYPE_INVALID")
+
+    prediction_id = event.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(f"{prefix}PREDICTION_ID_INVALID")
+    for field in (
+        "prediction_event_hash",
+        "projection_hash",
+        "observation_record_hash",
+        "observation_file_sha256",
+        "previous_hash",
+    ):
+        digest = _sha(event.get(field), f"{prefix}{field.upper()}")
+        if event.get(field) != digest:
+            raise MaturityObservationError(f"{prefix}{field.upper()}_INVALID")
+
+    size = event.get("observation_size_bytes")
+    if (
+        isinstance(size, bool)
+        or not isinstance(size, int)
+        or size <= 0
+        or size > _MAX_MATURITY_OBSERVATION_BYTES
+    ):
+        raise MaturityObservationError(
+            f"{prefix}OBSERVATION_SIZE_BYTES_INVALID"
+        )
+    reference = _observation_reference(
+        event.get("observation_uri"),
+        f"{prefix}OBSERVATION_URI",
+    )
+    if event.get("observation_uri") != reference:
+        raise MaturityObservationError(f"{prefix}OBSERVATION_URI_INVALID")
+
+    recorded = _time(event.get("recorded_at"), f"{prefix}RECORDED_AT")
+    cutoff = _time(event.get("source_cutoff_at"), f"{prefix}SOURCE_CUTOFF_AT")
+    if cutoff > recorded:
+        raise MaturityObservationError(f"{prefix}LEDGER_TIME_ORDER_INVALID")
+    if event.get("final_outcome_status") != (
+        "NOT_PROVEN_ADJUSTMENT_REVIEW_PENDING"
+    ):
+        raise MaturityObservationError(
+            f"{prefix}FINAL_OUTCOME_STATUS_INVALID"
+        )
+    if (
+        event.get("raw_reference_observations") != 1
+        or event.get("matured_adjusted_outcomes") != 0
+    ):
+        raise MaturityObservationError(f"{prefix}LEDGER_COUNTS_INVALID")
+    for field in (
+        "adjusted_actual_return_pct",
+        "direction_correct",
+        "calibration_error",
+    ):
+        if event.get(field) is not None:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_PREMATURE"
+            )
+    for field in (
+        "market_validation_claimed",
+        "performance_metrics_available",
+        "performance_gate_passed",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if event.get(field) is not False:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_INVALID"
+            )
+    if not allow_unhashed:
+        expected_hash = sha256(
+            _canonical_maturity_ledger_event(event)
+        ).hexdigest()
+        if event.get("event_hash") != expected_hash:
+            raise MaturityObservationError(f"{prefix}LEDGER_HASH_MISMATCH")
+    return recorded, cutoff
+
+
+def build_maturity_observation_event(
+    observation: dict[str, Any],
+    *,
+    observation_bytes: bytes,
+    observation_uri: str,
+    trusted_prediction_event_hash: str,
+    trusted_projection_hash: str,
+    previous_hash: str,
+) -> dict[str, Any]:
+    """Seal one retained raw observation against independent trusted anchors."""
+    validate_maturity_observation(observation)
+    parsed = _strict_json_object(observation_bytes, "OBSERVATION")
+    if parsed != observation:
+        raise MaturityObservationError("OBSERVATION_BYTES_RECORD_MISMATCH")
+
+    prediction_hash = _sha(
+        trusted_prediction_event_hash,
+        "TRUSTED_PREDICTION_EVENT_HASH",
+    )
+    projection_hash = _sha(
+        trusted_projection_hash,
+        "TRUSTED_PROJECTION_HASH",
+    )
+    if observation["prediction_event_hash"] != prediction_hash:
+        raise MaturityObservationError(
+            "PREDICTION_EVENT_HASH_TRUST_MISMATCH"
+        )
+    if observation["projection_hash"] != projection_hash:
+        raise MaturityObservationError("PROJECTION_HASH_TRUST_MISMATCH")
+
+    retained_uri = _observation_reference(
+        observation_uri,
+        "OBSERVATION_URI",
+    )
+    event = {
+        "schema_version": MATURITY_LEDGER_SCHEMA_VERSION,
+        "event_type": _MATURITY_LEDGER_EVENT_TYPE,
+        "prediction_id": observation["prediction_id"],
+        "prediction_event_hash": prediction_hash,
+        "projection_hash": projection_hash,
+        "observation_record_hash": observation["record_hash"],
+        "observation_file_sha256": sha256(observation_bytes).hexdigest(),
+        "observation_size_bytes": len(observation_bytes),
+        "observation_uri": retained_uri,
+        "recorded_at": observation["recorded_at"],
+        "source_cutoff_at": observation["source_cutoff_at"],
+        "final_outcome_status": observation["final_outcome_status"],
+        "raw_reference_observations": observation["counts"][
+            "raw_reference_observations"
+        ],
+        "matured_adjusted_outcomes": observation["counts"][
+            "matured_adjusted_outcomes"
+        ],
+        "adjusted_actual_return_pct": None,
+        "direction_correct": None,
+        "calibration_error": None,
+        "previous_hash": _sha(previous_hash, "PREVIOUS_HASH"),
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "performance_gate_passed": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    _validate_maturity_ledger_event(event, allow_unhashed=True)
+    event["event_hash"] = sha256(
+        _canonical_maturity_ledger_event(event)
+    ).hexdigest()
+    _validate_maturity_ledger_event(event)
+    return event
+
+
+def verify_maturity_observation_chain(
+    events: list[dict[str, Any]],
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    trusted_projection_hashes: Mapping[str, str],
+) -> dict[str, Any]:
+    """Verify chain order plus independent prediction/projection anchors."""
+    if not isinstance(trusted_prediction_hashes, Mapping):
+        raise MaturityObservationError("TRUSTED_PREDICTION_HASHES_REQUIRED")
+    if not isinstance(trusted_projection_hashes, Mapping):
+        raise MaturityObservationError("TRUSTED_PROJECTION_HASHES_REQUIRED")
+
+    previous = MATURITY_LEDGER_GENESIS_HASH
+    previous_recorded: datetime | None = None
+    seen_record_hashes: set[str] = set()
+    seen_uris: set[str] = set()
+    latest_cutoff: dict[str, datetime] = {}
+    for index, event in enumerate(events):
+        prefix = f"ROW_{index}_"
+        recorded, cutoff = _validate_maturity_ledger_event(
+            event,
+            prefix=prefix,
+        )
+        prediction_id = event["prediction_id"]
+        trusted_prediction = trusted_prediction_hashes.get(prediction_id)
+        trusted_projection = trusted_projection_hashes.get(prediction_id)
+        if trusted_prediction is None:
+            raise MaturityObservationError(
+                f"{prefix}TRUSTED_PREDICTION_HASH_MISSING"
+            )
+        if trusted_projection is None:
+            raise MaturityObservationError(
+                f"{prefix}TRUSTED_PROJECTION_HASH_MISSING"
+            )
+        if event["prediction_event_hash"] != _sha(
+            trusted_prediction,
+            f"{prefix}TRUSTED_PREDICTION_HASH",
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PREDICTION_EVENT_HASH_TRUST_MISMATCH"
+            )
+        if event["projection_hash"] != _sha(
+            trusted_projection,
+            f"{prefix}TRUSTED_PROJECTION_HASH",
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PROJECTION_HASH_TRUST_MISMATCH"
+            )
+        if event["previous_hash"] != previous:
+            raise MaturityObservationError(f"{prefix}LEDGER_CHAIN_BROKEN")
+        if previous_recorded is not None and recorded < previous_recorded:
+            raise MaturityObservationError(
+                f"{prefix}RECORDED_ORDER_INVALID"
+            )
+        if event["observation_record_hash"] in seen_record_hashes:
+            raise MaturityObservationError(
+                f"{prefix}OBSERVATION_RECORD_HASH_DUPLICATE"
+            )
+        if event["observation_uri"] in seen_uris:
+            raise MaturityObservationError(
+                f"{prefix}OBSERVATION_URI_DUPLICATE"
+            )
+        prior_cutoff = latest_cutoff.get(prediction_id)
+        if prior_cutoff is not None and cutoff <= prior_cutoff:
+            raise MaturityObservationError(
+                f"{prefix}SOURCE_CUTOFF_NOT_ADVANCED"
+            )
+        previous = event["event_hash"]
+        previous_recorded = recorded
+        latest_cutoff[prediction_id] = cutoff
+        seen_record_hashes.add(event["observation_record_hash"])
+        seen_uris.add(event["observation_uri"])
+
+    return {
+        "status": "VERIFIED" if events else "EMPTY",
+        "verification_scope": (
+            "HASH_CHAIN_TRUSTED_PREDICTION_PROJECTION_AND_RETAINED_OBSERVATION"
+        ),
+        "record_count": len(events),
+        "head_hash": previous,
+        "matured_adjusted_outcomes": 0,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+
+
+def _read_retained_observation_bytes(
+    evidence_root: Path,
+    observation_uri: str,
+) -> bytes:
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        if not root.is_dir():
+            raise MaturityObservationError("EVIDENCE_ROOT_NOT_DIRECTORY")
+        parts = _observation_reference(
+            observation_uri,
+            "OBSERVATION_URI",
+        ).split("/")
+
+        def checked_path() -> Path:
+            candidate = root
+            for part in parts:
+                candidate = candidate / part
+                info = candidate.lstat()
+                reparse = getattr(info, "st_file_attributes", 0) & getattr(
+                    stat,
+                    "FILE_ATTRIBUTE_REPARSE_POINT",
+                    0,
+                )
+                if stat.S_ISLNK(info.st_mode) or reparse:
+                    raise MaturityObservationError(
+                        "OBSERVATION_RETAINED_LINK_FORBIDDEN"
+                    )
+            candidate.resolve(strict=True).relative_to(root)
+            return candidate
+
+        path = checked_path()
+        before = path.stat()
+        if not stat.S_ISREG(before.st_mode):
+            raise MaturityObservationError(
+                "OBSERVATION_RETAINED_NOT_REGULAR"
+            )
+        flags = (
+            os.O_RDONLY
+            | getattr(os, "O_NOFOLLOW", 0)
+            | getattr(os, "O_NONBLOCK", 0)
+            | getattr(os, "O_BINARY", 0)
+        )
+        descriptor = os.open(path, flags)
+        with os.fdopen(descriptor, "rb") as handle:
+            opened = os.fstat(handle.fileno())
+            if (
+                not stat.S_ISREG(opened.st_mode)
+                or (before.st_dev, before.st_ino)
+                != (opened.st_dev, opened.st_ino)
+            ):
+                raise MaturityObservationError(
+                    "OBSERVATION_RETAINED_CHANGED_DURING_READ"
+                )
+            raw = handle.read(_MAX_MATURITY_OBSERVATION_BYTES + 1)
+            after = os.fstat(handle.fileno())
+            retained = checked_path().stat()
+
+        def identity(info: os.stat_result) -> tuple[int, ...]:
+            return (
+                info.st_dev,
+                info.st_ino,
+                info.st_size,
+                info.st_mtime_ns,
+                info.st_ctime_ns,
+            )
+
+        if (
+            identity(opened) != identity(after)
+            or identity(after) != identity(retained)
+        ):
+            raise MaturityObservationError(
+                "OBSERVATION_RETAINED_CHANGED_DURING_READ"
+            )
+        if len(raw) > _MAX_MATURITY_OBSERVATION_BYTES:
+            raise MaturityObservationError("OBSERVATION_RETAINED_TOO_LARGE")
+        return raw
+    except MaturityObservationError:
+        raise
+    except (LedgerError, OSError, ValueError) as exc:
+        raise MaturityObservationError(
+            "OBSERVATION_RETAINED_UNAVAILABLE"
+        ) from exc
+
+
+def _load_retained_observation(
+    event: Mapping[str, Any],
+    *,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    raw = _read_retained_observation_bytes(
+        evidence_root,
+        event["observation_uri"],
+    )
+    if (
+        len(raw) != event["observation_size_bytes"]
+        or sha256(raw).hexdigest() != event["observation_file_sha256"]
+    ):
+        raise MaturityObservationError(
+            "OBSERVATION_RETAINED_HASH_OR_SIZE_MISMATCH"
+        )
+    observation = _strict_json_object(raw, "OBSERVATION")
+    validate_maturity_observation(observation)
+    if (
+        observation["prediction_id"] != event["prediction_id"]
+        or observation["prediction_event_hash"]
+        != event["prediction_event_hash"]
+        or observation["projection_hash"] != event["projection_hash"]
+        or observation["record_hash"] != event["observation_record_hash"]
+        or observation["recorded_at"] != event["recorded_at"]
+        or observation["source_cutoff_at"] != event["source_cutoff_at"]
+        or observation["final_outcome_status"]
+        != event["final_outcome_status"]
+        or observation["counts"]["raw_reference_observations"]
+        != event["raw_reference_observations"]
+        or observation["counts"]["matured_adjusted_outcomes"]
+        != event["matured_adjusted_outcomes"]
+    ):
+        raise MaturityObservationError(
+            "OBSERVATION_LEDGER_BINDING_MISMATCH"
+        )
+    verify_maturity_evidence(observation, evidence_root=evidence_root)
+    return observation
+
+
+def _read_maturity_observation_ledger_unlocked(
+    path: Path,
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    trusted_projection_hashes: Mapping[str, str],
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    raw = path.read_bytes()
+    if raw and not raw.endswith(b"\n"):
+        raise MaturityObservationError("MATURITY_LEDGER_TRUNCATED")
+    events = [
+        _strict_json_object(line, "MATURITY_LEDGER_ROW")
+        for line in raw.splitlines()
+        if line.strip()
+    ]
+    verify_maturity_observation_chain(
+        events,
+        trusted_prediction_hashes=trusted_prediction_hashes,
+        trusted_projection_hashes=trusted_projection_hashes,
+    )
+    for event in events:
+        _load_retained_observation(event, evidence_root=evidence_root)
+    return events
+
+
+def read_maturity_observation_ledger(
+    path: Path,
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    trusted_projection_hashes: Mapping[str, str],
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    """Read only after chain, external anchors and retained bytes verify."""
+    with _ledger_lock(path, exclusive=False):
+        return _read_maturity_observation_ledger_unlocked(
+            path,
+            trusted_prediction_hashes=trusted_prediction_hashes,
+            trusted_projection_hashes=trusted_projection_hashes,
+            evidence_root=evidence_root,
+        )
+
+
+def append_maturity_observation(
+    path: Path,
+    observation_uri: str,
+    *,
+    trusted_prediction_hashes: Mapping[str, str],
+    trusted_projection_hashes: Mapping[str, str],
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Append one retained maturity observation after full-chain validation."""
+    with _ledger_lock(path, exclusive=True):
+        events = _read_maturity_observation_ledger_unlocked(
+            path,
+            trusted_prediction_hashes=trusted_prediction_hashes,
+            trusted_projection_hashes=trusted_projection_hashes,
+            evidence_root=evidence_root,
+        )
+        raw = _read_retained_observation_bytes(
+            evidence_root,
+            observation_uri,
+        )
+        observation = _strict_json_object(raw, "OBSERVATION")
+        validate_maturity_observation(observation)
+        prediction_id = observation["prediction_id"]
+        trusted_prediction = trusted_prediction_hashes.get(prediction_id)
+        trusted_projection = trusted_projection_hashes.get(prediction_id)
+        if trusted_prediction is None:
+            raise MaturityObservationError(
+                "TRUSTED_PREDICTION_HASH_MISSING"
+            )
+        if trusted_projection is None:
+            raise MaturityObservationError(
+                "TRUSTED_PROJECTION_HASH_MISSING"
+            )
+        previous_hash = (
+            events[-1]["event_hash"]
+            if events
+            else MATURITY_LEDGER_GENESIS_HASH
+        )
+        event = build_maturity_observation_event(
+            observation,
+            observation_bytes=raw,
+            observation_uri=observation_uri,
+            trusted_prediction_event_hash=trusted_prediction,
+            trusted_projection_hash=trusted_projection,
+            previous_hash=previous_hash,
+        )
+        _load_retained_observation(event, evidence_root=evidence_root)
+        verify_maturity_observation_chain(
+            [*events, event],
+            trusted_prediction_hashes=trusted_prediction_hashes,
+            trusted_projection_hashes=trusted_projection_hashes,
+        )
+        payload = json.dumps(
+            event,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        return event

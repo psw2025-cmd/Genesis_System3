@@ -104,6 +104,7 @@ reports/latest/manual_*
 
 # Runtime state files
 state/
+*.ndjson.lock
 chrome_profile/
 chrome_profile*/
 **/chrome_profile*

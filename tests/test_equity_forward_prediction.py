@@ -25,10 +25,16 @@ from scripts.equity_forward_prediction import (
     validate_prediction,
 )
 from scripts.equity_directional_maturity import (
+    MATURITY_LEDGER_GENESIS_HASH,
     MaturityObservationError,
+    _canonical_maturity_ledger_event,
+    append_maturity_observation,
     build_maturity_observation,
+    build_maturity_observation_event,
+    read_maturity_observation_ledger,
     validate_maturity_observation,
     verify_maturity_evidence,
+    verify_maturity_observation_chain,
 )
 from scripts.equity_instrument_scope import EQUITY_URL, ETF_URL
 from scripts.equity_observation_packet import CM_URL
@@ -1291,3 +1297,224 @@ def test_directional_maturity_revalidates_matching_action_event():
         in result["final_outcome_blockers"]
     )
     assert validate_maturity_observation(result)["orders_allowed"] is False
+
+
+def retained_maturity_case(tmp_path):
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    observation = build_maturity_observation(
+        prediction,
+        projection,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        outcome_close="121",
+        source_bytes=sources,
+        source_receipts=receipts,
+        source_snapshot_uris=uris,
+        now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+    )
+    for role, raw in sources.items():
+        path = tmp_path / uris[role]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    observation_uri = (
+        "research/forward/equity/test/"
+        "directional_maturity_observation.json"
+    )
+    observation_bytes = json.dumps(
+        observation,
+        sort_keys=True,
+        indent=2,
+    ).encode("utf-8")
+    observation_path = tmp_path / observation_uri
+    observation_path.parent.mkdir(parents=True, exist_ok=True)
+    observation_path.write_bytes(observation_bytes)
+    trusted_predictions = {
+        observation["prediction_id"]: observation["prediction_event_hash"]
+    }
+    trusted_projections = {
+        observation["prediction_id"]: observation["projection_hash"]
+    }
+    return (
+        observation,
+        observation_bytes,
+        observation_uri,
+        observation_path,
+        trusted_predictions,
+        trusted_projections,
+    )
+
+
+def test_maturity_observation_ledger_is_append_only_and_source_bound(
+    tmp_path,
+):
+    (
+        observation,
+        _,
+        observation_uri,
+        observation_path,
+        trusted_predictions,
+        trusted_projections,
+    ) = retained_maturity_case(tmp_path)
+    ledger = tmp_path / "maturity_observations.ndjson"
+    event = append_maturity_observation(
+        ledger,
+        observation_uri,
+        trusted_prediction_hashes=trusted_predictions,
+        trusted_projection_hashes=trusted_projections,
+        evidence_root=tmp_path,
+    )
+    assert event["observation_record_hash"] == observation["record_hash"]
+    assert event["adjusted_actual_return_pct"] is None
+    assert event["direction_correct"] is None
+    assert event["calibration_error"] is None
+    assert event["matured_adjusted_outcomes"] == 0
+    assert event["order_placement_allowed"] is False
+    assert read_maturity_observation_ledger(
+        ledger,
+        trusted_prediction_hashes=trusted_predictions,
+        trusted_projection_hashes=trusted_projections,
+        evidence_root=tmp_path,
+    ) == [event]
+
+    original = ledger.read_bytes()
+    with pytest.raises(
+        MaturityObservationError,
+        match="OBSERVATION_RECORD_HASH_DUPLICATE",
+    ):
+        append_maturity_observation(
+            ledger,
+            observation_uri,
+            trusted_prediction_hashes=trusted_predictions,
+            trusted_projection_hashes=trusted_projections,
+            evidence_root=tmp_path,
+        )
+    assert ledger.read_bytes() == original
+
+    observation_path.write_bytes(b"{}")
+    with pytest.raises(
+        MaturityObservationError,
+        match="OBSERVATION_RETAINED_HASH_OR_SIZE_MISMATCH",
+    ):
+        read_maturity_observation_ledger(
+            ledger,
+            trusted_prediction_hashes=trusted_predictions,
+            trusted_projection_hashes=trusted_projections,
+            evidence_root=tmp_path,
+        )
+
+
+def test_maturity_ledger_rejects_self_rehashed_anchor_replacement(tmp_path):
+    (
+        observation,
+        _,
+        _,
+        _,
+        trusted_predictions,
+        trusted_projections,
+    ) = retained_maturity_case(tmp_path)
+    replaced = deepcopy(observation)
+    replaced["prediction_event_hash"] = "0" * 64
+    replaced["raw_reference"]["prediction_event_hash"] = "0" * 64
+    replaced["projection_hash"] = "1" * 64
+    replaced["raw_reference"]["projection_hash"] = "1" * 64
+    payload = {
+        key: value
+        for key, value in replaced.items()
+        if key != "record_hash"
+    }
+    replaced["record_hash"] = sha256(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode()
+    ).hexdigest()
+    assert validate_maturity_observation(replaced)["orders_allowed"] is False
+
+    replaced_uri = (
+        "research/forward/equity/test/"
+        "replaced_maturity_observation.json"
+    )
+    replaced_path = tmp_path / replaced_uri
+    replaced_path.write_text(
+        json.dumps(replaced, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PREDICTION_EVENT_HASH_TRUST_MISMATCH",
+    ):
+        append_maturity_observation(
+            tmp_path / "replaced.ndjson",
+            replaced_uri,
+            trusted_prediction_hashes=trusted_predictions,
+            trusted_projection_hashes=trusted_projections,
+            evidence_root=tmp_path,
+        )
+
+
+def test_maturity_ledger_rejects_rehashed_premature_score(tmp_path):
+    (
+        observation,
+        observation_bytes,
+        observation_uri,
+        _,
+        trusted_predictions,
+        trusted_projections,
+    ) = retained_maturity_case(tmp_path)
+    event = build_maturity_observation_event(
+        observation,
+        observation_bytes=observation_bytes,
+        observation_uri=observation_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    event["direction_correct"] = True
+    event["event_hash"] = sha256(
+        _canonical_maturity_ledger_event(event)
+    ).hexdigest()
+    with pytest.raises(
+        MaturityObservationError,
+        match="DIRECTION_CORRECT_PREMATURE",
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            trusted_prediction_hashes=trusted_predictions,
+            trusted_projection_hashes=trusted_projections,
+        )
+
+
+def test_retained_molbio_maturity_observation_ledger_verifies():
+    root = Path(__file__).resolve().parents[1]
+    prediction_id = "EQ7D-2026-10-01-MOLBIO-V1"
+    events = read_maturity_observation_ledger(
+        root
+        / "research/forward/equity/2026-10-01/"
+        "equity_maturity_observation_ledger.ndjson",
+        trusted_prediction_hashes={
+            prediction_id: (
+                "91912ef5ef5264cdff60fd06449f355fc"
+                "d4bfcedc6b743e46c7b6ded7236744f"
+            )
+        },
+        trusted_projection_hashes={
+            prediction_id: (
+                "766b28454446333047b5e8a51ac955cd"
+                "458b639c32c736348a58f619f5fce2ac"
+            )
+        },
+        evidence_root=root,
+    )
+    assert len(events) == 1
+    assert events[0]["observation_record_hash"] == (
+        "d222604fb3df647e1f95373aa642f6d0"
+        "0e21ac6ce2a81d3ecc6a46b28b7f4f9b"
+    )
+    assert events[0]["matured_adjusted_outcomes"] == 0
+    assert events[0]["direction_correct"] is None
+    assert events[0]["order_placement_allowed"] is False
