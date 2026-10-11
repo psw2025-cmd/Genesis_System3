@@ -24,6 +24,12 @@ from scripts.equity_forward_prediction import (
     build_prediction,
     validate_prediction,
 )
+from scripts.equity_directional_maturity import (
+    MaturityObservationError,
+    build_maturity_observation,
+    validate_maturity_observation,
+    verify_maturity_evidence,
+)
 from scripts.equity_instrument_scope import EQUITY_URL, ETF_URL
 from scripts.equity_observation_packet import CM_URL
 
@@ -1007,3 +1013,153 @@ def test_real_molbio_direction_only_prediction_projects_without_magnitude():
         projection,
         evidence_root=root,
     )
+
+
+def maturity_sources(args):
+    outcome_cash, outcome_url = outcome_archive()
+    index = (
+        "Index Name,Index Date,Open Index Value,High Index Value,"
+        "Low Index Value,Closing Index Value\n"
+        "Nifty 50,08-10-2026,22100,22300,22000,22210\n"
+    ).encode()
+    sources = {
+        "outcome_cash": outcome_cash,
+        "company": args["equity_sources"]["company"],
+        "etf": args["equity_sources"]["etf"],
+        "actions": args["equity_sources"]["actions"],
+        "index": index,
+    }
+    urls = {
+        "outcome_cash": outcome_url,
+        "company": EQUITY_URL,
+        "etf": ETF_URL,
+        "actions": args["equity_receipts"]["actions"]["url"],
+        "index": (
+            "https://nsearchives.nseindia.com/content/indices/"
+            "ind_close_all_08102026.csv"
+        ),
+    }
+    receipts = {}
+    for offset, role in enumerate(sorted(sources)):
+        receipts[role] = receipt(
+            sources[role],
+            urls[role],
+            observed=f"2026-10-08T10:{5 + offset:02d}:00Z",
+        )
+        receipts[role]["exchange_published_at"] = None
+    uris = {
+        role: f"research/evidence/test-maturity/{role}.bin"
+        for role in sources
+    }
+    return sources, receipts, uris
+
+
+def test_directional_maturity_binds_sources_without_premature_scoring(tmp_path):
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    result = build_maturity_observation(
+        prediction,
+        projection,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        outcome_close="121",
+        source_bytes=sources,
+        source_receipts=receipts,
+        source_snapshot_uris=uris,
+        now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+    )
+    assert result["identity_review"]["classification"] == (
+        "COMPANY_EQ_IDENTITY_MATCHED"
+    )
+    assert result["corporate_action_review"]["action_count"] == 0
+    assert result["corporate_action_review"][
+        "requested_interval_covered"
+    ] is True
+    assert result["corporate_action_review"][
+        "complete_action_coverage"
+    ] is False
+    assert result["raw_reference"]["raw_actual_return_pct"] == 10.0
+    assert result["raw_reference"]["raw_reference_direction"] == "POSITIVE"
+    assert result["raw_reference"]["direction_correct"] is None
+    assert result["benchmark_raw_reference"]["raw_return_pct"] == (
+        0.497738
+    )
+    assert result["benchmark_raw_reference"][
+        "raw_unadjusted_equity_excess_pp"
+    ] == 9.502262
+    assert result["counts"]["raw_reference_observations"] == 1
+    assert result["counts"]["matured_adjusted_outcomes"] == 0
+    assert "POINT_IN_TIME_MATURITY_IDENTITY_NOT_PROVEN" in result[
+        "final_outcome_blockers"
+    ]
+    assert "COMPLETE_CORPORATE_ACTION_COVERAGE_NOT_PROVEN" in result[
+        "final_outcome_blockers"
+    ]
+    assert validate_maturity_observation(result)["orders_allowed"] is False
+
+    for role, raw in sources.items():
+        path = tmp_path / uris[role]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    verify_maturity_evidence(result, evidence_root=tmp_path)
+    index_path = tmp_path / uris["index"]
+    index_path.write_bytes(index_path.read_bytes() + b"\n")
+    with pytest.raises(
+        MaturityObservationError,
+        match="INDEX_RETAINED_HASH_OR_SIZE_MISMATCH",
+    ):
+        verify_maturity_evidence(result, evidence_root=tmp_path)
+
+
+def test_directional_maturity_rejects_invented_publication_time():
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    receipts["outcome_cash"]["exchange_published_at"] = (
+        "2026-10-08T10:01:00Z"
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="OFFICIAL_SOURCE_RECEIPT_MISMATCH",
+    ):
+        build_maturity_observation(
+            prediction,
+            projection,
+            entry_source_snapshot=args["equity_sources"]["cash"],
+            outcome_close="121",
+            source_bytes=sources,
+            source_receipts=receipts,
+            source_snapshot_uris=uris,
+            now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+        )
+
+
+def test_directional_maturity_record_cannot_claim_adjusted_outcome():
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    result = build_maturity_observation(
+        prediction,
+        projection,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        outcome_close="121",
+        source_bytes=sources,
+        source_receipts=receipts,
+        source_snapshot_uris=uris,
+        now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+    )
+    result["raw_reference"]["direction_correct"] = True
+    payload = {
+        key: value for key, value in result.items() if key != "record_hash"
+    }
+    result["record_hash"] = sha256(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(
+        MaturityObservationError,
+        match="RAW_REFERENCE_SEMANTICS_INVALID",
+    ):
+        validate_maturity_observation(result)
