@@ -6634,12 +6634,8 @@ async def get_charts_index(symbol: str = "NIFTY"):
 
 @app.get("/api/multibagger")
 async def get_multibagger_workspace_endpoint():
-    """Multibagger research workspace endpoint (PEND-013)."""
-    try:
-        from dashboard.backend.multibagger_service import get_multibagger_research_data
-    except ImportError:
-        from multibagger_service import get_multibagger_research_data
-    return get_multibagger_research_data()
+    """Expose the same provenance-gated research contract as /api/research/multibagger."""
+    return await get_multibagger_research()
 
 
 @app.get("/api/multibagger/predictions")
@@ -6656,7 +6652,7 @@ async def get_multibagger_predictions(horizon: str = "all"):
     else:
         predictions = horizons.get(horizon, [])
     return {
-        "status": data.get("status", "READY"),
+        "status": data.get("status", "pending"),
         "horizon": horizon,
         "predictions": predictions,
         "count": len(predictions),
@@ -6667,24 +6663,16 @@ async def get_multibagger_predictions(horizon: str = "all"):
 
 @app.get("/api/multibagger/backtest")
 async def get_multibagger_backtest():
-    """Multibagger backtest evidence (PEND-013)."""
-    try:
-        from dashboard.backend.backtest_service import get_backtest_results, BACKTEST_STRATEGIES
-        results = get_backtest_results()
-        return {
-            "status": results.get("status", "NOT_RUN"),
-            "strategies": BACKTEST_STRATEGIES,
-            "latest": results,
-            "live_trading_enabled": False,
-        }
-    except Exception as e:
-        return {
-            "status": "pending",
-            "error": str(e),
-            "strategies": [],
-            "latest": {},
-            "live_trading_enabled": False,
-        }
+    """Return an honest pending state until an equity-specific, point-in-time audit exists."""
+    return {
+        "status": "pending",
+        "passed": False,
+        "reason": "NO_EQUITY_MULTIBAGGER_WALK_FORWARD_EVIDENCE",
+        "strategies": [],
+        "latest": {},
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
 
 
 @app.get("/api/opportunity-gap")

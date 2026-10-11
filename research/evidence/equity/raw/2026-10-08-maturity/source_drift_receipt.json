@@ -1,0 +1,101 @@
+{
+  "schema_version": "equity-maturity-source-drift-v1",
+  "task_id": "EQ-OUTCOME-027",
+  "session_date": "2026-10-08",
+  "earlier_observation": {
+    "observed_on": "2026-10-08",
+    "sources": {
+      "actions": {
+        "bytes": 3245,
+        "first_observed_at": "2026-10-08T12:29:00+00:00",
+        "raw_bytes_retained": false,
+        "sha256": "cc5e931539dd3b55a39e453c37f28cb5e645489d45eeeaeb6f7df43d5a322edd",
+        "url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=01-10-2026&to_date=08-10-2026"
+      },
+      "company": {
+        "bytes": 183697,
+        "first_observed_at": "2026-10-08T12:28:46+00:00",
+        "raw_bytes_retained": false,
+        "sha256": "2f4a55e0e8dd4cea9a4247afac95cc7522596a1d05d296935374f22da6379df2",
+        "url": "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+      },
+      "etf": {
+        "bytes": 37654,
+        "first_observed_at": "2026-10-08T12:28:55+00:00",
+        "raw_bytes_retained": false,
+        "sha256": "7d945a67c708d61c400bc0db47aceae76c9d04e45bcbe3a0350a986e9c395108",
+        "url": "https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv"
+      },
+      "index": {
+        "bytes": 16537,
+        "first_observed_at": "2026-10-08T12:28:03+00:00",
+        "raw_bytes_retained": false,
+        "sha256": "2fcfc71cc83f3996ae60ffb159d036978ab9c846bc361f62643148db300a8742",
+        "url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_08102026.csv"
+      },
+      "outcome_cash": {
+        "bytes": 208947,
+        "first_observed_at": "2026-10-08T12:27:52+00:00",
+        "raw_bytes_retained": false,
+        "sha256": "07fdfc3409b83fac6ee4a736ceb4fde20069c5d1a490d960b332c178cb703e39",
+        "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261008_F_0000.csv.zip"
+      }
+    }
+  },
+  "later_retrieval": {
+    "observed_on": "2026-10-11",
+    "sources": {
+      "actions": {
+        "bytes": 3245,
+        "first_observed_at": "2026-10-11T04:28:14+00:00",
+        "sha256": "b8c800570bc6ac71b726431c43d5cd0adeaaabf0df8c7464600748549865bc46",
+        "snapshot_uri": "research/evidence/equity/raw/2026-10-08-maturity/corporate_actions_20261001_20261008_observed_20261011.json"
+      },
+      "company": {
+        "bytes": 183825,
+        "first_observed_at": "2026-10-11T04:28:07+00:00",
+        "sha256": "bc10f067810ea7a82c14fda8907c4f72e4ffab4a6b617fcb59a73a938a62ad00",
+        "snapshot_uri": "research/evidence/equity/raw/2026-10-08-maturity/EQUITY_L_observed_20261011.csv"
+      },
+      "etf": {
+        "bytes": 37654,
+        "first_observed_at": "2026-10-11T04:28:11+00:00",
+        "sha256": "7d945a67c708d61c400bc0db47aceae76c9d04e45bcbe3a0350a986e9c395108",
+        "snapshot_uri": "research/evidence/equity/raw/2026-10-08-maturity/eq_etfseclist_observed_20261011.csv"
+      },
+      "index": {
+        "bytes": 17939,
+        "first_observed_at": "2026-10-11T04:28:03+00:00",
+        "sha256": "c3b14c2d31bc95afca4af696dc871430f6349797e0dedfded154aeabf35e3512",
+        "snapshot_uri": "research/evidence/equity/raw/2026-10-08-maturity/index_close_20261008_observed_20261011.csv"
+      },
+      "outcome_cash": {
+        "bytes": 208947,
+        "first_observed_at": "2026-10-11T04:27:55+00:00",
+        "sha256": "07fdfc3409b83fac6ee4a736ceb4fde20069c5d1a490d960b332c178cb703e39",
+        "snapshot_uri": "research/evidence/equity/raw/2026-10-08-maturity/cm_20261008.zip"
+      }
+    }
+  },
+  "comparison": {
+    "byte_identical_roles": [
+      "outcome_cash",
+      "etf"
+    ],
+    "changed_roles": [
+      "index",
+      "company",
+      "actions"
+    ],
+    "earlier_unretained_bytes_used_for_outcome": false,
+    "later_retrieval_is_relabelled_as_earlier_observation": false
+  },
+  "interpretation": "Official endpoints can change after first observation. Only the retained 2026-10-11 bytes and their true first-observed timestamps feed the maturity observation; the 2026-10-08 receipt-only hashes are drift evidence, not substitute source bytes.",
+  "safety": {
+    "adjusted_outcome_proven": false,
+    "market_validation_claimed": false,
+    "real_money_ready": false,
+    "live_trading_enabled": false,
+    "orders_allowed": false
+  }
+}

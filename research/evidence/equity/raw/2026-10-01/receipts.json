@@ -1,0 +1,46 @@
+[
+  {
+    "file": "cm_20260930.zip",
+    "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
+    "request_started_at": "2026-10-01T07:29:34.928679+00:00",
+    "http_status": 200,
+    "final_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
+    "content_type": "application/zip",
+    "first_observed_at": "2026-10-01T07:29:39.787246+00:00",
+    "raw_sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59",
+    "bytes": 206815
+  },
+  {
+    "file": "corporate_actions.json",
+    "url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=30-09-2026&to_date=08-10-2026",
+    "request_started_at": "2026-10-01T07:29:34.929481+00:00",
+    "http_status": 200,
+    "final_url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=30-09-2026&to_date=08-10-2026",
+    "content_type": "application/json; charset=utf-8",
+    "first_observed_at": "2026-10-01T07:29:40.469702+00:00",
+    "raw_sha256": "86414a11360fc20c3217b3249d98b5b86a9a1d9d7486fe030bf3ea2411fa79cb",
+    "bytes": 2667
+  },
+  {
+    "file": "EQUITY_L.csv",
+    "url": "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv",
+    "request_started_at": "2026-10-01T07:29:34.929932+00:00",
+    "http_status": 200,
+    "final_url": "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv",
+    "content_type": "text/csv",
+    "first_observed_at": "2026-10-01T07:29:39.750449+00:00",
+    "raw_sha256": "95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f",
+    "bytes": 183140
+  },
+  {
+    "file": "eq_etfseclist.csv",
+    "url": "https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv",
+    "request_started_at": "2026-10-01T07:29:34.930434+00:00",
+    "http_status": 200,
+    "final_url": "https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv",
+    "content_type": "text/csv",
+    "first_observed_at": "2026-10-01T07:29:39.855584+00:00",
+    "raw_sha256": "35eda34e5ec5b8f0bf3b5de72f8180e25d17de7da3351ea514dcb5c103ce918c",
+    "bytes": 37551
+  }
+]

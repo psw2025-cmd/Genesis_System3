@@ -1,0 +1,77 @@
+{
+  "adjusted_entry_price": null,
+  "adjustment_basis": null,
+  "adjustment_status": "PENDING_MATURITY_RECHECK",
+  "calibrated_probability": null,
+  "due_at": "2026-10-08T10:00:00+00:00",
+  "due_session_date": "2026-10-08",
+  "entry_price_as_of_at": "2026-10-01T10:00:00+00:00",
+  "entry_reference_close": "1513.10",
+  "entry_session_date": "2026-10-01",
+  "entry_snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/cm_20261001.zip",
+  "entry_source": "NSE",
+  "entry_source_hash": "ccc5fb27872716bbcc99d2d87e522ab304f6620e11c3a5045c30e1ff25cbfb73",
+  "entry_source_row_hash": "ad211b6d5704d7abb462030a03651061efeebe0694f77f1a0a9580d4594b8296",
+  "entry_source_size_bytes": 208712,
+  "entry_source_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261001_F_0000.csv.zip",
+  "event_type": "EQUITY_DIRECTIONAL_OUTCOME_PROJECTION",
+  "expected_return_range": null,
+  "forecast_direction": "POSITIVE",
+  "forecast_kind": "DIRECTION_ONLY",
+  "isin": "INE869T01028",
+  "issued_at": "2026-10-01T12:44:51.984966+00:00",
+  "live_trading_enabled": false,
+  "market_validation_claimed": false,
+  "maturity_recheck_required": true,
+  "order_placement_allowed": false,
+  "outcome_status": "PENDING",
+  "performance_gate_passed": false,
+  "performance_metrics_available": false,
+  "predicted_return_pct": null,
+  "prediction_event_hash": "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f",
+  "prediction_id": "EQ7D-2026-10-01-MOLBIO-V1",
+  "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+  "projection_hash": "766b28454446333047b5e8a51ac955cd458b639c32c736348a58f619f5fce2ac",
+  "real_money_ready": false,
+  "reference_prices_are_executable_fills": false,
+  "schema_version": "equity-directional-outcome-projection-v1",
+  "source_bindings": {
+    "actions": {
+      "sha256": "25fb285b1f69606ffc6665c5079f34108f2995a578784e47f829929bde2d17e3",
+      "size_bytes": 3250,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/corporate_actions.json"
+    },
+    "cash": {
+      "sha256": "ccc5fb27872716bbcc99d2d87e522ab304f6620e11c3a5045c30e1ff25cbfb73",
+      "size_bytes": 208712,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/cm_20261001.zip"
+    },
+    "company": {
+      "sha256": "95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f",
+      "size_bytes": 183140,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/EQUITY_L.csv"
+    },
+    "etf": {
+      "sha256": "35eda34e5ec5b8f0bf3b5de72f8180e25d17de7da3351ea514dcb5c103ce918c",
+      "size_bytes": 37551,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/eq_etfseclist.csv"
+    },
+    "holiday_calendar": {
+      "sha256": "933cf5dc6dd4efe3b8db8ce6ecd6ecb2582929f5e0b4faffdb88e11cf4efdfbe",
+      "size_bytes": 34022,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/trading_holidays.json"
+    },
+    "index": {
+      "sha256": "b39ea533d496f2764d135dbf0492512287f780d8cc9258117a5f57355abb3aaa",
+      "size_bytes": 16359,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/index_close_20261001.csv"
+    },
+    "model_spec": {
+      "sha256": "f7d40fcaca5afc320ad8f715c66111ebb1674f202962243bb6a6cf1758b0c0ba",
+      "size_bytes": 3924,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/equity_forward_rank_v1.json"
+    }
+  },
+  "source_cutoff_at": "2026-10-01T12:39:01.892139+00:00",
+  "symbol": "MOLBIO"
+}
