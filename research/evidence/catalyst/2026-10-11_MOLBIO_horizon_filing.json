@@ -1,0 +1,91 @@
+{
+  "schema_version": "catalyst-horizon-filing-v1",
+  "task_id": "CAT-LINK-013",
+  "lane": "NEWS_CATALYST",
+  "symbol": "MOLBIO",
+  "isin": "INE869T01028",
+  "prediction": {
+    "prediction_id": "EQ7D-2026-10-01-MOLBIO-V1",
+    "prediction_event_hash": "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f",
+    "issued_at": "2026-10-01T12:44:51.984966+00:00",
+    "catalyst_feature_included": false
+  },
+  "feed_source": {
+    "url": "https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=01-10-2026&to_date=08-10-2026",
+    "request_started_at": "2026-10-11T04:40:11+00:00",
+    "first_observed_at": "2026-10-11T04:40:17+00:00",
+    "http_status": 200,
+    "content_type": "application/json",
+    "exchange_published_at": null,
+    "raw_bytes": 2557324,
+    "raw_sha256": "b4c23b05ed4f78cc7986af9339d70fc0dd34f0f35d1edfa04e36ca8f1a107431",
+    "gzip_path": "research/evidence/catalyst/raw/2026-10-08/announcements_20261001_20261008_observed_20261011.json.gz",
+    "gzip_bytes": 374264,
+    "gzip_sha256": "423254fb8ad56a35746499f41fd27b56b8314ae7a28a3989d1f406b4020b5669",
+    "captured_rows": 3535,
+    "exact_symbol_or_isin_matches": 1
+  },
+  "filing": {
+    "sequence_id": "106811007",
+    "source_row_sha256": "87205fb26c1b662c9d38b811b1c6c5d90903480db324f4774e9039ba0cc330ec",
+    "category": "Certificate under SEBI (Depositories and Participants) Regulations, 2018",
+    "description": "Molbio Diagnostics Limited has informed the Exchange about Certificate under SEBI (Depositories and Participants) Regulations, 2018 for the quarter ended September 30,2026.",
+    "attachment_url": "https://nsearchives.nseindia.com/corporate/MOLBIO_08102026131105_Certificate_under_74_5_.pdf",
+    "published_at_raw": "08-Oct-2026 13:11:21",
+    "published_at": "2026-10-08T13:11:21+05:30",
+    "disseminated_at_raw": "08-Oct-2026 13:11:22",
+    "disseminated_at": "2026-10-08T13:11:22+05:30",
+    "timestamp_basis": "NSE_API_DISPLAY_ASSUMED_ASIA_KOLKATA",
+    "timezone_independently_proven": false,
+    "known_by_prediction_issue_time": false,
+    "point_in_time_system_observation_before_outcome_close": false
+  },
+  "attachment": {
+    "url": "https://nsearchives.nseindia.com/corporate/MOLBIO_08102026131105_Certificate_under_74_5_.pdf",
+    "first_observed_at": "2026-10-11T04:40:47+00:00",
+    "http_status": 200,
+    "content_type": "application/pdf",
+    "path": "research/evidence/catalyst/raw/2026-10-08/MOLBIO_08102026131105_Certificate_under_74_5_.pdf",
+    "bytes": 542401,
+    "sha256": "43ab8443a894628a6e5f587b74e282d21c8fedd48484935423839dd06779e31d"
+  },
+  "feature_eligibility": {
+    "feature_id": "exact_issuer_catalyst_match",
+    "version": "catalyst-link-v1",
+    "known_by_prediction_issue_time": false,
+    "feature_eligible": false,
+    "source_backfilled_into_prediction": false,
+    "promotion_status": "POST_ISSUE_EVIDENCE_NOT_A_PREDICTION_FEATURE"
+  },
+  "later_horizon_reference": {
+    "horizon_session_date": "2026-10-08",
+    "raw_unadjusted_equity_return_pct": -2.240434,
+    "raw_unadjusted_nifty_50_return_pct": -0.848053,
+    "raw_unadjusted_equity_excess_pp": -1.392381,
+    "adjusted_outcome_proven": false,
+    "performance_metric_status": "NOT_PROVEN_RAW_REFERENCE_ONLY",
+    "equity_maturity_record_hash": "d222604fb3df647e1f95373aa642f6d00e21ac6ce2a81d3ecc6a46b28b7f4f9b",
+    "equity_commit": "d7f1c184d4a459891d393571386a1db62cf26eff"
+  },
+  "ablation": {
+    "no_catalyst_baseline": true,
+    "catalyst_eligible_at_issue": false,
+    "valid_ablation_sample_size": 0,
+    "catalyst_contribution": "NOT_PROVEN",
+    "causal_attribution": "CORRELATION_ONLY_NOT_CAUSAL"
+  },
+  "counts": {
+    "captured_feed_rows": 3535,
+    "exact_horizon_filings": 1,
+    "eligible_catalyst_features_at_issue": 0,
+    "linked_predictions": 1,
+    "matured_adjusted_outcomes": 0
+  },
+  "safety": {
+    "market_validation_claimed": false,
+    "real_money_ready": false,
+    "live_trading_enabled": false,
+    "orders_allowed": false
+  },
+  "record_hash": "c4e3f433c50b9ab710ad97efb586e47f42ffed882dd4aefa0c4ad0d45104b1b5"
+}
