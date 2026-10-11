@@ -1,0 +1,136 @@
+{
+  "schema_version": "cepe-next-open-historical-distribution-v1",
+  "task_id": "CEPE-OUTCOME-027",
+  "lane": "CEPE_NEXT_OPEN",
+  "measured_at": "2026-10-11T04:33:00+00:00",
+  "source_availability": {
+    "october_8_archive_first_successfully_observed_at": "2026-10-11T04:27:59+00:00",
+    "exchange_published_at": null,
+    "october_8_attempt_status": "HTTP_404_OBSERVED_ON_2026-10-08",
+    "october_8_404_response_bytes": 3425,
+    "october_8_404_response_sha256": "41fd81290608a684e8c2e9912890d5e77734a2f4f631ab9e4298274e485fa4e1",
+    "october_8_404_raw_bytes_retained": false,
+    "availability_interpretation": "OUTCOME_SOURCE_FIRST_PROVEN_AVAILABLE_AFTER_TARGET_SESSION_NO_BACKFILL_INTO_PRIOR_DECISION"
+  },
+  "inputs": {
+    "previous_session": {
+      "date": "2026-10-07",
+      "url": "https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261007_F_0000.csv.zip",
+      "first_observed_at": "2026-10-07T20:05:52.576907+05:30",
+      "zip_path": "research/evidence/cepe/raw/fo_20261007.zip",
+      "zip_bytes": 1086658,
+      "zip_sha256": "676932c7a62c953cd1a82c277a4bb040ace5cd593c661dac4b9030a49c1801df",
+      "csv_bytes": 6378435,
+      "csv_sha256": "54774919d0962f213ed6ac3b482c9e4321af3815a421544ed162e26a96d1e2dd"
+    },
+    "following_session": {
+      "date": "2026-10-08",
+      "url": "https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20261008_F_0000.csv.zip",
+      "first_observed_at": "2026-10-11T04:27:59+00:00",
+      "zip_path": "research/evidence/cepe/raw/fo_20261008.zip",
+      "zip_bytes": 1120018,
+      "zip_sha256": "7223a223f12a5789a33e3018eeeb9f8dc7b5122129902eed23b329241b6bad7d",
+      "csv_bytes": 6507537,
+      "csv_sha256": "dc3b9a245085b6453dda6f26f5e6027ac71aee11ecbe249e02606197fc3b0cf0"
+    }
+  },
+  "horizon": {
+    "instrument": "NSE_FO_OPTION_EXACT_SYMBOL_EXPIRY_STRIKE_SIDE_AND_INSTRUMENT_ID",
+    "entry_reference": "2026-10-07_OFFICIAL_CLOSE_NOT_EXECUTABLE_FILL",
+    "outcome_reference": "2026-10-08_OFFICIAL_OPEN_NOT_EXECUTABLE_FILL",
+    "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+    "opening_time_basis": "REGULAR_SESSION_ASSUMPTION",
+    "distribution_scope": "FULL_MATCHED_CONTRACT_SET_UNCAPPED"
+  },
+  "filters": {
+    "minimum_previous_close": 1.0,
+    "minimum_volume_each_day": 100.0,
+    "fees_slippage_applied": false
+  },
+  "historical_distribution": {
+    "matched_contract_outcomes": 4613,
+    "instrument_id_proven_matches": 4613,
+    "excluded_illiquid_contracts": 29940,
+    "ce_outcomes": 2534,
+    "pe_outcomes": 2079,
+    "gross_multiple": {
+      "minimum": 0.386792,
+      "p10": 0.845997,
+      "p25": 0.925926,
+      "median": 1.0,
+      "mean": 1.001859,
+      "p75": 1.06646,
+      "p90": 1.15,
+      "p95": 1.215871,
+      "p99": 1.380358,
+      "maximum": 3.657143
+    },
+    "multiple_counts": {
+      "greater_than_1x": 2128,
+      "equal_or_greater_than_1x": 2420,
+      "less_than_1x": 2193,
+      "equal_or_greater_than_3x": 2,
+      "equal_or_greater_than_10x": 0,
+      "equal_or_greater_than_20x": 0,
+      "equal_or_greater_than_30x": 0
+    },
+    "top_observed_moves": [
+      {
+        "symbol": "PAYTM",
+        "expiry": "2026-10-27",
+        "strike": "1560.0000",
+        "side": "PE",
+        "instrument_id": "100707",
+        "previous_close": 8.75,
+        "next_open": 32.0,
+        "gross_reference_multiple": 3.657143
+      },
+      {
+        "symbol": "PAYTM",
+        "expiry": "2026-10-27",
+        "strike": "1540.0000",
+        "side": "PE",
+        "instrument_id": "122469",
+        "previous_close": 7.1,
+        "next_open": 23.2,
+        "gross_reference_multiple": 3.267606
+      }
+    ]
+  },
+  "forward_state": {
+    "qualified_candidates_at_send": 0,
+    "issued_contract_forecasts": 0,
+    "matured_issued_forecast_outcomes": 0,
+    "positive_forecasts": 0,
+    "negative_forecasts": 0,
+    "prediction_accuracy_proven": false,
+    "historical_distribution_promoted_to_forecast": false
+  },
+  "gate_status": {
+    "minimum_oos_trades": 100,
+    "minimum_oos_days": 60,
+    "valid_forward_trades": 0,
+    "valid_forward_days": 0,
+    "trade_gap": 100,
+    "day_gap": 60,
+    "minimum_directional_accuracy": 0.65,
+    "directional_accuracy": null,
+    "minimum_top_decile_precision": 0.7,
+    "top_decile_precision": null,
+    "minimum_sharpe": 2.5,
+    "sharpe": null,
+    "maximum_drawdown": 0.1,
+    "max_drawdown": null,
+    "minimum_deflated_sharpe_probability": 0.95,
+    "deflated_sharpe_probability": null,
+    "strategy_promoted": false
+  },
+  "safety": {
+    "historical_moves_only": true,
+    "opening_price_is_executable_fill": false,
+    "cost_adjusted": false,
+    "real_money_ready": false,
+    "live_trading_enabled": false,
+    "orders_allowed": false
+  }
+}

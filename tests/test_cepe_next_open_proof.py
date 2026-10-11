@@ -1,9 +1,21 @@
 from datetime import date
 from hashlib import sha256
+from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 
 from scripts.cepe_next_open_proof import compare
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _only_member(path: Path) -> bytes:
+    with ZipFile(path) as archive:
+        names = archive.namelist()
+        assert len(names) == 1
+        return archive.read(names[0])
 
 
 PREVIOUS = (
@@ -186,3 +198,65 @@ def test_mixed_modern_and_legacy_identity_fails_closed():
             date(2026, 9, 22),
             date(2026, 9, 23),
         )
+
+
+def test_october_7_to_8_official_full_distribution_replays_exactly():
+    previous_path = (
+        REPO_ROOT / "research/evidence/cepe/raw/fo_20261007.zip"
+    )
+    following_path = (
+        REPO_ROOT / "research/evidence/cepe/raw/fo_20261008.zip"
+    )
+    previous_zip = previous_path.read_bytes()
+    following_zip = following_path.read_bytes()
+    assert sha256(previous_zip).hexdigest() == (
+        "676932c7a62c953cd1a82c277a4bb040ace5cd593c661dac4b9030a49c1801df"
+    )
+    assert sha256(following_zip).hexdigest() == (
+        "7223a223f12a5789a33e3018eeeb9f8dc7b5122129902eed23b329241b6bad7d"
+    )
+
+    result = compare(
+        _only_member(previous_path),
+        _only_member(following_path),
+        date(2026, 10, 7),
+        date(2026, 10, 8),
+    )
+    assert result["previous_sha256"] == (
+        "54774919d0962f213ed6ac3b482c9e4321af3815a421544ed162e26a96d1e2dd"
+    )
+    assert result["following_sha256"] == (
+        "dc3b9a245085b6453dda6f26f5e6027ac71aee11ecbe249e02606197fc3b0cf0"
+    )
+    assert result["matched_contracts"] == 4613
+    assert result["instrument_id_proven_matches"] == 4613
+    assert result["excluded_illiquid_contracts"] == 29940
+    assert result["highest_multiple"] == 3.657143
+    assert result["example_threshold_counts"] == {
+        "3": 2,
+        "10": 0,
+        "20": 0,
+        "30": 0,
+    }
+    assert result["top_moves"][0] == {
+        "symbol": "PAYTM",
+        "expiry": "2026-10-27",
+        "strike": "1560.0000",
+        "type": "PE",
+        "instrument_id": "100707",
+        "instrument_id_match_proven": True,
+        "previous_close": 8.75,
+        "next_open": 32.0,
+        "observed_open": 32.0,
+        "multiple": 3.657143,
+        "gross_reference_multiple": 3.657143,
+        "opening_fill_proven": False,
+        "cost_adjusted": False,
+    }
+    assert result["distribution_scope"] == (
+        "FULL_MATCHED_CONTRACT_SET_UNCAPPED"
+    )
+    assert result["fees_slippage_status"] == "NOT_APPLIED"
+    assert result["opening_fill_proven"] is False
+    assert result["prediction_accuracy_proven"] is False
+    assert result["orders_allowed"] is False
