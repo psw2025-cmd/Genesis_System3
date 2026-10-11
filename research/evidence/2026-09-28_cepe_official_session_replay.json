@@ -1,0 +1,81 @@
+{
+  "schema_version": "cepe-official-session-replay-v1",
+  "task_id": "CEPE-CALENDAR-006",
+  "evidence_as_of": "2026-09-28T02:22:17+05:30",
+  "prior_state": {
+    "development_pairs": 236,
+    "validation_pairs": 43,
+    "reason": "Only adjacent calendar dates were evaluated; valid Friday-to-Monday, exchange-holiday and declared special-session transitions were excluded."
+  },
+  "change": {
+    "description": "Bind every pair to the official NSE F&O session calendar, complete acquisition manifests and exact raw circular PDF SHA-256 values; pass the pair calendar through the inner outcome scorer.",
+    "calendar_evidence": "research/evidence/2026-09-27_nse_fo_session_calendar.json",
+    "calendar_evidence_sha256": "e62d3840b389cecf7b9b0af38b260763f465ffe2c406be9a27727c5a7fc88717",
+    "raw_calendar_sources": 7,
+    "raw_calendar_source_hashes_complete": true,
+    "archived_fo_sessions": 434,
+    "orders_allowed": false
+  },
+  "development": {
+    "period": ["2024-09-26", "2025-12-31"],
+    "sessions": 314,
+    "session_pairs": 313,
+    "excluded_errors": 0,
+    "historical_selections": 48871,
+    "scoreable_historical_outcomes": 48787,
+    "unscoreable": 84,
+    "positive_returns": 27581,
+    "negative_returns": 18930,
+    "unchanged_returns": 2276,
+    "selected_threshold_counts": {"3x": 100, "10x": 2, "20x": 0, "30x": 0},
+    "full_eligible_population": 489433,
+    "full_eligible_threshold_counts": {"3x": 796, "10x": 56, "20x": 22, "30x": 8},
+    "gross_reference_mean_return_pct": 3.5799668989689875,
+    "directional_hit_pct": 56.53350277737922,
+    "three_x_precision_pct": 0.20497263615307354,
+    "same_universe_momentum_mean_return_pct": 4.084580179109372,
+    "paired_mean_excess_vs_comparator_pct": -0.48898498387260275,
+    "paired_day_bootstrap_95pct_interval": [-1.0618178182288305, 0.023670129106375313],
+    "output_sha256": "9398a0ecca939ad2274689134c296a60888f82b95423bd87583f319467fbf0c3"
+  },
+  "validation": {
+    "period": ["2026-01-01", "2026-03-31"],
+    "sessions": 60,
+    "session_pairs": 59,
+    "excluded_errors": 0,
+    "historical_selections": 10360,
+    "scoreable_historical_outcomes": 10357,
+    "unscoreable": 3,
+    "positive_returns": 5556,
+    "negative_returns": 4383,
+    "unchanged_returns": 418,
+    "selected_threshold_counts": {"3x": 46, "10x": 0, "20x": 0, "30x": 0},
+    "full_eligible_population": 103778,
+    "full_eligible_threshold_counts": {"3x": 387, "10x": 44, "20x": 22, "30x": 9},
+    "gross_reference_mean_return_pct": 5.3358004344887515,
+    "directional_hit_pct": 53.64487786038428,
+    "three_x_precision_pct": 0.44414405715940913,
+    "same_universe_momentum_mean_return_pct": 6.086915136596197,
+    "paired_mean_excess_vs_comparator_pct": -0.950151198438529,
+    "paired_day_bootstrap_95pct_interval": [-3.8156595807165687, 1.3964885579117232],
+    "gap_to_65pct_directional_gate_pp": 11.355122139615723,
+    "gap_to_70pct_three_x_precision_gate_pp": 69.5558559428406,
+    "output_sha256": "c5336a50c637f9988388dd16f27fd3e85d9748577162bcb5f435f8308e1440cc"
+  },
+  "decision": {
+    "candidate_status": "REJECTED_ON_CHRONOLOGICAL_VALIDATION",
+    "reason": "Positive gross reference returns did not beat the same-universe comparator and project accuracy/precision gates were missed.",
+    "frozen_retrospective_test": "UNTOUCHED_NOT_SCORED_AFTER_VALIDATION_REJECTION",
+    "historical_source_availability_at_issue": "NOT_PROVEN",
+    "opening_price_is_executable_fill": false,
+    "actual_cost_net_performance": "NOT_PROVEN",
+    "forward_predictions": 0,
+    "forward_outcomes": 0,
+    "real_money_readiness": "NOT_PROVEN",
+    "orders_allowed": false
+  },
+  "test_evidence": {
+    "focused_tests": "11 passed",
+    "fixture_arithmetic_is_market_validation": false
+  }
+}

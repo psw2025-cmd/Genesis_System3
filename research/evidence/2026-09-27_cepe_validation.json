@@ -1,0 +1,3946 @@
+{
+  "task_id": "CEPE-NEXT-005",
+  "phase": "validation",
+  "start": "2026-01-01",
+  "end": "2026-03-31",
+  "generated_at": "2026-09-26T23:43:34.544444+00:00",
+  "registration_commit": "1cf0f9d731e3d3bebaa2f496484c0cb56646732f",
+  "strategy_implementation_commit": "85e1c444c6c247aa468f009e83a61dc97929b287",
+  "evaluated_session_pairs": 43,
+  "skipped_calendar_gaps": [
+    {
+      "previous_day": "2026-01-02",
+      "following_day": "2026-01-05",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-01-09",
+      "following_day": "2026-01-12",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-01-14",
+      "following_day": "2026-01-16",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-01-16",
+      "following_day": "2026-01-19",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-01-23",
+      "following_day": "2026-01-27",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-01-30",
+      "following_day": "2026-02-01",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-02-06",
+      "following_day": "2026-02-09",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-02-13",
+      "following_day": "2026-02-16",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-02-20",
+      "following_day": "2026-02-23",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-02-27",
+      "following_day": "2026-03-02",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-02",
+      "following_day": "2026-03-04",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-06",
+      "following_day": "2026-03-09",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-13",
+      "following_day": "2026-03-16",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-20",
+      "following_day": "2026-03-23",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-25",
+      "following_day": "2026-03-27",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    },
+    {
+      "previous_day": "2026-03-27",
+      "following_day": "2026-03-30",
+      "status": "NOT_PROVEN_NO_COMPLETE_SESSION_CALENDAR"
+    }
+  ],
+  "excluded_errors": [],
+  "summary": {
+    "variant": {
+      "selected": 7517,
+      "scoreable": 7515,
+      "unscoreable": 2,
+      "hits": 40,
+      "false_picks": 7475,
+      "missed_events": 280,
+      "positive_returns": 3861,
+      "negative_returns": 3350,
+      "unchanged_returns": 304,
+      "distribution": {
+        "count": 7515,
+        "mean": 1.0342196537591484,
+        "quantiles": {
+          "0": 0.064815,
+          "0.01": 0.5148819,
+          "0.05": 0.6847357000000001,
+          "0.25": 0.917454,
+          "0.5": 1.001863,
+          "0.75": 1.0805615,
+          "0.95": 1.4184852999999993,
+          "0.99": 2.3091639999999996,
+          "1": 8.004574
+        },
+        "thresholds": {
+          "3": 40,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "2a78336c2d36d698e9e2ae35e3fb4ee294b5e1ae89b5ed8ef673870b34fd00da"
+      },
+      "gross_reference_mean_return_pct": 3.421965375914837,
+      "assumed_cost_stress_mean_return_pct": {
+        "0": 3.421965375914837,
+        "25": 3.171965375914837,
+        "50": 2.921965375914837,
+        "100": 2.421965375914837
+      },
+      "raw_reference_directional_hit_pct": 51.37724550898204,
+      "raw_3x_event_precision_pct": 0.5322687957418496,
+      "reference_gap_to_65pct_directional_gate": 13.622754491017957,
+      "reference_gap_to_70pct_3x_precision_gate": 69.46773120425814
+    },
+    "same_universe_momentum": {
+      "selected": 7517,
+      "scoreable": 7516,
+      "unscoreable": 1,
+      "hits": 51,
+      "false_picks": 7465,
+      "missed_events": 269,
+      "positive_returns": 3920,
+      "negative_returns": 3263,
+      "unchanged_returns": 333,
+      "distribution": {
+        "count": 7516,
+        "mean": 1.0384696274614156,
+        "quantiles": {
+          "0": 0.059954,
+          "0.01": 0.41810845,
+          "0.05": 0.6097015,
+          "0.25": 0.90395275,
+          "0.5": 1.0050795,
+          "0.75": 1.0998195,
+          "0.95": 1.45873975,
+          "0.99": 2.499934550000007,
+          "1": 11.597938
+        },
+        "thresholds": {
+          "3": 51,
+          "10": 2,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "8faed48af8bcbe7a44398acc32a4f9fbaf377287a16b30542cde5b78f6204ca7"
+      },
+      "gross_reference_mean_return_pct": 3.8469627461415645,
+      "assumed_cost_stress_mean_return_pct": {
+        "0": 3.8469627461415645,
+        "25": 3.5969627461415645,
+        "50": 3.3469627461415645,
+        "100": 2.8469627461415645
+      },
+      "raw_reference_directional_hit_pct": 52.155401809473126,
+      "raw_3x_event_precision_pct": 0.6785524215007983,
+      "reference_gap_to_65pct_directional_gate": 12.844598190526874,
+      "reference_gap_to_70pct_3x_precision_gate": 69.3214475784992
+    }
+  },
+  "uncertainty": {
+    "paired_session_mean_excess_pct": -0.4358654814032064,
+    "paired_day_bootstrap_95pct_interval": [
+      -2.1507647631545033,
+      1.1933386312380092
+    ],
+    "positive_excess_days": 19,
+    "negative_excess_days": 24,
+    "bootstrap_seed": 20260926,
+    "resamples": 10000,
+    "limitations": "Day bootstrap does not correct serial dependence or selection across earlier experiments. Contract observations are not independent."
+  },
+  "population_distribution": {
+    "count": 75303,
+    "mean": 1.0252841758628475,
+    "quantiles": {
+      "0": 0.00464,
+      "0.01": 0.37024848,
+      "0.05": 0.6371233,
+      "0.25": 0.8980775,
+      "0.5": 1.0,
+      "0.75": 1.078336,
+      "0.95": 1.365188,
+      "0.99": 2.10896196,
+      "1": 105.840708
+    },
+    "thresholds": {
+      "3": 320,
+      "10": 44,
+      "20": 22,
+      "30": 9
+    },
+    "full_uncapped_distribution_sha256": "2b7f058b19d54d7d00d45a71f0bb165d3b70ca3fb0c8701cf0c5f0b8762a25c0"
+  },
+  "daily": [
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-01",
+      "following_day": "2026-01-02",
+      "previous_sha256": "f36d330cc39701461714b08cfa4e35318f92217f95dede3d8599ce90fec59727",
+      "following_sha256": "9c8d19a62a55032925c3428185f8a2a7990e3fb2d02d30ad7d681412cb5f2b29",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1072,
+      "matched_eligible_contracts": 1060,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 24748,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 8788
+      },
+      "variant": {
+        "selected": 107,
+        "scoreable": 105,
+        "unscoreable": 2,
+        "hits": 0,
+        "false_picks": 105,
+        "missed_events": 0,
+        "positive_returns": 87,
+        "negative_returns": 17,
+        "unchanged_returns": 1,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 10.785193333333334,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 10.785193333333334,
+          "25": 10.535193333333334,
+          "50": 10.285193333333334,
+          "100": 9.785193333333334
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 107,
+        "scoreable": 107,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 107,
+        "missed_events": 0,
+        "positive_returns": 77,
+        "negative_returns": 28,
+        "unchanged_returns": 2,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 8.105502803738318,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 8.105502803738318,
+          "25": 7.855502803738318,
+          "50": 7.605502803738318,
+          "100": 7.105502803738318
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1060,
+        "mean": 1.0106511849056603,
+        "quantiles": {
+          "0": 0.600439,
+          "0.01": 0.77134574,
+          "0.05": 0.8681162,
+          "0.25": 0.96259275,
+          "0.5": 1.0039055000000001,
+          "0.75": 1.049368,
+          "0.95": 1.163954,
+          "0.99": 1.4086340000000004,
+          "1": 1.794964
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "19cad605a20dada5282af5cd90d5762f1efe3e78a28e48bf777042f490104575"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-05",
+      "following_day": "2026-01-06",
+      "previous_sha256": "24e0be972ae344287d08335b49ed5ab2e245e2da5c07ca8cbee5edb2216a03aa",
+      "following_sha256": "76d912a70e0df599c4842b8cfd11ecd80e53ebf89c1df7dde8509d0f00b7aaa0",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1646,
+      "matched_eligible_contracts": 1646,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 25120,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10147
+      },
+      "variant": {
+        "selected": 164,
+        "scoreable": 164,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 164,
+        "missed_events": 1,
+        "positive_returns": 108,
+        "negative_returns": 45,
+        "unchanged_returns": 11,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 6.282094512195122,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 6.282094512195122,
+          "25": 6.032094512195122,
+          "50": 5.782094512195122,
+          "100": 5.282094512195122
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 164,
+        "scoreable": 164,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 164,
+        "missed_events": 1,
+        "positive_returns": 107,
+        "negative_returns": 42,
+        "unchanged_returns": 15,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 6.5171579268292685,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 6.5171579268292685,
+          "25": 6.2671579268292685,
+          "50": 6.0171579268292685,
+          "100": 5.5171579268292685
+        }
+      },
+      "threshold_counts": {
+        "3": 1,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1646,
+        "mean": 1.0073129447144593,
+        "quantiles": {
+          "0": 0.182093,
+          "0.01": 0.6414165000000001,
+          "0.05": 0.82210925,
+          "0.25": 0.9568180000000001,
+          "0.5": 1.0,
+          "0.75": 1.05012875,
+          "0.95": 1.18387575,
+          "0.99": 1.4768552499999998,
+          "1": 3.264407
+        },
+        "thresholds": {
+          "3": 1,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "54c8ee48039019712c077cd41a7fb8b185d2ce237b413ace2997ca4b707212b4"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-06",
+      "following_day": "2026-01-07",
+      "previous_sha256": "76d912a70e0df599c4842b8cfd11ecd80e53ebf89c1df7dde8509d0f00b7aaa0",
+      "following_sha256": "05173779794437553ce09bef9b36da4c134fa232cfbdacdae7acd77501f0d615",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1600,
+      "matched_eligible_contracts": 1600,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 25894,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10057,
+        "EXPIRED_BEFORE_OUTCOME": 166
+      },
+      "variant": {
+        "selected": 160,
+        "scoreable": 160,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 160,
+        "missed_events": 1,
+        "positive_returns": 84,
+        "negative_returns": 64,
+        "unchanged_returns": 12,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.9511237499999998,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.9511237499999998,
+          "25": 1.7011237499999998,
+          "50": 1.4511237499999998,
+          "100": 0.9511237499999999
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 160,
+        "scoreable": 160,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 160,
+        "missed_events": 1,
+        "positive_returns": 91,
+        "negative_returns": 52,
+        "unchanged_returns": 17,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 3.7807643749999995,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 3.7807643749999995,
+          "25": 3.5307643749999995,
+          "50": 3.2807643749999995,
+          "100": 2.7807643749999995
+        }
+      },
+      "threshold_counts": {
+        "3": 1,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1600,
+        "mean": 1.0108790975,
+        "quantiles": {
+          "0": 0.51735,
+          "0.01": 0.73166693,
+          "0.05": 0.83979175,
+          "0.25": 0.94402125,
+          "0.5": 1.000959,
+          "0.75": 1.0628905,
+          "0.95": 1.1881536,
+          "0.99": 1.42633231,
+          "1": 3.150327
+        },
+        "thresholds": {
+          "3": 1,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "04c1b927071120dfdb901b9662c275107aab81cc0d3dc0e4d4bbb9f30e3b9cfd"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-07",
+      "following_day": "2026-01-08",
+      "previous_sha256": "05173779794437553ce09bef9b36da4c134fa232cfbdacdae7acd77501f0d615",
+      "following_sha256": "a7a3b81aea4bce11a12e78ab8970252ee7e01fab948842d2abb9568e721bb2d8",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1743,
+      "matched_eligible_contracts": 1743,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 26543,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10280
+      },
+      "variant": {
+        "selected": 174,
+        "scoreable": 174,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 174,
+        "missed_events": 0,
+        "positive_returns": 90,
+        "negative_returns": 65,
+        "unchanged_returns": 19,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.716301149425287,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.716301149425287,
+          "25": 1.466301149425287,
+          "50": 1.216301149425287,
+          "100": 0.716301149425287
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 174,
+        "scoreable": 174,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 174,
+        "missed_events": 0,
+        "positive_returns": 98,
+        "negative_returns": 60,
+        "unchanged_returns": 16,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.3314614942528737,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.3314614942528737,
+          "25": 2.0814614942528737,
+          "50": 1.8314614942528735,
+          "100": 1.3314614942528735
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1743,
+        "mean": 0.9994875920826162,
+        "quantiles": {
+          "0": 0.561798,
+          "0.01": 0.7079006,
+          "0.05": 0.8217416,
+          "0.25": 0.9365559999999999,
+          "0.5": 1.0,
+          "0.75": 1.060023,
+          "0.95": 1.1788329,
+          "0.99": 1.3396877399999996,
+          "1": 1.4875
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "4927e3a301bcaf98af263c5937c382278f92440181ff8d7a484aabc0e8f98615"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-08",
+      "following_day": "2026-01-09",
+      "previous_sha256": "a7a3b81aea4bce11a12e78ab8970252ee7e01fab948842d2abb9568e721bb2d8",
+      "following_sha256": "ca14f98ac280be04985af5b04e74f7319be93488055eb6eefe6f198df17bbae5",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1844,
+      "matched_eligible_contracts": 1844,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 26458,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10920
+      },
+      "variant": {
+        "selected": 184,
+        "scoreable": 184,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 184,
+        "missed_events": 0,
+        "positive_returns": 95,
+        "negative_returns": 83,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -1.7130869565217393,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -1.7130869565217393,
+          "25": -1.9630869565217393,
+          "50": -2.2130869565217393,
+          "100": -2.7130869565217393
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 184,
+        "scoreable": 184,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 184,
+        "missed_events": 0,
+        "positive_returns": 100,
+        "negative_returns": 77,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -1.1010896739130434,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -1.1010896739130434,
+          "25": -1.3510896739130434,
+          "50": -1.6010896739130434,
+          "100": -2.101089673913043
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1844,
+        "mean": 0.9966843367678959,
+        "quantiles": {
+          "0": 0.094828,
+          "0.01": 0.6856159,
+          "0.05": 0.8157214500000001,
+          "0.25": 0.944444,
+          "0.5": 1.0,
+          "0.75": 1.049458,
+          "0.95": 1.16394015,
+          "0.99": 1.3160624999999997,
+          "1": 2.256881
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "aadd0a69abd38a9dcbc55260bfcbbc5680384f9180477888cc3448faed7371cc"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-12",
+      "following_day": "2026-01-13",
+      "previous_sha256": "639a1213594df4fcbd75480e91dbe8e6df93bdc32ab32c359c243c8688c7e4a1",
+      "following_sha256": "2bd8b85103949acba77978a293ff2702aa412581eb72214cb8333ac875e279ee",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1819,
+      "matched_eligible_contracts": 1819,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 27046,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11644
+      },
+      "variant": {
+        "selected": 181,
+        "scoreable": 181,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 181,
+        "missed_events": 0,
+        "positive_returns": 114,
+        "negative_returns": 56,
+        "unchanged_returns": 11,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.0815060773480663,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.0815060773480663,
+          "25": 0.8315060773480661,
+          "50": 0.5815060773480661,
+          "100": 0.08150607734806614
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 181,
+        "scoreable": 181,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 181,
+        "missed_events": 0,
+        "positive_returns": 104,
+        "negative_returns": 68,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 0.7219397790055248,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 0.7219397790055248,
+          "25": 0.4719397790055248,
+          "50": 0.22193977900552478,
+          "100": -0.27806022099447525
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1819,
+        "mean": 0.9790291214953271,
+        "quantiles": {
+          "0": 0.167488,
+          "0.01": 0.5926088399999999,
+          "0.05": 0.7763958,
+          "0.25": 0.9150134999999999,
+          "0.5": 1.0,
+          "0.75": 1.0477365,
+          "0.95": 1.1446501,
+          "0.99": 1.31404426,
+          "1": 2.5
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "1549f49a4ca11edcad3f877ce17d8fd46217257ad7047d1c4c9c73daba547e4f"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-13",
+      "following_day": "2026-01-14",
+      "previous_sha256": "2bd8b85103949acba77978a293ff2702aa412581eb72214cb8333ac875e279ee",
+      "following_sha256": "4817f04cf3686799f3b0ffb22ad22dae77436ff732ea7f4fb9e0799bb31d5697",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1567,
+      "matched_eligible_contracts": 1556,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 27861,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11249,
+        "EXPIRED_BEFORE_OUTCOME": 168
+      },
+      "variant": {
+        "selected": 156,
+        "scoreable": 156,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 156,
+        "missed_events": 0,
+        "positive_returns": 104,
+        "negative_returns": 46,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 5.230498717948719,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 5.230498717948719,
+          "25": 4.980498717948719,
+          "50": 4.730498717948719,
+          "100": 4.230498717948719
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 156,
+        "scoreable": 156,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 156,
+        "missed_events": 0,
+        "positive_returns": 117,
+        "negative_returns": 33,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 8.41331794871795,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 8.41331794871795,
+          "25": 8.16331794871795,
+          "50": 7.913317948717949,
+          "100": 7.413317948717949
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1556,
+        "mean": 0.9939481323907455,
+        "quantiles": {
+          "0": 0.251497,
+          "0.01": 0.628095,
+          "0.05": 0.7761575000000001,
+          "0.25": 0.912029,
+          "0.5": 0.997908,
+          "0.75": 1.07732625,
+          "0.95": 1.21088225,
+          "0.99": 1.3680186500000004,
+          "1": 2.280992
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "e95bac11ef6858bbb020fe1eb8e131d50ffd6359fe6ad9eb69dc73dbdb1fe992"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-19",
+      "following_day": "2026-01-20",
+      "previous_sha256": "fec27fb3ede93f31cd9e74803c207e754bc37f06200b2788114bc3e3a0f02989",
+      "following_sha256": "3f3ebb1c09f3ac143b0d24d4a083399ea8272c1560205321906d60b04bdac6bc",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1682,
+      "matched_eligible_contracts": 1682,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 14468,
+        "INVALID_PRICE_RANGE": 26074
+      },
+      "variant": {
+        "selected": 168,
+        "scoreable": 168,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 168,
+        "missed_events": 0,
+        "positive_returns": 85,
+        "negative_returns": 71,
+        "unchanged_returns": 12,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.224204166666667,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.224204166666667,
+          "25": 1.9742041666666668,
+          "50": 1.7242041666666668,
+          "100": 1.2242041666666668
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 168,
+        "scoreable": 168,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 168,
+        "missed_events": 0,
+        "positive_returns": 76,
+        "negative_returns": 79,
+        "unchanged_returns": 13,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.670758928571428,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.670758928571428,
+          "25": 1.420758928571428,
+          "50": 1.170758928571428,
+          "100": 0.6707589285714279
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1682,
+        "mean": 0.9937214060642092,
+        "quantiles": {
+          "0": 0.173037,
+          "0.01": 0.5053597799999999,
+          "0.05": 0.7572967,
+          "0.25": 0.94103575,
+          "0.5": 1.0,
+          "0.75": 1.047896,
+          "0.95": 1.2115745499999997,
+          "0.99": 1.4682074300000028,
+          "1": 2.405638
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "00bab57d7134761611ca59a71305d2e7649fafc0f1a6a28bad2cc9dbb0afcd48"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-20",
+      "following_day": "2026-01-21",
+      "previous_sha256": "3f3ebb1c09f3ac143b0d24d4a083399ea8272c1560205321906d60b04bdac6bc",
+      "following_sha256": "0c1943ebae0ad08369cc2067d0a5aee937c6343fe2cafe846a840e3b74cec394",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1828,
+      "matched_eligible_contracts": 1828,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 25428,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 15529,
+        "EXPIRED_BEFORE_OUTCOME": 172
+      },
+      "variant": {
+        "selected": 182,
+        "scoreable": 182,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 182,
+        "missed_events": 0,
+        "positive_returns": 95,
+        "negative_returns": 71,
+        "unchanged_returns": 16,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 0.02798956043956087,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 0.02798956043956087,
+          "25": -0.22201043956043914,
+          "50": -0.47201043956043914,
+          "100": -0.9720104395604391
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 182,
+        "scoreable": 182,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 182,
+        "missed_events": 0,
+        "positive_returns": 118,
+        "negative_returns": 50,
+        "unchanged_returns": 14,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 6.955634065934066,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 6.955634065934066,
+          "25": 6.705634065934066,
+          "50": 6.455634065934066,
+          "100": 5.955634065934066
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1828,
+        "mean": 1.0002446050328229,
+        "quantiles": {
+          "0": 0.039301,
+          "0.01": 0.5465842999999999,
+          "0.05": 0.711024,
+          "0.25": 0.92108675,
+          "0.5": 1.0,
+          "0.75": 1.0775817499999998,
+          "0.95": 1.2756032999999987,
+          "0.99": 1.52991782,
+          "1": 2.006079
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "f42647b83948ceececcd607855bd2ebfe5376903d2f911de747dd02a0ec994f6"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-21",
+      "following_day": "2026-01-22",
+      "previous_sha256": "0c1943ebae0ad08369cc2067d0a5aee937c6343fe2cafe846a840e3b74cec394",
+      "following_sha256": "a61252b042e1d8104a4ec8a5541f6d8012ff50f54e6aca3db984c3a0bdc3efdb",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 2088,
+      "matched_eligible_contracts": 2088,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 25093,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 17082
+      },
+      "variant": {
+        "selected": 208,
+        "scoreable": 208,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 208,
+        "missed_events": 0,
+        "positive_returns": 42,
+        "negative_returns": 164,
+        "unchanged_returns": 2,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -13.71952596153846,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -13.71952596153846,
+          "25": -13.96952596153846,
+          "50": -14.21952596153846,
+          "100": -14.71952596153846
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 208,
+        "scoreable": 208,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 208,
+        "missed_events": 0,
+        "positive_returns": 26,
+        "negative_returns": 179,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -25.068715384615384,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -25.068715384615384,
+          "25": -25.318715384615384,
+          "50": -25.568715384615384,
+          "100": -26.068715384615384
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 2088,
+        "mean": 0.9923642073754789,
+        "quantiles": {
+          "0": 0.064815,
+          "0.01": 0.28027639000000004,
+          "0.05": 0.4708738,
+          "0.25": 0.7328589999999999,
+          "0.5": 1.0,
+          "0.75": 1.2123615,
+          "0.95": 1.5860408999999998,
+          "0.99": 1.8404782200000027,
+          "1": 2.355769
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "ab011717d4bf48109d4e142503178d515631a84c680655b0a8b7556314fefb10"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-22",
+      "following_day": "2026-01-23",
+      "previous_sha256": "a61252b042e1d8104a4ec8a5541f6d8012ff50f54e6aca3db984c3a0bdc3efdb",
+      "following_sha256": "e5b74134021204c2fd6caff0802f36118a3feda9733a3208c658e4316310b1f6",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1775,
+      "matched_eligible_contracts": 1775,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 18164,
+        "INVALID_PRICE_RANGE": 25096
+      },
+      "variant": {
+        "selected": 177,
+        "scoreable": 177,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 177,
+        "missed_events": 0,
+        "positive_returns": 81,
+        "negative_returns": 86,
+        "unchanged_returns": 10,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -2.532382485875706,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -2.532382485875706,
+          "25": -2.782382485875706,
+          "50": -3.032382485875706,
+          "100": -3.532382485875706
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 177,
+        "scoreable": 177,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 177,
+        "missed_events": 0,
+        "positive_returns": 69,
+        "negative_returns": 94,
+        "unchanged_returns": 14,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -5.676321468926553,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -5.676321468926553,
+          "25": -5.926321468926553,
+          "50": -6.176321468926553,
+          "100": -6.676321468926553
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1775,
+        "mean": 0.9865023842253521,
+        "quantiles": {
+          "0": 0.100775,
+          "0.01": 0.36466200000000004,
+          "0.05": 0.5998014,
+          "0.25": 0.8991564999999999,
+          "0.5": 1.0,
+          "0.75": 1.0571415000000002,
+          "0.95": 1.3376171999999997,
+          "0.99": 1.78951368,
+          "1": 2.895161
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "848789a626f9c0de1fe2862fd4bd58dafea4adab3278ffe1a08ea09ca2c6b04c"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-27",
+      "following_day": "2026-01-28",
+      "previous_sha256": "64d4f3e56506b0bd00c7c3ed93dc9761ab1441fb6c151ed2b25d71f8fad8f29d",
+      "following_sha256": "3af3664a315b153f716b8ad092eab0eff62ab1037ecd91a9a8d8283c3046ff72",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1293,
+      "matched_eligible_contracts": 1293,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 17015,
+        "EXPIRED_BEFORE_OUTCOME": 18605,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 9540
+      },
+      "variant": {
+        "selected": 129,
+        "scoreable": 129,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 129,
+        "missed_events": 0,
+        "positive_returns": 99,
+        "negative_returns": 26,
+        "unchanged_returns": 4,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.141580620155038,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.141580620155038,
+          "25": 3.8915806201550383,
+          "50": 3.6415806201550383,
+          "100": 3.1415806201550383
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 129,
+        "scoreable": 129,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 129,
+        "missed_events": 0,
+        "positive_returns": 108,
+        "negative_returns": 18,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 13.722976744186045,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 13.722976744186045,
+          "25": 13.472976744186045,
+          "50": 13.222976744186045,
+          "100": 12.722976744186045
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1293,
+        "mean": 1.0118497525135344,
+        "quantiles": {
+          "0": 0.199645,
+          "0.01": 0.61680696,
+          "0.05": 0.8141916,
+          "0.25": 0.941441,
+          "0.5": 1.011111,
+          "0.75": 1.071983,
+          "0.95": 1.1839037999999997,
+          "0.99": 1.5627739599999984,
+          "1": 2.109155
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "54cfa925554c4a3e19f149e3f6ab51c4f1f2455242a666c9e5d44cf8920222ed"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-28",
+      "following_day": "2026-01-29",
+      "previous_sha256": "3af3664a315b153f716b8ad092eab0eff62ab1037ecd91a9a8d8283c3046ff72",
+      "following_sha256": "718a44d5c1735cd660c3d9d36d5745a1572f21befa486adce0e6363bda512d49",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1651,
+      "matched_eligible_contracts": 1651,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 28700,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 9968
+      },
+      "variant": {
+        "selected": 165,
+        "scoreable": 165,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 165,
+        "missed_events": 0,
+        "positive_returns": 116,
+        "negative_returns": 40,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 3.8781406060606063,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 3.8781406060606063,
+          "25": 3.6281406060606063,
+          "50": 3.3781406060606063,
+          "100": 2.8781406060606063
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 165,
+        "scoreable": 165,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 165,
+        "missed_events": 0,
+        "positive_returns": 125,
+        "negative_returns": 33,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 5.265587272727273,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 5.265587272727273,
+          "25": 5.015587272727273,
+          "50": 4.765587272727273,
+          "100": 4.265587272727273
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1651,
+        "mean": 1.0032236656571776,
+        "quantiles": {
+          "0": 0.375494,
+          "0.01": 0.708855,
+          "0.05": 0.8251955,
+          "0.25": 0.940559,
+          "0.5": 1.0,
+          "0.75": 1.0643445,
+          "0.95": 1.1769065,
+          "0.99": 1.2461865,
+          "1": 1.806452
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "db795d3c272bda04913b14e8822bf6656694e64a63a5a5e6642164874a979f8d"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-01-29",
+      "following_day": "2026-01-30",
+      "previous_sha256": "718a44d5c1735cd660c3d9d36d5745a1572f21befa486adce0e6363bda512d49",
+      "following_sha256": "6e4e84d62797af451d3475ee31af07bab0c21104b1f8da5cbabc0e12f69a0988",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1618,
+      "matched_eligible_contracts": 1618,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 24144,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10309
+      },
+      "variant": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 28,
+        "negative_returns": 127,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -10.8522950310559,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -10.8522950310559,
+          "25": -11.1022950310559,
+          "50": -11.3522950310559,
+          "100": -11.8522950310559
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 44,
+        "negative_returns": 112,
+        "unchanged_returns": 5,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -7.45402546583851,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -7.45402546583851,
+          "25": -7.70402546583851,
+          "50": -7.95402546583851,
+          "100": -8.45402546583851
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1618,
+        "mean": 0.9914213399258344,
+        "quantiles": {
+          "0": 0.168033,
+          "0.01": 0.60347758,
+          "0.05": 0.72466715,
+          "0.25": 0.8656845,
+          "0.5": 0.9831515,
+          "0.75": 1.0949784999999999,
+          "0.95": 1.33024115,
+          "0.99": 1.4890712699999997,
+          "1": 1.995851
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "91e1a9fdc4a67dd9f59ad984f45c76536a13e069f04d9a0735b02e8e64e7923d"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-01",
+      "following_day": "2026-02-02",
+      "previous_sha256": "e6512a3176196c1dd969f5be9811c69cddd1d5618feae445c7db2b87f23b91b4",
+      "following_sha256": "ce8360ded5025a1799fd0007416148340c23b9253b66ed3dbce0f7a07da3e6f4",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 2043,
+      "matched_eligible_contracts": 2043,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 26709,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 10959
+      },
+      "variant": {
+        "selected": 204,
+        "scoreable": 204,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 204,
+        "missed_events": 0,
+        "positive_returns": 133,
+        "negative_returns": 65,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.7055588235294112,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.7055588235294112,
+          "25": 2.4555588235294112,
+          "50": 2.2055588235294112,
+          "100": 1.7055588235294112
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 204,
+        "scoreable": 204,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 204,
+        "missed_events": 0,
+        "positive_returns": 150,
+        "negative_returns": 44,
+        "unchanged_returns": 10,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 6.885217156862745,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 6.885217156862745,
+          "25": 6.635217156862745,
+          "50": 6.385217156862745,
+          "100": 5.885217156862745
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 2043,
+        "mean": 1.0160902809593735,
+        "quantiles": {
+          "0": 0.18018,
+          "0.01": 0.6428995200000001,
+          "0.05": 0.7944141,
+          "0.25": 0.944444,
+          "0.5": 1.004484,
+          "0.75": 1.0877905,
+          "0.95": 1.2522788999999999,
+          "0.99": 1.3990079599999998,
+          "1": 2.366337
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "ba19a34ff9c6a88deb3feb7c0d71b82aee9c7190cdec9dcc7c9ddfe1208da186"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-02",
+      "following_day": "2026-02-03",
+      "previous_sha256": "ce8360ded5025a1799fd0007416148340c23b9253b66ed3dbce0f7a07da3e6f4",
+      "following_sha256": "c7e1a91c375f3b994b82d53ee20bc3c886bebe33c18ad5ccb68a4cd1a0bf153b",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1883,
+      "matched_eligible_contracts": 1883,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 27500,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11465
+      },
+      "variant": {
+        "selected": 188,
+        "scoreable": 188,
+        "unscoreable": 0,
+        "hits": 32,
+        "false_picks": 156,
+        "missed_events": 253,
+        "positive_returns": 186,
+        "negative_returns": 2,
+        "unchanged_returns": 0,
+        "event_precision": 0.1702127659574468,
+        "gross_reference_mean_return_pct": 117.25916117021276,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 117.25916117021276,
+          "25": 117.00916117021276,
+          "50": 116.75916117021276,
+          "100": 116.25916117021276
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 188,
+        "scoreable": 188,
+        "unscoreable": 0,
+        "hits": 41,
+        "false_picks": 147,
+        "missed_events": 244,
+        "positive_returns": 182,
+        "negative_returns": 6,
+        "unchanged_returns": 0,
+        "event_precision": 0.21808510638297873,
+        "gross_reference_mean_return_pct": 140.87318989361702,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 140.87318989361702,
+          "25": 140.62318989361702,
+          "50": 140.37318989361702,
+          "100": 139.87318989361702
+        }
+      },
+      "threshold_counts": {
+        "3": 285,
+        "10": 44,
+        "20": 22,
+        "30": 9
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1883,
+        "mean": 2.238554690918747,
+        "quantiles": {
+          "0": 0.00464,
+          "0.01": 0.07488088,
+          "0.05": 0.15060360000000003,
+          "0.25": 0.49481600000000003,
+          "0.5": 1.475309,
+          "0.75": 2.1787715,
+          "0.95": 6.518056299999998,
+          "0.99": 22.068492220000103,
+          "1": 105.840708
+        },
+        "thresholds": {
+          "3": 285,
+          "10": 44,
+          "20": 22,
+          "30": 9
+        },
+        "full_uncapped_distribution_sha256": "23029f9d994101b1201e91a68e1bf98e781c7e802dd6907e377355f08181a80e"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-03",
+      "following_day": "2026-02-04",
+      "previous_sha256": "c7e1a91c375f3b994b82d53ee20bc3c886bebe33c18ad5ccb68a4cd1a0bf153b",
+      "following_sha256": "5e593390beb61a6494c8b635c7a06c05358b84196d8d880553f2822846e61150",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 2229,
+      "matched_eligible_contracts": 2219,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 28985,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11450,
+        "EXPIRED_BEFORE_OUTCOME": 202
+      },
+      "variant": {
+        "selected": 222,
+        "scoreable": 222,
+        "unscoreable": 0,
+        "hits": 5,
+        "false_picks": 217,
+        "missed_events": 6,
+        "positive_returns": 130,
+        "negative_returns": 84,
+        "unchanged_returns": 8,
+        "event_precision": 0.02252252252252252,
+        "gross_reference_mean_return_pct": 10.381373873873875,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 10.381373873873875,
+          "25": 10.131373873873875,
+          "50": 9.881373873873875,
+          "100": 9.381373873873875
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 222,
+        "scoreable": 221,
+        "unscoreable": 1,
+        "hits": 3,
+        "false_picks": 218,
+        "missed_events": 8,
+        "positive_returns": 146,
+        "negative_returns": 65,
+        "unchanged_returns": 10,
+        "event_precision": 0.013574660633484163,
+        "gross_reference_mean_return_pct": 9.568733936651583,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 9.568733936651583,
+          "25": 9.318733936651583,
+          "50": 9.068733936651583,
+          "100": 8.568733936651583
+        }
+      },
+      "threshold_counts": {
+        "3": 11,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 2219,
+        "mean": 1.0161602172149617,
+        "quantiles": {
+          "0": 0.130802,
+          "0.01": 0.43088116,
+          "0.05": 0.7650034,
+          "0.25": 0.9331324999999999,
+          "0.5": 1.0,
+          "0.75": 1.0689915,
+          "0.95": 1.2049249999999998,
+          "0.99": 2.1465768400000043,
+          "1": 4.774775
+        },
+        "thresholds": {
+          "3": 11,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "dc6b536bf5f33788deb6a78e9bae021b05c43bd7bfe8cfed4f4f9831a2c34bdd"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-04",
+      "following_day": "2026-02-05",
+      "previous_sha256": "5e593390beb61a6494c8b635c7a06c05358b84196d8d880553f2822846e61150",
+      "following_sha256": "3c2505cd3b6e62fc0d218eb671fe1efaa7f446be90b7c57e13ca8121d33fa4fe",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1992,
+      "matched_eligible_contracts": 1992,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 29738,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11984
+      },
+      "variant": {
+        "selected": 199,
+        "scoreable": 199,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 199,
+        "missed_events": 0,
+        "positive_returns": 52,
+        "negative_returns": 130,
+        "unchanged_returns": 17,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -4.74632311557789,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -4.74632311557789,
+          "25": -4.99632311557789,
+          "50": -5.24632311557789,
+          "100": -5.74632311557789
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 199,
+        "scoreable": 199,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 199,
+        "missed_events": 0,
+        "positive_returns": 98,
+        "negative_returns": 84,
+        "unchanged_returns": 17,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.6059924623115573,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.6059924623115573,
+          "25": 1.3559924623115573,
+          "50": 1.1059924623115573,
+          "100": 0.6059924623115572
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1992,
+        "mean": 0.9898491852409639,
+        "quantiles": {
+          "0": 0.169118,
+          "0.01": 0.543506,
+          "0.05": 0.7708608,
+          "0.25": 0.9301665,
+          "0.5": 1.0,
+          "0.75": 1.04768575,
+          "0.95": 1.1775293,
+          "0.99": 1.518382049999998,
+          "1": 2.288
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "937bdf1e193294011c292ea5f8cc59118b48930943bdb6cf6ba18f5ddded667e"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-05",
+      "following_day": "2026-02-06",
+      "previous_sha256": "3c2505cd3b6e62fc0d218eb671fe1efaa7f446be90b7c57e13ca8121d33fa4fe",
+      "following_sha256": "c217f887e3e735a9f96a0f21d4c27c2f3e5234c3ebb34588ffdc63544e2045e4",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1700,
+      "matched_eligible_contracts": 1700,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 31097,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11618
+      },
+      "variant": {
+        "selected": 170,
+        "scoreable": 170,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 170,
+        "missed_events": 0,
+        "positive_returns": 75,
+        "negative_returns": 90,
+        "unchanged_returns": 5,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -2.1453064705882348,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -2.1453064705882348,
+          "25": -2.3953064705882348,
+          "50": -2.6453064705882348,
+          "100": -3.1453064705882348
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 170,
+        "scoreable": 170,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 170,
+        "missed_events": 0,
+        "positive_returns": 70,
+        "negative_returns": 93,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -4.307799999999999,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -4.307799999999999,
+          "25": -4.557799999999999,
+          "50": -4.807799999999999,
+          "100": -5.307799999999999
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1700,
+        "mean": 0.9872744364705882,
+        "quantiles": {
+          "0": 0.247842,
+          "0.01": 0.53783161,
+          "0.05": 0.75083885,
+          "0.25": 0.8913854999999999,
+          "0.5": 0.98454,
+          "0.75": 1.0644735,
+          "0.95": 1.2443828499999998,
+          "0.99": 1.51427948,
+          "1": 2.145232
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "ce4c46236d4b0285d6b5c7553f5b5abb1408a42771922378b310ae32082c35fc"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-09",
+      "following_day": "2026-02-10",
+      "previous_sha256": "2c9b84f448be31f593337c716ea2e690e71de2eff6cd088f30c3c7e1d717548d",
+      "following_sha256": "2bff8314af9f70254bdcb18dd0a89734acdeee9e6ef18d572f271f5abf2638ee",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1863,
+      "matched_eligible_contracts": 1863,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12658,
+        "INVALID_PRICE_RANGE": 30717
+      },
+      "variant": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 131,
+        "negative_returns": 45,
+        "unchanged_returns": 10,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.098287634408602,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.098287634408602,
+          "25": 3.848287634408602,
+          "50": 3.598287634408602,
+          "100": 3.098287634408602
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 128,
+        "negative_returns": 47,
+        "unchanged_returns": 11,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.1471064516129035,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.1471064516129035,
+          "25": 3.897106451612903,
+          "50": 3.647106451612903,
+          "100": 3.147106451612903
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1863,
+        "mean": 0.9897353521202362,
+        "quantiles": {
+          "0": 0.243902,
+          "0.01": 0.47722894,
+          "0.05": 0.8013146,
+          "0.25": 0.940594,
+          "0.5": 1.0,
+          "0.75": 1.050021,
+          "0.95": 1.1670648,
+          "0.99": 1.33346182,
+          "1": 1.788991
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "4c55031f8879058d99a59accf33914059ca2447876b48e541aa463f2a17af637"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-10",
+      "following_day": "2026-02-11",
+      "previous_sha256": "2bff8314af9f70254bdcb18dd0a89734acdeee9e6ef18d572f271f5abf2638ee",
+      "following_sha256": "488a7dba9a8d531f27cbd95956deccfa8c416efa75b671d7ca5738ebc81b7640",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1783,
+      "matched_eligible_contracts": 1783,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 31308,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12596,
+        "EXPIRED_BEFORE_OUTCOME": 196
+      },
+      "variant": {
+        "selected": 178,
+        "scoreable": 178,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 178,
+        "missed_events": 0,
+        "positive_returns": 97,
+        "negative_returns": 75,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.2750713483146074,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.2750713483146074,
+          "25": 2.025071348314607,
+          "50": 1.7750713483146072,
+          "100": 1.2750713483146072
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 178,
+        "scoreable": 178,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 178,
+        "missed_events": 0,
+        "positive_returns": 86,
+        "negative_returns": 83,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -1.9498382022471903,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -1.9498382022471903,
+          "25": -2.1998382022471903,
+          "50": -2.4498382022471903,
+          "100": -2.9498382022471903
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1783,
+        "mean": 0.9899112204150309,
+        "quantiles": {
+          "0": 0.201005,
+          "0.01": 0.53654162,
+          "0.05": 0.7968976,
+          "0.25": 0.9336475,
+          "0.5": 1.0,
+          "0.75": 1.04613,
+          "0.95": 1.1597209999999998,
+          "0.99": 1.42679266,
+          "1": 2.24
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "dbe4590cb3dc48d6fd5dcf210cfd75cda59aaaa73d9fa14c7452df03e0ebbac6"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-11",
+      "following_day": "2026-02-12",
+      "previous_sha256": "488a7dba9a8d531f27cbd95956deccfa8c416efa75b671d7ca5738ebc81b7640",
+      "following_sha256": "3f81636208503a3b9f3b6b725570a73883bb2c73d05afa88f280d6a5188f13a8",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1860,
+      "matched_eligible_contracts": 1860,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 31557,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12824
+      },
+      "variant": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 84,
+        "negative_returns": 90,
+        "unchanged_returns": 12,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 5.758804838709678,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 5.758804838709678,
+          "25": 5.508804838709678,
+          "50": 5.258804838709678,
+          "100": 4.758804838709678
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 81,
+        "negative_returns": 97,
+        "unchanged_returns": 8,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 3.312332258064516,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 3.312332258064516,
+          "25": 3.062332258064516,
+          "50": 2.812332258064516,
+          "100": 2.312332258064516
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1860,
+        "mean": 0.9774109758064516,
+        "quantiles": {
+          "0": 0.213052,
+          "0.01": 0.5855623000000001,
+          "0.05": 0.75336845,
+          "0.25": 0.90048125,
+          "0.5": 0.9859519999999999,
+          "0.75": 1.03719925,
+          "0.95": 1.19043075,
+          "0.99": 1.5562954800000004,
+          "1": 2.252874
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "ff68e5d026dead595e4a6116565d163dac0ec267f319b8e35092617eddb58029"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-12",
+      "following_day": "2026-02-13",
+      "previous_sha256": "3f81636208503a3b9f3b6b725570a73883bb2c73d05afa88f280d6a5188f13a8",
+      "following_sha256": "41475e4eacb6c2676a7031823461b5d35ea09d5257204b49a25e3e0b7f40407c",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1834,
+      "matched_eligible_contracts": 1834,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 13105,
+        "INVALID_PRICE_RANGE": 31863
+      },
+      "variant": {
+        "selected": 183,
+        "scoreable": 183,
+        "unscoreable": 0,
+        "hits": 3,
+        "false_picks": 180,
+        "missed_events": 8,
+        "positive_returns": 131,
+        "negative_returns": 52,
+        "unchanged_returns": 0,
+        "event_precision": 0.01639344262295082,
+        "gross_reference_mean_return_pct": 46.278029508196724,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 46.278029508196724,
+          "25": 46.028029508196724,
+          "50": 45.778029508196724,
+          "100": 45.278029508196724
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 183,
+        "scoreable": 183,
+        "unscoreable": 0,
+        "hits": 6,
+        "false_picks": 177,
+        "missed_events": 5,
+        "positive_returns": 136,
+        "negative_returns": 46,
+        "unchanged_returns": 1,
+        "event_precision": 0.03278688524590164,
+        "gross_reference_mean_return_pct": 55.565902185792346,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 55.565902185792346,
+          "25": 55.315902185792346,
+          "50": 55.065902185792346,
+          "100": 54.565902185792346
+        }
+      },
+      "threshold_counts": {
+        "3": 11,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1834,
+        "mean": 1.0359888369683752,
+        "quantiles": {
+          "0": 0.193794,
+          "0.01": 0.36682829,
+          "0.05": 0.5375002,
+          "0.25": 0.802948,
+          "0.5": 0.9726185,
+          "0.75": 1.15814825,
+          "0.95": 1.8248313499999997,
+          "0.99": 2.764626510000002,
+          "1": 3.626667
+        },
+        "thresholds": {
+          "3": 11,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "aa8c85d2d2bf3d83e71a13c022756328928e07ac713718fa29c28c60815b61e3"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-16",
+      "following_day": "2026-02-17",
+      "previous_sha256": "8e7c4263e9fadb0158a905421fb8388002a9252082c5f6cbd330e2a2bd094d7b",
+      "following_sha256": "cef8ae1a647050b443025aea811cded76636803e8ef0c47a5c380b1819d216c3",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1793,
+      "matched_eligible_contracts": 1793,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 15041,
+        "INVALID_PRICE_RANGE": 30852
+      },
+      "variant": {
+        "selected": 179,
+        "scoreable": 179,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 179,
+        "missed_events": 0,
+        "positive_returns": 33,
+        "negative_returns": 139,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -7.29617094972067,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -7.29617094972067,
+          "25": -7.54617094972067,
+          "50": -7.79617094972067,
+          "100": -8.29617094972067
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 179,
+        "scoreable": 179,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 179,
+        "missed_events": 0,
+        "positive_returns": 42,
+        "negative_returns": 128,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -6.313336312849162,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -6.313336312849162,
+          "25": -6.563336312849162,
+          "50": -6.813336312849162,
+          "100": -7.313336312849162
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1793,
+        "mean": 0.9741851277189069,
+        "quantiles": {
+          "0": 0.208054,
+          "0.01": 0.49129072000000007,
+          "0.05": 0.759122,
+          "0.25": 0.898204,
+          "0.5": 0.987124,
+          "0.75": 1.049587,
+          "0.95": 1.1851802,
+          "0.99": 1.3126463999999998,
+          "1": 1.55303
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "3b203d23266965d68b230b46af03c0721064297aec42700a9420fc0d56233eb9"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-17",
+      "following_day": "2026-02-18",
+      "previous_sha256": "cef8ae1a647050b443025aea811cded76636803e8ef0c47a5c380b1819d216c3",
+      "following_sha256": "24a0fa9f9c9064a8c5731f90d03ad126a39bf832a31caf2f0b2bb7e8eebfe805",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1646,
+      "matched_eligible_contracts": 1646,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 30566,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 15450,
+        "EXPIRED_BEFORE_OUTCOME": 186
+      },
+      "variant": {
+        "selected": 164,
+        "scoreable": 164,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 164,
+        "missed_events": 0,
+        "positive_returns": 116,
+        "negative_returns": 35,
+        "unchanged_returns": 13,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.546358536585366,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.546358536585366,
+          "25": 4.296358536585366,
+          "50": 4.046358536585366,
+          "100": 3.5463585365853665
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 164,
+        "scoreable": 164,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 164,
+        "missed_events": 0,
+        "positive_returns": 112,
+        "negative_returns": 37,
+        "unchanged_returns": 15,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.321881707317074,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.321881707317074,
+          "25": 4.071881707317074,
+          "50": 3.821881707317074,
+          "100": 3.321881707317074
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1646,
+        "mean": 0.9827437588092345,
+        "quantiles": {
+          "0": 0.437158,
+          "0.01": 0.66303645,
+          "0.05": 0.782363,
+          "0.25": 0.9297577499999999,
+          "0.5": 0.9973540000000001,
+          "0.75": 1.035277,
+          "0.95": 1.14985625,
+          "0.99": 1.3260113999999998,
+          "1": 1.880795
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "e309d9b65b0364c525d4bf4845548bb059214ccf1b60e25186c4841f0232d921"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-18",
+      "following_day": "2026-02-19",
+      "previous_sha256": "24a0fa9f9c9064a8c5731f90d03ad126a39bf832a31caf2f0b2bb7e8eebfe805",
+      "following_sha256": "5d81aee94bd656bb555fd27945f6fd57166db81e4cb37fd8445eb092d1a7d49f",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1684,
+      "matched_eligible_contracts": 1684,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 29566,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 16675
+      },
+      "variant": {
+        "selected": 168,
+        "scoreable": 168,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 168,
+        "missed_events": 0,
+        "positive_returns": 85,
+        "negative_returns": 73,
+        "unchanged_returns": 10,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.25576130952381,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.25576130952381,
+          "25": 2.00576130952381,
+          "50": 1.7557613095238096,
+          "100": 1.2557613095238096
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 168,
+        "scoreable": 168,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 168,
+        "missed_events": 0,
+        "positive_returns": 77,
+        "negative_returns": 85,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -1.9584696428571429,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -1.9584696428571429,
+          "25": -2.208469642857143,
+          "50": -2.458469642857143,
+          "100": -2.958469642857143
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1684,
+        "mean": 0.9764343349168646,
+        "quantiles": {
+          "0": 0.27204,
+          "0.01": 0.5535247600000001,
+          "0.05": 0.71046835,
+          "0.25": 0.892547,
+          "0.5": 0.989112,
+          "0.75": 1.043478,
+          "0.95": 1.2486096999999996,
+          "0.99": 1.5931192200000015,
+          "1": 1.809955
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "1a819672b07e852585fdc88f5999ea8d55b24a6ed22c273bd9ff7b3426483b83"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-19",
+      "following_day": "2026-02-20",
+      "previous_sha256": "5d81aee94bd656bb555fd27945f6fd57166db81e4cb37fd8445eb092d1a7d49f",
+      "following_sha256": "57e7070fdaacb6ae398584856337dade6289504ff46ad0020bdfe17698010b7a",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1825,
+      "matched_eligible_contracts": 1825,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 17374,
+        "INVALID_PRICE_RANGE": 29179
+      },
+      "variant": {
+        "selected": 182,
+        "scoreable": 182,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 182,
+        "missed_events": 0,
+        "positive_returns": 81,
+        "negative_returns": 94,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -0.0838214285714284,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -0.0838214285714284,
+          "25": -0.3338214285714284,
+          "50": -0.5838214285714284,
+          "100": -1.0838214285714285
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 182,
+        "scoreable": 182,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 182,
+        "missed_events": 0,
+        "positive_returns": 119,
+        "negative_returns": 54,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 6.2114719780219785,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 6.2114719780219785,
+          "25": 5.961471978021978,
+          "50": 5.7114719780219785,
+          "100": 5.2114719780219785
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1825,
+        "mean": 0.9863700405479452,
+        "quantiles": {
+          "0": 0.24359,
+          "0.01": 0.53105824,
+          "0.05": 0.6997512,
+          "0.25": 0.901288,
+          "0.5": 0.992674,
+          "0.75": 1.056417,
+          "0.95": 1.285623,
+          "0.99": 1.55651664,
+          "1": 2.359551
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "475d60103535f26a3201d27ae72be66a6fd8382b395000f02e5d1bb68f5305bc"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-23",
+      "following_day": "2026-02-24",
+      "previous_sha256": "c18d089f3cb3a4b9feb3ce643360b8018b65c10c97e12cc249b5f48499165ad5",
+      "following_sha256": "0e38fb2e65e4b2651bce4ccd07890076517d826a7fddf11a4e082e5d3e0fb495",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1539,
+      "matched_eligible_contracts": 1539,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 27944,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 19362
+      },
+      "variant": {
+        "selected": 153,
+        "scoreable": 153,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 153,
+        "missed_events": 3,
+        "positive_returns": 68,
+        "negative_returns": 79,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -0.3249522875816988,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -0.3249522875816988,
+          "25": -0.5749522875816988,
+          "50": -0.8249522875816988,
+          "100": -1.3249522875816988
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 153,
+        "scoreable": 153,
+        "unscoreable": 0,
+        "hits": 1,
+        "false_picks": 152,
+        "missed_events": 2,
+        "positive_returns": 58,
+        "negative_returns": 90,
+        "unchanged_returns": 5,
+        "event_precision": 0.006535947712418301,
+        "gross_reference_mean_return_pct": -6.606037908496732,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -6.606037908496732,
+          "25": -6.856037908496732,
+          "50": -7.106037908496732,
+          "100": -7.606037908496732
+        }
+      },
+      "threshold_counts": {
+        "3": 3,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1539,
+        "mean": 0.9337796452241716,
+        "quantiles": {
+          "0": 0.084507,
+          "0.01": 0.17421978,
+          "0.05": 0.3982776,
+          "0.25": 0.7937065000000001,
+          "0.5": 0.965693,
+          "0.75": 1.0552730000000001,
+          "0.95": 1.3791267999999994,
+          "0.99": 2.2367313399999946,
+          "1": 3.757576
+        },
+        "thresholds": {
+          "3": 3,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "29a5a59fa9f5aa9a5207c4d1b748665abb059d3303154bd3eb23c632189c09a5"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-24",
+      "following_day": "2026-02-25",
+      "previous_sha256": "0e38fb2e65e4b2651bce4ccd07890076517d826a7fddf11a4e082e5d3e0fb495",
+      "following_sha256": "60156cdc91b5d0208f852f43666d15d8ea3796cb3ba3b836fbba9c21e987222b",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1162,
+      "matched_eligible_contracts": 1162,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 19170,
+        "EXPIRED_BEFORE_OUTCOME": 19672,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 9217
+      },
+      "variant": {
+        "selected": 116,
+        "scoreable": 116,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 116,
+        "missed_events": 0,
+        "positive_returns": 48,
+        "negative_returns": 65,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -6.4427206896551725,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -6.4427206896551725,
+          "25": -6.6927206896551725,
+          "50": -6.9427206896551725,
+          "100": -7.4427206896551725
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 116,
+        "scoreable": 116,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 116,
+        "missed_events": 0,
+        "positive_returns": 24,
+        "negative_returns": 89,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -13.985985344827586,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -13.985985344827586,
+          "25": -14.235985344827585,
+          "50": -14.485985344827585,
+          "100": -14.985985344827585
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1162,
+        "mean": 0.9928984285714286,
+        "quantiles": {
+          "0": 0.243542,
+          "0.01": 0.61359903,
+          "0.05": 0.7644341,
+          "0.25": 0.9158364999999999,
+          "0.5": 1.0048895,
+          "0.75": 1.0793407499999998,
+          "0.95": 1.1764115000000002,
+          "0.99": 1.2873116300000003,
+          "1": 1.809055
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "c35bacd0746e7d5fbf75e2c9a06dfb1da34ce109be07efe4c6ec12a86ba822fc"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-25",
+      "following_day": "2026-02-26",
+      "previous_sha256": "60156cdc91b5d0208f852f43666d15d8ea3796cb3ba3b836fbba9c21e987222b",
+      "following_sha256": "9061ad7525a7abf8736b746f2ab73a69d61a3579cebf8c709dd09fc09a384fd2",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1613,
+      "matched_eligible_contracts": 1608,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 29697,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 9727
+      },
+      "variant": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 101,
+        "negative_returns": 56,
+        "unchanged_returns": 4,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.3462888198757759,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.3462888198757759,
+          "25": 1.0962888198757759,
+          "50": 0.846288819875776,
+          "100": 0.346288819875776
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 97,
+        "negative_returns": 55,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.690121118012423,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.690121118012423,
+          "25": 1.440121118012423,
+          "50": 1.190121118012423,
+          "100": 0.6901211180124229
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1608,
+        "mean": 0.991147092039801,
+        "quantiles": {
+          "0": 0.604082,
+          "0.01": 0.7459244300000001,
+          "0.05": 0.8353871,
+          "0.25": 0.94235125,
+          "0.5": 1.0,
+          "0.75": 1.043478,
+          "0.95": 1.13336835,
+          "0.99": 1.20130099,
+          "1": 1.497561
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "75bb8faad699e518ebb743a799a630d5d338324a62ac71f74874152a368e9bc7"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-02-26",
+      "following_day": "2026-02-27",
+      "previous_sha256": "9061ad7525a7abf8736b746f2ab73a69d61a3579cebf8c709dd09fc09a384fd2",
+      "following_sha256": "62f1c43ff1391cb0a6553ff39e9d47c02960528c6146ff997795079b352efe91",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1387,
+      "matched_eligible_contracts": 1381,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 24510,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 9877
+      },
+      "variant": {
+        "selected": 138,
+        "scoreable": 138,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 138,
+        "missed_events": 0,
+        "positive_returns": 61,
+        "negative_returns": 68,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -0.8760021739130438,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -0.8760021739130438,
+          "25": -1.126002173913044,
+          "50": -1.376002173913044,
+          "100": -1.876002173913044
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 138,
+        "scoreable": 138,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 138,
+        "missed_events": 0,
+        "positive_returns": 69,
+        "negative_returns": 60,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 0.45836449275362356,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 0.45836449275362356,
+          "25": 0.2083644927536236,
+          "50": -0.04163550724637642,
+          "100": -0.5416355072463764
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1381,
+        "mean": 0.9956788218682114,
+        "quantiles": {
+          "0": 0.581699,
+          "0.01": 0.715245,
+          "0.05": 0.800847,
+          "0.25": 0.909366,
+          "0.5": 0.996973,
+          "0.75": 1.077476,
+          "0.95": 1.198347,
+          "0.99": 1.3524028000000006,
+          "1": 1.612022
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "a9c6263e1b45b1d186d2848875457a2aaad890d346fe545e69a0b267838b00ad"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-04",
+      "following_day": "2026-03-05",
+      "previous_sha256": "489c63ed3c44d1605143e96be61faa046bc48bbf1af2cf0f4f7731c7872c57f4",
+      "following_sha256": "6ed703f9a7c948dc9e188be3907341494f64b951b3f3a481103a39ba7ea6d586",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1903,
+      "matched_eligible_contracts": 1903,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 27072,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11608
+      },
+      "variant": {
+        "selected": 190,
+        "scoreable": 190,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 190,
+        "missed_events": 0,
+        "positive_returns": 42,
+        "negative_returns": 145,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -7.923993684210527,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -7.923993684210527,
+          "25": -8.173993684210528,
+          "50": -8.423993684210528,
+          "100": -8.923993684210528
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 190,
+        "scoreable": 190,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 190,
+        "missed_events": 0,
+        "positive_returns": 46,
+        "negative_returns": 138,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -7.753062105263158,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -7.753062105263158,
+          "25": -8.003062105263158,
+          "50": -8.253062105263158,
+          "100": -8.753062105263158
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1903,
+        "mean": 0.9837412369942197,
+        "quantiles": {
+          "0": 0.508197,
+          "0.01": 0.67427828,
+          "0.05": 0.7557821,
+          "0.25": 0.897991,
+          "0.5": 1.0,
+          "0.75": 1.064177,
+          "0.95": 1.1822627,
+          "0.99": 1.30255338,
+          "1": 1.790997
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "4939850433839328efdbf6e1686dde3e3298c91ae55d78b8c5a5f73b1193a9cf"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-05",
+      "following_day": "2026-03-06",
+      "previous_sha256": "6ed703f9a7c948dc9e188be3907341494f64b951b3f3a481103a39ba7ea6d586",
+      "following_sha256": "2320d9a7edc4d4667e3f4cc3b3229ad1ef50893ef61b05e6184773e50abd08b9",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1737,
+      "matched_eligible_contracts": 1737,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 29253,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 11225
+      },
+      "variant": {
+        "selected": 173,
+        "scoreable": 173,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 173,
+        "missed_events": 0,
+        "positive_returns": 49,
+        "negative_returns": 118,
+        "unchanged_returns": 6,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -4.206320231213873,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -4.206320231213873,
+          "25": -4.456320231213873,
+          "50": -4.706320231213873,
+          "100": -5.206320231213873
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 173,
+        "scoreable": 173,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 173,
+        "missed_events": 0,
+        "positive_returns": 67,
+        "negative_returns": 97,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -2.3063919075144512,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -2.3063919075144512,
+          "25": -2.5563919075144512,
+          "50": -2.8063919075144512,
+          "100": -3.3063919075144512
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1737,
+        "mean": 1.005617696027634,
+        "quantiles": {
+          "0": 0.294931,
+          "0.01": 0.6479866,
+          "0.05": 0.7715144,
+          "0.25": 0.893805,
+          "0.5": 1.0,
+          "0.75": 1.114286,
+          "0.95": 1.2572739999999998,
+          "0.99": 1.405337239999999,
+          "1": 1.570093
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "a7811663f82e17bb03b5c4d8393d118ef20e516a96a027bf7b5560cf4373ca16"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-09",
+      "following_day": "2026-03-10",
+      "previous_sha256": "9455181200246add3619a6a4857f06c4bf11f7e0cedd8572735de9b7f199d9d8",
+      "following_sha256": "730f386c401f82b86928f19960fc728fc9067039a689ac6211aa7dd348d16832",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 2097,
+      "matched_eligible_contracts": 2097,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 30794,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12217
+      },
+      "variant": {
+        "selected": 209,
+        "scoreable": 209,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 209,
+        "missed_events": 0,
+        "positive_returns": 166,
+        "negative_returns": 40,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 7.873596172248805,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 7.873596172248805,
+          "25": 7.623596172248805,
+          "50": 7.373596172248805,
+          "100": 6.873596172248805
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 209,
+        "scoreable": 209,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 209,
+        "missed_events": 0,
+        "positive_returns": 127,
+        "negative_returns": 80,
+        "unchanged_returns": 2,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 1.2314909090909094,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 1.2314909090909094,
+          "25": 0.9814909090909093,
+          "50": 0.7314909090909093,
+          "100": 0.23149090909090933
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 2097,
+        "mean": 0.9825926809728183,
+        "quantiles": {
+          "0": 0.08596,
+          "0.01": 0.24175928000000002,
+          "0.05": 0.5881137999999999,
+          "0.25": 0.804233,
+          "0.5": 1.007121,
+          "0.75": 1.143011,
+          "0.95": 1.355894,
+          "0.99": 1.72660552,
+          "1": 2.291963
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "42c7c60788abcac7ba8ee37cec90be09136b8446385e6f5d721c0d83f67eb49d"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-10",
+      "following_day": "2026-03-11",
+      "previous_sha256": "730f386c401f82b86928f19960fc728fc9067039a689ac6211aa7dd348d16832",
+      "following_sha256": "6f29d8be2d5e037033271dc8d849865a3f064de42fbb72190fe4e454864b5171",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1694,
+      "matched_eligible_contracts": 1694,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 31744,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12168,
+        "EXPIRED_BEFORE_OUTCOME": 252
+      },
+      "variant": {
+        "selected": 169,
+        "scoreable": 169,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 169,
+        "missed_events": 0,
+        "positive_returns": 95,
+        "negative_returns": 66,
+        "unchanged_returns": 8,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 2.317344378698225,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 2.317344378698225,
+          "25": 2.067344378698225,
+          "50": 1.8173443786982248,
+          "100": 1.3173443786982248
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 169,
+        "scoreable": 169,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 169,
+        "missed_events": 0,
+        "positive_returns": 99,
+        "negative_returns": 63,
+        "unchanged_returns": 7,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 3.0317893491124264,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 3.0317893491124264,
+          "25": 2.7817893491124264,
+          "50": 2.5317893491124264,
+          "100": 2.0317893491124264
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1694,
+        "mean": 0.9992287491145219,
+        "quantiles": {
+          "0": 0.581395,
+          "0.01": 0.793581,
+          "0.05": 0.85333315,
+          "0.25": 0.9460792499999999,
+          "0.5": 1.0,
+          "0.75": 1.0449515,
+          "0.95": 1.1461069,
+          "0.99": 1.2803029999999995,
+          "1": 1.726916
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "e9dcf0c748ada70f9e4483afc332dbf5386ae3e267e7259e1cbcd396c71b9c89"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-11",
+      "following_day": "2026-03-12",
+      "previous_sha256": "6f29d8be2d5e037033271dc8d849865a3f064de42fbb72190fe4e454864b5171",
+      "following_sha256": "d6219bee37f8ba3e3d8f3712679ef002bbef246a8cdf744095e5a3af824ce5c4",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1860,
+      "matched_eligible_contracts": 1860,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 31898,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12242
+      },
+      "variant": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 183,
+        "negative_returns": 2,
+        "unchanged_returns": 1,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 19.77190752688172,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 19.77190752688172,
+          "25": 19.52190752688172,
+          "50": 19.27190752688172,
+          "100": 18.77190752688172
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 186,
+        "scoreable": 186,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 186,
+        "missed_events": 0,
+        "positive_returns": 179,
+        "negative_returns": 6,
+        "unchanged_returns": 1,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 21.246698387096774,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 21.246698387096774,
+          "25": 20.996698387096774,
+          "50": 20.746698387096774,
+          "100": 20.246698387096774
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1860,
+        "mean": 0.9957699607526882,
+        "quantiles": {
+          "0": 0.413738,
+          "0.01": 0.56772681,
+          "0.05": 0.6785049000000001,
+          "0.25": 0.82099225,
+          "0.5": 0.9923515,
+          "0.75": 1.16109225,
+          "0.95": 1.3337148,
+          "0.99": 1.4583501400000003,
+          "1": 1.942974
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "9dbd578649bab7dbac65b715a04ac724a036faaebf0aa07653a50574e4987b7e"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-12",
+      "following_day": "2026-03-13",
+      "previous_sha256": "d6219bee37f8ba3e3d8f3712679ef002bbef246a8cdf744095e5a3af824ce5c4",
+      "following_sha256": "405dff862087f6cdf6313d42544c58af93e5697f5713c5b3a94fc86fc2cd4eed",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1896,
+      "matched_eligible_contracts": 1896,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 32019,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 12636
+      },
+      "variant": {
+        "selected": 189,
+        "scoreable": 189,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 189,
+        "missed_events": 0,
+        "positive_returns": 136,
+        "negative_returns": 50,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.983668253968253,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.983668253968253,
+          "25": 4.733668253968253,
+          "50": 4.483668253968253,
+          "100": 3.9836682539682537
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 189,
+        "scoreable": 189,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 189,
+        "missed_events": 0,
+        "positive_returns": 122,
+        "negative_returns": 62,
+        "unchanged_returns": 5,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 3.688628571428571,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 3.688628571428571,
+          "25": 3.438628571428571,
+          "50": 3.188628571428571,
+          "100": 2.688628571428571
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1896,
+        "mean": 0.9919804541139241,
+        "quantiles": {
+          "0": 0.487078,
+          "0.01": 0.64476035,
+          "0.05": 0.74442225,
+          "0.25": 0.87305275,
+          "0.5": 0.9930559999999999,
+          "0.75": 1.1033315,
+          "0.95": 1.2563577499999998,
+          "0.99": 1.38256005,
+          "1": 1.754717
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "de4650d4faac3f818923468d782013fa0e874892c00feb6a763e3e6605d4f509"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-16",
+      "following_day": "2026-03-17",
+      "previous_sha256": "88cc3e31002b92014f8b082093877f65776782383dfaf769c46a12266d59839e",
+      "following_sha256": "5f9717f2c65679ae3b28ce56354235ce847d620af109b0b68833079eb97b4300",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1925,
+      "matched_eligible_contracts": 1924,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 32268,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 14462
+      },
+      "variant": {
+        "selected": 192,
+        "scoreable": 192,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 192,
+        "missed_events": 0,
+        "positive_returns": 85,
+        "negative_returns": 92,
+        "unchanged_returns": 15,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -0.8362005208333336,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -0.8362005208333336,
+          "25": -1.0862005208333336,
+          "50": -1.3362005208333336,
+          "100": -1.8362005208333336
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 192,
+        "scoreable": 192,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 192,
+        "missed_events": 0,
+        "positive_returns": 77,
+        "negative_returns": 99,
+        "unchanged_returns": 16,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -1.7495208333333336,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -1.7495208333333336,
+          "25": -1.9995208333333336,
+          "50": -2.2495208333333334,
+          "100": -2.7495208333333334
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1924,
+        "mean": 0.9653968581081082,
+        "quantiles": {
+          "0": 0.141361,
+          "0.01": 0.27879713,
+          "0.05": 0.7954011999999999,
+          "0.25": 0.92506675,
+          "0.5": 0.986543,
+          "0.75": 1.02044025,
+          "0.95": 1.1123053,
+          "0.99": 1.26115665,
+          "1": 1.940299
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "c4c647e9f6ff2b8ae2835b61c99c9e934f93ede2ed873c4c46290d1aa1da3da7"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-17",
+      "following_day": "2026-03-18",
+      "previous_sha256": "5f9717f2c65679ae3b28ce56354235ce847d620af109b0b68833079eb97b4300",
+      "following_sha256": "57240965fa05c3abd0cd42ee5f7861bb65e90aa9dfed74d2050edebe6a19ab3a",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1610,
+      "matched_eligible_contracts": 1610,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 33570,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 13520,
+        "EXPIRED_BEFORE_OUTCOME": 272
+      },
+      "variant": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 113,
+        "negative_returns": 39,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 4.060426708074534,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 4.060426708074534,
+          "25": 3.810426708074534,
+          "50": 3.560426708074534,
+          "100": 3.060426708074534
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 161,
+        "scoreable": 161,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 161,
+        "missed_events": 0,
+        "positive_returns": 115,
+        "negative_returns": 37,
+        "unchanged_returns": 9,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 5.0798055900621115,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 5.0798055900621115,
+          "25": 4.8298055900621115,
+          "50": 4.5798055900621115,
+          "100": 4.0798055900621115
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1610,
+        "mean": 0.9807268826086957,
+        "quantiles": {
+          "0": 0.496063,
+          "0.01": 0.64183638,
+          "0.05": 0.75501285,
+          "0.25": 0.9031015,
+          "0.5": 1.0,
+          "0.75": 1.05200475,
+          "0.95": 1.1891303500000001,
+          "0.99": 1.317499390000001,
+          "1": 1.567164
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "bbb8cdf72d6758cb54502ffce02d79039b58f75e216c8f291f5ded35c37c1e2d"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-18",
+      "following_day": "2026-03-19",
+      "previous_sha256": "57240965fa05c3abd0cd42ee5f7861bb65e90aa9dfed74d2050edebe6a19ab3a",
+      "following_sha256": "1108cedab67758885de3c65d30b4e9fd388aeb59cfb62a654b2f6ef49c0af918",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1871,
+      "matched_eligible_contracts": 1871,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 32701,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 14416
+      },
+      "variant": {
+        "selected": 187,
+        "scoreable": 187,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 187,
+        "missed_events": 8,
+        "positive_returns": 16,
+        "negative_returns": 169,
+        "unchanged_returns": 2,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -24.08845294117647,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -24.08845294117647,
+          "25": -24.33845294117647,
+          "50": -24.58845294117647,
+          "100": -25.08845294117647
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 187,
+        "scoreable": 187,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 187,
+        "missed_events": 8,
+        "positive_returns": 6,
+        "negative_returns": 179,
+        "unchanged_returns": 2,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -27.830470588235293,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -27.830470588235293,
+          "25": -28.080470588235293,
+          "50": -28.330470588235293,
+          "100": -28.830470588235293
+        }
+      },
+      "threshold_counts": {
+        "3": 8,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1871,
+        "mean": 1.0649645045430252,
+        "quantiles": {
+          "0": 0.099222,
+          "0.01": 0.245476,
+          "0.05": 0.4063415,
+          "0.25": 0.6434455,
+          "0.5": 0.826832,
+          "0.75": 1.4153015,
+          "0.95": 2.1569399999999996,
+          "0.99": 2.735483799999999,
+          "1": 8.563107
+        },
+        "thresholds": {
+          "3": 8,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "6f8ea71d2943f335d894d8fde04fb3a36125159b31eb2cc443ee0337b99a7ec9"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-19",
+      "following_day": "2026-03-20",
+      "previous_sha256": "1108cedab67758885de3c65d30b4e9fd388aeb59cfb62a654b2f6ef49c0af918",
+      "following_sha256": "f5ce8495c2f2ecef415c39623e96d4c2ccc9227f644cceaccb6dc8133f4f8cb2",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1874,
+      "matched_eligible_contracts": 1874,
+      "rejected": {
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 14895,
+        "INVALID_PRICE_RANGE": 32794
+      },
+      "variant": {
+        "selected": 187,
+        "scoreable": 187,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 187,
+        "missed_events": 0,
+        "positive_returns": 3,
+        "negative_returns": 181,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -21.487186096256686,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -21.487186096256686,
+          "25": -21.737186096256686,
+          "50": -21.987186096256686,
+          "100": -22.487186096256686
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 187,
+        "scoreable": 187,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 187,
+        "missed_events": 0,
+        "positive_returns": 16,
+        "negative_returns": 167,
+        "unchanged_returns": 4,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -19.73707219251337,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -19.73707219251337,
+          "25": -19.98707219251337,
+          "50": -20.23707219251337,
+          "100": -20.73707219251337
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1874,
+        "mean": 0.9836001953041622,
+        "quantiles": {
+          "0": 0.358025,
+          "0.01": 0.50850496,
+          "0.05": 0.6221849,
+          "0.25": 0.8009855,
+          "0.5": 0.9791855,
+          "0.75": 1.1538095,
+          "0.95": 1.3554509,
+          "0.99": 1.5613956599999994,
+          "1": 2.015326
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "447878cb3f30ac5a82ae332f03d85f1f3848f4c18f1ff3af5ac43ba282ccaf4b"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-23",
+      "following_day": "2026-03-24",
+      "previous_sha256": "b5aebcd6cc8bd125e11d9ea8eb22482a807459093ccb44bb3e010678ed0dabf7",
+      "following_sha256": "d791e219316ce9690d9de96c3d6a70b2288bce2e0cb0804dec66be2bb0640e55",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 2048,
+      "matched_eligible_contracts": 2047,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 32369,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 17399
+      },
+      "variant": {
+        "selected": 204,
+        "scoreable": 204,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 204,
+        "missed_events": 0,
+        "positive_returns": 1,
+        "negative_returns": 203,
+        "unchanged_returns": 0,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -31.31386519607843,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -31.31386519607843,
+          "25": -31.56386519607843,
+          "50": -31.81386519607843,
+          "100": -32.31386519607843
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 204,
+        "scoreable": 204,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 204,
+        "missed_events": 0,
+        "positive_returns": 9,
+        "negative_returns": 195,
+        "unchanged_returns": 0,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": -40.52720931372549,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": -40.52720931372549,
+          "25": -40.77720931372549,
+          "50": -41.02720931372549,
+          "100": -41.52720931372549
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 2047,
+        "mean": 0.9719561475329751,
+        "quantiles": {
+          "0": 0.050607,
+          "0.01": 0.20363844,
+          "0.05": 0.4110962,
+          "0.25": 0.6197025,
+          "0.5": 0.96,
+          "0.75": 1.2726104999999999,
+          "0.95": 1.6225365,
+          "0.99": 2.01421248,
+          "1": 2.905109
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "5b1655aeed2e80954d1ce6ff6b523b08929b66e2f4992ffdab7b5d904c6f885c"
+      }
+    },
+    {
+      "version": "range-liquidity-v1",
+      "previous_day": "2026-03-24",
+      "following_day": "2026-03-25",
+      "previous_sha256": "d791e219316ce9690d9de96c3d6a70b2288bce2e0cb0804dec66be2bb0640e55",
+      "following_sha256": "87fc40c943f6f2fbc0ea2eac1efbca6dc6cc68f7168d8a7969185a33dacde1a2",
+      "session_alignment_status": "CONSECUTIVE_DATED_OBSERVATIONS",
+      "eligible_prior_contracts": 1772,
+      "matched_eligible_contracts": 1772,
+      "rejected": {
+        "INVALID_PRICE_RANGE": 32405,
+        "PRIOR_PRICE_VOLUME_OI_FILTER": 18408,
+        "EXPIRED_BEFORE_OUTCOME": 284
+      },
+      "variant": {
+        "selected": 177,
+        "scoreable": 177,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 177,
+        "missed_events": 0,
+        "positive_returns": 132,
+        "negative_returns": 42,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 13.191129378531073,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 13.191129378531073,
+          "25": 12.941129378531073,
+          "50": 12.691129378531073,
+          "100": 12.191129378531073
+        }
+      },
+      "same_universe_momentum": {
+        "selected": 177,
+        "scoreable": 177,
+        "unscoreable": 0,
+        "hits": 0,
+        "false_picks": 177,
+        "missed_events": 0,
+        "positive_returns": 122,
+        "negative_returns": 52,
+        "unchanged_returns": 3,
+        "event_precision": 0.0,
+        "gross_reference_mean_return_pct": 12.49652881355932,
+        "assumed_cost_stress_mean_return_pct": {
+          "0": 12.49652881355932,
+          "25": 12.24652881355932,
+          "50": 11.99652881355932,
+          "100": 11.49652881355932
+        }
+      },
+      "threshold_counts": {
+        "3": 0,
+        "10": 0,
+        "20": 0,
+        "30": 0
+      },
+      "status": "RETROSPECTIVE_REFERENCE_ONLY",
+      "expected_range": null,
+      "source_availability_at_issue": "NOT_PROVEN",
+      "cost_and_fill_proof": "NOT_PROVEN",
+      "forward_issued_predictions": 0,
+      "orders_allowed": false,
+      "population_distribution": {
+        "count": 1772,
+        "mean": 1.0174873510158013,
+        "quantiles": {
+          "0": 0.224359,
+          "0.01": 0.44035917,
+          "0.05": 0.5391226,
+          "0.25": 0.796694,
+          "0.5": 1.0423710000000002,
+          "0.75": 1.20980475,
+          "0.95": 1.4815827000000001,
+          "0.99": 1.6963255599999998,
+          "1": 2.276786
+        },
+        "thresholds": {
+          "3": 0,
+          "10": 0,
+          "20": 0,
+          "30": 0
+        },
+        "full_uncapped_distribution_sha256": "0550a0630c001c649301b6c9d3fe19ce57f8c36f8961b9bd56c806457d2e8a28"
+      }
+    }
+  ],
+  "multiple_precision": "Six decimal reference multiples from frozen comparator; no capping",
+  "negative_forecasts_issued": 0,
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "calibrated_expected_range": null,
+  "source_availability_at_historical_issue": "NOT_PROVEN",
+  "executable_cost_net_performance": "NOT_PROVEN",
+  "project_qualified_oos_trades": 0,
+  "project_qualified_oos_days": 0,
+  "gap_to_100_qualified_oos_trades": 100,
+  "gap_to_60_qualified_oos_days": 60,
+  "project_sharpe": "NOT_PROVEN",
+  "project_max_drawdown": "NOT_PROVEN",
+  "project_deflated_sharpe": "NOT_PROVEN",
+  "numeric_reference_metrics_are_project_gate_pass": false,
+  "catalyst_ablation": "NO_CATALYST_BASELINE_ONLY",
+  "orders_allowed": false,
+  "status": "RETROSPECTIVE_REFERENCE_ONLY"
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "segment": "FO",
+  "scope": {"start": "2024-09-26", "end": "2026-06-30"},
+  "time_zone": "Asia/Kolkata",
+  "first_observed_at": "2026-09-27T15:47:09Z",
+  "derivation": "All Monday-Friday dates in scope, minus official NSE F&O holidays, plus official NSE F&O special live sessions. Later holiday amendments override annual circulars.",
+  "official_sources": [
+    {
+      "circular": "NSE/FAOP/59723",
+      "published_date": "2023-12-12",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP59723.pdf",
+      "role": "2024 F&O annual holiday calendar and 2024-11-01 Muhurat live session",
+      "calendar_year": 2024,
+      "override_dates": [],
+      "raw_pdf_sha256": "f05edc1dbb8943895f2e2675bb4ca0dfd17538ebb5ca2bb42fad8b6c4607f6e0",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/64959",
+      "published_date": "2024-11-08",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP64959.pdf",
+      "role": "Adds 2024-11-20 Maharashtra Assembly Election F&O holiday",
+      "calendar_year": null,
+      "override_dates": ["2024-11-20"],
+      "raw_pdf_sha256": "8e473c97c858d346f9adc8a83138a0a6db5799a027cea85be33b3f716d6eeb43",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/65588",
+      "published_date": "2024-12-13",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP65588.pdf",
+      "role": "2025 F&O annual holiday calendar and 2025-10-21 Muhurat live session",
+      "calendar_year": 2025,
+      "override_dates": [],
+      "raw_pdf_sha256": "e359379d4d7bc0296cea9b9bb1deda6d8460957cf49209208525da5a25ed7629",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/65730",
+      "published_date": "2024-12-23",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP65730.pdf",
+      "role": "Declares 2025-02-01 Union Budget F&O live session",
+      "calendar_year": null,
+      "override_dates": ["2025-02-01"],
+      "raw_pdf_sha256": "d5179d0d0fab72ef3928eb8d8157a1e547751e792ff3040e0301015fc23c9145",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/71777",
+      "published_date": "2025-12-12",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf",
+      "role": "2026 F&O annual holiday calendar",
+      "calendar_year": 2026,
+      "override_dates": [],
+      "raw_pdf_sha256": "5a2079cd78b2e6b536ef0d28300e63b645721bed22cc82a91facf5945f3296ea",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/72262",
+      "published_date": "2026-01-12",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP72262.pdf",
+      "role": "Adds 2026-01-15 Maharashtra Municipal Corporation Election F&O holiday",
+      "calendar_year": null,
+      "override_dates": ["2026-01-15"],
+      "raw_pdf_sha256": "f98ae37cf6a6f8c18b1064b0551599d084c4b4a27804842c487f0da43fea8f0f",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    },
+    {
+      "circular": "NSE/FAOP/72352",
+      "published_date": "2026-01-16",
+      "url": "https://nsearchives.nseindia.com/content/circulars/FAOP72352.pdf",
+      "role": "Declares 2026-02-01 Union Budget F&O live session",
+      "calendar_year": null,
+      "override_dates": ["2026-02-01"],
+      "raw_pdf_sha256": "7b282150e8cf7757da6944c682fe810189d2ed86fe6b171094bb4cd4d7f1facb",
+      "raw_pdf_sha256_status": "CAPTURED_FROM_OFFICIAL_NSE_CIRCULAR_REGISTER_2026-09-27"
+    }
+  ],
+  "holidays": [
+    "2024-10-02", "2024-11-01", "2024-11-15", "2024-11-20", "2024-12-25",
+    "2025-02-26", "2025-03-14", "2025-03-31", "2025-04-10", "2025-04-14",
+    "2025-04-18", "2025-05-01", "2025-08-15", "2025-08-27", "2025-10-02",
+    "2025-10-21", "2025-10-22", "2025-11-05", "2025-12-25",
+    "2026-01-15", "2026-01-26", "2026-03-03", "2026-03-26", "2026-03-31",
+    "2026-04-03", "2026-04-14", "2026-05-01", "2026-05-28", "2026-06-26"
+  ],
+  "special_live_sessions": ["2024-11-01", "2025-02-01", "2025-10-21", "2026-02-01"],
+  "session_dates_sha256": "61b7afd1e57673aba22060d520ce3847aa745014e3c918d631c56d9919ebbb5b",
+  "derived_session_count": 434,
+  "expected_phase_counts": {
+    "development": {"sessions": 314, "pairs": 313},
+    "validation": {"sessions": 60, "pairs": 59},
+    "frozen_retrospective_test": {"sessions": 60, "pairs": 59}
+  },
+  "raw_pdf_hashes_complete": true,
+  "orders_allowed": false
+}

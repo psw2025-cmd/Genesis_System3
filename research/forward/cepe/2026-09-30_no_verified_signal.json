@@ -1,0 +1,51 @@
+{
+  "schema": "cepe-forward-decision-v1",
+  "task_id": "CEPE-NEXT-009",
+  "evidence_class": "FORWARD_NO_SIGNAL_DECISION",
+  "session_date": "2026-09-30",
+  "following_open_at": "2026-09-30T09:15:00+05:30",
+  "issued_at": "2026-09-30T09:08:55+05:30",
+  "source_cutoff_at": "2026-09-30T09:08:55+05:30",
+  "decision": "NO_VERIFIED_SIGNAL",
+  "reason_codes": [
+    "FRESH_OFFICIAL_PREVIOUS_SESSION_FO_BYTES_NOT_OBTAINED",
+    "NO_SOURCE_QUALIFIED_EXACT_CONTRACT_CANDIDATE",
+    "NO_CALIBRATED_FORWARD_PROBABILITY"
+  ],
+  "source_checks": [
+    {
+      "source_role": "PRIMARY_FO_PREVIOUS_SESSION",
+      "url": "https://nsearchives.nseindia.com/content/fo/BhavCopy_NSE_FO_0_0_0_20260929_F_0000.csv.zip",
+      "result": "NOT_OBTAINED",
+      "interpretation": "NOT_PROVEN",
+      "note": "Transport failure is not evidence that the official file is absent."
+    },
+    {
+      "source_role": "CACHED_HISTORICAL_CHECKPOINT",
+      "name": "NSE_System3_2026Q3_Raw_Checkpoint.zip",
+      "archive_sha256": "e7851a94f84f2075b71dd769c0bdf3aac552f439409ab4ad03732262c57c1e23",
+      "latest_fo_observation_date": "2026-09-25",
+      "latest_fo_csv_sha256": "504583af2f1ad060f1830afce279ce5e36cf9ecae973a687514e4f7001e64edb",
+      "latest_fo_zip_sha256": "d7fda7c5881bf6b1aff715af0c90ae5bdc8fccbb7d537c83e3b1e44470dfa4af",
+      "result": "HISTORICAL_ONLY_STALE_FOR_SESSION"
+    },
+    {
+      "source_role": "SECONDARY_DISCOVERY_ONLY",
+      "url": "https://www.moneycontrol.com/stocks/fno/marketstats/options/gainers/homebody.php?optiontopic=gainers&optinst=allopt&sel_mth=all",
+      "result": "ACCESS_DENIED_NOT_USED",
+      "interpretation": "NOT_A_PRIMARY_CONTRACT_SOURCE"
+    }
+  ],
+  "candidate_count": 0,
+  "prediction_count": 0,
+  "expected_premium_move_range": null,
+  "highest_gap_up_contract": null,
+  "forecast_issued": false,
+  "forward_decision_issued": true,
+  "retrospective": false,
+  "opening_price_is_executable_fill": false,
+  "verified_forecast_accuracy": null,
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}
