@@ -1163,3 +1163,131 @@ def test_directional_maturity_record_cannot_claim_adjusted_outcome():
         match="RAW_REFERENCE_SEMANTICS_INVALID",
     ):
         validate_maturity_observation(result)
+
+
+@pytest.mark.parametrize(
+    ("path", "value", "message"),
+    [
+        (
+            ("raw_reference", "raw_actual_return_pct"),
+            999999.0,
+            "RAW_REFERENCE_RETURN_INVALID",
+        ),
+        (
+            ("raw_reference", "raw_reference_direction"),
+            "NEGATIVE",
+            "RAW_REFERENCE_DIRECTION_INVALID",
+        ),
+        (
+            ("benchmark_raw_reference", "raw_return_pct"),
+            999999.0,
+            "BENCHMARK_RETURN_INVALID",
+        ),
+        (
+            (
+                "benchmark_raw_reference",
+                "raw_unadjusted_equity_excess_pp",
+            ),
+            999999.0,
+            "BENCHMARK_EXCESS_INVALID",
+        ),
+        (
+            ("identity_review", "snapshot_digest"),
+            "0" * 64,
+            "IDENTITY_SNAPSHOT_DIGEST_MISMATCH",
+        ),
+        (
+            ("corporate_action_review", "status"),
+            "ACTION_OR_IDENTITY_REVIEW_REQUIRED",
+            "ACTION_REVIEW_SEMANTICS_INVALID",
+        ),
+        (
+            ("source_cutoff_at",),
+            "2026-10-08T10:00:00+00:00",
+            "SOURCE_CUTOFF_MISMATCH",
+        ),
+        (
+            ("final_outcome_blockers",),
+            ["EXCHANGE_PUBLICATION_TIME_NOT_PROVEN"],
+            "FINAL_OUTCOME_BLOCKERS_INVALID",
+        ),
+        (
+            ("raw_reference", "hidden_performance_claim"),
+            True,
+            "RAW_REFERENCE_FIELDS_INVALID",
+        ),
+    ],
+)
+def test_directional_maturity_rejects_rehashed_nested_semantic_mutations(
+    path,
+    value,
+    message,
+):
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    result = build_maturity_observation(
+        prediction,
+        projection,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        outcome_close="121",
+        source_bytes=sources,
+        source_receipts=receipts,
+        source_snapshot_uris=uris,
+        now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+    )
+    target = result
+    for key in path[:-1]:
+        target = target[key]
+    target[path[-1]] = value
+    payload = {
+        key: item
+        for key, item in result.items()
+        if key != "record_hash"
+    }
+    result["record_hash"] = sha256(
+        json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode()
+    ).hexdigest()
+    with pytest.raises(MaturityObservationError, match=message):
+        validate_maturity_observation(result)
+
+
+def test_directional_maturity_revalidates_matching_action_event():
+    args, prediction, projection = build_projection()
+    sources, receipts, uris = maturity_sources(args)
+    actions = json.dumps(
+        [
+            {
+                "symbol": "AAA",
+                "isin": "INE000A01001",
+                "exDate": "05-Oct-2026",
+                "subject": "Dividend",
+            }
+        ]
+    ).encode()
+    sources["actions"] = actions
+    receipts["actions"].update(
+        raw_sha256=sha256(actions).hexdigest(),
+        bytes=len(actions),
+    )
+    result = build_maturity_observation(
+        prediction,
+        projection,
+        entry_source_snapshot=args["equity_sources"]["cash"],
+        outcome_close="121",
+        source_bytes=sources,
+        source_receipts=receipts,
+        source_snapshot_uris=uris,
+        now=datetime(2026, 10, 8, 10, 15, tzinfo=timezone.utc),
+    )
+    assert result["corporate_action_review"]["action_count"] == 1
+    assert (
+        "CORPORATE_ACTION_OR_IDENTITY_ADJUSTMENT_REQUIRED"
+        in result["final_outcome_blockers"]
+    )
+    assert validate_maturity_observation(result)["orders_allowed"] is False

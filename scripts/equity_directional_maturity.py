@@ -14,8 +14,9 @@ from hashlib import sha256
 from io import StringIO
 import json
 from pathlib import Path
+import re
 from typing import Any, Mapping
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 from dashboard.backend.multibagger_ledger import (
     LedgerError,
@@ -32,6 +33,7 @@ from scripts.equity_corporate_action_scope import review as review_actions
 from scripts.equity_instrument_scope import (
     EQUITY_URL,
     ETF_URL,
+    VERSION as INSTRUMENT_SCOPE_VERSION,
     capture as capture_instruments,
 )
 
@@ -42,6 +44,105 @@ INDEX_URL_PREFIX = (
 )
 CM_URL_PREFIX = "https://nsearchives.nseindia.com/content/cm/"
 SOURCE_ROLES = {"outcome_cash", "company", "etf", "actions", "index"}
+_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+_ISIN_RE = re.compile(r"^IN[A-Z0-9]{10}$")
+_SYMBOL_RE = re.compile(r"^[A-Z0-9][A-Z0-9&.-]{0,39}$")
+_RECEIPT_FIELDS = {
+    "url",
+    "final_url",
+    "http_status",
+    "first_observed_at",
+    "exchange_published_at",
+    "sha256",
+    "bytes",
+    "snapshot_uri",
+}
+_IDENTITY_REVIEW_FIELDS = {
+    "symbol",
+    "isin",
+    "classification",
+    "snapshot_digest",
+    "scope",
+    "identity_change_proven",
+}
+_ACTION_REVIEW_FIELDS = {
+    "action_count",
+    "events",
+    "identity_link_review_required",
+    "requested_interval_covered",
+    "status",
+    "source_sha256",
+    "adjusted_return_proven",
+    "use_as_historical_prediction_feature_allowed",
+    "complete_action_coverage",
+    "raw_records",
+    "unique_records",
+}
+_BENCHMARK_FIELDS = {
+    "name",
+    "outcome_session_date",
+    "entry_reference_close",
+    "outcome_reference_close",
+    "raw_return_pct",
+    "price_basis",
+    "source_row_sha256",
+    "performance_metric_status",
+    "raw_unadjusted_equity_excess_pp",
+}
+_RAW_REFERENCE_FIELDS = {
+    "status",
+    "prediction_id",
+    "prediction_event_hash",
+    "projection_hash",
+    "symbol",
+    "isin",
+    "forecast_kind",
+    "forecast_direction",
+    "issued_at",
+    "due_at",
+    "outcome_price_as_of_at",
+    "outcome_source_exchange_published_at",
+    "outcome_source_first_observed_at",
+    "source_availability_status",
+    "entry_reference_close",
+    "outcome_reference_close",
+    "predicted_return_pct",
+    "expected_return_range",
+    "calibrated_probability",
+    "raw_actual_return_pct",
+    "raw_reference_direction",
+    "actual_return_pct",
+    "absolute_error_pp",
+    "direction_correct",
+    "entry_source_hash",
+    "entry_source_row_hash",
+    "entry_snapshot_uri",
+    "outcome_source",
+    "outcome_source_url",
+    "outcome_source_hash",
+    "outcome_source_size_bytes",
+    "outcome_source_row_hash",
+    "outcome_snapshot_uri",
+    "price_basis",
+    "adjustment_status",
+    "adjustment_basis",
+    "matured_outcomes",
+    "market_validation_claimed",
+    "reference_prices_are_executable_fills",
+    "performance_metrics_available",
+    "performance_gate_passed",
+    "real_money_ready",
+    "live_trading_enabled",
+    "order_placement_allowed",
+}
+_IDENTITY_CLASSIFICATIONS = {
+    "COMPANY_EQ_IDENTITY_MATCHED",
+    "ETF_EXCLUDED",
+    "COMPANY_NON_EQ_SERIES_EXCLUDED",
+    "NOT_PROVEN_SOURCE_NOT_YET_OBSERVED",
+    "NOT_PROVEN_REFRESH_REQUIRED",
+    "NOT_PROVEN_UNKNOWN_IDENTITY",
+}
 RECORD_FIELDS = {
     "schema_version",
     "task_id",
@@ -100,6 +201,27 @@ def _positive_decimal(value: Any, field: str) -> Decimal:
     if not result.is_finite() or result <= 0:
         raise MaturityObservationError(f"{field}_INVALID")
     return result
+
+
+def _finite_decimal(value: Any, field: str) -> Decimal:
+    try:
+        result = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise MaturityObservationError(f"{field}_INVALID") from exc
+    if not result.is_finite():
+        raise MaturityObservationError(f"{field}_INVALID")
+    return result
+
+
+def _sha(value: Any, field: str) -> str:
+    digest = str(value).strip()
+    if digest != value or not _SHA256_RE.fullmatch(digest):
+        raise MaturityObservationError(f"{field}_INVALID")
+    return digest
+
+
+def _rehash_without(record: Mapping[str, Any], field: str) -> str:
+    return sha256(_canonical({key: value for key, value in record.items() if key != field})).hexdigest()
 
 
 def _verify_receipt(
@@ -424,22 +546,370 @@ def build_maturity_observation(
     return record
 
 
+def _validate_raw_reference(
+    record: Mapping[str, Any],
+    *,
+    recorded: datetime,
+) -> tuple[dict[str, Any], datetime, datetime, str, str]:
+    raw = record.get("raw_reference")
+    if not isinstance(raw, dict) or set(raw) != _RAW_REFERENCE_FIELDS:
+        raise MaturityObservationError("RAW_REFERENCE_FIELDS_INVALID")
+    prediction_id = record.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or prediction_id != prediction_id.strip()
+        or not prediction_id
+        or len(prediction_id) > 128
+        or raw["prediction_id"] != prediction_id
+    ):
+        raise MaturityObservationError("PREDICTION_ID_INVALID")
+    prediction_hash = _sha(record.get("prediction_event_hash"), "PREDICTION_EVENT_HASH")
+    projection_hash = _sha(record.get("projection_hash"), "PROJECTION_HASH")
+    if raw["prediction_event_hash"] != prediction_hash or raw["projection_hash"] != projection_hash:
+        raise MaturityObservationError("RAW_REFERENCE_ANCHOR_MISMATCH")
+
+    symbol = str(raw.get("symbol", ""))
+    isin = str(raw.get("isin", ""))
+    if symbol != symbol.strip().upper() or not _SYMBOL_RE.fullmatch(symbol):
+        raise MaturityObservationError("RAW_REFERENCE_SYMBOL_INVALID")
+    if isin != isin.strip().upper() or not _ISIN_RE.fullmatch(isin):
+        raise MaturityObservationError("RAW_REFERENCE_ISIN_INVALID")
+
+    issued = _time(raw.get("issued_at"), "RAW_ISSUED_AT")
+    due = _time(raw.get("due_at"), "RAW_DUE_AT")
+    price_as_of = _time(raw.get("outcome_price_as_of_at"), "RAW_OUTCOME_PRICE_AS_OF_AT")
+    observed = _time(
+        raw.get("outcome_source_first_observed_at"),
+        "RAW_OUTCOME_SOURCE_FIRST_OBSERVED_AT",
+    )
+    if not issued < due == price_as_of <= observed <= recorded:
+        raise MaturityObservationError("RAW_REFERENCE_TIME_ORDER_INVALID")
+
+    entry = _positive_decimal(raw.get("entry_reference_close"), "RAW_ENTRY_REFERENCE_CLOSE")
+    outcome = _positive_decimal(raw.get("outcome_reference_close"), "RAW_OUTCOME_REFERENCE_CLOSE")
+    expected_return = round(
+        float((outcome / entry - Decimal("1")) * Decimal("100")),
+        6,
+    )
+    if _finite_decimal(raw.get("raw_actual_return_pct"), "RAW_ACTUAL_RETURN_PCT") != Decimal(str(expected_return)):
+        raise MaturityObservationError("RAW_REFERENCE_RETURN_INVALID")
+    expected_direction = "POSITIVE" if expected_return > 0 else "NEGATIVE" if expected_return < 0 else "FLAT"
+    if raw.get("raw_reference_direction") != expected_direction:
+        raise MaturityObservationError("RAW_REFERENCE_DIRECTION_INVALID")
+
+    if (
+        raw.get("status") != "RAW_REFERENCE_OBSERVED_ADJUSTMENT_REVIEW_PENDING"
+        or raw.get("forecast_kind") != "DIRECTION_ONLY"
+        or raw.get("forecast_direction") not in {"POSITIVE", "NEGATIVE"}
+        or raw.get("outcome_source_exchange_published_at") is not None
+        or raw.get("source_availability_status") != "FIRST_OBSERVED_ONLY_EXCHANGE_PUBLICATION_NOT_PROVEN"
+        or raw.get("outcome_source") != "NSE"
+        or raw.get("price_basis") != "UNADJUSTED_EXCHANGE_REFERENCE"
+        or raw.get("adjustment_status") != "PENDING_MATURITY_RECHECK"
+        or raw.get("matured_outcomes") != 0
+    ):
+        raise MaturityObservationError("RAW_REFERENCE_SEMANTICS_INVALID")
+    for field in (
+        "predicted_return_pct",
+        "expected_return_range",
+        "calibrated_probability",
+        "actual_return_pct",
+        "absolute_error_pp",
+        "direction_correct",
+        "adjustment_basis",
+    ):
+        if raw.get(field) is not None:
+            raise MaturityObservationError("RAW_REFERENCE_SEMANTICS_INVALID")
+    for field in (
+        "market_validation_claimed",
+        "reference_prices_are_executable_fills",
+        "performance_metrics_available",
+        "performance_gate_passed",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if raw.get(field) is not False:
+            raise MaturityObservationError(f"RAW_REFERENCE_{field.upper()}_INVALID")
+    for field in (
+        "entry_source_hash",
+        "entry_source_row_hash",
+        "outcome_source_hash",
+        "outcome_source_row_hash",
+    ):
+        _sha(raw.get(field), f"RAW_{field.upper()}")
+    for field in ("entry_snapshot_uri", "outcome_snapshot_uri"):
+        try:
+            if _snapshot_reference(raw.get(field), field.upper()) != raw.get(field):
+                raise MaturityObservationError(f"RAW_REFERENCE_{field.upper()}_INVALID")
+        except LedgerError as exc:
+            raise MaturityObservationError(str(exc)) from exc
+    size = raw.get("outcome_source_size_bytes")
+    if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+        raise MaturityObservationError("RAW_OUTCOME_SOURCE_SIZE_BYTES_INVALID")
+    expected_url = CM_URL_PREFIX + "BhavCopy_NSE_CM_0_0_0_" + due.strftime("%Y%m%d") + "_F_0000.csv.zip"
+    if raw.get("outcome_source_url") != expected_url:
+        raise MaturityObservationError("RAW_OUTCOME_SOURCE_URL_INVALID")
+    return raw, issued, due, symbol, isin
+
+
+def _validate_source_receipts(
+    record: Mapping[str, Any],
+    *,
+    raw: Mapping[str, Any],
+    issued: datetime,
+    due: datetime,
+    recorded: datetime,
+) -> dict[str, dict[str, Any]]:
+    receipts = record.get("source_receipts")
+    if not isinstance(receipts, dict) or set(receipts) != SOURCE_ROLES:
+        raise MaturityObservationError("SOURCE_RECEIPT_ROLES_INVALID")
+    expected_urls = {
+        "outcome_cash": raw["outcome_source_url"],
+        "company": EQUITY_URL,
+        "etf": ETF_URL,
+        "index": INDEX_URL_PREFIX + due.strftime("%d%m%Y") + ".csv",
+    }
+    observed: dict[str, datetime] = {}
+    for role in sorted(SOURCE_ROLES):
+        receipt = receipts[role]
+        if not isinstance(receipt, dict) or set(receipt) != _RECEIPT_FIELDS:
+            raise MaturityObservationError(f"{role.upper()}_RECEIPT_FIELDS_INVALID")
+        url = receipt.get("url")
+        parsed = urlsplit(str(url))
+        if (
+            receipt.get("final_url") != url
+            or receipt.get("http_status") != 200
+            or receipt.get("exchange_published_at") is not None
+            or parsed.scheme != "https"
+            or parsed.hostname not in {"nsearchives.nseindia.com", "www.nseindia.com"}
+            or parsed.username
+            or parsed.password
+            or parsed.fragment
+            or parsed.port not in (None, 443)
+        ):
+            raise MaturityObservationError(f"{role.upper()}_RECEIPT_SEMANTICS_INVALID")
+        if role != "actions" and url != expected_urls[role]:
+            raise MaturityObservationError(f"{role.upper()}_URL_INVALID")
+        _sha(receipt.get("sha256"), f"{role.upper()}_SHA256")
+        size = receipt.get("bytes")
+        if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+            raise MaturityObservationError(f"{role.upper()}_BYTES_INVALID")
+        try:
+            if _snapshot_reference(receipt.get("snapshot_uri"), f"{role.upper()}_SNAPSHOT_URI") != receipt.get(
+                "snapshot_uri"
+            ):
+                raise MaturityObservationError(f"{role.upper()}_SNAPSHOT_URI_INVALID")
+        except LedgerError as exc:
+            raise MaturityObservationError(str(exc)) from exc
+        observed[role] = _time(
+            receipt.get("first_observed_at"),
+            f"{role.upper()}_FIRST_OBSERVED_AT",
+        )
+        if not due <= observed[role] <= recorded:
+            raise MaturityObservationError(f"{role.upper()}_OBSERVATION_TIME_INVALID")
+
+    action_url = str(receipts["actions"]["url"])
+    action_parts = urlsplit(action_url)
+    action_query = parse_qs(action_parts.query, keep_blank_values=True)
+    try:
+        action_start = datetime.strptime(action_query["from_date"][0], "%d-%m-%Y").date()
+        action_end = datetime.strptime(action_query["to_date"][0], "%d-%m-%Y").date()
+    except (KeyError, IndexError, ValueError) as exc:
+        raise MaturityObservationError("ACTIONS_INTERVAL_INVALID") from exc
+    if (
+        action_parts.hostname != "www.nseindia.com"
+        or action_parts.path != "/api/corporates-corporateActions"
+        or set(action_query) != {"index", "from_date", "to_date"}
+        or action_query["index"] != ["equities"]
+        or action_start > issued.date()
+        or action_end < due.date()
+    ):
+        raise MaturityObservationError("ACTIONS_SOURCE_SCOPE_INVALID")
+
+    source_cutoff = max(observed.values())
+    if _time(record.get("source_cutoff_at"), "SOURCE_CUTOFF_AT") != source_cutoff:
+        raise MaturityObservationError("SOURCE_CUTOFF_MISMATCH")
+    if (
+        raw["outcome_source_first_observed_at"] != receipts["outcome_cash"]["first_observed_at"]
+        or raw["outcome_source_hash"] != receipts["outcome_cash"]["sha256"]
+        or raw["outcome_source_size_bytes"] != receipts["outcome_cash"]["bytes"]
+        or raw["outcome_snapshot_uri"] != receipts["outcome_cash"]["snapshot_uri"]
+    ):
+        raise MaturityObservationError("RAW_OUTCOME_RECEIPT_MISMATCH")
+    return receipts
+
+
+def _validate_identity_review(
+    record: Mapping[str, Any],
+    *,
+    raw: Mapping[str, Any],
+    receipts: Mapping[str, Mapping[str, Any]],
+) -> dict[str, Any]:
+    identity = record.get("identity_review")
+    if not isinstance(identity, dict) or set(identity) != _IDENTITY_REVIEW_FIELDS:
+        raise MaturityObservationError("IDENTITY_REVIEW_FIELDS_INVALID")
+    if (
+        identity.get("symbol") != raw["symbol"]
+        or identity.get("isin") != raw["isin"]
+        or identity.get("classification") not in _IDENTITY_CLASSIFICATIONS
+        or identity.get("scope") != "CURRENT_MASTER_AT_OBSERVATION_NOT_POINT_IN_TIME_MATURITY"
+        or identity.get("identity_change_proven") is not False
+    ):
+        raise MaturityObservationError("IDENTITY_REVIEW_SEMANTICS_INVALID")
+    equity_receipt = {
+        "url": receipts["company"]["url"],
+        "raw_sha256": receipts["company"]["sha256"],
+        "first_observed_at": receipts["company"]["first_observed_at"],
+    }
+    etf_receipt = {
+        "url": receipts["etf"]["url"],
+        "raw_sha256": receipts["etf"]["sha256"],
+        "first_observed_at": receipts["etf"]["first_observed_at"],
+    }
+    expected_digest = sha256(
+        _canonical(
+            {
+                "version": INSTRUMENT_SCOPE_VERSION,
+                "equity": equity_receipt,
+                "etf": etf_receipt,
+            }
+        )
+    ).hexdigest()
+    if identity.get("snapshot_digest") != expected_digest:
+        raise MaturityObservationError("IDENTITY_SNAPSHOT_DIGEST_MISMATCH")
+    return identity
+
+
+def _validate_action_review(
+    record: Mapping[str, Any],
+    *,
+    raw: Mapping[str, Any],
+    receipts: Mapping[str, Mapping[str, Any]],
+    issued: datetime,
+    due: datetime,
+) -> dict[str, Any]:
+    review = record.get("corporate_action_review")
+    if not isinstance(review, dict) or set(review) != _ACTION_REVIEW_FIELDS:
+        raise MaturityObservationError("ACTION_REVIEW_FIELDS_INVALID")
+    for field in ("action_count", "raw_records", "unique_records"):
+        value = review.get(field)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise MaturityObservationError(f"ACTION_{field.upper()}_INVALID")
+    if review["unique_records"] > review["raw_records"]:
+        raise MaturityObservationError("ACTION_RECORD_COUNTS_INVALID")
+    events = review.get("events")
+    if not isinstance(events, list) or review["action_count"] != len(events):
+        raise MaturityObservationError("ACTION_EVENTS_INVALID")
+    hashes: set[str] = set()
+    expected_identity_review = False
+    for event in events:
+        if not isinstance(event, dict):
+            raise MaturityObservationError("ACTION_EVENT_INVALID")
+        digest = _sha(event.get("record_sha256"), "ACTION_RECORD_SHA256")
+        original = {key: value for key, value in event.items() if key not in {"record_sha256", "ex_date"}}
+        if digest in hashes or sha256(_canonical(original)).hexdigest() != digest:
+            raise MaturityObservationError("ACTION_EVENT_HASH_INVALID")
+        hashes.add(digest)
+        try:
+            ex_date = date.fromisoformat(str(event.get("ex_date")))
+        except ValueError as exc:
+            raise MaturityObservationError("ACTION_EVENT_DATE_INVALID") from exc
+        if not issued.date() < ex_date <= due.date() or (
+            event.get("symbol") != raw["symbol"] and event.get("isin") != raw["isin"]
+        ):
+            raise MaturityObservationError("ACTION_EVENT_SCOPE_INVALID")
+        expected_identity_review = expected_identity_review or event.get("isin") != raw["isin"]
+    expected_status = "ACTION_OR_IDENTITY_REVIEW_REQUIRED" if events else "NO_MATCH_IN_CAPTURE_COVERAGE_NOT_PROVEN"
+    action_parts = urlsplit(str(receipts["actions"]["url"]))
+    action_query = parse_qs(action_parts.query)
+    start = datetime.strptime(action_query["from_date"][0], "%d-%m-%Y").date()
+    end = datetime.strptime(action_query["to_date"][0], "%d-%m-%Y").date()
+    expected_covered = start <= issued.date() and due.date() <= end
+    if (
+        review.get("identity_link_review_required") is not expected_identity_review
+        or review.get("requested_interval_covered") is not expected_covered
+        or review.get("status") != expected_status
+        or review.get("source_sha256") != receipts["actions"]["sha256"]
+        or review.get("adjusted_return_proven") is not False
+        or review.get("use_as_historical_prediction_feature_allowed") is not False
+        or review.get("complete_action_coverage") is not False
+    ):
+        raise MaturityObservationError("ACTION_REVIEW_SEMANTICS_INVALID")
+    return review
+
+
+def _validate_benchmark(
+    record: Mapping[str, Any],
+    *,
+    raw: Mapping[str, Any],
+    due: datetime,
+) -> None:
+    benchmark = record.get("benchmark_raw_reference")
+    if not isinstance(benchmark, dict) or set(benchmark) != _BENCHMARK_FIELDS:
+        raise MaturityObservationError("BENCHMARK_FIELDS_INVALID")
+    entry = _positive_decimal(benchmark.get("entry_reference_close"), "BENCHMARK_ENTRY_CLOSE")
+    outcome = _positive_decimal(benchmark.get("outcome_reference_close"), "BENCHMARK_OUTCOME_CLOSE")
+    expected_return = round(
+        float((outcome / entry - Decimal("1")) * Decimal("100")),
+        6,
+    )
+    if _finite_decimal(benchmark.get("raw_return_pct"), "BENCHMARK_RAW_RETURN_PCT") != Decimal(str(expected_return)):
+        raise MaturityObservationError("BENCHMARK_RETURN_INVALID")
+    expected_excess = round(
+        float(
+            _finite_decimal(raw.get("raw_actual_return_pct"), "RAW_ACTUAL_RETURN_PCT") - Decimal(str(expected_return))
+        ),
+        6,
+    )
+    if _finite_decimal(
+        benchmark.get("raw_unadjusted_equity_excess_pp"),
+        "BENCHMARK_RAW_EXCESS_PP",
+    ) != Decimal(str(expected_excess)):
+        raise MaturityObservationError("BENCHMARK_EXCESS_INVALID")
+    if (
+        benchmark.get("name") != "Nifty 50"
+        or benchmark.get("outcome_session_date") != due.date().isoformat()
+        or benchmark.get("price_basis") != "UNADJUSTED_EXCHANGE_REFERENCE"
+        or benchmark.get("performance_metric_status") != "RAW_REFERENCE_ONLY_EQUITY_ADJUSTMENT_NOT_PROVEN"
+    ):
+        raise MaturityObservationError("BENCHMARK_SEMANTICS_INVALID")
+    _sha(benchmark.get("source_row_sha256"), "BENCHMARK_SOURCE_ROW_SHA256")
+
+
 def validate_maturity_observation(record: dict[str, Any]) -> dict[str, Any]:
     """Validate immutable semantics without turning a raw reference into a score."""
     if not isinstance(record, dict) or set(record) != RECORD_FIELDS:
         raise MaturityObservationError("RECORD_FIELDS_INVALID")
     if record.get("schema_version") != SCHEMA_VERSION:
         raise MaturityObservationError("SCHEMA_VERSION_INVALID")
-    expected = sha256(
-        _canonical({key: value for key, value in record.items() if key != "record_hash"})
-    ).hexdigest()
+    if record.get("task_id") != "EQ-OUTCOME-027":
+        raise MaturityObservationError("TASK_ID_INVALID")
+    expected = _rehash_without(record, "record_hash")
     if record.get("record_hash") != expected:
         raise MaturityObservationError("RECORD_HASH_MISMATCH")
-    if set(record.get("source_receipts", {})) != SOURCE_ROLES:
-        raise MaturityObservationError("SOURCE_RECEIPT_ROLES_INVALID")
-    if record.get("final_outcome_status") != (
-        "NOT_PROVEN_ADJUSTMENT_REVIEW_PENDING"
-    ):
+    recorded = _time(record.get("recorded_at"), "RECORDED_AT")
+    raw, issued, due, _, _ = _validate_raw_reference(
+        record,
+        recorded=recorded,
+    )
+    receipts = _validate_source_receipts(
+        record,
+        raw=raw,
+        issued=issued,
+        due=due,
+        recorded=recorded,
+    )
+    identity = _validate_identity_review(record, raw=raw, receipts=receipts)
+    action_review = _validate_action_review(
+        record,
+        raw=raw,
+        receipts=receipts,
+        issued=issued,
+        due=due,
+    )
+    _validate_benchmark(record, raw=raw, due=due)
+    if record.get("final_outcome_status") != ("NOT_PROVEN_ADJUSTMENT_REVIEW_PENDING"):
         raise MaturityObservationError("FINAL_OUTCOME_STATUS_INVALID")
     counts = record.get("counts")
     if counts != {
@@ -448,16 +918,18 @@ def validate_maturity_observation(record: dict[str, Any]) -> dict[str, Any]:
         "matured_adjusted_outcomes": 0,
     }:
         raise MaturityObservationError("COUNTS_INVALID")
-    raw = record.get("raw_reference", {})
-    if (
-        raw.get("status")
-        != "RAW_REFERENCE_OBSERVED_ADJUSTMENT_REVIEW_PENDING"
-        or raw.get("actual_return_pct") is not None
-        or raw.get("absolute_error_pp") is not None
-        or raw.get("direction_correct") is not None
-        or raw.get("matured_outcomes") != 0
-    ):
-        raise MaturityObservationError("RAW_REFERENCE_SEMANTICS_INVALID")
+    expected_blockers = [
+        "EXCHANGE_PUBLICATION_TIME_NOT_PROVEN",
+        "POINT_IN_TIME_MATURITY_IDENTITY_NOT_PROVEN",
+    ]
+    if identity["classification"] != "COMPANY_EQ_IDENTITY_MATCHED":
+        expected_blockers.append("CURRENT_IDENTITY_MATCH_NOT_PROVEN")
+    if action_review["action_count"] or action_review["identity_link_review_required"]:
+        expected_blockers.append("CORPORATE_ACTION_OR_IDENTITY_ADJUSTMENT_REQUIRED")
+    if not action_review["complete_action_coverage"]:
+        expected_blockers.append("COMPLETE_CORPORATE_ACTION_COVERAGE_NOT_PROVEN")
+    if record.get("final_outcome_blockers") != expected_blockers:
+        raise MaturityObservationError("FINAL_OUTCOME_BLOCKERS_INVALID")
     for field in (
         "market_validation_claimed",
         "performance_metrics_available",
