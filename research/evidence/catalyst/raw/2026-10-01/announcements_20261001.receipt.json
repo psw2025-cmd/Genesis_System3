@@ -1,0 +1,11 @@
+{
+  "file": "announcements_20261001.json",
+  "url": "https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=01-10-2026&to_date=01-10-2026",
+  "final_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&from_date=01-10-2026&to_date=01-10-2026",
+  "http_status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "request_started_at": "2026-10-01T12:48:55.165981+00:00",
+  "first_observed_at": "2026-10-01T12:48:59.598877+00:00",
+  "raw_sha256": "05edabe9f869cfb38d6a69aa3e27b8b8464475f964b0287dc13088874b066e3c",
+  "bytes": 381617
+}

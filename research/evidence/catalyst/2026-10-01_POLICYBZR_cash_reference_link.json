@@ -1,0 +1,55 @@
+{
+  "task_id": "CAT-LINK-010",
+  "evidence_as_of": "2026-10-01T07:42:41.899009+00:00",
+  "symbol": "POLICYBZR",
+  "isin": "INE417T01026",
+  "status": "SAME_DATE_CASH_REFERENCE_LINKED_NOT_A_LATER_OUTCOME",
+  "catalyst_record": {
+    "commit": "eae49be5fcf6037724ecc2013e34e8b56e61495d",
+    "path": "research/evidence/catalyst/2026-10-01_POLICYBZR_capital_infusion.json",
+    "raw_sha256": "dcaa158e9b59aa225849e28f7e87c966e9250c26cc8cf5b001074c3ad1a5e393",
+    "filing_raw_sha256": "17ac3d571b7f3215f63ee74540156a138a492f35860ce1c86149e83989a49c95",
+    "exchange_disseminated_at": "2026-09-30T20:07:17+05:30",
+    "first_observed_at": "2026-09-30T22:47:16.959373+00:00"
+  },
+  "cash_reference": {
+    "commit": "85800b8c14cf79c4e5263b9db2569c08de7bf8cc",
+    "path": "research/evidence/equity/2026-10-01_equity_source_packet.json",
+    "summary_raw_sha256": "f7f3e3ce9240966fd787ca7f64ea6971c4aaa3ffb0eec4a638b587d5cc1ad655",
+    "source_receipt": {
+      "file": "cm_20260930.zip",
+      "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
+      "request_started_at": "2026-10-01T07:29:34.928679+00:00",
+      "http_status": 200,
+      "final_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20260930_F_0000.csv.zip",
+      "content_type": "application/zip",
+      "first_observed_at": "2026-10-01T07:29:39.787246+00:00",
+      "raw_sha256": "0ece4833d287f504885258a40edc21fd6368632849b87add88d288f1ef0d4a59",
+      "bytes": 206815
+    },
+    "csv_raw_sha256": "ae65f303173049b9f0b9d611c03df29af8d550828a7d8c9f545c7e9921ddb7a8",
+    "trade_date": "2026-09-30",
+    "currency": "INR",
+    "close": "1063.90",
+    "volume": 8915211,
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "canonical_source_row_sha256": "5299f0e38df368c96218aca65a2323d9b3e07414a7ca0fb39cec0e65c9c8e866",
+    "available_to_this_capture_before_filing": false,
+    "exact_close_observation_timestamp": null
+  },
+  "known_by_prediction_issue_time": null,
+  "linked_predictions": 0,
+  "linked_forward_outcomes": 0,
+  "later_measured_return": null,
+  "later_measured_return_status": "NOT_PROVEN",
+  "causal_market_move_claim": false,
+  "company_scale_control_status": "MISSING_NOT_PROVEN",
+  "notes": [
+    "Symbol/ISIN linkage verified against retained cash source bytes and the issuer filing.",
+    "A same-date closing reference captured later is not a subsequent horizon outcome or an executable entry.",
+    "Absolute share price and one-day volume do not supply the missing company-scale control.",
+    "No earlier prediction is amended and no catalyst effect or bullish signal is inferred."
+  ],
+  "live_trading_enabled": false,
+  "orders_allowed": false
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": "lane-research-targets-v1",
+  "project_targets_source": "config/quant_alpha_targets.json",
+  "evidence_as_of": "2026-09-24",
+  "lanes": {
+    "equity_weekly": {
+      "instrument": "NSE cash equity",
+      "prediction_horizon": "7 calendar days, settled on the configured next eligible exchange observation",
+      "observation_unit": "one immutable pre-issued symbol prediction with a horizon-matched corporate-action-adjusted outcome",
+      "positive_forecast_definition": "predicted adjusted return is greater than zero",
+      "hit_definition": "predicted direction equals the sign of the 7-day adjusted return",
+      "top_decile_definition": "top 10 percent of pre-issued scores evaluated only on the untouched chronological test",
+      "benchmark": "same-horizon NIFTY broad-market adjusted return fixed at issue time",
+      "required_metrics": [
+        "oos_directional_accuracy_pct",
+        "top_decile_precision_pct",
+        "oos_trades",
+        "oos_days",
+        "sharpe",
+        "max_drawdown_pct",
+        "deflated_sharpe_probability",
+        "positive_forecasts",
+        "negative_forecasts",
+        "return_distribution",
+        "calibration_error",
+        "benchmark_excess_return_pct",
+        "uncertainty"
+      ],
+      "current": {
+        "status": "NOT_PROVEN",
+        "valid_forward_oos_trades": 0,
+        "valid_forward_oos_days": 0,
+        "note": "Retrospective replay selections are not forward-issued OOS predictions."
+      }
+    },
+    "cepe_next_open": {
+      "instrument": "exact dated NSE F&O option contract (symbol, expiry, strike, CE/PE)",
+      "prediction_horizon": "prior session close observation to next session opening observation",
+      "observation_unit": "one immutable pre-issued contract prediction with an exact-identity next-open outcome",
+      "positive_forecast_definition": "pre-issued candidate whose registered target is next-open gross multiple >=3x",
+      "hit_definition": "exact contract next-open/prior-close gross reference multiple reaches the registered threshold",
+      "top_decile_definition": "top 10 percent of pre-issued scores evaluated only on the untouched chronological test",
+      "benchmark": "eligible full matched-contract-set >=3x base rate for the same session pair",
+      "execution_warning": "The next opening observation is not an executable fill; cost-adjusted performance requires dated fees and slippage.",
+      "required_metrics": [
+        "oos_directional_accuracy_pct",
+        "top_decile_precision_pct",
+        "oos_trades",
+        "oos_days",
+        "sharpe",
+        "max_drawdown_pct",
+        "deflated_sharpe_probability",
+        "positive_forecasts",
+        "negative_forecasts",
+        "full_uncapped_multiple_distribution",
+        "calibration_error",
+        "benchmark_excess_precision_pct_points",
+        "uncertainty"
+      ],
+      "current": {
+        "status": "NOT_PROVEN",
+        "valid_forward_oos_trades": 0,
+        "valid_forward_oos_days": 0,
+        "note": "Cached retrospective winners and baseline selections are not independently timestamped forward forecasts."
+      }
+    }
+  },
+  "shared_rules": {
+    "chronological_split_required": true,
+    "frozen_test_retuning_forbidden": true,
+    "costs_required_for_return_metrics": true,
+    "corporate_action_guard_required": true,
+    "survivorship_guard_required": true,
+    "multiple_testing_control_required": true,
+    "catalyst_ablation_required": true,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false
+  }
+}

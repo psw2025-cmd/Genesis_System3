@@ -1,0 +1,34 @@
+{
+  "task_id": "CAT-SOURCE-005",
+  "evidence_at": "2026-09-27T04:39:38.246619+00:00",
+  "symbol": "POLICYBZR",
+  "isin": "INE417T01026",
+  "source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=POLICYBZR&from_date=25-09-2026&to_date=27-09-2026",
+  "raw_sha256": "12fe6fc0310cc510417340df6bbf6e2892c083402efc61a35c41b89d4a681242",
+  "raw_bytes": 1478,
+  "previous_capture_at": "2026-09-26T23:41:28.443562+00:00",
+  "previous_raw_sha256": "12fe6fc0310cc510417340df6bbf6e2892c083402efc61a35c41b89d4a681242",
+  "same_bytes_as_previous": true,
+  "feed_records": 2,
+  "new_documents": 0,
+  "existing_unique_pdf_documents_in_lane": 2,
+  "forward_issued_predictions": 0,
+  "linked_outcomes": 0,
+  "causal_attribution": "NOT_CLAIMED",
+  "source_record_categories": [
+    {
+      "id": "106794670",
+      "category": "Price movement",
+      "exchange_received_at": "25-Sep-2026 18:56:39",
+      "exchange_disseminated_at": "25-Sep-2026 18:56:39"
+    },
+    {
+      "id": "106793388",
+      "category": "Analysts/Institutional Investor Meet/Con. Call Updates",
+      "exchange_received_at": "25-Sep-2026 14:14:41",
+      "exchange_disseminated_at": "25-Sep-2026 14:14:42"
+    }
+  ],
+  "status": "SOURCE_RECHECK_ONLY_NOT_A_FORECAST",
+  "orders_allowed": false
+}
