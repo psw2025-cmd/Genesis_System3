@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import tempfile
 from typing import Any, Callable, Mapping
 from urllib.parse import parse_qs, urlsplit
 
@@ -250,6 +251,11 @@ def _time(value: Any, field: str) -> datetime:
     if result.tzinfo is None or result.utcoffset() is None:
         raise MaturityObservationError(f"{field}_TIMEZONE_REQUIRED")
     return result.astimezone(timezone.utc)
+
+
+def _system_utc_now() -> datetime:
+    """Return the registration time used by prospective issuance."""
+    return datetime.now(timezone.utc)
 
 
 def _positive_decimal(value: Any, field: str) -> Decimal:
@@ -1225,6 +1231,16 @@ def build_issuance_artifact_event(
     previous_hash: str,
 ) -> dict[str, Any]:
     """Seal exact forecast artifact bytes without claiming validation."""
+    for raw, field in (
+        (prediction_bytes, "PREDICTION_ARTIFACT"),
+        (projection_bytes, "PROJECTION_ARTIFACT"),
+    ):
+        if (
+            not isinstance(raw, bytes)
+            or not raw
+            or len(raw) > _MAX_ANCHOR_ARTIFACT_BYTES
+        ):
+            raise MaturityObservationError(f"{field}_SIZE_INVALID")
     prediction = _strict_json_object(prediction_bytes, "PREDICTION_ARTIFACT")
     projection = _strict_json_object(projection_bytes, "PROJECTION_ARTIFACT")
     try:
@@ -1864,6 +1880,163 @@ def _read_retained_bytes(
         ) from exc
 
 
+def _prospective_storage_path(
+    evidence_root: Path,
+    retained_uri: str,
+    *,
+    field: str,
+    suffix: str,
+    must_not_exist: bool,
+) -> Path:
+    """Resolve a regular retained target without following path indirection."""
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        if not root.is_dir():
+            raise MaturityObservationError("EVIDENCE_ROOT_NOT_DIRECTORY")
+        reference = _observation_reference(retained_uri, f"{field}_URI")
+        if not reference.endswith(suffix):
+            raise MaturityObservationError(f"{field}_URI_INVALID")
+        candidate = root
+        for part in reference.split("/")[:-1]:
+            candidate = candidate / part
+            info = candidate.lstat()
+            reparse = getattr(info, "st_file_attributes", 0) & getattr(
+                stat,
+                "FILE_ATTRIBUTE_REPARSE_POINT",
+                0,
+            )
+            if stat.S_ISLNK(info.st_mode) or reparse:
+                raise MaturityObservationError(
+                    f"{field}_PARENT_LINK_FORBIDDEN"
+                )
+            if not stat.S_ISDIR(info.st_mode):
+                raise MaturityObservationError(
+                    f"{field}_PARENT_NOT_DIRECTORY"
+                )
+        target = candidate / reference.split("/")[-1]
+        target.parent.resolve(strict=True).relative_to(root)
+        try:
+            info = target.lstat()
+        except FileNotFoundError:
+            info = None
+        if info is not None:
+            reparse = getattr(info, "st_file_attributes", 0) & getattr(
+                stat,
+                "FILE_ATTRIBUTE_REPARSE_POINT",
+                0,
+            )
+            if stat.S_ISLNK(info.st_mode) or reparse:
+                raise MaturityObservationError(f"{field}_LINK_FORBIDDEN")
+            if must_not_exist:
+                raise MaturityObservationError(
+                    f"{field}_ALREADY_EXISTS_UNREGISTERED"
+                )
+            if not stat.S_ISREG(info.st_mode):
+                raise MaturityObservationError(f"{field}_NOT_REGULAR")
+        return target
+    except MaturityObservationError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise MaturityObservationError(f"{field}_PATH_INVALID") from exc
+
+
+def _write_new_prospective_artifact(
+    path: Path,
+    raw: bytes,
+    *,
+    field: str,
+) -> None:
+    """Create one transaction-owned artifact without overwriting anything."""
+    descriptor: int | None = None
+    created = False
+    try:
+        flags = (
+            os.O_WRONLY
+            | os.O_CREAT
+            | os.O_EXCL
+            | getattr(os, "O_BINARY", 0)
+        )
+        descriptor = os.open(path, flags, 0o644)
+        created = True
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = None
+            handle.write(raw)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except OSError as exc:
+        if descriptor is not None:
+            os.close(descriptor)
+        if created:
+            path.unlink(missing_ok=True)
+        raise MaturityObservationError(f"{field}_WRITE_FAILED") from exc
+
+
+def _fsync_directory(path: Path) -> None:
+    """Best-effort directory durability on platforms that support it."""
+    directory_flag = getattr(os, "O_DIRECTORY", 0)
+    try:
+        descriptor = os.open(path, os.O_RDONLY | directory_flag)
+    except OSError:
+        return
+    try:
+        os.fsync(descriptor)
+    except OSError:
+        pass
+    finally:
+        os.close(descriptor)
+
+
+def _replace_manifest_atomically(path: Path, payload: bytes) -> None:
+    """Make the fully validated manifest version the transaction commit point."""
+    mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.",
+        suffix=".tmp",
+        dir=path.parent,
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            descriptor = -1
+            handle.write(payload)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.chmod(temporary, mode)
+        os.replace(temporary, path)
+        _fsync_directory(path.parent)
+    except OSError as exc:
+        if descriptor >= 0:
+            os.close(descriptor)
+        temporary.unlink(missing_ok=True)
+        raise MaturityObservationError(
+            "ISSUANCE_MANIFEST_COMMIT_FAILED"
+        ) from exc
+
+
+def _manifest_storage_path(path: Path, evidence_root: Path) -> tuple[Path, str]:
+    """Bind a manifest filesystem path to its retained repository URI."""
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        candidate = Path(path)
+        if not candidate.is_absolute():
+            candidate = Path.cwd() / candidate
+        parent = candidate.parent.resolve(strict=True)
+        target = parent / candidate.name
+        relative = target.relative_to(root).as_posix()
+    except (OSError, ValueError) as exc:
+        raise MaturityObservationError(
+            "ISSUANCE_MANIFEST_PATH_INVALID"
+        ) from exc
+    verified = _prospective_storage_path(
+        root,
+        relative,
+        field="ISSUANCE_MANIFEST",
+        suffix=".ndjson",
+        must_not_exist=False,
+    )
+    return verified, relative
+
+
 def verify_issuance_artifact_manifest(
     events: list[dict[str, Any]],
     *,
@@ -2031,6 +2204,146 @@ def read_issuance_artifact_manifest(
     )
 
 
+def publish_prospective_issuance(
+    path: Path,
+    *,
+    prediction_bytes: bytes,
+    projection_bytes: bytes,
+    prediction_uri: str,
+    projection_uri: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Publish forecast artifacts with a system-timed manifest commit.
+
+    The manifest replacement is the acceptance commit point.  Artifacts are
+    created without overwrite while the manifest lock is held, the complete
+    prospective chain is replayed, and only then is the validated manifest
+    version installed atomically.  Orphan files are never trusted because all
+    readers require the manifest entry.
+    """
+    manifest_path, manifest_uri = _manifest_storage_path(
+        path, evidence_root
+    )
+    created_paths: list[Path] = []
+    committed = False
+    with _ledger_lock(manifest_path, exclusive=True):
+        if manifest_path.exists():
+            existing_raw = _read_retained_bytes(
+                evidence_root,
+                manifest_uri,
+                field="ISSUANCE_MANIFEST",
+                max_bytes=_MAX_ISSUANCE_MANIFEST_BYTES,
+                reference_validator=_observation_reference,
+            )
+            if existing_raw and not existing_raw.endswith(b"\n"):
+                raise MaturityObservationError(
+                    "ISSUANCE_MANIFEST_TRUNCATED"
+                )
+            events = [
+                _strict_json_object(line, "ISSUANCE_MANIFEST_ROW")
+                for line in existing_raw.splitlines()
+                if line.strip()
+            ]
+            verify_issuance_artifact_manifest(
+                events, evidence_root=evidence_root
+            )
+        else:
+            existing_raw = b""
+            events = []
+
+        registered_at = _system_utc_now()
+        if (
+            registered_at.tzinfo is None
+            or registered_at.utcoffset() is None
+        ):
+            raise MaturityObservationError(
+                "SYSTEM_REGISTRATION_TIME_INVALID"
+            )
+        event = build_issuance_artifact_event(
+            prediction_bytes=prediction_bytes,
+            projection_bytes=projection_bytes,
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            registered_at=registered_at,
+            previous_hash=(
+                events[-1]["event_hash"]
+                if events
+                else ISSUANCE_MANIFEST_GENESIS_HASH
+            ),
+        )
+        if not event["pre_maturity_registered"]:
+            raise MaturityObservationError(
+                "PROSPECTIVE_ISSUANCE_AFTER_HORIZON"
+            )
+        if any(
+            prior["prediction_id"] == event["prediction_id"]
+            for prior in events
+        ):
+            raise MaturityObservationError(
+                "PROSPECTIVE_PREDICTION_ID_DUPLICATE"
+            )
+        used_uris = {
+            uri
+            for prior in events
+            for uri in (prior["prediction_uri"], prior["projection_uri"])
+        }
+        if prediction_uri in used_uris or projection_uri in used_uris:
+            raise MaturityObservationError(
+                "PROSPECTIVE_ARTIFACT_URI_DUPLICATE"
+            )
+
+        prediction_path = _prospective_storage_path(
+            evidence_root,
+            prediction_uri,
+            field="PREDICTION_ARTIFACT",
+            suffix=".json",
+            must_not_exist=True,
+        )
+        projection_path = _prospective_storage_path(
+            evidence_root,
+            projection_uri,
+            field="PROJECTION_ARTIFACT",
+            suffix=".json",
+            must_not_exist=True,
+        )
+        try:
+            _write_new_prospective_artifact(
+                prediction_path,
+                prediction_bytes,
+                field="PREDICTION_ARTIFACT",
+            )
+            created_paths.append(prediction_path)
+            _write_new_prospective_artifact(
+                projection_path,
+                projection_bytes,
+                field="PROJECTION_ARTIFACT",
+            )
+            created_paths.append(projection_path)
+            candidate = [*events, event]
+            verify_issuance_artifact_manifest(
+                candidate, evidence_root=evidence_root
+            )
+            encoded_event = json.dumps(
+                event,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+                allow_nan=False,
+            ).encode("utf-8")
+            payload = existing_raw + encoded_event + b"\n"
+            if len(payload) > _MAX_ISSUANCE_MANIFEST_BYTES:
+                raise MaturityObservationError(
+                    "ISSUANCE_MANIFEST_RETAINED_TOO_LARGE"
+                )
+            _replace_manifest_atomically(manifest_path, payload)
+            committed = True
+            return event
+        finally:
+            if not committed:
+                for created_path in reversed(created_paths):
+                    created_path.unlink(missing_ok=True)
+
+
 def append_issuance_artifact_manifest(
     path: Path,
     *,
@@ -2039,7 +2352,7 @@ def append_issuance_artifact_manifest(
     registered_at: datetime,
     evidence_root: Path,
 ) -> dict[str, Any]:
-    """Append an exact-byte issuance registration before maturity when able."""
+    """Import an already-retained historical pair without forward claims."""
     with _ledger_lock(path, exclusive=True):
         if path.exists():
             raw = path.read_bytes()
@@ -2083,6 +2396,10 @@ def append_issuance_artifact_manifest(
                 else ISSUANCE_MANIFEST_GENESIS_HASH
             ),
         )
+        if event["pre_maturity_registered"]:
+            raise MaturityObservationError(
+                "PRE_MATURITY_REGISTRATION_REQUIRES_PROSPECTIVE_TRANSACTION"
+            )
         candidate = [*events, event]
         verify_issuance_artifact_manifest(
             candidate, evidence_root=evidence_root

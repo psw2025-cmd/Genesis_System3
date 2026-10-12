@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 import pytest
 
+import scripts.equity_directional_maturity as maturity_module
 from dashboard.backend.multibagger_outcome import (
     OutcomeLedgerError,
     build_directional_outcome_projection,
@@ -33,6 +34,7 @@ from scripts.equity_directional_maturity import (
     append_maturity_observation,
     build_maturity_observation,
     build_maturity_observation_event,
+    publish_prospective_issuance,
     read_issuance_artifact_manifest,
     read_maturity_observation_ledger,
     validate_maturity_observation,
@@ -1311,6 +1313,55 @@ def retain_anchor_artifacts(
     *,
     suffix="",
 ):
+    retain_projection_sources(tmp_path, args, projection)
+    prediction_uri = (
+        "research/forward/equity/test/"
+        f"prediction{suffix}.json"
+    )
+    projection_uri = (
+        "research/forward/equity/test/"
+        f"projection{suffix}.json"
+    )
+    prediction_path = tmp_path / prediction_uri
+    projection_path = tmp_path / projection_uri
+    prediction_path.parent.mkdir(parents=True, exist_ok=True)
+    prediction_bytes = json.dumps(
+        prediction, sort_keys=True, indent=2
+    ).encode("utf-8")
+    projection_bytes = json.dumps(
+        projection, sort_keys=True, indent=2
+    ).encode("utf-8")
+    manifest_uri = (
+        "research/forward/equity/test/"
+        f"issuance_manifest{suffix}.ndjson"
+    )
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            maturity_module,
+            "_system_utc_now",
+            lambda: datetime(
+                2026, 10, 1, 13, 1, tzinfo=timezone.utc
+            ),
+        )
+        publish_prospective_issuance(
+            tmp_path / manifest_uri,
+            prediction_bytes=prediction_bytes,
+            projection_bytes=projection_bytes,
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            evidence_root=tmp_path,
+        )
+    return (
+        manifest_uri,
+        prediction_path,
+        projection_path,
+    )
+
+
+def retain_projection_sources(tmp_path, args, projection):
+    (tmp_path / "research/forward/equity/test").mkdir(
+        parents=True, exist_ok=True
+    )
     projection_sources = {
         **args["equity_sources"],
         "index": args["index_raw"],
@@ -1323,43 +1374,6 @@ def retain_anchor_artifacts(
         ]
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(raw)
-    prediction_uri = (
-        "research/forward/equity/test/"
-        f"prediction{suffix}.json"
-    )
-    projection_uri = (
-        "research/forward/equity/test/"
-        f"projection{suffix}.json"
-    )
-    prediction_path = tmp_path / prediction_uri
-    projection_path = tmp_path / projection_uri
-    prediction_path.parent.mkdir(parents=True, exist_ok=True)
-    prediction_path.write_text(
-        json.dumps(prediction, sort_keys=True, indent=2),
-        encoding="utf-8",
-    )
-    projection_path.write_text(
-        json.dumps(projection, sort_keys=True, indent=2),
-        encoding="utf-8",
-    )
-    manifest_uri = (
-        "research/forward/equity/test/"
-        f"issuance_manifest{suffix}.ndjson"
-    )
-    append_issuance_artifact_manifest(
-        tmp_path / manifest_uri,
-        prediction_uri=prediction_uri,
-        projection_uri=projection_uri,
-        registered_at=datetime(
-            2026, 10, 1, 13, 1, tzinfo=timezone.utc
-        ),
-        evidence_root=tmp_path,
-    )
-    return (
-        manifest_uri,
-        prediction_path,
-        projection_path,
-    )
 
 
 def retained_maturity_case(tmp_path):
@@ -1467,6 +1481,188 @@ def test_issuance_manifest_marks_late_registration_not_proven(tmp_path):
     )
     assert status["pre_maturity_registration_count"] == 0
     assert status["historical_after_maturity_registration_count"] == 1
+
+
+def test_historical_append_cannot_backdate_pre_maturity_registration(
+    tmp_path,
+):
+    args, prediction, projection = build_projection()
+    _, prediction_path, projection_path = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest = tmp_path / (
+        "research/forward/equity/test/"
+        "backdated_historical_manifest.ndjson"
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PRE_MATURITY_REGISTRATION_REQUIRES_PROSPECTIVE_TRANSACTION",
+    ):
+        append_issuance_artifact_manifest(
+            manifest,
+            prediction_uri=str(prediction_path.relative_to(tmp_path)),
+            projection_uri=str(projection_path.relative_to(tmp_path)),
+            registered_at=datetime(
+                2026, 10, 1, 13, 2, tzinfo=timezone.utc
+            ),
+            evidence_root=tmp_path,
+        )
+    assert not manifest.exists()
+
+
+def test_prospective_issuance_rejects_after_horizon_before_writing(
+    tmp_path,
+    monkeypatch,
+):
+    args, prediction, projection = build_projection()
+    retain_projection_sources(tmp_path, args, projection)
+    prediction_uri = "research/forward/equity/test/late_prediction.json"
+    projection_uri = "research/forward/equity/test/late_projection.json"
+    manifest = tmp_path / (
+        "research/forward/equity/test/late_transaction.ndjson"
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 8, 10, 0, tzinfo=timezone.utc),
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PROSPECTIVE_ISSUANCE_AFTER_HORIZON",
+    ):
+        publish_prospective_issuance(
+            manifest,
+            prediction_bytes=json.dumps(
+                prediction, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            projection_bytes=json.dumps(
+                projection, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            evidence_root=tmp_path,
+        )
+    assert not (tmp_path / prediction_uri).exists()
+    assert not (tmp_path / projection_uri).exists()
+    assert not manifest.exists()
+
+
+def test_prospective_issuance_rejects_preexisting_unregistered_artifact(
+    tmp_path,
+    monkeypatch,
+):
+    args, prediction, projection = build_projection()
+    retain_projection_sources(tmp_path, args, projection)
+    prediction_uri = "research/forward/equity/test/orphan_prediction.json"
+    projection_uri = "research/forward/equity/test/orphan_projection.json"
+    prediction_path = tmp_path / prediction_uri
+    prediction_path.write_bytes(b"unregistered")
+    manifest = tmp_path / (
+        "research/forward/equity/test/orphan_transaction.ndjson"
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 1, 13, 1, tzinfo=timezone.utc),
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PREDICTION_ARTIFACT_ALREADY_EXISTS_UNREGISTERED",
+    ):
+        publish_prospective_issuance(
+            manifest,
+            prediction_bytes=json.dumps(
+                prediction, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            projection_bytes=json.dumps(
+                projection, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            evidence_root=tmp_path,
+        )
+    assert prediction_path.read_bytes() == b"unregistered"
+    assert not (tmp_path / projection_uri).exists()
+    assert not manifest.exists()
+
+
+def test_prospective_issuance_rolls_back_on_source_replay_failure(
+    tmp_path,
+    monkeypatch,
+):
+    args, prediction, projection = build_projection()
+    retain_projection_sources(tmp_path, args, projection)
+    cash_uri = projection["source_bindings"]["cash"]["snapshot_uri"]
+    (tmp_path / cash_uri).write_bytes(b"mutated-after-projection")
+    prediction_uri = "research/forward/equity/test/rollback_prediction.json"
+    projection_uri = "research/forward/equity/test/rollback_projection.json"
+    manifest = tmp_path / (
+        "research/forward/equity/test/rollback_transaction.ndjson"
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 1, 13, 1, tzinfo=timezone.utc),
+    )
+    with pytest.raises(MaturityObservationError):
+        publish_prospective_issuance(
+            manifest,
+            prediction_bytes=json.dumps(
+                prediction, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            projection_bytes=json.dumps(
+                projection, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            evidence_root=tmp_path,
+        )
+    assert not (tmp_path / prediction_uri).exists()
+    assert not (tmp_path / projection_uri).exists()
+    assert not manifest.exists()
+
+
+def test_prospective_issuance_rolls_back_on_manifest_commit_failure(
+    tmp_path,
+    monkeypatch,
+):
+    args, prediction, projection = build_projection()
+    retain_projection_sources(tmp_path, args, projection)
+    prediction_uri = "research/forward/equity/test/commit_prediction.json"
+    projection_uri = "research/forward/equity/test/commit_projection.json"
+    manifest = tmp_path / (
+        "research/forward/equity/test/commit_transaction.ndjson"
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 1, 13, 1, tzinfo=timezone.utc),
+    )
+
+    def fail_replace(source, destination):
+        raise OSError("simulated atomic replacement failure")
+
+    monkeypatch.setattr(maturity_module.os, "replace", fail_replace)
+    with pytest.raises(
+        MaturityObservationError,
+        match="ISSUANCE_MANIFEST_COMMIT_FAILED",
+    ):
+        publish_prospective_issuance(
+            manifest,
+            prediction_bytes=json.dumps(
+                prediction, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            projection_bytes=json.dumps(
+                projection, sort_keys=True, indent=2
+            ).encode("utf-8"),
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            evidence_root=tmp_path,
+        )
+    assert not (tmp_path / prediction_uri).exists()
+    assert not (tmp_path / projection_uri).exists()
+    assert not manifest.exists()
+    assert not list(manifest.parent.glob(f".{manifest.name}.*.tmp"))
 
 
 def test_maturity_ledger_requires_retained_issuance_manifest(tmp_path):
