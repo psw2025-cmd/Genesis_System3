@@ -25,14 +25,18 @@ from scripts.equity_forward_prediction import (
     validate_prediction,
 )
 from scripts.equity_directional_maturity import (
+    ISSUANCE_MANIFEST_GENESIS_HASH,
     MATURITY_LEDGER_GENESIS_HASH,
     MaturityObservationError,
     _canonical_maturity_ledger_event,
+    append_issuance_artifact_manifest,
     append_maturity_observation,
     build_maturity_observation,
     build_maturity_observation_event,
+    read_issuance_artifact_manifest,
     read_maturity_observation_ledger,
     validate_maturity_observation,
+    verify_issuance_artifact_manifest,
     verify_maturity_evidence,
     verify_maturity_observation_chain,
 )
@@ -1338,11 +1342,21 @@ def retain_anchor_artifacts(
         json.dumps(projection, sort_keys=True, indent=2),
         encoding="utf-8",
     )
+    manifest_uri = (
+        "research/forward/equity/test/"
+        f"issuance_manifest{suffix}.ndjson"
+    )
+    append_issuance_artifact_manifest(
+        tmp_path / manifest_uri,
+        prediction_uri=prediction_uri,
+        projection_uri=projection_uri,
+        registered_at=datetime(
+            2026, 10, 1, 13, 1, tzinfo=timezone.utc
+        ),
+        evidence_root=tmp_path,
+    )
     return (
-        [{
-            "prediction_uri": prediction_uri,
-            "projection_uri": projection_uri,
-        }],
+        manifest_uri,
         prediction_path,
         projection_path,
     )
@@ -1396,6 +1410,89 @@ def retained_maturity_case(tmp_path):
     )
 
 
+def test_issuance_manifest_seals_exact_artifact_bytes_before_maturity(
+    tmp_path,
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, prediction_path, projection_path = (
+        retain_anchor_artifacts(
+            tmp_path, args, prediction, projection
+        )
+    )
+    events = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )
+    assert len(events) == 1
+    event = events[0]
+    assert event["previous_hash"] == ISSUANCE_MANIFEST_GENESIS_HASH
+    assert event["pre_maturity_registered"] is True
+    assert event["registration_status"] == "PRE_MATURITY_REGISTERED"
+    assert event["prediction_file_sha256"] == sha256(
+        prediction_path.read_bytes()
+    ).hexdigest()
+    assert event["projection_file_sha256"] == sha256(
+        projection_path.read_bytes()
+    ).hexdigest()
+    status = verify_issuance_artifact_manifest(
+        events, evidence_root=tmp_path
+    )
+    assert status["pre_maturity_registration_count"] == 1
+    assert status["historical_after_maturity_registration_count"] == 0
+    assert status["order_placement_allowed"] is False
+
+
+def test_issuance_manifest_marks_late_registration_not_proven(tmp_path):
+    args, prediction, projection = build_projection()
+    _, prediction_path, projection_path = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_uri = (
+        "research/forward/equity/test/late_issuance_manifest.ndjson"
+    )
+    event = append_issuance_artifact_manifest(
+        tmp_path / manifest_uri,
+        prediction_uri=str(prediction_path.relative_to(tmp_path)),
+        projection_uri=str(projection_path.relative_to(tmp_path)),
+        registered_at=datetime(
+            2026, 10, 9, 10, 0, tzinfo=timezone.utc
+        ),
+        evidence_root=tmp_path,
+    )
+    assert event["pre_maturity_registered"] is False
+    assert event["registration_status"] == (
+        "HISTORICAL_AFTER_MATURITY_REGISTRATION_NOT_PROVEN"
+    )
+    status = verify_issuance_artifact_manifest(
+        [event], evidence_root=tmp_path
+    )
+    assert status["pre_maturity_registration_count"] == 0
+    assert status["historical_after_maturity_registration_count"] == 1
+
+
+def test_maturity_ledger_requires_retained_issuance_manifest(tmp_path):
+    (
+        _,
+        _,
+        observation_uri,
+        _,
+        _,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    with pytest.raises(
+        MaturityObservationError,
+        match="ISSUANCE_MANIFEST_RETAINED_UNAVAILABLE",
+    ):
+        append_maturity_observation(
+            tmp_path / "unregistered_maturity.ndjson",
+            observation_uri,
+            issuance_manifest_uri=(
+                "research/forward/equity/test/missing_manifest.ndjson"
+            ),
+            evidence_root=tmp_path,
+        )
+
+
 def test_maturity_observation_ledger_is_append_only_and_source_bound(
     tmp_path,
 ):
@@ -1412,7 +1509,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     event = append_maturity_observation(
         ledger,
         observation_uri,
-        anchor_artifacts=anchor_artifacts,
+        issuance_manifest_uri=anchor_artifacts,
         evidence_root=tmp_path,
     )
     assert event["observation_record_hash"] == observation["record_hash"]
@@ -1423,7 +1520,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     assert event["order_placement_allowed"] is False
     assert read_maturity_observation_ledger(
         ledger,
-        anchor_artifacts=anchor_artifacts,
+        issuance_manifest_uri=anchor_artifacts,
         evidence_root=tmp_path,
     ) == [event]
 
@@ -1435,7 +1532,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
         append_maturity_observation(
             ledger,
             observation_uri,
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
     assert ledger.read_bytes() == original
@@ -1447,7 +1544,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     ):
         read_maturity_observation_ledger(
             ledger,
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1499,7 +1596,7 @@ def test_maturity_ledger_rejects_self_rehashed_anchor_replacement(tmp_path):
         append_maturity_observation(
             tmp_path / "replaced.ndjson",
             replaced_uri,
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1549,7 +1646,7 @@ def test_maturity_verifier_rejects_caller_rehashed_anchor_event(tmp_path):
     ):
         verify_maturity_observation_chain(
             [event],
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1583,11 +1680,11 @@ def test_maturity_verifier_rejects_detached_rehashed_projection(tmp_path):
     )
     with pytest.raises(
         MaturityObservationError,
-        match="PROJECTION_PREDICTION_BINDING_MISMATCH",
+        match="PROJECTION_ARTIFACT_MANIFEST_MISMATCH",
     ):
         verify_maturity_observation_chain(
             [event],
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1628,11 +1725,11 @@ def test_maturity_verifier_rejects_non_genesis_prediction_chain(tmp_path):
     )
     with pytest.raises(
         MaturityObservationError,
-        match="PREDICTION_ARTIFACT_INVALID",
+        match="PREDICTION_ARTIFACT_MANIFEST_MISMATCH",
     ):
         verify_maturity_observation_chain(
             [event],
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1667,27 +1764,30 @@ def test_maturity_ledger_rejects_rehashed_premature_score(tmp_path):
     ):
         verify_maturity_observation_chain(
             [event],
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
 
 def test_retained_molbio_maturity_observation_ledger_verifies():
     root = Path(__file__).resolve().parents[1]
+    manifest_uri = (
+        "research/forward/equity/2026-10-01/"
+        "equity_issuance_artifact_manifest.ndjson"
+    )
+    manifest_events = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=root
+    )
+    assert len(manifest_events) == 1
+    assert manifest_events[0]["pre_maturity_registered"] is False
+    assert manifest_events[0]["registration_status"] == (
+        "HISTORICAL_AFTER_MATURITY_REGISTRATION_NOT_PROVEN"
+    )
     events = read_maturity_observation_ledger(
         root
         / "research/forward/equity/2026-10-01/"
         "equity_maturity_observation_ledger.ndjson",
-        anchor_artifacts=[{
-            "prediction_uri": (
-                "research/forward/equity/2026-10-01/"
-                "2026-10-01_equity_forward_prediction.json"
-            ),
-            "projection_uri": (
-                "research/forward/equity/2026-10-01/"
-                "2026-10-08_equity_directional_projection.json"
-            ),
-        }],
+        issuance_manifest_uri=manifest_uri,
         evidence_root=root,
     )
     assert len(events) == 1

@@ -183,7 +183,22 @@ _MATURITY_LEDGER_EVENT_TYPE = "EQUITY_MATURITY_OBSERVATION_RECORDED"
 _MAX_MATURITY_OBSERVATION_BYTES = 2 * 1024 * 1024
 _MAX_ANCHOR_ARTIFACT_BYTES = 2 * 1024 * 1024
 _MAX_ANCHOR_SOURCE_BYTES = 32 * 1024 * 1024
+_MAX_ISSUANCE_MANIFEST_BYTES = 2 * 1024 * 1024
 _ANCHOR_ARTIFACT_FIELDS = {"prediction_uri", "projection_uri"}
+ISSUANCE_MANIFEST_SCHEMA_VERSION = "equity-issuance-artifact-ledger-v1"
+ISSUANCE_MANIFEST_GENESIS_HASH = "0" * 64
+_ISSUANCE_MANIFEST_EVENT_TYPE = "EQUITY_ISSUANCE_ARTIFACTS_REGISTERED"
+_ISSUANCE_MANIFEST_FIELDS = {
+    "schema_version", "event_type", "prediction_id",
+    "prediction_event_hash", "prediction_uri",
+    "prediction_file_sha256", "prediction_size_bytes",
+    "projection_hash", "projection_uri", "projection_file_sha256",
+    "projection_size_bytes", "issued_at", "due_at", "registered_at",
+    "registration_status", "pre_maturity_registered", "previous_hash",
+    "market_validation_claimed", "performance_metrics_available",
+    "real_money_ready", "live_trading_enabled", "order_placement_allowed",
+    "event_hash",
+}
 _MATURITY_LEDGER_FIELDS = {
     "schema_version",
     "event_type",
@@ -1074,6 +1089,220 @@ def _strict_json_object(raw: bytes, field: str) -> dict[str, Any]:
     return parsed
 
 
+def _canonical_issuance_manifest_event(
+    record: Mapping[str, Any],
+) -> bytes:
+    return _canonical(
+        {key: value for key, value in record.items() if key != "event_hash"}
+    )
+
+
+def _validate_issuance_manifest_event(
+    event: Mapping[str, Any],
+    *,
+    prefix: str = "",
+    allow_unhashed: bool = False,
+) -> tuple[datetime, datetime, datetime]:
+    expected_fields = (
+        _ISSUANCE_MANIFEST_FIELDS - {"event_hash"}
+        if allow_unhashed
+        else _ISSUANCE_MANIFEST_FIELDS
+    )
+    if not isinstance(event, dict) or set(event) != expected_fields:
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_MANIFEST_FIELDS_INVALID"
+        )
+    if event.get("schema_version") != ISSUANCE_MANIFEST_SCHEMA_VERSION:
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_MANIFEST_SCHEMA_INVALID"
+        )
+    if event.get("event_type") != _ISSUANCE_MANIFEST_EVENT_TYPE:
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_MANIFEST_EVENT_TYPE_INVALID"
+        )
+    prediction_id = event.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_PREDICTION_ID_INVALID"
+        )
+    for field in (
+        "prediction_event_hash",
+        "prediction_file_sha256",
+        "projection_hash",
+        "projection_file_sha256",
+        "previous_hash",
+    ):
+        digest = _sha(event.get(field), f"{prefix}{field.upper()}")
+        if event.get(field) != digest:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_INVALID"
+            )
+    for field in ("prediction_size_bytes", "projection_size_bytes"):
+        size = event.get(field)
+        if (
+            isinstance(size, bool)
+            or not isinstance(size, int)
+            or size <= 0
+            or size > _MAX_ANCHOR_ARTIFACT_BYTES
+        ):
+            raise MaturityObservationError(f"{prefix}{field.upper()}_INVALID")
+    prediction_uri = _observation_reference(
+        event.get("prediction_uri"),
+        f"{prefix}PREDICTION_URI",
+    )
+    projection_uri = _observation_reference(
+        event.get("projection_uri"),
+        f"{prefix}PROJECTION_URI",
+    )
+    if (
+        event.get("prediction_uri") != prediction_uri
+        or event.get("projection_uri") != projection_uri
+        or not prediction_uri.endswith(".json")
+        or not projection_uri.endswith(".json")
+        or prediction_uri == projection_uri
+    ):
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_ARTIFACT_URI_INVALID"
+        )
+    issued = _time(event.get("issued_at"), f"{prefix}ISSUED_AT")
+    due = _time(event.get("due_at"), f"{prefix}DUE_AT")
+    registered = _time(
+        event.get("registered_at"),
+        f"{prefix}REGISTERED_AT",
+    )
+    if not issued <= registered or not issued < due:
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_MANIFEST_TIME_ORDER_INVALID"
+        )
+    pre_maturity = registered < due
+    expected_status = (
+        "PRE_MATURITY_REGISTERED"
+        if pre_maturity
+        else "HISTORICAL_AFTER_MATURITY_REGISTRATION_NOT_PROVEN"
+    )
+    if (
+        type(event.get("pre_maturity_registered")) is not bool
+        or event.get("pre_maturity_registered") is not pre_maturity
+        or event.get("registration_status") != expected_status
+    ):
+        raise MaturityObservationError(
+            f"{prefix}ISSUANCE_REGISTRATION_STATUS_INVALID"
+        )
+    for field in (
+        "market_validation_claimed",
+        "performance_metrics_available",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if event.get(field) is not False:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_INVALID"
+            )
+    if not allow_unhashed:
+        expected_hash = sha256(
+            _canonical_issuance_manifest_event(event)
+        ).hexdigest()
+        if event.get("event_hash") != expected_hash:
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_MANIFEST_HASH_MISMATCH"
+            )
+    return issued, due, registered
+
+
+def build_issuance_artifact_event(
+    *,
+    prediction_bytes: bytes,
+    projection_bytes: bytes,
+    prediction_uri: str,
+    projection_uri: str,
+    registered_at: datetime,
+    previous_hash: str,
+) -> dict[str, Any]:
+    """Seal exact forecast artifact bytes without claiming validation."""
+    prediction = _strict_json_object(prediction_bytes, "PREDICTION_ARTIFACT")
+    projection = _strict_json_object(projection_bytes, "PROJECTION_ARTIFACT")
+    try:
+        validate_directional_outcome_projection(projection)
+    except (KeyError, TypeError, ValueError) as exc:
+        raise MaturityObservationError(
+            "PROJECTION_ARTIFACT_INVALID"
+        ) from exc
+    prediction_event_hash = _sha(
+        prediction.get("event_hash"),
+        "PREDICTION_EVENT_HASH",
+    )
+    expected_prediction_hash = sha256(
+        _canonical({
+            key: value
+            for key, value in prediction.items()
+            if key != "event_hash"
+        })
+    ).hexdigest()
+    if prediction_event_hash != expected_prediction_hash:
+        raise MaturityObservationError("PREDICTION_ARTIFACT_HASH_MISMATCH")
+    if (
+        projection.get("prediction_id") != prediction.get("prediction_id")
+        or projection.get("prediction_event_hash") != prediction_event_hash
+        or projection.get("issued_at") != prediction.get("issued_at")
+        or projection.get("due_at") != prediction.get("due_at")
+    ):
+        raise MaturityObservationError("ISSUANCE_ARTIFACT_BINDING_MISMATCH")
+    if registered_at.tzinfo is None or registered_at.utcoffset() is None:
+        raise MaturityObservationError("REGISTERED_AT_TIMEZONE_REQUIRED")
+    registered = registered_at.astimezone(timezone.utc)
+    issued = _time(prediction.get("issued_at"), "ISSUED_AT")
+    due = _time(prediction.get("due_at"), "DUE_AT")
+    if registered < issued:
+        raise MaturityObservationError(
+            "ISSUANCE_MANIFEST_TIME_ORDER_INVALID"
+        )
+    pre_maturity = registered < due
+    event = {
+        "schema_version": ISSUANCE_MANIFEST_SCHEMA_VERSION,
+        "event_type": _ISSUANCE_MANIFEST_EVENT_TYPE,
+        "prediction_id": prediction["prediction_id"],
+        "prediction_event_hash": prediction_event_hash,
+        "prediction_uri": _observation_reference(
+            prediction_uri, "PREDICTION_URI"
+        ),
+        "prediction_file_sha256": sha256(prediction_bytes).hexdigest(),
+        "prediction_size_bytes": len(prediction_bytes),
+        "projection_hash": projection["projection_hash"],
+        "projection_uri": _observation_reference(
+            projection_uri, "PROJECTION_URI"
+        ),
+        "projection_file_sha256": sha256(projection_bytes).hexdigest(),
+        "projection_size_bytes": len(projection_bytes),
+        "issued_at": prediction["issued_at"],
+        "due_at": prediction["due_at"],
+        "registered_at": registered.isoformat(),
+        "registration_status": (
+            "PRE_MATURITY_REGISTERED"
+            if pre_maturity
+            else "HISTORICAL_AFTER_MATURITY_REGISTRATION_NOT_PROVEN"
+        ),
+        "pre_maturity_registered": pre_maturity,
+        "previous_hash": _sha(previous_hash, "PREVIOUS_HASH"),
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    _validate_issuance_manifest_event(event, allow_unhashed=True)
+    event["event_hash"] = sha256(
+        _canonical_issuance_manifest_event(event)
+    ).hexdigest()
+    _validate_issuance_manifest_event(event)
+    return event
+
+
 def _validate_maturity_ledger_event(
     event: Mapping[str, Any],
     *,
@@ -1510,24 +1739,41 @@ def _verify_maturity_observation_chain_with_anchors(
 def verify_maturity_observation_chain(
     events: list[dict[str, Any]],
     *,
-    anchor_artifacts: list[Mapping[str, str]],
+    issuance_manifest_uri: str,
     evidence_root: Path,
 ) -> dict[str, Any]:
-    """Verify a chain against hashes derived from replayed retained artifacts."""
-    prediction_hashes, projection_hashes = (
-        _derive_maturity_artifact_anchors(
-            anchor_artifacts=anchor_artifacts,
-            evidence_root=evidence_root,
-        )
+    """Verify maturity only against exact-byte registered artifacts."""
+    manifest_events = read_issuance_artifact_manifest(
+        issuance_manifest_uri, evidence_root=evidence_root
     )
+    prediction_hashes = {
+        event["prediction_id"]: event["prediction_event_hash"]
+        for event in manifest_events
+    }
+    projection_hashes = {
+        event["prediction_id"]: event["projection_hash"]
+        for event in manifest_events
+    }
     result = _verify_maturity_observation_chain_with_anchors(
         events,
         trusted_prediction_hashes=prediction_hashes,
         trusted_projection_hashes=projection_hashes,
     )
     result["verification_scope"] = (
-        "HASH_CHAIN_ARTIFACT_DERIVED_PREDICTION_PROJECTION_"
+        "HASH_CHAIN_ISSUANCE_MANIFEST_REGISTERED_PREDICTION_PROJECTION_"
         "AND_RETAINED_OBSERVATION"
+    )
+    result["issuance_manifest_record_count"] = len(manifest_events)
+    result["issuance_manifest_head_hash"] = (
+        manifest_events[-1]["event_hash"]
+        if manifest_events
+        else ISSUANCE_MANIFEST_GENESIS_HASH
+    )
+    result["pre_maturity_registration_count"] = sum(
+        event["pre_maturity_registered"] for event in manifest_events
+    )
+    result["historical_after_maturity_registration_count"] = sum(
+        not event["pre_maturity_registered"] for event in manifest_events
     )
     return result
 
@@ -1618,6 +1864,243 @@ def _read_retained_bytes(
         ) from exc
 
 
+def verify_issuance_artifact_manifest(
+    events: list[dict[str, Any]],
+    *,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Verify manifest order, exact artifact bytes and full source replay."""
+    if not isinstance(events, list):
+        raise MaturityObservationError("ISSUANCE_MANIFEST_LIST_REQUIRED")
+    previous = ISSUANCE_MANIFEST_GENESIS_HASH
+    previous_registered: datetime | None = None
+    seen_ids: set[str] = set()
+    seen_uris: set[str] = set()
+    anchor_artifacts: list[dict[str, str]] = []
+    pre_maturity_count = 0
+    historical_count = 0
+    for index, event in enumerate(events):
+        prefix = f"ISSUANCE_ROW_{index}_"
+        _, _, registered = _validate_issuance_manifest_event(
+            event, prefix=prefix
+        )
+        if event["previous_hash"] != previous:
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_MANIFEST_CHAIN_BROKEN"
+            )
+        if (
+            previous_registered is not None
+            and registered < previous_registered
+        ):
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_REGISTERED_ORDER_INVALID"
+            )
+        if event["prediction_id"] in seen_ids:
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_PREDICTION_ID_DUPLICATE"
+            )
+        if (
+            event["prediction_uri"] in seen_uris
+            or event["projection_uri"] in seen_uris
+        ):
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_ARTIFACT_URI_DUPLICATE"
+            )
+        prediction_raw = _read_retained_bytes(
+            evidence_root,
+            event["prediction_uri"],
+            field=f"{prefix}PREDICTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        projection_raw = _read_retained_bytes(
+            evidence_root,
+            event["projection_uri"],
+            field=f"{prefix}PROJECTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        if (
+            len(prediction_raw) != event["prediction_size_bytes"]
+            or sha256(prediction_raw).hexdigest()
+            != event["prediction_file_sha256"]
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PREDICTION_ARTIFACT_MANIFEST_MISMATCH"
+            )
+        if (
+            len(projection_raw) != event["projection_size_bytes"]
+            or sha256(projection_raw).hexdigest()
+            != event["projection_file_sha256"]
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PROJECTION_ARTIFACT_MANIFEST_MISMATCH"
+            )
+        expected = build_issuance_artifact_event(
+            prediction_bytes=prediction_raw,
+            projection_bytes=projection_raw,
+            prediction_uri=event["prediction_uri"],
+            projection_uri=event["projection_uri"],
+            registered_at=registered,
+            previous_hash=previous,
+        )
+        if event != expected:
+            raise MaturityObservationError(
+                f"{prefix}ISSUANCE_ARTIFACT_BINDING_MISMATCH"
+            )
+        anchor_artifacts.append({
+            "prediction_uri": event["prediction_uri"],
+            "projection_uri": event["projection_uri"],
+        })
+        previous = event["event_hash"]
+        previous_registered = registered
+        seen_ids.add(event["prediction_id"])
+        seen_uris.update({
+            event["prediction_uri"], event["projection_uri"]
+        })
+        if event["pre_maturity_registered"]:
+            pre_maturity_count += 1
+        else:
+            historical_count += 1
+    prediction_hashes, projection_hashes = (
+        _derive_maturity_artifact_anchors(
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=evidence_root,
+        )
+    )
+    for index, event in enumerate(events):
+        if (
+            prediction_hashes.get(event["prediction_id"])
+            != event["prediction_event_hash"]
+            or projection_hashes.get(event["prediction_id"])
+            != event["projection_hash"]
+        ):
+            raise MaturityObservationError(
+                f"ISSUANCE_ROW_{index}_REPLAY_HASH_MISMATCH"
+            )
+    return {
+        "status": "VERIFIED" if events else "EMPTY",
+        "record_count": len(events),
+        "head_hash": previous,
+        "pre_maturity_registration_count": pre_maturity_count,
+        "historical_after_maturity_registration_count": historical_count,
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+
+
+def _read_issuance_artifact_manifest_unlocked(
+    manifest_uri: str,
+    *,
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    reference = _observation_reference(
+        manifest_uri, "ISSUANCE_MANIFEST_URI"
+    )
+    if not reference.endswith(".ndjson"):
+        raise MaturityObservationError("ISSUANCE_MANIFEST_URI_INVALID")
+    raw = _read_retained_bytes(
+        evidence_root,
+        reference,
+        field="ISSUANCE_MANIFEST",
+        max_bytes=_MAX_ISSUANCE_MANIFEST_BYTES,
+        reference_validator=_observation_reference,
+    )
+    if not raw.endswith(b"\n"):
+        raise MaturityObservationError("ISSUANCE_MANIFEST_TRUNCATED")
+    events = [
+        _strict_json_object(line, "ISSUANCE_MANIFEST_ROW")
+        for line in raw.splitlines()
+        if line.strip()
+    ]
+    verify_issuance_artifact_manifest(events, evidence_root=evidence_root)
+    return events
+
+
+def read_issuance_artifact_manifest(
+    manifest_uri: str,
+    *,
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    """Read only a complete manifest whose artifact bytes fully replay."""
+    return _read_issuance_artifact_manifest_unlocked(
+        manifest_uri, evidence_root=evidence_root
+    )
+
+
+def append_issuance_artifact_manifest(
+    path: Path,
+    *,
+    prediction_uri: str,
+    projection_uri: str,
+    registered_at: datetime,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Append an exact-byte issuance registration before maturity when able."""
+    with _ledger_lock(path, exclusive=True):
+        if path.exists():
+            raw = path.read_bytes()
+            if raw and not raw.endswith(b"\n"):
+                raise MaturityObservationError(
+                    "ISSUANCE_MANIFEST_TRUNCATED"
+                )
+            events = [
+                _strict_json_object(line, "ISSUANCE_MANIFEST_ROW")
+                for line in raw.splitlines()
+                if line.strip()
+            ]
+            verify_issuance_artifact_manifest(
+                events, evidence_root=evidence_root
+            )
+        else:
+            events = []
+        prediction_raw = _read_retained_bytes(
+            evidence_root,
+            prediction_uri,
+            field="PREDICTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        projection_raw = _read_retained_bytes(
+            evidence_root,
+            projection_uri,
+            field="PROJECTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        event = build_issuance_artifact_event(
+            prediction_bytes=prediction_raw,
+            projection_bytes=projection_raw,
+            prediction_uri=prediction_uri,
+            projection_uri=projection_uri,
+            registered_at=registered_at,
+            previous_hash=(
+                events[-1]["event_hash"]
+                if events
+                else ISSUANCE_MANIFEST_GENESIS_HASH
+            ),
+        )
+        candidate = [*events, event]
+        verify_issuance_artifact_manifest(
+            candidate, evidence_root=evidence_root
+        )
+        payload = json.dumps(
+            event,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        with path.open("a", encoding="utf-8", newline="\n") as handle:
+            handle.write(payload + "\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        return event
+
+
 def _read_retained_observation_bytes(
     evidence_root: Path,
     observation_uri: str,
@@ -1674,7 +2157,7 @@ def _load_retained_observation(
 def _read_maturity_observation_ledger_unlocked(
     path: Path,
     *,
-    anchor_artifacts: list[Mapping[str, str]],
+    issuance_manifest_uri: str,
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
     if not path.exists():
@@ -1689,7 +2172,7 @@ def _read_maturity_observation_ledger_unlocked(
     ]
     verify_maturity_observation_chain(
         events,
-        anchor_artifacts=anchor_artifacts,
+        issuance_manifest_uri=issuance_manifest_uri,
         evidence_root=evidence_root,
     )
     for event in events:
@@ -1700,14 +2183,14 @@ def _read_maturity_observation_ledger_unlocked(
 def read_maturity_observation_ledger(
     path: Path,
     *,
-    anchor_artifacts: list[Mapping[str, str]],
+    issuance_manifest_uri: str,
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
-    """Read only after artifact-derived anchors and retained bytes verify."""
+    """Read only after registered artifacts and retained bytes verify."""
     with _ledger_lock(path, exclusive=False):
         return _read_maturity_observation_ledger_unlocked(
             path,
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=issuance_manifest_uri,
             evidence_root=evidence_root,
         )
 
@@ -1716,14 +2199,14 @@ def append_maturity_observation(
     path: Path,
     observation_uri: str,
     *,
-    anchor_artifacts: list[Mapping[str, str]],
+    issuance_manifest_uri: str,
     evidence_root: Path,
 ) -> dict[str, Any]:
     """Append one retained maturity observation after full-chain validation."""
     with _ledger_lock(path, exclusive=True):
         events = _read_maturity_observation_ledger_unlocked(
             path,
-            anchor_artifacts=anchor_artifacts,
+            issuance_manifest_uri=issuance_manifest_uri,
             evidence_root=evidence_root,
         )
         raw = _read_retained_observation_bytes(
@@ -1733,12 +2216,17 @@ def append_maturity_observation(
         observation = _strict_json_object(raw, "OBSERVATION")
         validate_maturity_observation(observation)
         prediction_id = observation["prediction_id"]
-        trusted_prediction_hashes, trusted_projection_hashes = (
-            _derive_maturity_artifact_anchors(
-                anchor_artifacts=anchor_artifacts,
-                evidence_root=evidence_root,
-            )
+        manifest_events = read_issuance_artifact_manifest(
+            issuance_manifest_uri, evidence_root=evidence_root
         )
+        trusted_prediction_hashes = {
+            item["prediction_id"]: item["prediction_event_hash"]
+            for item in manifest_events
+        }
+        trusted_projection_hashes = {
+            item["prediction_id"]: item["projection_hash"]
+            for item in manifest_events
+        }
         trusted_prediction = trusted_prediction_hashes.get(prediction_id)
         trusted_projection = trusted_projection_hashes.get(prediction_id)
         if trusted_prediction is None:
