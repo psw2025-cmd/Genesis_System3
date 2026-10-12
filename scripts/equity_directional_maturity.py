@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 import re
 import stat
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 from urllib.parse import parse_qs, urlsplit
 
 from dashboard.backend.multibagger_ledger import (
@@ -30,6 +30,7 @@ from dashboard.backend.multibagger_outcome import (
     OutcomeLedgerError,
     reconcile_directional_reference,
     validate_directional_outcome_projection,
+    verify_directional_projection_evidence,
 )
 from scripts.equity_corporate_action_scope import capture as capture_actions
 from scripts.equity_corporate_action_scope import review as review_actions
@@ -38,6 +39,10 @@ from scripts.equity_instrument_scope import (
     ETF_URL,
     VERSION as INSTRUMENT_SCOPE_VERSION,
     capture as capture_instruments,
+)
+from scripts.equity_forward_prediction import (
+    GENESIS_HASH as FORWARD_PREDICTION_GENESIS_HASH,
+    validate_prediction as validate_forward_prediction,
 )
 
 
@@ -176,6 +181,9 @@ MATURITY_LEDGER_SCHEMA_VERSION = "equity-maturity-observation-ledger-v1"
 MATURITY_LEDGER_GENESIS_HASH = "0" * 64
 _MATURITY_LEDGER_EVENT_TYPE = "EQUITY_MATURITY_OBSERVATION_RECORDED"
 _MAX_MATURITY_OBSERVATION_BYTES = 2 * 1024 * 1024
+_MAX_ANCHOR_ARTIFACT_BYTES = 2 * 1024 * 1024
+_MAX_ANCHOR_SOURCE_BYTES = 32 * 1024 * 1024
+_ANCHOR_ARTIFACT_FIELDS = {"prediction_uri", "projection_uri"}
 _MATURITY_LEDGER_FIELDS = {
     "schema_version",
     "event_type",
@@ -275,6 +283,13 @@ def _observation_reference(value: Any, field: str) -> str:
     if not value.startswith(_OBSERVATION_URI_PREFIX):
         raise MaturityObservationError(f"{field}_UNAPPROVED_PREFIX")
     return value
+
+
+def _retained_snapshot_reference(value: Any, field: str) -> str:
+    try:
+        return _snapshot_reference(value, field)
+    except LedgerError as exc:
+        raise MaturityObservationError(str(exc)) from exc
 
 
 def _verify_receipt(
@@ -1230,7 +1245,181 @@ def build_maturity_observation_event(
     return event
 
 
-def verify_maturity_observation_chain(
+def _derive_maturity_artifact_anchors(
+    *,
+    anchor_artifacts: list[Mapping[str, str]],
+    evidence_root: Path,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Derive trusted hashes only after replaying retained forecast artifacts."""
+    if not isinstance(anchor_artifacts, list):
+        raise MaturityObservationError("ANCHOR_ARTIFACTS_LIST_REQUIRED")
+
+    prediction_hashes: dict[str, str] = {}
+    projection_hashes: dict[str, str] = {}
+    seen_uris: set[str] = set()
+    expected_previous = FORWARD_PREDICTION_GENESIS_HASH
+    for index, pair in enumerate(anchor_artifacts):
+        prefix = f"ANCHOR_{index}_"
+        if not isinstance(pair, Mapping) or set(pair) != (
+            _ANCHOR_ARTIFACT_FIELDS
+        ):
+            raise MaturityObservationError(
+                f"{prefix}ARTIFACT_FIELDS_INVALID"
+            )
+        prediction_uri = _observation_reference(
+            pair.get("prediction_uri"),
+            f"{prefix}PREDICTION_URI",
+        )
+        projection_uri = _observation_reference(
+            pair.get("projection_uri"),
+            f"{prefix}PROJECTION_URI",
+        )
+        if (
+            not prediction_uri.endswith(".json")
+            or not projection_uri.endswith(".json")
+            or prediction_uri == projection_uri
+            or prediction_uri in seen_uris
+            or projection_uri in seen_uris
+        ):
+            raise MaturityObservationError(
+                f"{prefix}ARTIFACT_URI_INVALID"
+            )
+
+        prediction_raw = _read_retained_bytes(
+            evidence_root,
+            prediction_uri,
+            field=f"{prefix}PREDICTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        projection_raw = _read_retained_bytes(
+            evidence_root,
+            projection_uri,
+            field=f"{prefix}PROJECTION_ARTIFACT",
+            max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        prediction = _strict_json_object(
+            prediction_raw,
+            f"{prefix}PREDICTION_ARTIFACT",
+        )
+        projection = _strict_json_object(
+            projection_raw,
+            f"{prefix}PROJECTION_ARTIFACT",
+        )
+        try:
+            validate_directional_outcome_projection(projection)
+            verify_directional_projection_evidence(
+                projection,
+                evidence_root=evidence_root,
+            )
+        except (OutcomeLedgerError, KeyError, TypeError, ValueError) as exc:
+            raise MaturityObservationError(
+                f"{prefix}PROJECTION_ARTIFACT_INVALID"
+            ) from exc
+
+        source_bytes: dict[str, bytes] = {}
+        for role in sorted(projection["source_bindings"]):
+            binding = projection["source_bindings"][role]
+            raw = _read_retained_bytes(
+                evidence_root,
+                binding["snapshot_uri"],
+                field=f"{prefix}{role.upper()}_SOURCE",
+                max_bytes=_MAX_ANCHOR_SOURCE_BYTES,
+                reference_validator=_retained_snapshot_reference,
+            )
+            if (
+                sha256(raw).hexdigest() != binding["sha256"]
+                or len(raw) != binding["size_bytes"]
+            ):
+                raise MaturityObservationError(
+                    f"{prefix}{role.upper()}_SOURCE_BINDING_MISMATCH"
+                )
+            source_bytes[role] = raw
+
+        try:
+            validation = validate_forward_prediction(
+                prediction,
+                now=datetime.now(timezone.utc),
+                equity_source_bytes={
+                    role: source_bytes[role]
+                    for role in ("cash", "company", "etf", "actions")
+                },
+                index_source_raw=source_bytes["index"],
+                holiday_calendar_raw=source_bytes["holiday_calendar"],
+                model_spec_raw=source_bytes["model_spec"],
+                expected_previous_event_hash=expected_previous,
+            )
+        except (KeyError, TypeError, ValueError, OverflowError) as exc:
+            raise MaturityObservationError(
+                f"{prefix}PREDICTION_ARTIFACT_INVALID"
+            ) from exc
+
+        prediction_id = validation["prediction_id"]
+        if prediction_id in prediction_hashes:
+            raise MaturityObservationError(
+                f"{prefix}PREDICTION_ID_DUPLICATE"
+            )
+        forecast = prediction["prediction"]
+        receipts = prediction["source_receipts"]
+        expected_bindings = {
+            role: receipts[role]["sha256"]
+            for role in (
+                "cash",
+                "company",
+                "etf",
+                "actions",
+                "index",
+                "holiday_calendar",
+            )
+        }
+        expected_bindings["model_spec"] = prediction["strategy"][
+            "model_spec_sha256"
+        ]
+        if any(
+            projection["source_bindings"][role]["sha256"]
+            != expected_bindings[role]
+            for role in expected_bindings
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PROJECTION_SOURCE_BINDING_MISMATCH"
+            )
+        expected_projection_values = {
+            "prediction_id": prediction_id,
+            "prediction_event_hash": validation["event_hash"],
+            "symbol": forecast["symbol"],
+            "isin": forecast["isin"],
+            "forecast_direction": forecast["direction"],
+            "issued_at": prediction["issued_at"],
+            "source_cutoff_at": prediction["source_cutoff_at"],
+            "entry_session_date": prediction["entry_session_date"],
+            "due_session_date": prediction["due_session_date"],
+            "due_at": prediction["due_at"],
+            "entry_reference_close": forecast["entry_reference_close"],
+            "entry_source_url": receipts["cash"]["url"],
+            "entry_source_hash": receipts["cash"]["sha256"],
+            "entry_source_size_bytes": receipts["cash"]["bytes"],
+            "entry_source_row_hash": forecast["features"][
+                "source_row_sha256"
+            ],
+            "price_basis": forecast["price_basis"],
+        }
+        if any(
+            projection.get(field) != value
+            for field, value in expected_projection_values.items()
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PROJECTION_PREDICTION_BINDING_MISMATCH"
+            )
+
+        prediction_hashes[prediction_id] = validation["event_hash"]
+        projection_hashes[prediction_id] = projection["projection_hash"]
+        expected_previous = validation["event_hash"]
+        seen_uris.update({prediction_uri, projection_uri})
+    return prediction_hashes, projection_hashes
+
+
+def _verify_maturity_observation_chain_with_anchors(
     events: list[dict[str, Any]],
     *,
     trusted_prediction_hashes: Mapping[str, str],
@@ -1318,18 +1507,45 @@ def verify_maturity_observation_chain(
     }
 
 
-def _read_retained_observation_bytes(
+def verify_maturity_observation_chain(
+    events: list[dict[str, Any]],
+    *,
+    anchor_artifacts: list[Mapping[str, str]],
     evidence_root: Path,
-    observation_uri: str,
+) -> dict[str, Any]:
+    """Verify a chain against hashes derived from replayed retained artifacts."""
+    prediction_hashes, projection_hashes = (
+        _derive_maturity_artifact_anchors(
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=evidence_root,
+        )
+    )
+    result = _verify_maturity_observation_chain_with_anchors(
+        events,
+        trusted_prediction_hashes=prediction_hashes,
+        trusted_projection_hashes=projection_hashes,
+    )
+    result["verification_scope"] = (
+        "HASH_CHAIN_ARTIFACT_DERIVED_PREDICTION_PROJECTION_"
+        "AND_RETAINED_OBSERVATION"
+    )
+    return result
+
+
+def _read_retained_bytes(
+    evidence_root: Path,
+    retained_uri: str,
+    *,
+    field: str,
+    max_bytes: int,
+    reference_validator: Callable[[Any, str], str],
 ) -> bytes:
+    """Read one retained regular file without following path indirection."""
     try:
         root = Path(evidence_root).resolve(strict=True)
         if not root.is_dir():
             raise MaturityObservationError("EVIDENCE_ROOT_NOT_DIRECTORY")
-        parts = _observation_reference(
-            observation_uri,
-            "OBSERVATION_URI",
-        ).split("/")
+        parts = reference_validator(retained_uri, f"{field}_URI").split("/")
 
         def checked_path() -> Path:
             candidate = root
@@ -1343,7 +1559,7 @@ def _read_retained_observation_bytes(
                 )
                 if stat.S_ISLNK(info.st_mode) or reparse:
                     raise MaturityObservationError(
-                        "OBSERVATION_RETAINED_LINK_FORBIDDEN"
+                        f"{field}_RETAINED_LINK_FORBIDDEN"
                     )
             candidate.resolve(strict=True).relative_to(root)
             return candidate
@@ -1352,7 +1568,7 @@ def _read_retained_observation_bytes(
         before = path.stat()
         if not stat.S_ISREG(before.st_mode):
             raise MaturityObservationError(
-                "OBSERVATION_RETAINED_NOT_REGULAR"
+                f"{field}_RETAINED_NOT_REGULAR"
             )
         flags = (
             os.O_RDONLY
@@ -1369,9 +1585,9 @@ def _read_retained_observation_bytes(
                 != (opened.st_dev, opened.st_ino)
             ):
                 raise MaturityObservationError(
-                    "OBSERVATION_RETAINED_CHANGED_DURING_READ"
+                    f"{field}_RETAINED_CHANGED_DURING_READ"
                 )
-            raw = handle.read(_MAX_MATURITY_OBSERVATION_BYTES + 1)
+            raw = handle.read(max_bytes + 1)
             after = os.fstat(handle.fileno())
             retained = checked_path().stat()
 
@@ -1389,17 +1605,30 @@ def _read_retained_observation_bytes(
             or identity(after) != identity(retained)
         ):
             raise MaturityObservationError(
-                "OBSERVATION_RETAINED_CHANGED_DURING_READ"
+                f"{field}_RETAINED_CHANGED_DURING_READ"
             )
-        if len(raw) > _MAX_MATURITY_OBSERVATION_BYTES:
-            raise MaturityObservationError("OBSERVATION_RETAINED_TOO_LARGE")
+        if len(raw) > max_bytes:
+            raise MaturityObservationError(f"{field}_RETAINED_TOO_LARGE")
         return raw
     except MaturityObservationError:
         raise
     except (LedgerError, OSError, ValueError) as exc:
         raise MaturityObservationError(
-            "OBSERVATION_RETAINED_UNAVAILABLE"
+            f"{field}_RETAINED_UNAVAILABLE"
         ) from exc
+
+
+def _read_retained_observation_bytes(
+    evidence_root: Path,
+    observation_uri: str,
+) -> bytes:
+    return _read_retained_bytes(
+        evidence_root,
+        observation_uri,
+        field="OBSERVATION",
+        max_bytes=_MAX_MATURITY_OBSERVATION_BYTES,
+        reference_validator=_observation_reference,
+    )
 
 
 def _load_retained_observation(
@@ -1445,8 +1674,7 @@ def _load_retained_observation(
 def _read_maturity_observation_ledger_unlocked(
     path: Path,
     *,
-    trusted_prediction_hashes: Mapping[str, str],
-    trusted_projection_hashes: Mapping[str, str],
+    anchor_artifacts: list[Mapping[str, str]],
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
     if not path.exists():
@@ -1461,8 +1689,8 @@ def _read_maturity_observation_ledger_unlocked(
     ]
     verify_maturity_observation_chain(
         events,
-        trusted_prediction_hashes=trusted_prediction_hashes,
-        trusted_projection_hashes=trusted_projection_hashes,
+        anchor_artifacts=anchor_artifacts,
+        evidence_root=evidence_root,
     )
     for event in events:
         _load_retained_observation(event, evidence_root=evidence_root)
@@ -1472,16 +1700,14 @@ def _read_maturity_observation_ledger_unlocked(
 def read_maturity_observation_ledger(
     path: Path,
     *,
-    trusted_prediction_hashes: Mapping[str, str],
-    trusted_projection_hashes: Mapping[str, str],
+    anchor_artifacts: list[Mapping[str, str]],
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
-    """Read only after chain, external anchors and retained bytes verify."""
+    """Read only after artifact-derived anchors and retained bytes verify."""
     with _ledger_lock(path, exclusive=False):
         return _read_maturity_observation_ledger_unlocked(
             path,
-            trusted_prediction_hashes=trusted_prediction_hashes,
-            trusted_projection_hashes=trusted_projection_hashes,
+            anchor_artifacts=anchor_artifacts,
             evidence_root=evidence_root,
         )
 
@@ -1490,16 +1716,14 @@ def append_maturity_observation(
     path: Path,
     observation_uri: str,
     *,
-    trusted_prediction_hashes: Mapping[str, str],
-    trusted_projection_hashes: Mapping[str, str],
+    anchor_artifacts: list[Mapping[str, str]],
     evidence_root: Path,
 ) -> dict[str, Any]:
     """Append one retained maturity observation after full-chain validation."""
     with _ledger_lock(path, exclusive=True):
         events = _read_maturity_observation_ledger_unlocked(
             path,
-            trusted_prediction_hashes=trusted_prediction_hashes,
-            trusted_projection_hashes=trusted_projection_hashes,
+            anchor_artifacts=anchor_artifacts,
             evidence_root=evidence_root,
         )
         raw = _read_retained_observation_bytes(
@@ -1509,6 +1733,12 @@ def append_maturity_observation(
         observation = _strict_json_object(raw, "OBSERVATION")
         validate_maturity_observation(observation)
         prediction_id = observation["prediction_id"]
+        trusted_prediction_hashes, trusted_projection_hashes = (
+            _derive_maturity_artifact_anchors(
+                anchor_artifacts=anchor_artifacts,
+                evidence_root=evidence_root,
+            )
+        )
         trusted_prediction = trusted_prediction_hashes.get(prediction_id)
         trusted_projection = trusted_projection_hashes.get(prediction_id)
         if trusted_prediction is None:
@@ -1533,7 +1763,7 @@ def append_maturity_observation(
             previous_hash=previous_hash,
         )
         _load_retained_observation(event, evidence_root=evidence_root)
-        verify_maturity_observation_chain(
+        _verify_maturity_observation_chain_with_anchors(
             [*events, event],
             trusted_prediction_hashes=trusted_prediction_hashes,
             trusted_projection_hashes=trusted_projection_hashes,

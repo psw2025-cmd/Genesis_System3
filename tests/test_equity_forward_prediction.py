@@ -1299,6 +1299,55 @@ def test_directional_maturity_revalidates_matching_action_event():
     assert validate_maturity_observation(result)["orders_allowed"] is False
 
 
+def retain_anchor_artifacts(
+    tmp_path,
+    args,
+    prediction,
+    projection,
+    *,
+    suffix="",
+):
+    projection_sources = {
+        **args["equity_sources"],
+        "index": args["index_raw"],
+        "holiday_calendar": args["holiday_raw"],
+        "model_spec": args["model_spec_raw"],
+    }
+    for role, raw in projection_sources.items():
+        path = tmp_path / projection["source_bindings"][role][
+            "snapshot_uri"
+        ]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(raw)
+    prediction_uri = (
+        "research/forward/equity/test/"
+        f"prediction{suffix}.json"
+    )
+    projection_uri = (
+        "research/forward/equity/test/"
+        f"projection{suffix}.json"
+    )
+    prediction_path = tmp_path / prediction_uri
+    projection_path = tmp_path / projection_uri
+    prediction_path.parent.mkdir(parents=True, exist_ok=True)
+    prediction_path.write_text(
+        json.dumps(prediction, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    projection_path.write_text(
+        json.dumps(projection, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    return (
+        [{
+            "prediction_uri": prediction_uri,
+            "projection_uri": projection_uri,
+        }],
+        prediction_path,
+        projection_path,
+    )
+
+
 def retained_maturity_case(tmp_path):
     args, prediction, projection = build_projection()
     sources, receipts, uris = maturity_sources(args)
@@ -1328,19 +1377,22 @@ def retained_maturity_case(tmp_path):
     observation_path = tmp_path / observation_uri
     observation_path.parent.mkdir(parents=True, exist_ok=True)
     observation_path.write_bytes(observation_bytes)
-    trusted_predictions = {
-        observation["prediction_id"]: observation["prediction_event_hash"]
-    }
-    trusted_projections = {
-        observation["prediction_id"]: observation["projection_hash"]
-    }
+    anchor_artifacts, prediction_path, projection_path = (
+        retain_anchor_artifacts(
+            tmp_path,
+            args,
+            prediction,
+            projection,
+        )
+    )
     return (
         observation,
         observation_bytes,
         observation_uri,
         observation_path,
-        trusted_predictions,
-        trusted_projections,
+        anchor_artifacts,
+        prediction_path,
+        projection_path,
     )
 
 
@@ -1352,15 +1404,15 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
         _,
         observation_uri,
         observation_path,
-        trusted_predictions,
-        trusted_projections,
+        anchor_artifacts,
+        _,
+        _,
     ) = retained_maturity_case(tmp_path)
     ledger = tmp_path / "maturity_observations.ndjson"
     event = append_maturity_observation(
         ledger,
         observation_uri,
-        trusted_prediction_hashes=trusted_predictions,
-        trusted_projection_hashes=trusted_projections,
+        anchor_artifacts=anchor_artifacts,
         evidence_root=tmp_path,
     )
     assert event["observation_record_hash"] == observation["record_hash"]
@@ -1371,8 +1423,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     assert event["order_placement_allowed"] is False
     assert read_maturity_observation_ledger(
         ledger,
-        trusted_prediction_hashes=trusted_predictions,
-        trusted_projection_hashes=trusted_projections,
+        anchor_artifacts=anchor_artifacts,
         evidence_root=tmp_path,
     ) == [event]
 
@@ -1384,8 +1435,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
         append_maturity_observation(
             ledger,
             observation_uri,
-            trusted_prediction_hashes=trusted_predictions,
-            trusted_projection_hashes=trusted_projections,
+            anchor_artifacts=anchor_artifacts,
             evidence_root=tmp_path,
         )
     assert ledger.read_bytes() == original
@@ -1397,8 +1447,7 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     ):
         read_maturity_observation_ledger(
             ledger,
-            trusted_prediction_hashes=trusted_predictions,
-            trusted_projection_hashes=trusted_projections,
+            anchor_artifacts=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1409,8 +1458,9 @@ def test_maturity_ledger_rejects_self_rehashed_anchor_replacement(tmp_path):
         _,
         _,
         _,
-        trusted_predictions,
-        trusted_projections,
+        anchor_artifacts,
+        _,
+        _,
     ) = retained_maturity_case(tmp_path)
     replaced = deepcopy(observation)
     replaced["prediction_event_hash"] = "0" * 64
@@ -1449,8 +1499,140 @@ def test_maturity_ledger_rejects_self_rehashed_anchor_replacement(tmp_path):
         append_maturity_observation(
             tmp_path / "replaced.ndjson",
             replaced_uri,
-            trusted_prediction_hashes=trusted_predictions,
-            trusted_projection_hashes=trusted_projections,
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=tmp_path,
+        )
+
+
+def test_maturity_verifier_rejects_caller_rehashed_anchor_event(tmp_path):
+    (
+        observation,
+        _,
+        observation_uri,
+        _,
+        anchor_artifacts,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    replaced = deepcopy(observation)
+    replaced["prediction_event_hash"] = "2" * 64
+    replaced["raw_reference"]["prediction_event_hash"] = "2" * 64
+    replaced["projection_hash"] = "3" * 64
+    replaced["raw_reference"]["projection_hash"] = "3" * 64
+    replaced["record_hash"] = sha256(json.dumps(
+        {
+            key: value
+            for key, value in replaced.items()
+            if key != "record_hash"
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode()).hexdigest()
+    replaced_bytes = json.dumps(
+        replaced,
+        sort_keys=True,
+        indent=2,
+    ).encode("utf-8")
+    event = build_maturity_observation_event(
+        replaced,
+        observation_bytes=replaced_bytes,
+        observation_uri=observation_uri,
+        trusted_prediction_event_hash="2" * 64,
+        trusted_projection_hash="3" * 64,
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PREDICTION_EVENT_HASH_TRUST_MISMATCH",
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=tmp_path,
+        )
+
+
+def test_maturity_verifier_rejects_detached_rehashed_projection(tmp_path):
+    (
+        observation,
+        observation_bytes,
+        observation_uri,
+        _,
+        anchor_artifacts,
+        _,
+        projection_path,
+    ) = retained_maturity_case(tmp_path)
+    event = build_maturity_observation_event(
+        observation,
+        observation_bytes=observation_bytes,
+        observation_uri=observation_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    projection = json.loads(projection_path.read_text(encoding="utf-8"))
+    projection["prediction_event_hash"] = "4" * 64
+    rehash_projection(projection)
+    projection_path.write_text(
+        json.dumps(projection, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PROJECTION_PREDICTION_BINDING_MISMATCH",
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=tmp_path,
+        )
+
+
+def test_maturity_verifier_rejects_non_genesis_prediction_chain(tmp_path):
+    (
+        observation,
+        observation_bytes,
+        observation_uri,
+        _,
+        anchor_artifacts,
+        prediction_path,
+        projection_path,
+    ) = retained_maturity_case(tmp_path)
+    event = build_maturity_observation_event(
+        observation,
+        observation_bytes=observation_bytes,
+        observation_uri=observation_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    prediction = json.loads(prediction_path.read_text(encoding="utf-8"))
+    prediction["previous_event_hash"] = "5" * 64
+    rehash(prediction)
+    prediction_path.write_text(
+        json.dumps(prediction, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    projection = json.loads(projection_path.read_text(encoding="utf-8"))
+    projection["prediction_event_hash"] = prediction["event_hash"]
+    rehash_projection(projection)
+    projection_path.write_text(
+        json.dumps(projection, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PREDICTION_ARTIFACT_INVALID",
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            anchor_artifacts=anchor_artifacts,
             evidence_root=tmp_path,
         )
 
@@ -1461,8 +1643,9 @@ def test_maturity_ledger_rejects_rehashed_premature_score(tmp_path):
         observation_bytes,
         observation_uri,
         _,
-        trusted_predictions,
-        trusted_projections,
+        anchor_artifacts,
+        _,
+        _,
     ) = retained_maturity_case(tmp_path)
     event = build_maturity_observation_event(
         observation,
@@ -1484,30 +1667,27 @@ def test_maturity_ledger_rejects_rehashed_premature_score(tmp_path):
     ):
         verify_maturity_observation_chain(
             [event],
-            trusted_prediction_hashes=trusted_predictions,
-            trusted_projection_hashes=trusted_projections,
+            anchor_artifacts=anchor_artifacts,
+            evidence_root=tmp_path,
         )
 
 
 def test_retained_molbio_maturity_observation_ledger_verifies():
     root = Path(__file__).resolve().parents[1]
-    prediction_id = "EQ7D-2026-10-01-MOLBIO-V1"
     events = read_maturity_observation_ledger(
         root
         / "research/forward/equity/2026-10-01/"
         "equity_maturity_observation_ledger.ndjson",
-        trusted_prediction_hashes={
-            prediction_id: (
-                "91912ef5ef5264cdff60fd06449f355fc"
-                "d4bfcedc6b743e46c7b6ded7236744f"
-            )
-        },
-        trusted_projection_hashes={
-            prediction_id: (
-                "766b28454446333047b5e8a51ac955cd"
-                "458b639c32c736348a58f619f5fce2ac"
-            )
-        },
+        anchor_artifacts=[{
+            "prediction_uri": (
+                "research/forward/equity/2026-10-01/"
+                "2026-10-01_equity_forward_prediction.json"
+            ),
+            "projection_uri": (
+                "research/forward/equity/2026-10-01/"
+                "2026-10-08_equity_directional_projection.json"
+            ),
+        }],
         evidence_root=root,
     )
     assert len(events) == 1
