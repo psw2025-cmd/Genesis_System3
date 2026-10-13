@@ -239,6 +239,30 @@ _PUBLICATION_PULL_REQUEST = 471
 _PUBLICATION_AUTHOR_LOGIN = "psw2025-cmd"
 _GITHUB_API_VERSION = "2022-11-28"
 _GITHUB_PUBLICATION_USER_AGENT = "Genesis-System3-equity-publication-v1"
+_GITHUB_PUBLICATION_PAGE_SIZE = 100
+_GITHUB_PUBLICATION_MAX_PAGES = 20
+PUBLICATION_COLLISION_SCHEMA_VERSION = (
+    "equity-publication-identity-collision-v1"
+)
+_PUBLICATION_COLLISION_EVENT_TYPE = (
+    "EQUITY_PUBLICATION_IDENTITY_COLLISION_REVIEWED"
+)
+_PUBLICATION_COLLISION_STATUS = (
+    "REMOTE_IDENTITY_COLLISION_NOT_FORWARD_OOS"
+)
+_PUBLICATION_COLLISION_FIELDS = {
+    "schema_version", "event_type", "repository", "pull_request_number",
+    "detected_at", "collisions", "market_validation_claimed",
+    "performance_metrics_available", "real_money_ready",
+    "live_trading_enabled", "order_placement_allowed", "record_hash",
+}
+_PUBLICATION_COLLISION_ROW_FIELDS = {
+    "prediction_id", "canonical_receipt_event_hash", "comments",
+    "status", "effective_forward_oos_eligible",
+}
+_PUBLICATION_COLLISION_COMMENT_FIELDS = {
+    "comment_id", "snapshot_uri", "source_sha256", "source_size_bytes",
+}
 _MATURITY_LEDGER_FIELDS = {
     "schema_version",
     "event_type",
@@ -1134,6 +1158,29 @@ def _strict_json_object(raw: bytes, field: str) -> dict[str, Any]:
     return parsed
 
 
+def _strict_json_array(raw: bytes, field: str) -> list[Any]:
+    if not isinstance(raw, bytes) or not raw:
+        raise MaturityObservationError(f"{field}_BYTES_REQUIRED")
+
+    def pairs_hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise MaturityObservationError(f"{field}_DUPLICATE_KEY")
+            result[key] = value
+        return result
+
+    try:
+        parsed = json.loads(raw.decode("utf-8"), object_pairs_hook=pairs_hook)
+    except MaturityObservationError:
+        raise
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise MaturityObservationError(f"{field}_INVALID_JSON") from exc
+    if not isinstance(parsed, list):
+        raise MaturityObservationError(f"{field}_ARRAY_REQUIRED")
+    return parsed
+
+
 def _canonical_issuance_manifest_event(
     record: Mapping[str, Any],
 ) -> bytes:
@@ -1794,7 +1841,9 @@ def _verify_maturity_observation_chain_with_anchors(
 def _publication_qualified_manifest_anchors(
     manifest_events: list[dict[str, Any]],
     publication_events: list[dict[str, Any]],
+    collision_prediction_ids: set[str] | None = None,
 ) -> tuple[dict[str, str], dict[str, str], set[str]]:
+    collision_prediction_ids = collision_prediction_ids or set()
     receipts = {
         event["prediction_id"]: event for event in publication_events
     }
@@ -1811,6 +1860,7 @@ def _publication_qualified_manifest_anchors(
                 and receipt["forward_oos_eligible"]
                 and receipt["issuance_manifest_event_hash"]
                 == event["event_hash"]
+                and prediction_id not in collision_prediction_ids
             )
         )
         if not qualifies:
@@ -1843,9 +1893,20 @@ def verify_maturity_observation_chain(
         if publication_receipt_uri is not None
         else []
     )
+    collision_prediction_ids = (
+        _known_publication_collision_ids(
+            publication_receipt_uri,
+            publication_events=publication_events,
+            evidence_root=evidence_root,
+        )
+        if publication_receipt_uri is not None
+        else set()
+    )
     prediction_hashes, projection_hashes, blocked = (
         _publication_qualified_manifest_anchors(
-            manifest_events, publication_events
+            manifest_events,
+            publication_events,
+            collision_prediction_ids,
         )
     )
     used_prediction_ids = {event.get("prediction_id") for event in events}
@@ -1877,14 +1938,22 @@ def verify_maturity_observation_chain(
     result["external_publication_receipt_count"] = len(
         publication_events
     )
-    result["forward_oos_publication_eligible_count"] = sum(
+    result["receipt_forward_oos_publication_eligible_count"] = sum(
         event["forward_oos_eligible"] for event in publication_events
+    )
+    result["forward_oos_publication_eligible_count"] = sum(
+        event["forward_oos_eligible"]
+        and event["prediction_id"] not in collision_prediction_ids
+        for event in publication_events
     )
     result["historical_publication_receipt_count"] = sum(
         not event["forward_oos_eligible"] for event in publication_events
     )
     result["pre_maturity_without_eligible_publication_count"] = len(
         blocked
+    )
+    result["publication_identity_collision_count"] = len(
+        collision_prediction_ids
     )
     return result
 
@@ -2580,6 +2649,12 @@ def _github_publication_request_json(
         "https://api.github.com/repos/"
         f"{_PUBLICATION_REPOSITORY}/issues/comments/"
     )
+    comment_page_match = re.fullmatch(
+        re.escape(create_url)
+        + rf"\?per_page={_GITHUB_PUBLICATION_PAGE_SIZE}&page=([1-9][0-9]*)",
+        url,
+    )
+    response_is_array = False
     if method == "POST":
         if url != create_url or not isinstance(payload, bytes) or not payload:
             raise MaturityObservationError(
@@ -2589,15 +2664,19 @@ def _github_publication_request_json(
         failure_code = "GITHUB_PUBLICATION_POST_FAILED"
     elif method == "GET":
         suffix = url.removeprefix(comment_url_prefix)
-        if (
-            url == suffix
-            or not suffix.isdigit()
-            or int(suffix) <= 0
-            or payload is not None
-        ):
+        comment_fetch = (
+            url != suffix and suffix.isdigit() and int(suffix) > 0
+        )
+        comment_page = (
+            comment_page_match is not None
+            and int(comment_page_match.group(1))
+            <= _GITHUB_PUBLICATION_MAX_PAGES
+        )
+        if payload is not None or not (comment_fetch or comment_page):
             raise MaturityObservationError(
                 "GITHUB_PUBLICATION_FETCH_REQUEST_INVALID"
             )
+        response_is_array = comment_page
         expected_status = 200
         failure_code = "GITHUB_PUBLICATION_FETCH_FAILED"
     else:
@@ -2636,7 +2715,10 @@ def _github_publication_request_json(
         raise MaturityObservationError(
             "GITHUB_PUBLICATION_RESPONSE_BYTES_INVALID"
         )
-    _strict_json_object(raw, "GITHUB_PUBLICATION_RESPONSE")
+    if response_is_array:
+        _strict_json_array(raw, "GITHUB_PUBLICATION_RESPONSE")
+    else:
+        _strict_json_object(raw, "GITHUB_PUBLICATION_RESPONSE")
     return raw
 
 
@@ -2673,6 +2755,189 @@ def _parse_publication_attestation(body: Any) -> dict[str, Any]:
                 f"PUBLICATION_ATTESTATION_{field.upper()}_INVALID"
             )
     return attestation
+
+
+def _validated_github_publication_comment(
+    source: Mapping[str, Any],
+) -> tuple[int, datetime, dict[str, Any]]:
+    """Validate one owner-authored, canonical publication comment."""
+    if not isinstance(source, dict):
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_COMMENT_OBJECT_REQUIRED"
+        )
+    comment_id = source.get("id")
+    if (
+        isinstance(comment_id, bool)
+        or not isinstance(comment_id, int)
+        or comment_id <= 0
+    ):
+        raise MaturityObservationError("PUBLICATION_COMMENT_ID_INVALID")
+    source_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}"
+    )
+    issue_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/"
+        f"{_PUBLICATION_PULL_REQUEST}"
+    )
+    html_url = (
+        f"https://github.com/{_PUBLICATION_REPOSITORY}/pull/"
+        f"{_PUBLICATION_PULL_REQUEST}#issuecomment-{comment_id}"
+    )
+    if (
+        source.get("url") != source_url
+        or source.get("issue_url") != issue_url
+        or source.get("html_url") != html_url
+    ):
+        raise MaturityObservationError("PUBLICATION_SOURCE_URL_INVALID")
+    user = source.get("user")
+    if (
+        not isinstance(user, dict)
+        or user.get("login") != _PUBLICATION_AUTHOR_LOGIN
+        or user.get("type") != "User"
+        or isinstance(user.get("id"), bool)
+        or not isinstance(user.get("id"), int)
+        or user.get("id") <= 0
+        or source.get("author_association") != "OWNER"
+    ):
+        raise MaturityObservationError("PUBLICATION_AUTHOR_INVALID")
+    published = _time(source.get("created_at"), "PUBLICATION_CREATED_AT")
+    updated = _time(source.get("updated_at"), "PUBLICATION_UPDATED_AT")
+    if source.get("created_at") != source.get("updated_at") or published != updated:
+        raise MaturityObservationError(
+            "PUBLICATION_EDITED_COMMENT_FORBIDDEN"
+        )
+    body = source.get("body")
+    attestation = _parse_publication_attestation(body)
+    prediction_id = attestation.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_PREDICTION_ID_INVALID"
+        )
+    for field in (
+        "issuance_manifest_event_hash",
+        "prediction_event_hash",
+        "projection_hash",
+    ):
+        _sha(
+            attestation.get(field),
+            f"PUBLICATION_ATTESTATION_{field.upper()}",
+        )
+    _time(attestation.get("registered_at"), "PUBLICATION_REGISTERED_AT")
+    _time(attestation.get("due_at"), "PUBLICATION_DUE_AT")
+    canonical_body = _PUBLICATION_BODY_PREFIX + _canonical(
+        attestation
+    ).decode("ascii")
+    if body != canonical_body:
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+        )
+    return comment_id, published, attestation
+
+
+def _github_publication_comment_page_url(page: int) -> str:
+    if (
+        isinstance(page, bool)
+        or not isinstance(page, int)
+        or page <= 0
+        or page > _GITHUB_PUBLICATION_MAX_PAGES
+    ):
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_COMMENT_PAGE_INVALID"
+        )
+    return (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/"
+        f"{_PUBLICATION_PULL_REQUEST}/comments"
+        f"?per_page={_GITHUB_PUBLICATION_PAGE_SIZE}&page={page}"
+    )
+
+
+def _scan_github_publication_comments(
+    prediction_id: str,
+    *,
+    token: str,
+) -> list[dict[str, Any]]:
+    """Return all authoritative comments for one prediction ID."""
+    matches: list[dict[str, Any]] = []
+    seen_comment_ids: set[int] = set()
+    for page in range(1, _GITHUB_PUBLICATION_MAX_PAGES + 1):
+        raw = _github_publication_request_json(
+            "GET",
+            _github_publication_comment_page_url(page),
+            token=token,
+        )
+        rows = _strict_json_array(
+            raw, f"GITHUB_PUBLICATION_COMMENT_PAGE_{page}"
+        )
+        if len(rows) > _GITHUB_PUBLICATION_PAGE_SIZE:
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_COMMENT_PAGE_SIZE_INVALID"
+            )
+        for row in rows:
+            if not isinstance(row, dict):
+                raise MaturityObservationError(
+                    "GITHUB_PUBLICATION_COMMENT_OBJECT_REQUIRED"
+                )
+            user = row.get("user")
+            if (
+                not isinstance(user, dict)
+                or user.get("login") != _PUBLICATION_AUTHOR_LOGIN
+                or row.get("author_association") != "OWNER"
+            ):
+                continue
+            body = row.get("body")
+            if not isinstance(body, str) or not body.startswith(
+                _PUBLICATION_BODY_PREFIX
+            ):
+                continue
+            comment_id, _, attestation = (
+                _validated_github_publication_comment(row)
+            )
+            if comment_id in seen_comment_ids:
+                raise MaturityObservationError(
+                    "GITHUB_PUBLICATION_COMMENT_SCAN_DUPLICATE"
+                )
+            seen_comment_ids.add(comment_id)
+            if attestation["prediction_id"] == prediction_id:
+                matches.append(row)
+        if len(rows) < _GITHUB_PUBLICATION_PAGE_SIZE:
+            return matches
+    raise MaturityObservationError(
+        "GITHUB_PUBLICATION_COMMENT_SCAN_INCOMPLETE"
+    )
+
+
+def _resolve_github_publication_comment(
+    manifest_event: Mapping[str, Any],
+    *,
+    token: str,
+) -> dict[str, Any] | None:
+    """Resolve zero or one exact comment; reject remote identity collisions."""
+    prediction_id = manifest_event["prediction_id"]
+    matches = _scan_github_publication_comments(
+        prediction_id, token=token
+    )
+    expected = _publication_attestation(manifest_event)
+    exact: list[dict[str, Any]] = []
+    for source in matches:
+        _, _, attestation = _validated_github_publication_comment(source)
+        if attestation != expected:
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_REMOTE_IDENTITY_COLLISION"
+            )
+        exact.append(source)
+    if len(exact) > 1:
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_REMOTE_PREDICTION_DUPLICATE"
+        )
+    return exact[0] if exact else None
 
 
 def _validate_publication_receipt_event(
@@ -3003,11 +3268,251 @@ def _publication_receipt_storage_path(
     return verified, relative
 
 
+def publication_collision_uri_for(receipt_uri: str) -> str:
+    reference = _observation_reference(
+        receipt_uri, "PUBLICATION_RECEIPT_LEDGER_URI"
+    )
+    if not reference.endswith(".ndjson"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_URI_INVALID"
+        )
+    return reference[:-7] + ".collisions.json"
+
+
+def verify_publication_collision_evidence(
+    collision_uri: str,
+    *,
+    publication_events: list[dict[str, Any]],
+    evidence_root: Path,
+) -> set[str]:
+    """Verify retained exact comments that disqualify a publication ID."""
+    raw = _read_retained_bytes(
+        evidence_root,
+        collision_uri,
+        field="PUBLICATION_COLLISION_EVIDENCE",
+        max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+        reference_validator=_observation_reference,
+    )
+    record = _strict_json_object(raw, "PUBLICATION_COLLISION_EVIDENCE")
+    if set(record) != _PUBLICATION_COLLISION_FIELDS:
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_EVIDENCE_FIELDS_INVALID"
+        )
+    if (
+        record.get("schema_version")
+        != PUBLICATION_COLLISION_SCHEMA_VERSION
+        or record.get("event_type") != _PUBLICATION_COLLISION_EVENT_TYPE
+        or record.get("repository") != _PUBLICATION_REPOSITORY
+        or record.get("pull_request_number") != _PUBLICATION_PULL_REQUEST
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_EVIDENCE_SCHEMA_INVALID"
+        )
+    for field in (
+        "market_validation_claimed",
+        "performance_metrics_available",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if record.get(field) is not False:
+            raise MaturityObservationError(
+                f"PUBLICATION_COLLISION_{field.upper()}_INVALID"
+            )
+    expected_hash = sha256(
+        _canonical(
+            {
+                key: value
+                for key, value in record.items()
+                if key != "record_hash"
+            }
+        )
+    ).hexdigest()
+    if record.get("record_hash") != expected_hash:
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_EVIDENCE_HASH_MISMATCH"
+        )
+    observed = _time(
+        record.get("detected_at"),
+        "PUBLICATION_COLLISION_DETECTED_AT",
+    )
+    collisions = record.get("collisions")
+    if not isinstance(collisions, list) or not collisions:
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_ROWS_REQUIRED"
+        )
+    receipts_by_hash = {
+        event["event_hash"]: event for event in publication_events
+    }
+    seen_predictions: set[str] = set()
+    seen_comments: set[int] = set()
+    seen_snapshots: set[str] = set()
+    for index, collision in enumerate(collisions):
+        prefix = f"PUBLICATION_COLLISION_ROW_{index}_"
+        if (
+            not isinstance(collision, dict)
+            or set(collision) != _PUBLICATION_COLLISION_ROW_FIELDS
+        ):
+            raise MaturityObservationError(f"{prefix}FIELDS_INVALID")
+        prediction_id = collision.get("prediction_id")
+        if (
+            not isinstance(prediction_id, str)
+            or not prediction_id
+            or prediction_id != prediction_id.strip()
+            or len(prediction_id) > 128
+            or prediction_id in seen_predictions
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PREDICTION_ID_INVALID"
+            )
+        receipt_hash = _sha(
+            collision.get("canonical_receipt_event_hash"),
+            f"{prefix}CANONICAL_RECEIPT_EVENT_HASH",
+        )
+        receipt = receipts_by_hash.get(receipt_hash)
+        if receipt is None or receipt["prediction_id"] != prediction_id:
+            raise MaturityObservationError(
+                f"{prefix}CANONICAL_RECEIPT_MISSING"
+            )
+        if (
+            collision.get("status") != _PUBLICATION_COLLISION_STATUS
+            or collision.get("effective_forward_oos_eligible") is not False
+        ):
+            raise MaturityObservationError(f"{prefix}STATUS_INVALID")
+        comments = collision.get("comments")
+        if not isinstance(comments, list) or len(comments) < 2:
+            raise MaturityObservationError(f"{prefix}COMMENTS_REQUIRED")
+        attestation_identities: set[tuple[str, str, str]] = set()
+        collision_comment_ids: set[int] = set()
+        for comment_index, comment in enumerate(comments):
+            comment_prefix = f"{prefix}COMMENT_{comment_index}_"
+            if (
+                not isinstance(comment, dict)
+                or set(comment) != _PUBLICATION_COLLISION_COMMENT_FIELDS
+            ):
+                raise MaturityObservationError(
+                    f"{comment_prefix}FIELDS_INVALID"
+                )
+            comment_id = comment.get("comment_id")
+            if (
+                isinstance(comment_id, bool)
+                or not isinstance(comment_id, int)
+                or comment_id <= 0
+                or comment_id in seen_comments
+            ):
+                raise MaturityObservationError(
+                    f"{comment_prefix}ID_INVALID"
+                )
+            snapshot_uri = _observation_reference(
+                comment.get("snapshot_uri"),
+                f"{comment_prefix}SNAPSHOT_URI",
+            )
+            if (
+                not snapshot_uri.endswith(".json")
+                or snapshot_uri in seen_snapshots
+            ):
+                raise MaturityObservationError(
+                    f"{comment_prefix}SNAPSHOT_URI_INVALID"
+                )
+            source_raw = _read_retained_bytes(
+                evidence_root,
+                snapshot_uri,
+                field=f"{comment_prefix}SOURCE",
+                max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+                reference_validator=_observation_reference,
+            )
+            source_size = comment.get("source_size_bytes")
+            source_hash = _sha(
+                comment.get("source_sha256"),
+                f"{comment_prefix}SOURCE_SHA256",
+            )
+            if (
+                isinstance(source_size, bool)
+                or not isinstance(source_size, int)
+                or source_size <= 0
+                or len(source_raw) != source_size
+                or sha256(source_raw).hexdigest() != source_hash
+            ):
+                raise MaturityObservationError(
+                    f"{comment_prefix}SOURCE_HASH_OR_SIZE_MISMATCH"
+                )
+            source = _strict_json_object(
+                source_raw, f"{comment_prefix}SOURCE"
+            )
+            validated_id, published, attestation = (
+                _validated_github_publication_comment(source)
+            )
+            if (
+                validated_id != comment_id
+                or attestation["prediction_id"] != prediction_id
+                or published > observed
+            ):
+                raise MaturityObservationError(
+                    f"{comment_prefix}BINDING_INVALID"
+                )
+            attestation_identities.add(
+                (
+                    attestation["issuance_manifest_event_hash"],
+                    attestation["prediction_event_hash"],
+                    attestation["projection_hash"],
+                )
+            )
+            collision_comment_ids.add(comment_id)
+            seen_comments.add(comment_id)
+            seen_snapshots.add(snapshot_uri)
+        if (
+            len(attestation_identities) < 2
+            or receipt["comment_id"] not in collision_comment_ids
+        ):
+            raise MaturityObservationError(
+                f"{prefix}DISTINCT_IDENTITIES_NOT_PROVEN"
+            )
+        seen_predictions.add(prediction_id)
+    return seen_predictions
+
+
+def _existing_publication_collision_uri(
+    receipt_uri: str,
+    *,
+    evidence_root: Path,
+) -> str | None:
+    collision_uri = publication_collision_uri_for(receipt_uri)
+    collision_path = _prospective_storage_path(
+        Path(evidence_root),
+        collision_uri,
+        field="PUBLICATION_COLLISION_EVIDENCE",
+        suffix=".json",
+        must_not_exist=False,
+    )
+    if not collision_path.exists():
+        return None
+    return collision_uri
+
+
+def _known_publication_collision_ids(
+    receipt_uri: str,
+    *,
+    publication_events: list[dict[str, Any]],
+    evidence_root: Path,
+) -> set[str]:
+    collision_uri = _existing_publication_collision_uri(
+        receipt_uri, evidence_root=evidence_root
+    )
+    if collision_uri is None:
+        return set()
+    return verify_publication_collision_evidence(
+        collision_uri,
+        publication_events=publication_events,
+        evidence_root=evidence_root,
+    )
+
+
 def verify_external_publication_receipts(
     events: list[dict[str, Any]],
     *,
     issuance_manifest_uri: str,
     evidence_root: Path,
+    publication_collision_uri: str | None = None,
 ) -> dict[str, Any]:
     """Replay exact GitHub response bytes against issuance events."""
     if not isinstance(events, list):
@@ -3093,12 +3598,31 @@ def verify_external_publication_receipts(
             forward_count += 1
         else:
             historical_count += 1
+    collision_ids = (
+        verify_publication_collision_evidence(
+            publication_collision_uri,
+            publication_events=events,
+            evidence_root=evidence_root,
+        )
+        if publication_collision_uri is not None
+        else set()
+    )
+    eligible_prediction_ids = {
+        event["prediction_id"]
+        for event in events
+        if event["forward_oos_eligible"]
+    }
+    disqualified = eligible_prediction_ids & collision_ids
     return {
         "status": "VERIFIED" if events else "EMPTY",
         "record_count": len(events),
         "head_hash": previous,
-        "forward_oos_eligible_count": forward_count,
+        "receipt_forward_oos_eligible_count": forward_count,
+        "forward_oos_eligible_count": forward_count - len(disqualified),
         "historical_publication_count": historical_count,
+        "publication_identity_collision_count": len(collision_ids),
+        "collision_disqualified_count": len(disqualified),
+        "collision_disqualified_prediction_ids": sorted(disqualified),
         "market_validation_claimed": False,
         "performance_metrics_available": False,
         "real_money_ready": False,
@@ -3140,6 +3664,9 @@ def _read_external_publication_receipts_unlocked(
         events,
         issuance_manifest_uri=issuance_manifest_uri,
         evidence_root=evidence_root,
+        publication_collision_uri=_existing_publication_collision_uri(
+            receipt_uri, evidence_root=evidence_root
+        ),
     )
     return events
 
@@ -3272,12 +3799,13 @@ def publish_github_attestation_and_retain(
 ) -> dict[str, Any]:
     """Publish and retain one canonical prospective GitHub attestation.
 
-    The exact successful POST response is created without overwrite before an
-    immediate GET of the comment is compared.  Only a byte-retained,
-    semantically identical, fully replayed response reaches the receipt
-    ledger.  If a remote POST succeeds but later validation fails, the raw
-    response is deliberately left in place for explicit recovery; once those
-    response bytes are retained, routine retry cannot silently repost it.
+    A bounded scan rejects an existing conflicting prediction identity before
+    any POST.  One exact remote comment can be recovered without reposting.
+    A new POST is immediately refetched and followed by another bounded scan
+    to catch a concurrent duplicate.  Only a byte-retained, semantically
+    identical, fully replayed response reaches the receipt ledger.  If a
+    remote POST succeeds but later validation fails, the raw response is left
+    in place for explicit recovery; routine retry cannot silently repost it.
     """
     if (
         not isinstance(prediction_id, str)
@@ -3354,20 +3882,30 @@ def publish_github_attestation_and_retain(
             raise MaturityObservationError(
                 "PUBLICATION_HORIZON_ALREADY_REACHED"
             )
-        create_url = (
-            "https://api.github.com/repos/"
-            f"{_PUBLICATION_REPOSITORY}/issues/"
-            f"{_PUBLICATION_PULL_REQUEST}/comments"
+        existing_source = _resolve_github_publication_comment(
+            manifest_event, token=github_token
         )
-        request_payload = _canonical(
-            {"body": github_publication_comment_body(manifest_event)}
-        )
-        source_raw = _github_publication_request_json(
-            "POST",
-            create_url,
-            token=github_token,
-            payload=request_payload,
-        )
+        if existing_source is None:
+            create_url = (
+                "https://api.github.com/repos/"
+                f"{_PUBLICATION_REPOSITORY}/issues/"
+                f"{_PUBLICATION_PULL_REQUEST}/comments"
+            )
+            request_payload = _canonical(
+                {"body": github_publication_comment_body(manifest_event)}
+            )
+            source_raw = _github_publication_request_json(
+                "POST",
+                create_url,
+                token=github_token,
+                payload=request_payload,
+            )
+        else:
+            source_raw = _github_publication_request_json(
+                "GET",
+                str(existing_source["url"]),
+                token=github_token,
+            )
         observed = _system_utc_now()
         _write_new_prospective_artifact(
             source_path,
@@ -3402,6 +3940,16 @@ def publish_github_attestation_and_retain(
         if fetched != source:
             raise MaturityObservationError(
                 "GITHUB_PUBLICATION_REFETCH_MISMATCH"
+            )
+        resolved_source = _resolve_github_publication_comment(
+            manifest_event, token=github_token
+        )
+        if (
+            resolved_source is None
+            or resolved_source.get("id") != event["comment_id"]
+        ):
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_REMOTE_POSTCHECK_MISMATCH"
             )
         candidate = [*events, event]
         verify_external_publication_receipts(
@@ -3562,12 +4110,23 @@ def append_maturity_observation(
             if publication_receipt_uri is not None
             else []
         )
+        collision_prediction_ids = (
+            _known_publication_collision_ids(
+                publication_receipt_uri,
+                publication_events=publication_events,
+                evidence_root=evidence_root,
+            )
+            if publication_receipt_uri is not None
+            else set()
+        )
         (
             trusted_prediction_hashes,
             trusted_projection_hashes,
             blocked,
         ) = _publication_qualified_manifest_anchors(
-            manifest_events, publication_events
+            manifest_events,
+            publication_events,
+            collision_prediction_ids,
         )
         if prediction_id in blocked:
             raise MaturityObservationError(

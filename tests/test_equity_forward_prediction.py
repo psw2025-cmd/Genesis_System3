@@ -39,6 +39,7 @@ from scripts.equity_directional_maturity import (
     build_maturity_observation,
     build_maturity_observation_event,
     github_publication_comment_body,
+    publication_collision_uri_for,
     publish_github_attestation_and_retain,
     publish_prospective_issuance,
     read_external_publication_receipts,
@@ -49,6 +50,7 @@ from scripts.equity_directional_maturity import (
     verify_issuance_artifact_manifest,
     verify_maturity_evidence,
     verify_maturity_observation_chain,
+    verify_publication_collision_evidence,
 )
 from scripts.equity_instrument_scope import EQUITY_URL, ETF_URL
 from scripts.equity_observation_packet import CM_URL
@@ -1649,6 +1651,95 @@ def retain_publication_receipt(
     return receipt_uri, source_path, event
 
 
+def retain_publication_collision(
+    tmp_path,
+    receipt_uri,
+    receipt_event,
+    canonical_source_path,
+    *,
+    detected_at="2026-10-01T13:05:00Z",
+):
+    canonical_source = json.loads(
+        canonical_source_path.read_text(encoding="utf-8")
+    )
+    conflict = deepcopy(canonical_source)
+    conflict["id"] += 1
+    old_id = str(canonical_source["id"])
+    new_id = str(conflict["id"])
+    conflict["url"] = conflict["url"].replace(old_id, new_id)
+    conflict["html_url"] = conflict["html_url"].replace(old_id, new_id)
+    conflict["created_at"] = "2026-10-01T13:01:00Z"
+    conflict["updated_at"] = conflict["created_at"]
+    prefix, encoded = conflict["body"].split("\n", 1)
+    attestation = json.loads(encoded)
+    attestation["projection_hash"] = "f" * 64
+    conflict["body"] = prefix + "\n" + json.dumps(
+        attestation, sort_keys=True, separators=(",", ":")
+    )
+    conflict_uri = canonical_source_path.relative_to(tmp_path).as_posix()
+    conflict_uri = conflict_uri.replace(
+        "publication_comment", "publication_conflict"
+    )
+    conflict_path = tmp_path / conflict_uri
+    conflict_raw = json.dumps(
+        conflict, sort_keys=True, indent=2
+    ).encode("utf-8")
+    conflict_path.write_bytes(conflict_raw)
+    canonical_raw = canonical_source_path.read_bytes()
+    collision_uri = publication_collision_uri_for(receipt_uri)
+    record = {
+        "schema_version": "equity-publication-identity-collision-v1",
+        "event_type": "EQUITY_PUBLICATION_IDENTITY_COLLISION_REVIEWED",
+        "repository": "psw2025-cmd/Genesis_System3",
+        "pull_request_number": 471,
+        "detected_at": detected_at,
+        "collisions": [
+            {
+                "prediction_id": receipt_event["prediction_id"],
+                "canonical_receipt_event_hash": receipt_event["event_hash"],
+                "comments": [
+                    {
+                        "comment_id": canonical_source["id"],
+                        "snapshot_uri": canonical_source_path.relative_to(
+                            tmp_path
+                        ).as_posix(),
+                        "source_sha256": sha256(canonical_raw).hexdigest(),
+                        "source_size_bytes": len(canonical_raw),
+                    },
+                    {
+                        "comment_id": conflict["id"],
+                        "snapshot_uri": conflict_uri,
+                        "source_sha256": sha256(conflict_raw).hexdigest(),
+                        "source_size_bytes": len(conflict_raw),
+                    },
+                ],
+                "status": "REMOTE_IDENTITY_COLLISION_NOT_FORWARD_OOS",
+                "effective_forward_oos_eligible": False,
+            }
+        ],
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    record["record_hash"] = sha256(
+        json.dumps(
+            record,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("utf-8")
+    ).hexdigest()
+    collision_path = tmp_path / collision_uri
+    collision_path.write_text(
+        json.dumps(record, sort_keys=True, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return collision_uri, collision_path, conflict_path, record
+
+
 def retain_projection_sources(tmp_path, args, projection):
     (tmp_path / "research/forward/equity/test").mkdir(
         parents=True, exist_ok=True
@@ -1988,6 +2079,117 @@ def test_external_publication_receipt_qualifies_pre_horizon_manifest(
     assert status["order_placement_allowed"] is False
 
 
+def test_publication_collision_evidence_disqualifies_forward_oos(
+    tmp_path,
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, source_path, receipt_event = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    collision_uri, _, _, _ = retain_publication_collision(
+        tmp_path, receipt_uri, receipt_event, source_path
+    )
+    events = read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    status = verify_external_publication_receipts(
+        events,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+        publication_collision_uri=collision_uri,
+    )
+    assert status["receipt_forward_oos_eligible_count"] == 1
+    assert status["forward_oos_eligible_count"] == 0
+    assert status["publication_identity_collision_count"] == 1
+    assert status["collision_disqualified_count"] == 1
+    assert status["collision_disqualified_prediction_ids"] == [
+        receipt_event["prediction_id"]
+    ]
+    maturity_status = verify_maturity_observation_chain(
+        [],
+        issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=receipt_uri,
+        evidence_root=tmp_path,
+    )
+    assert maturity_status["forward_oos_publication_eligible_count"] == 0
+    assert maturity_status[
+        "receipt_forward_oos_publication_eligible_count"
+    ] == 1
+    assert maturity_status["publication_identity_collision_count"] == 1
+    assert maturity_status[
+        "pre_maturity_without_eligible_publication_count"
+    ] == 1
+
+
+def test_publication_collision_evidence_tamper_fails_replay(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, source_path, receipt_event = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    collision_uri, _, conflict_path, _ = retain_publication_collision(
+        tmp_path, receipt_uri, receipt_event, source_path
+    )
+    publication_events = read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    conflict_path.write_bytes(conflict_path.read_bytes() + b"\n")
+    with pytest.raises(
+        MaturityObservationError,
+        match="SOURCE_HASH_OR_SIZE_MISMATCH",
+    ):
+        verify_publication_collision_evidence(
+            collision_uri,
+            publication_events=publication_events,
+            evidence_root=tmp_path,
+        )
+
+
+def test_publication_collision_blocks_maturity_append(tmp_path):
+    (
+        _,
+        _,
+        observation_uri,
+        _,
+        manifest_uri,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    publication_events = read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    source_path = tmp_path / publication_source_uri_for(manifest_uri)
+    retain_publication_collision(
+        tmp_path,
+        receipt_uri,
+        publication_events[0],
+        source_path,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="EXTERNAL_PUBLICATION_BEFORE_HORIZON_REQUIRED",
+    ):
+        append_maturity_observation(
+            tmp_path / "maturity_observations.ndjson",
+            observation_uri,
+            issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=receipt_uri,
+            evidence_root=tmp_path,
+        )
+
+
 def test_prospective_github_publication_posts_refetches_and_retains(
     tmp_path, monkeypatch
 ):
@@ -2022,8 +2224,19 @@ def test_prospective_github_publication_posts_refetches_and_retains(
             return self.request.full_url
 
         def read(self, limit):
-            assert limit > len(source_raw)
-            return source_raw
+            if "?per_page=" in self.request.full_url:
+                raw = json.dumps(
+                    [source]
+                    if any(
+                        request.get_method() == "POST"
+                        for request in requests
+                    )
+                    else []
+                ).encode("utf-8")
+            else:
+                raw = source_raw
+            assert limit > len(raw)
+            return raw
 
     def fake_urlopen(request, timeout):
         assert timeout == 30
@@ -2051,11 +2264,13 @@ def test_prospective_github_publication_posts_refetches_and_retains(
         github_token="test-token",
         evidence_root=tmp_path,
     )
-    assert [request.get_method() for request in requests] == ["POST", "GET"]
-    assert json.loads(requests[0].data) == {
+    assert [request.get_method() for request in requests] == [
+        "GET", "POST", "GET", "GET"
+    ]
+    assert json.loads(requests[1].data) == {
         "body": github_publication_comment_body(manifest_event)
     }
-    assert requests[1].full_url == source["url"]
+    assert requests[2].full_url == source["url"]
     assert (tmp_path / source_uri).read_bytes() == source_raw
     assert event["forward_oos_eligible"] is True
     assert event["first_observed_at"] == "2026-10-01T13:03:00+00:00"
@@ -2066,6 +2281,252 @@ def test_prospective_github_publication_posts_refetches_and_retains(
     ) == [event]
     assert event["live_trading_enabled"] is False
     assert event["order_placement_allowed"] is False
+
+
+def test_prospective_github_publication_recovers_one_exact_comment(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source = github_comment_response(manifest_event)
+    source_raw = json.dumps(source, sort_keys=True).encode("utf-8")
+    calls = []
+
+    def request_json(method, url, *, token, payload=None):
+        calls.append((method, url, payload))
+        assert method == "GET"
+        if "?per_page=" in url:
+            return json.dumps([source], sort_keys=True).encode("utf-8")
+        return source_raw
+
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", request_json
+    )
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    event = publish_github_attestation_and_retain(
+        tmp_path / receipt_uri,
+        source_uri,
+        issuance_manifest_uri=manifest_uri,
+        prediction_id=manifest_event["prediction_id"],
+        github_token="test-token",
+        evidence_root=tmp_path,
+    )
+    assert [call[0] for call in calls] == ["GET", "GET", "GET", "GET"]
+    assert event["comment_id"] == source["id"]
+    assert (tmp_path / source_uri).read_bytes() == source_raw
+    assert (tmp_path / receipt_uri).exists()
+
+
+def test_prospective_github_publication_conflict_fails_before_post(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    conflict = github_comment_response(manifest_event)
+    prefix, encoded = conflict["body"].split("\n", 1)
+    attestation = json.loads(encoded)
+    attestation["projection_hash"] = "f" * 64
+    conflict["body"] = prefix + "\n" + json.dumps(
+        attestation, sort_keys=True, separators=(",", ":")
+    )
+    calls = []
+
+    def request_json(method, url, *, token, payload=None):
+        calls.append((method, url, payload))
+        assert method == "GET"
+        return json.dumps([conflict], sort_keys=True).encode("utf-8")
+
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", request_json
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.raises(
+        MaturityObservationError,
+        match="GITHUB_PUBLICATION_REMOTE_IDENTITY_COLLISION",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+    assert [call[0] for call in calls] == ["GET"]
+    assert not (tmp_path / source_uri).exists()
+    assert not (tmp_path / receipt_uri).exists()
+
+
+def test_prospective_github_publication_malformed_marker_fails_closed(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    malformed = github_comment_response(manifest_event)
+    malformed["body"] = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V1\n{"
+    calls = []
+
+    def request_json(method, url, *, token, payload=None):
+        calls.append((method, url, payload))
+        return json.dumps([malformed], sort_keys=True).encode("utf-8")
+
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", request_json
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_ATTESTATION_INVALID_JSON",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / publication_receipt_uri_for(manifest_uri),
+            publication_source_uri_for(manifest_uri),
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+    assert [call[0] for call in calls] == ["GET"]
+
+
+def test_github_publication_scan_paginates_and_caps(monkeypatch):
+    unrelated = {
+        "user": {"login": "someone-else"},
+        "author_association": "NONE",
+    }
+    urls = []
+
+    def paginated(method, url, *, token, payload=None):
+        urls.append(url)
+        rows = [unrelated] * 100 if url.endswith("page=1") else []
+        return json.dumps(rows).encode("utf-8")
+
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", paginated
+    )
+    assert maturity_module._scan_github_publication_comments(
+        "EQ7D-2026-10-01-ABC-V1", token="test-token"
+    ) == []
+    assert [url.rsplit("=", 1)[-1] for url in urls] == ["1", "2"]
+
+    monkeypatch.setattr(maturity_module, "_GITHUB_PUBLICATION_MAX_PAGES", 2)
+    urls.clear()
+
+    def full_pages(method, url, *, token, payload=None):
+        urls.append(url)
+        return json.dumps([unrelated] * 100).encode("utf-8")
+
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", full_pages
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="GITHUB_PUBLICATION_COMMENT_SCAN_INCOMPLETE",
+    ):
+        maturity_module._scan_github_publication_comments(
+            "EQ7D-2026-10-01-ABC-V1", token="test-token"
+        )
+    assert [url.rsplit("=", 1)[-1] for url in urls] == ["1", "2"]
+
+
+def test_prospective_github_publication_detects_post_race_collision(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source = github_comment_response(manifest_event)
+    source_raw = json.dumps(source, sort_keys=True).encode("utf-8")
+    conflict = deepcopy(source)
+    conflict["id"] = 6123456790
+    conflict["url"] = conflict["url"].replace("6123456789", "6123456790")
+    conflict["html_url"] = conflict["html_url"].replace(
+        "6123456789", "6123456790"
+    )
+    prefix, encoded = conflict["body"].split("\n", 1)
+    attestation = json.loads(encoded)
+    attestation["prediction_event_hash"] = "e" * 64
+    conflict["body"] = prefix + "\n" + json.dumps(
+        attestation, sort_keys=True, separators=(",", ":")
+    )
+    published = False
+
+    def request_json(method, url, *, token, payload=None):
+        nonlocal published
+        if "?per_page=" in url:
+            rows = [source, conflict] if published else []
+            return json.dumps(rows, sort_keys=True).encode("utf-8")
+        if method == "POST":
+            published = True
+        return source_raw
+
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", request_json
+    )
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.raises(
+        MaturityObservationError,
+        match="GITHUB_PUBLICATION_REMOTE_IDENTITY_COLLISION",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+    assert (tmp_path / source_uri).read_bytes() == source_raw
+    assert not (tmp_path / receipt_uri).exists()
 
 
 def test_prospective_github_publication_mismatch_retains_raw_without_receipt(
@@ -2087,6 +2548,8 @@ def test_prospective_github_publication_mismatch_retains_raw_without_receipt(
 
     def request_json(method, url, *, token, payload=None):
         calls.append((method, url, token, payload))
+        if "?per_page=" in url:
+            return b"[]"
         return source_raw if method == "POST" else fetched_raw
 
     observed_times = iter(
@@ -2117,7 +2580,7 @@ def test_prospective_github_publication_mismatch_retains_raw_without_receipt(
             github_token="test-token",
             evidence_root=tmp_path,
         )
-    assert [call[0] for call in calls] == ["POST", "GET"]
+    assert [call[0] for call in calls] == ["GET", "POST", "GET"]
     assert (tmp_path / source_uri).read_bytes() == source_raw
     assert not (tmp_path / receipt_uri).exists()
 
@@ -2162,10 +2625,22 @@ def test_prospective_github_publication_duplicate_fails_before_repost(
             datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
         ]
     )
+    published = False
+
+    def request_json(method, url, *, token, payload=None):
+        nonlocal published
+        if "?per_page=" in url:
+            return json.dumps(
+                [json.loads(source_raw)] if published else []
+            ).encode("utf-8")
+        if method == "POST":
+            published = True
+        return source_raw
+
     monkeypatch.setattr(
         maturity_module,
         "_github_publication_request_json",
-        lambda *_, **__: source_raw,
+        request_json,
     )
     monkeypatch.setattr(
         maturity_module, "_system_utc_now", lambda: next(observed_times)
@@ -2736,8 +3211,28 @@ def test_retained_cmll_publication_receipt_verifies():
         events,
         issuance_manifest_uri=manifest_uri,
         evidence_root=root,
+        publication_collision_uri=publication_collision_uri_for(
+            "research/forward/equity/2026-10-13/"
+            "equity_publication_receipts.ndjson"
+        ),
     )
     assert summary["record_count"] == 1
-    assert summary["forward_oos_eligible_count"] == 1
+    assert summary["receipt_forward_oos_eligible_count"] == 1
+    assert summary["forward_oos_eligible_count"] == 0
+    assert summary["publication_identity_collision_count"] == 1
+    assert summary["collision_disqualified_prediction_ids"] == [
+        "EQ7D-2026-10-13-CMLL-V1"
+    ]
+    maturity_status = verify_maturity_observation_chain(
+        [],
+        issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=(
+            "research/forward/equity/2026-10-13/"
+            "equity_publication_receipts.ndjson"
+        ),
+        evidence_root=root,
+    )
+    assert maturity_status["forward_oos_publication_eligible_count"] == 0
+    assert maturity_status["publication_identity_collision_count"] == 1
     assert summary["market_validation_claimed"] is False
     assert summary["order_placement_allowed"] is False

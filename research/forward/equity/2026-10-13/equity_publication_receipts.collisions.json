@@ -1,0 +1,35 @@
+{
+  "schema_version": "equity-publication-identity-collision-v1",
+  "event_type": "EQUITY_PUBLICATION_IDENTITY_COLLISION_REVIEWED",
+  "repository": "psw2025-cmd/Genesis_System3",
+  "pull_request_number": 471,
+  "detected_at": "2026-10-13T21:40:25Z",
+  "collisions": [
+    {
+      "prediction_id": "EQ7D-2026-10-13-CMLL-V1",
+      "canonical_receipt_event_hash": "efd335adf3b169a98de28f61c8ffedaf6a440fa2c46e268e35487be47d8ca841",
+      "comments": [
+        {
+          "comment_id": 6144833915,
+          "snapshot_uri": "research/forward/equity/2026-10-13/github_publication_comment_6144833915.json",
+          "source_sha256": "7c62ce12e5129fda38275a05e08cde4dd0be43f35b8ef5e27d24904e29afaa7a",
+          "source_size_bytes": 4653
+        },
+        {
+          "comment_id": 6149542270,
+          "snapshot_uri": "research/forward/equity/2026-10-13/github_publication_comment_6149542270.json",
+          "source_sha256": "6ec18484176885203b2ac71a2bf83a791eb0b30a7cf002f43c67bc59e3179765",
+          "source_size_bytes": 4018
+        }
+      ],
+      "status": "REMOTE_IDENTITY_COLLISION_NOT_FORWARD_OOS",
+      "effective_forward_oos_eligible": false
+    }
+  ],
+  "market_validation_claimed": false,
+  "performance_metrics_available": false,
+  "real_money_ready": false,
+  "live_trading_enabled": false,
+  "order_placement_allowed": false,
+  "record_hash": "edb2ccf7ae4a4a6bbd5734360f068bab755f22bacc0555e5d1086df3f6bf415f"
+}
