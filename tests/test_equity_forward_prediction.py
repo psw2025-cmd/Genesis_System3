@@ -12,6 +12,7 @@ from zipfile import ZipFile
 import pytest
 
 import scripts.equity_directional_maturity as maturity_module
+import scripts.issue_equity_forward_paper as issue_module
 from dashboard.backend.multibagger_outcome import (
     OutcomeLedgerError,
     build_directional_outcome_projection,
@@ -22,6 +23,7 @@ from dashboard.backend.multibagger_outcome import (
 from scripts.equity_forward_prediction import (
     GENESIS_HASH,
     HOLIDAY_URL,
+    INDEX_API_URL,
     build_prediction,
     validate_prediction,
 )
@@ -170,6 +172,32 @@ def fixture():
     )
 
 
+def all_indices_payload(timestamp="01-Oct-2026 15:30"):
+    return {
+        "timestamp": timestamp,
+        "data": [
+            {
+                "index": "NIFTY 50",
+                "indexSymbol": "NIFTY 50",
+                "open": 22020,
+                "high": 22120,
+                "low": 21980,
+                "last": 22100,
+                "previousClose": 22000,
+                "variation": 100,
+                "percentChange": 0.45,
+            }
+        ],
+    }
+
+
+def with_all_indices(args, payload=None):
+    raw = json.dumps(payload or all_indices_payload()).encode()
+    args["index_raw"] = raw
+    args["index_receipt"] = receipt(raw, INDEX_API_URL)
+    return args
+
+
 def retained_sources(args):
     return {
         "equity_source_bytes": args["equity_sources"],
@@ -240,6 +268,174 @@ def test_builds_one_unqualified_forward_paper_prediction():
         model_spec_raw=args["model_spec_raw"],
         expected_previous_event_hash=args["previous_event_hash"],
     )["orders_allowed"] is False
+
+
+def test_builds_from_official_all_indices_close_fallback():
+    args = with_all_indices(fixture())
+    result = build_prediction(**args)
+    assert result["benchmark"]["entry_reference_close"] == "22100"
+    assert result["benchmark"]["source_url"] == INDEX_API_URL
+    assert validate_prediction(
+        result,
+        now=NOW,
+        **retained_sources(args),
+        holiday_calendar_raw=args["holiday_raw"],
+        model_spec_raw=args["model_spec_raw"],
+        expected_previous_event_hash=args["previous_event_hash"],
+    )["orders_allowed"] is False
+
+
+@pytest.mark.parametrize(
+    ("case", "message"),
+    [
+        ("stale_date", "requested session close"),
+        ("not_close", "requested session close"),
+        ("duplicate", "missing or duplicated"),
+        ("variation", "change arithmetic"),
+        ("percent", "change arithmetic"),
+    ],
+)
+def test_all_indices_fallback_fails_closed(case, message):
+    payload = all_indices_payload()
+    if case == "stale_date":
+        payload["timestamp"] = "30-Sep-2026 15:30"
+    elif case == "not_close":
+        payload["timestamp"] = "01-Oct-2026 15:29"
+    elif case == "duplicate":
+        payload["data"].append(deepcopy(payload["data"][0]))
+    elif case == "variation":
+        payload["data"][0]["variation"] = 99.99
+    else:
+        payload["data"][0]["percentChange"] = 0.46
+    with pytest.raises(ValueError, match=message):
+        build_prediction(**with_all_indices(fixture(), payload))
+
+
+def test_capture_falls_back_after_exact_archive_404(monkeypatch):
+    entry = datetime(2026, 10, 13, tzinfo=timezone.utc).date()
+    holiday = json.dumps(
+        {"CM": [{"tradingDate": "20-Oct-2026"}]}
+    ).encode()
+    successful = b"official-source"
+    fallback = json.dumps(
+        all_indices_payload("13-Oct-2026 15:30")
+    ).encode()
+    archive_url = (
+        "https://nsearchives.nseindia.com/content/indices/"
+        "ind_close_all_13102026.csv"
+    )
+
+    def fake_fetch(url, *, opener=None):
+        del opener
+        if url == HOLIDAY_URL:
+            return issue_module.Capture(holiday, receipt(holiday, url))
+        if url == archive_url:
+            result = receipt(b"not found", url)
+            result["http_status"] = 404
+            return issue_module.Capture(b"not found", result)
+        if url == INDEX_API_URL:
+            return issue_module.Capture(fallback, receipt(fallback, url))
+        return issue_module.Capture(successful, receipt(successful, url))
+
+    monkeypatch.setattr(issue_module, "_source_opener", object)
+    monkeypatch.setattr(issue_module, "_fetch", fake_fetch)
+    captures, attempts, due = issue_module._capture_sources(entry)
+    assert captures["index"].raw == fallback
+    assert captures["index"].receipt["url"] == INDEX_API_URL
+    assert attempts[0]["http_status"] == 404
+    assert attempts[0]["retained_file"] is None
+    assert due.isoformat() == "2026-10-21"
+
+
+def test_issue_rejects_before_close_before_network(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        issue_module,
+        "_utc_now",
+        lambda: datetime(2026, 10, 13, 9, 59, tzinfo=timezone.utc),
+    )
+
+    def unexpected_capture(_entry):
+        raise AssertionError("network capture must not run before close")
+
+    monkeypatch.setattr(issue_module, "_capture_sources", unexpected_capture)
+    with pytest.raises(ValueError, match="completed NSE cash session"):
+        issue_module.issue(
+            datetime(2026, 10, 13, tzinfo=timezone.utc).date(),
+            evidence_root=tmp_path,
+        )
+
+
+def test_issue_creates_artifact_parent_before_atomic_publish(
+    monkeypatch, tmp_path
+):
+    entry = datetime(2026, 10, 13, tzinfo=timezone.utc).date()
+    due = datetime(2026, 10, 21, tzinfo=timezone.utc).date()
+    roles = {
+        "cash": CM_URL + "BhavCopy_NSE_CM_0_0_0_20261013_F_0000.csv.zip",
+        "company": EQUITY_URL,
+        "etf": ETF_URL,
+        "actions": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=13-10-2026&to_date=21-10-2026",
+        "holiday_calendar": HOLIDAY_URL,
+        "index": INDEX_API_URL,
+    }
+    captures = {
+        role: issue_module.Capture(b"x", receipt(b"x", url))
+        for role, url in roles.items()
+    }
+    model_path = tmp_path / issue_module.MODEL_SPEC_URI
+    model_path.parent.mkdir(parents=True)
+    model_path.write_bytes(b"model")
+    monkeypatch.setattr(
+        issue_module,
+        "_utc_now",
+        lambda: datetime(2026, 10, 13, 16, 0, tzinfo=timezone.utc),
+    )
+    monkeypatch.setattr(
+        issue_module,
+        "_load_captured_sources",
+        lambda *_: (captures, [{"http_status": 404}], due),
+    )
+    monkeypatch.setattr(
+        issue_module,
+        "read_issuance_artifact_manifest",
+        lambda *_args, **_kwargs: [{"prediction_event_hash": "1" * 64}],
+    )
+    prediction = {
+        "prediction_id": "EQ7D-2026-10-13-AAA-V1",
+        "issued_at": "2026-10-13T16:00:00+00:00",
+        "source_cutoff_at": "2026-10-13T15:59:00+00:00",
+        "due_at": "2026-10-21T10:00:00+00:00",
+        "prediction": {
+            "symbol": "AAA",
+            "isin": "INE000A01001",
+            "entry_reference_close": "100",
+        },
+        "benchmark": {"entry_reference_close": "22000"},
+        "counts": {"qualified_current_candidates": 0},
+        "event_hash": "2" * 64,
+    }
+    monkeypatch.setattr(
+        issue_module, "build_prediction", lambda **_kwargs: prediction
+    )
+    monkeypatch.setattr(
+        issue_module,
+        "build_directional_outcome_projection",
+        lambda *_args, **_kwargs: {"projection_hash": "3" * 64},
+    )
+
+    def fake_publish(_path, **kwargs):
+        del kwargs
+        assert (
+            tmp_path / "research/forward/equity/2026-10-13"
+        ).is_dir()
+        return {"event_hash": "4" * 64}
+
+    monkeypatch.setattr(
+        issue_module, "publish_prospective_issuance", fake_publish
+    )
+    result = issue_module.issue(entry, evidence_root=tmp_path)
+    assert result["orders_allowed"] is False
+    assert result["issuance_manifest_event_hash"] == "4" * 64
 
 
 def test_builder_requires_explicit_predecessor_anchor():
@@ -2488,11 +2684,21 @@ def test_retained_molbio_maturity_observation_ledger_verifies():
     manifest_events = read_issuance_artifact_manifest(
         manifest_uri, evidence_root=root
     )
-    assert len(manifest_events) == 1
-    assert manifest_events[0]["pre_maturity_registered"] is False
-    assert manifest_events[0]["registration_status"] == (
+    by_prediction = {
+        event["prediction_id"]: event for event in manifest_events
+    }
+    assert set(by_prediction) == {
+        "EQ7D-2026-10-01-MOLBIO-V1",
+        "EQ7D-2026-10-13-CMLL-V1",
+    }
+    historical = by_prediction["EQ7D-2026-10-01-MOLBIO-V1"]
+    assert historical["pre_maturity_registered"] is False
+    assert historical["registration_status"] == (
         "HISTORICAL_AFTER_MATURITY_REGISTRATION_NOT_PROVEN"
     )
+    prospective = by_prediction["EQ7D-2026-10-13-CMLL-V1"]
+    assert prospective["pre_maturity_registered"] is True
+    assert prospective["registration_status"] == "PRE_MATURITY_REGISTERED"
     events = read_maturity_observation_ledger(
         root
         / "research/forward/equity/2026-10-01/"
@@ -2508,3 +2714,30 @@ def test_retained_molbio_maturity_observation_ledger_verifies():
     assert events[0]["matured_adjusted_outcomes"] == 0
     assert events[0]["direction_correct"] is None
     assert events[0]["order_placement_allowed"] is False
+
+
+def test_retained_cmll_publication_receipt_verifies():
+    root = Path(__file__).resolve().parents[1]
+    manifest_uri = (
+        "research/forward/equity/2026-10-01/"
+        "equity_issuance_artifact_manifest.ndjson"
+    )
+    events = read_external_publication_receipts(
+        "research/forward/equity/2026-10-13/"
+        "equity_publication_receipts.ndjson",
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=root,
+    )
+    assert len(events) == 1
+    assert events[0]["prediction_id"] == "EQ7D-2026-10-13-CMLL-V1"
+    assert events[0]["comment_id"] == 6149542270
+    assert events[0]["forward_oos_eligible"] is True
+    summary = verify_external_publication_receipts(
+        events,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=root,
+    )
+    assert summary["record_count"] == 1
+    assert summary["forward_oos_eligible_count"] == 1
+    assert summary["market_validation_claimed"] is False
+    assert summary["order_placement_allowed"] is False

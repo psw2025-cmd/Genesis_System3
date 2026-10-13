@@ -1,0 +1,77 @@
+{
+  "adjusted_entry_price": null,
+  "adjustment_basis": null,
+  "adjustment_status": "PENDING_MATURITY_RECHECK",
+  "calibrated_probability": null,
+  "due_at": "2026-10-21T10:00:00+00:00",
+  "due_session_date": "2026-10-21",
+  "entry_price_as_of_at": "2026-10-13T10:00:00+00:00",
+  "entry_reference_close": "622.95",
+  "entry_session_date": "2026-10-13",
+  "entry_snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/cm_20261013.zip",
+  "entry_source": "NSE",
+  "entry_source_hash": "b3aba7f1e20587e4c77a5de2b720cbcd5d8f4c8fe42e1b67f06f0d7deaabbf46",
+  "entry_source_row_hash": "37a77aa85d4e94eeb54f604f9c86b1cc80c3e2d685c96ba2816c3ee28b4593f3",
+  "entry_source_size_bytes": 204601,
+  "entry_source_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261013_F_0000.csv.zip",
+  "event_type": "EQUITY_DIRECTIONAL_OUTCOME_PROJECTION",
+  "expected_return_range": null,
+  "forecast_direction": "POSITIVE",
+  "forecast_kind": "DIRECTION_ONLY",
+  "isin": "INE11XY01018",
+  "issued_at": "2026-10-13T15:51:59.693436+00:00",
+  "live_trading_enabled": false,
+  "market_validation_claimed": false,
+  "maturity_recheck_required": true,
+  "order_placement_allowed": false,
+  "outcome_status": "PENDING",
+  "performance_gate_passed": false,
+  "performance_metrics_available": false,
+  "predicted_return_pct": null,
+  "prediction_event_hash": "c7c7a6b28984066059dd92c97e6a6e5f31b6e594f3472a9fa50475049e081ab4",
+  "prediction_id": "EQ7D-2026-10-13-CMLL-V1",
+  "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+  "projection_hash": "ffbc8cc48e90bffdd7445c72abeb88276ae387e03409b38d3f698da478f3ba1c",
+  "real_money_ready": false,
+  "reference_prices_are_executable_fills": false,
+  "schema_version": "equity-directional-outcome-projection-v1",
+  "source_bindings": {
+    "actions": {
+      "sha256": "c187f73a67ab8f27bd5dd66338dcd97ffe7cd378cde9ef572279ee9cd5bcd87e",
+      "size_bytes": 3078,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/corporate_actions.json"
+    },
+    "cash": {
+      "sha256": "b3aba7f1e20587e4c77a5de2b720cbcd5d8f4c8fe42e1b67f06f0d7deaabbf46",
+      "size_bytes": 204601,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/cm_20261013.zip"
+    },
+    "company": {
+      "sha256": "bf199940551b6b977afc88f5096b072cdd2663d600bd7abe75433723dc4535a8",
+      "size_bytes": 184050,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/EQUITY_L.csv"
+    },
+    "etf": {
+      "sha256": "00b1db6250e99a7cc153cfb5423138e4b3481301fa692268267cd6be80c8aafe",
+      "size_bytes": 37753,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/eq_etfseclist.csv"
+    },
+    "holiday_calendar": {
+      "sha256": "933cf5dc6dd4efe3b8db8ce6ecd6ecb2582929f5e0b4faffdb88e11cf4efdfbe",
+      "size_bytes": 34022,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/trading_holidays.json"
+    },
+    "index": {
+      "sha256": "a402bb454057bc4497239e134d01fa920784acb740d67231bb3a1aee36271ecd",
+      "size_bytes": 15686,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-13-forward/index_close_20261013.csv"
+    },
+    "model_spec": {
+      "sha256": "f7d40fcaca5afc320ad8f715c66111ebb1674f202962243bb6a6cf1758b0c0ba",
+      "size_bytes": 3924,
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-01-forward/equity_forward_rank_v1.json"
+    }
+  },
+  "source_cutoff_at": "2026-10-13T15:50:40.640826+00:00",
+  "symbol": "CMLL"
+}

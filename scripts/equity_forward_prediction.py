@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import csv
 from datetime import date, datetime, time, timedelta, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from hashlib import sha256
 from io import StringIO
 import json
@@ -25,6 +25,7 @@ EVENT_TYPE = "EQUITY_FORWARD_PREDICTION_ISSUED"
 GENESIS_HASH = "0" * 64
 IST = ZoneInfo("Asia/Kolkata")
 INDEX_URL_PREFIX = "https://nsearchives.nseindia.com/content/indices/ind_close_all_"
+INDEX_API_URL = "https://www.nseindia.com/api/allIndices"
 HOLIDAY_URL = "https://www.nseindia.com/api/holiday-master?type=trading"
 EXPECTED_KEYS = {
     "schema",
@@ -114,9 +115,8 @@ def _percent_rank(values: list[Decimal], value: Decimal) -> Decimal:
     return (Decimal(lower) + Decimal(equal - 1) / 2) / Decimal(len(values) - 1)
 
 
-def _index_reference(raw: bytes, receipt: dict[str, Any], session: date) -> tuple[dict, datetime]:
-    url = f"{INDEX_URL_PREFIX}{session.strftime('%d%m%Y')}.csv"
-    observed = _verify_receipt(raw, receipt, url=url)
+def _index_csv_reference(raw: bytes, session: date) -> Decimal:
+    """Return the Nifty 50 close from the date-specific official CSV."""
     reader = csv.DictReader(StringIO(raw.decode("utf-8-sig")))
     required = {
         "Index Name",
@@ -147,13 +147,78 @@ def _index_reference(raw: bytes, receipt: dict[str, Any], session: date) -> tupl
         values["Open Index Value"], values["Closing Index Value"]
     ) <= values["High Index Value"]:
         raise ValueError("Inconsistent Nifty 50 OHLC")
+    return values["Closing Index Value"]
+
+
+def _index_api_reference(raw: bytes, session: date) -> Decimal:
+    """Return the close from NSE's official end-of-session all-indices API."""
+    try:
+        payload = json.loads(raw)
+        timestamp = datetime.strptime(payload["timestamp"], "%d-%b-%Y %H:%M")
+        rows = payload["data"]
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        raise ValueError("Unsupported all-indices schema") from exc
+    if timestamp.date() != session or timestamp.time() != time(15, 30):
+        raise ValueError("All-indices timestamp is not the requested session close")
+    if not isinstance(rows, list):
+        raise ValueError("Unsupported all-indices schema")
+    matches = [
+        row
+        for row in rows
+        if isinstance(row, dict)
+        and row.get("index") == "NIFTY 50"
+        and row.get("indexSymbol") == "NIFTY 50"
+    ]
+    if len(matches) != 1:
+        raise ValueError("Nifty 50 all-indices row missing or duplicated")
+    row = matches[0]
+    values = {
+        key: _decimal(row.get(key), key, positive=True)
+        for key in ("open", "high", "low", "last", "previousClose")
+    }
+    if not values["low"] <= min(values["open"], values["last"]) <= max(
+        values["open"], values["last"]
+    ) <= values["high"]:
+        raise ValueError("Inconsistent Nifty 50 OHLC")
+    variation = _decimal(row.get("variation"), "variation")
+    percent_change = _decimal(row.get("percentChange"), "percentChange")
+    expected_variation = (values["last"] - values["previousClose"]).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    expected_percent = (
+        (values["last"] - values["previousClose"])
+        / values["previousClose"]
+        * 100
+    ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    if (
+        variation.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        != expected_variation
+        or percent_change.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        != expected_percent
+    ):
+        raise ValueError("Inconsistent Nifty 50 change arithmetic")
+    return values["last"]
+
+
+def _index_reference(
+    raw: bytes, receipt: dict[str, Any], session: date
+) -> tuple[dict, datetime]:
+    archive_url = f"{INDEX_URL_PREFIX}{session.strftime('%d%m%Y')}.csv"
+    source_url = receipt.get("url")
+    if source_url == archive_url:
+        close = _index_csv_reference(raw, session)
+    elif source_url == INDEX_API_URL:
+        close = _index_api_reference(raw, session)
+    else:
+        raise ValueError("Unsupported official index source URL")
+    observed = _verify_receipt(raw, receipt, url=source_url)
     return {
         "name": "Nifty 50",
         "entry_session_date": session.isoformat(),
-        "entry_reference_close": str(values["Closing Index Value"]),
+        "entry_reference_close": str(close),
         "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
         "source_sha256": sha256(raw).hexdigest(),
-        "source_url": url,
+        "source_url": source_url,
     }, observed
 
 
