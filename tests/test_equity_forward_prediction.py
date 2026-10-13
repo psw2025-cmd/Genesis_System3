@@ -28,16 +28,21 @@ from scripts.equity_forward_prediction import (
 from scripts.equity_directional_maturity import (
     ISSUANCE_MANIFEST_GENESIS_HASH,
     MATURITY_LEDGER_GENESIS_HASH,
+    PUBLICATION_RECEIPT_GENESIS_HASH,
     MaturityObservationError,
     _canonical_maturity_ledger_event,
+    append_external_publication_receipt,
     append_issuance_artifact_manifest,
     append_maturity_observation,
     build_maturity_observation,
     build_maturity_observation_event,
+    github_publication_comment_body,
     publish_prospective_issuance,
+    read_external_publication_receipts,
     read_issuance_artifact_manifest,
     read_maturity_observation_ledger,
     validate_maturity_observation,
+    verify_external_publication_receipts,
     verify_issuance_artifact_manifest,
     verify_maturity_evidence,
     verify_maturity_observation_chain,
@@ -1358,6 +1363,95 @@ def retain_anchor_artifacts(
     )
 
 
+def publication_receipt_uri_for(manifest_uri):
+    return manifest_uri.replace(
+        "issuance_manifest", "publication_receipts"
+    )
+
+
+def publication_source_uri_for(manifest_uri):
+    return manifest_uri.replace(
+        "issuance_manifest", "publication_comment"
+    ).replace(".ndjson", ".json")
+
+
+def github_comment_response(
+    manifest_event,
+    *,
+    created_at="2026-10-01T13:02:00Z",
+    updated_at=None,
+    body=None,
+    comment_id=6123456789,
+):
+    return {
+        "id": comment_id,
+        "url": (
+            "https://api.github.com/repos/psw2025-cmd/"
+            f"Genesis_System3/issues/comments/{comment_id}"
+        ),
+        "html_url": (
+            "https://github.com/psw2025-cmd/Genesis_System3/"
+            f"pull/471#issuecomment-{comment_id}"
+        ),
+        "issue_url": (
+            "https://api.github.com/repos/psw2025-cmd/"
+            "Genesis_System3/issues/471"
+        ),
+        "user": {
+            "login": "psw2025-cmd",
+            "id": 176781239,
+            "type": "User",
+        },
+        "created_at": created_at,
+        "updated_at": updated_at or created_at,
+        "author_association": "OWNER",
+        "body": body or github_publication_comment_body(manifest_event),
+    }
+
+
+def retain_publication_receipt(
+    tmp_path,
+    manifest_uri,
+    *,
+    created_at="2026-10-01T13:02:00Z",
+    updated_at=None,
+    body=None,
+    observed_at=datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+):
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source_uri = publication_source_uri_for(manifest_uri)
+    source_path = tmp_path / source_uri
+    source_path.write_text(
+        json.dumps(
+            github_comment_response(
+                manifest_event,
+                created_at=created_at,
+                updated_at=updated_at,
+                body=body,
+            ),
+            sort_keys=True,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            maturity_module,
+            "_system_utc_now",
+            lambda: observed_at,
+        )
+        event = append_external_publication_receipt(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            evidence_root=tmp_path,
+        )
+    return receipt_uri, source_path, event
+
+
 def retain_projection_sources(tmp_path, args, projection):
     (tmp_path / "research/forward/equity/test").mkdir(
         parents=True, exist_ok=True
@@ -1413,6 +1507,7 @@ def retained_maturity_case(tmp_path):
             projection,
         )
     )
+    retain_publication_receipt(tmp_path, anchor_artifacts)
     return (
         observation,
         observation_bytes,
@@ -1665,6 +1760,146 @@ def test_prospective_issuance_rolls_back_on_manifest_commit_failure(
     assert not list(manifest.parent.glob(f".{manifest.name}.*.tmp"))
 
 
+def test_external_publication_receipt_qualifies_pre_horizon_manifest(
+    tmp_path,
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, _, event = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    assert event["previous_hash"] == PUBLICATION_RECEIPT_GENESIS_HASH
+    assert event["forward_oos_eligible"] is True
+    assert event["publication_status"] == (
+        "INDEPENDENT_GITHUB_PUBLICATION_BEFORE_HORIZON"
+    )
+    events = read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    assert events == [event]
+    status = verify_external_publication_receipts(
+        events,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    assert status["forward_oos_eligible_count"] == 1
+    assert status["historical_publication_count"] == 0
+    assert status["order_placement_allowed"] is False
+
+
+def test_maturity_rejects_pre_horizon_manifest_without_receipt(tmp_path):
+    (
+        _,
+        _,
+        observation_uri,
+        _,
+        manifest_uri,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    with pytest.raises(
+        MaturityObservationError,
+        match="EXTERNAL_PUBLICATION_BEFORE_HORIZON_REQUIRED",
+    ):
+        append_maturity_observation(
+            tmp_path / "missing_publication_receipt.ndjson",
+            observation_uri,
+            issuance_manifest_uri=manifest_uri,
+            evidence_root=tmp_path,
+        )
+
+
+def test_external_publication_rejects_edited_github_comment(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_EDITED_COMMENT_FORBIDDEN",
+    ):
+        retain_publication_receipt(
+            tmp_path,
+            manifest_uri,
+            updated_at="2026-10-01T13:02:01Z",
+        )
+    assert not (tmp_path / publication_receipt_uri_for(manifest_uri)).exists()
+
+
+def test_late_external_publication_remains_historical_only(tmp_path):
+    (
+        observation,
+        observation_bytes,
+        observation_uri,
+        _,
+        manifest_uri,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    (tmp_path / publication_receipt_uri_for(manifest_uri)).unlink()
+    receipt_uri, _, event = retain_publication_receipt(
+        tmp_path,
+        manifest_uri,
+        created_at="2026-10-08T10:00:00Z",
+        observed_at=datetime(
+            2026, 10, 8, 10, 1, tzinfo=timezone.utc
+        ),
+    )
+    assert event["forward_oos_eligible"] is False
+    assert event["publication_status"] == (
+        "HISTORICAL_PUBLICATION_NOT_FORWARD_OOS"
+    )
+    maturity_event = build_maturity_observation_event(
+        observation,
+        observation_bytes=observation_bytes,
+        observation_uri=observation_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="EXTERNAL_PUBLICATION_BEFORE_HORIZON_REQUIRED",
+    ):
+        verify_maturity_observation_chain(
+            [maturity_event],
+            issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=receipt_uri,
+            evidence_root=tmp_path,
+        )
+
+
+def test_publication_receipt_replay_rejects_replaced_source_bytes(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, source_path, event = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    source = json.loads(source_path.read_text(encoding="utf-8"))
+    source["user"]["login"] = "attacker"
+    source_path.write_text(
+        json.dumps(source, sort_keys=True, indent=2),
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_SOURCE_HASH_OR_SIZE_MISMATCH",
+    ):
+        verify_external_publication_receipts(
+            [event],
+            issuance_manifest_uri=manifest_uri,
+            evidence_root=tmp_path,
+        )
+
+
 def test_maturity_ledger_requires_retained_issuance_manifest(tmp_path):
     (
         _,
@@ -1706,6 +1941,9 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
         ledger,
         observation_uri,
         issuance_manifest_uri=anchor_artifacts,
+        publication_receipt_uri=publication_receipt_uri_for(
+            anchor_artifacts
+        ),
         evidence_root=tmp_path,
     )
     assert event["observation_record_hash"] == observation["record_hash"]
@@ -1717,6 +1955,9 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
     assert read_maturity_observation_ledger(
         ledger,
         issuance_manifest_uri=anchor_artifacts,
+        publication_receipt_uri=publication_receipt_uri_for(
+            anchor_artifacts
+        ),
         evidence_root=tmp_path,
     ) == [event]
 
@@ -1729,6 +1970,9 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
             ledger,
             observation_uri,
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
     assert ledger.read_bytes() == original
@@ -1741,6 +1985,9 @@ def test_maturity_observation_ledger_is_append_only_and_source_bound(
         read_maturity_observation_ledger(
             ledger,
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 
@@ -1793,6 +2040,9 @@ def test_maturity_ledger_rejects_self_rehashed_anchor_replacement(tmp_path):
             tmp_path / "replaced.ndjson",
             replaced_uri,
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 
@@ -1843,6 +2093,9 @@ def test_maturity_verifier_rejects_caller_rehashed_anchor_event(tmp_path):
         verify_maturity_observation_chain(
             [event],
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 
@@ -1881,6 +2134,9 @@ def test_maturity_verifier_rejects_detached_rehashed_projection(tmp_path):
         verify_maturity_observation_chain(
             [event],
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 
@@ -1926,6 +2182,9 @@ def test_maturity_verifier_rejects_non_genesis_prediction_chain(tmp_path):
         verify_maturity_observation_chain(
             [event],
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 
@@ -1961,6 +2220,9 @@ def test_maturity_ledger_rejects_rehashed_premature_score(tmp_path):
         verify_maturity_observation_chain(
             [event],
             issuance_manifest_uri=anchor_artifacts,
+            publication_receipt_uri=publication_receipt_uri_for(
+                anchor_artifacts
+            ),
             evidence_root=tmp_path,
         )
 

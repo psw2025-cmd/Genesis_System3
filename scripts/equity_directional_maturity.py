@@ -200,6 +200,41 @@ _ISSUANCE_MANIFEST_FIELDS = {
     "real_money_ready", "live_trading_enabled", "order_placement_allowed",
     "event_hash",
 }
+PUBLICATION_RECEIPT_SCHEMA_VERSION = (
+    "equity-external-publication-receipt-ledger-v1"
+)
+PUBLICATION_RECEIPT_GENESIS_HASH = "0" * 64
+_PUBLICATION_RECEIPT_EVENT_TYPE = (
+    "EQUITY_ISSUANCE_EXTERNALLY_PUBLISHED"
+)
+_MAX_PUBLICATION_RECEIPT_BYTES = 2 * 1024 * 1024
+_PUBLICATION_RECEIPT_FIELDS = {
+    "schema_version", "event_type", "prediction_id",
+    "issuance_manifest_event_hash", "prediction_event_hash",
+    "projection_hash", "due_at", "provider", "repository",
+    "pull_request_number", "comment_id", "author_login",
+    "published_at", "source_updated_at", "first_observed_at",
+    "source_url", "source_html_url", "source_snapshot_uri",
+    "source_sha256", "source_size_bytes", "attestation_sha256",
+    "publication_status", "forward_oos_eligible", "previous_hash",
+    "market_validation_claimed", "performance_metrics_available",
+    "real_money_ready", "live_trading_enabled",
+    "order_placement_allowed", "event_hash",
+}
+_PUBLICATION_ATTESTATION_SCHEMA_VERSION = (
+    "equity-publication-attestation-v1"
+)
+_PUBLICATION_ATTESTATION_FIELDS = {
+    "schema_version", "prediction_id", "issuance_manifest_event_hash",
+    "prediction_event_hash", "projection_hash", "registered_at",
+    "due_at", "execution_mode", "market_validation_claimed",
+    "live_trading_enabled", "order_placement_allowed",
+}
+_PUBLICATION_BODY_PREFIX = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V1\n"
+_PUBLICATION_PROVIDER = "GITHUB_ISSUE_COMMENT"
+_PUBLICATION_REPOSITORY = "psw2025-cmd/Genesis_System3"
+_PUBLICATION_PULL_REQUEST = 471
+_PUBLICATION_AUTHOR_LOGIN = "psw2025-cmd"
 _MATURITY_LEDGER_FIELDS = {
     "schema_version",
     "event_type",
@@ -1752,24 +1787,68 @@ def _verify_maturity_observation_chain_with_anchors(
     }
 
 
+def _publication_qualified_manifest_anchors(
+    manifest_events: list[dict[str, Any]],
+    publication_events: list[dict[str, Any]],
+) -> tuple[dict[str, str], dict[str, str], set[str]]:
+    receipts = {
+        event["prediction_id"]: event for event in publication_events
+    }
+    prediction_hashes: dict[str, str] = {}
+    projection_hashes: dict[str, str] = {}
+    blocked: set[str] = set()
+    for event in manifest_events:
+        prediction_id = event["prediction_id"]
+        receipt = receipts.get(prediction_id)
+        qualifies = (
+            not event["pre_maturity_registered"]
+            or (
+                receipt is not None
+                and receipt["forward_oos_eligible"]
+                and receipt["issuance_manifest_event_hash"]
+                == event["event_hash"]
+            )
+        )
+        if not qualifies:
+            blocked.add(prediction_id)
+            continue
+        prediction_hashes[prediction_id] = event[
+            "prediction_event_hash"
+        ]
+        projection_hashes[prediction_id] = event["projection_hash"]
+    return prediction_hashes, projection_hashes, blocked
+
+
 def verify_maturity_observation_chain(
     events: list[dict[str, Any]],
     *,
     issuance_manifest_uri: str,
+    publication_receipt_uri: str | None = None,
     evidence_root: Path,
 ) -> dict[str, Any]:
-    """Verify maturity only against exact-byte registered artifacts."""
+    """Verify maturity against registered and independently published bytes."""
     manifest_events = read_issuance_artifact_manifest(
         issuance_manifest_uri, evidence_root=evidence_root
     )
-    prediction_hashes = {
-        event["prediction_id"]: event["prediction_event_hash"]
-        for event in manifest_events
-    }
-    projection_hashes = {
-        event["prediction_id"]: event["projection_hash"]
-        for event in manifest_events
-    }
+    publication_events = (
+        read_external_publication_receipts(
+            publication_receipt_uri,
+            issuance_manifest_uri=issuance_manifest_uri,
+            evidence_root=evidence_root,
+        )
+        if publication_receipt_uri is not None
+        else []
+    )
+    prediction_hashes, projection_hashes, blocked = (
+        _publication_qualified_manifest_anchors(
+            manifest_events, publication_events
+        )
+    )
+    used_prediction_ids = {event.get("prediction_id") for event in events}
+    if blocked & used_prediction_ids:
+        raise MaturityObservationError(
+            "EXTERNAL_PUBLICATION_BEFORE_HORIZON_REQUIRED"
+        )
     result = _verify_maturity_observation_chain_with_anchors(
         events,
         trusted_prediction_hashes=prediction_hashes,
@@ -1777,7 +1856,7 @@ def verify_maturity_observation_chain(
     )
     result["verification_scope"] = (
         "HASH_CHAIN_ISSUANCE_MANIFEST_REGISTERED_PREDICTION_PROJECTION_"
-        "AND_RETAINED_OBSERVATION"
+        "EXTERNAL_PUBLICATION_ELIGIBILITY_GATED_AND_RETAINED_OBSERVATION"
     )
     result["issuance_manifest_record_count"] = len(manifest_events)
     result["issuance_manifest_head_hash"] = (
@@ -1790,6 +1869,18 @@ def verify_maturity_observation_chain(
     )
     result["historical_after_maturity_registration_count"] = sum(
         not event["pre_maturity_registered"] for event in manifest_events
+    )
+    result["external_publication_receipt_count"] = len(
+        publication_events
+    )
+    result["forward_oos_publication_eligible_count"] = sum(
+        event["forward_oos_eligible"] for event in publication_events
+    )
+    result["historical_publication_receipt_count"] = sum(
+        not event["forward_oos_eligible"] for event in publication_events
+    )
+    result["pre_maturity_without_eligible_publication_count"] = len(
+        blocked
     )
     return result
 
@@ -1986,7 +2077,12 @@ def _fsync_directory(path: Path) -> None:
         os.close(descriptor)
 
 
-def _replace_manifest_atomically(path: Path, payload: bytes) -> None:
+def _replace_manifest_atomically(
+    path: Path,
+    payload: bytes,
+    *,
+    failure_code: str = "ISSUANCE_MANIFEST_COMMIT_FAILED",
+) -> None:
     """Make the fully validated manifest version the transaction commit point."""
     mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
     descriptor, temporary_name = tempfile.mkstemp(
@@ -2008,9 +2104,7 @@ def _replace_manifest_atomically(path: Path, payload: bytes) -> None:
         if descriptor >= 0:
             os.close(descriptor)
         temporary.unlink(missing_ok=True)
-        raise MaturityObservationError(
-            "ISSUANCE_MANIFEST_COMMIT_FAILED"
-        ) from exc
+        raise MaturityObservationError(failure_code) from exc
 
 
 def _manifest_storage_path(path: Path, evidence_root: Path) -> tuple[Path, str]:
@@ -2418,6 +2512,663 @@ def append_issuance_artifact_manifest(
         return event
 
 
+def _canonical_publication_receipt_event(
+    record: Mapping[str, Any],
+) -> bytes:
+    return _canonical(
+        {key: value for key, value in record.items() if key != "event_hash"}
+    )
+
+
+def _publication_attestation(
+    manifest_event: Mapping[str, Any],
+) -> dict[str, Any]:
+    _validate_issuance_manifest_event(manifest_event)
+    return {
+        "schema_version": _PUBLICATION_ATTESTATION_SCHEMA_VERSION,
+        "prediction_id": manifest_event["prediction_id"],
+        "issuance_manifest_event_hash": manifest_event["event_hash"],
+        "prediction_event_hash": manifest_event["prediction_event_hash"],
+        "projection_hash": manifest_event["projection_hash"],
+        "registered_at": manifest_event["registered_at"],
+        "due_at": manifest_event["due_at"],
+        "execution_mode": "ANALYZE_PAPER",
+        "market_validation_claimed": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+
+
+def github_publication_comment_body(
+    manifest_event: Mapping[str, Any],
+) -> str:
+    """Return the exact machine-readable body to publish on GitHub."""
+    return _PUBLICATION_BODY_PREFIX + _canonical(
+        _publication_attestation(manifest_event)
+    ).decode("ascii")
+
+
+def _parse_publication_attestation(body: Any) -> dict[str, Any]:
+    if not isinstance(body, str) or not body.startswith(
+        _PUBLICATION_BODY_PREFIX
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_PREFIX_INVALID"
+        )
+    attestation = _strict_json_object(
+        body[len(_PUBLICATION_BODY_PREFIX):].encode("utf-8"),
+        "PUBLICATION_ATTESTATION",
+    )
+    if set(attestation) != _PUBLICATION_ATTESTATION_FIELDS:
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_FIELDS_INVALID"
+        )
+    if (
+        attestation.get("schema_version")
+        != _PUBLICATION_ATTESTATION_SCHEMA_VERSION
+        or attestation.get("execution_mode") != "ANALYZE_PAPER"
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_SCHEMA_INVALID"
+        )
+    for field in (
+        "market_validation_claimed",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if attestation.get(field) is not False:
+            raise MaturityObservationError(
+                f"PUBLICATION_ATTESTATION_{field.upper()}_INVALID"
+            )
+    return attestation
+
+
+def _validate_publication_receipt_event(
+    event: Mapping[str, Any],
+    *,
+    prefix: str = "",
+    allow_unhashed: bool = False,
+) -> tuple[datetime, datetime, datetime]:
+    expected_fields = (
+        _PUBLICATION_RECEIPT_FIELDS - {"event_hash"}
+        if allow_unhashed
+        else _PUBLICATION_RECEIPT_FIELDS
+    )
+    if not isinstance(event, dict) or set(event) != expected_fields:
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_RECEIPT_FIELDS_INVALID"
+        )
+    if (
+        event.get("schema_version")
+        != PUBLICATION_RECEIPT_SCHEMA_VERSION
+        or event.get("event_type") != _PUBLICATION_RECEIPT_EVENT_TYPE
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_RECEIPT_SCHEMA_INVALID"
+        )
+    prediction_id = event.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_PREDICTION_ID_INVALID"
+        )
+    for field in (
+        "issuance_manifest_event_hash",
+        "prediction_event_hash",
+        "projection_hash",
+        "source_sha256",
+        "attestation_sha256",
+        "previous_hash",
+    ):
+        digest = _sha(event.get(field), f"{prefix}{field.upper()}")
+        if event.get(field) != digest:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_INVALID"
+            )
+    if (
+        event.get("provider") != _PUBLICATION_PROVIDER
+        or event.get("repository") != _PUBLICATION_REPOSITORY
+        or event.get("pull_request_number")
+        != _PUBLICATION_PULL_REQUEST
+        or event.get("author_login") != _PUBLICATION_AUTHOR_LOGIN
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_AUTHORITY_INVALID"
+        )
+    comment_id = event.get("comment_id")
+    if (
+        isinstance(comment_id, bool)
+        or not isinstance(comment_id, int)
+        or comment_id <= 0
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_COMMENT_ID_INVALID"
+        )
+    source_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}"
+    )
+    html_url = (
+        f"https://github.com/{_PUBLICATION_REPOSITORY}/pull/"
+        f"{_PUBLICATION_PULL_REQUEST}#issuecomment-{comment_id}"
+    )
+    if (
+        event.get("source_url") != source_url
+        or event.get("source_html_url") != html_url
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_SOURCE_URL_INVALID"
+        )
+    snapshot_uri = _observation_reference(
+        event.get("source_snapshot_uri"),
+        f"{prefix}PUBLICATION_SOURCE_SNAPSHOT",
+    )
+    if (
+        event.get("source_snapshot_uri") != snapshot_uri
+        or not snapshot_uri.endswith(".json")
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_SOURCE_SNAPSHOT_URI_INVALID"
+        )
+    source_size = event.get("source_size_bytes")
+    if (
+        isinstance(source_size, bool)
+        or not isinstance(source_size, int)
+        or source_size <= 0
+        or source_size > _MAX_PUBLICATION_RECEIPT_BYTES
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_SOURCE_SIZE_INVALID"
+        )
+    due = _time(event.get("due_at"), f"{prefix}PUBLICATION_DUE_AT")
+    published = _time(
+        event.get("published_at"),
+        f"{prefix}PUBLICATION_PUBLISHED_AT",
+    )
+    updated = _time(
+        event.get("source_updated_at"),
+        f"{prefix}PUBLICATION_SOURCE_UPDATED_AT",
+    )
+    observed = _time(
+        event.get("first_observed_at"),
+        f"{prefix}PUBLICATION_FIRST_OBSERVED_AT",
+    )
+    if updated != published:
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_EDITED_COMMENT_FORBIDDEN"
+        )
+    if observed < published:
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_OBSERVED_BEFORE_PUBLISHED"
+        )
+    eligible = event.get("forward_oos_eligible")
+    if type(eligible) is not bool:
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_ELIGIBILITY_INVALID"
+        )
+    status = (
+        "INDEPENDENT_GITHUB_PUBLICATION_BEFORE_HORIZON"
+        if eligible
+        else "HISTORICAL_PUBLICATION_NOT_FORWARD_OOS"
+    )
+    if (
+        event.get("publication_status") != status
+        or (eligible and not published < due)
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PUBLICATION_STATUS_INVALID"
+        )
+    for field in (
+        "market_validation_claimed",
+        "performance_metrics_available",
+        "real_money_ready",
+        "live_trading_enabled",
+        "order_placement_allowed",
+    ):
+        if event.get(field) is not False:
+            raise MaturityObservationError(
+                f"{prefix}{field.upper()}_INVALID"
+            )
+    if not allow_unhashed:
+        expected_hash = sha256(
+            _canonical_publication_receipt_event(event)
+        ).hexdigest()
+        if event.get("event_hash") != expected_hash:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_RECEIPT_HASH_MISMATCH"
+            )
+    return published, observed, due
+
+
+def build_external_publication_receipt_event(
+    *,
+    manifest_event: Mapping[str, Any],
+    source_bytes: bytes,
+    source_snapshot_uri: str,
+    first_observed_at: datetime,
+    previous_hash: str,
+) -> dict[str, Any]:
+    """Bind an issuance event to an unedited GitHub server timestamp."""
+    _, due, registered = _validate_issuance_manifest_event(manifest_event)
+    if (
+        not isinstance(source_bytes, bytes)
+        or not source_bytes
+        or len(source_bytes) > _MAX_PUBLICATION_RECEIPT_BYTES
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_SOURCE_BYTES_INVALID"
+        )
+    source = _strict_json_object(source_bytes, "PUBLICATION_SOURCE")
+    comment_id = source.get("id")
+    if (
+        isinstance(comment_id, bool)
+        or not isinstance(comment_id, int)
+        or comment_id <= 0
+    ):
+        raise MaturityObservationError("PUBLICATION_COMMENT_ID_INVALID")
+    source_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}"
+    )
+    issue_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/"
+        f"{_PUBLICATION_PULL_REQUEST}"
+    )
+    html_url = (
+        f"https://github.com/{_PUBLICATION_REPOSITORY}/pull/"
+        f"{_PUBLICATION_PULL_REQUEST}#issuecomment-{comment_id}"
+    )
+    if (
+        source.get("url") != source_url
+        or source.get("issue_url") != issue_url
+        or source.get("html_url") != html_url
+    ):
+        raise MaturityObservationError("PUBLICATION_SOURCE_URL_INVALID")
+    user = source.get("user")
+    if (
+        not isinstance(user, dict)
+        or user.get("login") != _PUBLICATION_AUTHOR_LOGIN
+        or user.get("type") != "User"
+        or isinstance(user.get("id"), bool)
+        or not isinstance(user.get("id"), int)
+        or user.get("id") <= 0
+        or source.get("author_association") != "OWNER"
+    ):
+        raise MaturityObservationError("PUBLICATION_AUTHOR_INVALID")
+    published = _time(source.get("created_at"), "PUBLICATION_CREATED_AT")
+    updated = _time(source.get("updated_at"), "PUBLICATION_UPDATED_AT")
+    if (
+        source.get("created_at") != source.get("updated_at")
+        or published != updated
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_EDITED_COMMENT_FORBIDDEN"
+        )
+    if published < registered:
+        raise MaturityObservationError(
+            "PUBLICATION_PRECEDES_ISSUANCE_MANIFEST"
+        )
+    if (
+        first_observed_at.tzinfo is None
+        or first_observed_at.utcoffset() is None
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_FIRST_OBSERVED_TIMEZONE_REQUIRED"
+        )
+    observed = first_observed_at.astimezone(timezone.utc)
+    if observed < published:
+        raise MaturityObservationError(
+            "PUBLICATION_OBSERVED_BEFORE_PUBLISHED"
+        )
+    body = source.get("body")
+    attestation = _parse_publication_attestation(body)
+    if attestation != _publication_attestation(manifest_event):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+        )
+    if body != github_publication_comment_body(manifest_event):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+        )
+    eligible = (
+        manifest_event["pre_maturity_registered"]
+        and published < due
+    )
+    event = {
+        "schema_version": PUBLICATION_RECEIPT_SCHEMA_VERSION,
+        "event_type": _PUBLICATION_RECEIPT_EVENT_TYPE,
+        "prediction_id": manifest_event["prediction_id"],
+        "issuance_manifest_event_hash": manifest_event["event_hash"],
+        "prediction_event_hash": manifest_event["prediction_event_hash"],
+        "projection_hash": manifest_event["projection_hash"],
+        "due_at": manifest_event["due_at"],
+        "provider": _PUBLICATION_PROVIDER,
+        "repository": _PUBLICATION_REPOSITORY,
+        "pull_request_number": _PUBLICATION_PULL_REQUEST,
+        "comment_id": comment_id,
+        "author_login": _PUBLICATION_AUTHOR_LOGIN,
+        "published_at": source["created_at"],
+        "source_updated_at": source["updated_at"],
+        "first_observed_at": observed.isoformat(),
+        "source_url": source_url,
+        "source_html_url": html_url,
+        "source_snapshot_uri": _observation_reference(
+            source_snapshot_uri,
+            "PUBLICATION_SOURCE_SNAPSHOT_URI",
+        ),
+        "source_sha256": sha256(source_bytes).hexdigest(),
+        "source_size_bytes": len(source_bytes),
+        "attestation_sha256": sha256(body.encode("utf-8")).hexdigest(),
+        "publication_status": (
+            "INDEPENDENT_GITHUB_PUBLICATION_BEFORE_HORIZON"
+            if eligible
+            else "HISTORICAL_PUBLICATION_NOT_FORWARD_OOS"
+        ),
+        "forward_oos_eligible": eligible,
+        "previous_hash": _sha(previous_hash, "PREVIOUS_HASH"),
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    _validate_publication_receipt_event(event, allow_unhashed=True)
+    event["event_hash"] = sha256(
+        _canonical_publication_receipt_event(event)
+    ).hexdigest()
+    _validate_publication_receipt_event(event)
+    return event
+
+
+def _publication_receipt_storage_path(
+    path: Path,
+    evidence_root: Path,
+) -> tuple[Path, str]:
+    try:
+        root = Path(evidence_root).resolve(strict=True)
+        candidate = Path(path)
+        if not candidate.is_absolute():
+            candidate = Path.cwd() / candidate
+        parent = candidate.parent.resolve(strict=True)
+        target = parent / candidate.name
+        relative = target.relative_to(root).as_posix()
+    except (OSError, ValueError) as exc:
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_PATH_INVALID"
+        ) from exc
+    verified = _prospective_storage_path(
+        root,
+        relative,
+        field="PUBLICATION_RECEIPT_LEDGER",
+        suffix=".ndjson",
+        must_not_exist=False,
+    )
+    return verified, relative
+
+
+def verify_external_publication_receipts(
+    events: list[dict[str, Any]],
+    *,
+    issuance_manifest_uri: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Replay exact GitHub response bytes against issuance events."""
+    if not isinstance(events, list):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LIST_REQUIRED"
+        )
+    manifest_events = read_issuance_artifact_manifest(
+        issuance_manifest_uri, evidence_root=evidence_root
+    )
+    manifest_by_hash = {
+        event["event_hash"]: event for event in manifest_events
+    }
+    previous = PUBLICATION_RECEIPT_GENESIS_HASH
+    previous_observed: datetime | None = None
+    seen_predictions: set[str] = set()
+    seen_comments: set[int] = set()
+    seen_snapshots: set[str] = set()
+    forward_count = 0
+    historical_count = 0
+    for index, event in enumerate(events):
+        prefix = f"PUBLICATION_ROW_{index}_"
+        _, observed, _ = _validate_publication_receipt_event(
+            event, prefix=prefix
+        )
+        if event["previous_hash"] != previous:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_RECEIPT_CHAIN_BROKEN"
+            )
+        if previous_observed is not None and observed < previous_observed:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_OBSERVED_ORDER_INVALID"
+            )
+        if event["prediction_id"] in seen_predictions:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_PREDICTION_ID_DUPLICATE"
+            )
+        if event["comment_id"] in seen_comments:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_COMMENT_ID_DUPLICATE"
+            )
+        if event["source_snapshot_uri"] in seen_snapshots:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_SOURCE_SNAPSHOT_DUPLICATE"
+            )
+        manifest_event = manifest_by_hash.get(
+            event["issuance_manifest_event_hash"]
+        )
+        if manifest_event is None:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_MANIFEST_EVENT_MISSING"
+            )
+        source_raw = _read_retained_bytes(
+            evidence_root,
+            event["source_snapshot_uri"],
+            field=f"{prefix}PUBLICATION_SOURCE",
+            max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        if (
+            len(source_raw) != event["source_size_bytes"]
+            or sha256(source_raw).hexdigest() != event["source_sha256"]
+        ):
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_SOURCE_HASH_OR_SIZE_MISMATCH"
+            )
+        expected = build_external_publication_receipt_event(
+            manifest_event=manifest_event,
+            source_bytes=source_raw,
+            source_snapshot_uri=event["source_snapshot_uri"],
+            first_observed_at=observed,
+            previous_hash=previous,
+        )
+        if event != expected:
+            raise MaturityObservationError(
+                f"{prefix}PUBLICATION_RECEIPT_BINDING_MISMATCH"
+            )
+        previous = event["event_hash"]
+        previous_observed = observed
+        seen_predictions.add(event["prediction_id"])
+        seen_comments.add(event["comment_id"])
+        seen_snapshots.add(event["source_snapshot_uri"])
+        if event["forward_oos_eligible"]:
+            forward_count += 1
+        else:
+            historical_count += 1
+    return {
+        "status": "VERIFIED" if events else "EMPTY",
+        "record_count": len(events),
+        "head_hash": previous,
+        "forward_oos_eligible_count": forward_count,
+        "historical_publication_count": historical_count,
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+
+
+def _read_external_publication_receipts_unlocked(
+    receipt_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    reference = _observation_reference(
+        receipt_uri, "PUBLICATION_RECEIPT_LEDGER_URI"
+    )
+    if not reference.endswith(".ndjson"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_URI_INVALID"
+        )
+    raw = _read_retained_bytes(
+        evidence_root,
+        reference,
+        field="PUBLICATION_RECEIPT_LEDGER",
+        max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+        reference_validator=_observation_reference,
+    )
+    if raw and not raw.endswith(b"\n"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_TRUNCATED"
+        )
+    events = [
+        _strict_json_object(line, "PUBLICATION_RECEIPT_ROW")
+        for line in raw.splitlines()
+        if line.strip()
+    ]
+    verify_external_publication_receipts(
+        events,
+        issuance_manifest_uri=issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+    return events
+
+
+def read_external_publication_receipts(
+    receipt_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    evidence_root: Path,
+) -> list[dict[str, Any]]:
+    """Read exact external-publication receipts after full replay."""
+    return _read_external_publication_receipts_unlocked(
+        receipt_uri,
+        issuance_manifest_uri=issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+
+
+def append_external_publication_receipt(
+    path: Path,
+    source_snapshot_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Append a system-observed, server-timestamped GitHub receipt."""
+    receipt_path, receipt_uri = _publication_receipt_storage_path(
+        path, evidence_root
+    )
+    with _ledger_lock(receipt_path, exclusive=True):
+        if receipt_path.exists():
+            existing_raw = _read_retained_bytes(
+                evidence_root,
+                receipt_uri,
+                field="PUBLICATION_RECEIPT_LEDGER",
+                max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+                reference_validator=_observation_reference,
+            )
+            if existing_raw and not existing_raw.endswith(b"\n"):
+                raise MaturityObservationError(
+                    "PUBLICATION_RECEIPT_LEDGER_TRUNCATED"
+                )
+            events = [
+                _strict_json_object(line, "PUBLICATION_RECEIPT_ROW")
+                for line in existing_raw.splitlines()
+                if line.strip()
+            ]
+            verify_external_publication_receipts(
+                events,
+                issuance_manifest_uri=issuance_manifest_uri,
+                evidence_root=evidence_root,
+            )
+        else:
+            existing_raw = b""
+            events = []
+        source_raw = _read_retained_bytes(
+            evidence_root,
+            source_snapshot_uri,
+            field="PUBLICATION_SOURCE",
+            max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+            reference_validator=_observation_reference,
+        )
+        source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
+        attestation = _parse_publication_attestation(source.get("body"))
+        manifest_events = read_issuance_artifact_manifest(
+            issuance_manifest_uri, evidence_root=evidence_root
+        )
+        manifest_event = next(
+            (
+                event for event in manifest_events
+                if event["event_hash"]
+                == attestation["issuance_manifest_event_hash"]
+            ),
+            None,
+        )
+        if manifest_event is None:
+            raise MaturityObservationError(
+                "PUBLICATION_MANIFEST_EVENT_MISSING"
+            )
+        observed = _system_utc_now()
+        if observed.tzinfo is None or observed.utcoffset() is None:
+            raise MaturityObservationError(
+                "SYSTEM_PUBLICATION_OBSERVATION_TIME_INVALID"
+            )
+        event = build_external_publication_receipt_event(
+            manifest_event=manifest_event,
+            source_bytes=source_raw,
+            source_snapshot_uri=source_snapshot_uri,
+            first_observed_at=observed,
+            previous_hash=(
+                events[-1]["event_hash"]
+                if events
+                else PUBLICATION_RECEIPT_GENESIS_HASH
+            ),
+        )
+        candidate = [*events, event]
+        verify_external_publication_receipts(
+            candidate,
+            issuance_manifest_uri=issuance_manifest_uri,
+            evidence_root=evidence_root,
+        )
+        encoded_event = json.dumps(
+            event,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("utf-8")
+        payload = existing_raw + encoded_event + b"\n"
+        if len(payload) > _MAX_PUBLICATION_RECEIPT_BYTES:
+            raise MaturityObservationError(
+                "PUBLICATION_RECEIPT_LEDGER_RETAINED_TOO_LARGE"
+            )
+        _replace_manifest_atomically(
+            receipt_path,
+            payload,
+            failure_code="PUBLICATION_RECEIPT_LEDGER_COMMIT_FAILED",
+        )
+        return event
+
+
 def _read_retained_observation_bytes(
     evidence_root: Path,
     observation_uri: str,
@@ -2475,6 +3226,7 @@ def _read_maturity_observation_ledger_unlocked(
     path: Path,
     *,
     issuance_manifest_uri: str,
+    publication_receipt_uri: str | None,
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
     if not path.exists():
@@ -2490,6 +3242,7 @@ def _read_maturity_observation_ledger_unlocked(
     verify_maturity_observation_chain(
         events,
         issuance_manifest_uri=issuance_manifest_uri,
+        publication_receipt_uri=publication_receipt_uri,
         evidence_root=evidence_root,
     )
     for event in events:
@@ -2501,6 +3254,7 @@ def read_maturity_observation_ledger(
     path: Path,
     *,
     issuance_manifest_uri: str,
+    publication_receipt_uri: str | None = None,
     evidence_root: Path,
 ) -> list[dict[str, Any]]:
     """Read only after registered artifacts and retained bytes verify."""
@@ -2508,6 +3262,7 @@ def read_maturity_observation_ledger(
         return _read_maturity_observation_ledger_unlocked(
             path,
             issuance_manifest_uri=issuance_manifest_uri,
+            publication_receipt_uri=publication_receipt_uri,
             evidence_root=evidence_root,
         )
 
@@ -2517,6 +3272,7 @@ def append_maturity_observation(
     observation_uri: str,
     *,
     issuance_manifest_uri: str,
+    publication_receipt_uri: str | None = None,
     evidence_root: Path,
 ) -> dict[str, Any]:
     """Append one retained maturity observation after full-chain validation."""
@@ -2524,6 +3280,7 @@ def append_maturity_observation(
         events = _read_maturity_observation_ledger_unlocked(
             path,
             issuance_manifest_uri=issuance_manifest_uri,
+            publication_receipt_uri=publication_receipt_uri,
             evidence_root=evidence_root,
         )
         raw = _read_retained_observation_bytes(
@@ -2536,14 +3293,26 @@ def append_maturity_observation(
         manifest_events = read_issuance_artifact_manifest(
             issuance_manifest_uri, evidence_root=evidence_root
         )
-        trusted_prediction_hashes = {
-            item["prediction_id"]: item["prediction_event_hash"]
-            for item in manifest_events
-        }
-        trusted_projection_hashes = {
-            item["prediction_id"]: item["projection_hash"]
-            for item in manifest_events
-        }
+        publication_events = (
+            read_external_publication_receipts(
+                publication_receipt_uri,
+                issuance_manifest_uri=issuance_manifest_uri,
+                evidence_root=evidence_root,
+            )
+            if publication_receipt_uri is not None
+            else []
+        )
+        (
+            trusted_prediction_hashes,
+            trusted_projection_hashes,
+            blocked,
+        ) = _publication_qualified_manifest_anchors(
+            manifest_events, publication_events
+        )
+        if prediction_id in blocked:
+            raise MaturityObservationError(
+                "EXTERNAL_PUBLICATION_BEFORE_HORIZON_REQUIRED"
+            )
         trusted_prediction = trusted_prediction_hashes.get(prediction_id)
         trusted_projection = trusted_projection_hashes.get(prediction_id)
         if trusted_prediction is None:
