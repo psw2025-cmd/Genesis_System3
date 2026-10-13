@@ -19,7 +19,9 @@ import re
 import stat
 import tempfile
 from typing import Any, Callable, Mapping
+from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, urlsplit
+from urllib.request import Request, urlopen
 
 from dashboard.backend.multibagger_ledger import (
     LedgerError,
@@ -235,6 +237,8 @@ _PUBLICATION_PROVIDER = "GITHUB_ISSUE_COMMENT"
 _PUBLICATION_REPOSITORY = "psw2025-cmd/Genesis_System3"
 _PUBLICATION_PULL_REQUEST = 471
 _PUBLICATION_AUTHOR_LOGIN = "psw2025-cmd"
+_GITHUB_API_VERSION = "2022-11-28"
+_GITHUB_PUBLICATION_USER_AGENT = "Genesis-System3-equity-publication-v1"
 _MATURITY_LEDGER_FIELDS = {
     "schema_version",
     "event_type",
@@ -2548,6 +2552,94 @@ def github_publication_comment_body(
     ).decode("ascii")
 
 
+def _github_publication_request_json(
+    method: str,
+    url: str,
+    *,
+    token: str,
+    payload: bytes | None = None,
+) -> bytes:
+    """Issue one bounded GitHub JSON request without exposing credentials."""
+    if (
+        not isinstance(token, str)
+        or not token
+        or token != token.strip()
+        or len(token) > 1024
+        or "\r" in token
+        or "\n" in token
+    ):
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_TOKEN_INVALID"
+        )
+    create_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/"
+        f"{_PUBLICATION_PULL_REQUEST}/comments"
+    )
+    comment_url_prefix = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/comments/"
+    )
+    if method == "POST":
+        if url != create_url or not isinstance(payload, bytes) or not payload:
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_POST_REQUEST_INVALID"
+            )
+        expected_status = 201
+        failure_code = "GITHUB_PUBLICATION_POST_FAILED"
+    elif method == "GET":
+        suffix = url.removeprefix(comment_url_prefix)
+        if (
+            url == suffix
+            or not suffix.isdigit()
+            or int(suffix) <= 0
+            or payload is not None
+        ):
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_FETCH_REQUEST_INVALID"
+            )
+        expected_status = 200
+        failure_code = "GITHUB_PUBLICATION_FETCH_FAILED"
+    else:
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_METHOD_INVALID"
+        )
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {token}",
+        "User-Agent": _GITHUB_PUBLICATION_USER_AGENT,
+        "X-GitHub-Api-Version": _GITHUB_API_VERSION,
+    }
+    if method == "POST":
+        headers["Content-Type"] = "application/json"
+    request = Request(
+        url,
+        data=payload,
+        headers=headers,
+        method=method,
+    )
+    try:
+        with urlopen(request, timeout=30) as response:
+            status = response.getcode()
+            final_url = response.geturl()
+            content_type = response.headers.get("Content-Type", "")
+            raw = response.read(_MAX_PUBLICATION_RECEIPT_BYTES + 1)
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        raise MaturityObservationError(failure_code) from exc
+    if status != expected_status or final_url != url:
+        raise MaturityObservationError(failure_code)
+    if content_type.split(";", 1)[0].strip().lower() != "application/json":
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_RESPONSE_CONTENT_TYPE_INVALID"
+        )
+    if not raw or len(raw) > _MAX_PUBLICATION_RECEIPT_BYTES:
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_RESPONSE_BYTES_INVALID"
+        )
+    _strict_json_object(raw, "GITHUB_PUBLICATION_RESPONSE")
+    return raw
+
+
 def _parse_publication_attestation(body: Any) -> dict[str, Any]:
     if not isinstance(body, str) or not body.startswith(
         _PUBLICATION_BODY_PREFIX
@@ -3143,6 +3235,174 @@ def append_external_publication_receipt(
                 else PUBLICATION_RECEIPT_GENESIS_HASH
             ),
         )
+        candidate = [*events, event]
+        verify_external_publication_receipts(
+            candidate,
+            issuance_manifest_uri=issuance_manifest_uri,
+            evidence_root=evidence_root,
+        )
+        encoded_event = json.dumps(
+            event,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("utf-8")
+        payload = existing_raw + encoded_event + b"\n"
+        if len(payload) > _MAX_PUBLICATION_RECEIPT_BYTES:
+            raise MaturityObservationError(
+                "PUBLICATION_RECEIPT_LEDGER_RETAINED_TOO_LARGE"
+            )
+        _replace_manifest_atomically(
+            receipt_path,
+            payload,
+            failure_code="PUBLICATION_RECEIPT_LEDGER_COMMIT_FAILED",
+        )
+        return event
+
+
+def publish_github_attestation_and_retain(
+    path: Path,
+    source_snapshot_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    prediction_id: str,
+    github_token: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Publish and retain one canonical prospective GitHub attestation.
+
+    The exact successful POST response is created without overwrite before an
+    immediate GET of the comment is compared.  Only a byte-retained,
+    semantically identical, fully replayed response reaches the receipt
+    ledger.  If a remote POST succeeds but later validation fails, the raw
+    response is deliberately left in place for explicit recovery; once those
+    response bytes are retained, routine retry cannot silently repost it.
+    """
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_PREDICTION_ID_INVALID"
+        )
+    receipt_path, receipt_uri = _publication_receipt_storage_path(
+        path, evidence_root
+    )
+    with _ledger_lock(receipt_path, exclusive=True):
+        if receipt_path.exists():
+            existing_raw = _read_retained_bytes(
+                evidence_root,
+                receipt_uri,
+                field="PUBLICATION_RECEIPT_LEDGER",
+                max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+                reference_validator=_observation_reference,
+            )
+            if existing_raw and not existing_raw.endswith(b"\n"):
+                raise MaturityObservationError(
+                    "PUBLICATION_RECEIPT_LEDGER_TRUNCATED"
+                )
+            events = [
+                _strict_json_object(line, "PUBLICATION_RECEIPT_ROW")
+                for line in existing_raw.splitlines()
+                if line.strip()
+            ]
+            verify_external_publication_receipts(
+                events,
+                issuance_manifest_uri=issuance_manifest_uri,
+                evidence_root=evidence_root,
+            )
+        else:
+            existing_raw = b""
+            events = []
+        if any(event["prediction_id"] == prediction_id for event in events):
+            raise MaturityObservationError(
+                "PUBLICATION_RECEIPT_ALREADY_RECORDED"
+            )
+        source_path = _prospective_storage_path(
+            Path(evidence_root),
+            source_snapshot_uri,
+            field="PUBLICATION_SOURCE",
+            suffix=".json",
+            must_not_exist=True,
+        )
+        manifest_events = read_issuance_artifact_manifest(
+            issuance_manifest_uri, evidence_root=evidence_root
+        )
+        matches = [
+            event for event in manifest_events
+            if event["prediction_id"] == prediction_id
+        ]
+        if len(matches) != 1:
+            raise MaturityObservationError(
+                "PUBLICATION_MANIFEST_EVENT_MISSING"
+            )
+        manifest_event = matches[0]
+        _, due, _ = _validate_issuance_manifest_event(manifest_event)
+        if not manifest_event["pre_maturity_registered"]:
+            raise MaturityObservationError(
+                "PUBLICATION_PROSPECTIVE_MANIFEST_REQUIRED"
+            )
+        started = _system_utc_now()
+        if started.tzinfo is None or started.utcoffset() is None:
+            raise MaturityObservationError(
+                "SYSTEM_PUBLICATION_OBSERVATION_TIME_INVALID"
+            )
+        if started.astimezone(timezone.utc) >= due:
+            raise MaturityObservationError(
+                "PUBLICATION_HORIZON_ALREADY_REACHED"
+            )
+        create_url = (
+            "https://api.github.com/repos/"
+            f"{_PUBLICATION_REPOSITORY}/issues/"
+            f"{_PUBLICATION_PULL_REQUEST}/comments"
+        )
+        request_payload = _canonical(
+            {"body": github_publication_comment_body(manifest_event)}
+        )
+        source_raw = _github_publication_request_json(
+            "POST",
+            create_url,
+            token=github_token,
+            payload=request_payload,
+        )
+        observed = _system_utc_now()
+        _write_new_prospective_artifact(
+            source_path,
+            source_raw,
+            field="PUBLICATION_SOURCE",
+        )
+        _fsync_directory(source_path.parent)
+        if observed.tzinfo is None or observed.utcoffset() is None:
+            raise MaturityObservationError(
+                "SYSTEM_PUBLICATION_OBSERVATION_TIME_INVALID"
+            )
+        event = build_external_publication_receipt_event(
+            manifest_event=manifest_event,
+            source_bytes=source_raw,
+            source_snapshot_uri=source_snapshot_uri,
+            first_observed_at=observed,
+            previous_hash=(
+                events[-1]["event_hash"]
+                if events
+                else PUBLICATION_RECEIPT_GENESIS_HASH
+            ),
+        )
+        fetched_raw = _github_publication_request_json(
+            "GET",
+            event["source_url"],
+            token=github_token,
+        )
+        source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
+        fetched = _strict_json_object(
+            fetched_raw, "GITHUB_PUBLICATION_REFETCH"
+        )
+        if fetched != source:
+            raise MaturityObservationError(
+                "GITHUB_PUBLICATION_REFETCH_MISMATCH"
+            )
         candidate = [*events, event]
         verify_external_publication_receipts(
             candidate,

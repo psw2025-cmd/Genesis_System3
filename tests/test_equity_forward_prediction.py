@@ -37,6 +37,7 @@ from scripts.equity_directional_maturity import (
     build_maturity_observation,
     build_maturity_observation_event,
     github_publication_comment_body,
+    publish_github_attestation_and_retain,
     publish_prospective_issuance,
     read_external_publication_receipts,
     read_issuance_artifact_manifest,
@@ -1789,6 +1790,257 @@ def test_external_publication_receipt_qualifies_pre_horizon_manifest(
     assert status["forward_oos_eligible_count"] == 1
     assert status["historical_publication_count"] == 0
     assert status["order_placement_allowed"] is False
+
+
+def test_prospective_github_publication_posts_refetches_and_retains(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source = github_comment_response(manifest_event)
+    source_raw = json.dumps(
+        source, sort_keys=True, indent=2
+    ).encode("utf-8")
+    requests = []
+
+    class Response:
+        def __init__(self, request):
+            self.request = request
+            self.headers = {"Content-Type": "application/json; charset=utf-8"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_):
+            return False
+
+        def getcode(self):
+            return 201 if self.request.get_method() == "POST" else 200
+
+        def geturl(self):
+            return self.request.full_url
+
+        def read(self, limit):
+            assert limit > len(source_raw)
+            return source_raw
+
+    def fake_urlopen(request, timeout):
+        assert timeout == 30
+        assert request.get_header("Authorization") == "Bearer test-token"
+        requests.append(request)
+        return Response(request)
+
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(maturity_module, "urlopen", fake_urlopen)
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    event = publish_github_attestation_and_retain(
+        tmp_path / receipt_uri,
+        source_uri,
+        issuance_manifest_uri=manifest_uri,
+        prediction_id=manifest_event["prediction_id"],
+        github_token="test-token",
+        evidence_root=tmp_path,
+    )
+    assert [request.get_method() for request in requests] == ["POST", "GET"]
+    assert json.loads(requests[0].data) == {
+        "body": github_publication_comment_body(manifest_event)
+    }
+    assert requests[1].full_url == source["url"]
+    assert (tmp_path / source_uri).read_bytes() == source_raw
+    assert event["forward_oos_eligible"] is True
+    assert event["first_observed_at"] == "2026-10-01T13:03:00+00:00"
+    assert read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    ) == [event]
+    assert event["live_trading_enabled"] is False
+    assert event["order_placement_allowed"] is False
+
+
+def test_prospective_github_publication_mismatch_retains_raw_without_receipt(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source = github_comment_response(manifest_event)
+    source_raw = json.dumps(source, sort_keys=True).encode("utf-8")
+    changed = deepcopy(source)
+    changed["body"] += "\n"
+    fetched_raw = json.dumps(changed, sort_keys=True).encode("utf-8")
+    calls = []
+
+    def request_json(method, url, *, token, payload=None):
+        calls.append((method, url, token, payload))
+        return source_raw if method == "POST" else fetched_raw
+
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        request_json,
+    )
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.raises(
+        MaturityObservationError,
+        match="GITHUB_PUBLICATION_REFETCH_MISMATCH",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+    assert [call[0] for call in calls] == ["POST", "GET"]
+    assert (tmp_path / source_uri).read_bytes() == source_raw
+    assert not (tmp_path / receipt_uri).exists()
+
+    def unexpected_request(*_, **__):
+        raise AssertionError("retry must fail before another GitHub request")
+
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        unexpected_request,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_SOURCE_ALREADY_EXISTS_UNREGISTERED",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+
+
+def test_prospective_github_publication_duplicate_fails_before_repost(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    source_raw = json.dumps(
+        github_comment_response(manifest_event), sort_keys=True
+    ).encode("utf-8")
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        lambda *_, **__: source_raw,
+    )
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    publish_github_attestation_and_retain(
+        tmp_path / receipt_uri,
+        source_uri,
+        issuance_manifest_uri=manifest_uri,
+        prediction_id=manifest_event["prediction_id"],
+        github_token="test-token",
+        evidence_root=tmp_path,
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        lambda *_, **__: pytest.fail("duplicate GitHub POST attempted"),
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_RECEIPT_ALREADY_RECORDED",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+
+
+def test_prospective_github_publication_rejects_matured_horizon_before_post(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    monkeypatch.setattr(
+        maturity_module,
+        "_system_utc_now",
+        lambda: datetime.fromisoformat(
+            manifest_event["due_at"].replace("Z", "+00:00")
+        ),
+    )
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        lambda *_, **__: pytest.fail("matured forecast was published"),
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_HORIZON_ALREADY_REACHED",
+    ):
+        publish_github_attestation_and_retain(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            github_token="test-token",
+            evidence_root=tmp_path,
+        )
+    assert not (tmp_path / source_uri).exists()
+    assert not (tmp_path / receipt_uri).exists()
 
 
 def test_maturity_rejects_pre_horizon_manifest_without_receipt(tmp_path):
