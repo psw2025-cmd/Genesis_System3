@@ -27,6 +27,7 @@ from dashboard.backend.multibagger_outcome import (
     build_directional_outcome_projection,
 )
 from scripts.equity_directional_maturity import (
+    _validated_github_publication_comment,
     publish_prospective_issuance,
     read_issuance_artifact_manifest,
 )
@@ -42,9 +43,18 @@ from scripts.equity_instrument_scope import EQUITY_URL, ETF_URL
 from scripts.equity_observation_packet import CM_URL
 
 
-TASK_ID = "EQ-FORWARD-035"
+TASK_ID = "EQ-FORWARD-040"
 SOURCE_ATTEMPT_TASK_ID = "EQ-SOURCE-039"
 SOURCE_ATTEMPT_SCHEMA = "nse-equity-source-availability-attempt-v1"
+REMOTE_NAMESPACE_TASK_ID = "EQ-RECOVERY-040"
+REMOTE_NAMESPACE_SCHEMA = "equity-remote-namespace-attempt-v1"
+_PUBLICATION_BODY_PREFIX = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V1\n"
+_PUBLICATION_REPOSITORY = "psw2025-cmd/Genesis_System3"
+_PUBLICATION_PULL_REQUEST = 471
+_PUBLICATION_PAGE_SIZE = 100
+_PUBLICATION_MAX_PAGES = 20
+_PUBLICATION_MAX_MATCHES = 32
+_MAX_PUBLICATION_RESPONSE_BYTES = 2 * 1024 * 1024
 SOURCE_ROLES = frozenset(
     {"cash", "company", "etf", "actions", "holiday_calendar", "index"}
 )
@@ -79,6 +89,17 @@ class OfficialSourceUnavailable(ValueError):
         )
         self.role = role
         self.capture = capture
+
+
+class RemotePredictionIdentityOccupied(ValueError):
+    """The immutable GitHub namespace already contains this prediction ID."""
+
+    def __init__(self, record: dict[str, Any]):
+        super().__init__(
+            "Remote prediction identity already exists; no forecast issued: "
+            f"{record.get('prediction_id')}"
+        )
+        self.record = record
 
 
 def _utc_now() -> datetime:
@@ -266,6 +287,280 @@ def _retain_source_unavailability(
                 pass
         raise
     return record
+
+
+def _strict_json(raw: bytes, *, label: str) -> Any:
+    def reject_duplicates(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+        value: dict[str, Any] = {}
+        for key, item in pairs:
+            if key in value:
+                raise ValueError(f"{label} contains duplicate JSON keys")
+            value[key] = item
+        return value
+
+    try:
+        return json.loads(raw, object_pairs_hook=reject_duplicates)
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"{label} is not valid JSON") from exc
+
+
+def _fetch_publication_json(
+    url: str, *, opener: Any | None = None
+) -> Capture:
+    """Fetch one bounded public GitHub JSON response without credentials."""
+    client = opener or _source_opener()
+    started = _utc_now()
+    request = Request(
+        url,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Genesis-System3-equity-namespace-v1",
+            "X-GitHub-Api-Version": "2022-11-28",
+        },
+    )
+    try:
+        with client.open(request, timeout=30) as response:
+            raw = response.read(_MAX_PUBLICATION_RESPONSE_BYTES + 1)
+            observed = _utc_now()
+            receipt = {
+                "url": url,
+                "request_started_at": started.isoformat(),
+                "http_status": response.status,
+                "final_url": response.geturl(),
+                "content_type": response.headers.get("Content-Type"),
+                "etag": response.headers.get("ETag"),
+                "last_modified": response.headers.get("Last-Modified"),
+                "first_observed_at": observed.isoformat(),
+                "raw_sha256": sha256(raw).hexdigest(),
+                "bytes": len(raw),
+            }
+    except (HTTPError, URLError, TimeoutError, OSError) as exc:
+        raise ValueError("GitHub publication namespace request failed") from exc
+    media_type = str(receipt["content_type"] or "").split(";", 1)[0]
+    if (
+        receipt["http_status"] != 200
+        or receipt["final_url"] != url
+        or media_type.strip().lower() != "application/json"
+        or not raw
+        or len(raw) > _MAX_PUBLICATION_RESPONSE_BYTES
+    ):
+        raise ValueError("GitHub publication namespace response is invalid")
+    _strict_json(raw, label="GitHub publication namespace response")
+    return Capture(raw=raw, receipt=receipt)
+
+
+def _publication_comment_page_url(page: int) -> str:
+    if page <= 0 or page > _PUBLICATION_MAX_PAGES:
+        raise ValueError("GitHub publication page is outside the bound")
+    return (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/"
+        f"{_PUBLICATION_PULL_REQUEST}/comments"
+        f"?per_page={_PUBLICATION_PAGE_SIZE}&page={page}"
+    )
+
+
+def _scan_remote_prediction_identity(
+    prediction_id: str, *, opener: Any | None = None
+) -> list[Capture]:
+    """Return exact authoritative comments already using prediction_id."""
+    matches: list[tuple[int, dict[str, Any]]] = []
+    seen_ids: set[int] = set()
+    for page in range(1, _PUBLICATION_MAX_PAGES + 1):
+        capture = _fetch_publication_json(
+            _publication_comment_page_url(page), opener=opener
+        )
+        rows = _strict_json(
+            capture.raw, label="GitHub publication comment page"
+        )
+        if not isinstance(rows, list) or len(rows) > _PUBLICATION_PAGE_SIZE:
+            raise ValueError("GitHub publication comment page is invalid")
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ValueError("GitHub publication comment is invalid")
+            user = row.get("user")
+            body = row.get("body")
+            if (
+                not isinstance(user, dict)
+                or user.get("login") != "psw2025-cmd"
+                or row.get("author_association") != "OWNER"
+                or not isinstance(body, str)
+                or not body.startswith(_PUBLICATION_BODY_PREFIX)
+            ):
+                continue
+            comment_id, _, attestation = (
+                _validated_github_publication_comment(row)
+            )
+            if comment_id in seen_ids:
+                raise ValueError("GitHub publication comment is duplicated")
+            seen_ids.add(comment_id)
+            if attestation["prediction_id"] == prediction_id:
+                matches.append((comment_id, attestation))
+        if len(rows) < _PUBLICATION_PAGE_SIZE:
+            break
+    else:
+        raise ValueError("GitHub publication namespace scan is incomplete")
+    if len(matches) > _PUBLICATION_MAX_MATCHES:
+        raise ValueError("GitHub publication identity match bound exceeded")
+    exact: list[Capture] = []
+    for comment_id, expected_attestation in matches:
+        url = (
+            "https://api.github.com/repos/"
+            f"{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}"
+        )
+        capture = _fetch_publication_json(url, opener=opener)
+        source = _strict_json(
+            capture.raw, label="GitHub publication comment"
+        )
+        if not isinstance(source, dict):
+            raise ValueError("GitHub publication comment is invalid")
+        fetched_id, _, fetched_attestation = (
+            _validated_github_publication_comment(source)
+        )
+        if (
+            fetched_id != comment_id
+            or fetched_attestation != expected_attestation
+        ):
+            raise ValueError("GitHub publication comment changed during scan")
+        exact.append(capture)
+    return exact
+
+
+def _retain_remote_namespace_attempt(
+    root: Path,
+    entry: date,
+    prediction: dict[str, Any],
+    projection: dict[str, Any],
+    captures: list[Capture],
+) -> dict[str, Any]:
+    if not captures:
+        raise ValueError("Remote namespace attempt requires a match")
+    comments = []
+    snapshot_rows = []
+    for capture in captures:
+        source = _strict_json(
+            capture.raw, label="GitHub publication comment"
+        )
+        if not isinstance(source, dict):
+            raise ValueError("GitHub publication comment is invalid")
+        comment_id, published, attestation = (
+            _validated_github_publication_comment(source)
+        )
+        if attestation["prediction_id"] != prediction["prediction_id"]:
+            raise ValueError("Remote prediction identity does not match")
+        comments.append(
+            {
+                "comment_id": comment_id,
+                "published_at": published.isoformat(),
+                "source_url": capture.receipt["url"],
+                "source_sha256": capture.receipt["raw_sha256"],
+                "source_bytes": capture.receipt["bytes"],
+                "receipt": capture.receipt,
+                "attestation": attestation,
+            }
+        )
+        snapshot_rows.append((comment_id, capture))
+    comments.sort(key=lambda row: row["comment_id"])
+    exact_artifact_match = all(
+        row["attestation"]["prediction_event_hash"]
+        == prediction["event_hash"]
+        and row["attestation"]["projection_hash"]
+        == projection["projection_hash"]
+        for row in comments
+    )
+    observed = max(
+        datetime.fromisoformat(
+            str(row["receipt"]["first_observed_at"]).replace("Z", "+00:00")
+        ).astimezone(timezone.utc)
+        for row in comments
+    )
+    stamp = observed.strftime("%Y%m%dT%H%M%S%fZ")
+    base_uri = (
+        f"research/evidence/equity/raw/{entry.isoformat()}-forward/"
+        "remote_namespace_attempts"
+    )
+    written: list[Path] = []
+    snapshot_uris: dict[int, str] = {}
+    try:
+        for comment_id, capture in snapshot_rows:
+            digest = sha256(capture.raw).hexdigest()
+            uri = (
+                f"{base_uri}/{stamp}_comment_{comment_id}_"
+                f"{digest[:16]}.json"
+            )
+            _write_exclusive(root, uri, capture.raw)
+            written.append(_safe_path(root, uri))
+            snapshot_uris[comment_id] = uri
+        for row in comments:
+            row["snapshot_uri"] = snapshot_uris[row["comment_id"]]
+        status = (
+            "REMOTE_PREDICTION_ID_EXISTS_NOT_REISSUED"
+            if exact_artifact_match and len(comments) == 1
+            else "REMOTE_PREDICTION_ID_COLLISION_NOT_ISSUED"
+        )
+        record = {
+            "schema_version": REMOTE_NAMESPACE_SCHEMA,
+            "task_id": REMOTE_NAMESPACE_TASK_ID,
+            "entry_date": entry.isoformat(),
+            "prediction_id": prediction["prediction_id"],
+            "observed_at": observed.isoformat(),
+            "remote_identity_status": status,
+            "remote_comment_count": len(comments),
+            "remote_comments": comments,
+            "proposed_prediction_event_hash": prediction["event_hash"],
+            "proposed_projection_hash": projection["projection_hash"],
+            "proposed_due_at": prediction["due_at"],
+            "proposed_counts": prediction["counts"],
+            "forecast_issued": False,
+            "retained_prediction_count": 0,
+            "effective_forward_oos_eligible_count": 0,
+            "market_validation_claimed": False,
+            "performance_metrics_available": False,
+            "real_money_ready": False,
+            "live_trading_enabled": False,
+            "orders_allowed": False,
+        }
+        record["record_hash"] = sha256(
+            json.dumps(
+                record,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+                allow_nan=False,
+            ).encode("utf-8")
+        ).hexdigest()
+        record_uri = (
+            f"{base_uri}/{stamp}_{prediction['prediction_id']}_"
+            f"{record['record_hash'][:16]}.json"
+        )
+        _write_exclusive(root, record_uri, _json_bytes(record))
+        written.append(_safe_path(root, record_uri))
+    except Exception:
+        for path in reversed(written):
+            try:
+                path.unlink()
+            except OSError:
+                pass
+        raise
+    return record
+
+
+def _guard_remote_prediction_identity(
+    root: Path,
+    entry: date,
+    prediction: dict[str, Any],
+    projection: dict[str, Any],
+    *,
+    opener: Any | None = None,
+) -> None:
+    captures = _scan_remote_prediction_identity(
+        prediction["prediction_id"], opener=opener
+    )
+    if captures:
+        record = _retain_remote_namespace_attempt(
+            root, entry, prediction, projection, captures
+        )
+        raise RemotePredictionIdentityOccupied(record)
 
 
 def _capture_sources(entry: date) -> tuple[
@@ -487,6 +782,9 @@ def issue(entry: date, *, evidence_root: Path) -> dict[str, Any]:
         expected_previous_event_hash=previous_event_hash,
         retained_source_uris=retained_uris,
         now=issued,
+    )
+    _guard_remote_prediction_identity(
+        root, entry, prediction, projection
     )
     forecast_dir = f"research/forward/equity/{entry.isoformat()}"
     prediction_uri = (

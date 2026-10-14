@@ -484,6 +484,11 @@ def test_issue_creates_artifact_parent_before_atomic_publish(
         "build_directional_outcome_projection",
         lambda *_args, **_kwargs: {"projection_hash": "3" * 64},
     )
+    monkeypatch.setattr(
+        issue_module,
+        "_guard_remote_prediction_identity",
+        lambda *_args, **_kwargs: None,
+    )
 
     def fake_publish(_path, **kwargs):
         del kwargs
@@ -498,6 +503,143 @@ def test_issue_creates_artifact_parent_before_atomic_publish(
     result = issue_module.issue(entry, evidence_root=tmp_path)
     assert result["orders_allowed"] is False
     assert result["issuance_manifest_event_hash"] == "4" * 64
+
+
+def test_remote_namespace_guard_retains_conflict_without_forecast(
+    monkeypatch, tmp_path
+):
+    entry = datetime(2026, 10, 14, tzinfo=timezone.utc).date()
+    prediction = {
+        "prediction_id": "EQ7D-2026-10-14-AAA-V1",
+        "event_hash": "2" * 64,
+        "due_at": "2026-10-21T10:00:00+00:00",
+        "counts": {
+            "source_company_eq_observations": 10,
+            "screened_candidates": 2,
+            "selected_candidates": 1,
+            "qualified_current_candidates": 0,
+            "forward_predictions": 1,
+            "positive_forecasts": 1,
+            "negative_forecasts": 0,
+            "matured_outcomes": 0,
+        },
+    }
+    projection = {"projection_hash": "3" * 64}
+    attestation = {
+        "schema_version": "equity-publication-attestation-v1",
+        "prediction_id": prediction["prediction_id"],
+        "issuance_manifest_event_hash": "a" * 64,
+        "prediction_event_hash": "b" * 64,
+        "projection_hash": "c" * 64,
+        "registered_at": "2026-10-14T10:00:00+00:00",
+        "due_at": prediction["due_at"],
+        "execution_mode": "ANALYZE_PAPER",
+        "market_validation_claimed": False,
+        "live_trading_enabled": False,
+        "order_placement_allowed": False,
+    }
+    body = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V1\n" + json.dumps(
+        attestation,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    )
+    comment_id = 123456
+    comment_url = (
+        "https://api.github.com/repos/psw2025-cmd/Genesis_System3/"
+        f"issues/comments/{comment_id}"
+    )
+    source = {
+        "id": comment_id,
+        "url": comment_url,
+        "issue_url": (
+            "https://api.github.com/repos/psw2025-cmd/"
+            "Genesis_System3/issues/471"
+        ),
+        "html_url": (
+            "https://github.com/psw2025-cmd/Genesis_System3/"
+            f"pull/471#issuecomment-{comment_id}"
+        ),
+        "user": {"login": "psw2025-cmd", "type": "User", "id": 1},
+        "author_association": "OWNER",
+        "created_at": "2026-10-14T10:01:00Z",
+        "updated_at": "2026-10-14T10:01:00Z",
+        "body": body,
+    }
+    page_url = issue_module._publication_comment_page_url(1)
+    payloads = {
+        page_url: json.dumps([source]).encode("utf-8"),
+        comment_url: json.dumps(source).encode("utf-8"),
+    }
+
+    class Response:
+        def __init__(self, url):
+            self.status = 200
+            self.url = url
+            self.headers = {"Content-Type": "application/json; charset=utf-8"}
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def geturl(self):
+            return self.url
+
+        def read(self, limit):
+            raw = payloads[self.url]
+            assert len(raw) < limit
+            return raw
+
+    class Opener:
+        def open(self, request, timeout):
+            assert timeout == 30
+            return Response(request.full_url)
+
+    monkeypatch.setattr(
+        issue_module,
+        "_utc_now",
+        lambda: datetime(2026, 10, 14, 10, 2, tzinfo=timezone.utc),
+    )
+    with pytest.raises(
+        issue_module.RemotePredictionIdentityOccupied,
+        match="no forecast issued",
+    ):
+        issue_module._guard_remote_prediction_identity(
+            tmp_path,
+            entry,
+            prediction,
+            projection,
+            opener=Opener(),
+        )
+
+    attempt_dir = tmp_path / (
+        "research/evidence/equity/raw/2026-10-14-forward/"
+        "remote_namespace_attempts"
+    )
+    records = []
+    for path in attempt_dir.glob("*.json"):
+        value = json.loads(path.read_bytes())
+        if value.get("schema_version") == (
+            "equity-remote-namespace-attempt-v1"
+        ):
+            records.append(value)
+    assert len(records) == 1
+    record = records[0]
+    assert record["remote_identity_status"] == (
+        "REMOTE_PREDICTION_ID_COLLISION_NOT_ISSUED"
+    )
+    assert record["remote_comment_count"] == 1
+    assert record["forecast_issued"] is False
+    assert record["retained_prediction_count"] == 0
+    assert record["effective_forward_oos_eligible_count"] == 0
+    assert record["live_trading_enabled"] is False
+    assert record["orders_allowed"] is False
+    snapshot = tmp_path / record["remote_comments"][0]["snapshot_uri"]
+    assert json.loads(snapshot.read_bytes()) == source
+    assert not (tmp_path / "research/forward").exists()
 
 
 def test_builder_requires_explicit_predecessor_anchor():

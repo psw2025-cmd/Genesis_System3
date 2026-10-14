@@ -1,0 +1,66 @@
+{
+  "effective_forward_oos_eligible_count": 0,
+  "entry_date": "2026-10-14",
+  "forecast_issued": false,
+  "live_trading_enabled": false,
+  "market_validation_claimed": false,
+  "observed_at": "2026-10-14T12:39:29.580104+00:00",
+  "orders_allowed": false,
+  "performance_metrics_available": false,
+  "prediction_id": "EQ7D-2026-10-14-MVELECTRO-V1",
+  "proposed_counts": {
+    "forward_predictions": 1,
+    "matured_outcomes": 0,
+    "negative_forecasts": 0,
+    "positive_forecasts": 1,
+    "qualified_current_candidates": 0,
+    "screened_candidates": 489,
+    "selected_candidates": 1,
+    "source_company_eq_observations": 2339
+  },
+  "proposed_due_at": "2026-10-21T10:00:00+00:00",
+  "proposed_prediction_event_hash": "e687d15895c9c53be8c76c9bfd400f4ef43ce47145fb54bfe1644fddb8b41406",
+  "proposed_projection_hash": "d6b506a4e4733db92731cb8c6c0a5cb6e75a608380e9e9117957762c56584f2a",
+  "real_money_ready": false,
+  "record_hash": "082befbb0f9bc589c95c83b9f8e309c01122dbde02c905fe54fe7efd72679518",
+  "remote_comment_count": 1,
+  "remote_comments": [
+    {
+      "attestation": {
+        "due_at": "2026-10-21T10:00:00+00:00",
+        "execution_mode": "ANALYZE_PAPER",
+        "issuance_manifest_event_hash": "93d32aeed564f2d20ab1aebfc6ed53f8ce1d03d8ab67c92737ea6d7fb01689fc",
+        "live_trading_enabled": false,
+        "market_validation_claimed": false,
+        "order_placement_allowed": false,
+        "prediction_event_hash": "f9b65db544af303284c27a7e80bf9f018cc35a5e4848fa361fb53afa01c3b11b",
+        "prediction_id": "EQ7D-2026-10-14-MVELECTRO-V1",
+        "projection_hash": "9dfcd7c758924a8758f6a0f228a0fef52188c0347737dbd262e90e35d2770d84",
+        "registered_at": "2026-10-14T11:29:52.189044+00:00",
+        "schema_version": "equity-publication-attestation-v1"
+      },
+      "comment_id": 6167333324,
+      "published_at": "2026-10-14T11:30:47+00:00",
+      "receipt": {
+        "bytes": 4022,
+        "content_type": "application/json; charset=utf-8",
+        "etag": "W/\"f7c84375d86ddbfcf63701b85424569566874f1f8f9102c38b416df2b6f37527\"",
+        "final_url": "https://api.github.com/repos/psw2025-cmd/Genesis_System3/issues/comments/6167333324",
+        "first_observed_at": "2026-10-14T12:39:29.580104+00:00",
+        "http_status": 200,
+        "last_modified": null,
+        "raw_sha256": "f74f482ec67072076711b2a0a6c9418d8e3e9865c56252f4e7399cf9087530f8",
+        "request_started_at": "2026-10-14T12:39:24.932643+00:00",
+        "url": "https://api.github.com/repos/psw2025-cmd/Genesis_System3/issues/comments/6167333324"
+      },
+      "snapshot_uri": "research/evidence/equity/raw/2026-10-14-forward/remote_namespace_attempts/20261014T123929580104Z_comment_6167333324_f74f482ec6707207.json",
+      "source_bytes": 4022,
+      "source_sha256": "f74f482ec67072076711b2a0a6c9418d8e3e9865c56252f4e7399cf9087530f8",
+      "source_url": "https://api.github.com/repos/psw2025-cmd/Genesis_System3/issues/comments/6167333324"
+    }
+  ],
+  "remote_identity_status": "REMOTE_PREDICTION_ID_COLLISION_NOT_ISSUED",
+  "retained_prediction_count": 0,
+  "schema_version": "equity-remote-namespace-attempt-v1",
+  "task_id": "EQ-RECOVERY-040"
+}
