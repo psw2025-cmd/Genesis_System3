@@ -241,6 +241,7 @@ _GITHUB_API_VERSION = "2022-11-28"
 _GITHUB_PUBLICATION_USER_AGENT = "Genesis-System3-equity-publication-v1"
 _GITHUB_PUBLICATION_PAGE_SIZE = 100
 _GITHUB_PUBLICATION_MAX_PAGES = 20
+_MAX_PUBLICATION_COLLISION_FILES = 32
 PUBLICATION_COLLISION_SCHEMA_VERSION = (
     "equity-publication-identity-collision-v1"
 )
@@ -3471,22 +3472,74 @@ def verify_publication_collision_evidence(
     return seen_predictions
 
 
-def _existing_publication_collision_uri(
+def _publication_collision_uris(
     receipt_uri: str,
     *,
+    publication_events: list[dict[str, Any]],
     evidence_root: Path,
-) -> str | None:
-    collision_uri = publication_collision_uri_for(receipt_uri)
-    collision_path = _prospective_storage_path(
+) -> list[str]:
+    """Discover collision evidence from the event-bound evidence directory.
+
+    The receipt filename is supplied by the caller, so deriving only one
+    sidecar name from it would let a byte-for-byte ledger copy hide a known
+    collision.  Receipt events bind immutable source snapshots; requiring the
+    ledger to share that directory makes the directory the stable namespace.
+    A bounded scan then finds every retained collision review in that
+    namespace, regardless of the caller-selected ledger basename.
+    """
+    reference = _observation_reference(
+        receipt_uri, "PUBLICATION_RECEIPT_LEDGER_URI"
+    )
+    if not reference.endswith(".ndjson"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_URI_INVALID"
+        )
+    receipt_parent = reference.rsplit("/", 1)[0]
+    for index, event in enumerate(publication_events):
+        source_reference = _observation_reference(
+            event.get("source_snapshot_uri") if isinstance(event, dict) else None,
+            f"PUBLICATION_ROW_{index}_SOURCE_SNAPSHOT_URI",
+        )
+        if source_reference.rsplit("/", 1)[0] != receipt_parent:
+            raise MaturityObservationError(
+                "PUBLICATION_RECEIPT_SOURCE_DIRECTORY_MISMATCH"
+            )
+
+    receipt_path = _prospective_storage_path(
         Path(evidence_root),
-        collision_uri,
-        field="PUBLICATION_COLLISION_EVIDENCE",
-        suffix=".json",
+        reference,
+        field="PUBLICATION_RECEIPT_LEDGER",
+        suffix=".ndjson",
         must_not_exist=False,
     )
-    if not collision_path.exists():
-        return None
-    return collision_uri
+    try:
+        with os.scandir(receipt_path.parent) as entries:
+            names = sorted(
+                entry.name
+                for entry in entries
+                if entry.name.endswith(".collisions.json")
+            )
+    except OSError as exc:
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_DIRECTORY_UNAVAILABLE"
+        ) from exc
+    if len(names) > _MAX_PUBLICATION_COLLISION_FILES:
+        raise MaturityObservationError(
+            "PUBLICATION_COLLISION_FILE_BOUND_EXCEEDED"
+        )
+
+    collision_uris = []
+    for name in names:
+        collision_uri = f"{receipt_parent}/{name}"
+        _prospective_storage_path(
+            Path(evidence_root),
+            collision_uri,
+            field="PUBLICATION_COLLISION_EVIDENCE",
+            suffix=".json",
+            must_not_exist=False,
+        )
+        collision_uris.append(collision_uri)
+    return collision_uris
 
 
 def _known_publication_collision_ids(
@@ -3495,16 +3548,20 @@ def _known_publication_collision_ids(
     publication_events: list[dict[str, Any]],
     evidence_root: Path,
 ) -> set[str]:
-    collision_uri = _existing_publication_collision_uri(
-        receipt_uri, evidence_root=evidence_root
-    )
-    if collision_uri is None:
-        return set()
-    return verify_publication_collision_evidence(
-        collision_uri,
+    collision_ids: set[str] = set()
+    for collision_uri in _publication_collision_uris(
+        receipt_uri,
         publication_events=publication_events,
         evidence_root=evidence_root,
-    )
+    ):
+        collision_ids.update(
+            verify_publication_collision_evidence(
+                collision_uri,
+                publication_events=publication_events,
+                evidence_root=evidence_root,
+            )
+        )
+    return collision_ids
 
 
 def _verify_external_publication_receipt_events(
@@ -3605,17 +3662,10 @@ def _verify_external_publication_receipt_events(
             forward_count += 1
         else:
             historical_count += 1
-    collision_uri = _existing_publication_collision_uri(
-        receipt_uri, evidence_root=evidence_root
-    )
-    collision_ids = (
-        verify_publication_collision_evidence(
-            collision_uri,
-            publication_events=events,
-            evidence_root=evidence_root,
-        )
-        if collision_uri is not None
-        else set()
+    collision_ids = _known_publication_collision_ids(
+        receipt_uri,
+        publication_events=events,
+        evidence_root=evidence_root,
     )
     eligible_prediction_ids = {
         event["prediction_id"]

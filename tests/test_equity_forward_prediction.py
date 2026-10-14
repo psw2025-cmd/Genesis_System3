@@ -2127,6 +2127,68 @@ def test_publication_collision_evidence_disqualifies_forward_oos(
     ] == 1
 
 
+def test_publication_collision_cannot_be_hidden_by_receipt_copy(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, source_path, receipt_event = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    retain_publication_collision(
+        tmp_path, receipt_uri, receipt_event, source_path
+    )
+    copied_uri = receipt_uri.replace(
+        "publication_receipts", "caller_selected_copy"
+    )
+    (tmp_path / copied_uri).write_bytes((tmp_path / receipt_uri).read_bytes())
+
+    events = read_external_publication_receipts(
+        copied_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    )
+    status = verify_external_publication_receipts(
+        events,
+        issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=copied_uri,
+        evidence_root=tmp_path,
+    )
+
+    assert status["receipt_forward_oos_eligible_count"] == 1
+    assert status["forward_oos_eligible_count"] == 0
+    assert status["collision_disqualified_prediction_ids"] == [
+        receipt_event["prediction_id"]
+    ]
+
+
+def test_publication_receipt_copy_cannot_leave_source_directory(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, _, _ = retain_anchor_artifacts(
+        tmp_path, args, prediction, projection
+    )
+    receipt_uri, _, _ = retain_publication_receipt(
+        tmp_path, manifest_uri
+    )
+    copied_uri = (
+        "research/forward/equity/detached/"
+        "caller_selected_copy.ndjson"
+    )
+    copied_path = tmp_path / copied_uri
+    copied_path.parent.mkdir(parents=True)
+    copied_path.write_bytes((tmp_path / receipt_uri).read_bytes())
+
+    with pytest.raises(
+        MaturityObservationError,
+        match="PUBLICATION_RECEIPT_SOURCE_DIRECTORY_MISMATCH",
+    ):
+        read_external_publication_receipts(
+            copied_uri,
+            issuance_manifest_uri=manifest_uri,
+            evidence_root=tmp_path,
+        )
+
+
 def test_publication_collision_evidence_tamper_fails_replay(tmp_path):
     args, prediction, projection = build_projection()
     manifest_uri, _, _ = retain_anchor_artifacts(
