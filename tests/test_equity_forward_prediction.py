@@ -367,6 +367,66 @@ def test_issue_rejects_before_close_before_network(monkeypatch, tmp_path):
         )
 
 
+def test_issue_retains_exact_unavailable_source_without_forecast(
+    monkeypatch, tmp_path
+):
+    entry = datetime(2026, 10, 14, tzinfo=timezone.utc).date()
+    url = (
+        CM_URL
+        + "BhavCopy_NSE_CM_0_0_0_20261014_F_0000.csv.zip"
+    )
+    raw = b"official 404 response"
+    failed_receipt = receipt(raw, url)
+    failed_receipt["http_status"] = 404
+    failed_receipt["content_type"] = "text/html;charset=UTF-8"
+    failed_receipt["first_observed_at"] = (
+        "2026-10-14T10:29:19.785239+00:00"
+    )
+    failure = issue_module.OfficialSourceUnavailable(
+        "cash", issue_module.Capture(raw, failed_receipt)
+    )
+    monkeypatch.setattr(
+        issue_module,
+        "_utc_now",
+        lambda: datetime(2026, 10, 14, 10, 30, tzinfo=timezone.utc),
+    )
+    monkeypatch.setattr(
+        issue_module, "_load_captured_sources", lambda *_: None
+    )
+
+    def unavailable(_entry):
+        raise failure
+
+    monkeypatch.setattr(issue_module, "_capture_sources", unavailable)
+    with pytest.raises(
+        issue_module.OfficialSourceUnavailable,
+        match="Official source was not captured exactly",
+    ):
+        issue_module.issue(entry, evidence_root=tmp_path)
+
+    attempt_dir = tmp_path / (
+        "research/evidence/equity/raw/2026-10-14-forward/"
+        "availability_attempts"
+    )
+    records = list(attempt_dir.glob("*.json"))
+    responses = list(attempt_dir.glob("*.response"))
+    assert len(records) == 1
+    assert len(responses) == 1
+    assert responses[0].read_bytes() == raw
+    record = json.loads(records[0].read_bytes())
+    assert record["schema_version"] == (
+        "nse-equity-source-availability-attempt-v1"
+    )
+    assert record["source_role"] == "cash"
+    assert record["receipt"]["http_status"] == 404
+    assert record["response_sha256"] == sha256(raw).hexdigest()
+    assert record["forecast_issued"] is False
+    assert record["live_trading_enabled"] is False
+    assert record["orders_allowed"] is False
+    assert not list((tmp_path / "research/forward").rglob("*.json"))
+    assert not list((tmp_path / "research/forward").rglob("*.ndjson"))
+
+
 def test_issue_creates_artifact_parent_before_atomic_publish(
     monkeypatch, tmp_path
 ):

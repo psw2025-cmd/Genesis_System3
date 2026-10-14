@@ -43,6 +43,11 @@ from scripts.equity_observation_packet import CM_URL
 
 
 TASK_ID = "EQ-FORWARD-035"
+SOURCE_ATTEMPT_TASK_ID = "EQ-SOURCE-039"
+SOURCE_ATTEMPT_SCHEMA = "nse-equity-source-availability-attempt-v1"
+SOURCE_ROLES = frozenset(
+    {"cash", "company", "etf", "actions", "holiday_calendar", "index"}
+)
 MAX_SOURCE_BYTES = 32 * 1024 * 1024
 MODEL_SPEC_URI = (
     "research/evidence/equity/raw/2026-10-01-forward/"
@@ -62,6 +67,18 @@ _USER_AGENT = (
 class Capture:
     raw: bytes
     receipt: dict[str, Any]
+
+
+class OfficialSourceUnavailable(ValueError):
+    """Carry the exact failed official response to the durable boundary."""
+
+    def __init__(self, role: str, capture: Capture):
+        super().__init__(
+            "Official source was not captured exactly: "
+            f"{capture.receipt.get('url')}"
+        )
+        self.role = role
+        self.capture = capture
 
 
 def _utc_now() -> datetime:
@@ -127,7 +144,9 @@ def _fetch(url: str, *, opener: Any | None = None) -> Capture:
     return Capture(raw=raw, receipt=receipt)
 
 
-def _require_success(capture: Capture, *, url: str) -> None:
+def _require_success(
+    capture: Capture, *, url: str, role: str = "unknown"
+) -> None:
     receipt = capture.receipt
     if (
         receipt["url"] != url
@@ -137,7 +156,7 @@ def _require_success(capture: Capture, *, url: str) -> None:
         or receipt["bytes"] != len(capture.raw)
         or not capture.raw
     ):
-        raise ValueError(f"Official source was not captured exactly: {url}")
+        raise OfficialSourceUnavailable(role, capture)
 
 
 def _safe_path(root: Path, relative_uri: str) -> Path:
@@ -178,12 +197,85 @@ def _json_bytes(value: Any) -> bytes:
     ).encode("utf-8")
 
 
+def _retain_source_unavailability(
+    root: Path, entry: date, failure: OfficialSourceUnavailable
+) -> dict[str, Any]:
+    """Retain one immutable failed response without creating a forecast.
+
+    The attempt is intentionally separate from the resumable successful-source
+    packet.  A later successful capture cannot rewrite or silently promote it.
+    """
+    capture = failure.capture
+    receipt = capture.receipt
+    observed = datetime.fromisoformat(
+        str(receipt.get("first_observed_at", "")).replace("Z", "+00:00")
+    )
+    if observed.tzinfo is None or observed.utcoffset() is None:
+        raise ValueError("Failed-source observation requires a timezone")
+    observed = observed.astimezone(timezone.utc)
+    digest = sha256(capture.raw).hexdigest()
+    if (
+        failure.role not in SOURCE_ROLES
+        or receipt.get("raw_sha256") != digest
+        or receipt.get("bytes") != len(capture.raw)
+        or not isinstance(receipt.get("http_status"), int)
+    ):
+        raise ValueError("Failed-source response or receipt is invalid")
+    stamp = observed.strftime("%Y%m%dT%H%M%S%fZ")
+    stem = f"{stamp}_{failure.role}_{digest[:16]}"
+    attempt_dir = (
+        f"research/evidence/equity/raw/{entry.isoformat()}-forward/"
+        "availability_attempts"
+    )
+    response_uri = f"{attempt_dir}/{stem}.response"
+    record_uri = f"{attempt_dir}/{stem}.json"
+    record = {
+        "schema_version": SOURCE_ATTEMPT_SCHEMA,
+        "task_id": SOURCE_ATTEMPT_TASK_ID,
+        "entry_date": entry.isoformat(),
+        "source_role": failure.role,
+        "availability_status": "OFFICIAL_SOURCE_UNAVAILABLE_NOT_ISSUED",
+        "response_uri": response_uri,
+        "response_sha256": digest,
+        "response_bytes": len(capture.raw),
+        "receipt": receipt,
+        "forecast_issued": False,
+        "market_validation_claimed": False,
+        "live_trading_enabled": False,
+        "orders_allowed": False,
+    }
+    record["record_hash"] = sha256(
+        json.dumps(
+            record,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("utf-8")
+    ).hexdigest()
+    response_path = _safe_path(root, response_uri)
+    record_path = _safe_path(root, record_uri)
+    try:
+        _write_exclusive(root, response_uri, capture.raw)
+        _write_exclusive(root, record_uri, _json_bytes(record))
+    except Exception:
+        for path in (record_path, response_path):
+            try:
+                path.unlink()
+            except OSError:
+                pass
+        raise
+    return record
+
+
 def _capture_sources(entry: date) -> tuple[
     dict[str, Capture], list[dict[str, Any]], date
 ]:
     opener = _source_opener()
     holiday = _fetch(HOLIDAY_URL, opener=opener)
-    _require_success(holiday, url=HOLIDAY_URL)
+    _require_success(
+        holiday, url=HOLIDAY_URL, role="holiday_calendar"
+    )
     due, _ = _due_session(
         holiday.raw,
         holiday.receipt,
@@ -199,15 +291,16 @@ def _capture_sources(entry: date) -> tuple[
         f"?index=equities&from_date={entry.strftime('%d-%m-%Y')}"
         f"&to_date={due.strftime('%d-%m-%Y')}"
     )
-    captures = {
-        "cash": _fetch(cash_url, opener=opener),
-        "company": _fetch(EQUITY_URL, opener=opener),
-        "etf": _fetch(ETF_URL, opener=opener),
-        "actions": _fetch(action_url, opener=opener),
-        "holiday_calendar": holiday,
-    }
-    for role, capture in captures.items():
-        _require_success(capture, url=capture.receipt["url"])
+    captures = {"holiday_calendar": holiday}
+    for role, url in (
+        ("cash", cash_url),
+        ("company", EQUITY_URL),
+        ("etf", ETF_URL),
+        ("actions", action_url),
+    ):
+        capture = _fetch(url, opener=opener)
+        _require_success(capture, url=url, role=role)
+        captures[role] = capture
 
     archive_index_url = (
         f"{INDEX_URL_PREFIX}{entry.strftime('%d%m%Y')}.csv"
@@ -221,14 +314,16 @@ def _capture_sources(entry: date) -> tuple[
         }
     ]
     if archive_probe.receipt["http_status"] == 200:
-        _require_success(archive_probe, url=archive_index_url)
+        _require_success(
+            archive_probe, url=archive_index_url, role="index"
+        )
         captures["index"] = archive_probe
     elif archive_probe.receipt["http_status"] == 404:
         fallback = _fetch(INDEX_API_URL, opener=opener)
-        _require_success(fallback, url=INDEX_API_URL)
+        _require_success(fallback, url=INDEX_API_URL, role="index")
         captures["index"] = fallback
     else:
-        raise ValueError("Date-specific official index archive is unavailable")
+        raise OfficialSourceUnavailable("index", archive_probe)
     return captures, attempts, due
 
 
@@ -305,7 +400,11 @@ def issue(entry: date, *, evidence_root: Path) -> dict[str, Any]:
     raw_dir = f"research/evidence/equity/raw/{entry.isoformat()}-forward"
     retained = _load_captured_sources(root, entry)
     if retained is None:
-        captures, attempts, due = _capture_sources(entry)
+        try:
+            captures, attempts, due = _capture_sources(entry)
+        except OfficialSourceUnavailable as failure:
+            _retain_source_unavailability(root, entry, failure)
+            raise
     else:
         captures, attempts, due = retained
     filenames = {
