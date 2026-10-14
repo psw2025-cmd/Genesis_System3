@@ -3507,17 +3507,24 @@ def _known_publication_collision_ids(
     )
 
 
-def verify_external_publication_receipts(
+def _verify_external_publication_receipt_events(
     events: list[dict[str, Any]],
     *,
     issuance_manifest_uri: str,
+    publication_receipt_uri: str,
     evidence_root: Path,
-    publication_collision_uri: str | None = None,
 ) -> dict[str, Any]:
-    """Replay exact GitHub response bytes against issuance events."""
+    """Replay receipt events and the sidecar bound to their ledger URI."""
     if not isinstance(events, list):
         raise MaturityObservationError(
             "PUBLICATION_RECEIPT_LIST_REQUIRED"
+        )
+    receipt_uri = _observation_reference(
+        publication_receipt_uri, "PUBLICATION_RECEIPT_LEDGER_URI"
+    )
+    if not receipt_uri.endswith(".ndjson"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_URI_INVALID"
         )
     manifest_events = read_issuance_artifact_manifest(
         issuance_manifest_uri, evidence_root=evidence_root
@@ -3598,13 +3605,16 @@ def verify_external_publication_receipts(
             forward_count += 1
         else:
             historical_count += 1
+    collision_uri = _existing_publication_collision_uri(
+        receipt_uri, evidence_root=evidence_root
+    )
     collision_ids = (
         verify_publication_collision_evidence(
-            publication_collision_uri,
+            collision_uri,
             publication_events=events,
             evidence_root=evidence_root,
         )
-        if publication_collision_uri is not None
+        if collision_uri is not None
         else set()
     )
     eligible_prediction_ids = {
@@ -3629,6 +3639,49 @@ def verify_external_publication_receipts(
         "live_trading_enabled": False,
         "order_placement_allowed": False,
     }
+
+
+def verify_external_publication_receipts(
+    events: list[dict[str, Any]],
+    *,
+    issuance_manifest_uri: str,
+    publication_receipt_uri: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Replay the retained receipt ledger without a collision opt-out."""
+    receipt_uri = _observation_reference(
+        publication_receipt_uri, "PUBLICATION_RECEIPT_LEDGER_URI"
+    )
+    if not receipt_uri.endswith(".ndjson"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_URI_INVALID"
+        )
+    raw = _read_retained_bytes(
+        evidence_root,
+        receipt_uri,
+        field="PUBLICATION_RECEIPT_LEDGER",
+        max_bytes=_MAX_PUBLICATION_RECEIPT_BYTES,
+        reference_validator=_observation_reference,
+    )
+    if raw and not raw.endswith(b"\n"):
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_LEDGER_TRUNCATED"
+        )
+    retained_events = [
+        _strict_json_object(line, "PUBLICATION_RECEIPT_ROW")
+        for line in raw.splitlines()
+        if line.strip()
+    ]
+    if events != retained_events:
+        raise MaturityObservationError(
+            "PUBLICATION_RECEIPT_EVENT_SET_NOT_RETAINED"
+        )
+    return _verify_external_publication_receipt_events(
+        retained_events,
+        issuance_manifest_uri=issuance_manifest_uri,
+        publication_receipt_uri=receipt_uri,
+        evidence_root=evidence_root,
+    )
 
 
 def _read_external_publication_receipts_unlocked(
@@ -3663,10 +3716,8 @@ def _read_external_publication_receipts_unlocked(
     verify_external_publication_receipts(
         events,
         issuance_manifest_uri=issuance_manifest_uri,
+        publication_receipt_uri=receipt_uri,
         evidence_root=evidence_root,
-        publication_collision_uri=_existing_publication_collision_uri(
-            receipt_uri, evidence_root=evidence_root
-        ),
     )
     return events
 
@@ -3717,6 +3768,7 @@ def append_external_publication_receipt(
             verify_external_publication_receipts(
                 events,
                 issuance_manifest_uri=issuance_manifest_uri,
+                publication_receipt_uri=receipt_uri,
                 evidence_root=evidence_root,
             )
         else:
@@ -3763,9 +3815,10 @@ def append_external_publication_receipt(
             ),
         )
         candidate = [*events, event]
-        verify_external_publication_receipts(
+        _verify_external_publication_receipt_events(
             candidate,
             issuance_manifest_uri=issuance_manifest_uri,
+            publication_receipt_uri=receipt_uri,
             evidence_root=evidence_root,
         )
         encoded_event = json.dumps(
@@ -3840,6 +3893,7 @@ def publish_github_attestation_and_retain(
             verify_external_publication_receipts(
                 events,
                 issuance_manifest_uri=issuance_manifest_uri,
+                publication_receipt_uri=receipt_uri,
                 evidence_root=evidence_root,
             )
         else:
@@ -3952,9 +4006,10 @@ def publish_github_attestation_and_retain(
                 "GITHUB_PUBLICATION_REMOTE_POSTCHECK_MISMATCH"
             )
         candidate = [*events, event]
-        verify_external_publication_receipts(
+        _verify_external_publication_receipt_events(
             candidate,
             issuance_manifest_uri=issuance_manifest_uri,
+            publication_receipt_uri=receipt_uri,
             evidence_root=evidence_root,
         )
         encoded_event = json.dumps(

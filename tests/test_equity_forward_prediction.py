@@ -2072,6 +2072,7 @@ def test_external_publication_receipt_qualifies_pre_horizon_manifest(
     status = verify_external_publication_receipts(
         events,
         issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=receipt_uri,
         evidence_root=tmp_path,
     )
     assert status["forward_oos_eligible_count"] == 1
@@ -2089,7 +2090,7 @@ def test_publication_collision_evidence_disqualifies_forward_oos(
     receipt_uri, source_path, receipt_event = retain_publication_receipt(
         tmp_path, manifest_uri
     )
-    collision_uri, _, _, _ = retain_publication_collision(
+    retain_publication_collision(
         tmp_path, receipt_uri, receipt_event, source_path
     )
     events = read_external_publication_receipts(
@@ -2100,8 +2101,8 @@ def test_publication_collision_evidence_disqualifies_forward_oos(
     status = verify_external_publication_receipts(
         events,
         issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=receipt_uri,
         evidence_root=tmp_path,
-        publication_collision_uri=collision_uri,
     )
     assert status["receipt_forward_oos_eligible_count"] == 1
     assert status["forward_oos_eligible_count"] == 0
@@ -2819,6 +2820,7 @@ def test_publication_receipt_replay_rejects_replaced_source_bytes(tmp_path):
         verify_external_publication_receipts(
             [event],
             issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=receipt_uri,
             evidence_root=tmp_path,
         )
 
@@ -3210,11 +3212,11 @@ def test_retained_cmll_publication_receipt_verifies():
     summary = verify_external_publication_receipts(
         events,
         issuance_manifest_uri=manifest_uri,
-        evidence_root=root,
-        publication_collision_uri=publication_collision_uri_for(
+        publication_receipt_uri=(
             "research/forward/equity/2026-10-13/"
             "equity_publication_receipts.ndjson"
         ),
+        evidence_root=root,
     )
     assert summary["record_count"] == 1
     assert summary["receipt_forward_oos_eligible_count"] == 1
