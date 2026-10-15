@@ -3206,16 +3206,25 @@ def build_external_publication_receipt_event(
             raise MaturityObservationError(
                 "PUBLICATION_ATTESTATION_NOT_CANONICAL"
             )
-        return comment_id, published, attestation
-    attestation = _parse_publication_attestation(body)
-    if attestation != _publication_attestation(manifest_event):
-        raise MaturityObservationError(
-            "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
-        )
-    if body != github_publication_comment_body(manifest_event):
-        raise MaturityObservationError(
-            "PUBLICATION_ATTESTATION_NOT_CANONICAL"
-        )
+        if (
+            attestation["prediction_id"] != manifest_event["prediction_id"]
+            or attestation["issuance_manifest_event_hash"] != manifest_event["event_hash"]
+            or attestation["prediction_event_hash"] != manifest_event["prediction_event_hash"]
+            or attestation["projection_hash"] != manifest_event["projection_hash"]
+        ):
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+            )
+    else:
+        attestation = _parse_publication_attestation(body)
+        if attestation != _publication_attestation(manifest_event):
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+            )
+        if body != github_publication_comment_body(manifest_event):
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+            )
     eligible = (
         manifest_event["pre_maturity_registered"]
         and published < due
