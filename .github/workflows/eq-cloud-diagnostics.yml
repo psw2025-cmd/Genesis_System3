@@ -1,0 +1,41 @@
+name: Equity Cloud Diagnostics
+on:
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/eq-cloud-diagnostics.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  checks: read
+jobs:
+  diagnostics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Capture exact failed check and annotations
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          gh api repos/psw2025-cmd/Genesis_System3/check-runs/115859129314 > evidence/check.json
+          gh api --paginate --slurp repos/psw2025-cmd/Genesis_System3/check-runs/115859129314/annotations > evidence/annotations.json
+          python3 - <<'PY'
+          import hashlib, json, pathlib
+          root = pathlib.Path('evidence')
+          check = json.loads((root / 'check.json').read_text())
+          if check.get('head_sha') != '9b4fbd0aad564eb8796716c74b0aa8f4d46db026':
+              raise SystemExit('CHECK_HEAD_MISMATCH')
+          rows = {p.name: {'bytes': p.stat().st_size, 'sha256': hashlib.sha256(p.read_bytes()).hexdigest()} for p in sorted(root.glob('*.json'))}
+          (root / 'hashes.json').write_text(json.dumps(rows, sort_keys=True, indent=2) + '\n')
+          print(json.dumps({'name': check.get('name'), 'conclusion': check.get('conclusion'), 'output': check.get('output')}, indent=2))
+          PY
+      - name: Retain cloud diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eq-codeql-diagnostics-${{ github.run_id }}
+          path: evidence/
+          if-no-files-found: error
+          retention-days: 30
