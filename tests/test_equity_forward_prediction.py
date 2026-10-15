@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 import pytest
 
+import scripts.equity_durable_publication as durable_publication
 import scripts.equity_directional_maturity as maturity_module
 import scripts.issue_equity_forward_paper as issue_module
 from dashboard.backend.multibagger_outcome import (
@@ -2282,6 +2283,42 @@ def test_external_publication_receipt_qualifies_pre_horizon_manifest(
     assert status["order_placement_allowed"] is False
 
 
+def test_external_publication_import_accepts_manifest_bound_v2(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, prediction_path, projection_path = (
+        retain_anchor_artifacts(tmp_path, args, prediction, projection)
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    body = durable_publication.publication_v2_comment_body(
+        manifest_event,
+        artifact_commit_sha="2" * 40,
+        prediction_raw=prediction_path.read_bytes(),
+        projection_raw=projection_path.read_bytes(),
+    )
+    receipt_uri, source_path, event = retain_publication_receipt(
+        tmp_path,
+        manifest_uri,
+        body=body,
+    )
+    assert json.loads(source_path.read_text(encoding="utf-8"))["body"] == body
+    assert read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    ) == [event]
+    status = verify_external_publication_receipts(
+        [event],
+        issuance_manifest_uri=manifest_uri,
+        publication_receipt_uri=receipt_uri,
+        evidence_root=tmp_path,
+    )
+    assert status["forward_oos_eligible_count"] == 1
+    assert event["live_trading_enabled"] is False
+    assert event["order_placement_allowed"] is False
+
+
 def test_publication_collision_evidence_disqualifies_forward_oos(
     tmp_path,
 ):
@@ -2546,6 +2583,166 @@ def test_prospective_github_publication_posts_refetches_and_retains(
     ) == [event]
     assert event["live_trading_enabled"] is False
     assert event["order_placement_allowed"] is False
+
+
+def test_commit_pinned_v2_publication_enters_canonical_receipt_chain(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, prediction_path, projection_path = (
+        retain_anchor_artifacts(tmp_path, args, prediction, projection)
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    manifest_raw = (tmp_path / manifest_uri).read_bytes()
+    prediction_raw = prediction_path.read_bytes()
+    projection_raw = projection_path.read_bytes()
+    artifact_commit_sha = "3" * 40
+    remote = {
+        manifest_uri: manifest_raw,
+        manifest_event["prediction_uri"]: prediction_raw,
+        manifest_event["projection_uri"]: projection_raw,
+    }
+
+    def fetch_remote(repository, commit_sha, relative_path):
+        assert repository == "psw2025-cmd/Genesis_System3"
+        assert commit_sha == artifact_commit_sha
+        return remote[relative_path]
+
+    body = durable_publication.publication_v2_comment_body(
+        manifest_event,
+        artifact_commit_sha=artifact_commit_sha,
+        prediction_raw=prediction_raw,
+        projection_raw=projection_raw,
+    )
+    source = github_comment_response(manifest_event, body=body)
+    source_raw = json.dumps(
+        source, sort_keys=True, indent=2
+    ).encode("utf-8")
+    requests = []
+    published = False
+
+    def request_json(method, url, *, token, payload=None):
+        nonlocal published
+        requests.append((method, url, payload))
+        assert token == "test-token"
+        if "?per_page=" in url:
+            return json.dumps(
+                [source] if published else [], sort_keys=True
+            ).encode("utf-8")
+        if method == "POST":
+            assert json.loads(payload) == {"body": body}
+            published = True
+        return source_raw
+
+    observed_times = iter(
+        [
+            datetime(2026, 10, 1, 13, 1, 30, tzinfo=timezone.utc),
+            datetime(2026, 10, 1, 13, 3, tzinfo=timezone.utc),
+        ]
+    )
+    monkeypatch.setattr(
+        maturity_module, "_github_publication_request_json", request_json
+    )
+    monkeypatch.setattr(
+        maturity_module, "_system_utc_now", lambda: next(observed_times)
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    event = durable_publication.publish_durable_equity_attestation(
+        tmp_path / receipt_uri,
+        source_uri,
+        issuance_manifest_uri=manifest_uri,
+        prediction_id=manifest_event["prediction_id"],
+        artifact_commit_sha=artifact_commit_sha,
+        session_date="2026-10-01",
+        github_token="test-token",
+        evidence_root=tmp_path,
+        fetch_fn=fetch_remote,
+    )
+
+    assert [request[0] for request in requests] == [
+        "GET", "POST", "GET", "GET"
+    ]
+    assert (tmp_path / source_uri).read_bytes() == source_raw
+    assert read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=manifest_uri,
+        evidence_root=tmp_path,
+    ) == [event]
+    retained_source = json.loads((tmp_path / source_uri).read_bytes())
+    attestation = durable_publication.parse_publication_v2_attestation(
+        retained_source["body"]
+    )
+    assert attestation["artifact_commit_sha"] == artifact_commit_sha
+    assert attestation["prediction_file_sha256"] == sha256(
+        prediction_raw
+    ).hexdigest()
+    assert attestation["projection_file_sha256"] == sha256(
+        projection_raw
+    ).hexdigest()
+    assert event["forward_oos_eligible"] is True
+    assert event["market_validation_claimed"] is False
+    assert event["real_money_ready"] is False
+    assert event["live_trading_enabled"] is False
+    assert event["order_placement_allowed"] is False
+
+
+def test_commit_pinned_v2_rejects_remote_manifest_byte_drift_before_post(
+    tmp_path, monkeypatch
+):
+    args, prediction, projection = build_projection()
+    manifest_uri, prediction_path, projection_path = (
+        retain_anchor_artifacts(tmp_path, args, prediction, projection)
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    prediction_raw = prediction_path.read_bytes()
+    projection_raw = projection_path.read_bytes()
+    remote_manifest = json.dumps(
+        dict(reversed(list(manifest_event.items()))),
+        sort_keys=False,
+        separators=(",", ":"),
+    ).encode("utf-8") + b"\n"
+    local_manifest = (tmp_path / manifest_uri).read_bytes()
+    assert len(remote_manifest) == len(local_manifest)
+    assert remote_manifest != local_manifest
+
+    def fetch_remote(_repository, _commit_sha, relative_path):
+        if relative_path == manifest_uri:
+            return remote_manifest
+        if relative_path == manifest_event["prediction_uri"]:
+            return prediction_raw
+        if relative_path == manifest_event["projection_uri"]:
+            return projection_raw
+        raise AssertionError(relative_path)
+
+    monkeypatch.setattr(
+        maturity_module,
+        "_github_publication_request_json",
+        lambda *_, **__: pytest.fail("GitHub called before byte verification"),
+    )
+    source_uri = publication_source_uri_for(manifest_uri)
+    receipt_uri = publication_receipt_uri_for(manifest_uri)
+    with pytest.raises(
+        durable_publication.MaturityObservationError,
+        match="REMOTE_BYTE_MISMATCH",
+    ):
+        durable_publication.publish_durable_equity_attestation(
+            tmp_path / receipt_uri,
+            source_uri,
+            issuance_manifest_uri=manifest_uri,
+            prediction_id=manifest_event["prediction_id"],
+            artifact_commit_sha="4" * 40,
+            session_date="2026-10-01",
+            github_token="test-token",
+            evidence_root=tmp_path,
+            fetch_fn=fetch_remote,
+        )
+    assert not (tmp_path / source_uri).exists()
+    assert not (tmp_path / receipt_uri).exists()
 
 
 def test_prospective_github_publication_recovers_one_exact_comment(

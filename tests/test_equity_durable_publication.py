@@ -178,7 +178,7 @@ class TestEquityDurablePublication(unittest.TestCase):
         with TemporaryDirectory() as tmp:
             ledger_path = Path(tmp) / "receipts.ndjson"
             with self.assertRaises(pub.MaturityObservationError) as ctx:
-                pub.publish_durable_equity_attestation(
+                pub._publish_durable_equity_attestation_with_test_adapters(
                     self.manifest_event,
                     manifest_uri=self.manifest_uri,
                     manifest_raw=self.manifest_bytes,
@@ -210,7 +210,7 @@ class TestEquityDurablePublication(unittest.TestCase):
                 return list(posted_comments)
 
             def worker():
-                return pub.publish_durable_equity_attestation(
+                return pub._publish_durable_equity_attestation_with_test_adapters(
                     self.manifest_event,
                     manifest_uri=self.manifest_uri,
                     manifest_raw=self.manifest_bytes,
@@ -258,7 +258,7 @@ class TestEquityDurablePublication(unittest.TestCase):
                 )
                 raise TimeoutError("GitHub connection timed out after write")
 
-            res = pub.publish_durable_equity_attestation(
+            res = pub._publish_durable_equity_attestation_with_test_adapters(
                 self.manifest_event,
                 manifest_uri=self.manifest_uri,
                 manifest_raw=self.manifest_bytes,
@@ -283,7 +283,7 @@ class TestEquityDurablePublication(unittest.TestCase):
                 raise URLError("Network unreachable")
 
             with self.assertRaises(pub.MaturityObservationError) as ctx:
-                pub.publish_durable_equity_attestation(
+                pub._publish_durable_equity_attestation_with_test_adapters(
                     self.manifest_event,
                     manifest_uri=self.manifest_uri,
                     manifest_raw=self.manifest_bytes,
@@ -317,7 +317,7 @@ class TestEquityDurablePublication(unittest.TestCase):
                     updated_at="2026-10-15T10:06:00Z",
                 )
             with self.assertRaises(pub.MaturityObservationError) as ctx:
-                pub.publish_durable_equity_attestation(
+                pub._publish_durable_equity_attestation_with_test_adapters(
                     self.manifest_event,
                     manifest_uri=self.manifest_uri,
                     manifest_raw=self.manifest_bytes,
@@ -347,7 +347,7 @@ class TestEquityDurablePublication(unittest.TestCase):
             )
             comment = self._comment(body, comment_id=1)
             with self.assertRaises(pub.MaturityObservationError) as ctx:
-                pub.publish_durable_equity_attestation(
+                pub._publish_durable_equity_attestation_with_test_adapters(
                     self.manifest_event,
                     manifest_uri=self.manifest_uri,
                     manifest_raw=self.manifest_bytes,
@@ -430,7 +430,7 @@ class TestEquityDurablePublication(unittest.TestCase):
             with self.subTest(label=label), TemporaryDirectory() as tmp:
                 ledger_path = Path(tmp) / "receipts.ndjson"
                 with self.assertRaises(pub.MaturityObservationError) as ctx:
-                    pub.publish_durable_equity_attestation(
+                    pub._publish_durable_equity_attestation_with_test_adapters(
                         self.manifest_event,
                         manifest_uri=self.manifest_uri,
                         manifest_raw=self.manifest_bytes,
@@ -473,7 +473,7 @@ class TestEquityDurablePublication(unittest.TestCase):
         for label, (comment, observed, error) in cases.items():
             with self.subTest(label=label), TemporaryDirectory() as tmp:
                 with self.assertRaises(pub.MaturityObservationError) as ctx:
-                    pub.publish_durable_equity_attestation(
+                    pub._publish_durable_equity_attestation_with_test_adapters(
                         self.manifest_event,
                         manifest_uri=self.manifest_uri,
                         manifest_raw=self.manifest_bytes,

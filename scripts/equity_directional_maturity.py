@@ -2758,6 +2758,98 @@ def _parse_publication_attestation(body: Any) -> dict[str, Any]:
     return attestation
 
 
+def _parse_canonical_publication_body(body: Any) -> dict[str, Any]:
+    """Parse either supported publication body and require canonical bytes."""
+    if isinstance(body, str) and body.startswith(
+        "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"
+    ):
+        from scripts.equity_durable_publication import (
+            parse_publication_v2_attestation,
+        )
+
+        try:
+            attestation = parse_publication_v2_attestation(body)
+        except ValueError as exc:
+            raise MaturityObservationError(str(exc)) from exc
+        canonical_body = (
+            "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"
+            + _canonical(attestation).decode("ascii")
+        )
+    else:
+        attestation = _parse_publication_attestation(body)
+        canonical_body = _PUBLICATION_BODY_PREFIX + _canonical(
+            attestation
+        ).decode("ascii")
+    if body != canonical_body:
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+        )
+    prediction_id = attestation.get("prediction_id")
+    if (
+        not isinstance(prediction_id, str)
+        or not prediction_id
+        or prediction_id != prediction_id.strip()
+        or len(prediction_id) > 128
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_PREDICTION_ID_INVALID"
+        )
+    for field in (
+        "issuance_manifest_event_hash",
+        "prediction_event_hash",
+        "projection_hash",
+    ):
+        _sha(
+            attestation.get(field),
+            f"PUBLICATION_ATTESTATION_{field.upper()}",
+        )
+    _time(attestation.get("registered_at"), "PUBLICATION_REGISTERED_AT")
+    _time(attestation.get("due_at"), "PUBLICATION_DUE_AT")
+    return attestation
+
+
+def _validate_publication_attestation_binding(
+    attestation: Mapping[str, Any],
+    manifest_event: Mapping[str, Any],
+) -> None:
+    """Bind a v1 or commit-pinned v2 attestation to one manifest event."""
+    _validate_issuance_manifest_event(manifest_event)
+    expected = {
+        "prediction_id": manifest_event["prediction_id"],
+        "issuance_manifest_event_hash": manifest_event["event_hash"],
+        "prediction_event_hash": manifest_event["prediction_event_hash"],
+        "projection_hash": manifest_event["projection_hash"],
+        "registered_at": manifest_event["registered_at"],
+        "due_at": manifest_event["due_at"],
+    }
+    if any(attestation.get(key) != value for key, value in expected.items()):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+        )
+    if attestation.get("schema_version") == _PUBLICATION_ATTESTATION_SCHEMA_VERSION:
+        if dict(attestation) != _publication_attestation(manifest_event):
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+            )
+        return
+    if attestation.get("schema_version") != (
+        "genesis-equity-publication-attestation-v2"
+    ):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_SCHEMA_INVALID"
+        )
+    v2_expected = {
+        "prediction_file_sha256": manifest_event["prediction_file_sha256"],
+        "prediction_size_bytes": manifest_event["prediction_size_bytes"],
+        "projection_file_sha256": manifest_event["projection_file_sha256"],
+        "projection_size_bytes": manifest_event["projection_size_bytes"],
+    }
+    if any(attestation.get(key) != value for key, value in v2_expected.items()):
+        raise MaturityObservationError(
+            "PUBLICATION_ATTESTATION_ARTIFACT_MISMATCH"
+        )
+
+
 def _validated_github_publication_comment(
     source: Mapping[str, Any],
 ) -> tuple[int, datetime, dict[str, Any]]:
@@ -2809,47 +2901,7 @@ def _validated_github_publication_comment(
         raise MaturityObservationError(
             "PUBLICATION_EDITED_COMMENT_FORBIDDEN"
         )
-    body = source.get("body")
-    if isinstance(body, str) and body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"):
-        from scripts.equity_durable_publication import parse_publication_v2_attestation
-        attestation = parse_publication_v2_attestation(body)
-        canonical_body = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n" + _canonical(
-            attestation
-        ).decode("ascii")
-        if body != canonical_body:
-            raise MaturityObservationError(
-                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
-            )
-        return comment_id, published, attestation
-    attestation = _parse_publication_attestation(body)
-    prediction_id = attestation.get("prediction_id")
-    if (
-        not isinstance(prediction_id, str)
-        or not prediction_id
-        or prediction_id != prediction_id.strip()
-        or len(prediction_id) > 128
-    ):
-        raise MaturityObservationError(
-            "PUBLICATION_ATTESTATION_PREDICTION_ID_INVALID"
-        )
-    for field in (
-        "issuance_manifest_event_hash",
-        "prediction_event_hash",
-        "projection_hash",
-    ):
-        _sha(
-            attestation.get(field),
-            f"PUBLICATION_ATTESTATION_{field.upper()}",
-        )
-    _time(attestation.get("registered_at"), "PUBLICATION_REGISTERED_AT")
-    _time(attestation.get("due_at"), "PUBLICATION_DUE_AT")
-    canonical_body = _PUBLICATION_BODY_PREFIX + _canonical(
-        attestation
-    ).decode("ascii")
-    if body != canonical_body:
-        raise MaturityObservationError(
-            "PUBLICATION_ATTESTATION_NOT_CANONICAL"
-        )
+    attestation = _parse_canonical_publication_body(source.get("body"))
     return comment_id, published, attestation
 
 
@@ -2931,17 +2983,22 @@ def _resolve_github_publication_comment(
     manifest_event: Mapping[str, Any],
     *,
     token: str,
+    publication_body: str | None = None,
 ) -> dict[str, Any] | None:
     """Resolve zero or one exact comment; reject remote identity collisions."""
     prediction_id = manifest_event["prediction_id"]
     matches = _scan_github_publication_comments(
         prediction_id, token=token
     )
-    expected = _publication_attestation(manifest_event)
+    expected_body = publication_body or github_publication_comment_body(
+        manifest_event
+    )
+    expected = _parse_canonical_publication_body(expected_body)
+    _validate_publication_attestation_binding(expected, manifest_event)
     exact: list[dict[str, Any]] = []
     for source in matches:
         _, _, attestation = _validated_github_publication_comment(source)
-        if attestation != expected:
+        if attestation != expected or source.get("body") != expected_body:
             raise MaturityObservationError(
                 "GITHUB_PUBLICATION_REMOTE_IDENTITY_COLLISION"
             )
@@ -3196,35 +3253,8 @@ def build_external_publication_receipt_event(
             "PUBLICATION_OBSERVED_BEFORE_PUBLISHED"
         )
     body = source.get("body")
-    if isinstance(body, str) and body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"):
-        from scripts.equity_durable_publication import parse_publication_v2_attestation
-        attestation = parse_publication_v2_attestation(body)
-        canonical_body = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n" + _canonical(
-            attestation
-        ).decode("ascii")
-        if body != canonical_body:
-            raise MaturityObservationError(
-                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
-            )
-        if (
-            attestation["prediction_id"] != manifest_event["prediction_id"]
-            or attestation["issuance_manifest_event_hash"] != manifest_event["event_hash"]
-            or attestation["prediction_event_hash"] != manifest_event["prediction_event_hash"]
-            or attestation["projection_hash"] != manifest_event["projection_hash"]
-        ):
-            raise MaturityObservationError(
-                "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
-            )
-    else:
-        attestation = _parse_publication_attestation(body)
-        if attestation != _publication_attestation(manifest_event):
-            raise MaturityObservationError(
-                "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
-            )
-        if body != github_publication_comment_body(manifest_event):
-            raise MaturityObservationError(
-                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
-            )
+    attestation = _parse_canonical_publication_body(body)
+    _validate_publication_attestation_binding(attestation, manifest_event)
     eligible = (
         manifest_event["pre_maturity_registered"]
         and published < due
@@ -3864,7 +3894,7 @@ def append_external_publication_receipt(
             reference_validator=_observation_reference,
         )
         source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
-        attestation = _parse_publication_attestation(source.get("body"))
+        attestation = _parse_canonical_publication_body(source.get("body"))
         manifest_events = read_issuance_artifact_manifest(
             issuance_manifest_uri, evidence_root=evidence_root
         )
@@ -3923,7 +3953,7 @@ def append_external_publication_receipt(
         return event
 
 
-def publish_github_attestation_and_retain(
+def _publish_github_attestation_and_retain(
     path: Path,
     source_snapshot_uri: str,
     *,
@@ -3931,6 +3961,7 @@ def publish_github_attestation_and_retain(
     prediction_id: str,
     github_token: str,
     evidence_root: Path,
+    publication_body: str | None = None,
 ) -> dict[str, Any]:
     """Publish and retain one canonical prospective GitHub attestation.
 
@@ -4004,6 +4035,13 @@ def publish_github_attestation_and_retain(
                 "PUBLICATION_MANIFEST_EVENT_MISSING"
             )
         manifest_event = matches[0]
+        body = publication_body or github_publication_comment_body(
+            manifest_event
+        )
+        attestation = _parse_canonical_publication_body(body)
+        _validate_publication_attestation_binding(
+            attestation, manifest_event
+        )
         _, due, _ = _validate_issuance_manifest_event(manifest_event)
         if not manifest_event["pre_maturity_registered"]:
             raise MaturityObservationError(
@@ -4019,7 +4057,9 @@ def publish_github_attestation_and_retain(
                 "PUBLICATION_HORIZON_ALREADY_REACHED"
             )
         existing_source = _resolve_github_publication_comment(
-            manifest_event, token=github_token
+            manifest_event,
+            token=github_token,
+            publication_body=body,
         )
         if existing_source is None:
             create_url = (
@@ -4028,7 +4068,7 @@ def publish_github_attestation_and_retain(
                 f"{_PUBLICATION_PULL_REQUEST}/comments"
             )
             request_payload = _canonical(
-                {"body": github_publication_comment_body(manifest_event)}
+                {"body": body}
             )
             source_raw = _github_publication_request_json(
                 "POST",
@@ -4078,7 +4118,9 @@ def publish_github_attestation_and_retain(
                 "GITHUB_PUBLICATION_REFETCH_MISMATCH"
             )
         resolved_source = _resolve_github_publication_comment(
-            manifest_event, token=github_token
+            manifest_event,
+            token=github_token,
+            publication_body=body,
         )
         if (
             resolved_source is None
@@ -4112,6 +4154,26 @@ def publish_github_attestation_and_retain(
             failure_code="PUBLICATION_RECEIPT_LEDGER_COMMIT_FAILED",
         )
         return event
+
+
+def publish_github_attestation_and_retain(
+    path: Path,
+    source_snapshot_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    prediction_id: str,
+    github_token: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Publish the canonical v1 attestation through the retained pipeline."""
+    return _publish_github_attestation_and_retain(
+        path,
+        source_snapshot_uri,
+        issuance_manifest_uri=issuance_manifest_uri,
+        prediction_id=prediction_id,
+        github_token=github_token,
+        evidence_root=evidence_root,
+    )
 
 
 def _read_retained_observation_bytes(

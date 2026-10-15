@@ -1,4 +1,4 @@
-"""EQ-DURABILITY-041: Commit-pinned equity publication bundles and durability gate.
+"""Commit-pinned equity publication bundles and canonical durability gate.
 
 Enforces:
 prepare exact validated bytes
@@ -7,7 +7,7 @@ prepare exact validated bytes
 -> verify repository, paths, lengths, hashes and semantic bindings
 -> only then permit canonical publication
 -> refetch/validate exact remote comment
--> retain separate durable valid receipt
+-> retain a canonical maturity-replayable receipt
 -> only then enable publication-dependent eligibility.
 """
 from __future__ import annotations
@@ -461,6 +461,127 @@ def verify_prepared_publication_bundle(
 
 
 def publish_durable_equity_attestation(
+    path: Path,
+    source_snapshot_uri: str,
+    *,
+    issuance_manifest_uri: str,
+    prediction_id: str,
+    artifact_commit_sha: str,
+    session_date: date | str,
+    github_token: str,
+    evidence_root: Path,
+    fetch_fn: Callable[[str, str, str], bytes] | None = None,
+) -> dict[str, Any]:
+    """Publish commit-pinned v2 evidence into the canonical receipt chain.
+
+    The local manifest is first replayed by the maturity pipeline. Its exact
+    manifest, prediction, and projection bytes must then match the immutable
+    remote commit before any GitHub publication request is allowed. The
+    resulting v2 comment is published through the same retained-source and
+    receipt-ledger transaction used by maturity replay.
+    """
+    if fetch_fn is None:
+        raise MaturityObservationError("REMOTE_ARTIFACT_FETCHER_REQUIRED")
+    verify_artifact_commit_sha(artifact_commit_sha)
+    validate_prediction_identity_durability(prediction_id, session_date)
+
+    from scripts import equity_directional_maturity as canonical
+
+    manifest_events = canonical.read_issuance_artifact_manifest(
+        issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+    matches = [
+        event
+        for event in manifest_events
+        if event["prediction_id"] == prediction_id
+    ]
+    if len(matches) != 1:
+        raise MaturityObservationError("PUBLICATION_MANIFEST_EVENT_MISSING")
+    manifest_event = matches[0]
+
+    manifest_raw = canonical._read_retained_bytes(
+        evidence_root,
+        issuance_manifest_uri,
+        field="ISSUANCE_MANIFEST",
+        max_bytes=canonical._MAX_ISSUANCE_MANIFEST_BYTES,
+        reference_validator=canonical._observation_reference,
+    )
+    prediction_raw = canonical._read_retained_bytes(
+        evidence_root,
+        manifest_event["prediction_uri"],
+        field="PREDICTION_ARTIFACT",
+        max_bytes=canonical._MAX_ANCHOR_ARTIFACT_BYTES,
+        reference_validator=canonical._observation_reference,
+    )
+    projection_raw = canonical._read_retained_bytes(
+        evidence_root,
+        manifest_event["projection_uri"],
+        field="PROJECTION_ARTIFACT",
+        max_bytes=canonical._MAX_ANCHOR_ARTIFACT_BYTES,
+        reference_validator=canonical._observation_reference,
+    )
+    verify_prepared_publication_bundle(
+        repository=_PUBLICATION_REPOSITORY,
+        artifact_commit_sha=artifact_commit_sha,
+        manifest_event=manifest_event,
+        manifest_uri=issuance_manifest_uri,
+        manifest_raw=manifest_raw,
+        prediction_raw=prediction_raw,
+        projection_raw=projection_raw,
+        session_date=session_date,
+        evidence_root=evidence_root,
+        fetch_fn=fetch_fn,
+    )
+    body = publication_v2_comment_body(
+        manifest_event,
+        artifact_commit_sha=artifact_commit_sha,
+        prediction_raw=prediction_raw,
+        projection_raw=projection_raw,
+    )
+    event = canonical._publish_github_attestation_and_retain(
+        path,
+        source_snapshot_uri,
+        issuance_manifest_uri=issuance_manifest_uri,
+        prediction_id=prediction_id,
+        github_token=github_token,
+        evidence_root=evidence_root,
+        publication_body=body,
+    )
+
+    receipt_path = Path(path)
+    if not receipt_path.is_absolute():
+        receipt_path = Path.cwd() / receipt_path
+    receipt_uri = receipt_path.resolve().relative_to(
+        Path(evidence_root).resolve()
+    ).as_posix()
+    retained = canonical.read_external_publication_receipts(
+        receipt_uri,
+        issuance_manifest_uri=issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+    exact = [row for row in retained if row["event_hash"] == event["event_hash"]]
+    if len(exact) != 1 or exact[0] != event:
+        raise MaturityObservationError(
+            "CANONICAL_PUBLICATION_RECEIPT_NOT_REPLAYABLE"
+        )
+    source_raw = canonical._read_retained_bytes(
+        evidence_root,
+        event["source_snapshot_uri"],
+        field="PUBLICATION_SOURCE",
+        max_bytes=canonical._MAX_PUBLICATION_RECEIPT_BYTES,
+        reference_validator=canonical._observation_reference,
+    )
+    source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
+    attestation = parse_publication_v2_attestation(source.get("body"))
+    if attestation["artifact_commit_sha"] != artifact_commit_sha:
+        raise MaturityObservationError(
+            "PUBLICATION_ARTIFACT_COMMIT_MISMATCH"
+        )
+    return event
+
+
+def _publish_durable_equity_attestation_with_test_adapters(
     manifest_event: Mapping[str, Any],
     *,
     manifest_uri: str,
@@ -477,7 +598,7 @@ def publish_durable_equity_attestation(
     get_fn: Callable[[str], list[dict[str, Any]]] | None = None,
     first_observed_at: datetime | None = None,
 ) -> dict[str, Any]:
-    """Serialized, idempotent, crash-resilient publication with receipt persistence."""
+    """Legacy isolated adapter harness retained for unit-level fault tests."""
     if fetch_fn is None:
         raise MaturityObservationError("REMOTE_ARTIFACT_FETCHER_REQUIRED")
     if post_fn is None:
