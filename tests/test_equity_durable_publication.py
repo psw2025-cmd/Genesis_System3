@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 import unittest
+from urllib.error import URLError
 
 # Standard test imports
 import scripts.equity_durable_publication as pub
@@ -49,6 +50,37 @@ class TestEquityDurablePublication(unittest.TestCase):
         elif rel_path == self.manifest_event["projection_uri"]:
             return self.proj_bytes
         raise KeyError(f"Unknown path {rel_path}")
+
+    def _comment(
+        self,
+        body,
+        *,
+        comment_id=555001,
+        created_at="2026-10-15T10:05:00Z",
+        updated_at=None,
+        login="psw2025-cmd",
+        author_association="OWNER",
+    ):
+        return {
+            "id": comment_id,
+            "url": (
+                "https://api.github.com/repos/psw2025-cmd/"
+                f"Genesis_System3/issues/comments/{comment_id}"
+            ),
+            "issue_url": (
+                "https://api.github.com/repos/psw2025-cmd/"
+                "Genesis_System3/issues/471"
+            ),
+            "html_url": (
+                "https://github.com/psw2025-cmd/Genesis_System3/"
+                f"pull/471#issuecomment-{comment_id}"
+            ),
+            "created_at": created_at,
+            "updated_at": updated_at or created_at,
+            "body": body,
+            "user": {"login": login, "type": "User", "id": 1},
+            "author_association": author_association,
+        }
 
     # 1. No remote fetch adapter fails closed
     def test_01_no_remote_fetch_adapter_rejected(self):
@@ -170,14 +202,7 @@ class TestEquityDurablePublication(unittest.TestCase):
             posted_comments = []
             
             def thread_safe_post(b):
-                c = {
-                    "id": 555001,
-                    "created_at": "2026-10-15T10:05:00Z",
-                    "updated_at": "2026-10-15T10:05:00Z",
-                    "body": b,
-                    "user": {"login": "psw2025-cmd", "type": "User", "id": 1},
-                    "author_association": "OWNER",
-                }
+                c = self._comment(b)
                 posted_comments.append(c)
                 return c
 
@@ -228,14 +253,9 @@ class TestEquityDurablePublication(unittest.TestCase):
 
             def failing_post(b):
                 # Server accepted comment, but network timed out before response reached client
-                server_comments.append({
-                    "id": 999333,
-                    "created_at": "2026-10-15T10:05:00Z",
-                    "updated_at": "2026-10-15T10:05:00Z",
-                    "body": b,
-                    "user": {"login": "psw2025-cmd", "type": "User", "id": 1},
-                    "author_association": "OWNER",
-                })
+                server_comments.append(
+                    self._comment(b, comment_id=999333)
+                )
                 raise TimeoutError("GitHub connection timed out after write")
 
             res = pub.publish_durable_equity_attestation(
@@ -291,14 +311,11 @@ class TestEquityDurablePublication(unittest.TestCase):
                 projection_raw=self.proj_bytes,
             )
             def post_then_tamper(b):
-                return {
-                    "id": 123999,
-                    "created_at": "2026-10-15T10:05:00Z",
-                    "updated_at": "2026-10-15T10:06:00Z",  # EDITED!
-                    "body": expected_body,
-                    "user": {"login": "psw2025-cmd", "type": "User", "id": 1},
-                    "author_association": "OWNER",
-                }
+                return self._comment(
+                    expected_body,
+                    comment_id=123999,
+                    updated_at="2026-10-15T10:06:00Z",
+                )
             with self.assertRaises(pub.MaturityObservationError) as ctx:
                 pub.publish_durable_equity_attestation(
                     self.manifest_event,
@@ -322,6 +339,13 @@ class TestEquityDurablePublication(unittest.TestCase):
             bad_dir = Path(tmp) / "as_dir"
             bad_dir.mkdir()
             # Passing a directory as the ledger path must fail closed
+            body = pub.publication_v2_comment_body(
+                self.manifest_event,
+                artifact_commit_sha=self.sha,
+                prediction_raw=self.pred_bytes,
+                projection_raw=self.proj_bytes,
+            )
+            comment = self._comment(body, comment_id=1)
             with self.assertRaises(pub.MaturityObservationError) as ctx:
                 pub.publish_durable_equity_attestation(
                     self.manifest_event,
@@ -334,8 +358,8 @@ class TestEquityDurablePublication(unittest.TestCase):
                     evidence_root=Path(tmp),
                     receipt_ledger_path=bad_dir,
                     fetch_fn=self._good_fetcher,
-                    post_fn=lambda b: {"id": 1, "created_at": "2026-10-15T10:05:00Z", "updated_at": "2026-10-15T10:05:00Z", "body": b},
-                    get_fn=lambda pid: [{"id": 1, "created_at": "2026-10-15T10:05:00Z", "updated_at": "2026-10-15T10:05:00Z", "body": pub.publication_v2_comment_body(self.manifest_event, artifact_commit_sha=self.sha, prediction_raw=self.pred_bytes, projection_raw=self.proj_bytes)}],
+                    post_fn=lambda b: comment,
+                    get_fn=lambda pid: [comment],
                 )
             self.assertIn("RECEIPT_PATH_CANNOT_BE_DIRECTORY", str(ctx.exception))
 
@@ -380,6 +404,91 @@ class TestEquityDurablePublication(unittest.TestCase):
         with self.assertRaises(pub.MaturityObservationError) as ctx2:
             pub.parse_publication_v2_attestation(bad_body2)
         self.assertIn("PUBLICATION_V2_FIELDS_INVALID", str(ctx2.exception))
+
+    # 16. Only an immutable owner-authored comment in PR 471 is authoritative
+    def test_16_remote_comment_authority_is_required(self):
+        body = pub.publication_v2_comment_body(
+            self.manifest_event,
+            artifact_commit_sha=self.sha,
+            prediction_raw=self.pred_bytes,
+            projection_raw=self.proj_bytes,
+        )
+        cases = {
+            "wrong_login": self._comment(body, login="attacker"),
+            "wrong_association": self._comment(
+                body, author_association="CONTRIBUTOR"
+            ),
+            "wrong_pr_scope": {
+                **self._comment(body),
+                "issue_url": (
+                    "https://api.github.com/repos/psw2025-cmd/"
+                    "Genesis_System3/issues/472"
+                ),
+            },
+        }
+        for label, comment in cases.items():
+            with self.subTest(label=label), TemporaryDirectory() as tmp:
+                ledger_path = Path(tmp) / "receipts.ndjson"
+                with self.assertRaises(pub.MaturityObservationError) as ctx:
+                    pub.publish_durable_equity_attestation(
+                        self.manifest_event,
+                        manifest_uri=self.manifest_uri,
+                        manifest_raw=self.manifest_bytes,
+                        artifact_commit_sha=self.sha,
+                        prediction_raw=self.pred_bytes,
+                        projection_raw=self.proj_bytes,
+                        session_date="2026-10-15",
+                        evidence_root=Path(tmp),
+                        receipt_ledger_path=ledger_path,
+                        fetch_fn=self._good_fetcher,
+                        post_fn=lambda b, row=comment: row,
+                        get_fn=lambda pid, row=comment: [row],
+                    )
+                self.assertIn(
+                    str(ctx.exception),
+                    {"PUBLICATION_AUTHOR_INVALID", "PUBLICATION_SOURCE_URL_INVALID"},
+                )
+                self.assertFalse(ledger_path.exists())
+
+    # 17. Observation and publication cannot predate their durable anchors
+    def test_17_publication_timestamp_order_is_required(self):
+        body = pub.publication_v2_comment_body(
+            self.manifest_event,
+            artifact_commit_sha=self.sha,
+            prediction_raw=self.pred_bytes,
+            projection_raw=self.proj_bytes,
+        )
+        cases = {
+            "pre_registration": (
+                self._comment(body, created_at="2026-10-15T09:59:59Z"),
+                datetime(2026, 10, 15, 10, 6, tzinfo=timezone.utc),
+                "PUBLICATION_PRECEDES_ISSUANCE_MANIFEST",
+            ),
+            "observed_before_publication": (
+                self._comment(body),
+                datetime(2026, 10, 15, 10, 4, tzinfo=timezone.utc),
+                "PUBLICATION_OBSERVED_BEFORE_PUBLISHED",
+            ),
+        }
+        for label, (comment, observed, error) in cases.items():
+            with self.subTest(label=label), TemporaryDirectory() as tmp:
+                with self.assertRaises(pub.MaturityObservationError) as ctx:
+                    pub.publish_durable_equity_attestation(
+                        self.manifest_event,
+                        manifest_uri=self.manifest_uri,
+                        manifest_raw=self.manifest_bytes,
+                        artifact_commit_sha=self.sha,
+                        prediction_raw=self.pred_bytes,
+                        projection_raw=self.proj_bytes,
+                        session_date="2026-10-15",
+                        evidence_root=Path(tmp),
+                        receipt_ledger_path=Path(tmp) / "receipts.ndjson",
+                        fetch_fn=self._good_fetcher,
+                        post_fn=lambda b, row=comment: row,
+                        get_fn=lambda pid, row=comment: [row],
+                        first_observed_at=observed,
+                    )
+                self.assertIn(error, str(ctx.exception))
 
 
 if __name__ == "__main__":

@@ -301,6 +301,68 @@ def parse_publication_v2_attestation(body: Any) -> dict[str, Any]:
     return attestation
 
 
+def _validated_github_publication_comment(
+    source: Mapping[str, Any],
+) -> tuple[int, datetime, dict[str, Any]]:
+    """Validate the immutable PR scope, owner identity, and canonical v2 body."""
+    if not isinstance(source, dict):
+        raise MaturityObservationError(
+            "GITHUB_PUBLICATION_COMMENT_OBJECT_REQUIRED"
+        )
+    comment_id = source.get("id")
+    if (
+        isinstance(comment_id, bool)
+        or not isinstance(comment_id, int)
+        or comment_id <= 0
+    ):
+        raise MaturityObservationError("PUBLICATION_COMMENT_ID_INVALID")
+
+    source_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}"
+    )
+    issue_url = (
+        "https://api.github.com/repos/"
+        f"{_PUBLICATION_REPOSITORY}/issues/{_PUBLICATION_PULL_REQUEST}"
+    )
+    html_url = (
+        f"https://github.com/{_PUBLICATION_REPOSITORY}/pull/"
+        f"{_PUBLICATION_PULL_REQUEST}#issuecomment-{comment_id}"
+    )
+    if (
+        source.get("url") != source_url
+        or source.get("issue_url") != issue_url
+        or source.get("html_url") != html_url
+    ):
+        raise MaturityObservationError("PUBLICATION_SOURCE_URL_INVALID")
+
+    user = source.get("user")
+    if (
+        not isinstance(user, dict)
+        or user.get("login") != _PUBLICATION_AUTHOR_LOGIN
+        or user.get("type") != "User"
+        or isinstance(user.get("id"), bool)
+        or not isinstance(user.get("id"), int)
+        or user.get("id") <= 0
+        or source.get("author_association") != "OWNER"
+    ):
+        raise MaturityObservationError("PUBLICATION_AUTHOR_INVALID")
+
+    published = _time(source.get("created_at"), "PUBLICATION_CREATED_AT")
+    updated = _time(source.get("updated_at"), "PUBLICATION_UPDATED_AT")
+    if source.get("created_at") != source.get("updated_at") or published != updated:
+        raise MaturityObservationError("PUBLICATION_EDITED_COMMENT_FORBIDDEN")
+
+    body = source.get("body")
+    attestation = parse_publication_v2_attestation(body)
+    canonical_body = PUBLICATION_V2_BODY_PREFIX + _canonical(
+        attestation
+    ).decode("ascii")
+    if body != canonical_body:
+        raise MaturityObservationError("PUBLICATION_ATTESTATION_NOT_CANONICAL")
+    return comment_id, published, attestation
+
+
 def verify_prepared_publication_bundle(
     *,
     repository: str,
@@ -487,6 +549,7 @@ def publish_durable_equity_attestation(
                 if c_body.startswith(PUBLICATION_V2_BODY_PREFIX):
                     parsed = parse_publication_v2_attestation(c_body)
                     if parsed["prediction_id"] == manifest_event["prediction_id"]:
+                        _validated_github_publication_comment(c)
                         if c_body == body:
                             existing_comment = c
                             break
@@ -503,6 +566,7 @@ def publish_durable_equity_attestation(
                     rechecked = get_fn(manifest_event["prediction_id"])
                     for c in rechecked:
                         if c.get("body") == body:
+                            _validated_github_publication_comment(c)
                             comment_record = c
                             break
                     else:
@@ -517,15 +581,34 @@ def publish_durable_equity_attestation(
                     break
             if refetched is None:
                 raise MaturityObservationError("PUBLICATION_REFETCH_NOT_FOUND")
+            comment_id, pub_dt, remote_attestation = (
+                _validated_github_publication_comment(refetched)
+            )
             if refetched.get("body") != body:
                 raise MaturityObservationError("PUBLICATION_ATTESTATION_NOT_CANONICAL")
-            if refetched.get("created_at") != refetched.get("updated_at"):
-                raise MaturityObservationError("PUBLICATION_EDITED_COMMENT_FORBIDDEN")
+            if remote_attestation != parse_publication_v2_attestation(body):
+                raise MaturityObservationError(
+                    "PUBLICATION_ATTESTATION_MANIFEST_MISMATCH"
+                )
 
-            comment_id = refetched["id"]
             now = first_observed_at or datetime.now(timezone.utc)
+            if now.tzinfo is None or now.utcoffset() is None:
+                raise MaturityObservationError(
+                    "PUBLICATION_FIRST_OBSERVED_TIMEZONE_REQUIRED"
+                )
+            now = now.astimezone(timezone.utc)
             due_dt = _time(manifest_event["due_at"], "DUE_AT")
-            pub_dt = _time(refetched["created_at"], "PUBLISHED_AT")
+            registered_dt = _time(
+                manifest_event["registered_at"], "REGISTERED_AT"
+            )
+            if pub_dt < registered_dt:
+                raise MaturityObservationError(
+                    "PUBLICATION_PRECEDES_ISSUANCE_MANIFEST"
+                )
+            if now < pub_dt:
+                raise MaturityObservationError(
+                    "PUBLICATION_OBSERVED_BEFORE_PUBLISHED"
+                )
 
             eligible = manifest_event.get("pre_maturity_registered", True) and (pub_dt < due_dt)
 
@@ -539,7 +622,7 @@ def publish_durable_equity_attestation(
                 "prediction_event_hash": manifest_event["prediction_event_hash"],
                 "projection_hash": manifest_event["projection_hash"],
                 "comment_id": comment_id,
-                "author_login": refetched.get("user", {}).get("login", _PUBLICATION_AUTHOR_LOGIN),
+                "author_login": _PUBLICATION_AUTHOR_LOGIN,
                 "published_at": refetched["created_at"],
                 "first_observed_at": now.isoformat(),
                 "source_url": f"https://api.github.com/repos/{_PUBLICATION_REPOSITORY}/issues/comments/{comment_id}",
