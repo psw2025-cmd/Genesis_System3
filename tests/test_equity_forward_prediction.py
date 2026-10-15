@@ -502,6 +502,16 @@ def test_issue_creates_artifact_parent_before_atomic_publish(
         issue_module, "publish_prospective_issuance", fake_publish
     )
     result = issue_module.issue(entry, evidence_root=tmp_path)
+    assert result["task_id"] == "EQ-PREPARE-044"
+    assert result["artifact_status"] == (
+        "PREPARED_AWAITING_COMMIT_PINNED_PUBLICATION"
+    )
+    assert result["forecast_issued"] is False
+    assert result["externally_published"] is False
+    assert result["canonical_publication_receipt_count"] == 0
+    assert result["forward_oos_eligible"] is False
+    assert result["artifact_commit_sha"] is None
+    assert result["publication_comment_id"] is None
     assert result["orders_allowed"] is False
     assert result["issuance_manifest_event_hash"] == "4" * 64
 

@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""Capture official NSE evidence and issue one same-session PAPER forecast.
+"""Capture official NSE evidence and prepare one same-session PAPER forecast.
 
 The command is deliberately narrow: it may run only after the requested cash
 session has closed, captures exact official bytes, and atomically registers the
-prediction/projection pair before its future horizon.  It never calls a broker.
+prediction/projection pair before its future horizon.  Preparation is not
+issuance: the forecast remains ineligible until its exact artifacts are pushed
+to an immutable commit, externally published, and retained in the canonical
+publication-receipt ledger.  It never calls a broker.
 """
 from __future__ import annotations
 
@@ -43,7 +46,7 @@ from scripts.equity_instrument_scope import EQUITY_URL, ETF_URL
 from scripts.equity_observation_packet import CM_URL
 
 
-TASK_ID = "EQ-FORWARD-040"
+TASK_ID = "EQ-PREPARE-044"
 SOURCE_ATTEMPT_TASK_ID = "EQ-SOURCE-039"
 SOURCE_ATTEMPT_SCHEMA = "nse-equity-source-availability-attempt-v1"
 REMOTE_NAMESPACE_TASK_ID = "EQ-RECOVERY-040"
@@ -694,7 +697,13 @@ def _load_captured_sources(
 
 
 def issue(entry: date, *, evidence_root: Path) -> dict[str, Any]:
-    """Capture, seal, and register one future-horizon PAPER prediction."""
+    """Prepare one future-horizon PAPER artifact bundle, without issuing it.
+
+    The historical function name is retained for callers, but this boundary
+    intentionally stops before commit-pinned GitHub publication.  Returning an
+    explicit non-issued lifecycle prevents a successful local preparation from
+    being mistaken for durable forward-OOS issuance.
+    """
     root = evidence_root.resolve(strict=True)
     now = _utc_now()
     local_now = now.astimezone(IST)
@@ -814,6 +823,15 @@ def issue(entry: date, *, evidence_root: Path) -> dict[str, Any]:
     return {
         "task_id": TASK_ID,
         "execution_mode": "ANALYZE_PAPER",
+        "artifact_status": (
+            "PREPARED_AWAITING_COMMIT_PINNED_PUBLICATION"
+        ),
+        "forecast_issued": False,
+        "externally_published": False,
+        "canonical_publication_receipt_count": 0,
+        "forward_oos_eligible": False,
+        "artifact_commit_sha": None,
+        "publication_comment_id": None,
         "prediction_id": prediction["prediction_id"],
         "issued_at": prediction["issued_at"],
         "source_cutoff_at": prediction["source_cutoff_at"],
@@ -840,7 +858,10 @@ def issue(entry: date, *, evidence_root: Path) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Issue a source-qualified equity PAPER prediction"
+        description=(
+            "Prepare source-qualified equity PAPER artifacts; commit-pinned "
+            "publication is a separate mandatory transaction"
+        )
     )
     parser.add_argument("--entry-date", required=True)
     parser.add_argument("--evidence-root", default=".")
