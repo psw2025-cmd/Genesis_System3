@@ -2121,7 +2121,7 @@ def _write_new_prospective_artifact(
             | os.O_EXCL
             | getattr(os, "O_BINARY", 0)
         )
-        descriptor = os.open(path, flags, 0o644)
+        descriptor = os.open(path, flags, 0o600)
         created = True
         with os.fdopen(descriptor, "wb") as handle:
             descriptor = None
@@ -2158,7 +2158,7 @@ def _replace_manifest_atomically(
     failure_code: str = "ISSUANCE_MANIFEST_COMMIT_FAILED",
 ) -> None:
     """Make the fully validated manifest version the transaction commit point."""
-    mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o644
+    mode = stat.S_IMODE(path.stat().st_mode) if path.exists() else 0o600
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{path.name}.",
         suffix=".tmp",
@@ -2810,6 +2810,17 @@ def _validated_github_publication_comment(
             "PUBLICATION_EDITED_COMMENT_FORBIDDEN"
         )
     body = source.get("body")
+    if isinstance(body, str) and body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"):
+        from scripts.equity_durable_publication import parse_publication_v2_attestation
+        attestation = parse_publication_v2_attestation(body)
+        canonical_body = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n" + _canonical(
+            attestation
+        ).decode("ascii")
+        if body != canonical_body:
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+            )
+        return comment_id, published, attestation
     attestation = _parse_publication_attestation(body)
     prediction_id = attestation.get("prediction_id")
     if (
@@ -2894,8 +2905,9 @@ def _scan_github_publication_comments(
             ):
                 continue
             body = row.get("body")
-            if not isinstance(body, str) or not body.startswith(
-                _PUBLICATION_BODY_PREFIX
+            if not isinstance(body, str) or not (
+                body.startswith(_PUBLICATION_BODY_PREFIX)
+                or body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n")
             ):
                 continue
             comment_id, _, attestation = (
@@ -3184,6 +3196,17 @@ def build_external_publication_receipt_event(
             "PUBLICATION_OBSERVED_BEFORE_PUBLISHED"
         )
     body = source.get("body")
+    if isinstance(body, str) and body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"):
+        from scripts.equity_durable_publication import parse_publication_v2_attestation
+        attestation = parse_publication_v2_attestation(body)
+        canonical_body = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n" + _canonical(
+            attestation
+        ).decode("ascii")
+        if body != canonical_body:
+            raise MaturityObservationError(
+                "PUBLICATION_ATTESTATION_NOT_CANONICAL"
+            )
+        return comment_id, published, attestation
     attestation = _parse_publication_attestation(body)
     if attestation != _publication_attestation(manifest_event):
         raise MaturityObservationError(

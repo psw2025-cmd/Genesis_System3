@@ -385,7 +385,10 @@ def _scan_remote_prediction_identity(
                 or user.get("login") != "psw2025-cmd"
                 or row.get("author_association") != "OWNER"
                 or not isinstance(body, str)
-                or not body.startswith(_PUBLICATION_BODY_PREFIX)
+                or not (
+                    body.startswith(_PUBLICATION_BODY_PREFIX)
+                    or body.startswith("GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n")
+                )
             ):
                 continue
             comment_id, _, attestation = (
@@ -553,6 +556,12 @@ def _guard_remote_prediction_identity(
     *,
     opener: Any | None = None,
 ) -> None:
+    from scripts.equity_durable_publication import (
+        validate_prediction_identity_durability,
+    )
+    validate_prediction_identity_durability(
+        prediction["prediction_id"], entry
+    )
     captures = _scan_remote_prediction_identity(
         prediction["prediction_id"], opener=opener
     )
