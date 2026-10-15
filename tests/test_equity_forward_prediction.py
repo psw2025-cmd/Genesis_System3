@@ -2660,7 +2660,7 @@ def test_commit_pinned_v2_publication_enters_canonical_receipt_chain(
     )
     source_uri = publication_source_uri_for(manifest_uri)
     receipt_uri = publication_receipt_uri_for(manifest_uri)
-    event = durable_publication.publish_durable_equity_attestation(
+    status = durable_publication.publish_durable_equity_attestation(
         tmp_path / receipt_uri,
         source_uri,
         issuance_manifest_uri=manifest_uri,
@@ -2676,6 +2676,7 @@ def test_commit_pinned_v2_publication_enters_canonical_receipt_chain(
         "GET", "POST", "GET", "GET"
     ]
     assert (tmp_path / source_uri).read_bytes() == source_raw
+    event = status["canonical_receipt_event"]
     assert read_external_publication_receipts(
         receipt_uri,
         issuance_manifest_uri=manifest_uri,
@@ -2692,11 +2693,65 @@ def test_commit_pinned_v2_publication_enters_canonical_receipt_chain(
     assert attestation["projection_file_sha256"] == sha256(
         projection_raw
     ).hexdigest()
+    assert status["task_id"] == "EQ-FINALIZE-045"
+    assert status["artifact_status"] == (
+        "DURABLY_ISSUED_CANONICAL_RECEIPT_REPLAYED"
+    )
+    assert status["forecast_issued"] is True
+    assert status["externally_published"] is True
+    assert status["canonical_publication_receipt_count"] == 1
+    assert status["canonical_publication_receipt_ledger_count"] == 1
+    assert status["effective_forward_oos_eligible_count"] == 1
+    assert status["forward_oos_eligible"] is True
+    assert status["artifact_commit_sha"] == artifact_commit_sha
+    assert status["publication_comment_id"] == event["comment_id"]
+    assert status["canonical_receipt_event_hash"] == event["event_hash"]
+    assert status["orders_allowed"] is False
     assert event["forward_oos_eligible"] is True
     assert event["market_validation_claimed"] is False
     assert event["real_money_ready"] is False
     assert event["live_trading_enabled"] is False
     assert event["order_placement_allowed"] is False
+
+
+def test_durable_issuance_finalizer_rejects_collision_sidecar(tmp_path):
+    args, prediction, projection = build_projection()
+    manifest_uri, prediction_path, projection_path = (
+        retain_anchor_artifacts(tmp_path, args, prediction, projection)
+    )
+    manifest_event = read_issuance_artifact_manifest(
+        manifest_uri, evidence_root=tmp_path
+    )[0]
+    artifact_commit_sha = "5" * 40
+    body = durable_publication.publication_v2_comment_body(
+        manifest_event,
+        artifact_commit_sha=artifact_commit_sha,
+        prediction_raw=prediction_path.read_bytes(),
+        projection_raw=projection_path.read_bytes(),
+    )
+    receipt_uri, source_path, receipt_event = retain_publication_receipt(
+        tmp_path,
+        manifest_uri,
+        body=body,
+    )
+    retain_publication_collision(
+        tmp_path,
+        receipt_uri,
+        receipt_event,
+        source_path,
+    )
+
+    with pytest.raises(
+        durable_publication.MaturityObservationError,
+        match="DURABLE_ISSUANCE_NOT_FORWARD_OOS_ELIGIBLE",
+    ):
+        durable_publication.finalize_durable_equity_issuance(
+            issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=receipt_uri,
+            prediction_id=manifest_event["prediction_id"],
+            artifact_commit_sha=artifact_commit_sha,
+            evidence_root=tmp_path,
+        )
 
 
 def test_commit_pinned_v2_rejects_remote_manifest_byte_drift_before_post(

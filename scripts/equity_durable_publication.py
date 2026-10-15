@@ -29,6 +29,7 @@ PUBLICATION_V2_BODY_PREFIX = "GENESIS_SYSTEM3_EQUITY_PUBLICATION_V2\n"
 PUBLICATION_V2_ATTESTATION_SCHEMA = "genesis-equity-publication-attestation-v2"
 PUBLICATION_RECEIPT_V2_SCHEMA = "genesis-equity-publication-receipt-v2"
 PUBLICATION_RECEIPT_GENESIS_HASH = "0" * 64
+FINALIZE_TASK_ID = "EQ-FINALIZE-045"
 
 _COMMIT_SHA_RE = re.compile(r"^[0-9a-f]{40}$")
 _SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -460,6 +461,144 @@ def verify_prepared_publication_bundle(
     }
 
 
+def finalize_durable_equity_issuance(
+    *,
+    issuance_manifest_uri: str,
+    publication_receipt_uri: str,
+    prediction_id: str,
+    artifact_commit_sha: str,
+    evidence_root: Path,
+) -> dict[str, Any]:
+    """Promote a prepared forecast only from replayed canonical evidence.
+
+    Publication success is not inferred from a caller-supplied event.  The
+    issuance manifest, receipt ledger, retained GitHub response, commit-pinned
+    v2 attestation, and collision sidecar are all reread before the lifecycle
+    may move from PREPARED to DURABLY_ISSUED.
+    """
+    verify_artifact_commit_sha(artifact_commit_sha)
+
+    from scripts import equity_directional_maturity as canonical
+
+    manifest_events = canonical.read_issuance_artifact_manifest(
+        issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+    manifest_matches = [
+        event
+        for event in manifest_events
+        if event["prediction_id"] == prediction_id
+    ]
+    if len(manifest_matches) != 1:
+        raise MaturityObservationError(
+            "DURABLE_ISSUANCE_MANIFEST_EVENT_MISSING"
+        )
+    manifest_event = manifest_matches[0]
+
+    receipt_events = canonical.read_external_publication_receipts(
+        publication_receipt_uri,
+        issuance_manifest_uri=issuance_manifest_uri,
+        evidence_root=evidence_root,
+    )
+    receipt_matches = [
+        event
+        for event in receipt_events
+        if event["prediction_id"] == prediction_id
+    ]
+    if len(receipt_matches) != 1:
+        raise MaturityObservationError(
+            "DURABLE_ISSUANCE_RECEIPT_EVENT_MISSING"
+        )
+    receipt_event = receipt_matches[0]
+    receipt_status = canonical.verify_external_publication_receipts(
+        receipt_events,
+        issuance_manifest_uri=issuance_manifest_uri,
+        publication_receipt_uri=publication_receipt_uri,
+        evidence_root=evidence_root,
+    )
+    if (
+        not receipt_event["forward_oos_eligible"]
+        or prediction_id
+        in receipt_status["collision_disqualified_prediction_ids"]
+    ):
+        raise MaturityObservationError(
+            "DURABLE_ISSUANCE_NOT_FORWARD_OOS_ELIGIBLE"
+        )
+    if (
+        receipt_event["issuance_manifest_event_hash"]
+        != manifest_event["event_hash"]
+        or receipt_event["prediction_event_hash"]
+        != manifest_event["prediction_event_hash"]
+        or receipt_event["projection_hash"]
+        != manifest_event["projection_hash"]
+    ):
+        raise MaturityObservationError(
+            "DURABLE_ISSUANCE_RECEIPT_BINDING_MISMATCH"
+        )
+
+    source_raw = canonical._read_retained_bytes(
+        evidence_root,
+        receipt_event["source_snapshot_uri"],
+        field="PUBLICATION_SOURCE",
+        max_bytes=canonical._MAX_PUBLICATION_RECEIPT_BYTES,
+        reference_validator=canonical._observation_reference,
+    )
+    source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
+    attestation = parse_publication_v2_attestation(source.get("body"))
+    if (
+        attestation["artifact_commit_sha"] != artifact_commit_sha
+        or attestation["prediction_id"] != prediction_id
+        or attestation["issuance_manifest_event_hash"]
+        != manifest_event["event_hash"]
+    ):
+        raise MaturityObservationError(
+            "DURABLE_ISSUANCE_ARTIFACT_COMMIT_MISMATCH"
+        )
+
+    return {
+        "task_id": FINALIZE_TASK_ID,
+        "execution_mode": "ANALYZE_PAPER",
+        "artifact_status": (
+            "DURABLY_ISSUED_CANONICAL_RECEIPT_REPLAYED"
+        ),
+        "forecast_issued": True,
+        "externally_published": True,
+        "canonical_publication_receipt_count": 1,
+        "canonical_publication_receipt_ledger_count": receipt_status[
+            "record_count"
+        ],
+        "effective_forward_oos_eligible_count": receipt_status[
+            "forward_oos_eligible_count"
+        ],
+        "forward_oos_eligible": True,
+        "artifact_commit_sha": artifact_commit_sha,
+        "publication_comment_id": receipt_event["comment_id"],
+        "prediction_id": prediction_id,
+        "issued_at": manifest_event["issued_at"],
+        "registered_at": manifest_event["registered_at"],
+        "published_at": receipt_event["published_at"],
+        "first_observed_at": receipt_event["first_observed_at"],
+        "due_at": receipt_event["due_at"],
+        "prediction_event_hash": receipt_event[
+            "prediction_event_hash"
+        ],
+        "projection_hash": receipt_event["projection_hash"],
+        "issuance_manifest_event_hash": receipt_event[
+            "issuance_manifest_event_hash"
+        ],
+        "canonical_receipt_event_hash": receipt_event["event_hash"],
+        "publication_receipt_uri": publication_receipt_uri,
+        "source_snapshot_uri": receipt_event["source_snapshot_uri"],
+        "canonical_receipt_event": dict(receipt_event),
+        "market_validation_claimed": False,
+        "performance_metrics_available": False,
+        "real_money_ready": False,
+        "live_trading_enabled": False,
+        "orders_allowed": False,
+        "order_placement_allowed": False,
+    }
+
+
 def publish_durable_equity_attestation(
     path: Path,
     source_snapshot_uri: str,
@@ -539,7 +678,7 @@ def publish_durable_equity_attestation(
         prediction_raw=prediction_raw,
         projection_raw=projection_raw,
     )
-    event = canonical._publish_github_attestation_and_retain(
+    canonical._publish_github_attestation_and_retain(
         path,
         source_snapshot_uri,
         issuance_manifest_uri=issuance_manifest_uri,
@@ -555,30 +694,13 @@ def publish_durable_equity_attestation(
     receipt_uri = receipt_path.resolve().relative_to(
         Path(evidence_root).resolve()
     ).as_posix()
-    retained = canonical.read_external_publication_receipts(
-        receipt_uri,
+    return finalize_durable_equity_issuance(
         issuance_manifest_uri=issuance_manifest_uri,
+        publication_receipt_uri=receipt_uri,
+        prediction_id=prediction_id,
+        artifact_commit_sha=artifact_commit_sha,
         evidence_root=evidence_root,
     )
-    exact = [row for row in retained if row["event_hash"] == event["event_hash"]]
-    if len(exact) != 1 or exact[0] != event:
-        raise MaturityObservationError(
-            "CANONICAL_PUBLICATION_RECEIPT_NOT_REPLAYABLE"
-        )
-    source_raw = canonical._read_retained_bytes(
-        evidence_root,
-        event["source_snapshot_uri"],
-        field="PUBLICATION_SOURCE",
-        max_bytes=canonical._MAX_PUBLICATION_RECEIPT_BYTES,
-        reference_validator=canonical._observation_reference,
-    )
-    source = _strict_json_object(source_raw, "PUBLICATION_SOURCE")
-    attestation = parse_publication_v2_attestation(source.get("body"))
-    if attestation["artifact_commit_sha"] != artifact_commit_sha:
-        raise MaturityObservationError(
-            "PUBLICATION_ARTIFACT_COMMIT_MISMATCH"
-        )
-    return event
 
 
 def _publish_durable_equity_attestation_with_test_adapters(
