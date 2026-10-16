@@ -3707,6 +3707,75 @@ def test_maturity_verifier_replays_outcome_price_from_retained_source(
         )
 
 
+def test_maturity_verifier_replays_benchmark_from_retained_index_source(
+    tmp_path,
+):
+    (
+        observation,
+        _,
+        _,
+        _,
+        manifest_uri,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    replaced = deepcopy(observation)
+    benchmark = replaced["benchmark_raw_reference"]
+    benchmark["outcome_reference_close"] = "24000"
+    benchmark["raw_return_pct"] = 8.597285
+    benchmark["source_row_sha256"] = "0" * 64
+    benchmark["raw_unadjusted_equity_excess_pp"] = 1.402715
+    replaced["record_hash"] = sha256(json.dumps(
+        {
+            key: value
+            for key, value in replaced.items()
+            if key != "record_hash"
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode()).hexdigest()
+    assert validate_maturity_observation(replaced)[
+        "matured_adjusted_outcomes"
+    ] == 0
+
+    replaced_uri = (
+        "research/forward/equity/test/"
+        "rehashed_benchmark_maturity_observation.json"
+    )
+    replaced_bytes = json.dumps(
+        replaced,
+        sort_keys=True,
+        indent=2,
+    ).encode("utf-8")
+    (tmp_path / replaced_uri).write_bytes(replaced_bytes)
+    event = build_maturity_observation_event(
+        replaced,
+        observation_bytes=replaced_bytes,
+        observation_uri=replaced_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match=(
+            "ROW_0_OBSERVATION_BENCHMARK_SOURCE_REPLAY_MISMATCH"
+        ),
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=publication_receipt_uri_for(
+                manifest_uri
+            ),
+            evidence_root=tmp_path,
+        )
+
+
 def test_maturity_verifier_rejects_detached_rehashed_projection(tmp_path):
     (
         observation,

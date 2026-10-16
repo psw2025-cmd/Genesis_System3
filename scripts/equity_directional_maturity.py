@@ -1938,8 +1938,8 @@ def verify_maturity_observation_chain(
     result["verification_scope"] = (
         "HASH_CHAIN_ISSUANCE_MANIFEST_REGISTERED_PREDICTION_PROJECTION_"
         "EXTERNAL_PUBLICATION_ELIGIBILITY_GATED_RETAINED_OBSERVATION_"
-        "PROJECTION_SEMANTICS_BOUND_AND_ENTRY_OUTCOME_PRICE_SOURCE_ROWS_"
-        "REPLAYED"
+        "PROJECTION_SEMANTICS_BOUND_AND_ENTRY_OUTCOME_PRICE_BENCHMARK_"
+        "SOURCE_ROWS_REPLAYED"
     )
     result["issuance_manifest_record_count"] = len(manifest_events)
     result["issuance_manifest_head_hash"] = (
@@ -4294,6 +4294,55 @@ def _load_manifest_projection(
     return projection
 
 
+def _load_manifest_prediction(
+    manifest_event: Mapping[str, Any],
+    *,
+    evidence_root: Path,
+    prefix: str = "",
+) -> dict[str, Any]:
+    """Load the exact retained prediction named by one verified manifest row."""
+    _validate_issuance_manifest_event(manifest_event, prefix=prefix)
+    raw = _read_retained_bytes(
+        evidence_root,
+        manifest_event["prediction_uri"],
+        field=f"{prefix}PREDICTION_ARTIFACT",
+        max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+        reference_validator=_observation_reference,
+    )
+    if (
+        len(raw) != manifest_event["prediction_size_bytes"]
+        or sha256(raw).hexdigest()
+        != manifest_event["prediction_file_sha256"]
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PREDICTION_ARTIFACT_MANIFEST_MISMATCH"
+        )
+    prediction = _strict_json_object(
+        raw,
+        f"{prefix}PREDICTION_ARTIFACT",
+    )
+    expected_event_hash = sha256(
+        _canonical({
+            key: value
+            for key, value in prediction.items()
+            if key != "event_hash"
+        })
+    ).hexdigest()
+    if (
+        prediction.get("prediction_id")
+        != manifest_event["prediction_id"]
+        or prediction.get("event_hash")
+        != manifest_event["prediction_event_hash"]
+        or prediction.get("event_hash") != expected_event_hash
+        or prediction.get("issued_at") != manifest_event["issued_at"]
+        or prediction.get("due_at") != manifest_event["due_at"]
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PREDICTION_MANIFEST_BINDING_MISMATCH"
+        )
+    return prediction
+
+
 def _verify_observation_projection_binding(
     observation: Mapping[str, Any],
     projection: Mapping[str, Any],
@@ -4361,6 +4410,11 @@ def _verify_maturity_event_projection_binding(
         event,
         evidence_root=evidence_root,
     )
+    prediction = _load_manifest_prediction(
+        manifest_event,
+        evidence_root=evidence_root,
+        prefix=prefix,
+    )
     projection = _load_manifest_projection(
         manifest_event,
         evidence_root=evidence_root,
@@ -4424,6 +4478,44 @@ def _verify_maturity_event_projection_binding(
     if replayed != raw:
         raise MaturityObservationError(
             f"{prefix}OBSERVATION_SOURCE_REPLAY_MISMATCH"
+        )
+
+    benchmark_receipt = observation["source_receipts"]["index"]
+    index_source_snapshot = _read_retained_bytes(
+        evidence_root,
+        benchmark_receipt["snapshot_uri"],
+        field=f"{prefix}INDEX_SOURCE",
+        max_bytes=_MAX_ANCHOR_SOURCE_BYTES,
+        reference_validator=_retained_snapshot_reference,
+    )
+    try:
+        benchmark = _benchmark_reference(
+            index_source_snapshot,
+            session=_time(
+                projection["due_at"],
+                f"{prefix}PROJECTION_DUE_AT",
+            ).date(),
+            entry_close=prediction["benchmark"][
+                "entry_reference_close"
+            ],
+        )
+    except (KeyError, TypeError, MaturityObservationError) as exc:
+        reason = str(exc)
+        if not re.fullmatch(r"[A-Z0-9_]{1,128}", reason):
+            reason = "NOT_PROVEN"
+        raise MaturityObservationError(
+            f"{prefix}OBSERVATION_BENCHMARK_SOURCE_REPLAY_{reason}"
+        ) from exc
+    raw_excess = Decimal(str(replayed["raw_actual_return_pct"])) - Decimal(
+        str(benchmark["raw_return_pct"])
+    )
+    benchmark["raw_unadjusted_equity_excess_pp"] = round(
+        float(raw_excess),
+        6,
+    )
+    if benchmark != observation["benchmark_raw_reference"]:
+        raise MaturityObservationError(
+            f"{prefix}OBSERVATION_BENCHMARK_SOURCE_REPLAY_MISMATCH"
         )
 
 
