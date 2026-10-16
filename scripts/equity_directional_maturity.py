@@ -1938,7 +1938,8 @@ def verify_maturity_observation_chain(
     result["verification_scope"] = (
         "HASH_CHAIN_ISSUANCE_MANIFEST_REGISTERED_PREDICTION_PROJECTION_"
         "EXTERNAL_PUBLICATION_ELIGIBILITY_GATED_RETAINED_OBSERVATION_"
-        "AND_PROJECTION_SEMANTICS_BOUND"
+        "PROJECTION_SEMANTICS_BOUND_AND_ENTRY_OUTCOME_PRICE_SOURCE_ROWS_"
+        "REPLAYED"
     )
     result["issuance_manifest_record_count"] = len(manifest_events)
     result["issuance_manifest_head_hash"] = (
@@ -4370,6 +4371,60 @@ def _verify_maturity_event_projection_binding(
         projection,
         prefix=prefix,
     )
+    raw = observation["raw_reference"]
+    receipt = observation["source_receipts"]["outcome_cash"]
+    entry_source_snapshot = _read_retained_bytes(
+        evidence_root,
+        projection["entry_snapshot_uri"],
+        field=f"{prefix}ENTRY_SOURCE",
+        max_bytes=_MAX_ANCHOR_SOURCE_BYTES,
+        reference_validator=_retained_snapshot_reference,
+    )
+    outcome_source_snapshot = _read_retained_bytes(
+        evidence_root,
+        receipt["snapshot_uri"],
+        field=f"{prefix}OUTCOME_SOURCE",
+        max_bytes=_MAX_ANCHOR_SOURCE_BYTES,
+        reference_validator=_retained_snapshot_reference,
+    )
+    replayed = reconcile_directional_reference(
+        dict(projection),
+        {
+            "symbol": projection["symbol"],
+            "isin": projection["isin"],
+            "price_as_of_at": projection["due_at"],
+            "source_exchange_published_at": None,
+            "source_first_observed_at": receipt["first_observed_at"],
+            "reference_close": raw["outcome_reference_close"],
+            "source": "NSE",
+            "source_url": receipt["url"],
+            "source_hash": receipt["sha256"],
+            "source_snapshot": outcome_source_snapshot,
+            "source_snapshot_uri": receipt["snapshot_uri"],
+            "price_basis": projection["price_basis"],
+        },
+        entry_source_snapshot=entry_source_snapshot,
+        now=_time(
+            observation["recorded_at"],
+            f"{prefix}OBSERVATION_RECORDED_AT",
+        ),
+    )
+    if replayed.get("status") != (
+        "RAW_REFERENCE_OBSERVED_ADJUSTMENT_REVIEW_PENDING"
+    ):
+        reason = replayed.get("reason")
+        if (
+            not isinstance(reason, str)
+            or not re.fullmatch(r"[A-Z0-9_]{1,128}", reason)
+        ):
+            reason = "NOT_PROVEN"
+        raise MaturityObservationError(
+            f"{prefix}OBSERVATION_SOURCE_REPLAY_{reason}"
+        )
+    if replayed != raw:
+        raise MaturityObservationError(
+            f"{prefix}OBSERVATION_SOURCE_REPLAY_MISMATCH"
+        )
 
 
 def _read_maturity_observation_ledger_unlocked(
