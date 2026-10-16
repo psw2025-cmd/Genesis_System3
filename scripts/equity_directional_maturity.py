@@ -1920,9 +1920,25 @@ def verify_maturity_observation_chain(
         trusted_prediction_hashes=prediction_hashes,
         trusted_projection_hashes=projection_hashes,
     )
+    manifest_by_prediction = {
+        event["prediction_id"]: event for event in manifest_events
+    }
+    for index, event in enumerate(events):
+        manifest_event = manifest_by_prediction.get(event["prediction_id"])
+        if manifest_event is None:
+            raise MaturityObservationError(
+                f"ROW_{index}_ISSUANCE_MANIFEST_EVENT_MISSING"
+            )
+        _verify_maturity_event_projection_binding(
+            event,
+            manifest_event=manifest_event,
+            evidence_root=evidence_root,
+            prefix=f"ROW_{index}_",
+        )
     result["verification_scope"] = (
         "HASH_CHAIN_ISSUANCE_MANIFEST_REGISTERED_PREDICTION_PROJECTION_"
-        "EXTERNAL_PUBLICATION_ELIGIBILITY_GATED_AND_RETAINED_OBSERVATION"
+        "EXTERNAL_PUBLICATION_ELIGIBILITY_GATED_RETAINED_OBSERVATION_"
+        "AND_PROJECTION_SEMANTICS_BOUND"
     )
     result["issuance_manifest_record_count"] = len(manifest_events)
     result["issuance_manifest_head_hash"] = (
@@ -4229,6 +4245,133 @@ def _load_retained_observation(
     return observation
 
 
+def _load_manifest_projection(
+    manifest_event: Mapping[str, Any],
+    *,
+    evidence_root: Path,
+    prefix: str = "",
+) -> dict[str, Any]:
+    """Load the exact retained projection named by one verified manifest row."""
+    _validate_issuance_manifest_event(manifest_event, prefix=prefix)
+    raw = _read_retained_bytes(
+        evidence_root,
+        manifest_event["projection_uri"],
+        field=f"{prefix}PROJECTION_ARTIFACT",
+        max_bytes=_MAX_ANCHOR_ARTIFACT_BYTES,
+        reference_validator=_observation_reference,
+    )
+    if (
+        len(raw) != manifest_event["projection_size_bytes"]
+        or sha256(raw).hexdigest()
+        != manifest_event["projection_file_sha256"]
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PROJECTION_ARTIFACT_MANIFEST_MISMATCH"
+        )
+    projection = _strict_json_object(
+        raw,
+        f"{prefix}PROJECTION_ARTIFACT",
+    )
+    try:
+        validate_directional_outcome_projection(projection)
+    except (OutcomeLedgerError, KeyError, TypeError, ValueError) as exc:
+        raise MaturityObservationError(
+            f"{prefix}PROJECTION_ARTIFACT_INVALID"
+        ) from exc
+    if (
+        projection["prediction_id"] != manifest_event["prediction_id"]
+        or projection["prediction_event_hash"]
+        != manifest_event["prediction_event_hash"]
+        or projection["projection_hash"]
+        != manifest_event["projection_hash"]
+        or projection["issued_at"] != manifest_event["issued_at"]
+        or projection["due_at"] != manifest_event["due_at"]
+    ):
+        raise MaturityObservationError(
+            f"{prefix}PROJECTION_MANIFEST_BINDING_MISMATCH"
+        )
+    return projection
+
+
+def _verify_observation_projection_binding(
+    observation: Mapping[str, Any],
+    projection: Mapping[str, Any],
+    *,
+    prefix: str = "",
+) -> None:
+    """Bind maturity identity and horizon to the retained issued projection."""
+    validate_maturity_observation(dict(observation))
+    try:
+        validate_directional_outcome_projection(dict(projection))
+    except (OutcomeLedgerError, KeyError, TypeError, ValueError) as exc:
+        raise MaturityObservationError(
+            f"{prefix}PROJECTION_ARTIFACT_INVALID"
+        ) from exc
+
+    top_level_bindings = {
+        "prediction_id": projection["prediction_id"],
+        "prediction_event_hash": projection["prediction_event_hash"],
+        "projection_hash": projection["projection_hash"],
+    }
+    for field, expected in top_level_bindings.items():
+        if observation.get(field) != expected:
+            raise MaturityObservationError(
+                f"{prefix}OBSERVATION_PROJECTION_{field.upper()}_MISMATCH"
+            )
+
+    raw = observation["raw_reference"]
+    raw_bindings = {
+        "prediction_id": projection["prediction_id"],
+        "prediction_event_hash": projection["prediction_event_hash"],
+        "projection_hash": projection["projection_hash"],
+        "symbol": projection["symbol"],
+        "isin": projection["isin"],
+        "forecast_kind": projection["forecast_kind"],
+        "forecast_direction": projection["forecast_direction"],
+        "issued_at": projection["issued_at"],
+        "due_at": projection["due_at"],
+        "entry_reference_close": projection["entry_reference_close"],
+        "predicted_return_pct": projection["predicted_return_pct"],
+        "expected_return_range": projection["expected_return_range"],
+        "calibrated_probability": projection["calibrated_probability"],
+        "entry_source_hash": projection["entry_source_hash"],
+        "entry_source_row_hash": projection["entry_source_row_hash"],
+        "entry_snapshot_uri": projection["entry_snapshot_uri"],
+        "price_basis": projection["price_basis"],
+        "adjustment_status": projection["adjustment_status"],
+        "adjustment_basis": projection["adjustment_basis"],
+    }
+    for field, expected in raw_bindings.items():
+        if raw.get(field) != expected:
+            raise MaturityObservationError(
+                f"{prefix}OBSERVATION_PROJECTION_{field.upper()}_MISMATCH"
+            )
+
+
+def _verify_maturity_event_projection_binding(
+    event: Mapping[str, Any],
+    *,
+    manifest_event: Mapping[str, Any],
+    evidence_root: Path,
+    prefix: str = "",
+) -> None:
+    """Replay one retained observation against its exact issued projection."""
+    observation = _load_retained_observation(
+        event,
+        evidence_root=evidence_root,
+    )
+    projection = _load_manifest_projection(
+        manifest_event,
+        evidence_root=evidence_root,
+        prefix=prefix,
+    )
+    _verify_observation_projection_binding(
+        observation,
+        projection,
+        prefix=prefix,
+    )
+
+
 def _read_maturity_observation_ledger_unlocked(
     path: Path,
     *,
@@ -4354,7 +4497,19 @@ def append_maturity_observation(
             trusted_projection_hash=trusted_projection,
             previous_hash=previous_hash,
         )
-        _load_retained_observation(event, evidence_root=evidence_root)
+        manifest_by_prediction = {
+            item["prediction_id"]: item for item in manifest_events
+        }
+        manifest_event = manifest_by_prediction.get(prediction_id)
+        if manifest_event is None:
+            raise MaturityObservationError(
+                "ISSUANCE_MANIFEST_EVENT_MISSING"
+            )
+        _verify_maturity_event_projection_binding(
+            event,
+            manifest_event=manifest_event,
+            evidence_root=evidence_root,
+        )
         _verify_maturity_observation_chain_with_anchors(
             [*events, event],
             trusted_prediction_hashes=trusted_prediction_hashes,
@@ -4371,4 +4526,14 @@ def append_maturity_observation(
             handle.write(payload + "\n")
             handle.flush()
             os.fsync(handle.fileno())
-        return event
+        replayed = _read_maturity_observation_ledger_unlocked(
+            path,
+            issuance_manifest_uri=issuance_manifest_uri,
+            publication_receipt_uri=publication_receipt_uri,
+            evidence_root=evidence_root,
+        )
+        if replayed != [*events, event]:
+            raise MaturityObservationError(
+                "MATURITY_LEDGER_POST_WRITE_REPLAY_MISMATCH"
+            )
+        return replayed[-1]

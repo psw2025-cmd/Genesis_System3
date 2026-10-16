@@ -3551,6 +3551,87 @@ def test_maturity_verifier_rejects_caller_rehashed_anchor_event(tmp_path):
         )
 
 
+def test_maturity_verifier_rejects_rehashed_horizon_substitution(tmp_path):
+    (
+        observation,
+        _,
+        _,
+        _,
+        manifest_uri,
+        _,
+        _,
+    ) = retained_maturity_case(tmp_path)
+    replaced = deepcopy(observation)
+    substituted_due = "2026-10-07T10:00:00+00:00"
+    raw = replaced["raw_reference"]
+    raw["due_at"] = substituted_due
+    raw["outcome_price_as_of_at"] = substituted_due
+    raw["outcome_source_url"] = (
+        "https://nsearchives.nseindia.com/content/cm/"
+        "BhavCopy_NSE_CM_0_0_0_20261007_F_0000.csv.zip"
+    )
+    cash_receipt = replaced["source_receipts"]["outcome_cash"]
+    cash_receipt["url"] = raw["outcome_source_url"]
+    cash_receipt["final_url"] = raw["outcome_source_url"]
+    index_url = (
+        "https://nsearchives.nseindia.com/content/indices/"
+        "ind_close_all_07102026.csv"
+    )
+    index_receipt = replaced["source_receipts"]["index"]
+    index_receipt["url"] = index_url
+    index_receipt["final_url"] = index_url
+    replaced["benchmark_raw_reference"]["outcome_session_date"] = (
+        "2026-10-07"
+    )
+    replaced["record_hash"] = sha256(json.dumps(
+        {
+            key: value
+            for key, value in replaced.items()
+            if key != "record_hash"
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=True,
+        allow_nan=False,
+    ).encode()).hexdigest()
+    assert validate_maturity_observation(replaced)[
+        "matured_adjusted_outcomes"
+    ] == 0
+
+    replaced_uri = (
+        "research/forward/equity/test/"
+        "rehashed_horizon_maturity_observation.json"
+    )
+    replaced_bytes = json.dumps(
+        replaced,
+        sort_keys=True,
+        indent=2,
+    ).encode("utf-8")
+    (tmp_path / replaced_uri).write_bytes(replaced_bytes)
+    event = build_maturity_observation_event(
+        replaced,
+        observation_bytes=replaced_bytes,
+        observation_uri=replaced_uri,
+        trusted_prediction_event_hash=observation[
+            "prediction_event_hash"
+        ],
+        trusted_projection_hash=observation["projection_hash"],
+        previous_hash=MATURITY_LEDGER_GENESIS_HASH,
+    )
+    with pytest.raises(
+        MaturityObservationError,
+        match="OBSERVATION_PROJECTION_DUE_AT_MISMATCH",
+    ):
+        verify_maturity_observation_chain(
+            [event],
+            issuance_manifest_uri=manifest_uri,
+            publication_receipt_uri=publication_receipt_uri_for(
+                manifest_uri
+            ),
+            evidence_root=tmp_path,
+        )
+
+
 def test_maturity_verifier_rejects_detached_rehashed_projection(tmp_path):
     (
         observation,
