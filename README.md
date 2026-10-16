@@ -1,3 +1,24 @@
+# LIVE DASHBOARD - system3 Free Cloud
+🔴 LIVE URL: https://psw2025-cmd.github.io/Genesis_System3/dashboard/out/system3-cloud-free-fresh-live/
+[![Live](https://img.shields.io/badge/LIVE-DASHBOARD-brightgreen?style=for-the-badge)](https://psw2025-cmd.github.io/Genesis_System3/dashboard/out/system3-cloud-free-fresh-live/)
+
+## Kaise dekhna hai:
+  1. Upar LIVE URL pe click karo - mobile pe bhi khulega
+  2. Roz subah 9:15 AM URL kholo - Gold/Silver/Bronze winner dekho
+
+## Roz ka kya karna hai:
+  - Bas URL kholna hai, kuch install nahi karna
+  - Agar Gold (Cloudflare Free 100k) full ho jaye to Silver (Oracle) pe jao
+
+## Kya nahi karna hai:
+  - Laptop pe kuch install mat karo - 100% cloud hai
+  - Paid plan mat lo - ye 100% free edition hai
+  - Purana dashboard/out/ wala folder mat kholna - sirf ye naya system3-cloud-free-fresh-live wala hi live hai
+
+## Files kaha hai: dashboard/out/system3-cloud-free-fresh-live/ me index.html, svg, png, manifest
+
+---
+
 # Genesis System3
 
 Genesis System3 is a cloud-authoritative, proof-first market-analysis and PAPER
