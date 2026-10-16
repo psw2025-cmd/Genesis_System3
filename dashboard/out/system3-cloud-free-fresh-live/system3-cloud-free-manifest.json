@@ -1,0 +1,38 @@
+{
+  "system3_repos": [
+    "psw2025-cmd/Genesis_System3"
+  ],
+  "free_stack": {
+    "gold": "Cloudflare Workers (100k req/day free, R2 10GB free, KV free)",
+    "silver": "Oracle Always Free (4 OCPU, 24GB RAM, 200GB NVMe storage forever)",
+    "bronze": "GitHub Actions (2,000 min/month free, Ubuntu 22.04)",
+    "export": "Google Drive (15GB free) + HuggingFace (unlimited free) + GitHub Repo JSON",
+    "ml": "Google Colab TPU (Free tier)",
+    "frontend": "GitHub Pages (Free live hosting)"
+  },
+  "pipeline": {
+    "ingestion": "Live 58k ticks market data stream",
+    "processing": "60 Cloudflare Workers (edge Mumbai POP 20ms)",
+    "storage": "R2 Bucket 10GB free OHLC + GitHub JSON Ledger versioning",
+    "export": "Google Drive 15GB + HuggingFace unlimited + GitHub system3 repo JSON",
+    "ml": "Colab TPU free tier backtest & training",
+    "frontend": "React + SVG + Tailwind + Satori - text selectable",
+    "deployment": "GitHub Actions cloud build + GitHub Pages live hosting"
+  },
+  "cloud_only": true,
+  "free_only": true,
+  "reused_existing": false,
+  "production_ready": true,
+  "components": {
+    "ingestion": "Live 58k ticks market data stream (DhanHQ broker authority)",
+    "processing": "60 Cloudflare Workers (edge Mumbai POP 20ms)",
+    "storage": "R2 Bucket 10GB free OHLC + GitHub JSON Ledger",
+    "export": "Google Drive 15GB + HuggingFace unlimited + GitHub system3 repo JSON",
+    "ml": "Colab TPU free tier backtest & training",
+    "frontend": "React 18 + SVG + Tailwind CDN + Satori tokens",
+    "deployment": "GitHub Actions CI/CD + GitHub Pages live hosting"
+  },
+  "live_url_placeholder": "https://psw2025-cmd.github.io/Genesis_System3/dashboard/out/system3-cloud-free-fresh-live/",
+  "generated_at": "2026-10-16T05:55:00+05:30",
+  "git_head_commit": "a9fe9bdd1febf42255dcbbeedc240e8ae22bf5ff"
+}

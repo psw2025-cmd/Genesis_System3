@@ -1,0 +1,134 @@
+{
+  "task_id": "EQ-CA-005",
+  "evidence_at": "2026-09-27T04:46:51.963509+00:00",
+  "symbol": "SANGHVIMOV",
+  "issuer": "Sanghvi Movers Limited",
+  "company_cin": "L29150PN1989PLC054143",
+  "record_date": "2024-09-27",
+  "ex_date": "2024-09-27",
+  "shares_after_per_share_before": "2",
+  "old_isin": "INE989A01024",
+  "new_isin": "INE989A01032",
+  "notice_receipt": {
+    "source_url": "https://nsearchives.nseindia.com/corporate/SANGHVIMOV_16092024180920_SML_SE_Intimation_RD_signed_16092024.pdf",
+    "raw_sha256": "1951ef18947baecaaf873e2d53bafe5b0d0d90517d7153a2f800f09cb309e2e4",
+    "first_observed_at": "2026-09-27T04:43:40.000696+00:00",
+    "bytes": 498454
+  },
+  "announcement_receipt": {
+    "source_url": "https://www.nseindia.com/api/corporate-announcements?index=equities&symbol=SANGHVIMOV&from_date=01-09-2024&to_date=30-09-2024",
+    "raw_sha256": "ce79eb8420a53704e94c95126b3349affe41010204d104c6b91eb69650a1e11e",
+    "first_observed_at": "2026-09-27T04:42:51.923483+00:00",
+    "bytes": 3485
+  },
+  "announcement_disseminated_at": "2024-09-16T18:09:20+05:30",
+  "later_issuer_identity_receipt": {
+    "source_url": "https://nsearchives.nseindia.com/corporate/ixbrl/INTEGRATED_FILING_INDAS_92280_20052025211401_iXBRL_WEB.html",
+    "raw_sha256": "3e59f99ca8836dc35d583d9c24595c94875475c8569fe8a60df62ce1b27ed335",
+    "first_observed_at": "2026-09-27T04:45:59.639143+00:00",
+    "bytes": 105940
+  },
+  "market_observations": [
+    {
+      "trade_date": "2024-09-26",
+      "symbol": "SANGHVIMOV",
+      "isin": "INE989A01024",
+      "close": "839.15",
+      "volume": "450584",
+      "source_receipt": {
+        "bytes": 498045,
+        "csv_sha256": "d7d58971be4cccf8655963949e3a2244193c83d8a4e422646807679702c20bf1",
+        "date": "2024-09-26",
+        "first_observed_at": "2026-09-26T23:45:36.028234+00:00",
+        "row_count": 2867,
+        "segment": "CM",
+        "source": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20240926_F_0000.csv.zip",
+        "status": "downloaded",
+        "zip_sha256": "e02ef2a07c34dcd41e9d68167b2a9fb332dd78728ee14e38a3d3df6e5629bcf3"
+      }
+    },
+    {
+      "trade_date": "2024-09-27",
+      "symbol": "SANGHVIMOV",
+      "isin": "INE989A01032",
+      "close": "407.20",
+      "volume": "442285",
+      "source_receipt": {
+        "bytes": 503774,
+        "csv_sha256": "c28efcafc947a47ef8cc1c78de1b53cd0e7bf23149a58c5a11aa8502c4615263",
+        "date": "2024-09-27",
+        "first_observed_at": "2026-09-26T23:45:35.768004+00:00",
+        "row_count": 2899,
+        "segment": "CM",
+        "source": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20240927_F_0000.csv.zip",
+        "status": "downloaded",
+        "zip_sha256": "62e1791bfbee9efa0e3960ce2a686e915e0bc8a0e0495bc51ee5a7e1f06f26c6"
+      }
+    },
+    {
+      "trade_date": "2024-10-03",
+      "symbol": "SANGHVIMOV",
+      "isin": "INE989A01032",
+      "close": "385.30",
+      "volume": "258490",
+      "source_receipt": {
+        "bytes": 506378,
+        "csv_sha256": "90f435176acdc8b7d54e32110bd15e3e87332903fe45850309080790489ea709",
+        "date": "2024-10-03",
+        "first_observed_at": "2026-09-26T23:45:53.102198+00:00",
+        "row_count": 2914,
+        "segment": "CM",
+        "source": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241003_F_0000.csv.zip",
+        "status": "downloaded",
+        "zip_sha256": "fb36f9606ea447e372e69bad7a95888c778cbea843fdf36d11b8a05e71b17e31"
+      }
+    },
+    {
+      "trade_date": "2024-10-10",
+      "symbol": "SANGHVIMOV",
+      "isin": "INE989A01032",
+      "close": "385.10",
+      "volume": "338435",
+      "source_receipt": {
+        "bytes": 497125,
+        "csv_sha256": "023200d0503395da765ffed8d9a1d7c4fd78110f7cfd950b837136d1a7e2025e",
+        "date": "2024-10-10",
+        "first_observed_at": "2026-09-26T23:46:14.322125+00:00",
+        "row_count": 2869,
+        "segment": "CM",
+        "source": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20241010_F_0000.csv.zip",
+        "status": "downloaded",
+        "zip_sha256": "85f776a901c09998c4387fbaba71e11cbc1332985c91515de2a789cb4f34a62b"
+      }
+    }
+  ],
+  "reference_arithmetic": [
+    {
+      "date": "2024-09-27",
+      "raw_price_return_pct": "-51.47470654829291545015789787",
+      "split_adjusted_reference_return_pct": "-2.949413096585830900315795750"
+    },
+    {
+      "date": "2024-10-03",
+      "raw_price_return_pct": "-54.08449025799916582255854138",
+      "split_adjusted_reference_return_pct": "-8.168980515998331645117082760"
+    },
+    {
+      "date": "2024-10-10",
+      "raw_price_return_pct": "-54.10832389918369778942978013",
+      "split_adjusted_reference_return_pct": "-8.216647798367395578859560270"
+    }
+  ],
+  "guard_real_case": {
+    "later_dividend_event": "2025-09-12",
+    "action_count": 1,
+    "stale_feed_isin_flagged": true
+  },
+  "scope": "MANUALLY_RECONCILED_SINGLE_SPLIT_REFERENCE_NOT_GENERAL_ADJUSTED_PERFORMANCE",
+  "complete_other_actions_coverage": "NOT_PROVEN",
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "causal_attribution": "NOT_CLAIMED",
+  "historical_feature_use_allowed": false,
+  "orders_allowed": false
+}

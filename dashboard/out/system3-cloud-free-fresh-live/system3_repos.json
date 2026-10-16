@@ -1,0 +1,12 @@
+{
+  "repos": [
+    "psw2025-cmd/Genesis_System3"
+  ],
+  "count": 1,
+  "scanned_at": "2026-10-16T05:55:00+05:30",
+  "filter": "q=system3 in:name user:@me",
+  "cloud_authoritative": true,
+  "free_tier_status": "100% FREE ONLY ($0.00)",
+  "active_branch": "fix/multibagger-evidence-gate-20260924",
+  "active_pr": 471
+}

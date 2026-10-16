@@ -1,0 +1,27 @@
+{
+  "availability_status": "OFFICIAL_SOURCE_UNAVAILABLE_NOT_ISSUED",
+  "entry_date": "2026-10-14",
+  "forecast_issued": false,
+  "live_trading_enabled": false,
+  "market_validation_claimed": false,
+  "orders_allowed": false,
+  "receipt": {
+    "bytes": 3425,
+    "content_type": "text/html;charset=UTF-8",
+    "etag": null,
+    "final_url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261014_F_0000.csv.zip",
+    "first_observed_at": "2026-10-14T10:32:17.868095+00:00",
+    "http_status": 404,
+    "last_modified": null,
+    "raw_sha256": "41fd81290608a684e8c2e9912890d5e77734a2f4f631ab9e4298274e485fa4e1",
+    "request_started_at": "2026-10-14T10:32:14.977985+00:00",
+    "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261014_F_0000.csv.zip"
+  },
+  "record_hash": "7118bd1f805cf848da8fd49f6b2de0c366c42a7b3b783b921f019dd4038e16c5",
+  "response_bytes": 3425,
+  "response_sha256": "41fd81290608a684e8c2e9912890d5e77734a2f4f631ab9e4298274e485fa4e1",
+  "response_uri": "research/evidence/equity/raw/2026-10-14-forward/availability_attempts/20261014T103217868095Z_cash_41fd81290608a684.response",
+  "schema_version": "nse-equity-source-availability-attempt-v1",
+  "source_role": "cash",
+  "task_id": "EQ-SOURCE-039"
+}

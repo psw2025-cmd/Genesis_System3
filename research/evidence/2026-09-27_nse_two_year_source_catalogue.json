@@ -1,0 +1,131 @@
+{
+  "task_id": "NSE-HISTORY-007",
+  "evidence_at": "2026-09-27T04:59:49.167522+00:00",
+  "requested_start": "2024-09-26",
+  "requested_end": "2026-09-25",
+  "calendar_days": 730,
+  "date_segment_requests": 1460,
+  "all_requests_accounted_for": true,
+  "statuses": {
+    "already_present": 66,
+    "source_404": 468,
+    "downloaded": 926
+  },
+  "raw_files": 992,
+  "source": "Official NSE UDiFF bhavcopy CSV ZIPs",
+  "segments": {
+    "CM": {
+      "files": 496,
+      "first_date": "2024-09-26",
+      "last_date": "2026-09-25",
+      "raw_rows": 1573021,
+      "bytes": 271725294
+    },
+    "FO": {
+      "files": 496,
+      "first_date": "2024-09-26",
+      "last_date": "2026-09-25",
+      "raw_rows": 18489162,
+      "bytes": 3368444670
+    }
+  },
+  "unmatched_segment_dates": [],
+  "archive_parts": [
+    {
+      "batch": "2024Q4",
+      "attempts": 194,
+      "statuses": {
+        "downloaded": 64,
+        "already_present": 66,
+        "source_404": 64,
+        "error": 0,
+        "existing_unverified": 0
+      },
+      "manifest_sha256": "5e2a63012ff767944d2406d80c9ef3e5eab3ac1ff239eaeee6611e761028cea2",
+      "raw_file_count": 130,
+      "archive_filename": "NSE_System3_2024Q4_Raw_Checkpoint.zip",
+      "archive_bytes": 110366408,
+      "archive_sha256": "48df4b849b43659d02ee1c02f237ba3ef7f1284739c22e24b585f21a326a7a10",
+      "completed_at": "2026-09-27T04:39:21.783359+00:00"
+    },
+    {
+      "batch": "2025H1",
+      "attempts": 362,
+      "statuses": {
+        "downloaded": 246,
+        "already_present": 0,
+        "source_404": 116,
+        "error": 0,
+        "existing_unverified": 0
+      },
+      "manifest_sha256": "0d47d09f7c2e91f5e20ec651565a631e358b238ba23039ee1d1a8024007a035f",
+      "raw_file_count": 246,
+      "archive_filename": "NSE_System3_2025H1_Raw_Checkpoint.zip",
+      "archive_bytes": 209873253,
+      "archive_sha256": "c9429128d095b6610f379571a190126b194230124d1cea4555351189d0064ad0",
+      "completed_at": "2026-09-27T04:47:08.193912+00:00"
+    },
+    {
+      "batch": "2025H2",
+      "attempts": 368,
+      "statuses": {
+        "downloaded": 252,
+        "already_present": 0,
+        "source_404": 116,
+        "error": 0,
+        "existing_unverified": 0
+      },
+      "manifest_sha256": "09761cb2db902919570aba168fb84f8d49ad317539f60a9c2a94419d698acd96",
+      "raw_file_count": 252,
+      "archive_filename": "NSE_System3_2025H2_Raw_Checkpoint.zip",
+      "archive_bytes": 196431995,
+      "archive_sha256": "5b419eccbb3538d1b90f397fff5f22b4f7cb935b813e6af24e2b370fd8d52850",
+      "completed_at": "2026-09-27T04:55:02.404071+00:00"
+    },
+    {
+      "batch": "2026H1",
+      "attempts": 362,
+      "statuses": {
+        "downloaded": 240,
+        "already_present": 0,
+        "source_404": 122,
+        "error": 0,
+        "existing_unverified": 0
+      },
+      "manifest_sha256": "a2e95d92bd60ddb1173586f6b80b6d0de65ef161b599cc73ca9b33f888bcd058",
+      "raw_file_count": 240,
+      "archive_filename": "NSE_System3_2026H1_Raw_Checkpoint.zip",
+      "archive_bytes": 236534416,
+      "archive_sha256": "f07fa0669dee5095268897a9e5a07af817ac44045c23c5838fe5cdce5c575b50",
+      "completed_at": "2026-09-26T23:44:37.961754+00:00"
+    },
+    {
+      "batch": "2026Q3",
+      "attempts": 174,
+      "statuses": {
+        "downloaded": 124,
+        "already_present": 0,
+        "source_404": 50,
+        "error": 0,
+        "existing_unverified": 0
+      },
+      "manifest_sha256": "ff1fbc6cf2f0bfebf733ecca35bda52a177f98d85fc51c3ed0f7a175444f3b3c",
+      "raw_file_count": 124,
+      "archive_filename": "NSE_System3_2026Q3_Raw_Checkpoint.zip",
+      "archive_bytes": 101528695,
+      "archive_sha256": "e7851a94f84f2075b71dd769c0bdf3aac552f439409ab4ad03732262c57c1e23",
+      "completed_at": "2026-09-27T04:58:38.545410+00:00"
+    }
+  ],
+  "all_retained_csv_hashes_verified": true,
+  "market_calendar_completeness": "NOT_PROVEN",
+  "http_404_proves_holiday": false,
+  "archival_scope": "Raw acquisition spans two years; this does not mean two years of qualified OOS performance",
+  "cepe_frozen_2026Q2_outcome_test": "UNSCORED_PRESERVED",
+  "forward_predictions": 0,
+  "forward_outcomes": 0,
+  "orders_allowed": false,
+  "manifest_file": "2026-09-27_nse_two_year_source_manifest.json.gz",
+  "manifest_gzip_sha256": "79ed9a2bcd7e394b89feae1f86827b252521a04013aac9b721cca88b09553420",
+  "manifest_json_sha256": "4cea5f89358a931243f7e3fee5a034eb1920794c28bd5e1d4b4c5de34e689fd2"
+}

@@ -1,0 +1,2 @@
+# Retained official source artifacts are hash-bound and must stay byte-exact.
+research/evidence/equity/raw/*-forward/*.csv binary

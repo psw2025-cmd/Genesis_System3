@@ -1,0 +1,141 @@
+{
+  "action_policy": {
+    "capture_interval_end": "2026-10-21",
+    "capture_interval_start": "2026-10-13",
+    "complete_action_coverage_at_issue": false,
+    "maturity_recheck_required": true,
+    "score_if_action_or_identity_change": "NOT_PROVEN_UNTIL_ADJUSTMENT_RESOLVED",
+    "selected_action_count_at_issue": 0
+  },
+  "benchmark": {
+    "entry_reference_close": "22721.95",
+    "entry_session_date": "2026-10-13",
+    "name": "Nifty 50",
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "source_sha256": "a402bb454057bc4497239e134d01fa920784acb740d67231bb3a1aee36271ecd",
+    "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_13102026.csv"
+  },
+  "counts": {
+    "forward_predictions": 1,
+    "matured_outcomes": 0,
+    "negative_forecasts": 0,
+    "positive_forecasts": 1,
+    "qualified_current_candidates": 0,
+    "screened_candidates": 488,
+    "selected_candidates": 1,
+    "source_company_eq_observations": 2341
+  },
+  "current_metrics": {
+    "benchmark_excess_return": null,
+    "calibration_error": null,
+    "deflated_sharpe_probability": null,
+    "directional_accuracy": null,
+    "max_drawdown": null,
+    "oos_days": 0,
+    "sharpe": null,
+    "target_gaps": {
+      "deflated_sharpe_probability": null,
+      "directional_accuracy": null,
+      "max_drawdown": null,
+      "oos_days": 60,
+      "sharpe": null,
+      "top_decile_precision": null,
+      "valid_outcomes": 100
+    },
+    "top_decile_precision": null,
+    "valid_outcomes": 0
+  },
+  "due_at": "2026-10-21T10:00:00+00:00",
+  "due_session_date": "2026-10-21",
+  "entry_session_date": "2026-10-13",
+  "event_hash": "c7c7a6b28984066059dd92c97e6a6e5f31b6e594f3472a9fa50475049e081ab4",
+  "event_type": "EQUITY_FORWARD_PREDICTION_ISSUED",
+  "evidence_class": "EXPLORATORY_FORWARD_PAPER_PREDICTION",
+  "horizon": {
+    "calendar_days": 7,
+    "outcome_reference": "OFFICIAL_CLOSE_FIRST_CM_SESSION_ON_OR_AFTER_CALENDAR_HORIZON"
+  },
+  "issued_at": "2026-10-13T15:51:59.693436+00:00",
+  "prediction": {
+    "adjusted_entry_price": null,
+    "calibrated_probability": null,
+    "direction": "POSITIVE",
+    "entry_reference_close": "622.95",
+    "entry_reference_is_executable_fill": false,
+    "expected_return_range": null,
+    "feature_hash": "6a6841db9ac24b93cae8506d14156a3a67954ed67f8fec9476fa6686f0c9882b",
+    "features": {
+      "close": "622.95",
+      "close_times_volume_inr": "18731371419.00",
+      "intraday_return": "0.0928947368",
+      "intraday_return_percent_rank": "0.9897330595",
+      "liquidity_proxy_percent_rank": "0.9958932238",
+      "open": "570.00",
+      "selection_score": "0.9928131417",
+      "source_row_sha256": "37a77aa85d4e94eeb54f604f9c86b1cc80c3e2d685c96ba2816c3ee28b4593f3",
+      "volume": 30068820
+    },
+    "forward_evaluation_status": "PENDING",
+    "isin": "INE11XY01018",
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "series": "EQ",
+    "symbol": "CMLL"
+  },
+  "prediction_id": "EQ7D-2026-10-13-CMLL-V1",
+  "previous_event_hash": "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f",
+  "safety": {
+    "catalyst_feature_included": false,
+    "live_trading_enabled": false,
+    "orders_allowed": false,
+    "real_money_ready": false,
+    "retrospective": false
+  },
+  "schema": "equity-forward-paper-prediction-v1",
+  "source_cutoff_at": "2026-10-13T15:50:40.640826+00:00",
+  "source_receipts": {
+    "actions": {
+      "bytes": 3078,
+      "first_observed_at": "2026-10-13T15:50:37.992990+00:00",
+      "sha256": "c187f73a67ab8f27bd5dd66338dcd97ffe7cd378cde9ef572279ee9cd5bcd87e",
+      "url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=13-10-2026&to_date=21-10-2026"
+    },
+    "cash": {
+      "bytes": 204601,
+      "first_observed_at": "2026-10-13T15:50:25.587277+00:00",
+      "sha256": "b3aba7f1e20587e4c77a5de2b720cbcd5d8f4c8fe42e1b67f06f0d7deaabbf46",
+      "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261013_F_0000.csv.zip"
+    },
+    "company": {
+      "bytes": 184050,
+      "first_observed_at": "2026-10-13T15:50:29.158311+00:00",
+      "sha256": "bf199940551b6b977afc88f5096b072cdd2663d600bd7abe75433723dc4535a8",
+      "url": "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv"
+    },
+    "etf": {
+      "bytes": 37753,
+      "first_observed_at": "2026-10-13T15:50:34.676768+00:00",
+      "sha256": "00b1db6250e99a7cc153cfb5423138e4b3481301fa692268267cd6be80c8aafe",
+      "url": "https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv"
+    },
+    "holiday_calendar": {
+      "bytes": 34022,
+      "first_observed_at": "2026-10-13T15:50:21.912749+00:00",
+      "sha256": "933cf5dc6dd4efe3b8db8ce6ecd6ecb2582929f5e0b4faffdb88e11cf4efdfbe",
+      "url": "https://www.nseindia.com/api/holiday-master?type=trading"
+    },
+    "index": {
+      "bytes": 15686,
+      "first_observed_at": "2026-10-13T15:50:40.640826+00:00",
+      "sha256": "a402bb454057bc4497239e134d01fa920784acb740d67231bb3a1aee36271ecd",
+      "url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_13102026.csv"
+    }
+  },
+  "strategy": {
+    "experiment_id": "EQ-FWD-RANK-001",
+    "model_spec_sha256": "f7d40fcaca5afc320ad8f715c66111ebb1674f202962243bb6a6cf1758b0c0ba",
+    "qualification_status": "EXPLORATORY_NOT_GATE_QUALIFIED",
+    "strategy_id": "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY",
+    "strategy_version": "1.0.0"
+  },
+  "task_id": "EQ-ADJUST-008"
+}

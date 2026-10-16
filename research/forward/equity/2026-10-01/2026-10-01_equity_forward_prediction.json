@@ -1,0 +1,141 @@
+{
+  "schema": "equity-forward-paper-prediction-v1",
+  "event_type": "EQUITY_FORWARD_PREDICTION_ISSUED",
+  "task_id": "EQ-ADJUST-008",
+  "evidence_class": "EXPLORATORY_FORWARD_PAPER_PREDICTION",
+  "prediction_id": "EQ7D-2026-10-01-MOLBIO-V1",
+  "issued_at": "2026-10-01T12:44:51.984966+00:00",
+  "source_cutoff_at": "2026-10-01T12:39:01.892139+00:00",
+  "entry_session_date": "2026-10-01",
+  "due_session_date": "2026-10-08",
+  "due_at": "2026-10-08T10:00:00+00:00",
+  "horizon": {
+    "calendar_days": 7,
+    "outcome_reference": "OFFICIAL_CLOSE_FIRST_CM_SESSION_ON_OR_AFTER_CALENDAR_HORIZON"
+  },
+  "strategy": {
+    "experiment_id": "EQ-FWD-RANK-001",
+    "strategy_id": "EQUITY_INTRADAY_MOMENTUM_LIQUIDITY",
+    "strategy_version": "1.0.0",
+    "model_spec_sha256": "f7d40fcaca5afc320ad8f715c66111ebb1674f202962243bb6a6cf1758b0c0ba",
+    "qualification_status": "EXPLORATORY_NOT_GATE_QUALIFIED"
+  },
+  "counts": {
+    "source_company_eq_observations": 2313,
+    "screened_candidates": 244,
+    "selected_candidates": 1,
+    "qualified_current_candidates": 0,
+    "forward_predictions": 1,
+    "matured_outcomes": 0,
+    "positive_forecasts": 1,
+    "negative_forecasts": 0
+  },
+  "prediction": {
+    "symbol": "MOLBIO",
+    "isin": "INE869T01028",
+    "series": "EQ",
+    "direction": "POSITIVE",
+    "entry_reference_close": "1513.10",
+    "entry_reference_is_executable_fill": false,
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "adjusted_entry_price": null,
+    "expected_return_range": null,
+    "calibrated_probability": null,
+    "features": {
+      "open": "1313.00",
+      "close": "1513.10",
+      "volume": 8751936,
+      "intraday_return": "0.1523990861",
+      "close_times_volume_inr": "13242554361.60",
+      "intraday_return_percent_rank": "1.0000000000",
+      "liquidity_proxy_percent_rank": "0.9835390947",
+      "selection_score": "0.9917695473",
+      "source_row_sha256": "ad211b6d5704d7abb462030a03651061efeebe0694f77f1a0a9580d4594b8296"
+    },
+    "feature_hash": "8ab6759e439fa2292b93c94bb6c09ededefbac8c93e63fec3af483247046f953",
+    "forward_evaluation_status": "PENDING"
+  },
+  "benchmark": {
+    "name": "Nifty 50",
+    "entry_session_date": "2026-10-01",
+    "entry_reference_close": "22421.95",
+    "price_basis": "UNADJUSTED_EXCHANGE_REFERENCE",
+    "source_sha256": "b39ea533d496f2764d135dbf0492512287f780d8cc9258117a5f57355abb3aaa",
+    "source_url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_01102026.csv"
+  },
+  "source_receipts": {
+    "cash": {
+      "url": "https://nsearchives.nseindia.com/content/cm/BhavCopy_NSE_CM_0_0_0_20261001_F_0000.csv.zip",
+      "first_observed_at": "2026-10-01T12:39:01.598413+00:00",
+      "sha256": "ccc5fb27872716bbcc99d2d87e522ab304f6620e11c3a5045c30e1ff25cbfb73",
+      "bytes": 208712
+    },
+    "company": {
+      "url": "https://nsearchives.nseindia.com/content/equities/EQUITY_L.csv",
+      "first_observed_at": "2026-10-01T12:39:01.892139+00:00",
+      "sha256": "95f0d731f5858f71e876c45377dcefa79bc7a8db1e8161d0c92320252af4aa8f",
+      "bytes": 183140
+    },
+    "etf": {
+      "url": "https://nsearchives.nseindia.com/content/equities/eq_etfseclist.csv",
+      "first_observed_at": "2026-10-01T12:39:01.839695+00:00",
+      "sha256": "35eda34e5ec5b8f0bf3b5de72f8180e25d17de7da3351ea514dcb5c103ce918c",
+      "bytes": 37551
+    },
+    "actions": {
+      "url": "https://www.nseindia.com/api/corporates-corporateActions?index=equities&from_date=01-10-2026&to_date=09-10-2026",
+      "first_observed_at": "2026-10-01T12:39:00.749508+00:00",
+      "sha256": "25fb285b1f69606ffc6665c5079f34108f2995a578784e47f829929bde2d17e3",
+      "bytes": 3250
+    },
+    "index": {
+      "url": "https://nsearchives.nseindia.com/content/indices/ind_close_all_01102026.csv",
+      "first_observed_at": "2026-10-01T12:39:01.832057+00:00",
+      "sha256": "b39ea533d496f2764d135dbf0492512287f780d8cc9258117a5f57355abb3aaa",
+      "bytes": 16359
+    },
+    "holiday_calendar": {
+      "url": "https://www.nseindia.com/api/holiday-master?type=trading",
+      "first_observed_at": "2026-10-01T12:39:00.715881+00:00",
+      "sha256": "933cf5dc6dd4efe3b8db8ce6ecd6ecb2582929f5e0b4faffdb88e11cf4efdfbe",
+      "bytes": 34022
+    }
+  },
+  "action_policy": {
+    "capture_interval_start": "2026-10-01",
+    "capture_interval_end": "2026-10-09",
+    "selected_action_count_at_issue": 0,
+    "complete_action_coverage_at_issue": false,
+    "maturity_recheck_required": true,
+    "score_if_action_or_identity_change": "NOT_PROVEN_UNTIL_ADJUSTMENT_RESOLVED"
+  },
+  "current_metrics": {
+    "valid_outcomes": 0,
+    "oos_days": 0,
+    "directional_accuracy": null,
+    "top_decile_precision": null,
+    "sharpe": null,
+    "max_drawdown": null,
+    "deflated_sharpe_probability": null,
+    "benchmark_excess_return": null,
+    "calibration_error": null,
+    "target_gaps": {
+      "valid_outcomes": 100,
+      "oos_days": 60,
+      "directional_accuracy": null,
+      "top_decile_precision": null,
+      "sharpe": null,
+      "max_drawdown": null,
+      "deflated_sharpe_probability": null
+    }
+  },
+  "safety": {
+    "retrospective": false,
+    "catalyst_feature_included": false,
+    "real_money_ready": false,
+    "live_trading_enabled": false,
+    "orders_allowed": false
+  },
+  "previous_event_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "event_hash": "91912ef5ef5264cdff60fd06449f355fcd4bfcedc6b743e46c7b6ded7236744f"
+}
