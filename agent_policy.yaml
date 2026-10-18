@@ -6,7 +6,7 @@ target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
 coordination_bus: none
 
 execution_authority:
-  effective_date: 2026-09-16
+  effective_date: 2026-10-18
   authority_doc: docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md
   sole_controller: none
   multi_agent: true
