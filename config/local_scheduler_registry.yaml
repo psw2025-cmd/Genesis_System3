@@ -1,0 +1,118 @@
+# Genesis System3 — Canonical Local Scheduler Registry
+# Reconciles the 9 retired GCP Cloud Scheduler jobs against the existing
+# local job scheduler (config/system3_job_scheduler.json + the
+# core/engine/system3_phase82_job_scheduler.py daemon that runs it).
+#
+# This file is documentation/reconciliation, not a second scheduling engine —
+# the daemon still reads config/system3_job_scheduler.json for actual
+# schedule_time/interval/timeout values. This registry exists so an agent
+# without laptop access can see the GCP->local mapping without needing to
+# read both files and cross-reference them by hand.
+
+reconciliation_date: "2026-09-01"
+local_scheduler_engine: "core/engine/system3_phase82_job_scheduler.py"
+local_scheduler_config: "config/system3_job_scheduler.json"
+local_scheduler_windows_task: "Genesis_System3_Local_Scheduler"  # pending owner approval to register as auto-start
+
+gcp_job_reconciliation:
+  - gcp_cloud_run_job: genesis-system3-dhan-token-rotate
+    gcp_scheduler: genesis-system3-dhan-token-rotate-daily
+    gcp_cron: "*/5 * * * *"
+    decision: MERGE
+    local_job_id: local_dhan_token_rotate
+    local_script: scripts/local_dhan_token_rotate.py
+    status: IMPLEMENTED_AND_SMOKE_TESTED
+    notes: >
+      New local-only twin of scripts/gcp_dhan_token_rotation_job.py; persists
+      via core/security/windows_secret_vault.py (DPAPI) instead of Secret
+      Manager. Verified 2026-09-01: correctly detected an existing token with
+      16.81h remaining and skipped rotation (no unnecessary re-mint). Rotation
+      path (actual token generation) not yet exercised live since the current
+      token was not near expiry at test time.
+
+  - gcp_cloud_run_job: genesis-system3-scheduler-collector
+    gcp_scheduler: genesis-system3-scheduler-collector-every-minute
+    gcp_cron: "* * * * *"
+    decision: NEEDS_DECISION
+    local_job_id: null
+    local_script: scripts/system3_laptop_supervisor.py
+    status: PARTIAL_OVERLAP_UNRESOLVED
+    notes: >
+      scripts/system3_laptop_supervisor.py (built earlier today, untracked)
+      already runs a similar tick loop calling paper_pipeline_v8.run_pipeline_once.
+      This overlaps in responsibility with the phase82 daemon. Do not run both
+      against the same state without an explicit ownership decision — flagged
+      in the master plan Phase C checklist, not yet resolved.
+
+  - gcp_cloud_run_job: genesis-system3-forecast
+    gcp_scheduler: genesis-system3-forecast-daily
+    gcp_cron: "0 4 * * MON-FRI"
+    decision: KEEP_LOCAL
+    local_job_id: daily_gain_rank
+    local_script: scripts/daily_gain_rank_and_validate.py
+    status: ALREADY_REGISTERED_NOT_YET_RUNNING
+    notes: >
+      Already defined in system3_job_scheduler.json at 09:15 IST weekdays-only.
+      Separately blocked on the stale-forecast-source issue
+      (state/gain_rank_history.json last updated 2026-06-14) reported earlier
+      in Issue #188 — fixing the schedule does not fix that data-freshness bug.
+
+  - gcp_cloud_run_job: genesis-system3-rank
+    gcp_scheduler: genesis-system3-rank-daily
+    gcp_cron: "45 3 * * MON-FRI"
+    decision: KEEP_LOCAL
+    local_job_id: daily_gain_rank
+    local_script: scripts/daily_gain_rank_and_validate.py
+    status: ALREADY_REGISTERED_NOT_YET_RUNNING
+    notes: "Same local job as forecast above — the local script combines rank+forecast."
+
+  - gcp_cloud_run_job: genesis-system3-validate
+    gcp_scheduler: genesis-system3-validate-daily
+    gcp_cron: "5 10 * * MON-FRI"
+    decision: KEEP_LOCAL
+    local_job_id: daily_gain_validate
+    local_script: scripts/daily_gain_rank_and_validate.py
+    status: ALREADY_REGISTERED_NOT_YET_RUNNING
+    notes: "Registered at 15:35 IST locally (end-of-day validate) rather than 10:05 IST — different point in the day than GCP's cron; confirm this timing difference is intentional before relying on it."
+
+  - gcp_cloud_run_job: genesis-system3-signals
+    gcp_scheduler: genesis-system3-signals-daily
+    gcp_cron: "15 13 * * MON-FRI"
+    decision: KEEP_LOCAL
+    local_job_id: signal_engine_bhavcopy
+    local_script: scripts/run_signal_engine_from_bhavcopy.py
+    status: ALREADY_REGISTERED_NOT_YET_RUNNING
+    notes: "Registered at 18:45 IST locally (post-market, bhavcopy-driven) vs GCP's 13:15 IST intraday cron — these are different signal-generation designs, not a straight port. Needs an explicit decision on which timing is correct going forward."
+
+  - gcp_cloud_run_job: genesis-system3-control-plane-verify
+    gcp_scheduler: null
+    gcp_cron: null
+    decision: NOT_YET_MAPPED
+    local_job_id: null
+    local_script: null
+    status: GAP
+    notes: "No obvious local equivalent found in the 26-job config. Lowest priority (was an audit/preflight job, not a data-producing one)."
+
+  - gcp_cloud_run_job: genesis-system3-ml-history-bootstrap
+    gcp_scheduler: null
+    gcp_cron: null
+    decision: REMOVE
+    local_job_id: null
+    local_script: null
+    status: NOT_NEEDED_LOCALLY
+    notes: "One-off bootstrap job; rerun manually on the laptop if ever needed again, not a recurring schedule."
+
+  - gcp_cloud_run_job: genesis-system3-smoke
+    gcp_scheduler: null
+    gcp_cron: null
+    decision: REMOVE
+    local_job_id: null
+    local_script: null
+    status: NOT_NEEDED_LOCALLY
+    notes: "Already runs in GitHub Actions CI, not a laptop scheduling concern."
+
+open_gaps:
+  - "genesis-system3-control-plane-verify has no local equivalent yet (low priority)."
+  - "scheduler-collector vs. system3_laptop_supervisor.py ownership overlap unresolved."
+  - "Validate/signals local schedule times differ from their GCP cron times — needs an explicit owner decision on whether that's intentional, not just inherited."
+  - "Windows Scheduled Task to actually run the daemon continuously is built and smoke-tested but NOT yet registered as a persistent auto-start task — pending explicit owner approval (a standing background-process change)."
