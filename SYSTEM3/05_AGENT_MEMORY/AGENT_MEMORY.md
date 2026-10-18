@@ -11,3 +11,6 @@
 10. OWNER is nontechnical: do all permitted GitHub engineering. Ask only explicit legal/credential/budget/approval necessities.
 11. Source snapshots, output hashes and UTC timestamps must be named; NDJSON evidence is append-only.
 12. Owner approval never inferred from repository files. Billable GCP deployments/configuration require separate explicit consent.
+
+13. Phase 0.2 historical UI script was restored, SHA check hardened to full 40 digits, and current manual-lineage gate fails immediately when no deployed source receipt exists. Original head 5d618967ee937fd8601cca328e69dee653533e37 passed seven workflows; later evidence/documentation commit must rerun CI.
+14. An approved deployment-lineage JSON is a source hint only; real /api/deploy/info and before/after browser/API verification establish actual runtime identity. Never fabricate a receipt or assume a green branch equals main.
