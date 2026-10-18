@@ -64,6 +64,17 @@ class ProductionProofRecoveryTests(unittest.TestCase):
         self.assertFalse(proof._sha_matches("a"*40, "b"*40))
         self.assertFalse(proof._sha_matches("", "a"*40))
 
+    def test_live_proof_logs_allowlisted_summary_and_scrubs_variable_text(self):
+        proof = importlib.import_module("gcp_live_ui_snapshot")
+        source = (ROOT / "scripts/gcp_live_ui_snapshot.py").read_text(encoding="utf-8")
+        self.assertIn('LIVE_PRODUCTION_UI_PROOF_SUMMARY', source)
+        self.assertNotIn('print("LIVE_PRODUCTION_UI_PROOF", json.dumps(manifest', source)
+        original = "Bearer abcdefghijk access_token=123456789 pin=654321 api_key=SECRET123"
+        scrubbed = proof._scrub(original)
+        for secret in ("abcdefghijk", "123456789", "654321", "SECRET123"):
+            self.assertNotIn(secret, scrubbed)
+        self.assertIn("[REDACTED]", scrubbed)
+
     def test_unavailable_public_runtime_never_converges(self):
         proof = importlib.import_module("gcp_live_ui_snapshot")
         with patch.dict(os.environ, {"SYSTEM3_EXPECTED_SERVING_SHA": "a"*40}):
