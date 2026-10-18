@@ -59,6 +59,8 @@ jobs:
           python -m py_compile scripts/frontend_local_runtime_smoke.py
           python -m py_compile scripts/system3_temporal_truth_guard.py
           python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
+          python -m py_compile scripts/system3_release_proof_gate.py
+          python -m py_compile scripts/gcp_live_ui_snapshot.py
 
       - name: Enforce temporal truth and live UI remediation contracts
         shell: bash
@@ -100,7 +102,7 @@ jobs:
       - name: Resolve expected runtime-affecting serving SHA
         if: github.ref == 'refs/heads/main'
         shell: bash
-        run: python scripts/system3_resolve_runtime_deploy_sha.py --write-github-env
+        run: python scripts/system3_release_proof_gate.py --write-github-env
 
       - name: Capture exact-SHA request-scoped read-only live production UI lifecycle proof
         if: github.ref == 'refs/heads/main'
