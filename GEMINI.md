@@ -1,13 +1,9 @@
-# Genesis System3 — Gemini Operating Contract
+# Genesis System3 — Gemini operating contract
 
-Read `AGENTS.md` and `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` first.
+Active owner directive: `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`; read it and `AGENTS.md` first. The old September laptop-only directive is historical, not operative.
 
-**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+GitHub exact approved main is code authority. Intended production is cloud-only GCP `system3-openalgo-safe` / `asia-south1`. Laptop/mobile/Cloud Shell are optional control clients only. No local System3 runtime or user-run command loop.
 
-Runtime: local Windows `http://127.0.0.1:8000`. GitHub `main` is code baseline, not local-runtime truth. GCP Cloud Run URLs are HISTORICAL_NON_AUTHORITY.
+Current owner consent: autonomous GitHub fixes, tests, CI, and read-only GCP verification only. Never deploy, trigger a billable cloud build, mutate Cloud Run/Scheduler/IAM/secrets/billing or enable automatic deployment absent separate explicit approval. Preserve PAPER/ANALYZE: `ANALYZE_MODE=1`, `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`, `LIVE_ORDER_AUTHORITY=0`. No real orders or secret payloads.
 
-Broker: Dhan. Angel and Render hosting are retired and non-authoritative.
-
-Safety: ANALYZE_MODE=1, LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0, AUTO_EXECUTE_TRADES=0. No real orders. No secrets. No Claude-only ownership. Issue #188 is not a mandatory bus.
-
-Current/live UI claims require a new local browser session after a recorded UTC start, plus same-session local APIs. `reports/latest/` is historical. Discover tabs dynamically; do not assume 22 tabs.
+Fresh exact-deployed-SHA cloud API/browser/broker evidence is required for runtime claims. A past CI check, image tag, HTTP response or old Cloud Run URL is historical until independently re-observed. No one model is sole controller. Issue #188 is context, not a substitute for fresh proof.
