@@ -214,6 +214,7 @@ jobs:
           set -euo pipefail
           python -m unittest -v tests.test_cloud_paper_preflight_contract
           python -m unittest -v tests.test_mission_persistence_contract
+          python -m unittest -v tests.test_system3_append_evidence
           python scripts/system3_cloud_paper_preflight.py --sha "${GITHUB_SHA}" > "${RUNNER_TEMP}/system3-cloud-paper-preflight.json"
           python -c 'import json,os; d=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"system3-cloud-paper-preflight.json"))); assert d["overall"] == "BLOCKED"; assert not any(d[x] for x in ("gcp_mutations_performed","broker_calls_performed","secrets_read","live_order_authority")); print("read_only_preflight=PASS; production_release=BLOCKED_OWNER_APPROVAL")'
 
