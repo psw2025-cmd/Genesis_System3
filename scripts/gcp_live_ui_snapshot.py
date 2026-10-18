@@ -61,17 +61,14 @@ def _sanitize_deploy(payload: dict) -> dict:
 
 
 def _sha_matches(expected: str, actual: str) -> bool:
-    expected = expected.strip().lower()
-    actual = actual.strip().lower()
-    if not expected or not actual:
-        return False
-    if expected == actual:
-        return True
-    if len(actual) >= 7 and expected.startswith(actual):
-        return True
-    if len(expected) >= 7 and actual.startswith(expected):
-        return True
-    return False
+    """Require the full exact 40-hex Git SHA; short prefix is not release proof."""
+    expected = str(expected).strip().lower()
+    actual = str(actual).strip().lower()
+    return bool(
+        re.fullmatch(r"[a-f0-9]{40}", expected)
+        and re.fullmatch(r"[a-f0-9]{40}", actual)
+        and expected == actual
+    )
 
 
 def _wait_for_expected_serving_sha() -> tuple[bool, dict, dict]:
