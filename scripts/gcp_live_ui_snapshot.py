@@ -30,6 +30,21 @@ DEPLOY_POLL_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_POLL_SECONDS", "1
 REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY")
 BAD_CHAIN_SOURCES = {"csv", "yahoo", "synthetic", "mock", "fake"}
 
+# Never persist arbitrary upstream error/body strings without redaction. These
+# are public UI proof artifacts, and the verifier MUST NOT echo credentials.
+_BEARER = re.compile(r"(?i)\\bBearer\\s+[A-Za-z0-9._~+/-]{6,}")
+_KV_SECRET = re.compile(
+    r"(?i)\\b(access[ _-]?token|api[ _-]?key|client[ _-]?secret|"
+    r"authorization|password|pin|totp)\\s*[:=]\\s*[^\\s,;]{2,}"
+)
+
+
+def _scrub(value: object) -> str:
+    raw = str(value or "")
+    raw = _BEARER.sub("Bearer [REDACTED]", raw)
+    return _KV_SECRET.sub(r"\\1=[REDACTED]", raw)[:50000]
+
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -124,7 +139,7 @@ def _sanitize_broker(payload: dict) -> dict:
     token = payload.get("token_proof") if isinstance(payload.get("token_proof"), dict) else {}
     return {
         "connected": payload.get("connected"),
-        "error": payload.get("error"),
+        "error": _scrub(payload.get("error")),
         "latency_ms": payload.get("latency_ms"),
         "token_source": token.get("source"),
         "secret_version": token.get("secret_version"),
@@ -142,7 +157,7 @@ def _sanitize_health(payload: dict) -> dict:
         "healthy": payload.get("healthy"),
         "live_trading_enabled": payload.get("live_trading_enabled"),
         "live_allowed": payload.get("live_allowed"),
-        "live_blockers": payload.get("live_blockers"),
+        "live_blockers": [_scrub(v) for v in (payload.get("live_blockers") or [])] if isinstance(payload.get("live_blockers"), list) else [],
     }
 
 
@@ -153,7 +168,7 @@ def _sanitize_live_board(payload: dict) -> dict:
         "source": payload.get("source"),
         "live_count": payload.get("live_count"),
         "feed_hits": payload.get("feed_hits"),
-        "feed_errors": list(payload.get("feed_errors") or [])[:6],
+        "feed_errors": [_scrub(v) for v in (payload.get("feed_errors") or [])[:6]],
         "indices": [
             {
                 "symbol": row.get("symbol"),
@@ -179,7 +194,7 @@ def _api_snapshot() -> dict:
 
 def _visible_text(browser: Browser) -> str:
     body = browser._execute("return (document.body && document.body.innerText) || '';", [])
-    return body if isinstance(body, str) else ""
+    return _scrub(body) if isinstance(body, str) else ""
 
 
 def _semantic_alerts(text: str) -> list[str]:
@@ -342,7 +357,7 @@ def main() -> int:
             },
         }
         (PROOF_DIR / "manifest.json").write_text(json.dumps(failure, indent=2, sort_keys=True), encoding="utf-8")
-        print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=NOT_CURRENT_SERVING_SHA", json.dumps(failure, sort_keys=True))
+        print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=NOT_CURRENT_SERVING_SHA; manifest_written=true")
         return 5
 
     capture_started = _utc_now()
@@ -469,7 +484,15 @@ def main() -> int:
         },
     }
     (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True), encoding="utf-8")
-    print("LIVE_PRODUCTION_UI_PROOF", json.dumps(manifest, sort_keys=True))
+    print("LIVE_PRODUCTION_UI_PROOF_SUMMARY", json.dumps({
+        "schema": manifest["schema"],
+        "policy": manifest["policy"],
+        "tabs_captured": manifest["tabs_captured"],
+        "all_tabs_rendered": manifest["all_tabs_rendered"],
+        "all_required_chain_subviews_ready": manifest["all_required_chain_subviews_ready"],
+        "exact_serving_sha_stable": manifest["exact_serving_sha_stable"],
+        "safety": manifest["safety"],
+    }, sort_keys=True))
     if not exact_sha_stable:
         print("LIVE_PRODUCTION_UI_CAPTURE=FAIL reason=SERVING_SHA_CHANGED_DURING_CAPTURE")
         return 7
