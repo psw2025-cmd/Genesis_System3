@@ -5,3 +5,5 @@
 **ADR-004 — 2026-10-18 — Evidence truth.** Four verdicts PASS/FAIL/BLOCKED/UNKNOWN. Code flags cannot establish independent broker real_orders=0. Historical evidence stays historical. EVIDENCE.ndjson append-only.
 
 **ADR-005 — 2026-10-18 — Proof/approval separation.** Release-lineage file cannot authorize billable deployment and cannot mark production PASS; it only supplies a full expected source SHA for subsequent independent live proof. Without it, main UI workflow must exit BLOCKED quickly with a manifest, never skip the required production check. Separate owner consent controls any future cloud mutation.
+
+**ADR-006 — 2026-10-18 — Sensitive proof output.** Never echo the full production manifest or unsanitized upstream/UI diagnostic strings in CI logs; allowlisted summaries and redaction tests are mandatory. An Advanced Security code-scanning FAIL blocks merge even when its enclosing Actions workflow is SUCCESS.
