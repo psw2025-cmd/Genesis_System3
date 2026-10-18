@@ -1,0 +1,2 @@
+# Rollback architecture
+Before future approved promotion: capture currently serving revision + immutable image digest and traffic splits, or explicitly record no baseline. Deploy candidate with zero traffic. Independently verify. On failure: do not promote; if promoted and failed, revert to actual recorded previous healthy revision (never invent one). All cloud actions require separate scoped approval.

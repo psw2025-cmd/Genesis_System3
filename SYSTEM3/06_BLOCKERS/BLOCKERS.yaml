@@ -1,0 +1,52 @@
+schema: system3-blockers-v1
+updated_at_utc: '2026-10-18T06:19:12.513035+00:00'
+blockers:
+  - id: B-001
+    severity: P0
+    owner: agent
+    status: UNKNOWN
+    root_cause: Deleted production UI proof referenced by active workflow
+    fix_strategy: Restore historical script, enforce exact SHA, add lineage gate and missing-target tests
+    verification: Exact-head GitHub CI and missing-receipt negative tests
+  - id: B-002
+    severity: P0
+    owner: agent
+    status: BLOCKED
+    root_cause: Manual-only deployment implementation absent since historical GCP purge
+    fix_strategy: Build isolated workflow, candidate/rollback package and static no-mutation tests
+    verification: Zero deployment triggers on push; canonical Dockerfile and deny-by-default tested
+  - id: B-003
+    severity: P0
+    owner: owner
+    status: BLOCKED
+    root_cause: Billable cloud mutation consent not granted
+    fix_strategy: Seek one bounded owner approval only after deployment candidate independently PASS
+    verification: Explicit separate authority receipt
+  - id: B-004
+    severity: P0
+    owner: agent_after_approval
+    status: UNKNOWN
+    root_cause: Serving System3 Cloud Run resource not independently proven
+    fix_strategy: Approved zero-traffic candidate then exact revision/digest/health and rollback proof
+    verification: Fresh project-scoped cloud inventory and same-revision API receipts
+  - id: B-005
+    severity: P0
+    owner: agent_after_approval
+    status: UNKNOWN
+    root_cause: Broker, scheduler, worker, heartbeat and PAPER lifecycle lack current runtime proof
+    fix_strategy: Verify read-only broker, market freshness, fenced worker and durable ledger during market session
+    verification: UTC receipts and independent reconciliation
+  - id: B-006
+    severity: P0
+    owner: agent_after_approval
+    status: UNKNOWN
+    root_cause: Independent broker-side order history not inspected
+    fix_strategy: Obtain authorized read-only broker order-history evidence without any order creation
+    verification: Independent actual-order reconciliation
+  - id: B-007
+    severity: P1
+    owner: agent
+    status: UNKNOWN
+    root_cause: Full telemetry/FinOps/failure injection and paper prediction statistics not verified
+    fix_strategy: Tests and independently measured runtime evidence; no synthetic production claims
+    verification: Traces, SLO, cost, walk-forward and chaos receipts

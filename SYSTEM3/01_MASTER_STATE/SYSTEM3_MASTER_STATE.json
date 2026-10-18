@@ -1,0 +1,100 @@
+{
+  "approval_boundary": "Explicit separate bounded consent before billable GCP changes",
+  "architecture_state": {
+    "approved_deployment_lineage": "MISSING",
+    "broker_worker": "UNKNOWN",
+    "canonical_candidate_dockerfile": "dashboard/backend/Dockerfile",
+    "deployment_workflow": "MISSING",
+    "legacy_root_dockerfile": "NONPRODUCTION",
+    "observability": "PARTIAL_CODE",
+    "production_image": "UNKNOWN",
+    "tracing": "UNKNOWN"
+  },
+  "baseline_main_sha": "1dbae834605b7cbabd57eda82a9db182deb0822c",
+  "blocker_ids": [
+    "B-001",
+    "B-002",
+    "B-003",
+    "B-004",
+    "B-005",
+    "B-006",
+    "B-007"
+  ],
+  "current_phase": "0.2_GITHUB_REPAIR",
+  "decisions": [
+    "ADR-001",
+    "ADR-002",
+    "ADR-003",
+    "ADR-004"
+  ],
+  "evidence": [
+    {
+      "type": "GITHUB_COMMIT",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/commit/1dbae834605b7cbabd57eda82a9db182deb0822c"
+    },
+    {
+      "type": "GITHUB_ISSUE",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/issues/480"
+    },
+    {
+      "type": "GITHUB_RUN",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/39093854945"
+    }
+  ],
+  "main_merge_verification": "PENDING",
+  "next_actions": [
+    "Run exact-head PR CI for restored verifier",
+    "Implement manually gated deployment candidate without executing it",
+    "Add independent runtime and broker verification after owner approval"
+  ],
+  "overall": "BLOCKED",
+  "owner_action_required": "NONE_NOW",
+  "phase_status": {
+    "0": "PASS",
+    "0.1": "PASS",
+    "0.2": "UNKNOWN",
+    "0.3": "UNKNOWN",
+    "0.4": "PASS",
+    "0.5": "UNKNOWN",
+    "1": "UNKNOWN",
+    "10": "UNKNOWN",
+    "11": "UNKNOWN",
+    "12": "UNKNOWN",
+    "13": "UNKNOWN",
+    "14": "UNKNOWN",
+    "2": "UNKNOWN",
+    "3": "PASS",
+    "4": "UNKNOWN",
+    "5": "UNKNOWN",
+    "6": "BLOCKED",
+    "8": "BLOCKED",
+    "9": "UNKNOWN"
+  },
+  "production": "UNKNOWN",
+  "repo": "psw2025-cmd/Genesis_System3",
+  "safety": {
+    "ANALYZE_MODE": "1",
+    "AUTO_EXECUTE_TRADES": "0",
+    "LIVE_ORDER_AUTHORITY": "0",
+    "LIVE_TRADING_ENABLED": "0",
+    "ORDER_PLACEMENT_ALLOWED": "false",
+    "PAPER_MODE": "1",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+    "real_orders": "UNKNOWN_NO_INDEPENDENT_BROKER_HISTORY"
+  },
+  "schema": "system3-master-state-v1",
+  "source_truth": {
+    "last_cloud_inventory": {
+      "cloud_run_jobs": "MISSING",
+      "cloud_run_service": "MISSING",
+      "mumbai_scheduler": "MISSING",
+      "observation_time_utc": "2026-10-18T03:22:00Z",
+      "project": "system3-openalgo-safe",
+      "refresh_required": true
+    },
+    "main_baseline": "1dbae834605b7cbabd57eda82a9db182deb0822c",
+    "phase0_1_root_cause": "PASS"
+  },
+  "updated_at_utc": "2026-10-18T06:19:12.513035+00:00",
+  "working_branch": "fix/system3-phase02-production-ui-truth-20261018"
+}

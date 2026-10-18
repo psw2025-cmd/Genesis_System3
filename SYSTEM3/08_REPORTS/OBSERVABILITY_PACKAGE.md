@@ -1,0 +1,2 @@
+# Phase 5 observability status
+Spider Web (OpenTelemetry): end-to-end trace UNKNOWN. Heartbeat: source loop exists; cloud pulse UNKNOWN. Blood Pressure: broker latency source exists; unified queue/SLO UNKNOWN. Synapse: Firestore schema and route capability checks CODE_PRESENT; deployed consumer parity UNKNOWN. Immune System: local-oriented self-heal handlers CODE_PRESENT; cloud watchdog UNKNOWN. No fabricated measurements. Cloud deployment needed for runtime validation.
