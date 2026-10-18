@@ -4,8 +4,8 @@
 **Code authority:** `psw2025-cmd/Genesis_System3` exact approved `main` SHA.
 **Target production authority (not a readiness claim):** GCP `system3-openalgo-safe` / `asia-south1`.
 **Machine policy:** `agent_policy.yaml` (v6).
-**Temporal truth:** `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
-**Broker:** Dhan; retired Render/Angel-era instructions are not System3 runtime authority.
+**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
+**Broker:** Dhan. Retired Render and Angel-era deployments/instructions are historical and non-authoritative for System3.
 
 ## Priority and conflicts
 1. Latest explicit owner instruction, including the active cloud-only directive and its scoped consent.
