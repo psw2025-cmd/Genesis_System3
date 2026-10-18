@@ -1,3 +1,7 @@
+> **HISTORICAL_NON_AUTHORITY / RETIRED 2026-10-18.** This complete RUHI/RHUI laptop-only contract is retained for forensic timeline and regression history. Its prohibitions against GCP and its directions to use a local runtime are SUPERSEDED and MUST NOT be executed. Current owner directive: `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`. Authorized now: GitHub repairs/testing and read-only GCP verification only; a separate owner approval is required for any cloud configuration/billable deployment mutation. Permanent PAPER/LIVE and secrets safety remains in force via `AGENTS.md` and the active directive.
+
+---
+
 # RHUI_RULE_V2.3 — Genesis System3 LOCAL-LAPTOP-ONLY Execution Contract
 
 Status: ACTIVE when merged. Supersedes every prior RUHI/RHUI instruction that treated GCP or any Google Cloud service as System3 runtime, deployment, broker-token, evidence, or acceptance authority.

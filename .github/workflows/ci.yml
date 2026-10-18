@@ -201,6 +201,23 @@ jobs:
           python -m pip install --no-cache-dir -r dashboard/backend/requirements.txt --quiet
           echo "deps_install=PASS"
 
+      - name: Verify current cloud-only authority and fail-closed trading policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/evals/test_autonomous_e2e_runbook_contract.py -o addopts="" -v --tb=short
+          echo "cloud_only_owner_directive_contract=PASS"
+
+      - name: Prove cloud deployment preflight remains fail closed without owner consent
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m unittest -v tests.test_cloud_paper_preflight_contract
+          python -m unittest -v tests.test_mission_persistence_contract
+          python -m unittest -v tests.test_system3_append_evidence
+          python scripts/system3_cloud_paper_preflight.py --sha "${GITHUB_SHA}" > "${RUNNER_TEMP}/system3-cloud-paper-preflight.json"
+          python -c 'import json,os; d=json.load(open(os.path.join(os.environ["RUNNER_TEMP"],"system3-cloud-paper-preflight.json"))); assert d["overall"] == "BLOCKED"; assert not any(d[x] for x in ("gcp_mutations_performed","broker_calls_performed","secrets_read","live_order_authority")); print("read_only_preflight=PASS; production_release=BLOCKED_OWNER_APPROVAL")'
+
       - name: Compile expanded critical scripts
         shell: bash
         run: |

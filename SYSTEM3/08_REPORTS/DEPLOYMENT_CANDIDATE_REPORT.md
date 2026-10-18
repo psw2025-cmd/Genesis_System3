@@ -1,0 +1,3 @@
+# Phase 6 release candidate — BLOCKED
+Historical auto deploy was intentionally removed. Manual-only workflow/implementation currently MISSING; image build and rollback package not independently tested. Do not claim candidate PASS; do not request GCP deployment approval yet. No billable GCP build or resource change executed.
+Required gate: complete GitHub PR tests, manual-only/no-push/no-order contract, canonical Dockerfile build, rollback check, code/security scan and full evidence pack. If and only if candidate independently PASS, STOP and request OWNER APPROVAL REQUIRED with change/cost/safety/rollback evidence.
