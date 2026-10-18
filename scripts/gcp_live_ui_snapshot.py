@@ -32,17 +32,17 @@ BAD_CHAIN_SOURCES = {"csv", "yahoo", "synthetic", "mock", "fake"}
 
 # Never persist arbitrary upstream error/body strings without redaction. These
 # are public UI proof artifacts, and the verifier MUST NOT echo credentials.
-_BEARER = re.compile(r"(?i)\\bBearer\\s+[A-Za-z0-9._~+/-]{6,}")
+_BEARER = re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]{6,}")
 _KV_SECRET = re.compile(
-    r"(?i)\\b(access[ _-]?token|api[ _-]?key|client[ _-]?secret|"
-    r"authorization|password|pin|totp)\\s*[:=]\\s*[^\\s,;]{2,}"
+    r"(?i)\b(access[ _-]?token|api[ _-]?key|client[ _-]?secret|"
+    r"authorization|password|pin|totp)\b[\"']?\s*[:=]\s*[\"']?[^\s,;\"']{2,}"
 )
 
 
 def _scrub(value: object) -> str:
     raw = str(value or "")
     raw = _BEARER.sub("Bearer [REDACTED]", raw)
-    return _KV_SECRET.sub(r"\\1=[REDACTED]", raw)[:50000]
+    return _KV_SECRET.sub(r"\1=[REDACTED]", raw)[:50000]
 
 
 
