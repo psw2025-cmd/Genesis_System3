@@ -1,13 +1,7 @@
-# Genesis System3 — Claude / multi-agent operating notes
+# System3 — Claude / multi-agent operating notes
 
-**Status:** HISTORICAL filename retained for GitHub Copilot/Claude instruction discovery.
+**Active owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`. Read it and `AGENTS.md` first. The local-laptop 2026-09-07 directive and older cloud-exit passages are historical, not active. This file does not grant Claude exclusive ownership.
 
-**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+Intended System3 production: GCP `system3-openalgo-safe` / `asia-south1`; GitHub exact approved main is code authority. Laptop/Cloud Shell is a temporary control client, never production. **Current authorization:** GitHub repair/testing and read-only GCP checks only. Request separate owner consent before cloud/billing/IAM/secret/scheduler/deploy/image-push mutation. No automatic push-to-production workflow without authorization.
 
-Active constitution: `AGENTS.md`.
-Active machine policy: `agent_policy.yaml` v6.
-Active user directive: `docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md`.
-
-Claude is not sole controller. Local Windows laptop is runtime and acceptance authority. GCP Cloud Run production URLs in older copies of this file are HISTORICAL_NON_AUTHORITY.
-
-Safety: PAPER/ANALYZE, ANALYZE_MODE=1, LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0, AUTO_EXECUTE_TRADES=0. No real orders. No secret payloads.
+Safety: `ANALYZE_MODE=1`, `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`, `LIVE_ORDER_AUTHORITY=0`; no real broker order actions, credential exposure or service-account JSON keys. Independent, fresh runtime evidence required before any PASS claim.
