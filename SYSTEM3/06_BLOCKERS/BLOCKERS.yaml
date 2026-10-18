@@ -50,3 +50,11 @@ blockers:
     root_cause: Full telemetry/FinOps/failure injection and paper prediction statistics not verified
     fix_strategy: Tests and independently measured runtime evidence; no synthetic production claims
     verification: Traces, SLO, cost, walk-forward and chaos receipts
+
+  - id: B-008
+    severity: P0
+    owner: agent
+    status: UNKNOWN
+    root_cause: Advanced Security CodeQL detected one HIGH clear-text logging issue in restored production proof
+    fix_strategy: Emit allowlisted manifest summary and redact variable diagnostics; preserve full independent security gate
+    verification: Latest-head CodeQL code-scanning check must explicitly return success, not merely the Actions workflow
