@@ -14,3 +14,6 @@
 
 13. Phase 0.2 historical UI script was restored, SHA check hardened to full 40 digits, and current manual-lineage gate fails immediately when no deployed source receipt exists. Original head 5d618967ee937fd8601cca328e69dee653533e37 passed seven workflows; later evidence/documentation commit must rerun CI.
 14. An approved deployment-lineage JSON is a source hint only; real /api/deploy/info and before/after browser/API verification establish actual runtime identity. Never fabricate a receipt or assume a green branch equals main.
+
+15. On Phase 0.2 head 9392a9fb892dccf12e8064cbc839d634a9e09547, all seven Actions workflows were success BUT separate Advanced Security CodeQL check 117606737994 failed with one HIGH clear-text logging finding at restored script line 472. Therefore mergeability remained unstable and merge was correctly stopped. Never treat Actions workflow success alone as code-scanning approval.
+16. Source was updated to avoid printing entire API-derived manifest, scrub variable diagnostic strings and add regression tests; 34/34 local tests passed at remediation b1d566b032126ef541cd6029ceef781af4ee5dde. Await real Advanced Security recheck before Phase 0.2 PASS.
