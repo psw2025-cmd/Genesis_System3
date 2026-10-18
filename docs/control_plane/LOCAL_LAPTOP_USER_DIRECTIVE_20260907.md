@@ -1,3 +1,7 @@
+> **HISTORICAL_NON_AUTHORITY (superseded 2026-10-18).** The latest explicit owner direction is cloud-only production with GitHub-repair/read-only-GCP consent only. Read `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`. The text below records the 2026-09-07 decision and MUST NOT be executed as current runtime, acceptance, deployment, token or cost authority.
+
+---
+
 # Local laptop authority — user directive, 2026-09-07
 
 The user confirmed on 2026-09-07 that Genesis System3 must run entirely on the
