@@ -67,7 +67,8 @@ jobs:
         run: |
           python -m unittest \
             tests.test_temporal_truth_contract \
-            tests.test_live_ui_truth_remediation_contract
+            tests.test_live_ui_truth_remediation_contract \
+            tests.test_phase02_live_ui_recovery
 
       - name: Prove all canonical tabs render in local Chrome
         shell: bash
