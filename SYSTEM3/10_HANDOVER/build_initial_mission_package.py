@@ -75,6 +75,7 @@ events=[
   ISSUE),
  ("order-safety","UNKNOWN","Application policy locks checked in code; broker order history not independently queried",ISSUE),
  ("phase0.2","UNKNOWN","Historical proof restored with expected blob before modernization; exact-head CI has not yet completed",ISSUE)]
+(HOME/"02_EVIDENCE").mkdir(parents=True,exist_ok=True)
 with (HOME/"02_EVIDENCE/EVIDENCE.ndjson").open("x",encoding="utf-8",newline="\n") as out:
     for id,status,claim,url in events:
         out.write(json.dumps({"schema":"system3-evidence-v1","id":id,
