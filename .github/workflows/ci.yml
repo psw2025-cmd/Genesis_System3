@@ -201,6 +201,13 @@ jobs:
           python -m pip install --no-cache-dir -r dashboard/backend/requirements.txt --quiet
           echo "deps_install=PASS"
 
+      - name: Verify current cloud-only authority and fail-closed trading policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/evals/test_autonomous_e2e_runbook_contract.py -o addopts="" -v --tb=short
+          echo "cloud_only_owner_directive_contract=PASS"
+
       - name: Compile expanded critical scripts
         shell: bash
         run: |

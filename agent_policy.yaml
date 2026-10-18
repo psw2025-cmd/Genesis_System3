@@ -1,13 +1,13 @@
-# agent_policy.yaml — Genesis System3 local-laptop invariants
+# agent_policy.yaml — Genesis System3 cloud-only intent; GCP mutation requires separate owner approval
 version: 6
 schema_version: 6
 schema_path: schemas/agent_policy.v6.schema.json
-target_url: http://127.0.0.1:8000/ui/
+target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
 coordination_bus: none
 
 execution_authority:
-  effective_date: 2026-09-16
-  authority_doc: docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md
+  effective_date: 2026-10-18
+  authority_doc: docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md
   sole_controller: none
   multi_agent: true
   other_agents_default_role: concurrent_safe_non_overlapping
@@ -21,18 +21,20 @@ execution_authority:
   mandatory_issue_188: false
 
 mandatory_reads:
-  - docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md
+  - docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md
   - AGENTS.md
   - agent_policy.yaml
 
 runtime:
-  authority: local_windows_laptop
-  canonical_repository: C:\Genesis_System3_Clean
+  authority: gcp_managed_cloud_target
+  canonical_repository: psw2025-cmd/Genesis_System3
   upstream: psw2025-cmd/Genesis_System3
-  gcp_runtime_authority: false
-  cloudrun_acceptance_authority: false
-  discover_bound_port: true
-  default_ui: http://127.0.0.1:8000/ui/
+  gcp_runtime_authority: true
+  cloudrun_acceptance_authority: true
+  discover_bound_port: false
+  default_ui: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
+  local_runtime_required: false
+  cloud_mutation_allowed_without_owner_approval: false
 
 safety:
   analyze_mode: true
@@ -70,15 +72,17 @@ completion:
     - HISTORICAL_ONLY
 
 gcp_exit_billing_control:
-  runtime_authority: retired
+  runtime_authority: cloud_only_target_pending_deployment_proof
   high_frequency_scheduler_resume_without_reconciled_ssot: forbidden
-  do_not_execute_gcloud: true
-  do_not_deploy_cloud_run: true
+  do_not_execute_gcloud: false # read-only inventory permitted
+  do_not_deploy_cloud_run: true # until a separate explicit owner approval
+  owner_approval_before_cloud_mutation: true
 
 evidence:
   current_evidence_over_historical_claims: true
   chat_memory_is_not_runtime_proof: true
   exact_source_sha_required: true
-  local_semantic_proof_required: true
+  local_semantic_proof_required: false
+  cloud_semantic_proof_required: true
   ui_and_api_parity_required: true
   broker_source_freshness_truth_required: true
