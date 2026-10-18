@@ -1,33 +1,88 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/psw2025-cmd/Genesis_System3/schemas/agent_policy.v6.schema.json",
-  "title": "Genesis System3 Agent Policy v6 (local laptop, multi-agent)",
+  "title": "Genesis System3 Agent Policy v6 (cloud-only target; no unapproved GCP mutation)",
   "type": "object",
-  "required": ["version", "schema_version", "schema_path", "execution_authority", "safety", "coordination", "completion", "runtime"],
+  "required": [
+    "version",
+    "schema_version",
+    "schema_path",
+    "execution_authority",
+    "safety",
+    "coordination",
+    "completion",
+    "runtime",
+    "gcp_exit_billing_control"
+  ],
   "properties": {
-    "version": {"const": 6},
-    "schema_version": {"const": 6},
-    "schema_path": {"const": "schemas/agent_policy.v6.schema.json"},
-    "target_url": {"type": "string", "pattern": "^https?://127\\.0\\.0\\.1"},
-    "coordination_bus": {"const": "none"},
+    "version": {
+      "const": 6
+    },
+    "schema_version": {
+      "const": 6
+    },
+    "schema_path": {
+      "const": "schemas/agent_policy.v6.schema.json"
+    },
+    "target_url": {
+      "type": "string",
+      "pattern": "^https://genesis-system3-web-[a-z0-9-]+\\.a\\.run\\.app/ui/$"
+    },
+    "coordination_bus": {
+      "const": "none"
+    },
     "execution_authority": {
       "type": "object",
-      "required": ["sole_controller", "multi_agent", "other_agents_may_mutate", "claude_only_ownership", "mandatory_issue_188"],
+      "required": [
+        "sole_controller",
+        "multi_agent",
+        "other_agents_may_mutate",
+        "claude_only_ownership",
+        "mandatory_issue_188"
+      ],
       "properties": {
-        "sole_controller": {"const": "none"},
-        "multi_agent": {"const": true},
-        "other_agents_may_mutate": {"const": true},
-        "claude_only_ownership": {"const": false},
-        "mandatory_issue_188": {"const": false}
+        "sole_controller": {
+          "const": "none"
+        },
+        "multi_agent": {
+          "const": true
+        },
+        "other_agents_may_mutate": {
+          "const": true
+        },
+        "claude_only_ownership": {
+          "const": false
+        },
+        "mandatory_issue_188": {
+          "const": false
+        }
       }
     },
     "runtime": {
       "type": "object",
-      "required": ["authority", "gcp_runtime_authority", "cloudrun_acceptance_authority"],
+      "required": [
+        "authority",
+        "gcp_runtime_authority",
+        "cloudrun_acceptance_authority",
+        "local_runtime_required",
+        "cloud_mutation_allowed_without_owner_approval"
+      ],
       "properties": {
-        "authority": {"const": "local_windows_laptop"},
-        "gcp_runtime_authority": {"const": false},
-        "cloudrun_acceptance_authority": {"const": false}
+        "authority": {
+          "const": "gcp_managed_cloud_target"
+        },
+        "gcp_runtime_authority": {
+          "const": true
+        },
+        "cloudrun_acceptance_authority": {
+          "const": true
+        },
+        "local_runtime_required": {
+          "const": false
+        },
+        "cloud_mutation_allowed_without_owner_approval": {
+          "const": false
+        }
       }
     },
     "safety": {
@@ -43,32 +98,86 @@
         "live_enablement_requires_human_break_glass"
       ],
       "properties": {
-        "live_trading_enabled": {"const": false},
-        "system3_live_trading_allowed": {"const": false},
-        "auto_execute_trades": {"const": false},
-        "real_order_count_required": {"const": 0},
-        "real_order_placement_modification_cancellation_squareoff": {"const": "forbidden"},
-        "broker_secret_payload_exposure": {"const": "forbidden"},
-        "service_account_json_keys": {"const": "forbidden"},
-        "live_enablement_requires_human_break_glass": {"const": true}
+        "live_trading_enabled": {
+          "const": false
+        },
+        "system3_live_trading_allowed": {
+          "const": false
+        },
+        "auto_execute_trades": {
+          "const": false
+        },
+        "real_order_count_required": {
+          "const": 0
+        },
+        "real_order_placement_modification_cancellation_squareoff": {
+          "const": "forbidden"
+        },
+        "broker_secret_payload_exposure": {
+          "const": "forbidden"
+        },
+        "service_account_json_keys": {
+          "const": "forbidden"
+        },
+        "live_enablement_requires_human_break_glass": {
+          "const": true
+        }
       }
     },
     "coordination": {
       "type": "object",
-      "required": ["github_issue_188_is_live_bus", "parallel_overlapping_mutation"],
+      "required": [
+        "github_issue_188_is_live_bus",
+        "parallel_overlapping_mutation"
+      ],
       "properties": {
-        "github_issue_188_is_live_bus": {"const": false},
-        "parallel_overlapping_mutation": {"const": "forbidden"}
+        "github_issue_188_is_live_bus": {
+          "const": false
+        },
+        "parallel_overlapping_mutation": {
+          "const": "forbidden"
+        }
       }
     },
     "completion": {
       "type": "object",
-      "required": ["stop_at_code_or_pr_or_ci", "require_runtime_proof", "require_truthful_ui_proof", "genuine_external_or_user_only_blocker_must_be_explicit"],
+      "required": [
+        "stop_at_code_or_pr_or_ci",
+        "require_runtime_proof",
+        "require_truthful_ui_proof",
+        "genuine_external_or_user_only_blocker_must_be_explicit"
+      ],
       "properties": {
-        "stop_at_code_or_pr_or_ci": {"const": false},
-        "require_runtime_proof": {"const": true},
-        "require_truthful_ui_proof": {"const": true},
-        "genuine_external_or_user_only_blocker_must_be_explicit": {"const": true}
+        "stop_at_code_or_pr_or_ci": {
+          "const": false
+        },
+        "require_runtime_proof": {
+          "const": true
+        },
+        "require_truthful_ui_proof": {
+          "const": true
+        },
+        "genuine_external_or_user_only_blocker_must_be_explicit": {
+          "const": true
+        }
+      }
+    },
+    "gcp_exit_billing_control": {
+      "type": "object",
+      "required": [
+        "do_not_deploy_cloud_run",
+        "owner_approval_before_cloud_mutation"
+      ],
+      "properties": {
+        "do_not_execute_gcloud": {
+          "const": false
+        },
+        "do_not_deploy_cloud_run": {
+          "const": true
+        },
+        "owner_approval_before_cloud_mutation": {
+          "const": true
+        }
       }
     }
   }
