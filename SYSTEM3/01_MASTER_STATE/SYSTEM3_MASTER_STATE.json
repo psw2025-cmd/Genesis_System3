@@ -20,7 +20,7 @@
     "B-006",
     "B-007"
   ],
-  "current_phase": "0.3_DEPLOYMENT_DISCOVERY",
+  "current_phase": "0.2_SECURITY_REMEDIATION_INDEPENDENT_RECHECK",
   "decisions": [
     "ADR-001",
     "ADR-002",
@@ -48,9 +48,9 @@
   ],
   "main_merge_verification": "PENDING",
   "next_actions": [
-    "Verify final Phase0.2 documentation update head in CI and merge PR #482 normally",
-    "Prepare/test manual-only canonical image build and rollback implementation without GCP execution",
-    "Request explicit scoped owner approval only after deployment candidate PASS"
+    "Verify latest exact-head workflows AND separate GitHub Advanced Security CodeQL check",
+    "Do not merge if CodeQL scanning check fails, even if CodeQL workflow succeeds",
+    "After Phase0.2 main merge continue manual-only deployment candidate and rollback engineering"
   ],
   "overall": "BLOCKED",
   "owner_action_required": "NONE_NOW",
@@ -70,7 +70,7 @@
     "13": "UNKNOWN",
     "14": "UNKNOWN",
     "0.1": "PASS",
-    "0.2": "PASS",
+    "0.2": "UNKNOWN",
     "0.3": "UNKNOWN",
     "0.4": "PASS",
     "0.5": "UNKNOWN"
@@ -100,7 +100,15 @@
     "main_baseline": "1dbae834605b7cbabd57eda82a9db182deb0822c",
     "phase0_1_root_cause": "PASS"
   },
-  "updated_at_utc": "2026-10-18T06:28:00.406Z",
+  "updated_at_utc": "2026-10-18T06:36:13.356Z",
   "working_branch": "fix/system3-phase02-production-ui-truth-20261018",
-  "phase_0_2_evidence_sha": "5d618967ee937fd8601cca328e69dee653533e37"
+  "phase_0_2_evidence_sha": "5d618967ee937fd8601cca328e69dee653533e37",
+  "codeql_security_check": {
+    "check_id": 117606737994,
+    "earlier_head": "9392a9fb892dccf12e8064cbc839d634a9e09547",
+    "earlier_result": "FAIL",
+    "finding": "one HIGH clear-text logging issue in restored live proof",
+    "remediation_commit": "b1d566b032126ef541cd6029ceef781af4ee5dde",
+    "current_result": "UNKNOWN_PENDING_INDEPENDENT_CHECK"
+  }
 }
