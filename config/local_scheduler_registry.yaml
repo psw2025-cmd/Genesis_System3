@@ -1,0 +1,70 @@
+schema_version: 1
+authority_marker: SYSTEM3_LOCAL_SCHEDULER_REGISTRY_V1
+status: migration_registry_pending_agent_reconciliation
+timezone: Asia/Kolkata
+scheduler_authority: windows_task_scheduler_plus_local_supervisor
+parallel_gcp_scheduler_allowed: false
+
+required_fields:
+  - id
+  - purpose
+  - entrypoint
+  - trigger
+  - timeout_seconds
+  - retry_policy
+  - missed_run_policy
+  - lock_name
+  - state_checkpoint
+  - log_stream
+  - heartbeat_expectation
+  - paper_live_safety
+  - enabled
+  - migration_status
+  - owner
+
+schedule_classes:
+  - STARTUP_SUPERVISOR
+  - BROKER_SESSION_MAINTENANCE
+  - INSTRUMENT_MASTER_REFRESH
+  - MARKET_DATA_COLLECTION
+  - FORECAST
+  - RANKING
+  - SIGNAL_GENERATION
+  - PAPER_LIFECYCLE
+  - VALIDATION_RECONCILIATION
+  - MODEL_PREDICTION_EVALUATION
+  - BACKUP
+  - CLEANUP_RETENTION
+  - HEARTBEAT_STATUS_SNAPSHOT
+
+historical_gcp_jobs_to_reconcile:
+  - id: genesis-system3-forecast-daily
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-signals-schedule
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-validate-daily
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-dhan-token-rotate-daily
+    migration_status: P0_LOCAL_BROKER_SESSION_REPLACEMENT_REQUIRED
+  - id: genesis-system3-rank-daily
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-rank-schedule
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-forecast-schedule
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-signals-daily
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+  - id: genesis-system3-scheduler-collector-every-minute
+    migration_status: TODO_VERIFY_KEEP_MERGE_OR_REMOVE
+
+rules:
+  create_unregistered_windows_task: false
+  duplicate_function_schedules_allowed: false
+  duplicate_worker_allowed: false
+  missed_run_may_fabricate_history: false
+  market_gap_must_be_explicit: true
+  live_order_authority_allowed: false
+  temporary_test_task_cleanup_same_cycle: true
+
+# Implementation agents must replace TODO entries with measured current-local truth,
+# actual entrypoints/schedules/locks/state paths and tests through normal PR governance.
