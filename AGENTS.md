@@ -1,61 +1,39 @@
-# Genesis System3 — Agent Constitution
+# Genesis System3 — agent constitution
 
-**Canonical checkout:** `C:\Genesis_System3_Clean`  
-**Upstream code:** GitHub `psw2025-cmd/Genesis_System3` (`origin/main`)  
-**Runtime and acceptance:** local Windows laptop at `http://127.0.0.1:8000` (discover the bound port; do not assume a document).  
-**Machine policy:** `agent_policy.yaml` (schema v6)  
-**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`  
-**Broker:** Dhan. Angel and Render hosting are retired and non-authoritative.
+**Active owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md` (`SYSTEM3_CLOUD_ONLY_OWNER_DIRECTIVE_20261018`).
+**Code authority:** `psw2025-cmd/Genesis_System3` exact approved `main` SHA.
+**Target production authority (not a readiness claim):** GCP `system3-openalgo-safe` / `asia-south1`.
+**Machine policy:** `agent_policy.yaml` (v6).
+**Temporal truth:** `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
+**Broker:** Dhan; retired Render/Angel-era instructions are not System3 runtime authority.
 
-This file is the short universal constitution. Domain rules live under `.cursor/rules/00`–`60`. Do not duplicate them here.
+## Priority and conflicts
+1. Latest explicit owner instruction, including the active cloud-only directive and its scoped consent.
+2. Permanent trading, secret, cost/approval and destructive-operation safety.
+3. This constitution and the active machine policy.
+4. Applicable scoped rules, runbook, current source and fresh evidence.
+5. Prior local-laptop/RUHI/GCP-exit material and historical reports as history only.
 
-## Instruction precedence
+The 2026-09-07 local-laptop directive and conflicting older prose are superseded. The laptop/Cloud Shell is only an optional control client. Never require a local System3 server, checkout, Windows scheduler or laptop uptime for routine operation.
 
-1. Latest explicit user instruction.
-2. Permanent trading, secret, and destructive-operation safety.
-3. This `AGENTS.md`.
-4. Applicable scoped `.cursor/rules/*.mdc` files.
-5. Current control-plane documents under `docs/control_plane/`.
-6. Current source, tests, and fresh local runtime evidence.
-7. Historical reports, snapshots, Issue #188, Cloud Run URLs, and old agent output as context only.
+## Owner-approved actions as of 2026-10-18
+Autonomous GitHub repairs, testing, CI and read-only GCP verification ONLY. Separate explicit owner approval is required before any new billable cloud build/deployment or cloud configuration mutation (including GCP IAM, Scheduler, Cloud Run, secrets, artifact pushes, billing/budgets). A PR merge is not implicit permission to deploy. Do not enable automatic production deployment through a normal GitHub push.
 
-If two instructions conflict, stop only the conflicting action. Continue other safe work.
-
-`docs/control_plane/LOCAL_LAPTOP_USER_DIRECTIVE_20260907.md` supersedes active GCP/Cloud Run/Claude-only/Issue-#188-bus/GitOps-deploy clauses.
-
-## Safety (non-negotiable)
-
-```
+## Permanent PAPER/analyzer safety
+```text
 ANALYZE_MODE=1
+PAPER_MODE=1
+SYSTEM3_MODE=analyze
 LIVE_TRADING_ENABLED=0
 SYSTEM3_LIVE_TRADING_ALLOWED=0
 AUTO_EXECUTE_TRADES=0
-SYSTEM3_MODE=analyze
+LIVE_ORDER_AUTHORITY=0
+ORDER_PLACEMENT_ALLOWED=false
 ```
+No real order placement/modification/cancellation/square-off, no order-shaped real-broker test traffic, no broker secret payload in code/chat/logs/evidence, no service-account JSON keys, no bypass of safety gates. Prove real broker order counts independently before claiming zero.
 
-PAPER/ANALYZER only. Never enable LIVE, never place/modify/cancel/square-off a real Dhan order, never print secrets, never weaken gates to manufacture PASS. Prove `place_order_calls=0` via blocked adapters and mocks. Do not send order-shaped traffic to a real broker order endpoint.
+## GitHub and evidence discipline
+Dedicated non-destructive branch/PR from fresh main; inspect parallel PR ownership and workflow side effects before writing. Do not force-push or overwrite unrelated work. Only current independently observed cloud runtime and same-session authenticated API/browser/broker receipts can establish production truth. CI green, `reports/latest/`, historical GCP image digests and HTTP 200 alone cannot. Evidence statuses: `PASS/FAIL/BLOCKED/UNKNOWN/PARTIAL/NOT_PROVEN/HISTORICAL_ONLY`. Include UTC time, project, command, exit, exact SHA/digest and proof hash. Read-only project inventory must use explicit `--project` and region.
 
-## Mutation boundaries
-
-- Do not `git reset --hard`, `git clean`, `git restore .`, stash, rebase --autostash, or force-push.
-- Dirty-worktree files in the canonical checkout are protected. Task work happens on a dedicated branch/worktree from `origin/main`.
-- No single named AI is sole controller. Concurrent agents must not overwrite unrelated work.
-- Issue #188 is historical coordination context, not a mandatory bus.
-- GCP/Cloud Run/Render are retired as runtime, token, storage, scheduler, monitoring, and acceptance authority. Do not run `gcloud`, deploy Cloud Run, or mint tokens through GCP.
-- GitHub `main` is the upstream code baseline. It is not local-runtime truth.
-
-## Evidence
-
-Current claims (`now` / `live` / `UI now`) require a new observation after a recorded UTC start: local browser + same-session local API. `reports/latest/` is historical. HTTP 200 and a screenshot are not semantic PASS. `connected=true` is not market-data PASS.
-
-Statuses: `PASS` `FAIL` `BLOCKED` `UNKNOWN` `PARTIAL` `NOT_PROVEN` `NOT_APPLICABLE` `HISTORICAL_ONLY`.
-
-## Product lock (one copy)
-
-Local-laptop, evidence-driven, AI-assisted Indian-market intelligence: authentic data, instrument identity, options intelligence (six indices + dynamic equity CE/PE), PAPER only, prediction-to-outcome lineage, multibagger equity research with uncertainty, local scheduling, dashboard proof, tests. No guaranteed profit. No fabricated readiness. Detail: `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md`.
-
-## Completion
-
-Do not stop at analysis, a plan, a commit, a PR, or CI green. Completion requires local API/browser/data/safety proof for the claimed scope, plus an honest residual list.
-
-Every material update states: `STATUS`, `IN_PROGRESS`, `CURRENT_STEP`, `NEXT_ACTION`, `MANDATORY_USER_ACTION`, `OPTIONAL_ACCELERATION_ACTION`.
+## Delivery
+Carry out safe connected-tool work autonomously; ask the owner only at genuine owner-only approval/consent/MFA boundaries. Keep blocked and unknown facts explicit. Follow `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` for exact pre-merge and acceptance re-reads. Full PAPER/ANALYZE PASS requires verified deployed cloud runtime, single worker lease, fresh data, 22-tab semantic UI/API parity, durable paper ledger, provenance and independent LIVE/order safety checks.
