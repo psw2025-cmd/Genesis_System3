@@ -4,9 +4,24 @@
 
 **Policy marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
-## Local runtime override (2026-09-07+)
+## Current runtime authority (2026-10-18+)
 
-Current acceptance authority is the local Windows laptop. For `now` / `live` / `UI now` claims, open a **new** browser session against the proven local URL (default `http://127.0.0.1:8000/ui/`, discover the bound port). GCP Cloud Run `run.app` URLs and `scripts/gcp_live_ui_snapshot.py` below are HISTORICAL_NON_AUTHORITY unless the user explicitly re-authorizes cloud runtime.
+The active owner directive is `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`
+(`SYSTEM3_CLOUD_ONLY_OWNER_DIRECTIVE_20261018`). It supersedes the September 7
+local-laptop override. The intended production authority is GCP project
+`system3-openalgo-safe`, region `asia-south1`, established through current deployed
+source/image lineage and request-scoped read-only API/browser evidence. This target
+is not a claim that a service is deployed, healthy or approved for mutation.
+
+The laptop, localhost smoke tests and Cloud Shell are optional control/test clients,
+not routine production dependencies or production acceptance authority. Local
+render success does not replace the GCP proof sequence below. Preserve historical
+local evidence as history; do not reuse it as current cloud proof.
+
+Current authorization covers GitHub repairs/CI and read-only GCP verification only.
+Separate explicit owner approval is required before billable cloud build/deploy,
+image pushes, or cloud configuration, IAM, scheduler, secret or billing mutations.
+Never fabricate a deployment receipt or bypass an unresolved serving-SHA gate.
 
 ## Core law
 

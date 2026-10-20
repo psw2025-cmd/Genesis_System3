@@ -12,6 +12,15 @@ CANONICAL_DEPLOY_INFO_PATH = "/api/deploy/info"
 
 
 class TemporalTruthContractTests(unittest.TestCase):
+    def test_temporal_policy_uses_current_cloud_authority(self):
+        text = (ROOT / "docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md").read_text(encoding="utf-8")
+        self.assertIn("SYSTEM3_CLOUD_ONLY_OWNER_DIRECTIVE_20261018", text)
+        self.assertIn("system3-openalgo-safe", text)
+        self.assertIn("Separate explicit owner approval is required", text)
+        self.assertIn("not routine production dependencies", text)
+        self.assertNotIn("## Local runtime override (2026-09-07+)", text)
+        self.assertNotIn("Current acceptance authority is the local Windows laptop.", text)
+
     def _manifest(self, started: datetime, captured: datetime) -> dict:
         return {
             "evidence_class": "REQUEST_SCOPED_LIVE_BROWSER",
