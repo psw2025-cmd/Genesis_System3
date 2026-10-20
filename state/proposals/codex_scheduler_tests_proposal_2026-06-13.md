@@ -488,10 +488,12 @@ Expected: load_oi_cache() returns {} without raising exception
 ```
 
 **TC-OI-7: Corrupt JSON — returns {} (no crash)**
+{% raw %}
 ```
 Setup:  Write "NOT VALID JSON {{{" to MARKET_CACHE_FILE
 Expected: load_oi_cache() returns {} without raising exception
 ```
+{% endraw %}
 
 **TC-OI-8: save_oi_cache() round-trip — data survives save→load**
 ```
