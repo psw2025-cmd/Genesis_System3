@@ -151,6 +151,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Check Pages literal JSON example with Liquid
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GEM_HOME="$RUNNER_TEMP/pages-liquid-gems"
+          export GEM_PATH="$GEM_HOME"
+          gem install liquid --version 4.0.4 --no-document
+          ruby scripts/check_pages_json_example.rb
+
       - name: Compile critical scripts
         shell: bash
         run: |
