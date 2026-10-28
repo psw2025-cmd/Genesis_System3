@@ -45,11 +45,18 @@ if not exist "storage\instruments\master_meta.json" (
     echo   instruments cache present — skip
 )
 
-echo [4/6] Freeing port 8000...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING" 2^>nul') do (
-    taskkill /F /PID %%a >nul 2>&1
+echo [4/6] Checking port 8000...
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0port8000_guard.ps1" -Mode reuse
+set PORT_RC=!ERRORLEVEL!
+if "!PORT_RC!"=="10" (
+    echo   Reusing the System3 uvicorn already listening on port 8000.
+    set READY=1
+    goto :healthy
 )
-timeout /t 2 /nobreak >nul
+if "!PORT_RC!"=="20" (
+    echo   Port 8000 belongs to another process. Not stopping it.
+    goto :done
+)
 
 echo [5/6] Starting backend + cloud worker...
 start "System3 Backend" /MIN cmd /c "cd /d %ROOT% && set SYSTEM3_LOCAL=1&& set LIVE_TRADING_ENABLED=0&& set SYSTEM3_REAL_ONLY=1&& venv\Scripts\python.exe -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000"
