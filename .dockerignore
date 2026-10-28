@@ -1,4 +1,4 @@
-.git
+﻿.git
 .venv
 venv
 __pycache__
@@ -21,11 +21,6 @@ agent_memory
 dashboard/backend/logs
 # Runtime state stays out of the image. Later exceptions keep real validation JSON.
 state/*
-!state/market_validations/
-!state/market_validations/*.json
-!state/paper_validations/
-!state/paper_validations/*.json
-
 !state/market_validations/
 !state/market_validations/*.json
 !state/paper_validations/
