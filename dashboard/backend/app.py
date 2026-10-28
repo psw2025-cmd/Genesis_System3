@@ -8606,7 +8606,7 @@ def _ml_accuracy_report_record(report_json: Path) -> Dict[str, Any]:
         "generated_at_utc": summary.get("generated_at_utc"),
         "blocker_reason": blocker,
         "source_file": str(report_json),
-        "ready_for_live": False,
+        "ready_for_live": ml_router._check_real_validations()[0],
     }
 
 
@@ -8668,7 +8668,7 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
             "validation_pending_count": int(data.get("validation_pending_count") or 0),
             "blocker_reason": "PHANTOM_FAMILY_NO_WEIGHTS" if phantom else (data.get("reason") or status_raw or "OPTIONS_ML_NOT_PROMOTABLE"),
             "source_file": str(options_ml),
-            "ready_for_live": False,
+            "ready_for_live": ml_router._check_real_validations()[0],
         }
     )
     return out
@@ -8693,12 +8693,19 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
         reason = rec.get("blocker_reason") or rec.get("message") or rec.get("status")
         if reason:
             blockers.append(f"{name}:{reason}")
+    live_ready, live_reason = ml_router._check_real_validations()
     if any_proven:
-        message = (
-            f"Loaded {len(proven)} proven model performance record(s) "
-            "(analyzer-only). Live readiness remains blocked until forward paper validation passes."
-        )
-        status = "PROVEN_ANALYZER_ONLY"
+        if live_ready:
+            message = (
+                f"Loaded {len(proven)} proven model performance record(s). {live_reason}"
+            )
+            status = "PROVEN_FORWARD_VALIDATION"
+        else:
+            message = (
+                f"Loaded {len(proven)} proven model performance record(s) "
+                f"(analyzer-only). {live_reason}"
+            )
+            status = "PROVEN_ANALYZER_ONLY"
     elif usable:
         message = (
             f"Loaded {len(usable)} blocked accuracy artifact(s). Model not proven — "
@@ -8706,11 +8713,13 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
         )
         if blockers:
             message = f"{message} Blocker: {blockers[0]}"
+        message = f"{message} {live_reason}"
         status = "BLOCKED"
     else:
         message = (
             "No matured ML training/performance artifact is available. "
-            "This means model is not proven trained/ready yet."
+            "This means model is not proven trained/ready yet. "
+            + live_reason
         )
         status = "BLOCKED"
     return {
@@ -8720,7 +8729,8 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
         "model_count": len(usable),
         "proven_count": len(proven),
         "blocked_count": len(blocked),
-        "ready_for_live": False,
+        "ready_for_live": live_ready,
+        "ready_for_live_reason": live_reason,
     }
 
 
@@ -8759,9 +8769,9 @@ async def get_ml_performance(model_name: Optional[str] = None):
             has_metrics = rec.get("avg_accuracy") is not None and int(rec.get("total_predictions") or 0) > 0
             rec["model_proof_ready"] = bool(has_metrics)
             rec.setdefault("status", "PROVEN_ANALYZER_ONLY" if has_metrics else "BLOCKED")
-            rec.setdefault("ready_for_live", False)
             if not has_metrics:
                 rec.setdefault("blocker_reason", "TRACKER_METRICS_INCOMPLETE")
+        rec["ready_for_live"] = ml_router._check_real_validations()[0]
     if not models:
         models["status"] = {
             "status": "NOT_TRAINED",
@@ -8781,7 +8791,7 @@ async def get_ml_performance(model_name: Optional[str] = None):
         "model_proof_ready": summary["model_proof_ready"],
         "proof_status": summary["status"],
         "message": summary["message"],
-        "ready_for_live": False,
+        "ready_for_live": bool(summary.get("ready_for_live")),
     }
 
 
@@ -8838,7 +8848,7 @@ async def compare_ml_models():
         "model_proof_ready": summary["model_proof_ready"],
         "proof_status": summary["status"],
         "message": summary["message"],
-        "ready_for_live": False,
+        "ready_for_live": bool(summary.get("ready_for_live")),
     }
 
 
