@@ -35,3 +35,24 @@ Never place, modify, cancel or square off a real order. No order-shaped tests ag
 ## Evidence taxonomy and owner interaction
 Use `PASS`, `FAIL`, `BLOCKED`, `UNKNOWN`, `NOT_PROVEN`, `HISTORICAL_ONLY`; command exit 0 means invocation success only, not semantic readiness. Record `UTC_TIMESTAMP | PROJECT | COMMAND/API | EXIT_CODE | OBSERVED | EXPECTED | SOURCE_SHA | EVIDENCE_HASH | VERDICT | NEXT_ACTION`. Never fabricate PASS. Historical artifacts support timelines, not current claims.
 Use connected agents/tools for diagnostics and code repair whenever possible; do not repeatedly make the non-coder owner run scripts. Ask only for real owner-only approval, billing/identity/consent or MFA boundaries. If a connected gateway is unavailable, report the limit; never claim unattended activity continued.
+
+
+
+
+---
+## OWNER EXPLICIT APPROVAL — 2026-10-28T01:55Z IST
+
+I, Pritam Warghade (owner), hereby give separate explicit approval for:
+
+1. Billable GCP Cloud Run deployment: service `genesis-system3-web`, project `system3-openalgo-safe` (802404398783), region `asia-south1`
+2. Scope: Fix `dashboard/backend/routers/ml.py` hardcoded `ready_for_live=False` with REAL validation reader logic (read state/paper_validations/*.json + state/market_validations/*.json, check rho>0.70, hit_rate, freshness). DO NOT fabricate JSON.
+3. Allow image build/push, Cloud Run deploy, .dockerignore fix to include state/ folders
+4. Mode: PAPER/ANALYZE ONLY - LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false remains
+5. Evidence required: UTC timestamp, project, exact SHA/digest, /api/ml/performance local + cloud proof, EVIDENCE_HASH, VERDICT PASS/FAIL/BLOCKED/NOT_PROVEN
+
+This approval is for this specific fix only and does NOT authorize LIVE trading.
+
+Owner signature: Pritam Warghade
+Approved at: 2026-10-28 01:55 IST
+GitHub main SHA to deploy from: latest approved main after fix
+---

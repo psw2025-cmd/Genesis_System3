@@ -25,3 +25,8 @@ state/*
 !state/market_validations/*.json
 !state/paper_validations/
 !state/paper_validations/*.json
+
+!state/market_validations/
+!state/market_validations/*.json
+!state/paper_validations/
+!state/paper_validations/*.json
