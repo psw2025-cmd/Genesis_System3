@@ -2,7 +2,7 @@ import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
   Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
-  Search, Zap
+  Search, Zap, ListChecks
 } from 'lucide-react'
 import { useStore } from '../store'
 
@@ -28,6 +28,7 @@ export const DASHBOARD_TABS = [
   { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
+  { id: 'system-readiness', label: 'System readiness', Icon: ListChecks,  group: 'system' },
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ] as const
 
@@ -132,7 +133,7 @@ export function Sidebar() {
                     <span style={{
                       marginLeft: 'auto',
                       width: '7px', height: '7px', borderRadius: '50%',
-                      background: brokerConnected ? 'var(--up)' : 'var(--down)',
+                      background: brokerConnected ? 'var(--amber)' : 'var(--down)',
                     }} />
                   )}
                   {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}

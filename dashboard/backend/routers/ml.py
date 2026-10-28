@@ -349,6 +349,185 @@ def _check_real_validations() -> tuple[bool, str]:
     return False, detail
 
 
+def _format_metric(value: float) -> str:
+    text = f"{value:.4f}".rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def _json_files_in(directory: Path) -> List[Path]:
+    if not directory.is_dir():
+        return []
+    return sorted(path for path in directory.glob("*.json") if path.is_file())
+
+
+def _primary_validation_metrics() -> tuple[Optional[float], Optional[float], str]:
+    """Rho and hit rate from an on-disk validation file. A passing file wins; otherwise the June stub if present."""
+    files = _validation_json_files()
+    chosen: Optional[Path] = None
+    for path in files:
+        ok, _detail = _assess_validation_file(path)
+        if ok:
+            chosen = path
+            break
+    if chosen is None:
+        june = VAL_DIR / "market_validation_2026-06-12.json"
+        if june.is_file():
+            chosen = june
+        elif files:
+            chosen = files[-1]
+    if chosen is None:
+        return None, None, "no validation JSON"
+    data = _load_json(chosen, None)
+    if not isinstance(data, dict):
+        return None, None, f"{chosen.name}: unreadable"
+    rho = _first_float(
+        data,
+        ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
+    )
+    hit = _first_float(data, ("hit_rate", "avg_hit_rate", "direction_hit_rate"))
+    return rho, hit, chosen.name
+
+
+def _validations_checklist() -> List[Dict[str, Any]]:
+    """Pass/fail items from the same on-disk reader. Does not write files."""
+    items: List[Dict[str, Any]] = []
+    paper_exists = PAPER_VAL_DIR.is_dir()
+    items.append(
+        {
+            "id": "paper_validations_exists",
+            "label": "state/paper_validations exists?",
+            "pass": paper_exists,
+            "detail": "YES" if paper_exists else "NO",
+        }
+    )
+    script = ROOT / "scripts" / "run_paper_validation.py"
+    script_exists = script.is_file()
+    items.append(
+        {
+            "id": "paper_validation_script",
+            "label": "scripts/run_paper_validation.py present?",
+            "pass": script_exists,
+            "detail": (
+                "YES"
+                if script_exists
+                else "NO: script is missing; ready_for_live stays false until a real paper lifecycle exists"
+            ),
+        }
+    )
+
+    market_files = _json_files_in(VAL_DIR)
+    paper_files = _json_files_in(PAPER_VAL_DIR)
+    real_names: List[str] = []
+    stub_names: List[str] = []
+    for path in market_files:
+        data = _load_json(path, None)
+        if not isinstance(data, dict):
+            continue
+        ok, detail = _assess_validation_file(path)
+        if ok:
+            real_names.append(path.name)
+        elif _is_stub_validation(data) or "stub" in detail:
+            stub_names.append(path.name)
+    if real_names:
+        market_pass = True
+        market_detail = "YES " + ", ".join(real_names)
+    elif not VAL_DIR.is_dir():
+        market_pass = False
+        market_detail = "NO: state/market_validations is missing"
+    elif not market_files:
+        market_pass = False
+        market_detail = "NO: state/market_validations has no JSON"
+    elif stub_names:
+        market_pass = False
+        market_detail = "NO (stub) " + ", ".join(stub_names)
+    else:
+        market_pass = False
+        market_detail = "NO: no market validation file is a completed real run"
+    items.append(
+        {
+            "id": "market_validation_real_run",
+            "label": "market_validation real run?",
+            "pass": market_pass,
+            "detail": market_detail,
+        }
+    )
+
+    rho, _hit, rho_source = _primary_validation_metrics()
+    rho_pass = rho is not None and rho > _MIN_RHO
+    if rho is None:
+        rho_detail = "NO (missing)"
+    elif rho_pass:
+        rho_detail = f"YES ({_format_metric(rho)}) from {rho_source}"
+    else:
+        rho_detail = f"NO ({_format_metric(rho)}) from {rho_source}"
+    items.append(
+        {
+            "id": "rho_gt_0_70",
+            "label": "rho >0.70?",
+            "pass": rho_pass,
+            "detail": rho_detail,
+        }
+    )
+
+    recon_pass = False
+    recon_detail = "NO"
+    walk_pass = False
+    walk_detail = "NO"
+    for path in paper_files + market_files:
+        data = _load_json(path, None)
+        if not isinstance(data, dict) or _is_stub_validation(data):
+            continue
+        if _reconciliation_complete(data) and _closed_trade_count(data) > 0:
+            recon_pass = True
+            recon_detail = f"YES {path.name}"
+        if _walk_forward_pass(data) and _walk_forward_trade_count(data) > 0:
+            walk_pass = True
+            walk_detail = f"YES {path.name}"
+    items.append(
+        {
+            "id": "closed_trade_reconciliation",
+            "label": "closed-trade reconciliation complete?",
+            "pass": recon_pass,
+            "detail": recon_detail,
+        }
+    )
+    items.append(
+        {
+            "id": "costed_walk_forward",
+            "label": "costed walk-forward PASS?",
+            "pass": walk_pass,
+            "detail": walk_detail,
+        }
+    )
+    return items
+
+
+def _validation_truth_payload() -> Dict[str, Any]:
+    """Shared reader output for /api/ml/performance and the readiness page."""
+    ready, reason = _check_real_validations()
+    rho, hit, _source = _primary_validation_metrics()
+    return {
+        "ready_for_live": ready,
+        "ready_for_live_reason": reason,
+        "validations_checklist": _validations_checklist(),
+        "rho": None if rho is None else round(rho, 4),
+        "hit_rate": None if hit is None else round(hit, 4),
+    }
+
+
+def _with_validation_truth(payload: Dict[str, Any]) -> Dict[str, Any]:
+    truth = _validation_truth_payload()
+    payload.update(truth)
+    performance = payload.get("performance")
+    if isinstance(performance, dict):
+        performance["ready_for_live"] = truth["ready_for_live"]
+        performance["ready_for_live_reason"] = truth["ready_for_live_reason"]
+        performance["validations_checklist"] = truth["validations_checklist"]
+        performance["rho"] = truth["rho"]
+        performance["hit_rate"] = truth["hit_rate"]
+    return payload
+
+
 def _paper_validation_proven() -> bool:
     return _check_real_validations()[0]
 
@@ -521,7 +700,7 @@ async def get_ml_performance():
         "options_ml_training": str(OPTIONS_ML_SUMMARY),
     }
     if not models:
-        return {
+        return _with_validation_truth({
             "models": {},
             "performance": {"models": {}},
             "validation_days": 0,
@@ -531,7 +710,7 @@ async def get_ml_performance():
             "status": "BLOCKED",
             "message": "No real post-market validation reports or CE/PE training proof found. Model is not proven trained/ready. " + live_reason,
             "source_files": source_files,
-        }
+        })
 
     any_proven = any(bool(m.get("model_proof_ready")) for m in models.values())
     if live_ready:
@@ -543,7 +722,7 @@ async def get_ml_performance():
     else:
         status = "BLOCKED"
         message = f"{metrics['reason']} {live_reason}".strip()
-    return {
+    return _with_validation_truth({
         "models": models,
         "performance": {"models": models},
         "validation_days": metrics["validation_days"],
@@ -555,7 +734,7 @@ async def get_ml_performance():
         "status": status,
         "message": message,
         "source_files": source_files,
-    }
+    })
 
 
 @router.get("/api/ml/compare")

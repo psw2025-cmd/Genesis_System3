@@ -33,6 +33,7 @@ interface DashboardState {
   // Runtime facts (deploy SHA, research contract)
   deployInfo: any
   research: any
+  mlPerformance: any
 
   // UI
   activeTab: string
@@ -62,6 +63,7 @@ interface DashboardState {
   setChainSymbol: (s: string) => void
   setDeployInfo: (d: any) => void
   setResearch: (d: any) => void
+  setMlPerformance: (d: any) => void
   setSidebarOpen: (open: boolean) => void
   setCommandQuery: (q: string) => void
 }
@@ -105,6 +107,7 @@ export const useStore = create<DashboardState>((set) => ({
   liveBoard: null,
   deployInfo: null,
   research: null,
+  mlPerformance: null,
   activeTab: 'decision-intel',
   chainSymbol: 'NIFTY',
   sidebarOpen: false,
@@ -162,6 +165,7 @@ export const useStore = create<DashboardState>((set) => ({
   setChainSymbol: (chainSymbol) => set({ chainSymbol }),
   setDeployInfo: (deployInfo) => set({ deployInfo }),
   setResearch: (research) => set({ research }),
+  setMlPerformance: (mlPerformance) => set({ mlPerformance }),
   setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
   setCommandQuery: (commandQuery) => set({ commandQuery }),
 }))

@@ -1,7 +1,9 @@
 import React, { useMemo } from 'react'
 import { useStore } from '../store'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
+import { liveTradingValue, orderAllowedValue, requiredChainCounts } from '../lib/lifecycleTruth'
 
-type Status = 'PASS' | 'WAITING' | 'PARTIAL'
+type Status = 'PASS' | 'WAITING' | 'PARTIAL' | 'PENDING' | 'BLOCKED'
 type LayerRow = { layer: string; status: Status; evidence: string; requiredForMoney: boolean }
 
 const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
@@ -9,13 +11,14 @@ const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX']
 
 function badge(status: Status) {
   const ok = status === 'PASS'
-  const partial = status === 'PARTIAL'
+  const partial = status === 'PARTIAL' || status === 'PENDING'
+  const blocked = status === 'BLOCKED'
   return (
     <span style={{
       display: 'inline-flex', padding: '4px 9px', borderRadius: 999, fontSize: 11, fontWeight: 900,
       border: `1px solid ${ok ? 'rgba(16,185,129,.45)' : partial ? 'rgba(245,158,11,.45)' : 'rgba(239,68,68,.45)'}`,
       color: ok ? 'var(--up)' : partial ? '#f59e0b' : 'var(--down)',
-      background: ok ? 'rgba(16,185,129,.12)' : partial ? 'rgba(245,158,11,.12)' : 'rgba(239,68,68,.12)',
+      background: ok ? 'rgba(16,185,129,.12)' : partial ? 'rgba(245,158,11,.12)' : blocked ? 'rgba(239,68,68,.12)' : 'rgba(239,68,68,.12)',
     }}>{status}</span>
   )
 }
@@ -62,12 +65,6 @@ function isDhanChainReady(value: any): boolean {
   return ['OK', 'MARKET_OPEN'].includes(status) && value.stale !== true
 }
 
-function isSafeNoTradeChain(value: any): boolean {
-  if (!value || typeof value !== 'object') return false
-  return String(value.data_source || value.source || '').toLowerCase().startsWith('dhan')
-    && String(value.status || '').toUpperCase() === 'NO_DHAN_DATA'
-}
-
 export function SystemTruthControl() {
   const {
     health, state, brokerConnected, brokerStatus, brokerFunds, brokerHoldings, brokerPositions,
@@ -86,17 +83,18 @@ export function SystemTruthControl() {
     const holdingsCount = rowsOf(brokerHoldings).length
     const positionsCount = rowsOf(brokerPositions).length
 
-    const required = REQUIRED_CHAIN_SYMBOLS.map(symbol => ({ symbol, value: chain?.[symbol] }))
+    const requiredCounts = requiredChainCounts(chain)
+    const requiredReady = requiredCounts.requiredReady
+    const requiredSafeNoTrade = requiredCounts.safeNoTrade
     const optional = OPTIONAL_CHAIN_SYMBOLS.map(symbol => ({ symbol, value: chain?.[symbol] }))
-    const requiredReady = required.filter(item => isDhanChainReady(item.value)).length
-    const requiredSafeNoTrade = required.filter(item => isSafeNoTradeChain(item.value)).length
     const optionalReady = optional.filter(item => isDhanChainReady(item.value)).length
 
     const candidates = collectCandidates(gainRank)
     const candidateCount = candidates.length
     const cePeOk = hasCePe(gainRank)
-    const liveFlag = Boolean(state?.live_trading_enabled ?? health?.live_allowed ?? brokerStatus?.live_trading_enabled)
-    const orderAllowed = Boolean(state?.order_placement_allowed ?? brokerStatus?.order_placement_allowed)
+    const liveFlag = liveTradingValue(state, brokerStatus, health)
+    const liveOn = liveFlag === true || liveFlag === 1 || liveFlag === '1'
+    const orderAllowed = orderAllowedValue(state, brokerStatus)
     const available = brokerFunds?.available_balance ?? brokerFunds?.normalized?.available_balance
     const used = brokerFunds?.used_margin ?? brokerFunds?.normalized?.used_margin ?? brokerFunds?.normalized?.utilized_amount
 
@@ -110,7 +108,7 @@ export function SystemTruthControl() {
       {
         layer: 'Broker read-only connection',
         status: brokerOk ? 'PASS' : 'WAITING',
-        evidence: `connected=${brokerOk}, source=${brokerStatus?.broker || 'dhan'}, order_allowed=${orderAllowed}`,
+        evidence: `connected=${brokerOk}, source=${brokerStatus?.broker || 'dhan'}, order_allowed=${orderAllowed === null ? 'null' : orderAllowed}, trade_permission=PAPER LOCKED`,
         requiredForMoney: true,
       },
       {
@@ -132,9 +130,15 @@ export function SystemTruthControl() {
         requiredForMoney: true,
       },
       {
+        layer: 'Option-chain tradable permission',
+        status: 'PENDING',
+        evidence: `safe_no_trade=${requiredSafeNoTrade}/${REQUIRED_CHAIN_SYMBOLS.length} is data-present, not tradable. Show PENDING, never ACTIVE.`,
+        requiredForMoney: true,
+      },
+      {
         layer: 'Universe / ranking candidates',
         status: candidateCount > 0 ? 'PASS' : 'PARTIAL',
-        evidence: `candidate_rows=${candidateCount}; zero candidates is not fabricated into a PASS`,
+        evidence: candidateCount > 0 ? `candidate_rows=${candidateCount}; candidate_rows zero not fabricated into PASS; rows are not trades and not profit` : `candidate_rows zero not fabricated into PASS; candidate_rows=${candidateCount}`,
         requiredForMoney: true,
       },
       {
@@ -146,8 +150,14 @@ export function SystemTruthControl() {
       {
         layer: 'Paper/analyzer lifecycle read path',
         status: paper != null ? 'PASS' : 'WAITING',
-        evidence: `paper=${paper == null ? 'missing' : String(paper.status || 'present')}; read-path presence does not prove completed lifecycle`,
+        evidence: `PRESENCE ONLY: read-path presence does not prove completed lifecycle. paper=${paper == null ? 'missing' : String(paper.status || 'present')}. Checklist NOs come from the performance payload.`,
         requiredForMoney: false,
+      },
+      {
+        layer: 'Paper lifecycle proof',
+        status: 'BLOCKED',
+        evidence: 'ready_for_live is not granted here. See the shared checklist.',
+        requiredForMoney: true,
       },
       {
         layer: 'Risk gates / automation state',
@@ -157,20 +167,20 @@ export function SystemTruthControl() {
       },
       {
         layer: 'Live-money safety lock',
-        status: !liveFlag && !orderAllowed ? 'PASS' : 'WAITING',
-        evidence: `live_flag=${liveFlag}, order_allowed=${orderAllowed}; analyzer/PAPER requires both false`,
+        status: !liveOn && orderAllowed !== true ? 'PASS' : 'WAITING',
+        evidence: `LIVE_TRADING_ENABLED=${liveFlag === null ? 'null' : String(liveFlag)}, order_allowed=${orderAllowed === null ? 'null' : String(orderAllowed)}; analyzer/PAPER requires both false`,
         requiredForMoney: true,
       },
     ]
   }, [health, state, brokerConnected, brokerStatus, brokerFunds, brokerHoldings, brokerPositions, chain, gainRank, autoGates, paper, apiStatus])
 
-  const moneyRows = rows.filter(row => row.requiredForMoney)
-  const moneyReady = moneyRows.every(row => row.status === 'PASS')
   const infraRows = rows.slice(0, 5)
   const infraOk = infraRows.every(row => row.status === 'PASS')
+  const safetyRow = rows.find(row => row.layer === 'Live-money safety lock')
 
   return (
     <div data-testid="system-truth-control" style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
+      <PendingLifecycleBanner />
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>System Truth Control</h2>
@@ -185,15 +195,13 @@ export function SystemTruthControl() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(160px, 1fr))', gap: 12, marginBottom: 16 }}>
         <div className="card" style={{ padding: 12 }}>{badge(infraOk ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>Infrastructure / broker read state</div></div>
-        <div className="card" style={{ padding: 12 }}>{badge(moneyReady ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>{moneyReady ? 'All required proof layers present' : 'Readiness evidence still incomplete'}</div></div>
-        <div className="card" style={{ padding: 12 }}>{badge('PASS')}<div style={{ marginTop: 8, fontSize: 12 }}>PAPER / LIVE safety lock</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge('BLOCKED')}<div style={{ marginTop: 8, fontSize: 12 }}>Trade permission BLOCKED</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(safetyRow?.status === 'PASS' ? 'PASS' : 'WAITING')}<div style={{ marginTop: 8, fontSize: 12 }}>LIVE safety lock. Not a trade permission.</div></div>
       </div>
 
-      {!moneyReady && (
-        <div style={{ border: '1px solid rgba(245,158,11,.35)', background: 'rgba(245,158,11,.08)', padding: 10, borderRadius: 8, marginBottom: 14, color: '#f59e0b', fontSize: 12 }}>
-          <b>READINESS_NOT_PROVEN</b> — at least one required current evidence layer below is incomplete. This does not enable live broker orders.
-        </div>
-      )}
+      <div style={{ border: '1px solid rgba(245,158,11,.35)', background: 'rgba(245,158,11,.08)', padding: 10, borderRadius: 8, marginBottom: 14, color: '#f59e0b', fontSize: 12 }}>
+        <b>TRADE PERMISSION PENDING</b> — infrastructure rows may PASS. Lifecycle proof stays BLOCKED. This does not enable live broker orders.
+      </div>
 
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
         <thead><tr><th className="thead">Layer</th><th className="thead">Status</th><th className="thead">Required</th><th className="thead">Current shared evidence</th></tr></thead>
@@ -210,7 +218,7 @@ export function SystemTruthControl() {
       </table>
 
       <div style={{ marginTop: 14, color: 'var(--text-muted)', fontSize: 11, lineHeight: 1.5 }}>
-        Truth source: the same Zustand state populated by the dashboard's bounded read-only poller. A separate tab must not stampede the same Dhan/GCP endpoints and then display its timeout as broker truth.
+        Truth source: same Zustand state bounded read-only poller - no duplicate burst. A separate tab must not stampede the same Dhan/GCP endpoints and then display its timeout as broker truth.
       </div>
     </div>
   )

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import { cn } from '../lib/utils'
 import { AuthUnlock } from './AuthUnlock'
@@ -31,6 +32,22 @@ export function SystemTab() {
     marketOpen,
     state,
   } = useStore()
+  const [pinWarning, setPinWarning] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/system/readiness', { headers: { Accept: 'application/json' } })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (cancelled) return
+        const warning = data?.dhan_pin_warning
+        setPinWarning(typeof warning === 'string' && warning ? warning : null)
+      })
+      .catch(() => {
+        if (!cancelled) setPinWarning(null)
+      })
+    return () => { cancelled = true }
+  }, [])
 
   const proof = brokerStatus?.token_proof || {}
   const reload = brokerStatus?.token_reload || {}
@@ -95,6 +112,12 @@ export function SystemTab() {
         <Row label="SLA Result" value={health?.performance_sla?.sla_pass == null ? 'NOT PROVEN' : String(health.performance_sla.sla_pass)} ok={health?.performance_sla?.sla_pass == null ? undefined : Boolean(health.performance_sla.sla_pass)} />
         <Row label="QC Status" value={health?.qc_status ?? 'PENDING PROOF'} ok={health?.qc_status == null ? undefined : health.qc_status === 'OK' || health.qc_status === 'PASS'} />
       </div>
+
+      {pinWarning && (
+        <div className="card p-4" data-testid="dhan-pin-warning" style={{ borderColor: 'var(--amber)', color: 'var(--amber)' }}>
+          {pinWarning}
+        </div>
+      )}
 
       <div className="card p-5">
         <h3 className="text-sm font-semibold text-text-primary mb-3">Safety Truth</h3>

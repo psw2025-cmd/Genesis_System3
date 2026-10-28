@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
 import { OptionChain } from './OptionChain'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 import { MarketTopCePeTable } from './MarketTopCePeTable'
 import { useStore } from '../store'
-import { API_BASE, API_HEADERS } from '../config'
 import { fmt, cn } from '../lib/utils'
-
-const BASE = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '')
 
 function ScannerRow({ row }: { row: any }) {
   const isUp = row.direction === 'UP'
@@ -58,70 +55,9 @@ function EquityRow({ row }: { row: any }) {
 export function TradeTab() {
   const { gainRank, apiStatus, setChainSymbol, marketTop } = useStore()
   const rankings: any[] = gainRank?.rankings ?? []
-  const [equity, setEquity] = useState<unknown>(null)
-  const [equityErr, setEquityErr] = useState('')
-  const [seedRows, setSeedRows] = useState<any[]>([])
-
-  useEffect(() => {
-    let alive = true
-    const load = async () => {
-      try {
-        const r = await fetch(`${BASE}/api/scanner/equity_options?top_n=8`, {
-          credentials: 'include',
-          headers: { Accept: 'application/json', ...API_HEADERS },
-        })
-        if (!r.ok) throw new Error(String(r.status))
-        const data = await r.json()
-        if (alive) {
-          setEquity(data)
-          setEquityErr('')
-        }
-      } catch (e: any) {
-        if (alive) setEquityErr(String(e?.message || e))
-      }
-    }
-    load()
-    const t = setInterval(load, 180000)
-    return () => {
-      alive = false
-      clearInterval(t)
-    }
-  }, [])
-
-  useEffect(() => {
-    let alive = true
-    const seeds = ['RELIANCE', 'HDFCBANK', 'POWERGRID']
-    const loadSeeds = async () => {
-      const rows: any[] = []
-      await Promise.all(seeds.map(async (sym) => {
-        try {
-          const r = await fetch(`${BASE}/api/chain/${sym}`, {
-            credentials: 'include',
-            headers: { Accept: 'application/json', ...API_HEADERS },
-          })
-          if (!r.ok) return
-          const data = await r.json()
-          const contracts = Array.isArray(data?.contracts) ? data.contracts : []
-          const ce = contracts.filter((c: any) => String(c?.option_type || '').toUpperCase() === 'CE' && Number(c?.ltp) > 0)
-            .sort((a: any, b: any) => Number(b.oi || 0) - Number(a.oi || 0))[0]
-          const pe = contracts.filter((c: any) => String(c?.option_type || '').toUpperCase() === 'PE' && Number(c?.ltp) > 0)
-            .sort((a: any, b: any) => Number(b.oi || 0) - Number(a.oi || 0))[0]
-          if (ce) rows.push({ underlying: sym, option_type: 'CE', strike: ce.strike, ltp: ce.ltp, oi: ce.oi })
-          if (pe) rows.push({ underlying: sym, option_type: 'PE', strike: pe.strike, ltp: pe.ltp, oi: pe.oi })
-        } catch {
-          // keep last-good seeds
-        }
-      }))
-      if (alive) setSeedRows(rows)
-    }
-    loadSeeds()
-    return () => { alive = false }
-  }, [])
-
-  const scannerRows: any[] = [
-    ...(equity?.scanner?.top_ce_list || []),
-    ...(equity?.scanner?.top_pe_list || []),
-  ]
+  const equityErr = ''
+  const scannerRows: any[] = []
+  const seedRows: any[] = []
   const marketEquity = Array.isArray(marketTop?.market_top_table)
     ? marketTop.market_top_table.filter((row: any) => {
         const u = String(row?.underlying || row?.symbol || '').toUpperCase()
@@ -129,10 +65,11 @@ export function TradeTab() {
       })
     : []
   const equityRows: any[] = (scannerRows.length ? scannerRows : (seedRows.length ? seedRows : marketEquity)).slice(0, 12)
-  const liveOk = Number(equity?.segments?.equity_options?.live_chains_ok || seedRows.length || 0)
+  const liveOk = equityRows.length
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      <PendingLifecycleBanner />
       <div className="h-[46%] min-h-[240px] border-b border-border flex-shrink-0 overflow-hidden">
         <MarketTopCePeTable onSelectUnderlying={(sym) => setChainSymbol(sym)} />
       </div>

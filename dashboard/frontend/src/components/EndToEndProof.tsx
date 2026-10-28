@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { useStore } from '../store'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
+import { requiredChainCounts } from '../lib/lifecycleTruth'
 
 const REQUIRED_CHAIN_SYMBOLS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY']
 const OPTIONAL_CHAIN_SYMBOLS = ['SENSEX', 'RELIANCE']
@@ -97,8 +99,8 @@ export function EndToEndProof() {
       { item: 'Real broker positions response', ok: positionsOk, evidence: `rows=${rowsOf(brokerPositions).length}; empty success is valid` },
       { item: 'Required Dhan option chains', ok: requiredReady === REQUIRED_CHAIN_SYMBOLS.length, evidence: `${requiredReady}/${REQUIRED_CHAIN_SYMBOLS.length} ready` },
       { item: 'No non-Dhan source in required chains', ok: !badRequiredSource, evidence: badRequiredSource ? 'non-Dhan marker detected' : 'clean' },
-      { item: 'Current CE / PE candidate evidence', ok: cePe, evidence: cePe ? `${candidates.length} candidate rows include CE/PE truth` : `candidate_rows=${candidates.length}; CE/PE not yet proven` },
-      { item: 'Paper/analyzer read path', ok: paperOk, evidence: paperOk ? String(paper?.status || 'paper/pnl present') : 'not loaded' },
+      { item: 'Current CE / PE candidate evidence', ok: cePe, evidence: cePe ? `${candidates.length} candidate rows. Not trades and not profit.` : `candidate_rows=${candidates.length}; CE/PE not yet proven` },
+      { item: 'Paper/analyzer read path', ok: paperOk, evidence: paperOk ? `PRESENCE ONLY. ${String(paper?.status || 'paper/pnl present')}` : 'not loaded' },
       { item: 'Gate/risk state visible', ok: gatesOk, evidence: gatesOk ? String(autoGates?.status || 'present') : 'not loaded' },
       { item: 'LIVE/order safety lock', ok: safetyOk, evidence: `live=${liveOn}, order_allowed=${orderAllowed}` },
     ]
@@ -108,6 +110,7 @@ export function EndToEndProof() {
 
   return (
     <div data-testid="end-to-end-proof" style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
+      <PendingLifecycleBanner />
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <h2 style={{ margin: 0, fontSize: 22 }}>End-to-End Current Truth Proof</h2>
@@ -119,7 +122,8 @@ export function EndToEndProof() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(150px, 1fr))', gap: 12, marginBottom: 16 }}>
-        <div className="card" style={{ padding: 12 }}>{badge(proof.overall, 'FULL E2E')}<div style={{ marginTop: 8, fontSize: 12 }}>Current shared proof</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(false, 'LIFECYCLE BLOCKED', true)}<div style={{ marginTop: 8, fontSize: 12 }}>Trade permission. Infrastructure rows below are not a live pass.</div></div>
+        <div className="card" style={{ padding: 12 }}>{badge(false, `safe_no_trade ${requiredChainCounts(chain).safeNoTrade}/${requiredChainCounts(chain).total} PENDING`, true)}<div style={{ marginTop: 8, fontSize: 12 }}>required_ready {requiredChainCounts(chain).requiredReady}/{requiredChainCounts(chain).total} may pass as data. Tradable state stays PENDING.</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.brokerOk, 'BROKER')}<div style={{ marginTop: 8, fontSize: 12 }}>Dhan connectivity</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.requiredReady === REQUIRED_CHAIN_SYMBOLS.length, '4 CHAINS')}<div style={{ marginTop: 8, fontSize: 12 }}>Required option chains</div></div>
         <div className="card" style={{ padding: 12 }}>{badge(proof.cePe, 'CE/PE', !proof.cePe)}<div style={{ marginTop: 8, fontSize: 12 }}>Decision evidence</div></div>

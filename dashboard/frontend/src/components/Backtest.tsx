@@ -102,11 +102,11 @@ export default function Backtest() {
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Sharpe Ratio</div>
-              <div className="text-2xl font-bold">{summary.sharpe_ratio ?? 1.88}</div>
+              <div className="text-2xl font-bold">{summary.sharpe_ratio == null ? 'PENDING' : summary.sharpe_ratio}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Avg Trade Expectancy</div>
-              <div className="text-2xl font-bold text-green-400">₹{formatNumber(summary.avg_trade_expectancy ?? 1892.66)}</div>
+              <div className="text-2xl font-bold text-green-400">{summary.avg_trade_expectancy == null ? 'PENDING' : `₹${formatNumber(summary.avg_trade_expectancy)}`}</div>
             </div>
           </div>
 

@@ -3,6 +3,7 @@ import { useStore } from '../store'
 import { shortSha } from '../lib/formatLive'
 import { pickFutureNextOpen } from '../lib/nextMarketOpen'
 import { brokerConnectedFromPayloads, gatesDisplay } from '../lib/sourceQuality'
+import { brokerPermissionLabel } from '../lib/lifecycleTruth'
 
 const IST_FMT = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kolkata',
@@ -33,6 +34,7 @@ export function AutonomousLoopBanner() {
   const gates = gatesDisplay(autoGates)
   const passCount = gates.passCount
   const brokerOk = brokerConnectedFromPayloads(health, brokerStatus, brokerConnected).value
+  const brokerLabel = brokerPermissionLabel({ brokerConnected: brokerOk, brokerStatus, health, state })
   const serving = deployInfo?.git_sha ? shortSha(deployInfo.git_sha) : deployInfo?.version ? String(deployInfo.version).slice(0, 7) : '—'
   const marketReason = String(state?.market?.reason || health?.market?.reason || '')
   const isWeekendClosed = /weekend/i.test(marketReason)
@@ -72,7 +74,7 @@ export function AutonomousLoopBanner() {
       {/* System State Chips */}
       <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-          BROKER: <strong className={brokerOk ? 'text-emerald-400' : 'text-rose-400'}>{brokerOk ? 'CONNECTED' : 'DISCONNECTED'}</strong>
+          BROKER: <strong className="text-amber-400">{brokerLabel}</strong>
         </div>
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
           SERVING: <strong className="text-sky-400">{serving}</strong>

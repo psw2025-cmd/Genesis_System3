@@ -1,9 +1,13 @@
 import React from 'react'
 import { useStore } from '../store'
-import { Activity, ShieldCheck, Zap, Clock, CheckCircle2 } from 'lucide-react'
+import { Activity, ShieldCheck, Clock } from 'lucide-react'
+import { brokerPermissionLabel, requiredChainCounts } from '../lib/lifecycleTruth'
 
 export function TruthStrip() {
-  const { wsStatus, brokerConnected, marketOpen, state, health, deployInfo } = useStore()
+  const { wsStatus, brokerConnected, brokerStatus, marketOpen, state, health, deployInfo, chain } = useStore()
+  const permission = brokerPermissionLabel({ brokerConnected, brokerStatus, health, state })
+  const chains = requiredChainCounts(chain)
+  const latency = brokerStatus?.latency_ms
   
   // Authoritative live deployed SHA resolution (never hardcoded fallback)
   const deploySha = deployInfo?.git_sha
@@ -37,13 +41,9 @@ export function TruthStrip() {
         </div>
 
         {/* Broker Status */}
-        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-semibold ${
-          brokerConnected
-            ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
-            : 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-        }`}>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-semibold bg-amber-500/10 border-amber-500/30 text-amber-400">
           <ShieldCheck size={14} />
-          <span>{brokerConnected ? 'DHAN CONNECTED' : 'STANDBY REPLAY'}</span>
+          <span>DHAN {permission}</span>
         </div>
 
         {/* WebSocket Stream */}
@@ -60,7 +60,7 @@ export function TruthStrip() {
         {/* Option Chains */}
         <div className="hidden lg:flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">CHAINS:</span>
-          <span className="text-emerald-400 font-bold">4-of-4 FRESH</span>
+          <span className="text-amber-300 font-bold">required_ready {chains.requiredReady}/{chains.total} · safe_no_trade {chains.safeNoTrade}/{chains.total} · {chains.tradableLabel}</span>
         </div>
       </div>
 
@@ -75,9 +75,9 @@ export function TruthStrip() {
           <span>{marketOpen ? 'MARKET LIVE' : 'MARKET CLOSED (STANDBY)'}</span>
         </div>
 
-        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-sky-500/10 border border-sky-500/20 text-sky-400 font-mono text-[11px] font-semibold">
-          <Zap size={12} />
-          <span>LATENCY: &lt;15ms</span>
+        <div className="hidden sm:flex items-center gap-1 px-2 py-1 rounded-md bg-slate-950 border border-slate-700 text-slate-300 font-mono text-[11px] font-semibold">
+          <Clock size={12} />
+          <span>LATENCY: {latency != null ? `${latency}ms read-only` : 'PENDING'}</span>
         </div>
       </div>
     </div>

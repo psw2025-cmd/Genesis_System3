@@ -217,7 +217,7 @@ export function useData() {
     setHealth, setState, setPaper, setGainRank, setMarketTop,
     setAlerts, setAlertFeedStatus, setAutoGates, setWsStatus, chainSymbol, setChain,
     setBrokerStatus, setBrokerHoldings, setBrokerFunds, setBrokerPositions,
-    setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch,
+    setLiveBoard, setPnl, setApiStatus, setDeployInfo, setResearch, setMlPerformance,
   } = useStore()
 
   const wsRef = useRef<WebSocket | null>(null)
@@ -527,9 +527,10 @@ export function useData() {
   }, [setDeployInfo, setResearch])
 
   const pollSecondary = useCallback(async () => {
-    const [alerts, gates] = await Promise.allSettled([
+    const [alerts, gates, mlPerf] = await Promise.allSettled([
       fetchJSON('/api/alerts/recent?limit=30'),
       fetchJSON('/api/auto_gates'),
+      fetchJSON('/api/ml/performance', 12000),
     ])
 
     const err = apiError(alerts, '/api/alerts/recent') || apiError(gates, '/api/auto_gates')
@@ -547,7 +548,9 @@ export function useData() {
 
     if (gates.status === 'fulfilled') setAutoGates(gates.value)
     else if (!retainTransient || !prev.autoGates) setAutoGates(pendingGates(err))
-  }, [setAlerts, setAlertFeedStatus, setAutoGates, markFailure, markSuccess])
+
+    if (mlPerf.status === 'fulfilled') setMlPerformance(mlPerf.value)
+  }, [setAlerts, setAlertFeedStatus, setAutoGates, setMlPerformance, markFailure, markSuccess])
 
   const wsConnect = useCallback(() => {
     if (wsRef.current && wsRef.current.readyState <= 1) return

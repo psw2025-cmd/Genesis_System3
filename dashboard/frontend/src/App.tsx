@@ -38,6 +38,7 @@ import { PredictionAudit }      from './components/workspaces/PredictionAudit'
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
+import SystemReadiness from './components/SystemReadiness'
 import { GenesisTab } from './components/GenesisTab'
 
 function Content() {
@@ -58,6 +59,7 @@ function Content() {
     case 'paper':        return <PaperTrading />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
+    case 'system-readiness': return <SystemReadiness />
     case 'genesis':      return <GenesisTab />
     case 'e2e-proof':    return <EndToEndProof />
     case 'broker':       return <BrokerProofPanel />

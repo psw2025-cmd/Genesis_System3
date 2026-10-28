@@ -3,6 +3,7 @@ import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
 import DataSourceWarning from './DataSourceWarning'
 import ErrorBanner from './ErrorBanner'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 type ApiBundle = {
   state: any
@@ -50,8 +51,10 @@ type PaperPos = {
 }
 
 function money(v: any) {
-  const n = Number(v || 0)
-  return `₹${Number.isFinite(n) ? n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}`
+  if (v == null || v === '') return 'PENDING'
+  const n = Number(v)
+  if (!Number.isFinite(n)) return 'PENDING'
+  return `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 function statusBadge(ok: boolean, text: string) {
@@ -83,11 +86,11 @@ export default function PaperTrading() {
   const fetchData = async () => {
     try {
       const [stateRes, paperRes, pnlRes, tradesRes, accRes] = await Promise.all([
-        axios.get(`${API_BASE}/api/state`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: { mode: 'PAPER', live_trading_enabled: false, broker: { connected: true, status: 'OK' } } })),
-        axios.get(`${API_BASE}/api/paper`, { headers: API_HEADERS, timeout: 20000 }).catch((err) => ({ data: { status: 'OK', error: err.message, positions: { positions: [], open_count: 0 }, paper_truth: {} } })),
-        axios.get(`${API_BASE}/api/pnl`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: { summary: { total_realized_pnl: -1806.07, total_unrealized_pnl: 0, total_pnl: -1806.07 } } })),
-        axios.get(`${API_BASE}/api/trades/today`, { headers: API_HEADERS, timeout: 15000 }).catch((err) => ({ data: { status: 'OK', error: err.message, entries: [], exits: [], count: 0 } })),
-        axios.get(`${API_BASE}/api/paper/account`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: { initial_capital: 500000.0, available_margin: 450000.0, used_margin: 50000.0 } })),
+        axios.get(`${API_BASE}/api/state`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
+        axios.get(`${API_BASE}/api/paper`, { headers: API_HEADERS, timeout: 20000 }).catch((err) => ({ data: { status: 'ERROR', error: err.message, positions: { positions: [], open_count: 0 }, paper_truth: {} } })),
+        axios.get(`${API_BASE}/api/pnl`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
+        axios.get(`${API_BASE}/api/trades/today`, { headers: API_HEADERS, timeout: 15000 }).catch((err) => ({ data: { status: 'ERROR', error: err.message, entries: [], exits: [], count: 0 } })),
+        axios.get(`${API_BASE}/api/paper/account`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
       ])
       setBundle({ state: stateRes.data, paper: paperRes.data || null, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null, account: accRes.data || null })
       setLastRefresh(new Date().toLocaleString())
@@ -113,8 +116,6 @@ export default function PaperTrading() {
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 15000)
-    return () => clearInterval(interval)
   }, [])
 
   if (error && !bundle) {
@@ -169,15 +170,16 @@ export default function PaperTrading() {
   const totalUnrealized = positions.reduce((sum, p) => sum + Number(p.unrealized_pnl ?? p.unrealizedProfit ?? 0), 0)
   const totalPnL = Number(summary?.total_pnl ?? (totalRealized + totalUnrealized))
   const maxPositions = Number(paper?.max_positions ?? state?.max_positions ?? 3)
-  const initialCapital = Number(account.initial_capital || 500000.0)
-  const availableMargin = Number(account.available_margin || 450000.0)
-  const usedMargin = Number(account.used_margin || 50000.0)
+  const initialCapital = account.initial_capital == null ? null : Number(account.initial_capital)
+  const availableMargin = account.available_margin == null ? null : Number(account.available_margin)
+  const usedMargin = account.used_margin == null ? null : Number(account.used_margin)
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start gap-4 flex-wrap">
         <div>
           <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+          <PendingLifecycleBanner />
           <div className="text-sm text-gray-400 mt-1">
             Aligned to DhanHQ v2 Positions fields · Source: {positionsSource} · Refresh: {lastRefresh || '—'}
           </div>
