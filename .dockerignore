@@ -6,9 +6,8 @@ __pycache__
 .mypy_cache
 node_modules
 
-# Allow reports/latest for truth score, ignore other reports
+# Reports – keep only latest
 reports/*
-!reports/latest
 !reports/latest/
 !reports/latest/**
 runtime_reports
@@ -26,26 +25,21 @@ agent_memory
 
 dashboard/backend/logs
 
-# Runtime state stays out of the image.
-# Explicit exceptions keep the validation JSON files that Cloud Run needs.
-state/*
-!state/
-!state/paper_validations/
+# -------------------------------------------------
+# State folder – exclude everything by default
+# then explicitly re-include the validation folders
+# -------------------------------------------------
+state/**
 !state/paper_validations/
 !state/paper_validations/**
-!state/paper_validations/*.json
-!state/paper_validations/.gitkeep
-!state/market_validations/
 !state/market_validations/
 !state/market_validations/**
-!state/market_validations/*.json
-!state/market_validations/.gitkeep
 
-# PERMANENT FIX - Never bake live / volatile data
+# Never bake live / volatile data
 **/moneycontrol_option_gainers.json
 **/moneycontrol_*.json
 
-# Keep scripts that are required at runtime
+# Keep required scripts
 !scripts/run_paper_validation.py
 !scripts/paper_lifecycle_proof.py
 !scripts/system3_model_accuracy_tracker.py
