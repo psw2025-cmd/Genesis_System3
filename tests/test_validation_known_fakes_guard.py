@@ -30,3 +30,12 @@ def test_validation_requires_source_record_hashes():
     text = ast.get_source_segment(source, func)
     for field in ("source_evidence", "predictions_sha256", "outcomes_sha256", "closed_trades_sha256"):
         assert field in text
+
+
+def test_unverified_accuracy_never_falls_back_to_june_stub():
+    source = ROUTER.read_text(encoding="utf-8")
+    func = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "_primary_validation_metrics")
+    body = ast.get_source_segment(source, func)
+    assert "market_validation_2026-06-12.json" not in body
+    assert '"no verified validation report"' in body
+    assert "_assess_validation_file(path)" in body
