@@ -1,0 +1,21 @@
+{
+  "blocked_underlyings": {
+    "BANKNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "FINNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "MIDCPNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
+    "NIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+  },
+  "enabled_underlyings": [
+    "NIFTY",
+    "BANKNIFTY",
+    "FINNIFTY",
+    "MIDCPNIFTY"
+  ],
+  "generated_at": "2026-10-29T15:46:49.039580",
+  "live_trading_enabled": false,
+  "loaded_underlyings": [],
+  "order_placement_allowed": false,
+  "reason": "Some enabled Dhan chains unavailable",
+  "source": "dhan_only_no_fallback",
+  "status": "BLOCKED"
+}
