@@ -54,3 +54,10 @@ def test_readiness_does_not_recommend_disabled_synthetic_generator():
     source = ROUTER.read_text(encoding="utf-8")
     assert 'REAL_PAPER_LIFECYCLE_NOT_PROVEN - run scripts/run_paper_validation.py' not in source
     assert 'REAL_PAPER_LIFECYCLE_NOT_PROVEN - verified trade and market evidence unavailable' in source
+
+
+def test_nonfinite_and_out_of_range_accuracy_is_rejected():
+    source = ROUTER.read_text(encoding="utf-8")
+    assert "math.isfinite(number)" in source
+    assert '"hit_rate must be between 0 and 1"' in source
+    assert '"rho must be between -1 and 1"' in source
