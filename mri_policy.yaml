@@ -1,0 +1,34 @@
+mri_policy:
+  MRI-001:
+    description: "Critical - artifact or image mismatch or integrity breach"
+    actions:
+      - stop_live_execution: true
+      - rollback_to_last_stable_digest: true
+      - create_rca_ticket: true
+      - notify_oncall: true
+      - evidence_required: ["artifact_manifest.json", "deploy_info.json", "run_manifest.sha256"]
+  MRI-002:
+    description: "High - statistical or operational regression"
+    actions:
+      - disable_auto_trade_for_affected_symbols: true
+      - run_targeted_retrain: true
+      - run_chaos_scenario: "targeted"
+      - notify_oncall: true
+      - evidence_required: ["predictions.ndjson", "backtest_report.json"]
+  MRI-003:
+    description: "Medium - performance degradation"
+    actions:
+      - schedule_retrain: true
+      - run_extended_smoke_tests: true
+      - append_ledger: true
+      - evidence_required: ["metrics.json", "backtest_report.json"]
+  MRI-004:
+    description: "Low - non-critical issues"
+    actions:
+      - auto_patch_noncritical: true
+      - continue_monitoring: true
+      - append_ledger: true
+  MRI-005:
+    description: "Info - informational only"
+    actions:
+      - append_ledger: true
