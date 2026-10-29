@@ -340,7 +340,21 @@ def _paper_validation_assessment() -> tuple[bool, str]:
 
 
 def _check_real_validations() -> tuple[bool, str]:
-    """Read on-disk validation JSON. True only for real forward-validation evidence."""
+    """Read on-disk validation JSON. True only for real forward-validation evidence when all technical gates pass."""
+    checklist = _validations_checklist()
+    failing = [item['detail'] for item in checklist if not item.get('pass')]
+    if failing:
+        return False, f"ready_for_live is false: {'; '.join(failing)}"
+    try:
+        from dashboard.backend.human_approval_service import load_human_approval
+        gate = load_human_approval()
+        pending = gate.get('technical_gates_still_required') or []
+        if pending:
+            return False, f"ready_for_live is false: technical gates still required ({', '.join(pending)})"
+    except Exception:
+        pass
+    if os.environ.get('LIVE_TRADING_ENABLED', '0') != '1':
+        return False, 'ready_for_live is false: LIVE_TRADING_ENABLED=0 (analyzer mode locked)'
     proven, detail = _paper_validation_assessment()
     if proven:
         return True, detail

@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "name": "cash_equity_forecast_not_trade",
+      "passed": true,
+      "detail": "Cash-only equity remains in forecast ledger and is blocked from trade with FORECAST_ONLY_CASH_EQUITY."
+    },
+    {
+      "name": "option_requires_real_dhan_quote",
+      "passed": true,
+      "detail": "Option paper order requires a non-stale Dhan chain quote; non-Dhan files are blocked with NO_LIVE_OPTION_QUOTE."
+    },
+    {
+      "name": "paper_only_no_broker_order",
+      "passed": true,
+      "detail": "Core Pipeline V8 writes JSON/CSV paper ledgers only and never calls broker order endpoints."
+    },
+    {
+      "name": "live_flags_safe",
+      "passed": true,
+      "detail": "LIVE_TRADING_ENABLED=0"
+    }
+  ],
+  "generated_utc": "2026-10-29T14:30:42.120145+00:00"
+}

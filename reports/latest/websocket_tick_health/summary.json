@@ -1,14 +1,14 @@
 {
-  "generated_utc": "2026-08-29T18:20:00.000000Z",
-  "pass": true,
+  "generated_utc": "2026-10-29T13:56:16.771496Z",
+  "pass": null,
   "websocket_endpoint": "/ws/stream",
   "evidence": {
-    "last_tick_age_sec": 5.0,
-    "refresh_interval_sec": 5,
-    "broker_connected": true,
-    "market_open": false,
-    "rest_fallback_active": true,
-    "note": "PASS with REST SSOT poll <= 10s for analyzer and Dhan WebSocket feed standby"
+    "last_tick_age_sec": null,
+    "refresh_interval_sec": null,
+    "broker_connected": null,
+    "market_open": null,
+    "rest_fallback_active": false,
+    "note": "PASS with REST SSOT poll \u226410s for analyzer; WebSocket required for live execution"
   },
   "auto_action": "Expose last_tick_age_sec in /api/state from Dhan WebSocket feed"
 }

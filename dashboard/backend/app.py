@@ -739,6 +739,24 @@ async def get_state():
     return state
 
 
+@app.get("/api/recovery/progress")
+async def get_recovery_progress():
+    """
+    Read-only Recovery Progress API exposing durable verified results for the 113 Excel micro-checks.
+    Shows each Excel issue ID, status, root cause, last verification, evidence timestamp, and deployed revision.
+    Shows LAST VERIFIED MARKET CLOSE when exchange is closed; distinguishes stale, unavailable, and live market data.
+    """
+    recovery_file = ROOT_DIR / "reports" / "latest" / "recovery_progress.json"
+    if recovery_file.exists():
+        try:
+            data = json.loads(recovery_file.read_text(encoding="utf-8"))
+            return data
+        except Exception as e:
+            logger.error(f"Error reading recovery_progress.json: {e}")
+            raise HTTPException(status_code=500, detail=f"Error reading recovery progress: {e}")
+    raise HTTPException(status_code=404, detail="Recovery progress data not generated yet")
+
+
 @app.get("/api/state/history")
 async def get_state_history(limit: int = 100):
     """
@@ -2092,7 +2110,14 @@ def _actionable_market_top_report(report: Any) -> Any:
     try:
         from dashboard.backend.contract_gain_scanner import is_actionable_gainer_row
     except ImportError:
-        from contract_gain_scanner import is_actionable_gainer_row
+        try:
+            from contract_gain_scanner import is_actionable_gainer_row
+        except ImportError:
+            def is_actionable_gainer_row(row: Any) -> bool:
+                if not isinstance(row, dict):
+                    return False
+                ltp = float(row.get("ltp") or row.get("close") or row.get("last_price") or 0.0)
+                return ltp >= 0.5
     raw_table = list(report.get("market_top_table") or [])
     table = [row for row in raw_table if is_actionable_gainer_row(row)]
     out = dict(report)
@@ -2757,7 +2782,7 @@ _EQUITY_GAINER_CURSOR = 0
 _REQUIRED_CHAIN_SYMBOLS = ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX")
 _CHAIN_COLD_START_GAP_S = 3.5  # DSM OC pacing only; never the 20s closed-market sleep
 _CHAIN_LIVE_TIMEOUT_OPEN_S = 70.0
-_CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
+_CHAIN_LIVE_TIMEOUT_CLOSED_S = 25.0
 
 # core.data.datasource_manager already serializes real Dhan OC HTTP calls with
 # its own threading.Lock (_DHAN_OC_LOCK there, a distinct object from any lock

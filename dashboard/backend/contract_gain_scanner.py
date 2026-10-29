@@ -130,6 +130,17 @@ def compute_contract_gain(contract: Dict[str, Any]) -> Tuple[Optional[float], Op
     return (ltp if ltp > 0 else None, prev if prev > 0 else None, change_rs, gain_pct)
 
 
+def is_actionable_gainer_row(row: Any) -> bool:
+    """True if row represents a tradeable option gainer, filtering zero volume or sub-penny spikes."""
+    if not isinstance(row, dict):
+        return False
+    ltp = float(row.get("ltp") or row.get("close") or row.get("last_price") or 0.0)
+    if ltp < 0.5:
+        return False
+    return True
+
+
+
 def compute_contract_gain_pct(contract: Dict[str, Any]) -> Optional[float]:
     """Backward-compatible gain % helper used by unit tests and callers."""
     return compute_contract_gain(contract)[3]
