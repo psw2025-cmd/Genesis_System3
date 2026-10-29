@@ -504,7 +504,10 @@ def _validations_checklist() -> List[Dict[str, Any]]:
     walk_detail = "NO"
     for path in paper_files + market_files:
         data = _load_json(path, None)
-        if not isinstance(data, dict) or _is_stub_validation(data):
+        if not isinstance(data, dict):
+            continue
+        verified, _reason = _assess_validation_file(path)
+        if not verified:
             continue
         if _reconciliation_complete(data) and _closed_trade_count(data) > 0:
             recon_pass = True
