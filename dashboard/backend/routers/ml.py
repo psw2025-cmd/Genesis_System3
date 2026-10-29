@@ -296,6 +296,21 @@ def _assess_validation_file(path: Path) -> tuple[bool, str]:
     # A market-rank study is not, by itself, a completed paper-trade lifecycle.
     if str(data.get("generated_by") or "").endswith("real_bhavcopy_5day_validation.py"):
         problems.append("market ranking study is not closed paper-trade reconciliation")
+    # A report can self-assert PASS with invented metrics/trade counts.
+    # Require an external, content-addressed source manifest for lifecycle
+    # certification; this does not itself prove source records are genuine.
+    manifest = data.get("source_evidence")
+    if not isinstance(manifest, dict):
+        problems.append("missing independently verifiable source_evidence manifest")
+    else:
+        required = ("predictions_sha256", "outcomes_sha256", "closed_trades_sha256")
+        if not all(
+            isinstance(manifest.get(k), str)
+            and len(manifest[k]) == 64
+            and all(ch in "0123456789abcdefABCDEF" for ch in manifest[k])
+            for k in required
+        ):
+            problems.append("source_evidence manifest missing valid SHA256 references")
     rho = _first_float(
         data,
         ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
