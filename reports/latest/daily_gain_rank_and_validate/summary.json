@@ -11,7 +11,11 @@
     "FINNIFTY",
     "MIDCPNIFTY"
   ],
+<<<<<<< HEAD
   "generated_at": "2026-10-29T15:46:49.039580",
+=======
+  "generated_at": "2026-10-29T15:48:16.259472",
+>>>>>>> bae1821600bb083729103f951a29b1331f4f0a6e
   "live_trading_enabled": false,
   "loaded_underlyings": [],
   "order_placement_allowed": false,
