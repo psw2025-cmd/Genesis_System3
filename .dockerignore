@@ -1,39 +1,52 @@
-.git
+﻿.git
 .venv
 venv
 __pycache__
 .pytest_cache
 .mypy_cache
 node_modules
+
 # Allow reports/latest for truth score, ignore other reports
 reports/*
 !reports/latest
+!reports/latest/
+!reports/latest/**
 runtime_reports
 agent_memory
+
 *.log
 *.tmp
 *.cache
 *.pyc
 *.pyo
+
 .env
 .env.*
 !.env.example
-dashboard/backend/logs
-# Runtime state stays out of the image. Later exceptions keep real validation JSON.
-state/*
-!state
-!state/market_validations/
-!state/market_validations/*.json
 
-# PERMANENT FIX - Never bake live data - 2026-10-29
-**/moneycontrol_option_gainers.json
-**/moneycontrol_*.json
-reports/latest/*.json
-state/market_validations/*.json
-!state/market_validations/.gitkeep
-!reports/latest/.gitkeep
-!state/market_validations/*.json
-!scripts/run_paper_validation.py
+dashboard/backend/logs
+
+# Runtime state stays out of the image.
+# Explicit exceptions keep the validation JSON files that Cloud Run needs.
+state/*
+!state/
 !state/paper_validations/
+!state/paper_validations/
+!state/paper_validations/**
 !state/paper_validations/*.json
 !state/paper_validations/.gitkeep
+!state/market_validations/
+!state/market_validations/
+!state/market_validations/**
+!state/market_validations/*.json
+!state/market_validations/.gitkeep
+
+# PERMANENT FIX - Never bake live / volatile data
+**/moneycontrol_option_gainers.json
+**/moneycontrol_*.json
+
+# Keep scripts that are required at runtime
+!scripts/run_paper_validation.py
+!scripts/paper_lifecycle_proof.py
+!scripts/system3_model_accuracy_tracker.py
+!scripts/system3_option_visibility_audit.py
