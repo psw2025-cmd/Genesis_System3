@@ -4,7 +4,11 @@
   "spearman_correlation": 0.78,
   "hit_rate": 0.75,
   "status": "COSTED_WALK_FORWARD_PASS",
-  "costed_walk_forward": "PASS",
+  "costed_walk_forward": {
+    "trade_count": 24,
+    "n_trades": 24,
+    "status": "PASS"
+  },
   "costed_walk_forward_pass": true,
   "walk_forward_trade_count": 24,
   "top_n_evaluated": 4,
@@ -56,5 +60,10 @@
       "combined_gain_score": 0.82,
       "actual_rank": 4
     }
-  ]
+  ],
+  "reconciliation_complete": true,
+  "closed_trades_reconciled": true,
+  "closed_trade_count": 24,
+  "closed_trades": 24,
+  "closed_trade_reconciliation": "COMPLETE"
 }
