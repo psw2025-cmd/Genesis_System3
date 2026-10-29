@@ -19,9 +19,8 @@ Outputs:
 Environment/Config: None required. Handles missing files gracefully.
 """
 
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -44,7 +43,7 @@ MASTER_CSV = LEARNING_DIR / "dhan_index_real_master_dataset.csv"
 LEARNING_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def build_master_dataset() -> Dict[str, Any]:
+def build_master_dataset() -> dict[str, Any]:
     """
     Build master dataset from available sources.
 
@@ -205,7 +204,7 @@ def build_master_dataset() -> Dict[str, Any]:
             df_master.to_parquet(MASTER_PARQUET, index=False, engine="pyarrow")
             print(f"[SAVE] Master dataset (Parquet): {MASTER_PARQUET} ({len(df_master)} rows)")
         except ImportError:
-            print(f"[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
+            print("[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
         except Exception as e:
             print(f"[WARN] Parquet save failed: {e}. CSV saved successfully.")
 
@@ -228,10 +227,10 @@ def build_master_dataset() -> Dict[str, Any]:
 
 def _build_row_from_trade(
     trade_row: pd.Series,
-    df_signals: Optional[pd.DataFrame],
-    df_pnl: Optional[pd.DataFrame],
-    df_outcomes: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_signals: pd.DataFrame | None,
+    df_pnl: pd.DataFrame | None,
+    df_outcomes: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build master row from trade plan."""
     row = {
         "ts_entry": trade_row.get("timestamp", trade_row.get("ts", np.nan)),
@@ -282,10 +281,10 @@ def _build_row_from_trade(
 
 def _build_row_from_signal(
     signal_row: pd.Series,
-    df_trades: Optional[pd.DataFrame],
-    df_pnl: Optional[pd.DataFrame],
-    df_outcomes: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_trades: pd.DataFrame | None,
+    df_pnl: pd.DataFrame | None,
+    df_outcomes: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build master row from signal."""
     row = {
         "ts_entry": signal_row.get("timestamp", signal_row.get("ts", np.nan)),
@@ -324,10 +323,10 @@ def _build_row_from_signal(
 
 def _build_row_from_pnl(
     pnl_row: pd.Series,
-    df_signals: Optional[pd.DataFrame],
-    df_trades: Optional[pd.DataFrame],
-    df_outcomes: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_signals: pd.DataFrame | None,
+    df_trades: pd.DataFrame | None,
+    df_outcomes: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build master row from PnL log."""
     row = {
         "ts_entry": pnl_row.get("entry_timestamp", pnl_row.get("timestamp", np.nan)),
@@ -366,10 +365,10 @@ def _build_row_from_pnl(
 
 def _build_row_from_outcome(
     outcome_row: pd.Series,
-    df_signals: Optional[pd.DataFrame],
-    df_trades: Optional[pd.DataFrame],
-    df_pnl: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_signals: pd.DataFrame | None,
+    df_trades: pd.DataFrame | None,
+    df_pnl: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build master row from outcome log."""
     row = {
         "ts_entry": outcome_row.get("entry_timestamp", outcome_row.get("timestamp", np.nan)),
@@ -409,7 +408,7 @@ def _build_row_from_outcome(
     return row
 
 
-def _find_matching_signal(row: pd.Series, df_signals: pd.DataFrame) -> Optional[pd.Series]:
+def _find_matching_signal(row: pd.Series, df_signals: pd.DataFrame) -> pd.Series | None:
     """Find matching signal row."""
     # Try to match by underlying, strike, and timestamp proximity
     if "underlying" not in df_signals.columns or "underlying" not in row.index:
@@ -428,7 +427,7 @@ def _find_matching_signal(row: pd.Series, df_signals: pd.DataFrame) -> Optional[
     return matches.iloc[0] if not matches.empty else None
 
 
-def _find_matching_trade(row: pd.Series, df_trades: pd.DataFrame) -> Optional[pd.Series]:
+def _find_matching_trade(row: pd.Series, df_trades: pd.DataFrame) -> pd.Series | None:
     """Find matching trade plan row."""
     if "underlying" not in df_trades.columns or "underlying" not in row.index:
         return None
@@ -443,7 +442,7 @@ def _find_matching_trade(row: pd.Series, df_trades: pd.DataFrame) -> Optional[pd
     return matches.iloc[0] if not matches.empty else None
 
 
-def _find_matching_pnl(row: pd.Series, df_pnl: pd.DataFrame) -> Optional[pd.Series]:
+def _find_matching_pnl(row: pd.Series, df_pnl: pd.DataFrame) -> pd.Series | None:
     """Find matching PnL log row."""
     if "underlying" not in df_pnl.columns or "underlying" not in row.index:
         return None
@@ -458,7 +457,7 @@ def _find_matching_pnl(row: pd.Series, df_pnl: pd.DataFrame) -> Optional[pd.Seri
     return matches.iloc[0] if not matches.empty else None
 
 
-def _find_matching_outcome(row: pd.Series, df_outcomes: pd.DataFrame) -> Optional[pd.Series]:
+def _find_matching_outcome(row: pd.Series, df_outcomes: pd.DataFrame) -> pd.Series | None:
     """Find matching outcome row."""
     if "underlying" not in df_outcomes.columns or "underlying" not in row.index:
         return None
@@ -478,7 +477,7 @@ def main() -> None:
     result = build_master_dataset()
 
     if result["status"] == "SUCCESS":
-        print(f"\n=== BUILD SUMMARY ===")
+        print("\n=== BUILD SUMMARY ===")
         print(f"Sources Found: {', '.join(result['sources_found'])}")
         if result.get("sources_missing"):
             print(f"Sources Missing: {', '.join(result['sources_missing'])}")

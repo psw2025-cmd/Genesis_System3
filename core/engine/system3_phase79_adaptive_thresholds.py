@@ -10,7 +10,7 @@ import sys
 from datetime import datetime
 from itertools import product
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -39,7 +39,7 @@ REGIMES = ["LOW_VOL", "MID_VOL", "HIGH_VOL", "TREND_UP", "TREND_DOWN", "CHOPPY"]
 MIN_TRADES = 5  # Minimum trades per regime to consider
 
 
-def load_data() -> Dict[str, pd.DataFrame]:
+def load_data() -> dict[str, pd.DataFrame]:
     """Load signals and PnL data."""
     data = {}
 
@@ -79,7 +79,7 @@ def classify_regime(row: pd.Series) -> str:
 
 def evaluate_threshold_combo(
     signals_df: pd.DataFrame, pnl_df: pd.DataFrame, regime: str, min_conf: float, min_score: float
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Evaluate a threshold combination for a regime."""
     # Filter signals by regime and thresholds
     regime_signals = signals_df[signals_df["regime"] == regime].copy()
@@ -134,7 +134,7 @@ def evaluate_threshold_combo(
     }
 
 
-def grid_search_regime(signals_df: pd.DataFrame, pnl_df: pd.DataFrame, regime: str) -> Dict[str, Any]:
+def grid_search_regime(signals_df: pd.DataFrame, pnl_df: pd.DataFrame, regime: str) -> dict[str, Any]:
     """Grid search best thresholds for a regime."""
     conf_range = np.arange(0.60, 0.96, 0.05)
     score_range = np.arange(0.10, 0.61, 0.05)
@@ -163,7 +163,7 @@ def grid_search_regime(signals_df: pd.DataFrame, pnl_df: pd.DataFrame, regime: s
     }
 
 
-def generate_adaptive_thresholds() -> Dict[str, Any]:
+def generate_adaptive_thresholds() -> dict[str, Any]:
     """Generate adaptive thresholds per regime."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 79 - ADAPTIVE THRESHOLD ENGINE")
@@ -215,7 +215,7 @@ def generate_adaptive_thresholds() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 79 - Adaptive Thresholds Report\n\n")
@@ -235,7 +235,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_adaptive_thresholds()
+        generate_adaptive_thresholds()
         print("\n[PH79] Adaptive threshold generation complete.")
         return 0
     except Exception as e:

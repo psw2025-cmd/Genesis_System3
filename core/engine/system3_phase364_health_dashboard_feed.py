@@ -8,11 +8,9 @@ into a single dashboard-ready JSON feed for monitoring tools.
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
-
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -29,7 +27,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def load_heartbeat_status() -> Dict[str, Any]:
+def load_heartbeat_status() -> dict[str, Any]:
     """Load system heartbeat if available."""
     heartbeat_file = PROJECT_ROOT / "system3_daily_heartbeat.json"
 
@@ -54,7 +52,7 @@ def load_heartbeat_status() -> Dict[str, Any]:
         return {"status": "error", "error": str(e)}
 
 
-def scan_recent_logs() -> Dict[str, Any]:
+def scan_recent_logs() -> dict[str, Any]:
     """Scan recent autorun logs for errors/warnings."""
     log_summary = {"errors": 0, "warnings": 0, "recent_messages": []}
 
@@ -87,7 +85,7 @@ def scan_recent_logs() -> Dict[str, Any]:
         return log_summary
 
 
-def check_data_freshness() -> Dict[str, Any]:
+def check_data_freshness() -> dict[str, Any]:
     """Check if signal data files are fresh."""
     freshness_check = {"fresh_files": [], "stale_files": [], "missing_files": []}
 
@@ -124,7 +122,7 @@ def check_data_freshness() -> Dict[str, Any]:
     return freshness_check
 
 
-def aggregate_phase_metrics() -> Dict[str, Any]:
+def aggregate_phase_metrics() -> dict[str, Any]:
     """Load and aggregate metrics from phases 361-363."""
     phase_metrics = {}
 
@@ -179,7 +177,7 @@ def aggregate_phase_metrics() -> Dict[str, Any]:
     return phase_metrics
 
 
-def run_phase364(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase364(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 364: Health Dashboard Feed Generator.
 
@@ -289,8 +287,7 @@ def run_phase364(context: Dict[str, Any] = None) -> Dict[str, Any]:
 
             if health_issues:
                 f.write("### Issues Detected\n\n")
-                for issue in health_issues:
-                    f.write(f"- ⚠️ {issue}\n")
+                f.writelines(f"- ⚠️ {issue}\n" for issue in health_issues)
                 f.write("\n")
             else:
                 f.write("✅ No issues detected\n\n")
@@ -315,8 +312,7 @@ def run_phase364(context: Dict[str, Any] = None) -> Dict[str, Any]:
             if logs["recent_messages"]:
                 f.write("**Recent Messages:**\n\n")
                 f.write("```\n")
-                for msg in logs["recent_messages"][:5]:
-                    f.write(msg + "\n")
+                f.writelines(msg + "\n" for msg in logs["recent_messages"][:5])
                 f.write("```\n\n")
 
             # Data freshness
@@ -327,8 +323,7 @@ def run_phase364(context: Dict[str, Any] = None) -> Dict[str, Any]:
 
             if freshness["stale_files"]:
                 f.write("**Stale Files:**\n\n")
-                for file_info in freshness["stale_files"]:
-                    f.write(f"- {file_info['filename']} (age: {file_info['age_hours']}h)\n")
+                f.writelines(f"- {file_info['filename']} (age: {file_info['age_hours']}h)\n" for file_info in freshness["stale_files"])
                 f.write("\n")
 
             # Phase metrics summary
@@ -355,7 +350,7 @@ def run_phase364(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write(f"| {phase_name} | {status_emoji} {metrics.get('status', 'unknown')} | {key_metric} |\n")
 
             f.write("\n---\n\n")
-            f.write(f"**Next Refresh:** Check dashboard in 30 minutes\n")
+            f.write("**Next Refresh:** Check dashboard in 30 minutes\n")
 
         result["outputs"]["report"] = str(md_output)
         logger.info(f"Report written to: {md_output}")

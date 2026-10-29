@@ -9,9 +9,8 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -34,7 +33,7 @@ SIGNAL_FILES = {
 }
 
 
-def analyze_signal_file(file_path: Path) -> Dict[str, Any]:
+def analyze_signal_file(file_path: Path) -> dict[str, Any]:
     """Analyze a single signal CSV file."""
     if not file_path.exists():
         return {"exists": False, "error": "File not found"}
@@ -100,10 +99,10 @@ def analyze_signal_file(file_path: Path) -> Dict[str, Any]:
         return analysis
 
     except Exception as e:
-        return {"exists": True, "error": f"Failed to analyze: {str(e)}"}
+        return {"exists": True, "error": f"Failed to analyze: {e!s}"}
 
 
-def run_phase361(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase361(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 361: Signal Pipeline Snapshot & Quality Summary.
 
@@ -173,19 +172,19 @@ def run_phase361(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write(f"### {file_key}\n\n")
 
                 if not analysis.get("exists"):
-                    f.write(f"❌ **File not found**\n\n")
+                    f.write("❌ **File not found**\n\n")
                     continue
 
                 if "error" in analysis:
                     f.write(f"⚠️ **Error:** {analysis['error']}\n\n")
                     continue
 
-                f.write(f"✅ **File exists**\n\n")
+                f.write("✅ **File exists**\n\n")
                 f.write(f"- **Rows:** {analysis.get('row_count', 0)}\n")
                 f.write(f"- **Columns:** {analysis.get('column_count', 0)}\n")
 
                 if "signal_distribution" in analysis:
-                    f.write(f"- **Signal Distribution:**\n")
+                    f.write("- **Signal Distribution:**\n")
                     for signal, count in analysis["signal_distribution"].items():
                         f.write(f"  - {signal}: {count}\n")
 
@@ -196,7 +195,7 @@ def run_phase361(context: Dict[str, Any] = None) -> Dict[str, Any]:
                     f.write(f"- **Underlyings:** {', '.join(analysis['unique_underlyings'])}\n")
 
                 if analysis.get("issues"):
-                    f.write(f"- **Issues:**\n")
+                    f.write("- **Issues:**\n")
                     for issue in analysis["issues"]:
                         f.write(f"  - ⚠️ {issue}\n")
 
@@ -214,7 +213,7 @@ def run_phase361(context: Dict[str, Any] = None) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        error_msg = f"Phase 361 failed: {str(e)}"
+        error_msg = f"Phase 361 failed: {e!s}"
         errors.append(error_msg)
         return {
             "phase": 361,

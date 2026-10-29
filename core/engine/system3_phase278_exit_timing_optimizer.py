@@ -7,7 +7,7 @@ Optimizes exit timing based on historical performance.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_exit_timing_optimizer.md"
 
 
-def run_phase278(**kwargs) -> Dict[str, Any]:
+def run_phase278(**kwargs) -> dict[str, Any]:
     """Run Phase 278: Exit Timing Optimizer."""
     errors = []
 

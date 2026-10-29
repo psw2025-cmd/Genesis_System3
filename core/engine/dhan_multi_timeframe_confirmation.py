@@ -11,9 +11,8 @@ UPGRADED FEATURES:
 """
 
 from collections import Counter
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 # Default timeframes (in minutes): 1m, 3m, 5m, 15m, 30m, 1h, 4h, 1d
@@ -37,7 +36,7 @@ def get_timeframe_weight(timeframe: int) -> float:
     return TIMEFRAME_WEIGHTS.get(timeframe, 0.20)  # Default 0.20
 
 
-def aggregate_signals_across_timeframes(signals_by_timeframe: Dict[int, Dict[str, Any]]) -> Dict[str, Any]:
+def aggregate_signals_across_timeframes(signals_by_timeframe: dict[int, dict[str, Any]]) -> dict[str, Any]:
     """
     Aggregate signals across multiple timeframes with weighted scoring.
 
@@ -99,8 +98,8 @@ def aggregate_signals_across_timeframes(signals_by_timeframe: Dict[int, Dict[str
 
 def check_multi_timeframe_confirmation(
     df_signals: pd.DataFrame,
-    timeframes: Optional[List[int]] = None,
-    timeframe_data: Optional[Dict[int, pd.DataFrame]] = None,
+    timeframes: list[int] | None = None,
+    timeframe_data: dict[int, pd.DataFrame] | None = None,
 ) -> pd.DataFrame:
     """
     Check signal confirmation across 5+ timeframes with enhanced analysis.
@@ -187,7 +186,7 @@ def check_multi_timeframe_confirmation(
 
 
 def compute_confirmation_score(
-    signals_by_timeframe: Dict[int, Any],
+    signals_by_timeframe: dict[int, Any],
     use_weights: bool = True,
 ) -> float:
     """
@@ -210,10 +209,9 @@ def compute_confirmation_score(
     for tf, signal_data in signals_by_timeframe.items():
         if isinstance(signal_data, dict):
             signal = signal_data.get("signal", "HOLD")
-            confidence = signal_data.get("confidence", 0.5)
+            signal_data.get("confidence", 0.5)
         else:
             signal = str(signal_data)
-            confidence = 0.5
 
         signals.append(signal)
         if use_weights:

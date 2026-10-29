@@ -6,11 +6,10 @@ Converts recent signals + forward returns into real, money-like metrics per unde
 
 import json
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -41,7 +40,7 @@ def load_signals_robust(path: Path) -> pd.DataFrame:
     except Exception:
         try:
             df = pd.read_csv(path, engine="python", on_bad_lines="skip")
-        except Exception as e:
+        except Exception:
             return pd.DataFrame()
 
     return df
@@ -65,7 +64,7 @@ def get_recent_window(df: pd.DataFrame, hours: int = 24) -> pd.DataFrame:
     return df[df["ts"] >= cutoff].copy()
 
 
-def compute_metrics(df: pd.DataFrame, underlying: str, label: str, horizons: List[int]) -> Dict[str, Any]:
+def compute_metrics(df: pd.DataFrame, underlying: str, label: str, horizons: list[int]) -> dict[str, Any]:
     """Compute metrics for a specific underlying and label combination."""
     subset = df[(df["underlying"] == underlying) & (df["pred_label"] == label)].copy()
 
@@ -112,7 +111,7 @@ def compute_metrics(df: pd.DataFrame, underlying: str, label: str, horizons: Lis
     return metrics
 
 
-def run_phase301(**kwargs) -> Dict[str, Any]:
+def run_phase301(**kwargs) -> dict[str, Any]:
     """
     Run Phase 301: Daily Live-vs-Forward Performance Tracker.
 

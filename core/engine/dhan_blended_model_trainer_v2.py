@@ -6,7 +6,7 @@ MANUAL TRIGGER ONLY - Never runs automatically.
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ BLENDED_CSV = TRAINING_DIR / "dhan_blended_training_preview.csv"
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
 
 
-def train_blended_models() -> Dict[str, Any]:
+def train_blended_models() -> dict[str, Any]:
     """
     Train models on blended dataset.
 

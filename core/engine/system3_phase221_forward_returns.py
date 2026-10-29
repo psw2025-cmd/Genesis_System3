@@ -9,7 +9,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -45,7 +45,7 @@ def _log(msg: str) -> None:
         pass
 
 
-def run_phase221(**kwargs) -> Dict[str, Any]:
+def run_phase221(**kwargs) -> dict[str, Any]:
     """
     Run Phase 221: Forward Return Calculator.
 
@@ -270,7 +270,7 @@ def run_phase221(**kwargs) -> Dict[str, Any]:
         metrics = {
             "timestamp": datetime.now().isoformat(),
             "phase": 221,
-            "rows_processed": int(len(df)),
+            "rows_processed": len(df),
             "rows_with_forward_returns": int(rows_with_returns),
             "horizons": FORWARD_HORIZONS,
             "horizon_coverage": horizon_stats,

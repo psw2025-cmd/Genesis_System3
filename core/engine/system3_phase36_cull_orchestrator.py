@@ -21,7 +21,7 @@ import sys
 from datetime import datetime
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -53,7 +53,7 @@ def run_phase36_cull_full_cycle() -> str:
     print("[SAFETY] NO AUTOMATIC PROMOTION - NO CONFIG CHANGES\n")
 
     log_entries = []
-    log_entries.append(f"# Ultra Continuous Learning Cycle (CULL) Execution Log\n\n")
+    log_entries.append("# Ultra Continuous Learning Cycle (CULL) Execution Log\n\n")
     log_entries.append(f"Generated: {datetime.utcnow().isoformat()}\n\n")
 
     # Step 1: Real data extractor
@@ -67,8 +67,8 @@ def run_phase36_cull_full_cycle() -> str:
         log_entries.append("**Status**: COMPLETED\n\n")
         print("[STEP 1] Real data extraction completed")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 1] Real data extraction failed: {e}")
 
     # Step 2: Blended dataset builder
@@ -84,8 +84,8 @@ def run_phase36_cull_full_cycle() -> str:
         log_entries.append("**Status**: COMPLETED\n\n")
         print("[STEP 2] Blended dataset building completed")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 2] Blended dataset building failed: {e}")
 
     # Step 3: Blended model trainer (Ultra)
@@ -93,15 +93,14 @@ def run_phase36_cull_full_cycle() -> str:
     log_entries.append("**Status**: STARTED\n\n")
     log_entries.append("**Note**: This step requires manual confirmation and is not auto-executed\n\n")
     try:
-        from core.engine.dhan_blended_training_v3 import main as blended_trainer_main
 
         # Note: This may require manual confirmation, so we just log that it should be run
         log_entries.append("**Status**: MANUAL TRIGGER REQUIRED\n\n")
         log_entries.append("**Note**: Run menu option 71 to train blended models manually\n\n")
         print("[STEP 3] Blended model training requires manual trigger (menu option 71)")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 3] Blended model training check failed: {e}")
 
     # Step 4: Ultra comparison (Phase 32)
@@ -115,8 +114,8 @@ def run_phase36_cull_full_cycle() -> str:
         log_entries.append("**Status**: COMPLETED\n\n")
         print("[STEP 4] Ultra comparison completed")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 4] Ultra comparison failed: {e}")
 
     # Step 5: Promotion planner (Phase 33)
@@ -132,8 +131,8 @@ def run_phase36_cull_full_cycle() -> str:
         log_entries.append("**Status**: COMPLETED\n\n")
         print("[STEP 5] Promotion planning completed")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 5] Promotion planning failed: {e}")
 
     # Step 6: Auditor (Phase 35)
@@ -147,8 +146,8 @@ def run_phase36_cull_full_cycle() -> str:
         log_entries.append("**Status**: COMPLETED\n\n")
         print("[STEP 6] Decision auditing completed")
     except Exception as e:
-        log_entries.append(f"**Status**: FAILED\n\n")
-        log_entries.append(f"**Error**: {str(e)}\n\n")
+        log_entries.append("**Status**: FAILED\n\n")
+        log_entries.append(f"**Error**: {e!s}\n\n")
         print(f"[STEP 6] Decision auditing failed: {e}")
 
     # Final summary
@@ -177,7 +176,7 @@ def main() -> None:
         print(f"[PHASE 36][ERROR] {e}")
         error_path = ULTRA_DIR / "phase36_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 36 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 36 Error\n\n{e!s}\n")
         print(f"[PHASE 36] Error details saved to: {error_path}")
 
 

@@ -9,7 +9,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -29,7 +28,7 @@ DEFAULT_ITERATIONS = 5
 DEFAULT_INTERVAL = 5
 
 
-def get_system_status() -> Dict[str, str]:
+def get_system_status() -> dict[str, str]:
     """Get current system status."""
     try:
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
@@ -54,7 +53,7 @@ def get_system_status() -> Dict[str, str]:
         }
 
 
-def write_heartbeat(status: Dict[str, str]) -> None:
+def write_heartbeat(status: dict[str, str]) -> None:
     """Write heartbeat entry to log."""
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     entry = (

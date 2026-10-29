@@ -7,7 +7,7 @@ Calculates Sharpe ratio and other risk-adjusted return metrics.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_sharpe_ratio.md"
 
 
-def run_phase268(**kwargs) -> Dict[str, Any]:
+def run_phase268(**kwargs) -> dict[str, Any]:
     """Run Phase 268: Sharpe Ratio Calculator."""
     errors = []
 

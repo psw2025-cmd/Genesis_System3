@@ -18,7 +18,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -40,7 +40,7 @@ QUEUE_FILE = LOGS_DIR / "retraining_queue.json"
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def schedule_retraining(underlying: str, trigger: str = "drift_detected") -> Dict[str, Any]:
+def schedule_retraining(underlying: str, trigger: str = "drift_detected") -> dict[str, Any]:
     """
     Add underlying to retraining queue.
 
@@ -90,7 +90,7 @@ def schedule_retraining(underlying: str, trigger: str = "drift_detected") -> Dic
     }
 
 
-def check_retraining_queue() -> List[Dict[str, Any]]:
+def check_retraining_queue() -> list[dict[str, Any]]:
     """Get current retraining queue."""
     if not QUEUE_FILE.exists():
         return []
@@ -101,7 +101,7 @@ def check_retraining_queue() -> List[Dict[str, Any]]:
     return [q for q in queue if q["status"] == "PENDING"]
 
 
-def run_phase252(**kwargs) -> Dict[str, Any]:
+def run_phase252(**kwargs) -> dict[str, Any]:
     """
     Run Phase 252: Model Retraining Scheduler (SHADOW MODEL).
 

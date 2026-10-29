@@ -15,12 +15,11 @@ Status: FULLY FUNCTIONAL (wired to Phase 250 JSON evaluation output)
 Date: 2025-12-06
 """
 
-import json
 import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -28,7 +27,6 @@ if str(PROJECT_ROOT) not in sys.path:
 
 # Import LSTM utilities for reading Phase 250 output
 from core.engine.system3_lstm_utils import (
-    compare_to_baseline,
     extract_model_metrics,
     read_latest_evaluation_metrics,
     write_promotion_decision,
@@ -52,7 +50,7 @@ MIN_TEST_SAMPLES = 10  # Minimum test samples for valid evaluation
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def detect_drift_for_underlying(underlying: str, model_metrics: Dict[str, Any]) -> Dict[str, Any]:
+def detect_drift_for_underlying(underlying: str, model_metrics: dict[str, Any]) -> dict[str, Any]:
     """
     Check if model performance has degraded based on Phase 250 evaluation metrics.
 
@@ -147,7 +145,7 @@ def detect_drift_for_underlying(underlying: str, model_metrics: Dict[str, Any]) 
     }
 
 
-def run_phase251(**kwargs) -> Dict[str, Any]:
+def run_phase251(**kwargs) -> dict[str, Any]:
     """
     Run Phase 251: Model Drift Tracker (SHADOW MODEL).
 

@@ -10,9 +10,8 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ logger = logging.getLogger(__name__)
 MIN_CORRELATION = 0.05  # Minimum acceptable correlation between score and forward return
 
 
-def run_phase338_signal_outcome_correlation(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase338_signal_outcome_correlation(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 338: Signal-to-Outcome Correlation Monitor
 

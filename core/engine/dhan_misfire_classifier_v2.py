@@ -7,11 +7,9 @@ SAFE MODE ONLY - Read-only classification, no changes.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
-
-from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
@@ -50,7 +48,7 @@ def classify_misfires() -> pd.DataFrame:
             pnl = row.get("pnl_pct", 0.0)
             confidence = row.get("entry_confidence", 0.0)
             score = abs(row.get("entry_score", 0.0))
-            side = row.get("side", "")
+            row.get("side", "")
 
             misfire_reasons = []
 
@@ -143,7 +141,7 @@ def save_misfires(misfires: pd.DataFrame) -> Path:
     return MISFIRES_CSV
 
 
-def generate_misfire_report() -> Dict[str, Any]:
+def generate_misfire_report() -> dict[str, Any]:
     """
     Generate misfire classification report.
 
@@ -186,7 +184,7 @@ def main() -> None:
     report = generate_misfire_report()
 
     if report["status"] == "SUCCESS":
-        print(f"\n=== MISFIRE CLASSIFICATION REPORT ===")
+        print("\n=== MISFIRE CLASSIFICATION REPORT ===")
         print(f"Total Misfires: {report['total_misfires']}")
 
         print("\n=== BY TYPE ===")

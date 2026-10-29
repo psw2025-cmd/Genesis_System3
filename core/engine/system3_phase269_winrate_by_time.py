@@ -7,7 +7,7 @@ Analyzes win rate and performance by hour of day.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_winrate_by_time.md"
 
 
-def run_phase269(**kwargs) -> Dict[str, Any]:
+def run_phase269(**kwargs) -> dict[str, Any]:
     """Run Phase 269: Win Rate by Time of Day."""
     errors = []
 

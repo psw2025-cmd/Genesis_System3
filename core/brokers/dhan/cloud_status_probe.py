@@ -15,7 +15,7 @@ import base64
 import json
 import re
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from core.brokers.dhan.first_rejection_trace import record_auth_rejection, snapshot
@@ -55,7 +55,7 @@ def _clock_expired(token: str) -> bool | None:
         exp = json.loads(base64.urlsafe_b64decode(payload.encode("ascii"))).get("exp")
         if exp is None:
             return None
-        return float(exp) <= datetime.now(timezone.utc).timestamp()
+        return float(exp) <= datetime.now(UTC).timestamp()
     except Exception:
         return None
 
@@ -458,7 +458,7 @@ def get_cloud_status(module: Any, *, timeout_s: float = 5.0) -> dict[str, Any]:
 
     latency_ms = int((time.monotonic() - total_started) * 1000)
     if final["ok"]:
-        setattr(module, "_PROFILE_HEADER_CONTRACT_CACHE", chosen_contract)
+        module._PROFILE_HEADER_CONTRACT_CACHE = chosen_contract
         result = {
             **base,
             "connected": True,

@@ -10,14 +10,14 @@ UPGRADES (World-Class AI Trading System):
 - Time-based exits for range-bound markets
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
 
 def calculate_partial_profit_levels(
     entry_price: float, risk_amount: float, current_price: float
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Calculate partial profit taking levels.
 
@@ -77,7 +77,7 @@ def calculate_partial_profit_levels(
 
 def check_ml_exit_signal(
     current_confidence: float, entry_confidence: float, confidence_drop_threshold: float = 0.15
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Check if ML model suggests exit based on confidence drop or reversal.
 
@@ -123,12 +123,12 @@ def optimize_exit_timing(
     current_pnl: float,
     target: float,
     sl: float,
-    current_confidence: Optional[float] = None,
-    entry_confidence: Optional[float] = None,
-    current_price: Optional[float] = None,
-    atr: Optional[float] = None,
-    volatility: Optional[float] = None,
-) -> Dict[str, Any]:
+    current_confidence: float | None = None,
+    entry_confidence: float | None = None,
+    current_price: float | None = None,
+    atr: float | None = None,
+    volatility: float | None = None,
+) -> dict[str, Any]:
     """
     Optimize exit timing for a trade (UPGRADED with partial profit taking and ML exits).
 
@@ -284,13 +284,12 @@ def compute_trailing_stop(
     trailing_stop = current_price * (1.0 - trailing_pct / 100.0)
 
     # Ensure trailing stop is above entry (for long)
-    if trailing_stop < entry_price:
-        trailing_stop = entry_price
+    trailing_stop = max(trailing_stop, entry_price)
 
     return float(trailing_stop)
 
 
-def suggest_exit_strategy(trade_data: Dict[str, Any]) -> str:
+def suggest_exit_strategy(trade_data: dict[str, Any]) -> str:
     """
     Suggest exit strategy.
 

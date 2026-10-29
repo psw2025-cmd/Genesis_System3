@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -26,8 +27,9 @@ def _local_vault_secret(key: str) -> str:
 
 def get_dhan_token():
     try:
-        from google.cloud import secretmanager
         import datetime
+
+        from google.cloud import secretmanager
 
         client = secretmanager.SecretManagerServiceClient()
         name = "projects/802404398783/secrets/dhan-access-token/versions/latest"
@@ -40,26 +42,27 @@ def get_dhan_token():
             import jwt
             payload = jwt.decode(token, options={"verify_signature": False})
             if "exp" in payload:
-                exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
+                exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.UTC)
         except Exception:
             pass
         if exp is None:
             try:
-                import base64, json
+                import base64
+                import json
                 parts = token.split(".")
                 if len(parts) >= 2:
                     body = parts[1] + "=" * (-len(parts[1]) % 4)
                     payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
                     exp_val = payload.get("exp")
                     if exp_val:
-                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
+                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.UTC)
             except Exception:
                 pass
         hours = 23.5
         if exp:
-            hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
+            hours = (exp - datetime.datetime.now(tz=datetime.UTC)).total_seconds() / 3600
         return token, f"GCP_SECRET_MANAGER_V{ver}", "GCP_TOTP_ROTATE", hours, exp, False
-    except Exception as e:
+    except Exception:
         # fallback local
         local_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
         if not local_token:
@@ -68,15 +71,17 @@ def get_dhan_token():
         exp = None
         if local_token:
             try:
-                import base64, json, datetime
+                import base64
+                import datetime
+                import json
                 parts = local_token.split(".")
                 if len(parts) >= 2:
                     body = parts[1] + "=" * (-len(parts[1]) % 4)
                     payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
                     exp_val = payload.get("exp")
                     if exp_val:
-                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
-                        hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
+                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.UTC)
+                        hours = (exp - datetime.datetime.now(tz=datetime.UTC)).total_seconds() / 3600
             except Exception:
                 pass
         return local_token, "LOCAL_JWT_SESSION_FALLBACK", "DHAN_LOCAL_ROTATE_FALLBACK", hours, exp, True

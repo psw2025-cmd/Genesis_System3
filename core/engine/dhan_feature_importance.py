@@ -7,7 +7,7 @@ training data, per underlying.
 
 import os
 import sys
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -68,7 +68,7 @@ def _load_training_data() -> pd.DataFrame | None:
     return df
 
 
-def _compute_mi_for_underlying(df: pd.DataFrame, underlying: str) -> Dict[str, Any] | None:
+def _compute_mi_for_underlying(df: pd.DataFrame, underlying: str) -> dict[str, Any] | None:
     """
     Compute mutual information between numeric features and label for a given underlying.
 
@@ -163,7 +163,7 @@ def main():
         print("[ERROR] Could not load training data; aborting.")
         return
 
-    summaries: List[Dict[str, Any]] = []
+    summaries: list[dict[str, Any]] = []
 
     for underlying in TARGET_UNDERLYINGS:
         result = _compute_mi_for_underlying(df, underlying)

@@ -9,12 +9,11 @@ from __future__ import annotations
 
 import logging
 import sqlite3
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class InstitutionalCostModel:
         entry_price: float,
         exit_price: float,
         qty: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Compute all regulatory & execution friction components for a round-trip trade."""
         buy_value = entry_price * qty
         sell_value = exit_price * qty
@@ -140,11 +139,11 @@ class HistoricalDataPipeline:
         conn.close()
         return len(records)
 
-    def get_historical_df(self, symbol: str, start_date: Optional[str] = None, end_date: Optional[str] = None) -> pd.DataFrame:
+    def get_historical_df(self, symbol: str, start_date: str | None = None, end_date: str | None = None) -> pd.DataFrame:
         """Query historical OHLCV data for backtesting."""
         conn = sqlite3.connect(self.db_path)
         query = "SELECT date, open, high, low, close, volume, oi FROM ohlcv_5y WHERE symbol = ?"
-        params: List[Any] = [symbol.upper()]
+        params: list[Any] = [symbol.upper()]
         if start_date:
             query += " AND date >= ?"
             params.append(start_date)
@@ -159,9 +158,9 @@ class HistoricalDataPipeline:
 
     def run_friction_aware_backtest(
         self,
-        trades: List[Dict[str, Any]],
+        trades: list[dict[str, Any]],
         initial_capital: float = 500000.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Evaluate trade series with institutional transaction friction."""
         processed_trades = []
         equity = initial_capital
@@ -178,11 +177,9 @@ class HistoricalDataPipeline:
 
             net_pnl = friction_res["net_pnl"]
             equity += net_pnl
-            if equity > peak_equity:
-                peak_equity = equity
+            peak_equity = max(peak_equity, equity)
             dd = (peak_equity - equity) / peak_equity if peak_equity > 0 else 0.0
-            if dd > max_drawdown:
-                max_drawdown = dd
+            max_drawdown = max(max_drawdown, dd)
 
             if net_pnl > 0:
                 wins += 1

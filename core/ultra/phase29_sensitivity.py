@@ -12,9 +12,8 @@ Menu Option: 92
 
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -52,7 +51,7 @@ def compute_sensitivity(
     base_confidence: float,
     perturbed_lower_confidence: float,
     perturbed_upper_confidence: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute sensitivity metric for a feature.
 
@@ -97,10 +96,10 @@ def compute_sensitivity(
 
 
 def analyze_feature_sensitivity(
-    features: Dict[str, float],
+    features: dict[str, float],
     base_confidence: float,
     perturbation_pct: float = 0.05,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     """
     Analyze sensitivity of multiple features.
 

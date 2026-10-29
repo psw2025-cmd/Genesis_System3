@@ -7,7 +7,7 @@ Removes duplicate rows from curated training data.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ LOG_PATH = LOG_DIR / "system3_duplicate_purger.log"
 CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated.csv"
 
 
-def run_phase209(**kwargs) -> Dict[str, Any]:
+def run_phase209(**kwargs) -> dict[str, Any]:
     """
     Run Phase 209: Training Data Duplicate Purger.
 
@@ -114,7 +114,7 @@ def run_phase209(**kwargs) -> Dict[str, Any]:
 
         # Log
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Duplicate Purger Log\n")
+            f.write("System3 Duplicate Purger Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
             f.write(f"File: {CURATED_CSV}\n")

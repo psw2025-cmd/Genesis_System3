@@ -11,7 +11,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -74,7 +74,7 @@ def compute_sha256(file_path: Path) -> str:
         return ""
 
 
-def scan_directory(base_path: Path, relative_to: Path) -> List[Dict[str, Any]]:
+def scan_directory(base_path: Path, relative_to: Path) -> list[dict[str, Any]]:
     """Recursively scan directory and collect file metadata."""
     files = []
 
@@ -105,7 +105,7 @@ def scan_directory(base_path: Path, relative_to: Path) -> List[Dict[str, Any]]:
     return files
 
 
-def run_phase311(**kwargs) -> Dict[str, Any]:
+def run_phase311(**kwargs) -> dict[str, Any]:
     """
     Run Phase 311: Baseline Filesystem Snapshot
 
@@ -216,7 +216,7 @@ def run_phase311(**kwargs) -> Dict[str, Any]:
         return {
             "phase": 311,
             "status": "ERROR",
-            "details": f"Phase 311 failed: {str(e)}",
+            "details": f"Phase 311 failed: {e!s}",
             "outputs": outputs,
             "errors": [str(e)],
         }

@@ -8,9 +8,8 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,7 +27,7 @@ LOG_PATH = LOG_DIR / "system3_threshold_optimizer.log"
 SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
-def run_phase223(**kwargs) -> Dict[str, Any]:
+def run_phase223(**kwargs) -> dict[str, Any]:
     """
     Run Phase 223: Threshold Optimizer.
 
@@ -70,7 +69,7 @@ def run_phase223(**kwargs) -> Dict[str, Any]:
             try:
                 test_file = open(signals_file, "r")
                 test_file.close()
-            except (PermissionError, IOError, OSError) as lock_error:
+            except (PermissionError, OSError):
                 if attempt < max_retries - 1:
                     import time
 
@@ -157,7 +156,7 @@ def run_phase223(**kwargs) -> Dict[str, Any]:
 
             # Log optimization process
             with LOG_PATH.open("w", encoding="utf-8") as f:
-                f.write(f"System3 Threshold Optimizer Log\n")
+                f.write("System3 Threshold Optimizer Log\n")
                 f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
                 f.write("=" * 70 + "\n\n")
                 f.write(f"Candidates Generated: {len(candidates)}\n\n")

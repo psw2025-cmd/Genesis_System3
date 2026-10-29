@@ -11,9 +11,7 @@ Menu Option: 90
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-import numpy as np
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
@@ -35,9 +33,9 @@ def balance_risk_reward(
     volatility: float,
     score: float,
     drift_strength: float = 0.0,
-    drift_direction: Optional[str] = None,
-    premium_behavior: Optional[str] = None,
-) -> Dict[str, Any]:
+    drift_direction: str | None = None,
+    premium_behavior: str | None = None,
+) -> dict[str, Any]:
     """
     Balance SL/TP for optimized risk-reward ratio.
 

@@ -7,7 +7,7 @@ Computes signal quality metrics: accuracy, precision, recall, F1-score.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_signal_quality_metrics.md"
 
 
-def run_phase264(**kwargs) -> Dict[str, Any]:
+def run_phase264(**kwargs) -> dict[str, Any]:
     """Run Phase 264: Signal Quality Metrics."""
     errors = []
 

@@ -14,7 +14,6 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
-from typing import Dict, Optional
 
 import pandas as pd
 
@@ -52,7 +51,7 @@ def _persist_json(df: pd.DataFrame) -> None:
 
 class InstrumentsCache:
     _instance = None
-    _instruments_df: Optional[pd.DataFrame] = None
+    _instruments_df: pd.DataFrame | None = None
     _load_time: float = 0.0
     _load_duration: float = 0.0
     _load_failed: bool = False
@@ -61,7 +60,7 @@ class InstrumentsCache:
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(InstrumentsCache, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self):
@@ -146,7 +145,7 @@ class InstrumentsCache:
         return self._instruments_df.copy()
 
     def get_tokens_for_underlying_expiry(
-        self, underlying: str, expiry: str, strike_band: Optional[float] = None, spot_price: Optional[float] = None
+        self, underlying: str, expiry: str, strike_band: float | None = None, spot_price: float | None = None
     ) -> pd.DataFrame:
         df = self.get_instruments_df()
         if df.empty:
@@ -174,7 +173,7 @@ class InstrumentsCache:
 
         return filtered
 
-    def get_load_metrics(self) -> Dict:
+    def get_load_metrics(self) -> dict:
         csv_path = resolve_master_csv()
         return {
             "instruments_count": len(self._instruments_df) if self._instruments_df is not None else 0,
@@ -198,7 +197,7 @@ def get_instruments_cache() -> InstrumentsCache:
     return _instruments_cache
 
 
-def ensure_instruments_loaded() -> Dict:
+def ensure_instruments_loaded() -> dict:
     cache = get_instruments_cache()
     df = cache.get_instruments_df()
     metrics = cache.get_load_metrics()
@@ -211,7 +210,7 @@ def get_instruments_df() -> pd.DataFrame:
 
 
 def get_tokens_for_underlying_expiry(
-    underlying: str, expiry: str, strike_band: Optional[float] = None, spot_price: Optional[float] = None
+    underlying: str, expiry: str, strike_band: float | None = None, spot_price: float | None = None
 ) -> pd.DataFrame:
     return get_instruments_cache().get_tokens_for_underlying_expiry(
         underlying, expiry, strike_band, spot_price

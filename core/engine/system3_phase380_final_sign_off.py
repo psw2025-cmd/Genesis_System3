@@ -19,7 +19,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -34,7 +34,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def verify_all_phases_complete() -> Dict[str, Any]:
+def verify_all_phases_complete() -> dict[str, Any]:
     """Verify that all 15 phases (361-375) have executed successfully."""
     verification = {"phases_checked": 0, "phases_passed": 0, "phases_failed": 0, "phases": {}}
 
@@ -69,7 +69,7 @@ def verify_all_phases_complete() -> Dict[str, Any]:
     return verification
 
 
-def consolidate_test_results() -> Dict[str, Any]:
+def consolidate_test_results() -> dict[str, Any]:
     """Consolidate test results from all analysis phases."""
     consolidated = {
         "self_test_376": {"status": "NOT_RUN"},
@@ -162,7 +162,7 @@ def consolidate_test_results() -> Dict[str, Any]:
     return consolidated
 
 
-def verify_safety_compliance() -> Dict[str, Any]:
+def verify_safety_compliance() -> dict[str, Any]:
     """Final safety compliance verification."""
     compliance = {"checks": {}, "compliant": True, "violations": []}
 
@@ -171,7 +171,7 @@ def verify_safety_compliance() -> Dict[str, Any]:
         try:
             from config.live_trade_config import LIVE_TRADING_ENABLED
 
-            compliance["checks"]["LIVE_TRADING_ENABLED"] = LIVE_TRADING_ENABLED == False
+            compliance["checks"]["LIVE_TRADING_ENABLED"] = not LIVE_TRADING_ENABLED
             if LIVE_TRADING_ENABLED:
                 compliance["compliant"] = False
                 compliance["violations"].append("LIVE_TRADING_ENABLED is True")
@@ -192,7 +192,7 @@ def verify_safety_compliance() -> Dict[str, Any]:
                         if pattern in content:
                             live_trading_code_found = True
                             compliance["violations"].append(f"Found '{pattern}' in {phase_file.name}")
-            except Exception as e:
+            except Exception:
                 pass
 
         compliance["checks"]["no_live_code"] = not live_trading_code_found
@@ -325,7 +325,7 @@ This certification is valid for deployment pending final manual authorization.
 
 
 def generate_markdown_report(
-    verification: Dict[str, Any], consolidated: Dict[str, Any], compliance: Dict[str, Any]
+    verification: dict[str, Any], consolidated: dict[str, Any], compliance: dict[str, Any]
 ) -> str:
     """Generate final sign-off report."""
     report = "# System3 Phase 380 - Final Sign-Off Report\n\n"
@@ -401,7 +401,7 @@ def generate_markdown_report(
     return report
 
 
-def run_phase380(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase380(context: dict[str, Any] = None) -> dict[str, Any]:
     """Main phase executor."""
     logger.info("=" * 70)
     logger.info("Phase 380: Final Sign-Off")

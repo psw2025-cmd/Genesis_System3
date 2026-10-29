@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -38,7 +38,7 @@ def load_csv_robust(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def run_phase302(**kwargs) -> Dict[str, Any]:
+def run_phase302(**kwargs) -> dict[str, Any]:
     """
     Run Phase 302: Regime-Aware Performance Profiler.
 

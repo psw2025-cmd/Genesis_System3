@@ -10,7 +10,7 @@ Mode: Pre-market and each OP cycle before OP3.
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd

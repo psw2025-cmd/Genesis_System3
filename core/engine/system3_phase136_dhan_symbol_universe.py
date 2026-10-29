@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -34,7 +34,7 @@ SUPPORTED_UNDERLYINGS = [
 ]
 
 
-def run_phase136_dhan_symbol_universe() -> Dict[str, Any]:
+def run_phase136_dhan_symbol_universe() -> dict[str, Any]:
     """
     Create Angel symbol universe metadata.
 

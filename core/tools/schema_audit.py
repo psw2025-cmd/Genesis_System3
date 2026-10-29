@@ -7,7 +7,6 @@ Performs schema audit and generates documentation for dhan_index_ai_signals_with
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import pandas as pd
 
@@ -19,7 +18,7 @@ CSV_FILE = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forwa
 OUTPUT_REPORT = PROJECT_ROOT / "docs" / "SYSTEM3_CSV_SCHEMA_AUTOMATED.md"
 
 
-def detect_bad_rows(df: pd.DataFrame) -> Dict[str, List[int]]:
+def detect_bad_rows(df: pd.DataFrame) -> dict[str, list[int]]:
     """
     Detect and return indices of bad rows.
 
@@ -52,7 +51,7 @@ def detect_bad_rows(df: pd.DataFrame) -> Dict[str, List[int]]:
     return bad_rows
 
 
-def categorize_columns(df: pd.DataFrame) -> Dict[str, List[str]]:
+def categorize_columns(df: pd.DataFrame) -> dict[str, list[str]]:
     """
     Categorize columns into logical groups.
 
@@ -182,7 +181,7 @@ def categorize_columns(df: pd.DataFrame) -> Dict[str, List[str]]:
     return categories
 
 
-def run_schema_audit() -> Dict:
+def run_schema_audit() -> dict:
     """
     Run schema audit and generate report.
 
@@ -200,7 +199,7 @@ def run_schema_audit() -> Dict:
     # Load CSV
     try:
         df = pd.read_csv(CSV_FILE, engine="python", on_bad_lines="skip")
-        print(f"✅ CSV loaded successfully")
+        print("✅ CSV loaded successfully")
     except Exception as e:
         print(f"❌ Failed to load CSV: {e}")
         return {"error": str(e)}
@@ -209,14 +208,14 @@ def run_schema_audit() -> Dict:
     row_count = len(df)
     col_count = len(df.columns)
 
-    print(f"\n📊 BASIC STATISTICS")
+    print("\n📊 BASIC STATISTICS")
     print(f"  Total Rows: {row_count:,}")
     print(f"  Total Columns: {col_count}")
 
     # Detect bad rows
     bad_rows = detect_bad_rows(df)
 
-    print(f"\n🔍 BAD ROW DETECTION")
+    print("\n🔍 BAD ROW DETECTION")
     print(f"  Duplicate header rows: {len(bad_rows['duplicate_headers'])}")
     if bad_rows["duplicate_headers"]:
         print(

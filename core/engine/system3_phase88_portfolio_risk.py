@@ -9,7 +9,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -59,7 +59,7 @@ def calculate_notional(row: pd.Series) -> float:
     return entry_price * quantity * 50  # 50 is lot size for index options
 
 
-def analyze_portfolio_risk() -> Dict[str, Any]:
+def analyze_portfolio_risk() -> dict[str, Any]:
     """Analyze portfolio-level risk."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 88 - PORTFOLIO RISK ENGINE")
@@ -156,7 +156,7 @@ def analyze_portfolio_risk() -> Dict[str, Any]:
     # Save JSON
     with OUTPUT_JSON.open("w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
-    print(f"[PH88] Portfolio risk analysis complete")
+    print("[PH88] Portfolio risk analysis complete")
 
     # Generate MD
     generate_markdown(report)
@@ -165,7 +165,7 @@ def analyze_portfolio_risk() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 88 - Portfolio Risk Report\n\n")
@@ -204,7 +204,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = analyze_portfolio_risk()
+        analyze_portfolio_risk()
         print("\n[PH88] Portfolio risk analysis complete.")
         return 0
     except Exception as e:

@@ -8,9 +8,8 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,7 +27,7 @@ LOG_PATH = LOG_DIR / "system3_breakout_analyzer.log"
 SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
-def run_phase219(**kwargs) -> Dict[str, Any]:
+def run_phase219(**kwargs) -> dict[str, Any]:
     """
     Run Phase 219: Breakout Structure Analyzer.
 
@@ -119,7 +118,7 @@ def run_phase219(**kwargs) -> Dict[str, Any]:
 
         # Log important candidates
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Breakout Analyzer Log\n")
+            f.write("System3 Breakout Analyzer Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
             f.write(f"Breakout Zones Detected: {len(breakout_zones)}\n\n")

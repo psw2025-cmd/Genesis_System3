@@ -6,9 +6,8 @@ Validates execution requests before order placement.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -18,7 +17,7 @@ EXEC_LOG_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_trades_exec_lo
 def validate_execution_request(
     trade_row: pd.Series,
     current_market: pd.DataFrame,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Validate execution request before order placement.
 

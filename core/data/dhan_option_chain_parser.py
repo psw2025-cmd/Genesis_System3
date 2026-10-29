@@ -8,7 +8,7 @@ oi_change, flat greeks on leg).
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -31,7 +31,7 @@ def _safe_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def parse_dhan_leg(leg: Dict[str, Any], strike: float, option_type: str) -> Dict[str, Any]:
+def parse_dhan_leg(leg: dict[str, Any], strike: float, option_type: str) -> dict[str, Any]:
     """Parse one CE/PE leg using official DhanHQ field names."""
     greeks = leg.get("greeks") or {}
     if not isinstance(greeks, dict):
@@ -69,9 +69,9 @@ def parse_dhan_leg(leg: Dict[str, Any], strike: float, option_type: str) -> Dict
     }
 
 
-def _iter_official_oc_rows(data: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], float]:
+def _iter_official_oc_rows(data: dict[str, Any]) -> tuple[list[dict[str, Any]], float]:
     """Parse official Dhan v2 response shape: data.oc.{strike}.{ce|pe}."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     spot = _safe_float(data.get("last_price"))
     oc = data.get("oc") or {}
     if not isinstance(oc, dict):
@@ -88,9 +88,9 @@ def _iter_official_oc_rows(data: Dict[str, Any]) -> Tuple[List[Dict[str, Any]], 
     return rows, spot
 
 
-def _iter_list_rows(items: Any, initial_spot: float = 0.0) -> Tuple[List[Dict[str, Any]], float]:
+def _iter_list_rows(items: Any, initial_spot: float = 0.0) -> tuple[list[dict[str, Any]], float]:
     """Parse SDK/list style rows that contain strike_price and ce/pe objects."""
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     spot = initial_spot
     if not isinstance(items, list):
         return rows, spot
@@ -131,7 +131,7 @@ def _unwrap_option_chain_data(payload: Any) -> Any:
     return data
 
 
-def parse_dhan_option_chain_payload(payload: Any) -> Tuple[pd.DataFrame, float]:
+def parse_dhan_option_chain_payload(payload: Any) -> tuple[pd.DataFrame, float]:
     """
     Parse Dhan option_chain API response.
 
@@ -163,7 +163,7 @@ def parse_dhan_option_chain_payload(payload: Any) -> Tuple[pd.DataFrame, float]:
     return pd.DataFrame(), 0.0
 
 
-def parse_option_chain_to_df(resp: Dict[str, Any], symbol: str) -> tuple:
+def parse_option_chain_to_df(resp: dict[str, Any], symbol: str) -> tuple:
     """
     Parse option-chain response into (DataFrame, spot_price) tuple.
 

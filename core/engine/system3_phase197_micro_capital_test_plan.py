@@ -7,7 +7,7 @@ Builds a concrete 1-lot-only test plan.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ CAPITAL_GUARDRAIL_CSV = STORAGE_ULTRA / "phase140_capital_guardrail.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase197_micro_capital_test_plan.md"
 
 
-def run_phase197_micro_capital_test_plan() -> Dict[str, Any]:
+def run_phase197_micro_capital_test_plan() -> dict[str, Any]:
     """
     Build 1-lot-only test plan.
 
@@ -56,7 +56,7 @@ def run_phase197_micro_capital_test_plan() -> Dict[str, Any]:
             f.write(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
             f.write("## Test Configuration\n\n")
-            f.write(f"- **Mode**: 1-LOT ONLY TEST MODE\n")
+            f.write("- **Mode**: 1-LOT ONLY TEST MODE\n")
             f.write(f"- **Max Trades/Day**: {max_trades_per_day}\n")
             f.write(f"- **Max Drawdown Stop**: ₹{max_drawdown:,.2f} (10% of test capital)\n\n")
 

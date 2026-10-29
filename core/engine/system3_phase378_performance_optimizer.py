@@ -19,7 +19,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -34,12 +34,11 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def analyze_file_io_performance() -> Dict[str, Any]:
+def analyze_file_io_performance() -> dict[str, Any]:
     """Analyze file IO performance and identify bottlenecks."""
     analysis = {"files": {}, "bottlenecks": [], "optimizations": []}
 
     try:
-        import os
 
         # Check signal files
         signal_files = [
@@ -79,7 +78,7 @@ def analyze_file_io_performance() -> Dict[str, Any]:
     return analysis
 
 
-def analyze_memory_usage() -> Dict[str, Any]:
+def analyze_memory_usage() -> dict[str, Any]:
     """Estimate memory usage and identify hotspots."""
     analysis = {"estimated_usage": {}, "hotspots": [], "optimizations": []}
 
@@ -143,7 +142,7 @@ def analyze_memory_usage() -> Dict[str, Any]:
     return analysis
 
 
-def analyze_processing_time() -> Dict[str, Any]:
+def analyze_processing_time() -> dict[str, Any]:
     """Analyze processing time distribution across phases."""
     analysis = {"phase_times": {}, "slow_phases": [], "optimizations": []}
 
@@ -186,7 +185,7 @@ def analyze_processing_time() -> Dict[str, Any]:
     return analysis
 
 
-def identify_optimization_opportunities() -> Dict[str, Any]:
+def identify_optimization_opportunities() -> dict[str, Any]:
     """Identify specific optimization opportunities."""
     opportunities = {"quick_wins": [], "medium_effort": [], "long_term": []}
 
@@ -251,7 +250,7 @@ def identify_optimization_opportunities() -> Dict[str, Any]:
     return opportunities
 
 
-def generate_markdown_report(all_analysis: Dict[str, Any]) -> str:
+def generate_markdown_report(all_analysis: dict[str, Any]) -> str:
     """Generate performance optimization report."""
     report = "# System3 Phase 378 - Performance Optimization Report\n\n"
     report += f"**Generated:** {datetime.now().isoformat()}\n\n"
@@ -353,7 +352,7 @@ def generate_markdown_report(all_analysis: Dict[str, Any]) -> str:
     return report
 
 
-def run_phase378(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase378(context: dict[str, Any] = None) -> dict[str, Any]:
     """Main phase executor."""
     logger.info("=" * 70)
     logger.info("Phase 378: Performance Optimizer")

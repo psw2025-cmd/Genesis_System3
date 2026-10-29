@@ -8,10 +8,9 @@ Optimizes overall trading strategy parameters:
 - Portfolio allocation
 """
 
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -27,7 +26,7 @@ class StrategyOptimizer:
     def __init__(self):
         self.optimization_path = OPTIMIZATION_JSON
 
-    def optimize_strategy(self, days: int = 7) -> Dict[str, Any]:
+    def optimize_strategy(self, days: int = 7) -> dict[str, Any]:
         """
         Optimize strategy parameters based on recent performance.
 
@@ -108,7 +107,7 @@ class StrategyOptimizer:
                 "message": str(e),
             }
 
-    def _optimize_position_sizing(self, win_rate: float, avg_pnl: float) -> Dict[str, Any]:
+    def _optimize_position_sizing(self, win_rate: float, avg_pnl: float) -> dict[str, Any]:
         """Optimize position sizing based on performance."""
         # Kelly Criterion approximation
         if win_rate > 0 and avg_pnl > 0:
@@ -122,7 +121,7 @@ class StrategyOptimizer:
             "reasoning": f"Based on win_rate={win_rate:.1f}%, avg_pnl={avg_pnl:.2f}%",
         }
 
-    def _optimize_risk_management(self, max_drawdown: float, win_rate: float) -> Dict[str, Any]:
+    def _optimize_risk_management(self, max_drawdown: float, win_rate: float) -> dict[str, Any]:
         """Optimize risk management parameters."""
         recommendations = {
             "stoploss_pct": 5.0,  # Default
@@ -136,7 +135,7 @@ class StrategyOptimizer:
 
         return recommendations
 
-    def _optimize_allocation(self, by_underlying: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    def _optimize_allocation(self, by_underlying: dict[str, dict[str, Any]]) -> dict[str, Any]:
         """Optimize portfolio allocation across underlyings."""
         if not by_underlying:
             return {"allocation": {}, "reasoning": "Insufficient data"}
@@ -158,7 +157,7 @@ class StrategyOptimizer:
             "reasoning": "Allocation based on trade frequency and performance",
         }
 
-    def _optimize_entry_timing(self, df_pnl: pd.DataFrame) -> Dict[str, Any]:
+    def _optimize_entry_timing(self, df_pnl: pd.DataFrame) -> dict[str, Any]:
         """Optimize entry timing based on exit reasons."""
         if "exit_reason" not in df_pnl.columns:
             return {"reasoning": "No exit reason data available"}
@@ -169,7 +168,7 @@ class StrategyOptimizer:
             "reasoning": "Monitor exit reasons to optimize entry timing",
         }
 
-    def save_optimization(self, optimization: Dict[str, Any]) -> bool:
+    def save_optimization(self, optimization: dict[str, Any]) -> bool:
         """Save optimization results to JSON."""
         import json
 

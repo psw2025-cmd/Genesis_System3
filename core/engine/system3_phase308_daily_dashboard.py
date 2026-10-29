@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ def load_csv_robust(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def load_json_safe(path: Path) -> Dict:
+def load_json_safe(path: Path) -> dict:
     """Load JSON file safely."""
     if not path.exists():
         return {}
@@ -53,7 +53,7 @@ def load_json_safe(path: Path) -> Dict:
         return {}
 
 
-def run_phase308(**kwargs) -> Dict[str, Any]:
+def run_phase308(**kwargs) -> dict[str, Any]:
     """Run Phase 308: Daily PnL & Accuracy Dashboard Generator."""
     errors = []
 

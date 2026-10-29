@@ -7,7 +7,7 @@ Compares performance across different volatility regimes.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_regime_performance_comparison.md"
 
 
-def run_phase270(**kwargs) -> Dict[str, Any]:
+def run_phase270(**kwargs) -> dict[str, Any]:
     """Run Phase 270: Regime Performance Comparison."""
     errors = []
 

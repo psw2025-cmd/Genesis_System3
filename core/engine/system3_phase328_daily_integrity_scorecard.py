@@ -9,7 +9,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -25,7 +25,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "system_health"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def run_phase328(**kwargs) -> Dict[str, Any]:
+def run_phase328(**kwargs) -> dict[str, Any]:
     """
     Run Phase 328: Daily Integrity Scorecard
 
@@ -62,7 +62,7 @@ def run_phase328(**kwargs) -> Dict[str, Any]:
         with open(output_file, "w") as f:
             json.dump(result_data, f, indent=2)
 
-        logger.info(f"Phase 328 complete")
+        logger.info("Phase 328 complete")
 
         outputs = {"output_file": str(output_file), "log_file": str(log_file)}
 
@@ -83,7 +83,7 @@ def run_phase328(**kwargs) -> Dict[str, Any]:
         return {
             "phase": 328,
             "status": "ERROR",
-            "details": f"Phase 328 failed: {str(e)}",
+            "details": f"Phase 328 failed: {e!s}",
             "outputs": outputs,
             "errors": [str(e)],
         }

@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -13,7 +13,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase175_exception_catalog.md"
 
 
-def run_phase175_exception_catalog() -> Dict[str, Any]:
+def run_phase175_exception_catalog() -> dict[str, Any]:
     errors = []
     try:
         with OUTPUT_MD_PATH.open("w", encoding="utf-8") as f:

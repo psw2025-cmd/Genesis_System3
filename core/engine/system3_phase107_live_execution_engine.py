@@ -7,7 +7,6 @@ Actual real-order placement, but tightly guarded and controlled by config.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 
@@ -240,7 +239,7 @@ def run_phase107(**kwargs) -> dict:
                 df.at[idx, "status"] = "ERROR"
                 df.at[idx, "broker_status"] = "FAILED"
                 df.at[idx, "last_update_ts"] = datetime.now().isoformat()
-                df.at[idx, "notes"] = f"Exception: {str(e)}"
+                df.at[idx, "notes"] = f"Exception: {e!s}"
 
                 with LOG_FILE.open("a", encoding="utf-8") as f:
                     f.write(f"[{datetime.now().isoformat()}] ERROR: {error_msg}\n")

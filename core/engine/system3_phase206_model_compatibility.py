@@ -9,7 +9,7 @@ import pickle
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -62,7 +62,7 @@ def check_model_file(model_path: Path) -> tuple[bool, dict, str]:
         return False, {}, str(e)
 
 
-def run_phase206(**kwargs) -> Dict[str, Any]:
+def run_phase206(**kwargs) -> dict[str, Any]:
     """
     Run Phase 206: Model Compatibility Checker.
 
@@ -108,7 +108,7 @@ def run_phase206(**kwargs) -> Dict[str, Any]:
                 is_valid, model_info, error_msg = check_model_file(model_path)
 
                 if not is_valid:
-                    f.write(f"**Status**: ❌ ERROR\n\n")
+                    f.write("**Status**: ❌ ERROR\n\n")
                     f.write(f"**Error**: {error_msg}\n\n")
                     errors.append(f"Failed to check {model_path}: {error_msg}")
                 else:
@@ -116,15 +116,15 @@ def run_phase206(**kwargs) -> Dict[str, Any]:
                     compatible = model_info.get("compatible")
 
                     if version is None:
-                        f.write(f"**Status**: ⚠️ NO_VERSION\n\n")
+                        f.write("**Status**: ⚠️ NO_VERSION\n\n")
                         f.write("**Note**: Model does not have version metadata\n\n")
                         incompatible_models.append(str(model_path))
                     elif compatible:
-                        f.write(f"**Status**: ✅ COMPATIBLE\n\n")
+                        f.write("**Status**: ✅ COMPATIBLE\n\n")
                         f.write(f"**Version**: {version}\n\n")
                         compatible_models.append(str(model_path))
                     else:
-                        f.write(f"**Status**: ❌ INCOMPATIBLE\n\n")
+                        f.write("**Status**: ❌ INCOMPATIBLE\n\n")
                         f.write(f"**Version**: {version} (expected {ENGINE_VERSION})\n\n")
                         incompatible_models.append(str(model_path))
 

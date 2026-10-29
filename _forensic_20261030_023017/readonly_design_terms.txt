@@ -1,0 +1,16 @@
+﻿C:\Genesis_System3\core\config\cloud_runtime.py:120:    env = (os.environ.get("PUBLIC_DASHBOARD_URL") or "").strip().rstrip("/")
+C:\Genesis_System3\dashboard\backend\security_policy.py:131:        "PUBLIC_DASHBOARD_READ_ONLY",
+C:\Genesis_System3\dashboard\backend\secure_app.py:98:        "PUBLIC_DASHBOARD_READ_ONLY",
+C:\Genesis_System3\tests\test_cloud_runtime_public_urls.py:40:    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", f"{GCP}/ui")
+C:\Genesis_System3\tests\test_cloud_runtime_public_urls.py:54:    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+C:\Genesis_System3\tests\test_cloud_runtime_public_urls.py:65:    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", f"{cloud}/ui")
+C:\Genesis_System3\tests\test_cloud_runtime_public_urls.py:83:    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", "http://127.0.0.1:8000/ui")
+C:\Genesis_System3\tests\test_cloud_paper_preflight_contract.py:31:        self.assertEqual(gates["GCP_MUTATION_AUTHORITY"]["status"], "BLOCKED")
+C:\Genesis_System3\tests\test_cloud_paper_preflight_contract.py:73:        self.assertEqual(report["checks"][-2]["id"], "GCP_MUTATION_AUTHORITY")
+C:\Genesis_System3\tests\test_dashboard_app.py:224:    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+C:\Genesis_System3\tests\test_mutation_capability_manifest.py:91:        self.assertEqual(decision.code, "PAPER_MUTATION_AUTHORITY_REQUIRED")
+C:\Genesis_System3\scripts\patch_backend_root_urls.py:22:    dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")
+C:\Genesis_System3\scripts\system3_cloud_paper_preflight.py:80:    record("GCP_MUTATION_AUTHORITY", "BLOCKED",
+C:\Genesis_System3\tests\test_secure_app_contract.py:20:        self.assertIn("PUBLIC_DASHBOARD_READ_ONLY", source)
+C:\Genesis_System3\tests\test_security_policy.py:37:                self.assertEqual(decision.code, "PUBLIC_DASHBOARD_READ_ONLY")
+C:\Genesis_System3\tests\test_security_policy.py:115:        self.assertEqual(decision.code, "PUBLIC_DASHBOARD_READ_ONLY")

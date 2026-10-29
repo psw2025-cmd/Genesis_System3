@@ -15,8 +15,9 @@ import json
 import os
 import threading
 import time
-from datetime import datetime, timezone
-from typing import Any, Callable
+from collections.abc import Callable
+from datetime import UTC, datetime
+from typing import Any
 
 _LOCK = threading.RLock()
 _CACHE: dict[str, Any] = {
@@ -66,7 +67,7 @@ def _jwt_expiry(token: str) -> datetime | None:
         payload_part = parts[1] + "=" * (-len(parts[1]) % 4)
         payload = json.loads(base64.urlsafe_b64decode(payload_part.encode("ascii")))
         exp = payload.get("exp")
-        return datetime.fromtimestamp(float(exp), tz=timezone.utc) if exp else None
+        return datetime.fromtimestamp(float(exp), tz=UTC) if exp else None
     except Exception: return None
 
 
@@ -74,8 +75,8 @@ def _iso_utc(value: Any) -> str | None:
     if value is None: return None
     if hasattr(value, "ToDatetime"): value = value.ToDatetime()
     if isinstance(value, datetime):
-        if value.tzinfo is None: value = value.replace(tzinfo=timezone.utc)
-        return value.astimezone(timezone.utc).isoformat()
+        if value.tzinfo is None: value = value.replace(tzinfo=UTC)
+        return value.astimezone(UTC).isoformat()
     return str(value)
 
 
@@ -143,19 +144,19 @@ def token_metadata() -> dict[str, Any]:
     with _LOCK:
         token = str(_CACHE.get("token") or os.getenv("DHAN_ACCESS_TOKEN", "").strip())
         expiry = _jwt_expiry(token) if token else None
-        hours = (expiry - datetime.now(timezone.utc)).total_seconds() / 3600 if expiry else None
+        hours = (expiry - datetime.now(UTC)).total_seconds() / 3600 if expiry else None
         fetched_epoch = float(_CACHE.get("fetched_at_epoch") or 0.0)
         rejected_at = float(_CACHE.get("rejected_at_epoch") or 0.0)
         return {"source": "GCP_SECRET_MANAGER_DYNAMIC" if enabled() else "ENVIRONMENT_FALLBACK",
                 "secret_id": _secret_id() if enabled() else None, "secret_version": _CACHE.get("version"),
                 "secret_version_created_at_utc": _CACHE.get("version_created_at"),
-                "loaded_at_utc": datetime.fromtimestamp(fetched_epoch, tz=timezone.utc).isoformat() if fetched_epoch else None,
+                "loaded_at_utc": datetime.fromtimestamp(fetched_epoch, tz=UTC).isoformat() if fetched_epoch else None,
                 "cache_age_s": round(max(0.0, time.time()-fetched_epoch),1) if fetched_epoch else None,
                 "cache_ttl_s": _ttl_seconds(), "expires_at_utc": expiry.isoformat() if expiry else None,
                 "hours_remaining": round(hours,2) if hours is not None else None, "expired": bool(hours is not None and hours <= 0),
                 "reload_count": int(_CACHE.get("reload_count") or 0), "last_reload_reason": _CACHE.get("last_reload_reason"),
                 "last_error_type": _CACHE.get("last_error"), "rejected_secret_version": _CACHE.get("rejected_version"),
-                "rejected_at_utc": datetime.fromtimestamp(rejected_at, tz=timezone.utc).isoformat() if rejected_at else None,
+                "rejected_at_utc": datetime.fromtimestamp(rejected_at, tz=UTC).isoformat() if rejected_at else None,
                 "auth_reload_backoff_s": _auth_reload_backoff_s(),
                 "auth_reload_suppressed_count": int(_CACHE.get("auth_reload_suppressed_count") or 0),
                 "runtime_instance": os.getenv("K_REVISION") or os.getenv("HOSTNAME") or None,

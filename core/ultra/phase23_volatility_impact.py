@@ -11,9 +11,8 @@ Menu Option: 86
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,9 +24,9 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
 def compute_volatility_regime(
     volatility: float,
-    volatility_trend: Optional[float] = None,
-    volatility_spikiness: Optional[float] = None,
-) -> Dict[str, Any]:
+    volatility_trend: float | None = None,
+    volatility_spikiness: float | None = None,
+) -> dict[str, Any]:
     """
     Compute volatility regime and impact factor.
 
@@ -100,7 +99,7 @@ def compute_volatility_regime(
     }
 
 
-def analyze_volatility_from_data(df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_volatility_from_data(df: pd.DataFrame) -> dict[str, Any]:
     """
     Analyze volatility from historical data.
 
@@ -205,7 +204,7 @@ def main() -> None:
         try:
             df = pd.read_csv(shadow_csv)
             analysis = analyze_volatility_from_data(df)
-            print(f"\n=== ANALYSIS FROM SHADOW MASTER ===")
+            print("\n=== ANALYSIS FROM SHADOW MASTER ===")
             print(f"Vol Regime: {analysis['vol_regime']}")
             print(f"Impact Factor: {analysis['impact_factor']:.3f}")
             print(f"Explanation: {', '.join(analysis['explanation'])}")

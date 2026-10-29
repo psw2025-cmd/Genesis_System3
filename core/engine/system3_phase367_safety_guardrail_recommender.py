@@ -12,9 +12,9 @@ Hard-coded safety rules remain untouched.
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -34,7 +34,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def load_health_feed() -> Dict[str, Any]:
+def load_health_feed() -> dict[str, Any]:
     """Load health dashboard feed from Phase 364."""
     health_path = STORAGE_METRICS / "dashboard_feed_364.json"
 
@@ -47,7 +47,7 @@ def load_health_feed() -> Dict[str, Any]:
         return data.get("health_metrics", {"health_score": 50.0})
 
 
-def load_data_quality_summary() -> Dict[str, Any]:
+def load_data_quality_summary() -> dict[str, Any]:
     """Load data quality summary from Phase 375."""
     quality_path = STORAGE_METRICS / "data_quality_summary_375.json"
 
@@ -60,7 +60,7 @@ def load_data_quality_summary() -> Dict[str, Any]:
         return data.get("summary", {"quality_score": 50.0})
 
 
-def measure_volatility() -> Dict[str, float]:
+def measure_volatility() -> dict[str, float]:
     """
     Measure volatility using curated signal data.
 
@@ -141,7 +141,7 @@ def compute_signal_conflict_load() -> float:
         return 0.0
 
 
-def check_data_freshness() -> Dict[str, Any]:
+def check_data_freshness() -> dict[str, Any]:
     """Check freshness of critical data files."""
     now = datetime.now()
     freshness = {"files": {}, "overall_freshness": "unknown"}
@@ -189,12 +189,12 @@ def check_data_freshness() -> Dict[str, Any]:
 
 
 def generate_guardrail_recommendations(
-    health: Dict[str, Any],
-    quality: Dict[str, Any],
-    volatility: Dict[str, Any],
+    health: dict[str, Any],
+    quality: dict[str, Any],
+    volatility: dict[str, Any],
     conflict_load: float,
-    freshness: Dict[str, Any],
-) -> Dict[str, Any]:
+    freshness: dict[str, Any],
+) -> dict[str, Any]:
     """
     Generate safety guardrail recommendations based on system state.
 
@@ -297,7 +297,7 @@ def generate_guardrail_recommendations(
     }
 
 
-def generate_markdown_report(guardrails: Dict[str, Any]) -> str:
+def generate_markdown_report(guardrails: dict[str, Any]) -> str:
     """Generate markdown report for safety guardrails."""
 
     report = """# SAFETY GUARDRAIL RECOMMENDATIONS - PHASE 367
@@ -341,8 +341,8 @@ This phase analyzes system state and recommends safety guardrails to prevent los
 
         report += f"""### {priority_emoji.get(rec['priority'], '•')} {rec['guardrail']} [{rec['priority'].upper()}]
 
-**Reason:** {rec['reason']}  
-**Action:** {rec['action']}  
+**Reason:** {rec['reason']}
+**Action:** {rec['action']}
 **Safety Level:** {rec['safety_level']}
 
 """
@@ -366,15 +366,15 @@ These hard-coded safety rules are ALWAYS enforced:
 
 ---
 
-**Status:** [OK] Analysis Complete (DRY-RUN)  
-**Safety Mode:** DRY-RUN (no live orders possible)  
+**Status:** [OK] Analysis Complete (DRY-RUN)
+**Safety Mode:** DRY-RUN (no live orders possible)
 **Last Updated:** {timestamp}
 """
 
     return report.format(timestamp=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 
-def run_phase367(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase367(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 367 - Safety Guardrail Recommender
 

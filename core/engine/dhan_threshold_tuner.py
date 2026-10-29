@@ -6,14 +6,12 @@ based on historical signal performance.
 """
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Tuple
 
 import numpy as np
 import pandas as pd
 
-from core.engine.dhan_trade_config import TradeThresholds
 from core.engine.train_dhan_models import ROOT_DIR as _ROOT_DIR
 
 
@@ -49,7 +47,7 @@ class ThresholdTuner:
     def __init__(self, max_signals: int = 200):
         self.max_signals = max_signals
         self.signals_df: pd.DataFrame | None = None
-        self.tuned_thresholds: Dict[str, Dict[str, float]] = {}
+        self.tuned_thresholds: dict[str, dict[str, float]] = {}
 
     def load_signals(self) -> bool:
         """Load last N signals from CSV."""
@@ -205,7 +203,7 @@ class ThresholdTuner:
         except Exception:
             return None
 
-    def tune_underlying(self, underlying: str) -> Dict[str, float] | None:
+    def tune_underlying(self, underlying: str) -> dict[str, float] | None:
         """
         Tune thresholds for one underlying.
 
@@ -258,7 +256,7 @@ class ThresholdTuner:
             "min_abs_score": float(best.score),
         }
 
-    def tune_all(self) -> Dict[str, Dict[str, float]]:
+    def tune_all(self) -> dict[str, dict[str, float]]:
         """
         Tune thresholds for all underlyings.
 
@@ -273,7 +271,7 @@ class ThresholdTuner:
             return defaults
 
         underlyings = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
-        tuned: Dict[str, Dict[str, float]] = {}
+        tuned: dict[str, dict[str, float]] = {}
 
         for u in underlyings:
             result = self.tune_underlying(u)

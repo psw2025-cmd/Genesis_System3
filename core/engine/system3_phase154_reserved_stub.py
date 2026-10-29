@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -13,7 +13,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase154_stub_report.md"
 
 
-def run_phase154_stub() -> Dict[str, Any]:
+def run_phase154_stub() -> dict[str, Any]:
     with OUTPUT_MD_PATH.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 154 - Reserved Stub\n\n")
         f.write(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")

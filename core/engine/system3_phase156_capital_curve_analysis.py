@@ -7,7 +7,7 @@ Analyzes capital curve and drawdown from DRY-RUN PnL data.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase156_capital_curve.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase156_capital_curve_report.md"
 
 
-def run_phase156_capital_curve_analysis(initial_capital: float = 50000.0) -> Dict[str, Any]:
+def run_phase156_capital_curve_analysis(initial_capital: float = 50000.0) -> dict[str, Any]:
     """
     Analyze capital curve and drawdown from DRY-RUN PnL.
 
@@ -77,8 +77,7 @@ def run_phase156_capital_curve_analysis(initial_capital: float = 50000.0) -> Dic
                 running_capital = running_capital * (1 + pnl_pct / 100)
 
                 # Update peak
-                if running_capital > peak_capital:
-                    peak_capital = running_capital
+                peak_capital = max(peak_capital, running_capital)
 
                 # Calculate drawdown
                 drawdown = peak_capital - running_capital

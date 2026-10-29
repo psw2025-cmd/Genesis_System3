@@ -8,9 +8,8 @@ AUTO-UPDATE: DISABLED - Only suggestions, never auto-applies.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 from core.engine.dhan_real_outcome_logger import load_outcomes
@@ -22,7 +21,7 @@ RISK_PROFILE_JSON = CONFIG_DIR / "risk_profile_suggestions.json"
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def optimize_risk_profile() -> Dict[str, Any]:
+def optimize_risk_profile() -> dict[str, Any]:
     """
     Optimize risk profile based on real PnL distribution.
 
@@ -97,7 +96,7 @@ def optimize_risk_profile() -> Dict[str, Any]:
     return suggestions
 
 
-def save_risk_profile_suggestions(suggestions: Dict[str, Any]) -> Path:
+def save_risk_profile_suggestions(suggestions: dict[str, Any]) -> Path:
     """
     Save risk profile suggestions to JSON.
 

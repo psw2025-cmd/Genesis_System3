@@ -11,7 +11,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -63,7 +63,7 @@ EXPECTED_COLUMNS = [
 ]
 
 
-def backup_file(source_path: Path) -> Tuple[bool, str]:
+def backup_file(source_path: Path) -> tuple[bool, str]:
     """Create timestamped backup of original file."""
     if not source_path.exists():
         return False, f"Source file not found: {source_path}"
@@ -83,7 +83,7 @@ def backup_file(source_path: Path) -> Tuple[bool, str]:
         return False, str(e)
 
 
-def detect_schema_issues(df: pd.DataFrame, expected_cols: List[str]) -> Dict[str, Any]:
+def detect_schema_issues(df: pd.DataFrame, expected_cols: list[str]) -> dict[str, Any]:
     """Detect schema mismatches between actual and expected columns."""
     actual_cols = set(df.columns)
     expected_set = set(expected_cols)
@@ -99,7 +99,7 @@ def detect_schema_issues(df: pd.DataFrame, expected_cols: List[str]) -> Dict[str
     return issues
 
 
-def normalize_schema(df: pd.DataFrame, expected_cols: List[str]) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def normalize_schema(df: pd.DataFrame, expected_cols: list[str]) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Normalize dataframe to expected schema."""
     normalization_log = {"columns_added": [], "columns_removed": [], "columns_reordered": False}
 
@@ -127,7 +127,7 @@ def normalize_schema(df: pd.DataFrame, expected_cols: List[str]) -> Tuple[pd.Dat
     return df_normalized, normalization_log
 
 
-def repair_signal_file(file_path: Path, expected_cols: List[str]) -> Dict[str, Any]:
+def repair_signal_file(file_path: Path, expected_cols: list[str]) -> dict[str, Any]:
     """Repair a single signal file with schema normalization."""
     repair_result = {
         "file": file_path.name,
@@ -196,7 +196,7 @@ def repair_signal_file(file_path: Path, expected_cols: List[str]) -> Dict[str, A
         return repair_result
 
 
-def run_phase370(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase370(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 370: Signal Schema Auto-Normalizer.
 
@@ -266,7 +266,7 @@ def run_phase370(context: Dict[str, Any] = None) -> Dict[str, Any]:
             f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             f.write("---\n\n")
 
-            f.write(f"## Summary\n\n")
+            f.write("## Summary\n\n")
             f.write(f"**Files Processed:** {result['files_processed']}\n")
             f.write(f"**Files Repaired:** {result['files_repaired']}\n")
             f.write(f"**Status:** {result['status'].upper()}\n\n")
@@ -282,11 +282,11 @@ def run_phase370(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write(f"**Status:** {repair_res['status']}\n")
 
                 if repair_res.get("backed_up"):
-                    f.write(f"**Backup Created:** ✅ Yes\n")
+                    f.write("**Backup Created:** ✅ Yes\n")
                     f.write(f"**Backup Path:** `{repair_res.get('backup_path', 'N/A')}`\n")
 
                 if repair_res.get("normalized"):
-                    f.write(f"**Normalized:** ✅ Yes\n")
+                    f.write("**Normalized:** ✅ Yes\n")
                     f.write(f"**Clean File:** `{repair_res.get('clean_path', 'N/A')}`\n")
 
                     norm_log = repair_res.get("normalization_log", {})

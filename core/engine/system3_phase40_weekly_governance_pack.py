@@ -12,7 +12,7 @@ Menu Option: 103
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -46,7 +46,7 @@ def _get_iso_week(date: datetime) -> str:
     return f"{iso_year}-W{iso_week:02d}"
 
 
-def _find_files_last_7_days(base_path: Path, pattern: str) -> List[Path]:
+def _find_files_last_7_days(base_path: Path, pattern: str) -> list[Path]:
     """Find files matching pattern modified in last 7 days."""
     cutoff = datetime.now() - timedelta(days=7)
     files = []
@@ -65,7 +65,7 @@ def _find_files_last_7_days(base_path: Path, pattern: str) -> List[Path]:
     return sorted(files, key=lambda p: p.stat().st_mtime, reverse=True)
 
 
-def _aggregate_metrics() -> Dict[str, Any]:
+def _aggregate_metrics() -> dict[str, Any]:
     """Aggregate metrics from last 7 days."""
     metrics = {"comparisons": 0, "audits": 0, "shadow_summaries": 0, "governance_summaries": 0, "policy_dashboards": 0}
 
@@ -92,7 +92,7 @@ def _aggregate_metrics() -> Dict[str, Any]:
     return metrics
 
 
-def _read_latest_comparison() -> Optional[Dict[str, Any]]:
+def _read_latest_comparison() -> dict[str, Any] | None:
     """Read latest comparison summary."""
     summary_file = ULTRA_DIR / "phase32_ultra_vs_baseline_summary.md"
     if summary_file.exists():
@@ -105,7 +105,7 @@ def _read_latest_comparison() -> Optional[Dict[str, Any]]:
     return None
 
 
-def _read_latest_audit() -> Optional[Dict[str, Any]]:
+def _read_latest_audit() -> dict[str, Any] | None:
     """Read latest audit results."""
     audit_file = ULTRA_DIR / "phase35_decision_audit.csv"
     if audit_file.exists():
@@ -120,7 +120,7 @@ def _read_latest_audit() -> Optional[Dict[str, Any]]:
     return None
 
 
-def _read_latest_promotion_plan() -> Optional[Dict[str, Any]]:
+def _read_latest_promotion_plan() -> dict[str, Any] | None:
     """Read latest promotion plan."""
     plan_file = ULTRA_DIR / "phase33_promotion_plan.json"
     if plan_file.exists():
@@ -253,7 +253,7 @@ def run_phase40_weekly_pack() -> None:
         f.write("\n".join(files_list))
 
     _log(f"Weekly pack written to {md_file}")
-    print(f"\n[OK] Phase 40 Weekly Governance Pack completed")
+    print("\n[OK] Phase 40 Weekly Governance Pack completed")
     print(f"[SAVE] Pack saved to: {week_dir}")
     print(f"[SAVE] Markdown: {md_file.name}")
     print(f"[SAVE] Metadata: {meta_file.name}")

@@ -11,7 +11,7 @@ Menu Option: 91
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
 REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def analyze_misfires(df: pd.DataFrame, n: int = 300) -> Dict[str, Any]:
+def analyze_misfires(df: pd.DataFrame, n: int = 300) -> dict[str, Any]:
     """
     Analyze misfires from outcomes data.
 
@@ -132,7 +132,7 @@ def analyze_misfires(df: pd.DataFrame, n: int = 300) -> Dict[str, Any]:
     }
 
 
-def load_recent_outcomes(n: int = 300) -> Optional[pd.DataFrame]:
+def load_recent_outcomes(n: int = 300) -> pd.DataFrame | None:
     """Load last N outcomes from available sources."""
     # Try PnL simulation
     pnl_csv = ULTRA_DIR / "dhan_ultra_pnl_sim.csv"

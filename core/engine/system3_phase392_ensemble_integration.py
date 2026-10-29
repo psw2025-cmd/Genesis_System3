@@ -33,7 +33,7 @@ import sys
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -44,7 +44,6 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
 from core.engine.ultra_models_loader import load_ultra_model
-from model_training_v2 import load_balanced_dataset
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -122,7 +121,7 @@ def verify_safety_flags() -> bool:
 # ============================================================================
 
 
-def load_ultra_models() -> Dict[str, Any]:
+def load_ultra_models() -> dict[str, Any]:
     """
     Load all available Ultra models (one per underlying).
 
@@ -147,7 +146,7 @@ def load_ultra_models() -> Dict[str, Any]:
     return models
 
 
-def load_xgboost_models(config: EnsembleConfig) -> Dict[str, Any]:
+def load_xgboost_models(config: EnsembleConfig) -> dict[str, Any]:
     """
     Load all XGBoost models trained in Phase 391.
 
@@ -236,7 +235,7 @@ def delta_fallback_score(features: np.ndarray) -> float:
         return 0.0
 
 
-def get_model_score(model: Any, features: np.ndarray) -> Optional[float]:
+def get_model_score(model: Any, features: np.ndarray) -> float | None:
     """
     Get prediction score from a single model.
 
@@ -267,7 +266,7 @@ def get_model_score(model: Any, features: np.ndarray) -> Optional[float]:
             return float(pred[0]) if len(pred) > 0 else None
 
         else:
-            logger.warning(f"Model has no predict_proba or predict method")
+            logger.warning("Model has no predict_proba or predict method")
             return None
 
     except Exception as e:
@@ -303,8 +302,8 @@ def normalize_score(score: float) -> float:
 def ensemble_predict(
     features: np.ndarray,
     underlying: str,
-    ultra_models: Dict[str, Any],
-    xgboost_models: Dict[str, Any],
+    ultra_models: dict[str, Any],
+    xgboost_models: dict[str, Any],
     config: EnsembleConfig,
 ) -> float:
     """
@@ -380,7 +379,7 @@ def ensemble_predict(
 # ============================================================================
 
 
-def run_phase_392(context: Optional[Dict] = None) -> Dict[str, Any]:
+def run_phase_392(context: dict | None = None) -> dict[str, Any]:
     """
     Execute Phase 392: Ensemble Integration.
 
@@ -593,7 +592,7 @@ def run_phase_392(context: Optional[Dict] = None) -> Dict[str, Any]:
         logger.info("\n" + "=" * 80)
         logger.info("PHASE 392 EXECUTION SUMMARY")
         logger.info("=" * 80)
-        logger.info(f"Status: SUCCESS")
+        logger.info("Status: SUCCESS")
         logger.info(f"Scores computed: {valid_count}/{len(df)}")
         logger.info(f"Score range: [{score_stats['min']:.4f}, {score_stats['max']:.4f}]")
         logger.info(f"Score mean: {score_stats['mean']:.4f}")

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_health_score.md"
 
 
-def run_phase290(**kwargs) -> Dict[str, Any]:
+def run_phase290(**kwargs) -> dict[str, Any]:
     """Run Phase 290: System Health Score."""
     errors = []
 
@@ -45,7 +45,7 @@ def run_phase290(**kwargs) -> Dict[str, Any]:
             "data_quality": 0.2,
         }
 
-        overall_score = sum(health_factors[k] * weights[k] for k in health_factors.keys())
+        overall_score = sum(health_factors[k] * weights[k] for k in health_factors)
 
         # Determine health status
         if overall_score >= 90:

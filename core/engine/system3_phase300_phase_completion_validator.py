@@ -7,7 +7,7 @@ Validates that all phases 1-300 are implemented and working.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -18,7 +18,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_phase_completion_validation.md"
 
 
-def run_phase300(**kwargs) -> Dict[str, Any]:
+def run_phase300(**kwargs) -> dict[str, Any]:
     """Run Phase 300: Phase Completion Validator."""
     errors = []
     missing_phases = []
@@ -38,7 +38,7 @@ def run_phase300(**kwargs) -> Dict[str, Any]:
         report_lines = [
             "# System3 Phase Completion Validation\n",
             f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",
-            f"**Phases Checked**: 201-300\n",
+            "**Phases Checked**: 201-300\n",
             f"**Missing Phases**: {len(missing_phases)}\n",
         ]
 

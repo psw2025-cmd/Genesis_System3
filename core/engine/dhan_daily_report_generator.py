@@ -8,7 +8,6 @@ Generates comprehensive daily reports including:
 - Risk metrics
 """
 
-import os
 from datetime import datetime
 from pathlib import Path
 
@@ -42,7 +41,7 @@ class DailyReportGenerator:
 
         report_lines = []
         report_lines.append("=" * 80)
-        report_lines.append(f"ANGEL ONE INDEX OPTIONS - DAILY REPORT")
+        report_lines.append("ANGEL ONE INDEX OPTIONS - DAILY REPORT")
         report_lines.append(f"Date: {date}")
         report_lines.append(f"Generated: {datetime.utcnow().isoformat()}")
         report_lines.append("=" * 80)

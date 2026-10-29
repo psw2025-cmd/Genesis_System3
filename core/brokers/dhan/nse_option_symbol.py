@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import re
 from datetime import date, datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 try:
     from core.data.instruments_cache import get_instruments_df
@@ -23,7 +23,7 @@ except ImportError:
     get_instruments_df = None
 
 # NSE index F&O defaults (lot size used when instrument master unavailable)
-INDEX_FO_DEFAULTS: Dict[str, Dict[str, Any]] = {
+INDEX_FO_DEFAULTS: dict[str, dict[str, Any]] = {
     "NIFTY": {"lot_size": 50, "strike_step": 50, "exchange_segment": "NSE_FNO"},
     "BANKNIFTY": {"lot_size": 15, "strike_step": 100, "exchange_segment": "NSE_FNO"},
     "FINNIFTY": {"lot_size": 40, "strike_step": 50, "exchange_segment": "NSE_FNO"},
@@ -45,7 +45,7 @@ _TRADING_SYMBOL_RE = re.compile(
 )
 
 
-def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
+def _parse_stock_trading_symbol(sym: str) -> dict[str, Any] | None:
     """Parse stock OPTSTK symbol — supports YYMMM and DDMMMYY (OpenAlgo/NSE)."""
     m = re.match(
         rf"^(?P<underlying>[A-Z][A-Z0-9&]+?)"
@@ -68,7 +68,7 @@ def _parse_stock_trading_symbol(sym: str) -> Optional[Dict[str, Any]]:
         dm = re.match(
             rf"^(?P<u>[A-Z][A-Z0-9&]+)(?P<dd>\d{{2}})(?P<mon>{_MONTHS})(?P<yy>\d{{2}})(?P<strike>\d+(?:\.\d+)?)(?P<opt>CE|PE)$",
             sym,
-            re.I,
+            re.IGNORECASE,
         )
         if dm:
             dg = dm.groupdict()
@@ -116,7 +116,7 @@ _MONTH_MAP = {
 }
 
 
-def _parse_expiry_input(expiry: Union[str, date, datetime, None]) -> Optional[date]:
+def _parse_expiry_input(expiry: str | date | datetime | None) -> date | None:
     if expiry is None:
         return None
     if isinstance(expiry, datetime):
@@ -150,7 +150,7 @@ def _format_strike(strike: float) -> str:
 
 def build_trading_symbol(
     underlying: str,
-    expiry: Union[str, date, datetime],
+    expiry: str | date | datetime,
     strike: float,
     option_type: str,
 ) -> str:
@@ -167,7 +167,7 @@ def build_trading_symbol(
     return f"{underlying.upper()}{dd}{mmm}{yy}{_format_strike(strike)}{opt}"
 
 
-def parse_trading_symbol(trading_symbol: str) -> Optional[Dict[str, Any]]:
+def parse_trading_symbol(trading_symbol: str) -> dict[str, Any] | None:
     """Parse NSE/Dhan option trading symbol into components."""
     sym = (trading_symbol or "").strip().upper()
     if not sym:
@@ -220,9 +220,9 @@ def _lookup_instrument_master(
     underlying: str,
     strike: float,
     option_type: str,
-    expiry_date: Optional[date] = None,
-    trading_symbol: Optional[str] = None,
-) -> Optional[Dict[str, Any]]:
+    expiry_date: date | None = None,
+    trading_symbol: str | None = None,
+) -> dict[str, Any] | None:
     global _INSTRUMENTS_BY_SYMBOL, _INSTRUMENTS_BY_KEY, _LAST_DF_ID
     if get_instruments_df is None:
         return None
@@ -313,9 +313,9 @@ def resolve_option_contract(
     underlying: str,
     strike: float,
     option_type: str,
-    expiry_date: Union[str, date, datetime, None] = None,
-    trading_symbol: Optional[str] = None,
-) -> Dict[str, Any]:
+    expiry_date: str | date | datetime | None = None,
+    trading_symbol: str | None = None,
+) -> dict[str, Any]:
     """
     Resolve full contract identity: prefer instrument master, else build symbol.
     """
@@ -367,7 +367,7 @@ def resolve_option_contract(
     }
 
 
-def enrich_option_row(row: Dict[str, Any], default_expiry: Union[str, date, None] = None) -> Dict[str, Any]:
+def enrich_option_row(row: dict[str, Any], default_expiry: str | date | None = None) -> dict[str, Any]:
     """Add trading_symbol, expiry_date, security_id, lot_size to a trade/position/chain row."""
     if not isinstance(row, dict):
         return row
@@ -413,7 +413,7 @@ def enrich_option_row(row: Dict[str, Any], default_expiry: Union[str, date, None
 
 
 def enrich_option_rows(
-    rows: List[Dict[str, Any]],
-    default_expiry: Union[str, date, None] = None,
-) -> List[Dict[str, Any]]:
+    rows: list[dict[str, Any]],
+    default_expiry: str | date | None = None,
+) -> list[dict[str, Any]]:
     return [enrich_option_row(r, default_expiry=default_expiry) for r in rows]

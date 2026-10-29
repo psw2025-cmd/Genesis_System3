@@ -2,7 +2,6 @@
 Entry/Exit Rules - Compute entry signals, dynamic SL/Target, trailing SL
 """
 
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -10,7 +9,7 @@ import pandas as pd
 
 def compute_dynamic_sl_tp(
     entry_price: float, volatility: float, atr: float = None, risk_reward: float = 2.0
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute dynamic stop loss and target price.
 
@@ -106,7 +105,7 @@ def compute_exit_signals(
         if col not in df.columns:
             df[col] = 0.0
 
-    entry_price = pd.to_numeric(df[entry_price_col], errors="coerce").fillna(0.0)
+    pd.to_numeric(df[entry_price_col], errors="coerce").fillna(0.0)
     current_price = pd.to_numeric(df[current_price_col], errors="coerce").fillna(0.0)
     stop_loss = pd.to_numeric(df[stop_loss_col], errors="coerce").fillna(0.0)
     target = pd.to_numeric(df[target_col], errors="coerce").fillna(0.0)

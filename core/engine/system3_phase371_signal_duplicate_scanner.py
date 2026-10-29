@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 logger = logging.getLogger(__name__)
 
 
-def scan_for_duplicates(df: pd.DataFrame) -> Dict[str, Any]:
+def scan_for_duplicates(df: pd.DataFrame) -> dict[str, Any]:
     """Scan dataframe for duplicate signals."""
     dup_analysis = {
         "total_rows": len(df),
@@ -54,7 +54,7 @@ def scan_for_duplicates(df: pd.DataFrame) -> Dict[str, Any]:
     return dup_analysis
 
 
-def run_phase371(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase371(context: dict[str, Any] = None) -> dict[str, Any]:
     """Execute Phase 371: Signal Duplicate Scanner."""
     logger.info("=== Phase 371: Signal Duplicate Scanner ===")
 
@@ -101,7 +101,7 @@ def run_phase371(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write(f"- Symbol Conflicts: {scan['symbol_conflicts']}\n\n")
 
         result["outputs"]["report"] = str(md_output)
-        logger.info(f"Phase 371 complete")
+        logger.info("Phase 371 complete")
         return result
 
     except Exception as e:

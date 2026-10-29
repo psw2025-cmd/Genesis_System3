@@ -17,13 +17,12 @@ Menu Option: 75
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
-from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -41,8 +40,8 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 def prepare_features_labels(
     df: pd.DataFrame,
-    selected_features: Optional[List[str]] = None,
-) -> tuple[Optional[pd.DataFrame], Optional[pd.Series], Optional[List[str]]]:
+    selected_features: list[str] | None = None,
+) -> tuple[pd.DataFrame | None, pd.Series | None, list[str] | None]:
     """Prepare features and labels from DataFrame."""
     if df.empty:
         return None, None, None
@@ -124,7 +123,7 @@ def prepare_features_labels(
     return X, y, feature_cols
 
 
-def train_ultra_models() -> Dict[str, Any]:
+def train_ultra_models() -> dict[str, Any]:
     """
     Train Ultra shadow models for all underlyings.
 

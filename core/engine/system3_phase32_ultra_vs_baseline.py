@@ -11,7 +11,7 @@ Menu Option: 95
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def _load_baseline_trades() -> Optional[pd.DataFrame]:
+def _load_baseline_trades() -> pd.DataFrame | None:
     """Load baseline trade plans."""
     trades_csv = LIVE_DIR / "dhan_index_ai_trades_plan.csv"
     if not trades_csv.exists():
@@ -36,7 +36,7 @@ def _load_baseline_trades() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_baseline_pnl() -> Optional[pd.DataFrame]:
+def _load_baseline_pnl() -> pd.DataFrame | None:
     """Load baseline PnL log."""
     pnl_csv = LIVE_DIR / "dhan_index_ai_pnl_log.csv"
     if not pnl_csv.exists():
@@ -47,7 +47,7 @@ def _load_baseline_pnl() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_ultra_decisions() -> Optional[pd.DataFrame]:
+def _load_ultra_decisions() -> pd.DataFrame | None:
     """Load Ultra fused decisions."""
     ultra_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if not ultra_csv.exists():
@@ -144,7 +144,7 @@ def _align_trades(
     return pd.DataFrame(aligned_rows)
 
 
-def _compute_metrics(df_aligned: pd.DataFrame) -> Dict[str, Any]:
+def _compute_metrics(df_aligned: pd.DataFrame) -> dict[str, Any]:
     """Compute comparison metrics."""
     if df_aligned.empty:
         return {}
@@ -300,7 +300,7 @@ def main() -> None:
         print(f"[PHASE 32][ERROR] {e}")
         error_path = ULTRA_DIR / "phase32_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 32 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 32 Error\n\n{e!s}\n")
         print(f"[PHASE 32] Error details saved to: {error_path}")
 
 

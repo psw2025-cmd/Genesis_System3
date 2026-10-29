@@ -7,7 +7,7 @@ Analysis-only phase - reads from existing data and writes analysis.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase170_stability_metrics_summary.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase170_stability_metrics_summary_report.md"
 
 
-def run_phase170_stability_metrics_summary() -> Dict[str, Any]:
+def run_phase170_stability_metrics_summary() -> dict[str, Any]:
     """
     Stability Metrics Summary.
 
@@ -63,7 +63,7 @@ def run_phase170_stability_metrics_summary() -> Dict[str, Any]:
 def main():
     """CLI entry point."""
     print("=" * 70)
-    print(f"SYSTEM3 PHASE 170 - STABILITY METRICS SUMMARY")
+    print("SYSTEM3 PHASE 170 - STABILITY METRICS SUMMARY")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     result = run_phase170_stability_metrics_summary()

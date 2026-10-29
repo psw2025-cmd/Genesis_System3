@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_portfolio_rebalance.md"
 
 
-def run_phase279(**kwargs) -> Dict[str, Any]:
+def run_phase279(**kwargs) -> dict[str, Any]:
     """Run Phase 279: Portfolio Rebalancer."""
     errors = []
 

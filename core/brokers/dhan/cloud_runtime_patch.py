@@ -26,10 +26,11 @@ import json
 import os
 import threading
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, wait
-from typing import Any, Callable
+from typing import Any
 
-from core.brokers.dhan.cloud_status_probe import get_cloud_status, _safe_upstream_code
+from core.brokers.dhan.cloud_status_probe import _safe_upstream_code, get_cloud_status
 from core.brokers.dhan.cloud_token_provider import (
     force_reload,
     get_access_token,
@@ -548,7 +549,7 @@ def install() -> dict[str, Any]:
             original = getattr(module, name, None)
             if callable(original) and not getattr(original, "_system3_cloud_wrapped", False):
                 wrapped = _wrap_read(module, name, original)
-                setattr(wrapped, "_system3_cloud_wrapped", True)
+                wrapped._system3_cloud_wrapped = True
                 setattr(module, name, wrapped)
                 patched.append(name)
 

@@ -7,14 +7,11 @@ challenger models against champion, and records prediction audit lineage.
 
 from __future__ import annotations
 
-import hashlib
-import json
 import logging
 import os
 import uuid
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 logger = logging.getLogger("system3.retrainer")
 logging.basicConfig(level=logging.INFO)
@@ -32,10 +29,10 @@ class AutomatedModelRetrainer:
 
     def execute_daily_tournament(
         self, symbol: str = "NIFTY", horizon: str = "1D"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Execute automated retraining tournament."""
         run_id = f"retrain-{uuid.uuid4().hex[:8]}"
-        utc_now = datetime.now(timezone.utc).isoformat()
+        utc_now = datetime.now(UTC).isoformat()
         logger.info(
             f"[Retrainer] Starting automated tournament {run_id} for {symbol} ({horizon})"
         )

@@ -4,10 +4,8 @@ Dhan Index Options - Synthetic IV Estimator Refinement
 Estimates implied volatility from option prices.
 """
 
-from math import exp, log, sqrt
-from typing import Any, Dict
+from math import sqrt
 
-import numpy as np
 import pandas as pd
 
 
@@ -40,7 +38,7 @@ def estimate_synthetic_iv(
     # Simplified IV estimation using Black-Scholes approximation
     # This is a placeholder - real IV calculation requires iterative solving
 
-    moneyness = (spot - strike) / strike
+    (spot - strike) / strike
     intrinsic = max(0, spot - strike) if option_type == "CE" else max(0, strike - spot)
     time_value = ltp - intrinsic
 

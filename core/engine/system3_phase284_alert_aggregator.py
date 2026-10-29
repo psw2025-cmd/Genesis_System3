@@ -4,11 +4,10 @@ System3 Phase 284 - Alert Aggregator
 Aggregates and summarizes alerts from various system components.
 """
 
-import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +18,7 @@ ALERTS_LOG = LOG_DIR / "monitoring" / "system3_alerts.log"
 REPORT_PATH = LOG_DIR / "monitoring" / "system3_alert_aggregation.md"
 
 
-def run_phase284(**kwargs) -> Dict[str, Any]:
+def run_phase284(**kwargs) -> dict[str, Any]:
     """Run Phase 284: Alert Aggregator."""
     errors = []
 

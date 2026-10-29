@@ -9,12 +9,9 @@ SAFE MODE ONLY - Read-only suggestions.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
-
-from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
@@ -24,7 +21,7 @@ REAL_OUTCOMES_CSV = LEARNING_DIR / "real_outcomes.csv"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def optimize_risk_profile_v3() -> Dict[str, Any]:
+def optimize_risk_profile_v3() -> dict[str, Any]:
     """
     Optimize risk profile based on real outcomes (SUGGESTIONS ONLY).
 
@@ -123,7 +120,7 @@ def optimize_risk_profile_v3() -> Dict[str, Any]:
         }
 
 
-def save_risk_profile_suggestions(suggestions: Dict[str, Any]) -> Path:
+def save_risk_profile_suggestions(suggestions: dict[str, Any]) -> Path:
     """
     Save risk profile suggestions to JSON.
 

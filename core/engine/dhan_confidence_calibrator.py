@@ -13,7 +13,7 @@ UPGRADES (World-Class AI Trading System):
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ class ConfidenceCalibrator:
         self.loss_streak = 0
         self.last_trade_result = None
 
-    def calibrate(self, days: int = 7) -> Dict[str, Any]:
+    def calibrate(self, days: int = 7) -> dict[str, Any]:
         """
         Calibrate confidence and score based on real PnL outcomes.
 
@@ -99,7 +99,7 @@ class ConfidenceCalibrator:
                 "message": str(e),
             }
 
-    def _analyze_confidence_accuracy(self, df_signals: pd.DataFrame, df_pnl: pd.DataFrame) -> Dict[str, Any]:
+    def _analyze_confidence_accuracy(self, df_signals: pd.DataFrame, df_pnl: pd.DataFrame) -> dict[str, Any]:
         """Analyze how well confidence predicts actual outcomes."""
         # Group by confidence ranges
         df_signals["conf_bucket"] = pd.cut(
@@ -159,7 +159,7 @@ class ConfidenceCalibrator:
 
         return float(multiplier)
 
-    def is_trading_hours_optimal(self, timestamp: Optional[datetime] = None) -> bool:
+    def is_trading_hours_optimal(self, timestamp: datetime | None = None) -> bool:
         """
         Check if current time is in optimal trading hours.
 
@@ -231,8 +231,8 @@ class ConfidenceCalibrator:
         self.last_trade_result = trade_result
 
     def get_position_size_adjustments(
-        self, confidence: float, timestamp: Optional[datetime] = None, volatility: Optional[float] = None
-    ) -> Dict[str, Any]:
+        self, confidence: float, timestamp: datetime | None = None, volatility: float | None = None
+    ) -> dict[str, Any]:
         """
         Get all position size adjustments.
 
@@ -277,7 +277,7 @@ class ConfidenceCalibrator:
             "should_trade": time_optimal and final_mult > 0,
         }
 
-    def save_calibration(self, calibration: Dict[str, Any]) -> bool:
+    def save_calibration(self, calibration: dict[str, Any]) -> bool:
         """Save calibration data to JSON."""
         import json
 

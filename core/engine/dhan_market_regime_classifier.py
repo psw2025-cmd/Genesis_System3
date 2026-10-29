@@ -11,7 +11,7 @@ UPGRADED FEATURES:
 """
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -100,7 +100,7 @@ class StrategySwitcher:
         return cls.REGIME_STRATEGY_MAP.get(regime, TradingStrategy.MEAN_REVERSION)
 
     @classmethod
-    def get_strategy_config(cls, strategy: TradingStrategy, regime: Optional[str] = None) -> Dict[str, Any]:
+    def get_strategy_config(cls, strategy: TradingStrategy, regime: str | None = None) -> dict[str, Any]:
         """Get configuration for a strategy, adjusted for regime if provided."""
         config = cls.STRATEGY_CONFIGS.get(strategy, cls.STRATEGY_CONFIGS[TradingStrategy.MEAN_REVERSION]).copy()
 
@@ -119,7 +119,7 @@ class StrategySwitcher:
         return config
 
     @classmethod
-    def switch_strategy(cls, current_regime: str, previous_regime: Optional[str] = None) -> Dict[str, Any]:
+    def switch_strategy(cls, current_regime: str, previous_regime: str | None = None) -> dict[str, Any]:
         """
         Switch strategy based on regime change.
 
@@ -199,7 +199,7 @@ def classify_market_regime(df_signals: pd.DataFrame) -> str:
 def compute_regime_features(
     spot_series: pd.Series,
     vol_series: pd.Series,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute features for regime classification.
 
@@ -237,9 +237,9 @@ def compute_regime_features(
 
 def adjust_strategy_for_regime(
     regime: str,
-    current_strategy: Optional[Dict[str, Any]] = None,
-    previous_regime: Optional[str] = None,
-) -> Dict[str, Any]:
+    current_strategy: dict[str, Any] | None = None,
+    previous_regime: str | None = None,
+) -> dict[str, Any]:
     """
     Adjust or switch trading strategy based on market regime.
 
@@ -272,7 +272,7 @@ def adjust_strategy_for_regime(
     return adjusted
 
 
-def get_optimal_strategy_for_regime(regime: str) -> Dict[str, Any]:
+def get_optimal_strategy_for_regime(regime: str) -> dict[str, Any]:
     """
     Get optimal strategy configuration for a given regime.
 

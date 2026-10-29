@@ -6,11 +6,10 @@ Understands how fast signal edge decays after it is generated.
 
 import json
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -53,7 +52,7 @@ def get_last_trading_day(df: pd.DataFrame) -> pd.DataFrame:
     return df[df["ts"] >= cutoff].copy()
 
 
-def classify_edge_profile(ev_by_horizon: Dict[int, float]) -> str:
+def classify_edge_profile(ev_by_horizon: dict[int, float]) -> str:
     """Classify edge profile based on EV decay pattern."""
     if not ev_by_horizon:
         return "UNKNOWN"
@@ -77,7 +76,7 @@ def classify_edge_profile(ev_by_horizon: Dict[int, float]) -> str:
     return "MEDIUM"  # Default
 
 
-def run_phase303(**kwargs) -> Dict[str, Any]:
+def run_phase303(**kwargs) -> dict[str, Any]:
     """Run Phase 303: Intraday Edge Decay Analyzer."""
     errors = []
 

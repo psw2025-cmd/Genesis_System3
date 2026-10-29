@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,6 @@ from .order_models import PlannedOrder, RiskDecision
 from .risk_guard import (
     apply_global_safety_flags,
     check_daily_limits,
-    check_per_trade_limits,
 )
 
 LOG_DIR = PROJECT_ROOT / "logs" / "execution"
@@ -50,8 +49,8 @@ def _log_execution(message: str, level: str = "INFO") -> None:
 
 
 def plan_orders_from_signals(
-    signals_df: pd.DataFrame, thresholds_by_underlying: Dict[str, Dict[str, float]], live_trade_config: Dict[str, Any]
-) -> List[PlannedOrder]:
+    signals_df: pd.DataFrame, thresholds_by_underlying: dict[str, dict[str, float]], live_trade_config: dict[str, Any]
+) -> list[PlannedOrder]:
     """
     Convert signals DataFrame to planned orders.
 
@@ -134,11 +133,11 @@ def plan_orders_from_signals(
 
 
 def run_risk_checks_on_orders(
-    planned_orders: List[PlannedOrder],
-    risk_config: Dict[str, Any],
+    planned_orders: list[PlannedOrder],
+    risk_config: dict[str, Any],
     current_pnl: float = 0.0,
     open_positions_count: int = 0,
-) -> List[RiskDecision]:
+) -> list[RiskDecision]:
     """
     Run risk checks on planned orders.
 
@@ -187,7 +186,7 @@ def run_risk_checks_on_orders(
 
 
 def log_virtual_orders(
-    planned_orders: List[PlannedOrder], risk_decisions: List[RiskDecision], csv_path: Path = None
+    planned_orders: list[PlannedOrder], risk_decisions: list[RiskDecision], csv_path: Path = None
 ) -> None:
     """
     Log virtual orders to CSV file.

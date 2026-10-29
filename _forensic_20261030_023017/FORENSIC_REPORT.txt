@@ -1,0 +1,277 @@
+﻿GENESIS SYSTEM3 — FORENSIC AUDIT
+Timestamp : 20261030_023017
+Root      : C:\Genesis_System3
+Engine    : ripgrep
+Files     : 4253
+
+=== SEARCH RESULTS ===
+guard_code_literal                                      hits=5
+guard_message                                           hits=5
+mutation_flags                                          hits=42
+emergency_route                                         hits=6
+http_403_sites                                          hits=30
+route_decorators                                        hits=286
+app_router_defs                                         hits=8
+dependency_injection                                    hits=0
+auth_dependencies                                       hits=6
+settings_loaders                                        hits=481
+env_var_names                                           hits=33
+readonly_design_terms                                   hits=16
+todos                                                   hits=68
+bare_except                                             hits=243
+stray_prints                                            hits=11324
+dangerous_calls                                         hits=36
+
+Total forensic hits: 12589
+
+=== GUARD VERDICT ===
+GUARD CONFIRMED: PUBLIC_DASHBOARD_READ_ONLY is intentional.
+The 403 on POST /emergency-exit is CORRECT DESIGN, not a defect.
+Resolution: accept 403 as the contract, OR enable the mutation-authority flag discovered in:
+  - C:\Genesis_System3\_forensic_20261030_023017\mutation_flags.txt
+  - C:\Genesis_System3\_forensic_20261030_023017\env_var_names.txt
+
+=== LIVE API VERDICT ===
+OpenAPI loaded: System3 Genesis API v0.1.0
+Routes declared: 233
+  ROUTE /api/expiries/{underlying}
+  ROUTE /api/chain-expiry/{underlying}
+  ROUTE /api/auth/session
+  ROUTE /api/auth/status
+  ROUTE /api/auth/logout
+  ROUTE /
+  ROUTE /api/state
+  ROUTE /api/state/history
+  ROUTE /api/broker/status
+  ROUTE /api/broker/dhan/status
+  ROUTE /api/broker/truth
+  ROUTE /api/broker/holdings
+  ROUTE /api/broker/funds
+  ROUTE /api/holdings
+  ROUTE /api/funds
+  ROUTE /api/broker/diagnose
+  ROUTE /api/broker/positions/live
+  ROUTE /api/market/live_board
+  ROUTE /api/live_price
+  ROUTE /api/live_price/{symbol}
+  ROUTE /api/market/trajectories
+  ROUTE /api/market/volatility_smile
+  ROUTE /api/portfolio/unified
+  ROUTE /api/trader/requirements
+  ROUTE /api/approval/status
+  ROUTE /api/kill-switch/status
+  ROUTE /api/broker/deps
+  ROUTE /api/debug/state_source
+  ROUTE /api/status
+  ROUTE /api/instruments/health
+  ROUTE /api/research/multibagger
+  ROUTE /api/gain_rank
+  ROUTE /api/audit/option-visibility
+  ROUTE /api/scanner/top_contract_gainers
+  ROUTE /api/scanner/equity_options
+  ROUTE /api/scanner/moneycontrol_gainers
+  ROUTE /api/scanner/market_top_diagnose
+  ROUTE /api/scanner/segments
+  ROUTE /api/accuracy_trend
+  ROUTE /api/auto_gates
+  ROUTE /api/world_class_tracker
+  ROUTE /api/continuous_closure
+  ROUTE /api/proof_ledger
+  ROUTE /api/telemetry
+  ROUTE /api/agent-status
+  ROUTE /api/scheduler/health/push
+  ROUTE /api/chain/push
+  ROUTE /api/deploy/info
+  ROUTE /api/chronos/fused
+  ROUTE /api/paper/run
+  ROUTE /api/paper/chart
+  ROUTE /api/live-trading/gate
+  ROUTE /api/live-trading/approve
+  ROUTE /api/scheduler/health
+  ROUTE /api/system_health
+  ROUTE /api/scheduler/run/{job_id}
+  ROUTE /api/batch/market-data
+  ROUTE /api/batch/positions-holdings
+  ROUTE /api/memory
+  ROUTE /api/orch/ready
+  ROUTE /api/health
+  ROUTE /api/qc
+  ROUTE /api/qc/runtime
+  ROUTE /api/underlyings
+  ROUTE /api/truth
+  ROUTE /api/batch/chains
+  ROUTE /api/chains
+  ROUTE /api/chain/{underlying}
+  ROUTE /api/signal/top
+  ROUTE /api/positions
+  ROUTE /api/pnl
+  ROUTE /api/perf
+  ROUTE /api/overview
+  ROUTE /api/signals
+  ROUTE /api/signals/enhanced
+  ROUTE /api/paper
+  ROUTE /api/paper/tick
+  ROUTE /api/paper/positions
+  ROUTE /api/paper/trades
+  ROUTE /api/paper/account
+  ROUTE /api/paper/status
+  ROUTE /api/paper/pnl
+  ROUTE /api/paper/summary
+  ROUTE /api/chart/{symbol}
+  ROUTE /api/charts/{symbol}
+  ROUTE /api/option-chain
+  ROUTE /api/options-intel
+  ROUTE /api/charts
+  ROUTE /api/multibagger
+  ROUTE /api/multibagger/predictions
+  ROUTE /api/multibagger/backtest
+  ROUTE /api/opportunity_gap
+  ROUTE /api/opportunity-gap
+  ROUTE /api/t1_pre_ignition
+  ROUTE /api/t1-pre-ignition
+  ROUTE /api/ruhi_board
+  ROUTE /api/governance/ruhi_board
+  ROUTE /api/backtest/strategies
+  ROUTE /api/catalysts
+  ROUTE /api/news
+  ROUTE /api/runbook/audit
+  ROUTE /api/ml/features
+  ROUTE /api/simulation/live/state
+  ROUTE /api/positions/{position_id}/close
+  ROUTE /api/alerts
+  ROUTE /api/logs/tail
+  ROUTE /api/audit/secrets
+  ROUTE /api/validate/data
+  ROUTE /api/validate/status
+  ROUTE /api/predict/profit/{position_id}
+  ROUTE /api/predict/portfolio
+  ROUTE /api/validate/profit/all
+  ROUTE /api/validate/profit/{position_id}
+  ROUTE /api/predict/performance
+  ROUTE /api/alerts/recent
+  ROUTE /api/alerts/unread
+  ROUTE /api/alerts/{alert_id}/read
+  ROUTE /api/audit/comprehensive
+  ROUTE /api/audit/validate/spot/{underlying}
+  ROUTE /api/audit/validate/pnl/{position_id}
+  ROUTE /api/charting/heatmap/{underlying}
+  ROUTE /api/charting/iv-surface/{underlying}
+  ROUTE /api/charting/greeks/{underlying}
+  ROUTE /api/charting/pcr/{underlying}
+  ROUTE /api/filter/chain/{underlying}
+  ROUTE /api/filter/positions
+  ROUTE /api/risk
+  ROUTE /api/risk/portfolio
+  ROUTE /api/risk/check-limits
+  ROUTE /api/backtest/run
+  ROUTE /api/ml/performance
+  ROUTE /api/ml/compare
+  ROUTE /api/system/readiness
+  ROUTE /api/ml/intelligence
+  ROUTE /api/backtest/results
+  ROUTE /api/backtests/latest
+  ROUTE /api/model/behavior
+  ROUTE /api/journal/note
+  ROUTE /api/journal/notes
+  ROUTE /api/journal/search
+  ROUTE /api/export/positions
+  ROUTE /api/export/pnl
+  ROUTE /api/export/report
+  ROUTE /api/orders/create
+  ROUTE /api/orders
+  ROUTE /api/orders/history
+  ROUTE /api/orders/{order_id}/cancel
+  ROUTE /api/trades/history
+  ROUTE /api/trades/today
+  ROUTE /api/agent/status
+  ROUTE /api/agent/memory
+  ROUTE /api/agent/issues
+  ROUTE /api/agent/upgrade-plan
+  ROUTE /api/agent/create-plan
+  ROUTE /api/agent/apply-upgrade
+  ROUTE /api/agent/rollback
+  ROUTE /api/agent/test-results/{plan_id}
+  ROUTE /api/agent/pause
+  ROUTE /api/proof-pack
+  ROUTE /api/learning/insights
+  ROUTE /api/learning/status
+  ROUTE /api/forensic/report
+  ROUTE /api/validation/status
+  ROUTE /api/validation/run
+  ROUTE /api/learning/run
+  ROUTE /api/forensic/run
+  ROUTE /api/runner/test
+  ROUTE /api/runner/start
+  ROUTE /api/runner/stop
+  ROUTE /api/runner/status
+  ROUTE /health
+  ROUTE /state
+  ROUTE /api/healthz
+  ROUTE /healthz
+  ROUTE /api/deploy_info
+  ROUTE /api/instruments
+  ROUTE /api/prediction/all
+  ROUTE /api/paper/pipeline/status
+  ROUTE /profit-scan
+  ROUTE /chain/{symbol}
+  ROUTE /greeks
+  ROUTE /iv
+  ROUTE /chart/{symbol}
+  ROUTE /prediction/all
+  ROUTE /prediction/{symbol}
+  ROUTE /positions
+  ROUTE /pnl
+  ROUTE /place-order
+  ROUTE /order/{order_id}
+  ROUTE /order-status/{order_id}
+  ROUTE /order-history
+  ROUTE /margin
+  ROUTE /funds
+  ROUTE /instruments
+  ROUTE /signals
+  ROUTE /backtest
+  ROUTE /oi-analysis/{symbol}
+  ROUTE /iv-rank/{symbol}
+  ROUTE /volume-spike/{symbol}
+  ROUTE /risk
+  ROUTE /emergency-exit
+  ROUTE /tradebook
+  ROUTE /holdings
+  ROUTE /dhan-health
+  ROUTE /auto-research
+  ROUTE /verify-strategy
+  ROUTE /learn-from-loss
+  ROUTE /adapt-market
+  ROUTE /option-intelligence/{symbol}
+  ROUTE /autonomous-brain
+  ROUTE /hidden-secrets-lab
+  ROUTE /never-die-monitor
+  ROUTE /hunger-meter
+  ROUTE /data-truth-score
+  ROUTE /world-comparison
+  ROUTE /roadmap
+  ROUTE /cost-roi
+  ROUTE /compliance-check
+  ROUTE /audit-trail
+  ROUTE /agent-full-control
+  ROUTE /final-message
+  ROUTE /genesis-production-brief
+  ROUTE /api/broker/positions
+  ROUTE /api/market/top-gainers
+  ROUTE /api/market/top-losers
+  ROUTE /api/performance
+  ROUTE /api/ml/health
+  ROUTE /api/ml/ensemble
+  ROUTE /api/ml/drift
+  ROUTE /api/ml/retrain
+  ROUTE /api/safety/status
+  ROUTE /api/ml/predictions
+  ROUTE /api/predictions
+  LIVE /                            GET   expect 200  actual 200 -> PASS
+  LIVE /api/health                  GET   expect 200  actual 200 -> PASS
+  LIVE /api/state                   GET   expect 200  actual 200 -> PASS
+  LIVE /api/broker/status           GET   expect 200  actual 200 -> PASS
+  LIVE /emergency-exit              POST  expect 403  actual 403 -> PASS
+
+=== FINAL CALL ===
+SYSTEM HEALTHY — all live checks match expected contract

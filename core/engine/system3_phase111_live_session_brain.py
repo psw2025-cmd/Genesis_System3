@@ -8,7 +8,6 @@ Returns combined status for a pre-execution check.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent

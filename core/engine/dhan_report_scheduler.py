@@ -5,9 +5,8 @@ Schedules automatic report generation (read-only).
 AUTO-UPDATE: DISABLED - Only schedules, never executes automatically.
 """
 
-from datetime import datetime, time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -27,7 +26,7 @@ class ReportScheduler:
             "rolling_dashboard": {"time": "18:00", "enabled": False},
         }
 
-    def get_schedule_status(self) -> Dict[str, Any]:
+    def get_schedule_status(self) -> dict[str, Any]:
         """
         Get current schedule status (read-only).
 

@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import joblib
 import numpy as np
@@ -28,7 +28,7 @@ SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 TARGET_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_models_and_meta(root: Path, profile: str = None) -> Dict[str, Dict[str, Any]]:
+def load_models_and_meta(root: Path, profile: str = None) -> dict[str, dict[str, Any]]:
     """
     Load one model + meta per underlying.
 
@@ -61,7 +61,7 @@ def load_models_and_meta(root: Path, profile: str = None) -> Dict[str, Dict[str,
             model_data = load_models_for_profile(profile)
             if model_data["models"]:
                 # Convert to expected format
-                models: Dict[str, Dict[str, Any]] = {}
+                models: dict[str, dict[str, Any]] = {}
                 for underlying, model in model_data["models"].items():
                     meta_path = model_data["meta_paths"].get(underlying)
                     if meta_path and Path(meta_path).exists():
@@ -86,7 +86,7 @@ def load_models_and_meta(root: Path, profile: str = None) -> Dict[str, Dict[str,
             logger.warning(f"Profile-based model loading failed, falling back to baseline: {e}")
 
     # Default baseline behavior (unchanged)
-    models: Dict[str, Dict[str, Any]] = {}
+    models: dict[str, dict[str, Any]] = {}
 
     models_dir = root / "core" / "models" / "dhan"
     if not models_dir.exists():
@@ -187,7 +187,7 @@ def _ensure_features_for_df(
 
 def predict_for_snapshot_df(
     df_snap: pd.DataFrame,
-    models: Dict[str, Dict[str, Any]],
+    models: dict[str, dict[str, Any]],
 ) -> pd.DataFrame:
     """
     Input: df_snap with columns [ts, underlying, expiry, strike, side, ltp, spot, ...]

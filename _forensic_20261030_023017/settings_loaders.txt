@@ -1,0 +1,481 @@
+﻿C:\Genesis_System3\.github\scripts\root_architecture_gate.py:325:    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+C:\Genesis_System3\dashboard\backend\structured_logging.py:76:    level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
+C:\Genesis_System3\dashboard\backend\state_sync_service.py:35:    backend = os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower()
+C:\Genesis_System3\dashboard\backend\state_sync_service.py:151:        requested_interval = int(os.environ.get("SYSTEM3_SYNC_INTERVAL_S", "5"))
+C:\Genesis_System3\dashboard\backend\secure_app.py:33:    os.environ.pop(_name, None)
+C:\Genesis_System3\dashboard\backend\runtime_state_store.py:19:REAL_ONLY = os.environ.get("SYSTEM3_REAL_ONLY", "1").strip().lower() in ("1", "true", "yes")
+C:\Genesis_System3\dashboard\backend\runtime_state_store.py:35:        self._remote_backend_required = os.environ.get("SYSTEM3_STATE_BACKEND_REQUIRED", "0").strip().lower() in (
+C:\Genesis_System3\dashboard\backend\runtime_state_store.py:39:            1.0, float(os.environ.get("SYSTEM3_STATE_REFRESH_S", "5"))
+C:\Genesis_System3\dashboard\backend\runtime_state_store.py:43:        backend_name = os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower()
+C:\Genesis_System3\dashboard\backend\runtime_state_store.py:239:                if os.environ.get("SYSTEM3_LOCAL_STATE_MIRROR", "1").strip().lower() in (
+C:\Genesis_System3\dashboard\backend\routers\trading.py:39:    env_ok = os.environ.get("LIVE_TRADING_ENABLED", "0") == "1"
+C:\Genesis_System3\dashboard\backend\routers\trading.py:165:        client_id = os.environ.get("DHAN_CLIENT_ID", "")
+C:\Genesis_System3\dashboard\backend\routers\trading.py:166:        token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+C:\Genesis_System3\dashboard\backend\routers\ml.py:73:        if os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore" or os.environ.get("SYSTEM3_FIRESTORE_PROJECT"):
+C:\Genesis_System3\dashboard\backend\portfolio_truth_service.py:32:    val = os.environ.get("PORTFOLIO_BROKER_DETAILS", "0").strip().lower()
+C:\Genesis_System3\dashboard\backend\paper_pipeline_v8.py:472:            "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+C:\Genesis_System3\dashboard\backend\paper_pipeline_v8.py:473:            "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+C:\Genesis_System3\dashboard\backend\paper_pipeline_v8.py:474:            "analyze_mode": os.environ.get("ANALYZE_MODE", "1"),
+C:\Genesis_System3\dashboard\backend\paper_pipeline_v8.py:493:        {"name": "live_flags_safe", "passed": os.environ.get("LIVE_TRADING_ENABLED", "0") in ("0", "", "false", "False"), "detail": f"LIVE_TRADING_ENABLED={os.environ.get('LIVE_TRADING_ENABLED', '0')}"},
+C:\Genesis_System3\dashboard\backend\ml_evidence_store.py:22:        os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore"
+C:\Genesis_System3\dashboard\backend\ml_evidence_store.py:23:        or bool(os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT"))
+C:\Genesis_System3\dashboard\backend\ml_evidence_store.py:28:    return firestore_rank_configured() and _truthy(os.environ.get("SYSTEM3_STATE_BACKEND_REQUIRED"))
+C:\Genesis_System3\dashboard\backend\middleware\memory_guard.py:36:    raw = str(os.environ.get(name, default) or default).strip().split()[0]
+C:\Genesis_System3\dashboard\backend\lifetime_research_engine.py:282:        "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+C:\Genesis_System3\dashboard\backend\lifetime_research_engine.py:283:        "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+C:\Genesis_System3\dashboard\backend\lifetime_research_engine.py:284:        "analyze_mode": os.environ.get("ANALYZE_MODE", "1"),
+C:\Genesis_System3\dashboard\backend\firestore_state_backend.py:45:        project = project or os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT")
+C:\Genesis_System3\dashboard\backend\firestore_state_backend.py:46:        collection = collection or os.environ.get("SYSTEM3_FIRESTORE_COLLECTION", "system3_runtime")
+C:\Genesis_System3\dashboard\backend\firestore_state_backend.py:47:        document = document or os.environ.get("SYSTEM3_FIRESTORE_DOCUMENT", "state")
+C:\Genesis_System3\dashboard\backend\firestore_state_backend.py:103:        project = project or os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT")
+C:\Genesis_System3\dashboard\backend\contract_gain_scanner.py:42:    if not os.environ.get("K_SERVICE"):
+C:\Genesis_System3\dashboard\backend\chain_adapter.py:38:        raw = int(os.environ.get("CHAIN_MAX_CONTRACTS", "0") or 0)
+C:\Genesis_System3\dashboard\backend\auto_gates_service.py:133:        os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore"
+C:\Genesis_System3\dashboard\backend\auto_gates_service.py:134:        or bool(os.environ.get("SYSTEM3_FIRESTORE_PROJECT"))
+C:\Genesis_System3\dashboard\backend\auto_gates_service.py:135:        or os.environ.get("CLOUD_MODE", "").strip() in {"1", "true", "yes", "on"}
+C:\Genesis_System3\dashboard\backend\app.py:284:REAL_ONLY = os.environ.get("SYSTEM3_REAL_ONLY", "1").strip().lower() in ("1", "true", "yes")
+C:\Genesis_System3\dashboard\backend\app.py:291:    return os.environ.get("CLOUD_PAPER_ENGINE", "1") not in ("0", "false", "False")
+C:\Genesis_System3\dashboard\backend\app.py:364:if os.environ.get("DEFER_INSTRUMENT_WARMUP", "0").strip().lower() not in ("1", "true", "yes", "on"):
+C:\Genesis_System3\dashboard\backend\app.py:416:    _cloud_runtime = os.environ.get("CLOUD_MODE", "").strip() in {"1", "true", "yes", "on"}
+C:\Genesis_System3\dashboard\backend\app.py:419:    for o in os.environ.get("ALLOWED_ORIGINS", "").split(",")
+C:\Genesis_System3\dashboard\backend\app.py:459:_REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() == "true"
+C:\Genesis_System3\dashboard\backend\app.py:460:_API_KEY = os.environ.get("API_KEY", "").strip()
+C:\Genesis_System3\dashboard\backend\app.py:462:_DASHBOARD_SESSION_MAX_AGE = int(os.environ.get("DASHBOARD_SESSION_MAX_AGE", "43200"))
+C:\Genesis_System3\dashboard\backend\app.py:538:    tok = os.environ.get("WORKER_PUSH_TOKEN", "").strip()
+C:\Genesis_System3\dashboard\backend\app.py:827:    client_id_val = os.getenv("DHAN_CLIENT_ID", "1106583741").strip().lstrip("\ufeff")
+C:\Genesis_System3\dashboard\backend\app.py:876:    client_id_val = os.getenv("DHAN_CLIENT_ID", "1106583741").strip().lstrip("\ufeff")
+C:\Genesis_System3\dashboard\backend\app.py:1043:        "DHAN_CLIENT_ID": _os.environ.get("DHAN_CLIENT_ID", "").strip(),
+C:\Genesis_System3\dashboard\backend\app.py:1044:        "DHAN_ACCESS_TOKEN": _os.environ.get("DHAN_ACCESS_TOKEN", "").strip(),
+C:\Genesis_System3\dashboard\backend\app.py:1045:        "DHAN_PIN": _os.environ.get("DHAN_PIN", "").strip(),
+C:\Genesis_System3\dashboard\backend\app.py:1046:        "DHAN_TOTP_SECRET": _os.environ.get("DHAN_TOTP_SECRET", "").strip(),
+C:\Genesis_System3\dashboard\backend\app.py:2818:    git_sha = (os.environ.get("DEPLOY_GIT_SHA") or "").strip()
+C:\Genesis_System3\dashboard\backend\app.py:2835:    on_cloud_run = bool(os.environ.get("K_SERVICE"))
+C:\Genesis_System3\dashboard\backend\app.py:2837:        os.environ.get("K_SERVICE")
+C:\Genesis_System3\dashboard\backend\app.py:2841:        os.environ.get("SYSTEM3_DEPLOY_TARGET")
+C:\Genesis_System3\dashboard\backend\app.py:2845:        os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
+C:\Genesis_System3\dashboard\backend\app.py:2846:        or os.environ.get("SYSTEM3_API_BASE")
+C:\Genesis_System3\dashboard\backend\app.py:2851:        "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
+C:\Genesis_System3\dashboard\backend\app.py:2857:        "region": (os.environ.get("GCP_REGION") or cfg.get("region") or "") if on_cloud_run else "",
+C:\Genesis_System3\dashboard\backend\app.py:2858:        "project_id": (os.environ.get("GOOGLE_CLOUD_PROJECT") or cfg.get("project_id") or "") if on_cloud_run else "",
+C:\Genesis_System3\dashboard\backend\app.py:2859:        "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
+C:\Genesis_System3\dashboard\backend\app.py:2860:        "revision": os.environ.get("K_REVISION") or os.environ.get("CLOUD_RUN_REVISION") or service_name,
+C:\Genesis_System3\dashboard\backend\app.py:2861:        "cloud_run_revision": os.environ.get("K_REVISION") or os.environ.get("CLOUD_RUN_REVISION") or service_name,
+C:\Genesis_System3\dashboard\backend\app.py:2862:        "revision_name": os.environ.get("K_REVISION") or os.environ.get("CLOUD_RUN_REVISION") or service_name,
+C:\Genesis_System3\dashboard\backend\app.py:2963:    live_env = os.environ.get("LIVE_TRADING_ENABLED", "0")
+C:\Genesis_System3\dashboard\backend\app.py:3071:    if os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower() == "firestore":
+C:\Genesis_System3\dashboard\backend\app.py:3086:            payload["deploy_git_sha"] = os.environ.get("DEPLOY_GIT_SHA") or os.environ.get("SYSTEM3_GIT_SHA")
+C:\Genesis_System3\dashboard\backend\app.py:3281:    expected_secret = os.environ.get("SCHEDULER_SECRET")
+C:\Genesis_System3\dashboard\backend\app.py:4158:        limit_mb = int(os.environ.get("MEM_LIMIT_MB", "480"))
+C:\Genesis_System3\dashboard\backend\app.py:6821:    live_trading_enabled = os.environ.get("LIVE_TRADING_ENABLED", "0").strip() == "1"
+C:\Genesis_System3\dashboard\backend\app.py:6822:    system3_live_trading_allowed = os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0").strip() == "1"
+C:\Genesis_System3\dashboard\backend\app.py:6823:    auto_execute_trades = os.environ.get("AUTO_EXECUTE_TRADES", "0").strip() == "1"
+C:\Genesis_System3\dashboard\backend\app.py:6825:    on_cloud_run = bool(os.environ.get("K_SERVICE"))
+C:\Genesis_System3\dashboard\backend\app.py:6877:            "analyze_mode": os.environ.get("ANALYZE_MODE", "1"),
+C:\Genesis_System3\dashboard\backend\app.py:7547:            if os.environ.get("MONEYCONTROL_SCRAPE", "1") in ("0", "false", "False"):
+C:\Genesis_System3\dashboard\backend\app.py:7790:    _pin = os.environ.get("DHAN_PIN", "").strip()
+C:\Genesis_System3\dashboard\backend\app.py:7791:    _totp = os.environ.get("DHAN_TOTP_SECRET", "").strip()
+C:\Genesis_System3\dashboard\backend\app.py:7792:    _startup_refresh = os.environ.get("SYSTEM3_STARTUP_TOKEN_REFRESH", "1") not in (
+C:\Genesis_System3\dashboard\backend\app.py:7800:        if not os.environ.get("DHAN_ACCESS_TOKEN"):
+C:\Genesis_System3\dashboard\backend\app.py:7807:    if os.environ.get("SYSTEM3_GATE_SNAPSHOT_LOOP", "1") not in ("0", "false", "False"):
+C:\Genesis_System3\dashboard\backend\app.py:7810:    if os.environ.get("SYSTEM3_WORLD_CLASS_30MIN_TRACKER", "1") not in ("0", "false", "False"):
+C:\Genesis_System3\dashboard\backend\app.py:7828:    if os.environ.get("INDEX_CHAIN_MICRO_STREAM", "1") not in ("0", "false", "False"):
+C:\Genesis_System3\dashboard\backend\app.py:7835:    if os.environ.get("MARKET_TOP_MICRO_STREAM", "1") not in ("0", "false", "False"):
+C:\Genesis_System3\dashboard\backend\app.py:9213:    live_raw = os.environ.get("LIVE_TRADING_ENABLED")
+C:\Genesis_System3\dashboard\backend\app.py:9215:    pin_set = bool(os.environ.get("DHAN_PIN", "").strip())
+C:\Genesis_System3\dashboard\backend\app.py:10415:                "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+C:\Genesis_System3\dashboard\backend\app.py:10416:                "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+C:\Genesis_System3\dashboard\backend\app.py:10515:    if os.environ.get("ANALYZE_MODE", "1").strip() == "1":
+C:\Genesis_System3\dashboard\backend\app.py:10517:    if os.environ.get("AUTO_EXECUTE_TRADES", "0").strip() != "1":
+C:\Genesis_System3\dashboard\backend\app.py:10520:        os.environ.get("LIVE_TRADING_ENABLED", "0").strip() == "1"
+C:\Genesis_System3\dashboard\backend\app.py:10521:        and os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0").strip() == "1"
+C:\Genesis_System3\dashboard\backend\app.py:10826:                        if os.environ.get("BROKER_SELF_HEAL_TOKEN_REFRESH", "1") in (
+C:\Genesis_System3\dashboard\backend\app.py:11016:        return _compat_ok({"placed": False, "order_type": order_type, "message": message, "live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"), "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0")})
+C:\Genesis_System3\dashboard\backend\app.py:11523:    running_cost = _genesis_number(os.environ.get("SYSTEM3_MONTHLY_COST_INR"), 0.0)
+C:\Genesis_System3\dashboard\backend\app.py:11530:    return _compat_ok({"live_trading_enabled": os.environ.get("LIVE_TRADING_ENABLED", "0"), "system3_live_trading_allowed": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"), "trade_ready": False, "kill_switch_visible": True, "audit_trail": "CHANGE_LOG.md + state/genesis_memory.jsonl"})
+C:\Genesis_System3\dashboard\backend\alerts_system.py:22:_SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+C:\Genesis_System3\runner.py:32:    os.environ["LIVE_TRADING_ENABLED"] = "False"
+C:\Genesis_System3\runner.py:33:    os.environ["USE_LIVE_EXECUTION_ENGINE"] = "False"
+C:\Genesis_System3\runner.py:34:    os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = ""
+C:\Genesis_System3\runner.py:35:    os.environ["DRY_RUN"] = "True"
+C:\Genesis_System3\runner.py:36:    os.environ["HEARTBEAT_CONTINUOUS"] = "1"
+C:\Genesis_System3\runner.py:37:    os.environ["HEARTBEAT_INTERVAL_SECONDS"] = "60"
+C:\Genesis_System3\runner.py:133:                env=os.environ.copy(),
+C:\Genesis_System3\runner.py:139:                env=os.environ.copy(),
+C:\Genesis_System3\production_grade_validation.py:62:        base = os.environ.get("BACKEND_URL", "").strip()
+C:\Genesis_System3\production_grade_validation.py:63:        if not base and os.environ.get("PORT"):
+C:\Genesis_System3\production_grade_validation.py:64:            base = f"http://localhost:{os.environ.get('PORT')}"
+C:\Genesis_System3\production_grade_validation.py:133:            Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "System3 Ultra",
+C:\Genesis_System3\production_grade_validation.py:134:            Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "system3-ultra",
+C:\Genesis_System3\core\utils\env_loader.py:7:    os.getenv("SYSTEM3_ENV_FILE", ""),
+C:\Genesis_System3\core\utils\env_loader.py:64:        local_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+C:\Genesis_System3\core\utils\env_loader.py:97:    env_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+C:\Genesis_System3\core\utils\env_loader.py:106:    client_id = _local_vault_secret("DHAN_CLIENT_ID") or os.getenv("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff")
+C:\Genesis_System3\core\security\windows_secret_vault.py:19:VAULT_DIR = Path(os.environ.get("USERPROFILE", "C:\\Users\\ADMIN")) / ".genesis_vault"
+C:\Genesis_System3\core\security\windows_secret_vault.py:74:        user = os.environ.get("USERNAME", "ADMIN")
+C:\Genesis_System3\core\security\windows_secret_vault.py:75:        comp = os.environ.get("COMPUTERNAME", "LOCAL_HOST")
+C:\Genesis_System3\core\security\windows_secret_vault.py:109:    if val := os.environ.get(key):
+C:\Genesis_System3\core\ml\automated_model_retrainer.py:22:GCS_BUCKET = os.environ.get(
+C:\Genesis_System3\reports\latest\live_current_issue_check\live_current_issue_check.py:16:BASE_URL = os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "https://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\system3_autorun_master.py:446:        "venv_active": os.environ.get("VIRTUAL_ENV") is not None,
+C:\Genesis_System3\system3_autorun_master.py:889:    os.environ.setdefault("HEARTBEAT_CONTINUOUS", "1")
+C:\Genesis_System3\system3_autorun_master.py:890:    os.environ.setdefault("HEARTBEAT_INTERVAL_SECONDS", "60")
+C:\Genesis_System3\core\engine\system3_phase82_job_scheduler.py:302:        raw = (os.environ.get(key) or "").strip().rstrip("/")
+C:\Genesis_System3\core\engine\system3_phase82_job_scheduler.py:305:    if (os.environ.get("SYSTEM3_LOCAL") or "").strip().lower() in {"1", "true"}:
+C:\Genesis_System3\core\engine\system3_phase82_job_scheduler.py:361:    token = (os.environ.get("WORKER_PUSH_TOKEN") or "").strip()
+C:\Genesis_System3\core\engine\system3_phase43_env_guard.py:75:        if var in os.environ and os.environ[var]:
+C:\Genesis_System3\core\engine\system3_phase43_env_guard.py:91:        if var in os.environ and os.environ[var]:
+C:\Genesis_System3\core\engine\system3_phase392_ensemble_integration.py:105:    live_trading = os.environ.get("LIVE_TRADING_ENABLED", "False").lower() == "true"
+C:\Genesis_System3\core\engine\system3_phase392_ensemble_integration.py:106:    live_execution = os.environ.get("USE_LIVE_EXECUTION_ENGINE", "False").lower() == "true"
+C:\Genesis_System3\core\engine\system3_phase391_xgboost_training.py:60:        actual_val = os.environ.get(env_var, expected_val)
+C:\Genesis_System3\core\engine\system3_phase390_smote_balancing.py:64:    if os.environ.get("LIVE_TRADING_ENABLED", "False").lower() == "true":
+C:\Genesis_System3\core\engine\dhan_live_ai_signals.py:51:    use_profile = profile is not None or os.getenv("SYSTEM3_PROFILE") is not None
+C:\Genesis_System3\core\data_lake\dhan_5yr_history_downloader.py:22:PROJECT = os.environ.get("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
+C:\Genesis_System3\core\data_lake\dhan_5yr_history_downloader.py:23:GCS_BUCKET = os.environ.get(
+C:\Genesis_System3\core\data\nse_provider.py:22:    client_id = os.environ.get("DHAN_CLIENT_ID", "")
+C:\Genesis_System3\core\data\nse_provider.py:23:    access_token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+C:\Genesis_System3\core\data\lake\secrets.py:19:        os.getenv("GOOGLE_CLOUD_PROJECT")
+C:\Genesis_System3\core\data\lake\secrets.py:20:        or os.getenv("GCP_PROJECT")
+C:\Genesis_System3\core\data\lake\secrets.py:21:        or os.getenv("SYSTEM3_FIRESTORE_PROJECT")
+C:\Genesis_System3\core\data\lake\secrets.py:48:    1. `os.environ[env_var]` if set and non-empty (local dev, CI, or an
+C:\Genesis_System3\core\data\lake\secrets.py:57:    env_val = os.getenv(env_var, "").strip()
+C:\Genesis_System3\core\data\lake\secrets.py:79:    return os.getenv("MARKET_DATA_LAKE_BUCKET", "").strip() or f"{_project_id()}-market-data-lake"
+C:\Genesis_System3\core\data\lake\gcs_parquet_writer.py:73:        if os.getenv("K_SERVICE") or os.getenv("CLOUD_MODE"):
+C:\Genesis_System3\core\data\datasource_manager.py:27:_DHAN_OC_MIN_GAP_S = float(os.environ.get("DHAN_OC_MIN_GAP_S", "3.4"))
+C:\Genesis_System3\core\data\datasource_manager.py:164:        env_id = self._as_int_security_id(os.environ.get(f"DHAN_SECURITY_ID_{sym_u}", ""))
+C:\Genesis_System3\core\data\datasource_manager.py:165:        env_seg = (os.environ.get(f"DHAN_OPTION_CHAIN_SEGMENT_{sym_u}", "") or "").strip()
+C:\Genesis_System3\core\data\datasource_manager.py:258:        override = os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
+C:\Genesis_System3\core\data\datasource_manager.py:318:            or os.environ.get(f"DHAN_OPTION_CHAIN_EXPIRY_{sym.upper()}", "").strip()
+C:\Genesis_System3\core\data\datasource_manager.py:319:            or os.environ.get("DHAN_OPTION_CHAIN_EXPIRY", "").strip()
+C:\Genesis_System3\core\config\cloud_runtime.py:54:    return bool(os.environ.get("K_SERVICE", "").strip())
+C:\Genesis_System3\core\config\cloud_runtime.py:65:        value = (os.environ.get(name) or "").strip().rstrip("/")
+C:\Genesis_System3\core\config\cloud_runtime.py:105:        os.environ.get("PUBLIC_BACKEND_URL")
+C:\Genesis_System3\core\config\cloud_runtime.py:106:        or os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
+C:\Genesis_System3\core\config\cloud_runtime.py:107:        or os.environ.get("SYSTEM3_API_BASE")
+C:\Genesis_System3\core\config\cloud_runtime.py:108:        or os.environ.get("DASHBOARD_BASE_URL")
+C:\Genesis_System3\core\config\cloud_runtime.py:120:    env = (os.environ.get("PUBLIC_DASHBOARD_URL") or "").strip().rstrip("/")
+C:\Genesis_System3\core\config\cloud_runtime.py:132:        os.environ.get("SYSTEM3_DEPLOY_TARGET")
+C:\Genesis_System3\core\cloud_storage.py:22:DEFAULT_GCS_BUCKET = os.getenv("SYSTEM3_GCS_BUCKET", "system3-openalgo-safe-artifacts")
+C:\Genesis_System3\core\cloud_storage.py:23:DEFAULT_FIRESTORE_PROJECT = os.getenv("SYSTEM3_FIRESTORE_PROJECT", "system3-openalgo-safe")
+C:\Genesis_System3\core\brokers\dhan\token_manager.py:24:    token = (os.getenv("DHAN_ACCESS_TOKEN") or "").strip().lstrip("\ufeff")
+C:\Genesis_System3\core\brokers\dhan\market_ltp.py:31:_MARKETFEED_CACHE_TTL_S = max(1.0, float(os.environ.get("DHAN_MARKETFEED_CACHE_TTL_S", "8")))
+C:\Genesis_System3\core\brokers\dhan\market_ltp.py:33:    1.0, float(os.environ.get("DHAN_MARKETFEED_RATE_LIMIT_COOLDOWN_S", "20"))
+C:\Genesis_System3\core\brokers\dhan\first_rejection_trace.py:67:            "runtime_instance": os.getenv("K_REVISION") or os.getenv("HOSTNAME") or None,
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:32:    _sys3_env = os.getenv("SYSTEM3_ENV_FILE", "")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:40:            "client_id": os.getenv("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff"),
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:41:            "access_token": os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff"),
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:87:    _configured_status_refresh = int(os.getenv("DHAN_STATUS_REFRESH_COOLDOWN_S", "180") or "180")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:94:_STATUS_RESULT_TTL_S = float(os.getenv("DHAN_STATUS_CACHE_TTL_S", "25") or "25")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:107:    return os.getenv(name, default).strip().lower() in ("1", "true", "yes", "on")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:111:    return os.getenv(name, default).strip().lower() in ("0", "false", "no", "off", "")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:120:        os.getenv("K_SERVICE")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:121:        or os.getenv("CLOUD_MODE")
+C:\Genesis_System3\core\brokers\dhan\dhan_readonly.py:122:        or os.getenv("SYSTEM3_DEPLOY_TARGET") == "gcp-cloud-run"
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:32:    mode = os.getenv("DHAN_TOKEN_SOURCE", "").strip().lower()
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:35:    return bool(os.getenv("K_SERVICE") or os.getenv("CLOUD_MODE"))
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:39:    return os.getenv("GOOGLE_CLOUD_PROJECT") or os.getenv("GCP_PROJECT") or os.getenv("SYSTEM3_FIRESTORE_PROJECT") or "system3-openalgo-safe"
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:43:    return os.getenv("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token").strip() or "dhan-access-token"
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:47:    try: return max(1.0, min(float(os.getenv("DHAN_TOKEN_CACHE_TTL_S", "30").strip()), 300.0))
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:52:    try: return max(5.0, min(float(os.getenv("DHAN_AUTH_RELOAD_BACKOFF_S", "30").strip()), 300.0))
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:99:    os.environ["DHAN_ACCESS_TOKEN"] = token
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:104:    if not enabled(): return os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:112:            return cached or os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:123:        before_token = str(_CACHE.get("token") or os.getenv("DHAN_ACCESS_TOKEN", "").strip())
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:144:        token = str(_CACHE.get("token") or os.getenv("DHAN_ACCESS_TOKEN", "").strip())
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:161:                "runtime_instance": os.getenv("K_REVISION") or os.getenv("HOSTNAME") or None,
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:162:                "rotation_job": os.getenv("DHAN_TOKEN_ROTATION_JOB", "genesis-system3-dhan-token-rotate"),
+C:\Genesis_System3\core\brokers\dhan\cloud_token_provider.py:163:                "rotation_schedule": os.getenv("DHAN_TOKEN_ROTATION_SCHEDULE", "07:30 IST daily"),
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:111:    return os.getenv(name, "0").strip().lower() in {"", "0", "false", "no", "off"}
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:127:    raw = os.getenv("DHAN_CANONICAL_ROTATION_SELF_HEAL", "0").strip().lower()
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:133:    raw = os.getenv("DHAN_CANONICAL_ROTATION_COOLDOWN_S", "900").strip()
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:177:    if not (os.getenv("K_SERVICE") or os.getenv("CLOUD_MODE")):
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:205:            os.getenv("GOOGLE_CLOUD_PROJECT")
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:206:            or os.getenv("GCP_PROJECT")
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:209:        region = os.getenv("GCP_REGION", "asia-south1")
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:210:        job = os.getenv("DHAN_TOKEN_ROTATION_JOB", "genesis-system3-dhan-token-rotate")
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:240:            topic = os.getenv("DHAN_ROTATE_PUBSUB_TOPIC", "broker-token-rotate").strip()
+C:\Genesis_System3\core\brokers\dhan\cloud_runtime_patch.py:270:        deadline = time.time() + float(os.getenv("DHAN_CANONICAL_ROTATION_WAIT_S", "120") or "120")
+C:\Genesis_System3\sitecustomize.py:19:    interval_s = int(os.getenv("BACKGROUND_DATA_REFRESH_INTERVAL_S", "300") or "300")
+C:\Genesis_System3\tests\test_br2_runtime_qc_observer_contract.py:101:    old_val = os.environ.get("REQUIRE_API_KEY")
+C:\Genesis_System3\tests\test_br2_runtime_qc_observer_contract.py:102:    os.environ["REQUIRE_API_KEY"] = "false"
+C:\Genesis_System3\tests\test_br2_runtime_qc_observer_contract.py:113:            os.environ["REQUIRE_API_KEY"] = old_val
+C:\Genesis_System3\tests\test_br2_runtime_qc_observer_contract.py:115:            os.environ.pop("REQUIRE_API_KEY", None)
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:62:        os.environ.pop("DHAN_TOKEN_SOURCE", None)
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:63:        os.environ.pop("DHAN_AUTH_RELOAD_BACKOFF_S", None)
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:317:        os.environ["DHAN_TOKEN_SOURCE"] = "gcp"
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:318:        os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"] = "60"
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:332:        os.environ["DHAN_TOKEN_SOURCE"] = "gcp"
+C:\Genesis_System3\tests\test_br1_dhan_auth_reliability.py:333:        os.environ["DHAN_AUTH_RELOAD_BACKOFF_S"] = "60"
+C:\Genesis_System3\tools\verify_local_env.py:53:        v = os.environ.get(k, "").strip()
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:41:    repo = os.environ.get("GITHUB_REPOSITORY", "psw2025-cmd/Genesis_System3")
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:42:    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_TOKEN")
+C:\Genesis_System3\tools\system3_windows_self_hosted_workflow_migrator.py:95:        if status == "migratable" and os.environ.get("SYSTEM3_APPLY_WORKFLOW_MIGRATION", "1") not in ("0", "false", "False"):
+C:\Genesis_System3\tools\system3_windows_self_hosted_full_system_proof.py:23:BASE_URL = os.environ.get("DASHBOARD_BASE_URL") or os.environ.get("SYSTEM3_API_BASE") or "http://127.0.0.1:8000"
+C:\Genesis_System3\tools\system3_windows_self_hosted_full_system_proof.py:60:    os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\tools\system3_windows_self_hosted_full_system_proof.py:61:    os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\tools\system3_windows_self_hosted_full_system_proof.py:62:    os.environ["ANALYZE_MODE"] = "1"
+C:\Genesis_System3\tools\system3_windows_self_hosted_full_system_proof.py:116:    key = os.environ.get("DASHBOARD_API_KEY", "").strip()
+C:\Genesis_System3\tools\system3_secure_install_credential_audit.py:59:    val = os.environ.get(name, "")
+C:\Genesis_System3\tools\system3_secure_install_credential_audit.py:147:        "LIVE_TRADING_ENABLED": os.environ.get("LIVE_TRADING_ENABLED", "0"),
+C:\Genesis_System3\tools\system3_secure_install_credential_audit.py:148:        "SYSTEM3_LIVE_TRADING_ALLOWED": os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0"),
+C:\Genesis_System3\tools\system3_secure_install_credential_audit.py:149:        "ANALYZE_MODE": os.environ.get("ANALYZE_MODE", "1"),
+C:\Genesis_System3\tools\system3_safe_repair_runner.py:21:API_BASE = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\system3_safe_repair_runner.py:52:    e = os.environ.copy()
+C:\Genesis_System3\tools\system3_safe_repair_runner.py:63:    key = os.environ.get("DASHBOARD_API_KEY")
+C:\Genesis_System3\tools\system3_live_dry_run_launcher.py:109:        live_mode = os.environ.get("LIVE_TRADING_ENABLED", "false").lower()
+C:\Genesis_System3\tools\system3_broker_chain_semantic_gate.py:19:BASE = os.getenv("DASHBOARD_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\system3_broker_chain_semantic_gate.py:20:API_KEY = os.getenv("DASHBOARD_API_KEY", "")
+C:\Genesis_System3\tools\system3_broker_chain_semantic_gate.py:22:REQUIRED = [s.strip().upper() for s in os.getenv(
+C:\Genesis_System3\tools\system3_auto_coordinator.py:120:    parser.add_argument("--api-base", default=os.environ.get("SYSTEM3_API_BASE", DEFAULT_CLOUD))
+C:\Genesis_System3\tools\system3_auto_coordinator.py:125:    env = os.environ.copy()
+C:\Genesis_System3\tests\evals\test_eval_chain_warm_batch_readiness.py:95:    old_val = os.environ.get("REQUIRE_API_KEY")
+C:\Genesis_System3\tests\evals\test_eval_chain_warm_batch_readiness.py:96:    os.environ["REQUIRE_API_KEY"] = "false"
+C:\Genesis_System3\tests\evals\test_eval_chain_warm_batch_readiness.py:107:            os.environ["REQUIRE_API_KEY"] = old_val
+C:\Genesis_System3\tests\evals\test_eval_chain_warm_batch_readiness.py:109:            os.environ.pop("REQUIRE_API_KEY", None)
+C:\Genesis_System3\tools\run_phase_391_xgb_test.py:123:    if os.environ.get("LIVE_TRADING_ENABLED", "False").lower() == "true":
+C:\Genesis_System3\tools\run_phase_391_xgboost_test.py:120:    if os.environ.get("LIVE_TRADING_ENABLED", "False").lower() == "true":
+C:\Genesis_System3\tools\run_phase_390_smote_test.py:132:    if os.environ.get("LIVE_TRADING_ENABLED", "False").lower() == "true":
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:68:        self.assertIn('SECRET_ID = os.getenv("DHAN_ACCESS_TOKEN_SECRET_ID", "dhan-access-token")', text)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:92:        self.assertNotIn('token = os.getenv("DHAN_ACCESS_TOKEN"', self.job)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:108:        self.assertIn('os.environ["LIVE_TRADING_ENABLED"] = "0"', self.job)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:109:        self.assertIn('os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"', self.job)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:110:        self.assertIn('os.environ["AUTO_EXECUTE_TRADES"] = "0"', self.job)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:120:        self.assertIn('expected_version = os.getenv("DHAN_ROTATION_EXPECTED_VERSION"', self.job)
+C:\Genesis_System3\tools\run_all_tests.py:47:        env = os.environ.copy()
+C:\Genesis_System3\tests\test_dashboard_app.py:27:    old_val = os.environ.get("REQUIRE_API_KEY")
+C:\Genesis_System3\tests\test_dashboard_app.py:28:    os.environ["REQUIRE_API_KEY"] = "false"
+C:\Genesis_System3\tests\test_dashboard_app.py:38:            os.environ["REQUIRE_API_KEY"] = old_val
+C:\Genesis_System3\tests\test_dashboard_app.py:40:            os.environ.pop("REQUIRE_API_KEY", None)
+C:\Genesis_System3\tests\test_cloud_run_startup_deploy_contract.py:14:        self.assertIn('os.getenv("PORT", "8080")', text)
+C:\Genesis_System3\tests\test_cloud_run_secure_app_import.py:11:        env = dict(os.environ)
+C:\Genesis_System3\tools\qc_runtime_anomaly_audit.py:23:BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\qc_runtime_anomaly_audit.py:24:DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://127.0.0.1:8000/ui").rstrip("/")
+C:\Genesis_System3\tools\qc_runtime_anomaly_audit.py:27:TIMEOUT_S = int(os.getenv("QC_RUNTIME_AUDIT_TIMEOUT_S", "25") or "25")
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:40:    old_val = os.environ.get("REQUIRE_API_KEY")
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:41:    os.environ["REQUIRE_API_KEY"] = "false"
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:52:            os.environ["REQUIRE_API_KEY"] = old_val
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:54:            os.environ.pop("REQUIRE_API_KEY", None)
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:59:    old_val = os.environ.get("REQUIRE_API_KEY")
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:60:    os.environ["REQUIRE_API_KEY"] = "false"
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:71:            os.environ["REQUIRE_API_KEY"] = old_val
+C:\Genesis_System3\tests\test_health_qc_fail_closed.py:73:            os.environ.pop("REQUIRE_API_KEY", None)
+C:\Genesis_System3\tools\production_daily_cycle.py:27:CLOUD = os.environ.get(
+C:\Genesis_System3\tools\production_daily_cycle.py:38:    env = os.environ.copy()
+C:\Genesis_System3\tests\test_phase02_live_ui_recovery.py:80:        with patch.dict(os.environ, {"SYSTEM3_EXPECTED_SERVING_SHA": "a"*40}):
+C:\Genesis_System3\tools\permanent_repo_render_safety.py:160:                    or "os.environ" in text[max(0, m.start() - 80) : m.end() + 40]
+C:\Genesis_System3\tools\pending_tasks_closure.py:54:        env = os.environ.copy()
+C:\Genesis_System3\tools\multi_agent_production_coordinator.py:22:BASE_URL = os.environ.get(
+C:\Genesis_System3\tools\multi_agent_production_coordinator.py:23:    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", DEFAULT_GCP_URL)
+C:\Genesis_System3\tools\local_ci_runner.py:33:os.environ.setdefault("SYSTEM3_LOCAL", "1")
+C:\Genesis_System3\tools\local_ci_runner.py:34:os.environ.setdefault("SYSTEM3_API_BASE", LOCAL)
+C:\Genesis_System3\tools\local_ci_runner.py:35:os.environ.setdefault("LIVE_TRADING_ENABLED", "0")
+C:\Genesis_System3\tools\local_ci_runner.py:36:os.environ.setdefault("SYSTEM3_LIVE_TRADING_ALLOWED", "0")
+C:\Genesis_System3\tools\local_ci_runner.py:37:os.environ.setdefault("SYSTEM3_REAL_ONLY", "1")
+C:\Genesis_System3\tools\local_ci_runner.py:38:os.environ.setdefault("SYSTEM3_MODE", "analyzer")
+C:\Genesis_System3\tools\local_ci_runner.py:39:os.environ.setdefault("ANALYZE_MODE", "1")
+C:\Genesis_System3\tools\local_ci_runner.py:61:        proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout, env=os.environ.copy())
+C:\Genesis_System3\tools\local_ci_runner.py:133:                "import os; os.environ['LIVE_TRADING_ENABLED']='0'; "
+C:\Genesis_System3\tools\dhan_advance_platform_verification_audit.py:28:BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\dhan_advance_platform_verification_audit.py:29:DASHBOARD_URL = os.environ.get("DASHBOARD_URL", "http://127.0.0.1:8000/ui")
+C:\Genesis_System3\tools\dashboard_full_audit.py:18:BASE = os.environ.get(
+C:\Genesis_System3\tools\dashboard_full_audit.py:19:    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
+C:\Genesis_System3\tools\dashboard_deploy_provenance_gate.py:22:BASE = os.environ.get("DASHBOARD_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\cloud_runtime_check.py:27:DEFAULT_BASE_URL = os.environ.get(
+C:\Genesis_System3\tools\cloud_runtime_check.py:29:    os.environ.get(
+C:\Genesis_System3\tools\cloud_runtime_check.py:337:    parser.add_argument("--base-url", default=os.environ.get("CLOUD_RUNTIME_BASE_URL", DEFAULT_BASE_URL))
+C:\Genesis_System3\tools\cloud_runtime_check.py:338:    parser.add_argument("--timeout", type=float, default=float(os.environ.get("CLOUD_RUNTIME_TIMEOUT_S", "20")))
+C:\Genesis_System3\tools\cloud_runtime_check.py:339:    parser.add_argument("--expected-commit", default=os.environ.get("GITHUB_SHA", ""))
+C:\Genesis_System3\tools\cloud_runtime_check.py:344:    api_key = os.environ.get("DASHBOARD_API_KEY", "").strip() or os.environ.get("API_KEY", "").strip()
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:23:DASHBOARD_URL = os.getenv("DASHBOARD_URL", "http://127.0.0.1:8000/ui").rstrip("/")
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:24:BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:25:SNAP_DIR = Path(os.getenv("SNAP_DIR", "reports/latest/dashboard_auto_snap"))
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:26:AUTO_GIT_PUSH = os.getenv("AUTO_GIT_PUSH", "1").strip().lower() in {"1", "true", "yes", "on"}
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:27:GIT_PUSH_INTERVAL_S = int(os.getenv("GIT_PUSH_INTERVAL_S", "300") or "300")
+C:\Genesis_System3\tools\auto_dashboard_repo_snap.py:28:TIMEOUT_S = int(os.getenv("DASHBOARD_SNAP_TIMEOUT_S", "25") or "25")
+C:\Genesis_System3\tools\actions_truth_autopsy.py:211:    parser.add_argument("--workflow-name", default=os.environ.get("SOURCE_WORKFLOW_NAME", ""))
+C:\Genesis_System3\tools\actions_truth_autopsy.py:212:    parser.add_argument("--run-id", default=os.environ.get("SOURCE_RUN_ID", ""))
+C:\Genesis_System3\tools\actions_truth_autopsy.py:213:    parser.add_argument("--conclusion", default=os.environ.get("SOURCE_RUN_CONCLUSION", ""))
+C:\Genesis_System3\scripts\cloud_e2e_proof.py:23:BASE = os.environ.get("SYSTEM3_CLOUD_BASE", "https://genesis-system3-web-doq2wplepa-el.a.run.app").rstrip("/")
+C:\Genesis_System3\scripts\cloud_e2e_proof.py:24:EXPECTED_EPOCH = os.environ.get("SYSTEM3_EXPECTED_EPOCH", "20260803_e2e_full_cloud_40")
+C:\Genesis_System3\scripts\append_command_center_audit.py:19:    run_id = os.environ.get("GITHUB_RUN_ID") or os.environ.get("CC_RUN_ID") or f"local-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+C:\Genesis_System3\scripts\append_command_center_audit.py:20:    agent_id = os.environ.get("CC_AGENT_ID", "cursor-composer")
+C:\Genesis_System3\scripts\append_command_center_audit.py:23:    token_id = os.environ.get("CC_TOKEN_ID") or f"dryrun-{run_id}"
+C:\Genesis_System3\scripts\append_command_center_audit.py:24:    ttl = os.environ.get("CC_TOKEN_TTL", "0s-mint-denied")
+C:\Genesis_System3\scripts\append_command_center_audit.py:25:    signer = os.environ.get("CC_SIGNER", "agent-id:cursor-composer")
+C:\Genesis_System3\run_full_verification_checklist.py:64:        env = os.environ.copy()
+C:\Genesis_System3\scripts\dashboard_api_verify.py:13:BASE = os.environ.get(
+C:\Genesis_System3\scripts\dashboard_api_verify.py:15:    os.environ.get(
+C:\Genesis_System3\scripts\dashboard_api_verify.py:17:        os.environ.get(
+C:\Genesis_System3\scripts\daily_gain_rank_and_validate.py:77:    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+C:\Genesis_System3\scripts\daily_gain_rank_and_validate.py:97:    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+C:\Genesis_System3\scripts\daily_gain_rank_and_validate.py:128:    per_symbol_timeout = float(os.environ.get("DHAN_OPTION_CHAIN_TIMEOUT_S", "45"))
+C:\Genesis_System3\scripts\daily_gain_rank_and_validate.py:131:            time.sleep(float(os.environ.get("DHAN_OPTION_CHAIN_SPACING_S", "3.25")))
+C:\Genesis_System3\scripts\costed_walkforward_proof.py:32:if os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", ""):
+C:\Genesis_System3\scripts\command_center_smoke_test.py:15:BASE = os.environ.get(
+C:\Genesis_System3\scripts\command_center_smoke_test.py:80:    run_id = os.environ.get("GITHUB_RUN_ID") or os.environ.get("CC_RUN_ID") or f"local-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+C:\Genesis_System3\scripts\command_center_smoke_test.py:81:    agent_id = os.environ.get("CC_AGENT_ID", "cursor-composer")
+C:\Genesis_System3\scripts\cloud_worker.py:21:os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\scripts\cloud_worker.py:22:os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\scripts\cloud_worker.py:23:os.environ["AUTO_EXECUTE_TRADES"] = "0"
+C:\Genesis_System3\scripts\cloud_worker.py:24:os.environ["ANALYZE_MODE"] = "1"
+C:\Genesis_System3\scripts\cloud_worker.py:25:os.environ["SYSTEM3_MODE"] = "ANALYZER"
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:24:BASE_URL = os.getenv("SYSTEM3_PUBLIC_BASE_URL", DEFAULT_BASE).rstrip("/")
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:26:MAX_AGE_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_MAX_AGE_SECONDS", "300"))
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:27:SETTLE_SECONDS = float(os.getenv("SYSTEM3_LIVE_TAB_SETTLE_SECONDS", "2.0"))
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:28:DEPLOY_WAIT_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_WAIT_SECONDS", "720"))
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:29:DEPLOY_POLL_SECONDS = int(os.getenv("SYSTEM3_LIVE_PROOF_DEPLOY_POLL_SECONDS", "10"))
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:90:    expected = str(os.getenv("SYSTEM3_EXPECTED_SERVING_SHA") or os.getenv("GITHUB_SHA") or "").strip()
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:451:            "sha": os.getenv("GITHUB_SHA"),
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:452:            "run_id": os.getenv("GITHUB_RUN_ID"),
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:453:            "run_attempt": os.getenv("GITHUB_RUN_ATTEMPT"),
+C:\Genesis_System3\scripts\gcp_live_ui_snapshot.py:454:            "event_name": os.getenv("GITHUB_EVENT_NAME"),
+C:\Genesis_System3\scripts\forensic_audit.py:53:    for key, value in os.environ.items():
+C:\Genesis_System3\tests\test_rotator_reliability_attribution.py:26:    env = os.environ.copy()
+C:\Genesis_System3\tests\test_repo_clean_forensic_toolkit.py:84:        old_token = toolkit.os.environ.pop("GITHUB_TOKEN", None)
+C:\Genesis_System3\tests\test_repo_clean_forensic_toolkit.py:85:        old_repo = toolkit.os.environ.pop("GITHUB_REPOSITORY", None)
+C:\Genesis_System3\tests\test_repo_clean_forensic_toolkit.py:92:                toolkit.os.environ["GITHUB_TOKEN"] = old_token
+C:\Genesis_System3\tests\test_repo_clean_forensic_toolkit.py:94:                toolkit.os.environ["GITHUB_REPOSITORY"] = old_repo
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:20:TOKEN = os.getenv("GITHUB_TOKEN", "").strip()
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:21:REPO = os.getenv("GITHUB_REPOSITORY", "").strip()
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:22:SHA = os.getenv("GITHUB_SHA", "").strip()
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:23:API = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:24:OUT = Path(os.getenv("SYSTEM3_SECURITY_AUDIT_DIR", "reports/latest/security_audit"))
+C:\Genesis_System3\scripts\fetch_exact_security_audit.py:25:TIMEOUT_S = int(os.getenv("SYSTEM3_SECURITY_WAIT_SECONDS", "600"))
+C:\Genesis_System3\scripts\evaluate_rotator_reliability.py:19:SOURCE = Path(os.getenv("SYSTEM3_CLOUD_AUDIT_JSON", "reports/latest/full_cloud_audit/full_cloud_audit.json"))
+C:\Genesis_System3\scripts\evaluate_rotator_reliability.py:20:OUT = Path(os.getenv("SYSTEM3_ROTATOR_RELIABILITY_DIR", "reports/latest/rotator_reliability"))
+C:\Genesis_System3\scripts\evaluate_rotator_reliability.py:21:WINDOW = max(3, min(20, int(os.getenv("SYSTEM3_ROTATOR_RELIABILITY_WINDOW", "10"))))
+C:\Genesis_System3\tests\test_scanner_closed_market_no_network.py:55:        with patch.dict(os.environ, {"K_SERVICE": "genesis-system3-web"}, clear=False), patch(
+C:\Genesis_System3\scripts\dhan_full_api_test.py:30:CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "")
+C:\Genesis_System3\scripts\dhan_full_api_test.py:31:ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN", "")
+C:\Genesis_System3\scripts\dashboard_production_audit.py:437:        if _os.environ.get("SYSTEM3_LOCAL", "").strip().lower() in ("1", "true", "yes")
+C:\Genesis_System3\scripts\dashboard_production_audit.py:440:    base = (args.base or _os.environ.get("SYSTEM3_API_BASE") or _default_base).rstrip("/")
+C:\Genesis_System3\scripts\dashboard_endpoint_coverage_proof.py:26:BASE_URL = os.environ.get(
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:19:CLOUD_PATH = Path(os.getenv("SYSTEM3_CLOUD_AUDIT_JSON", "reports/latest/full_cloud_audit/full_cloud_audit.json"))
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:20:ROTATOR_PATH = Path(os.getenv("SYSTEM3_ROTATOR_RELIABILITY_JSON", "reports/latest/rotator_reliability/rotator_reliability.json"))
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:21:SECURITY_PATH = Path(os.getenv("SYSTEM3_SECURITY_AUDIT_JSON", "reports/latest/security_audit/security_audit.json"))
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:22:OUT = Path(os.getenv("SYSTEM3_AI_CONSENSUS_DIR", "reports/latest/ai_consensus"))
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:23:OPENAI_MODEL = os.getenv("OPENAI_AUDIT_MODEL", "gpt-4o")
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:24:ANTHROPIC_MODEL = os.getenv("ANTHROPIC_AUDIT_MODEL", "claude-sonnet-4-20250514")
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:25:ANTHROPIC_BETA = os.getenv("ANTHROPIC_1M_BETA_HEADER", "").strip()
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:75:    key = os.getenv("OPENAI_API_KEY", "").strip()
+C:\Genesis_System3\scripts\multi_ai_audit_consensus.py:107:    key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+C:\Genesis_System3\scripts\run_all_report_fail.py:26:    step = os.environ.get("RUN_ALL_FAIL_STEP", "Unknown step")
+C:\Genesis_System3\scripts\run_all_report_fail.py:27:    reason = os.environ.get("RUN_ALL_FAIL_REASON", "No reason provided")
+C:\Genesis_System3\scripts\run_all_report_fail.py:28:    impact = os.environ.get("RUN_ALL_FAIL_IMPACT", "Run cannot continue until fixed.")
+C:\Genesis_System3\scripts\run_all_report_fail.py:29:    next_raw = os.environ.get("RUN_ALL_FAIL_NEXT", "Fix the step and rerun Run-All.bat")
+C:\Genesis_System3\scripts\runtime_gate_proofs.py:15:MAX_AGE_SEC = int(os.environ.get("SYSTEM3_RUNTIME_PROOF_MAX_AGE_SEC", "900"))
+C:\Genesis_System3\scripts\runtime_gate_proofs.py:19:    port = os.environ.get("PORT")
+C:\Genesis_System3\scripts\runtime_gate_proofs.py:23:        val = os.environ.get(key)
+C:\Genesis_System3\scripts\monitor_health.py:14:BASE_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
+C:\Genesis_System3\scripts\model_training_dryrun_proof.py:28:if os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", ""):
+C:\Genesis_System3\scripts\quant_alpha_evaluator.py:37:        if str(os.environ.get(key, "0")).strip().lower() not in OFF_VALUES:
+C:\Genesis_System3\scripts\market_hours_engineering_loop.py:29:BASE = os.environ.get(
+C:\Genesis_System3\scripts\market_hours_engineering_loop.py:373:    os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\scripts\market_hours_engineering_loop.py:374:    os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\scripts\git_auto_workflow.py:61:    full_env = {**os.environ, **(env or {})}
+C:\Genesis_System3\scripts\pf_gated_backtest.py:33:if os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", ""):
+C:\Genesis_System3\scripts\paper_day_proof_pack.py:65:CLOUD = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\scripts\paper_day_proof_pack.py:319:    bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+C:\Genesis_System3\scripts\paper_day_proof_pack.py:320:    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:138:    token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:139:    client = os.environ.get("DHAN_CLIENT_ID", "")
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:201:    token = os.environ.get("DHAN_ACCESS_TOKEN", "")
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:202:    client = os.environ.get("DHAN_CLIENT_ID", "")
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:211:    base = os.environ.get("DHAN_CHARTS_BASE_URL", "https://api.dhan.co/v2/charts")
+C:\Genesis_System3\scripts\options_ce_pe_history_pipeline.py:212:    endpoint = os.environ.get("DHAN_HISTORICAL_ENDPOINT", f"{base}/historical")
+C:\Genesis_System3\scripts\patch_backend_root_urls.py:21:    base_url = os.environ.get("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\scripts\patch_backend_root_urls.py:22:    dashboard_url = os.environ.get("PUBLIC_DASHBOARD_URL", base_url).rstrip("/")
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:42:LIVE_TRADING_ENABLED = os.environ.get("LIVE_TRADING_ENABLED", "0") not in ("0", "false", "False", "")
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:43:LIVE_TRADING_ALLOWED = os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0") not in ("0", "false", "False", "")
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:49:os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:50:os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:78:    port = os.environ.get("PORT")
+C:\Genesis_System3\scripts\paper_lifecycle_proof.py:81:    return os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\scripts\system3_cloud_paper_preflight.py:57:           ('os.getenv("PORT", "8080")' in launcher and
+C:\Genesis_System3\scripts\system3_cloud_paper_preflight.py:105:    parser.add_argument("--sha", default=os.getenv("GITHUB_SHA", "UNRESOLVED"))
+C:\Genesis_System3\scripts\system3_repo_clean_forensic_toolkit.py:85:    env = dict(os.environ)
+C:\Genesis_System3\scripts\system3_repo_clean_forensic_toolkit.py:359:    token, repo = os.environ.get("GITHUB_TOKEN"), os.environ.get("GITHUB_REPOSITORY")
+C:\Genesis_System3\scripts\system3_release_proof_gate.py:91:        env_file = os.getenv("GITHUB_ENV", "").strip()
+C:\Genesis_System3\scripts\system3_proof_pack_closure_gate.py:71:    live_enabled_raw = os.environ.get("LIVE_TRADING_ENABLED", "0")
+C:\Genesis_System3\scripts\system3_proof_pack_closure_gate.py:72:    live_allowed_raw = os.environ.get("SYSTEM3_LIVE_TRADING_ALLOWED", "0")
+C:\Genesis_System3\scripts\system3_proof_pack_closure_gate.py:73:    analyze_raw = os.environ.get("ANALYZE_MODE", "1")
+C:\Genesis_System3\scripts\system3_access_capability_probe.py:88:            Path(os.environ.get("LOCALAPPDATA", ""))
+C:\Genesis_System3\scripts\system3_access_capability_probe.py:94:            Path(os.environ.get("ProgramFiles", r"C:\Program Files"))
+C:\Genesis_System3\scripts\system3_access_capability_probe.py:100:            Path(os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"))
+C:\Genesis_System3\scripts\sync_dhan_instruments_master.py:36:DHAN_DETAILED_URL = os.environ.get(
+C:\Genesis_System3\scripts\sync_dhan_instruments_master.py:41:MIN_ROWS = int(os.environ.get("DHAN_INSTRUMENT_MIN_ROWS", "50000"))
+C:\Genesis_System3\scripts\system3_preflight_control_plane.py:91:    return os.getenv("GITHUB_TOKEN", "").strip() or os.getenv("GH_TOKEN", "").strip()
+C:\Genesis_System3\scripts\system3_preflight_control_plane.py:95:    raw = os.getenv("SYSTEM3_ACTIVE_PR_MAX_AGE_H", str(DEFAULT_ACTIVE_PR_MAX_AGE_H)).strip()
+C:\Genesis_System3\scripts\start_cloud_run.py:47:    port = int(os.getenv("PORT", "8080"))
+C:\Genesis_System3\scripts\start_cloud_run.py:66:        log_level=os.getenv("UVICORN_LOG_LEVEL", "info"),
+C:\Genesis_System3\scripts\system3_post_market_auto_pipeline.py:15:CLOUD = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")
+C:\Genesis_System3\scripts\system3_post_market_auto_pipeline.py:31:    env = os.environ.copy()
+C:\Genesis_System3\scripts\system3_pending_tracker_refresh.py:26:BASE = os.environ.get(
+C:\Genesis_System3\scripts\system3_pending_tracker_refresh.py:30:TIMEOUT = float(os.environ.get("SYSTEM3_TRACKER_TIMEOUT", "25"))
+C:\Genesis_System3\scripts\system3_option_visibility_audit.py:409:    parser.add_argument("--api-base", default=os.environ.get("SYSTEM3_API_BASE"))
+C:\Genesis_System3\scripts\smoke_ml_validate_e2e.py:29:os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\scripts\smoke_ml_validate_e2e.py:30:os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\scripts\smoke_ml_validate_e2e.py:31:os.environ.setdefault("SYSTEM3_FIRESTORE_PROJECT", os.environ.get("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe"))
+C:\Genesis_System3\scripts\smoke_ml_validate_e2e.py:32:os.environ.setdefault("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
+C:\Genesis_System3\scripts\system3_one_click_max_proof.py:131:    if os.environ.get("SYSTEM3_API_BASE"):
+C:\Genesis_System3\scripts\system3_one_click_max_proof.py:132:        candidates.append(os.environ["SYSTEM3_API_BASE"])
+C:\Genesis_System3\scripts\system3_one_click_max_proof.py:164:    env = os.environ.copy()
+C:\Genesis_System3\scripts\system3_mri_gmail_scheduler_watch.py:31:LIVE_BASE = os.environ.get(
+C:\Genesis_System3\scripts\system3_mri_gmail_scheduler_watch.py:36:    os.environ.get(
+C:\Genesis_System3\scripts\system3_model_accuracy_tracker.py:366:    parser.add_argument("--api-base", default=os.environ.get("SYSTEM3_API_BASE"))
+C:\Genesis_System3\scripts\system3_master_proof_orchestrator.py:42:                    os.environ.setdefault(k.strip(), v)
+C:\Genesis_System3\scripts\system3_master_proof_orchestrator.py:370:        api_key = os.getenv("API_KEY")
+C:\Genesis_System3\scripts\system3_master_proof_orchestrator.py:405:        os.getenv("SYSTEM3_PUBLIC_BACKEND_URL")
+C:\Genesis_System3\scripts\system3_master_proof_orchestrator.py:406:        or os.getenv("PUBLIC_BACKEND_URL")
+C:\Genesis_System3\scripts\system3_master_proof_orchestrator.py:501:    if not os.getenv("DHAN_ACCESS_TOKEN") and not os.getenv("DHAN_CLIENT_ID"):
+C:\Genesis_System3\scripts\system3_master_lifecycle_and_multi_layer_audit.py:38:BASE_URL = os.getenv("SYSTEM3_PRODUCTION_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app").rstrip("/")
+C:\Genesis_System3\scripts\system3_live_proof_center.py:41:BASE = os.environ.get(
+C:\Genesis_System3\scripts\system3_live_proof_center.py:45:PROJ = os.environ.get("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
+C:\Genesis_System3\scripts\system3_live_proof_center.py:46:REG = os.environ.get("GCP_REGION", "asia-south1")
+C:\Genesis_System3\scripts\system3_live_proof_center.py:47:SERVICE = os.environ.get("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
+C:\Genesis_System3\scripts\system3_live_proof_center.py:465:        env_sha = os.environ.get("GITHUB_SHA")
+C:\Genesis_System3\scripts\system3_live_proof_center.py:910:        "github_run_id": os.environ.get("GITHUB_RUN_ID"),
+C:\Genesis_System3\scripts\system3_live_proof_center.py:912:            f"https://github.com/{os.environ.get('GITHUB_REPOSITORY')}/actions/runs/{os.environ.get('GITHUB_RUN_ID')}"
+C:\Genesis_System3\scripts\system3_live_proof_center.py:913:            if os.environ.get("GITHUB_RUN_ID") and os.environ.get("GITHUB_REPOSITORY")
+C:\Genesis_System3\scripts\system3_gate_evaluator.py:83:    cloud_backend = os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore" or bool(
+C:\Genesis_System3\scripts\system3_gate_evaluator.py:84:        os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("CLOUD_MODE")
+C:\Genesis_System3\scripts\system3_full_repo_verification.py:118:    env = os.environ.copy()
+C:\Genesis_System3\scripts\system3_full_repo_verification.py:373:    out_dir = Path(os.environ.get("SYSTEM3_FULL_VERIFY_OUT", str(DEFAULT_OUT)))
+C:\Genesis_System3\scripts\system3_friction_expectancy_proof.py:27:CLOUD = os.environ.get(
+C:\Genesis_System3\scripts\system3_friction_expectancy_proof.py:44:    return os.environ.get(_ALLOW_FIXTURE_ENV, "").strip().lower() in ("1", "true", "yes", "on")
+C:\Genesis_System3\scripts\run_three_validation_cycles.py:15:BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:8000")
+C:\Genesis_System3\scripts\system3_control_plane_runner.py:84:    env = os.environ.copy()
+C:\Genesis_System3\scripts\system3_control_plane_runner.py:199:    parser.add_argument("--api-base", default=os.environ.get("SYSTEM3_API_BASE"))
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:79:    run_id = os.environ.get("CC_RUN_ID") or os.environ.get("GITHUB_RUN_ID") or f"local-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:193:    run_id = os.environ.get("CC_RUN_ID") or os.environ.get("GITHUB_RUN_ID") or smoke.get("run_id") or "local-unknown"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:194:    token_id = os.environ.get("CC_TOKEN_ID") or f"dryrun-{run_id}"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:195:    ttl = os.environ.get("CC_TOKEN_TTL") or "0s-mint-denied"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:266:    if not os.environ.get("CC_RUN_ID") and not os.environ.get("GITHUB_RUN_ID"):
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:267:        os.environ["CC_RUN_ID"] = f"local-{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')}"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:268:    if not os.environ.get("CC_TOKEN_ID"):
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:269:        os.environ["CC_TOKEN_ID"] = f"dryrun-{os.environ['CC_RUN_ID']}"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:270:    if not os.environ.get("CC_TOKEN_TTL"):
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:271:        os.environ["CC_TOKEN_TTL"] = "0s-mint-denied"
+C:\Genesis_System3\scripts\system3_command_center_refresh.py:287:    print(f"last_run_id={os.environ.get('CC_RUN_ID')} token_id={os.environ.get('CC_TOKEN_ID')}")
+C:\Genesis_System3\scripts\ui_market_cross_verify.py:24:CLOUD = os.environ.get(
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:28:OUT = Path(os.getenv("SYSTEM3_ULTRA_MRI_OUT", "reports/latest/system3_ultra_mri"))
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:138:    token = os.getenv("GITHUB_TOKEN", "").strip()
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:139:    repo = os.getenv("GITHUB_REPOSITORY", "").strip()
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:140:    api = os.getenv("GITHUB_API_URL", "https://api.github.com").rstrip("/")
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:143:    server = os.getenv("GITHUB_SERVER_URL", "https://github.com").rstrip("/")
+C:\Genesis_System3\scripts\system3_ultra_mri_reconcile.py:144:    run_id = os.getenv("GITHUB_RUN_ID", "").strip()
+C:\Genesis_System3\scripts\system3_ultra_mri.py:26:PROJECT = os.getenv("GOOGLE_CLOUD_PROJECT", "system3-openalgo-safe")
+C:\Genesis_System3\scripts\system3_ultra_mri.py:27:REGION = os.getenv("GCP_REGION", "asia-south1")
+C:\Genesis_System3\scripts\system3_ultra_mri.py:28:SERVICE = os.getenv("GCP_CLOUD_RUN_SERVICE", "genesis-system3-web")
+C:\Genesis_System3\scripts\system3_ultra_mri.py:29:OUT = Path(os.getenv("SYSTEM3_ULTRA_MRI_OUT", "reports/latest/system3_ultra_mri"))
+C:\Genesis_System3\scripts\system3_ultra_mri.py:140:        "github_sha": os.getenv("GITHUB_SHA", ""),
+C:\Genesis_System3\scripts\system3_ultra_mri.py:141:        "github_run_id": os.getenv("GITHUB_RUN_ID", ""),
+C:\Genesis_System3\scripts\system3_truth_bridge.py:353:    parser.add_argument("--base-url", default=os.environ.get("SYSTEM3_BASE_URL", DEFAULT_BASE_URL))
+C:\Genesis_System3\scripts\system3_truth_bridge.py:354:    parser.add_argument("--underlyings", default=os.environ.get("SYSTEM3_UNDERLYINGS", DEFAULT_UNDERLYINGS))
+C:\Genesis_System3\scripts\system3_resolve_runtime_deploy_sha.py:93:        github_env = os.getenv("GITHUB_ENV", "").strip()
+C:\Genesis_System3\scripts\verify_dhan_readonly.py:23:    os.getenv("SYSTEM3_ENV_FILE", ""),
+C:\Genesis_System3\scripts\verify_dhan_readonly.py:45:DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID", "").strip()
+C:\Genesis_System3\scripts\verify_dhan_readonly.py:46:DHAN_ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN", "").strip()
+C:\Genesis_System3\tests\test_state_sync_broker_truth_precedence.py:21:        with patch.dict(os.environ, {"SYSTEM3_STATE_BACKEND": "firestore"}, clear=False):
+C:\Genesis_System3\tests\test_state_sync_broker_truth_precedence.py:30:        with patch.dict(os.environ, {"SYSTEM3_STATE_BACKEND": "file"}, clear=False):
+C:\Genesis_System3\tests\test_state_sync_broker_truth_precedence.py:34:        with patch.dict(os.environ, {"SYSTEM3_STATE_BACKEND": "file"}, clear=False):
+C:\Genesis_System3\scripts\websocket_tick_health_proof.py:14:CLOUD = os.environ.get("SYSTEM3_API_BASE", "http://127.0.0.1:8000").rstrip("/")

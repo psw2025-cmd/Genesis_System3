@@ -6,15 +6,13 @@ Currently DISABLED - requires manual review and approval.
 """
 
 import json
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
-from core.engine.dhan_automation_config import AUTOMATION_CONFIG
-from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS, TradeThresholds
+from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -36,7 +34,7 @@ class AutoThresholdAdjuster:
         self.min_trades_for_adjustment = 10  # Need at least 10 trades to adjust
         self.min_days_data = 3  # Need at least 3 days of data
 
-    def analyze_performance(self, days: int = 7) -> Dict[str, Any]:
+    def analyze_performance(self, days: int = 7) -> dict[str, Any]:
         """
         Analyze recent performance to generate threshold recommendations.
 
@@ -106,7 +104,7 @@ class AutoThresholdAdjuster:
                 "message": str(e),
             }
 
-    def _analyze_signals_distribution(self, days: int) -> Dict[str, Any]:
+    def _analyze_signals_distribution(self, days: int) -> dict[str, Any]:
         """Analyze signal distribution for threshold recommendations."""
         if not SIGNALS_CSV.exists():
             return {}
@@ -146,8 +144,8 @@ class AutoThresholdAdjuster:
         win_rate: float,
         avg_pnl: float,
         total_pnl: float,
-        signals_analysis: Dict[str, Any],
-    ) -> Dict[str, Any]:
+        signals_analysis: dict[str, Any],
+    ) -> dict[str, Any]:
         """Generate threshold adjustment recommendations."""
         recommendations = {
             "confidence_threshold": DEFAULT_THRESHOLDS.min_confidence,
@@ -197,7 +195,7 @@ class AutoThresholdAdjuster:
 
         return recommendations
 
-    def save_recommendations(self, recommendations: Dict[str, Any]) -> bool:
+    def save_recommendations(self, recommendations: dict[str, Any]) -> bool:
         """Save threshold recommendations to JSON."""
         CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -218,7 +216,7 @@ class AutoThresholdAdjuster:
             print(f"[ADJUSTER] Failed to save recommendations: {e}")
             return False
 
-    def apply_recommendations(self, recommendations: Dict[str, Any]) -> bool:
+    def apply_recommendations(self, recommendations: dict[str, Any]) -> bool:
         """
         Apply threshold recommendations (only if auto-adjust is enabled).
 

@@ -7,7 +7,7 @@ Non-trading meta/infra module.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +19,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase191_feature_importance_summary_report.md"
 
 
-def run_phase191_feature_importance_summary() -> Dict[str, Any]:
+def run_phase191_feature_importance_summary() -> dict[str, Any]:
     """
     Feature Importance Summary.
 
@@ -35,7 +35,7 @@ def run_phase191_feature_importance_summary() -> Dict[str, Any]:
     errors = []
     try:
         with OUTPUT_MD_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"# System3 Phase 191 - Feature Importance Summary\n\n")
+            f.write("# System3 Phase 191 - Feature Importance Summary\n\n")
             f.write(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             f.write("Non-trading meta/infra module.\n")
         return {
@@ -58,7 +58,7 @@ def run_phase191_feature_importance_summary() -> Dict[str, Any]:
 def main():
     """CLI entry point."""
     print("=" * 70)
-    print(f"SYSTEM3 PHASE 191 - FEATURE IMPORTANCE SUMMARY")
+    print("SYSTEM3 PHASE 191 - FEATURE IMPORTANCE SUMMARY")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     result = run_phase191_feature_importance_summary()

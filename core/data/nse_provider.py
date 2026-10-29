@@ -5,11 +5,12 @@ NSE scraping, Yahoo Finance, bhavcopy — all removed.
 Saves ~150MB RAM (no requests.Session pool).
 """
 from __future__ import annotations
+
 import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ def _get_dhan_client():
     return DhanHQ(client_id=client_id, access_token=access_token)
 
 
-async def get_option_chain(symbol: str) -> Dict[str, Any]:
+async def get_option_chain(symbol: str) -> dict[str, Any]:
     """
     Get option chain from Dhan API.
     Falls back to cached file if Dhan unavailable.
@@ -52,7 +53,7 @@ async def get_option_chain(symbol: str) -> Dict[str, Any]:
     return _read_cached_chain(sym)
 
 
-def _read_cached_chain(sym: str) -> Dict[str, Any]:
+def _read_cached_chain(sym: str) -> dict[str, Any]:
     """Read cached chain data written by worker scheduler."""
     cache_file = ROOT / "state" / "chain_cache" / f"{sym}.json"
     if cache_file.exists():
@@ -69,7 +70,7 @@ def _read_cached_chain(sym: str) -> Dict[str, Any]:
     }
 
 
-def get_spot_price(symbol: str) -> Optional[float]:
+def get_spot_price(symbol: str) -> float | None:
     """Get spot price from Dhan — synchronous version for workers."""
     try:
         dhan = _get_dhan_client()
@@ -87,7 +88,7 @@ def get_spot_price(symbol: str) -> Optional[float]:
 
 
 # ── Backward compatibility aliases ───────────────────────────────────────
-def fetch_option_chain(symbol: str, expiry: str = "") -> Dict[str, Any]:
+def fetch_option_chain(symbol: str, expiry: str = "") -> dict[str, Any]:
     """Sync wrapper for backward compatibility."""
     import asyncio
     try:
@@ -109,7 +110,7 @@ MARKET_CACHE_FILE = os.path.join(
 MAX_OI_CACHE_AGE_DAYS = 3  # Stale after 3 calendar days (handles long weekends)
 
 
-def load_oi_cache() -> Dict[str, int]:
+def load_oi_cache() -> dict[str, int]:
     """
     Loads previous session OI totals from state/market_cache.json.
 
@@ -143,7 +144,7 @@ def load_oi_cache() -> Dict[str, int]:
         return {}
 
 
-def load_oi_cache_raw() -> Dict:
+def load_oi_cache_raw() -> dict:
     """Returns the full cache dict including metadata. Used by dashboard."""
     try:
         with open(MARKET_CACHE_FILE) as f:
@@ -152,7 +153,7 @@ def load_oi_cache_raw() -> Dict:
         return {}
 
 
-def save_oi_cache(oi_data: Dict[str, int]) -> None:
+def save_oi_cache(oi_data: dict[str, int]) -> None:
     """
     Saves current OI totals to state/market_cache.json for next session's prev_oi.
     Stores cache_date so staleness can be detected on next read.
@@ -180,7 +181,7 @@ def is_expiry_day() -> bool:
     return date.today().weekday() == 3  # Thursday = 3
 
 
-def spot_price_from_chain(chain_json: Dict[str, Any]) -> float:
+def spot_price_from_chain(chain_json: dict[str, Any]) -> float:
     """Extracts underlying spot price from option chain JSON."""
     try:
         if "spot" in chain_json:

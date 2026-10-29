@@ -9,7 +9,7 @@ SAFE MODE ONLY - No training, no model changes.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ TRAINING_PLAN_JSON = TRAINING_DIR / "blended_training_plan.json"
 TRAINING_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def create_training_plan() -> Dict[str, Any]:
+def create_training_plan() -> dict[str, Any]:
     """
     Create training plan for blended dataset (dry-run only).
 
@@ -105,7 +105,7 @@ def create_training_plan() -> Dict[str, Any]:
         }
 
 
-def save_training_plan(plan: Dict[str, Any]) -> Path:
+def save_training_plan(plan: dict[str, Any]) -> Path:
     """
     Save training plan to JSON.
 
@@ -123,7 +123,7 @@ def main() -> None:
     plan = create_training_plan()
 
     if plan["status"] == "SUCCESS":
-        print(f"\n=== TRAINING PLAN (DRY-RUN) ===\n")
+        print("\n=== TRAINING PLAN (DRY-RUN) ===\n")
         print(f"Dataset: {plan['dataset_path']}")
         print(f"Total Rows: {plan['dataset_rows']}")
         print(f"Mode: {plan['mode']}")

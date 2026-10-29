@@ -7,9 +7,6 @@ SAFE MODE ONLY - Read-only report generation.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import pandas as pd
 
 from core.engine.dhan_misfire_classifier_v2 import generate_misfire_report
 from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats

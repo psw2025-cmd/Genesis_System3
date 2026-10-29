@@ -14,9 +14,8 @@ After normalization, Phase 239 join should succeed with >30% enrichment.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent
@@ -30,7 +29,7 @@ def _log(msg: str) -> None:
     print(f"[{ts}] {msg}")
 
 
-def normalize_underlying(series: pd.Series) -> Tuple[pd.Series, dict]:
+def normalize_underlying(series: pd.Series) -> tuple[pd.Series, dict]:
     """Standardize underlying values."""
     original = series.copy()
 
@@ -53,7 +52,7 @@ def normalize_underlying(series: pd.Series) -> Tuple[pd.Series, dict]:
     return normalized, {"metric": "underlying_normalized", "changes": int(changes)}
 
 
-def normalize_strike(series: pd.Series) -> Tuple[pd.Series, dict]:
+def normalize_strike(series: pd.Series) -> tuple[pd.Series, dict]:
     """Convert strike to integer."""
     original = series.copy()
 
@@ -67,7 +66,7 @@ def normalize_strike(series: pd.Series) -> Tuple[pd.Series, dict]:
     return normalized, {"metric": "strike_int", "changes": int(changes)}
 
 
-def normalize_side(series: pd.Series) -> Tuple[pd.Series, dict]:
+def normalize_side(series: pd.Series) -> tuple[pd.Series, dict]:
     """Map CE/PE → BUY/SELL or keep BUY/SELL as-is."""
     original = series.copy()
 
@@ -94,7 +93,7 @@ def normalize_side(series: pd.Series) -> Tuple[pd.Series, dict]:
     }
 
 
-def normalize_expiry(series: pd.Series) -> Tuple[pd.Series, dict]:
+def normalize_expiry(series: pd.Series) -> tuple[pd.Series, dict]:
     """
     Convert expiry to YYYY-MM-DD format.
 
@@ -103,7 +102,7 @@ def normalize_expiry(series: pd.Series) -> Tuple[pd.Series, dict]:
     - YYYY-MM-DD (e.g., 2025-12-30)
     - ISO date formats
     """
-    original = series.copy()
+    series.copy()
 
     # Try multiple formats
     for fmt in ["%d%b%Y", "%Y-%m-%d", "mixed"]:
@@ -129,7 +128,7 @@ def normalize_expiry(series: pd.Series) -> Tuple[pd.Series, dict]:
     }
 
 
-def normalize_timestamp(series: pd.Series) -> Tuple[pd.Series, dict]:
+def normalize_timestamp(series: pd.Series) -> tuple[pd.Series, dict]:
     """
     Normalize timestamps to ISO8601 UTC naive string format.
 
@@ -137,7 +136,7 @@ def normalize_timestamp(series: pd.Series) -> Tuple[pd.Series, dict]:
     - ISO8601 with offset (2025-11-28 23:44:02+00:00)
     - Naive local timestamps (2025-11-30 01:19:00)
     """
-    original = series.copy()
+    series.copy()
 
     # Parse with mixed format (handles both types)
     parsed = pd.to_datetime(series, format="mixed", errors="coerce", utc=True)
@@ -156,7 +155,7 @@ def normalize_timestamp(series: pd.Series) -> Tuple[pd.Series, dict]:
     }
 
 
-def normalize_signals(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
+def normalize_signals(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """Normalize signals (Phase 221) merge keys."""
     df = df.copy()
     metrics = {"name": "signals_normalized", "before": len(df), "operations": []}
@@ -173,7 +172,7 @@ def normalize_signals(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     if "expiry" in df.columns:
         df["expiry"], op_metrics = normalize_expiry(df["expiry"])
         metrics["operations"].append(op_metrics)
-        _log(f"  ✓ expiry: normalized")
+        _log("  ✓ expiry: normalized")
 
     # 3. Normalize ts (handle offset)
     if "ts" in df.columns:
@@ -197,7 +196,7 @@ def normalize_signals(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     return df, metrics
 
 
-def normalize_orders(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
+def normalize_orders(df: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     """Normalize orders (healed) merge keys."""
     df = df.copy()
     metrics = {"name": "orders_normalized", "before": len(df), "operations": []}
@@ -208,13 +207,13 @@ def normalize_orders(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     if "side" in df.columns:
         df["side"] = df["side"].astype(str).str.upper().str.strip()
         metrics["operations"].append({"metric": "side_clean", "action": "uppercase"})
-        _log(f"  ✓ side: cleaned")
+        _log("  ✓ side: cleaned")
 
     # 2. Normalize expiry (already YYYY-MM-DD, just ensure format)
     if "expiry" in df.columns:
         df["expiry"], op_metrics = normalize_expiry(df["expiry"])
         metrics["operations"].append(op_metrics)
-        _log(f"  ✓ expiry: normalized")
+        _log("  ✓ expiry: normalized")
 
     # 3. Normalize ts (ensure naive UTC)
     if "ts" in df.columns:
@@ -238,7 +237,7 @@ def normalize_orders(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     return df, metrics
 
 
-def validate_keys_alignment(signals: pd.DataFrame, orders: pd.DataFrame) -> Dict[str, Any]:
+def validate_keys_alignment(signals: pd.DataFrame, orders: pd.DataFrame) -> dict[str, Any]:
     """Validate that merge keys are aligned after normalization."""
     validation = {"status": "OK", "issues": []}
 
@@ -346,7 +345,7 @@ def main():
     print(f"{'='*70}")
     print(f"Signals: {sig_metrics['before']} → {sig_metrics['after']} rows")
     print(f"Orders: {ord_metrics['before']} → {ord_metrics['after']} rows")
-    print(f"Ready for Phase 239 join")
+    print("Ready for Phase 239 join")
 
 
 if __name__ == "__main__":

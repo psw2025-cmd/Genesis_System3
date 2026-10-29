@@ -4,11 +4,10 @@ System3 Phase 145 - One-Lot Test-Mode Health Report
 Summarizes 1-lot DRY-RUN testing health.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -26,7 +25,7 @@ PNL_SCENARIOS_CSV = STORAGE_ULTRA / "phase144_pnl_execution_scenarios.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase145_one_lot_health_report.md"
 
 
-def run_phase145_one_lot_health_report() -> Dict[str, Any]:
+def run_phase145_one_lot_health_report() -> dict[str, Any]:
     """
     Generate 1-lot test-mode health report.
 
@@ -110,7 +109,7 @@ def run_phase145_one_lot_health_report() -> Dict[str, Any]:
 
         # Determine health status per underlying
         health_statuses = {}
-        for underlying in capital_data.keys():
+        for underlying in capital_data:
             capital_usage = capital_data[underlying].get("capital_usage_percent", 100)
             max_lots = capital_data[underlying].get("max_lots_allowed", 0)
 

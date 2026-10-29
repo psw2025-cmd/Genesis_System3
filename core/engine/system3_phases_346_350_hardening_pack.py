@@ -48,8 +48,7 @@ def run_phase_346_live_data_integrity_checker(root_path: str = None, logger_obj=
 
         with open(diag_dir / "live_data_integrity_report.csv", "w") as f:
             f.write("check,status,timestamp\n")
-            for check, status in integrity_report["checks"].items():
-                f.write(f"{check},{status},{datetime.now().isoformat()}\n")
+            f.writelines(f"{check},{status},{datetime.now().isoformat()}\n" for check, status in integrity_report["checks"].items())
 
         logger.info("[PH346] Live Data Integrity Checker complete")
         return "OK"
@@ -140,8 +139,7 @@ def run_phase_348_virtual_orders_guard(root_path: str = None, logger_obj=None) -
 
         with open(diag_dir / "virtual_orders_validation_report.csv", "w") as f:
             f.write("check,count,timestamp\n")
-            for check, count in validation_report["checks"].items():
-                f.write(f"{check},{count},{datetime.now().isoformat()}\n")
+            f.writelines(f"{check},{count},{datetime.now().isoformat()}\n" for check, count in validation_report["checks"].items())
 
         logger.info("[PH348] Virtual Orders Guard complete")
         return "OK"

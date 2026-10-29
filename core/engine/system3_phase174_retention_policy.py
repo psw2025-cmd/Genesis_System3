@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -13,7 +13,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase174_retention_policy_report.md"
 
 
-def run_phase174_retention_policy() -> Dict[str, Any]:
+def run_phase174_retention_policy() -> dict[str, Any]:
     errors = []
     try:
         cutoff_date = datetime.now() - timedelta(days=90)  # 90-day retention

@@ -7,7 +7,6 @@ Summarize session health: PLANNED/SENT/FILLED trades, risk guard, kill switch.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 

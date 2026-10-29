@@ -7,7 +7,7 @@ Assigns risk tiers to underlyings deterministically.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -40,7 +40,7 @@ MAX_TRADES_BY_TIER = {
 }
 
 
-def run_phase138_risk_tier_assignment() -> Dict[str, Any]:
+def run_phase138_risk_tier_assignment() -> dict[str, Any]:
     """
     Assign risk tiers to underlyings.
 

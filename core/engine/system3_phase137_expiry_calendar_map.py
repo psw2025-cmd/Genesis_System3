@@ -7,7 +7,7 @@ Creates expiry calendar mapping for supported underlyings.
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -44,7 +44,7 @@ def get_next_expiries(base_date: datetime, count: int = 4) -> list:
     return expiries
 
 
-def run_phase137_expiry_calendar_map() -> Dict[str, Any]:
+def run_phase137_expiry_calendar_map() -> dict[str, Any]:
     """
     Create expiry calendar map.
 

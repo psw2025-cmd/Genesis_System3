@@ -7,7 +7,7 @@ Recomputes PnL under different execution scenarios.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase144_pnl_execution_scenarios.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase144_pnl_execution_scenarios.md"
 
 
-def run_phase144_pnl_vs_execution_scenario() -> Dict[str, Any]:
+def run_phase144_pnl_vs_execution_scenario() -> dict[str, Any]:
     """
     Recompute PnL under different execution scenarios.
 

@@ -9,7 +9,7 @@ SAFE MODE ONLY - No changes, observation only.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
@@ -21,7 +21,7 @@ LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 ULTRA_OBS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def build_health_tree() -> Dict[str, Any]:
+def build_health_tree() -> dict[str, Any]:
     """
     Build system health tree with dependencies.
 
@@ -72,7 +72,7 @@ def build_health_tree() -> Dict[str, Any]:
     return health_tree
 
 
-def _check_models_health() -> Dict[str, Any]:
+def _check_models_health() -> dict[str, Any]:
     """Check models health."""
     expected_models = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
     models_found = []
@@ -98,7 +98,7 @@ def _check_models_health() -> Dict[str, Any]:
     }
 
 
-def _check_data_pipeline_health() -> Dict[str, Any]:
+def _check_data_pipeline_health() -> dict[str, Any]:
     """Check data pipeline health."""
     training_csv = PROJECT_ROOT / "storage" / "training" / "dhan_index_options_training.csv"
     signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
@@ -119,7 +119,7 @@ def _check_data_pipeline_health() -> Dict[str, Any]:
     }
 
 
-def _check_learning_system_health() -> Dict[str, Any]:
+def _check_learning_system_health() -> dict[str, Any]:
     """Check learning system health."""
     outcomes_csv = LEARNING_DIR / "real_outcomes.csv"
     signals_raw_csv = LEARNING_DIR / "real_signals_raw.csv"
@@ -140,7 +140,7 @@ def _check_learning_system_health() -> Dict[str, Any]:
     }
 
 
-def _check_live_system_health() -> Dict[str, Any]:
+def _check_live_system_health() -> dict[str, Any]:
     """Check live system health."""
     try:
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
@@ -164,7 +164,7 @@ def _check_live_system_health() -> Dict[str, Any]:
     }
 
 
-def _check_config_health() -> Dict[str, Any]:
+def _check_config_health() -> dict[str, Any]:
     """Check configuration health."""
     try:
         from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
@@ -194,7 +194,7 @@ def _classify_health_status(score: float) -> str:
         return "POOR"
 
 
-def save_health_tree(health_tree: Dict[str, Any]) -> Path:
+def save_health_tree(health_tree: dict[str, Any]) -> Path:
     """
     Save health tree to JSON.
 

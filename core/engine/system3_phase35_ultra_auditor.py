@@ -14,7 +14,7 @@ Menu Option: 98
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -33,7 +33,7 @@ MAX_TRADES_PER_UNDERLYING = 10
 DISALLOWED_REGIMES = ["CHAOTIC", "EXTREME_VOL"]
 
 
-def _load_ultra_decisions() -> Optional[pd.DataFrame]:
+def _load_ultra_decisions() -> pd.DataFrame | None:
     """Load Ultra fused decisions."""
     ultra_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if not ultra_csv.exists():
@@ -44,7 +44,7 @@ def _load_ultra_decisions() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_shadow_trades() -> Optional[pd.DataFrame]:
+def _load_shadow_trades() -> pd.DataFrame | None:
     """Load shadow Ultra trades."""
     shadow_csv = LIVE_DIR / "dhan_index_ai_ultra_trades_shadow.csv"
     if not shadow_csv.exists():
@@ -55,7 +55,7 @@ def _load_shadow_trades() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_baseline_limits() -> Dict[str, Any]:
+def _load_baseline_limits() -> dict[str, Any]:
     """Load baseline safety limits (read-only)."""
     # Try to load from config
     config_json = CONFIG_DIR / "thresholds_auto.json"
@@ -83,9 +83,9 @@ def _load_baseline_limits() -> Dict[str, Any]:
 
 def _audit_decision(
     row: pd.Series,
-    limits: Dict[str, Any],
-    daily_trade_counts: Dict[str, int],
-) -> Dict[str, Any]:
+    limits: dict[str, Any],
+    daily_trade_counts: dict[str, int],
+) -> dict[str, Any]:
     """Audit a single Ultra decision."""
     audit_result = {
         "timestamp": row.get("timestamp", ""),
@@ -184,7 +184,7 @@ def run_phase35_audit() -> str:
     warn_count = status_counts.get("WARN", 0)
     block_count = status_counts.get("BLOCK", 0)
 
-    print(f"\n=== AUDIT SUMMARY ===")
+    print("\n=== AUDIT SUMMARY ===")
     print(f"Total decisions audited: {len(df_audit)}")
     print(f"OK: {ok_count}")
     print(f"WARN: {warn_count}")
@@ -241,7 +241,7 @@ def main() -> None:
         print(f"[PHASE 35][ERROR] {e}")
         error_path = ULTRA_DIR / "phase35_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 35 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 35 Error\n\n{e!s}\n")
         print(f"[PHASE 35] Error details saved to: {error_path}")
 
 

@@ -22,7 +22,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import joblib
 import numpy as np
@@ -118,7 +118,7 @@ def generate_sample_training_data() -> pd.DataFrame:
     return pd.DataFrame(data)
 
 
-def prepare_features_labels(df: pd.DataFrame, underlying: Optional[str] = None) -> Tuple[pd.DataFrame, pd.Series]:
+def prepare_features_labels(df: pd.DataFrame, underlying: str | None = None) -> tuple[pd.DataFrame, pd.Series]:
     """
     Prepare features (X) and labels (y) for training.
 
@@ -158,7 +158,7 @@ def prepare_features_labels(df: pd.DataFrame, underlying: Optional[str] = None) 
 
 def train_xgboost_model(
     X_train: pd.DataFrame, X_test: pd.DataFrame, y_train: pd.Series, y_test: pd.Series, underlying: str
-) -> Tuple[Optional[Any], Dict[str, Any]]:
+) -> tuple[Any | None, dict[str, Any]]:
     """
     Train XGBoost model for specific underlying.
 
@@ -240,7 +240,7 @@ def train_xgboost_model(
         return None, {"error": str(e)}
 
 
-def run_phase_391() -> Dict[str, Any]:
+def run_phase_391() -> dict[str, Any]:
     """
     Phase 391 entry point: XGBoost Model Training.
 
@@ -370,7 +370,7 @@ def run_phase_391() -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Phase 391 failed: {e}", exc_info=True)
-        return {"status": "error", "message": f"XGBoost training failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"XGBoost training failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

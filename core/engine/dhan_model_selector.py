@@ -15,7 +15,7 @@ Environment/Config: Profile selection via config file.
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import joblib
 
@@ -32,7 +32,7 @@ ACTIVE_PROFILE_JSON = CORE_CONFIG_DIR / "system3_active_profile.json"
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_profile_config() -> Dict[str, Any]:
+def load_profile_config() -> dict[str, Any]:
     """Load live beta profile config."""
     defaults = {
         "enabled": False,
@@ -103,7 +103,7 @@ def get_model_dir(profile: str = None) -> Path:
         return MODELS_DIR
 
 
-def get_storage_dirs(profile: str = None) -> Dict[str, Path]:
+def get_storage_dirs(profile: str = None) -> dict[str, Path]:
     """
     Get storage directories for specified profile.
 
@@ -135,7 +135,7 @@ def get_storage_dirs(profile: str = None) -> Dict[str, Path]:
         }
 
 
-def load_models_for_profile(profile_name: str = None) -> Dict[str, Any]:
+def load_models_for_profile(profile_name: str = None) -> dict[str, Any]:
     """
     Load models for specified profile.
 
@@ -228,7 +228,7 @@ def load_models_for_profile(profile_name: str = None) -> Dict[str, Any]:
     }
 
 
-def get_profile_thresholds(profile_name: str = None) -> Dict[str, float]:
+def get_profile_thresholds(profile_name: str = None) -> dict[str, float]:
     """
     Get thresholds for specified profile.
 
@@ -282,7 +282,7 @@ def show_profile_info() -> None:
     # Show model and storage directories
     model_dir = get_model_dir(profile)
     storage_dirs = get_storage_dirs(profile)
-    print(f"\n=== PROFILE PATHS ===")
+    print("\n=== PROFILE PATHS ===")
     print(f"Model Directory: {model_dir}")
     print(f"Signals Directory: {storage_dirs['signals_dir']}")
     print(f"Learning Directory: {storage_dirs['learning_dir']}")
@@ -291,7 +291,7 @@ def show_profile_info() -> None:
     # Load models
     model_data = load_models_for_profile(profile)
 
-    print(f"\n=== MODEL SOURCES ===")
+    print("\n=== MODEL SOURCES ===")
     for underlying in UNDERLYINGS:
         if underlying in model_data["model_paths"]:
             path = model_data["model_paths"][underlying]
@@ -306,7 +306,7 @@ def show_profile_info() -> None:
 
     # Show thresholds
     thresholds = get_profile_thresholds(profile)
-    print(f"\n=== THRESHOLDS ===")
+    print("\n=== THRESHOLDS ===")
     for key, value in thresholds.items():
         print(f"{key}: {value}")
 

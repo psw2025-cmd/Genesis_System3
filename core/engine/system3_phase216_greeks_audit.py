@@ -7,7 +7,7 @@ Verifies numerical stability of Greeks calculations.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 TOLERANCE = 0.1  # 10% deviation tolerance
 
 
-def run_phase216(**kwargs) -> Dict[str, Any]:
+def run_phase216(**kwargs) -> dict[str, Any]:
     """
     Run Phase 216: Greeks Calculation Auditor.
 
@@ -41,7 +41,6 @@ def run_phase216(**kwargs) -> Dict[str, Any]:
         }
     """
     errors = []
-    flagged_instruments = []
 
     try:
         if not SIGNALS_CSV.exists():

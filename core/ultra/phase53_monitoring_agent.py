@@ -13,9 +13,8 @@ Menu Option: 115
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def check_system_health() -> Dict[str, Any]:
+def check_system_health() -> dict[str, Any]:
     """Check system health metrics."""
     health = {
         "timestamp": datetime.now().isoformat(),
@@ -44,7 +43,7 @@ def check_system_health() -> Dict[str, Any]:
     if signals_path.exists():
         try:
             df = pd.read_csv(signals_path)
-            recent_count = len(df) if len(df) > 0 else 0
+            recent_count = max(0, len(df))
             health["checks"]["recent_signals"] = {
                 "status": "OK" if recent_count > 0 else "WARN",
                 "message": f"Recent signals: {recent_count}",
@@ -95,7 +94,7 @@ def check_system_health() -> Dict[str, Any]:
     return health
 
 
-def generate_suggestions(health: Dict[str, Any]) -> List[Dict[str, Any]]:
+def generate_suggestions(health: dict[str, Any]) -> list[dict[str, Any]]:
     """Generate AI suggestions based on health check."""
     suggestions = []
 
@@ -205,9 +204,9 @@ def run_phase53_monitoring_agent() -> None:
     print(f"[SAVE] Agent suggestions saved to: {suggestions_json}")
 
     # Summary
-    print(f"\n=== MONITORING AGENT SUMMARY ===")
+    print("\n=== MONITORING AGENT SUMMARY ===")
     print(f"Overall Status: {health['overall_status']}")
-    print(f"\nHealth Checks:")
+    print("\nHealth Checks:")
     for check_name, check_result in health["checks"].items():
         print(f"  {check_name}: {check_result['status']} - {check_result['message']}")
     print(f"\nSuggestions Generated: {len(suggestions)}")

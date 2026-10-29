@@ -7,9 +7,8 @@ Performs detailed PnL attribution analysis by component, timeframe, and regime.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_advanced_pnl_attribution.md"
 
 
-def run_phase263(**kwargs) -> Dict[str, Any]:
+def run_phase263(**kwargs) -> dict[str, Any]:
     """Run Phase 263: Advanced PnL Attribution."""
     errors = []
 

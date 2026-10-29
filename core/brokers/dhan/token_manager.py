@@ -16,7 +16,7 @@ from __future__ import annotations
 import base64
 import json
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _current_token() -> str:
@@ -40,7 +40,7 @@ def _expiry(token: str) -> datetime | None:
         body = parts[1] + "=" * (-len(parts[1]) % 4)
         payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
         exp = payload.get("exp")
-        return datetime.fromtimestamp(float(exp), tz=timezone.utc) if exp else None
+        return datetime.fromtimestamp(float(exp), tz=UTC) if exp else None
     except Exception:
         return None
 
@@ -63,7 +63,7 @@ def verify_token() -> dict:
             "source": "legacy-status-only",
             "raw_token_exposed": False,
         }
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     hours = (exp - now).total_seconds() / 3600.0
     return {
         "valid": hours > 0,

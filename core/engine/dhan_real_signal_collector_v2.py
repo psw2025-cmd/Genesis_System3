@@ -9,7 +9,7 @@ SAFE MODE ONLY - Read-only collection, no overwrites.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -24,7 +24,7 @@ LEARNING_DIR.mkdir(parents=True, exist_ok=True)
 def collect_real_signals(
     df_signals: pd.DataFrame | None = None,
     source: str = "live",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Collect real signals and store to learning directory.
 
@@ -99,7 +99,7 @@ def collect_real_signals(
         }
 
 
-def get_collection_stats() -> Dict[str, Any]:
+def get_collection_stats() -> dict[str, Any]:
     """
     Get collection statistics (read-only).
 
@@ -153,7 +153,7 @@ def main() -> None:
         # Show stats
         stats = get_collection_stats()
         if stats["status"] == "SUCCESS":
-            print(f"\n=== COLLECTION STATISTICS ===")
+            print("\n=== COLLECTION STATISTICS ===")
             print(f"Total Signals: {stats['total_signals']}")
             if "by_underlying" in stats:
                 print("\nBy Underlying:")

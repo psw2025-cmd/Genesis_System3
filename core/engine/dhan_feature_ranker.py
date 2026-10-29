@@ -8,11 +8,8 @@ Ranks features beyond MI using:
 - Feature stability
 """
 
-import os
 from pathlib import Path
-from typing import Dict, List
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -93,7 +90,7 @@ class AdvancedFeatureRanker:
             print(f"[RANKER] Error ranking features: {e}")
             return pd.DataFrame()
 
-    def rank_all_underlyings(self) -> Dict[str, pd.DataFrame]:
+    def rank_all_underlyings(self) -> dict[str, pd.DataFrame]:
         """Rank features for all underlyings."""
         underlyings = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
         results = {}
@@ -114,7 +111,7 @@ def main() -> None:
     print("=== ANGEL ONE INDEX OPTIONS - ADVANCED FEATURE RANKER ===")
 
     ranker = AdvancedFeatureRanker()
-    results = ranker.rank_all_underlyings()
+    ranker.rank_all_underlyings()
 
     print(f"\n[RANKER] Feature rankings saved to: {ranker.ranking_dir}")
 

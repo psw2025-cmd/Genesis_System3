@@ -7,7 +7,6 @@ Validates the cleaned CSV file and generates validation report.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
 import pandas as pd
@@ -25,7 +24,7 @@ CSV_SELL_ANOMALIES = CLEAN_DIR / "dhan_index_ai_signals_sell_anomalies.csv"
 OUTPUT_REPORT = PROJECT_ROOT / "docs" / "SYSTEM3_CSV_CLEAN_VALIDATION_SUMMARY.md"
 
 
-def validate_greeks(df: pd.DataFrame) -> Dict:
+def validate_greeks(df: pd.DataFrame) -> dict:
     """Validate Greeks ranges."""
     results = {
         "delta_valid": True,
@@ -60,7 +59,7 @@ def validate_greeks(df: pd.DataFrame) -> Dict:
     return results
 
 
-def validate_iv(df: pd.DataFrame) -> Dict:
+def validate_iv(df: pd.DataFrame) -> dict:
     """Validate IV ranges."""
     results = {"iv_valid": True, "iv_estimate_valid": True, "iv_out_of_range": 0, "iv_estimate_out_of_range": 0}
 
@@ -75,7 +74,7 @@ def validate_iv(df: pd.DataFrame) -> Dict:
     return results
 
 
-def validate_probabilities(df: pd.DataFrame) -> Dict:
+def validate_probabilities(df: pd.DataFrame) -> dict:
     """Validate probability ranges and sums."""
     results = {
         "prob_valid": True,
@@ -115,7 +114,7 @@ def validate_probabilities(df: pd.DataFrame) -> Dict:
     return results
 
 
-def validate_moneyness(df: pd.DataFrame) -> Dict:
+def validate_moneyness(df: pd.DataFrame) -> dict:
     """Validate moneyness consistency."""
     results = {"moneyness_valid": True, "moneyness_zero_count": 0, "moneyness_inconsistent": 0}
 
@@ -140,7 +139,7 @@ def validate_moneyness(df: pd.DataFrame) -> Dict:
     return results
 
 
-def validate_forward_returns(df: pd.DataFrame) -> Dict:
+def validate_forward_returns(df: pd.DataFrame) -> dict:
     """Validate forward returns."""
     results = {
         "fwd_ret_1_coverage": 0.0,
@@ -168,7 +167,7 @@ def validate_forward_returns(df: pd.DataFrame) -> Dict:
     return results
 
 
-def run_validation() -> Dict:
+def run_validation() -> dict:
     """Run validation on clean CSV files."""
     print("=" * 80)
     print("SYSTEM3 CLEAN CSV VALIDATION")
@@ -194,7 +193,7 @@ def run_validation() -> Dict:
         print(f"✅ Loaded EV-ready CSV: {len(df_ev):,} rows")
     else:
         df_ev = pd.DataFrame()
-        print(f"⚠️ EV-ready CSV not found")
+        print("⚠️ EV-ready CSV not found")
 
     # Load sell anomalies if exists
     if CSV_SELL_ANOMALIES.exists():
@@ -204,7 +203,7 @@ def run_validation() -> Dict:
         df_anomalies = pd.DataFrame()
 
     # Run validations
-    print(f"\n🔍 Running Validations...")
+    print("\n🔍 Running Validations...")
 
     greeks_results = validate_greeks(df_clean)
     iv_results = validate_iv(df_clean)
@@ -224,32 +223,32 @@ def run_validation() -> Dict:
     }
 
     # Print results
-    print(f"\n📊 Validation Results:")
-    print(f"\n  Greeks:")
+    print("\n📊 Validation Results:")
+    print("\n  Greeks:")
     print(f"    Delta valid: {greeks_results['delta_valid']} (out of range: {greeks_results['delta_out_of_range']})")
     print(f"    Vega valid: {greeks_results['vega_valid']} (negative: {greeks_results['negative_vega']})")
     print(
         f"    Theta valid: {greeks_results['theta_valid']} (positive: {greeks_results['positive_theta']}, large: {greeks_results['large_positive_theta']})"
     )
 
-    print(f"\n  IV:")
+    print("\n  IV:")
     print(f"    IV valid: {iv_results['iv_valid']} (out of range: {iv_results['iv_out_of_range']})")
     print(
         f"    IV estimate valid: {iv_results['iv_estimate_valid']} (out of range: {iv_results['iv_estimate_out_of_range']})"
     )
 
-    print(f"\n  Probabilities:")
+    print("\n  Probabilities:")
     print(f"    Prob valid: {prob_results['prob_valid']} (out of range: {prob_results['prob_out_of_range']})")
     print(
         f"    Prob sum valid: {prob_results['prob_sum_valid']} (bad: {prob_results['prob_sum_bad']}, mean: {prob_results['prob_sum_mean']:.4f})"
     )
 
-    print(f"\n  Moneyness:")
+    print("\n  Moneyness:")
     print(f"    Moneyness valid: {moneyness_results['moneyness_valid']}")
     print(f"    Zero values: {moneyness_results['moneyness_zero_count']}")
     print(f"    Inconsistent: {moneyness_results['moneyness_inconsistent']}")
 
-    print(f"\n  Forward Returns:")
+    print("\n  Forward Returns:")
     print(f"    fwd_ret_1 coverage: {fwd_ret_results['fwd_ret_1_coverage']:.1f}%")
     print(f"    fwd_ret_3 coverage: {fwd_ret_results['fwd_ret_3_coverage']:.1f}%")
     print(f"    fwd_ret_5 coverage: {fwd_ret_results['fwd_ret_5_coverage']:.1f}%")
@@ -261,7 +260,7 @@ def run_validation() -> Dict:
     return validation_results
 
 
-def generate_report(results: Dict, clean_rows: int, ev_rows: int, anomaly_rows: int) -> None:
+def generate_report(results: dict, clean_rows: int, ev_rows: int, anomaly_rows: int) -> None:
     """Generate markdown validation report."""
 
     report_lines = [
@@ -310,7 +309,7 @@ def generate_report(results: Dict, clean_rows: int, ev_rows: int, anomaly_rows: 
         "",
         "### Forward Returns Validation",
         "",
-        f"- **Coverage**:",
+        "- **Coverage**:",
         f"  - fwd_ret_1: {results['forward_returns']['fwd_ret_1_coverage']:.1f}%",
         f"  - fwd_ret_3: {results['forward_returns']['fwd_ret_3_coverage']:.1f}%",
         f"  - fwd_ret_5: {results['forward_returns']['fwd_ret_5_coverage']:.1f}%",
@@ -320,17 +319,17 @@ def generate_report(results: Dict, clean_rows: int, ev_rows: int, anomaly_rows: 
         "## Critical Issues Resolution",
         "",
         "### Moneyness Fix",
-        f"- ✅ Moneyness recalculated as spot/strike",
+        "- ✅ Moneyness recalculated as spot/strike",
         f"- Zero values: {results['moneyness']['moneyness_zero_count']} (should be 0 or very low)",
         "",
         "### Outlier Removal",
-        f"- ✅ Rows with |forward_return| > 1.0 removed",
+        "- ✅ Rows with |forward_return| > 1.0 removed",
         f"- Outliers remaining: {results['forward_returns']['fwd_ret_outliers']} (should be 0)",
         "",
         "### SELL Signal Anomalies",
         f"- ⚠️ Anomalies detected: {anomaly_rows} rows",
-        f"- Saved to: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`",
-        f"- **Action Required**: Review these rows manually",
+        "- Saved to: `storage/clean/dhan_index_ai_signals_sell_anomalies.csv`",
+        "- **Action Required**: Review these rows manually",
         "",
         "## Overall Status",
         "",

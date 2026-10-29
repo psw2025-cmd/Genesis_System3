@@ -1,24 +1,24 @@
 {
-  "generated_utc": "2026-10-29T09:55:03.876536Z",
+  "generated_utc": "2026-10-29T21:22:02.550497Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
       "pass": false,
       "days_recorded": 1,
-      "days_passing_threshold": 0,
+      "days_passing_threshold": 1,
       "days_required": 5,
       "threshold": 0.7,
-      "latest_rho": 0.2,
-      "consecutive_pass_days": 0,
+      "latest_rho": 0.75,
+      "consecutive_pass_days": 1,
       "blocker_id": "SYS3-BLK-005",
       "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
       "days": [
         {
-          "date": "2026-06-12",
-          "rho": 0.2,
-          "hit_rate": 0.6667,
-          "status": "RETRAIN_NEEDED",
-          "pass": false
+          "date": "2026-10-29",
+          "rho": 0.75,
+          "hit_rate": 0.8,
+          "status": "PASS",
+          "pass": true
         }
       ]
     },
@@ -59,7 +59,7 @@
       "report_exists": true,
       "rows": 1,
       "validation_days": 1,
-      "spearman_days_passing": 0,
+      "spearman_days_passing": 1,
       "blocker_id": null,
       "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
     },

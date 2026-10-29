@@ -11,10 +11,8 @@ import hashlib
 import json
 import logging
 import os
-import time
-from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 logger = logging.getLogger("system3.history_downloader")
 logging.basicConfig(level=logging.INFO)
@@ -38,17 +36,17 @@ class DhanHistoryDownloader:
         security_id: str,
         exchange_segment: str = "NSE_EQ",
         instrument_type: str = "EQUITY",
-        from_date: Optional[str] = None,
-        to_date: Optional[str] = None,
+        from_date: str | None = None,
+        to_date: str | None = None,
         interval: str = "1D",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Fetch historical candle series from Dhan API with backoff."""
         if not to_date:
-            to_date = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+            to_date = datetime.now(UTC).strftime("%Y-%m-%d")
         if not from_date:
             # 5-year window default (5 * 365 = 1825 days)
             from_date = (
-                datetime.now(timezone.utc) - timedelta(days=1825)
+                datetime.now(UTC) - timedelta(days=1825)
             ).strftime("%Y-%m-%d")
 
         logger.info(
@@ -97,7 +95,7 @@ class DhanHistoryDownloader:
 
     def sync_to_gcs(
         self, symbol: str, security_id: str, exchange_segment: str = "NSE_EQ"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Sync 5-year historical dataset to GCS data lake."""
         dataset = self.fetch_historical_candles(
             security_id=security_id,
@@ -118,7 +116,7 @@ class DhanHistoryDownloader:
             "total_candles": dataset["candles_count"],
             "dataset_sha256": dataset["sha256"],
             "gcs_uri": f"gs://{self.bucket_name}/{gcs_path}",
-            "synced_at_utc": datetime.now(timezone.utc).isoformat(),
+            "synced_at_utc": datetime.now(UTC).isoformat(),
         }
 
         logger.info(

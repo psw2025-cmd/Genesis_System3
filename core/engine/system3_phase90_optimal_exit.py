@@ -4,11 +4,10 @@ System3 Phase 90 - Optimal Exit Engine
 Assess quality of exit logic for trades.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -31,7 +30,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase90_optimal_exit.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def evaluate_exit_quality(row: pd.Series) -> Dict[str, Any]:
+def evaluate_exit_quality(row: pd.Series) -> dict[str, Any]:
     """Evaluate exit quality for a trade."""
     actual_pnl = row.get("pnl_pct", 0.0)
     best_case = row.get("max_fav_pct", 0.0)
@@ -136,14 +135,14 @@ def generate_markdown(df: pd.DataFrame) -> None:
             improvable_trades = df[df["exit_quality"].isin(["TOO_SOON", "TOO_LATE"])]
             if not improvable_trades.empty:
                 avg_improvable = improvable_trades["improvable_pnl_pct"].mean()
-                f.write(f"## Average Improvable PnL\n\n")
+                f.write("## Average Improvable PnL\n\n")
                 f.write(f"**Average improvable PnL % for improvable trades**: {avg_improvable:.2f}%\n\n")
 
 
 def main():
     """Main entry point."""
     try:
-        df = generate_exit_analysis()
+        generate_exit_analysis()
         print("\n[PH90] Exit quality evaluation complete.")
         return 0
     except Exception as e:

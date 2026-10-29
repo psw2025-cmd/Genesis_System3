@@ -2,14 +2,11 @@
 Utility functions for calculating additional option chain columns.
 """
 
-from datetime import datetime
-from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 
-def add_calculated_columns(df: pd.DataFrame, fetch_timestamp: Optional[str] = None) -> pd.DataFrame:
+def add_calculated_columns(df: pd.DataFrame, fetch_timestamp: str | None = None) -> pd.DataFrame:
     """
     Add calculated columns to option chain DataFrame.
 
@@ -151,7 +148,7 @@ def add_calculated_columns(df: pd.DataFrame, fetch_timestamp: Optional[str] = No
             # Clean up temporary column
             df = df.drop(columns=["expiry_date_dt"], errors="ignore")
 
-        except Exception as e:
+        except Exception:
             # If calculation fails, leave as None
             pass
 

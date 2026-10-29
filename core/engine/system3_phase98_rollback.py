@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -27,7 +27,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase98_rollback_plan.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def find_backup(backup_id: str) -> Optional[Dict[str, Any]]:
+def find_backup(backup_id: str) -> dict[str, Any] | None:
     """Find backup by ID or 'latest'."""
     if backup_id == "latest":
         if not MANIFEST_JSON.exists():

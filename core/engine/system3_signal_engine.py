@@ -17,7 +17,7 @@ Outputs to: storage/live/dhan_index_ai_signals.csv
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -28,9 +28,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from core.engine.ai_model import (
-    get_training_dataframe,
     predict_direction,
-    train_ml_model,
 )
 from core.engine.breakout_model import detect_breakouts
 from core.engine.entry_exit_engine import (
@@ -93,7 +91,7 @@ SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 def load_recent_signal_history(
     history_path: Path,
     max_rows: int = 5000,
-) -> Optional[pd.DataFrame]:
+) -> pd.DataFrame | None:
     """
     System3 AI upgrade: Load recent signal history from CSV.
 
@@ -141,7 +139,7 @@ def load_recent_signal_history(
 
 
 def compute_short_history_features(
-    history_df: Optional[pd.DataFrame],
+    history_df: pd.DataFrame | None,
     snapshot_df: pd.DataFrame,
     min_history_points: int = 5,
 ) -> pd.DataFrame:
@@ -176,9 +174,9 @@ def compute_short_history_features(
         errors="coerce",
     ).fillna(0.0)
 
-    short_return_map: Dict[Any, float] = {}
-    short_vol_map: Dict[Any, float] = {}
-    short_mom_map: Dict[Any, float] = {}
+    short_return_map: dict[Any, float] = {}
+    short_vol_map: dict[Any, float] = {}
+    short_mom_map: dict[Any, float] = {}
 
     grouped = df_hist.groupby(key_cols)
     for group_key, g in grouped:
@@ -613,7 +611,7 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
                         f"✓ USING_ENSEMBLE_PREDICTOR for {underlying} ({df['ensemble_model_count'].iloc[0]} models, method={df['ensemble_method'].iloc[0]})"
                     )
                 else:
-                    logger.warning(f"Ensemble prediction returned invalid results, falling back to Ultra/delta")
+                    logger.warning("Ensemble prediction returned invalid results, falling back to Ultra/delta")
             except Exception as e:
                 logger.warning(f"Ensemble prediction failed for {underlying}: {e}, falling back to Ultra/delta")
 
@@ -857,7 +855,7 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
 
             # Log confirmation statistics
             if "confirmation_score" in df.columns:
-                confirmed_count = (df["confirmed_signal"] == True).sum() if "confirmed_signal" in df.columns else 0
+                confirmed_count = (df["confirmed_signal"]).sum() if "confirmed_signal" in df.columns else 0
                 avg_confirmation = df["confirmation_score"].mean() if len(df) > 0 else 0.0
                 logger.info(
                     f"  Confirmed signals: {confirmed_count}/{len(df)}, avg confirmation score: {avg_confirmation:.3f}"
@@ -951,11 +949,11 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
 
         if buy_count + sell_count == 0:
             logger.warning(f"⚠️  NO ACTION SIGNALS: All {FINAL_ROW_COUNT} signals are HOLD")
-            logger.warning(f"   Check: Thresholds in generate_signals() are too strict")
+            logger.warning("   Check: Thresholds in generate_signals() are too strict")
         else:
             logger.info(f"✓ ACTION SIGNALS: {buy_count + sell_count} out of {FINAL_ROW_COUNT} are BUY/SELL")
     else:
-        logger.warning(f"⚠️  NO SIGNALS GENERATED: DataFrame is empty after processing")
+        logger.warning("⚠️  NO SIGNALS GENERATED: DataFrame is empty after processing")
 
     return df
 
@@ -1007,7 +1005,6 @@ def run_signal_engine(df_snap: pd.DataFrame, enable_safety_checks: bool = True) 
             try:
                 from core.validation.live_safety_guard import (
                     check_signal_safety,
-                    log_safety_trip,
                 )
 
                 # Group signals by underlying and check safety

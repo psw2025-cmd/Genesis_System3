@@ -11,7 +11,7 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -30,7 +30,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 ITERATIONS = 10  # Default iterations
 
 
-def simulate_live_loop_iteration() -> Dict[str, float]:
+def simulate_live_loop_iteration() -> dict[str, float]:
     """Simulate one live loop iteration and measure latencies."""
     metrics = {}
 
@@ -73,7 +73,7 @@ def simulate_live_loop_iteration() -> Dict[str, float]:
     return metrics
 
 
-def generate_latency_profile() -> Dict[str, Any]:
+def generate_latency_profile() -> dict[str, Any]:
     """Generate latency profile."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 81 - MICRO-LATENCY PROFILER")
@@ -127,7 +127,7 @@ def generate_latency_profile() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 81 - Latency Profile\n\n")
@@ -151,7 +151,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_latency_profile()
+        generate_latency_profile()
         print("\n[PH81] Latency profiling complete.")
         return 0
     except Exception as e:

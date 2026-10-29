@@ -15,11 +15,8 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 93
 """
 
-import json
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-import numpy as np
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
@@ -30,7 +27,6 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 from core.ultra.phase21_adaptive_risk_engine import AdaptiveRiskEngine
 from core.ultra.phase22_position_sizing import compute_position_size
 from core.ultra.phase23_volatility_impact import compute_volatility_regime
-from core.ultra.phase24_confidence_drift import analyze_confidence_drift
 from core.ultra.phase25_stoploss_engine import compute_stoploss
 from core.ultra.phase26_target_engine import compute_target
 from core.ultra.phase27_rr_balancer import balance_risk_reward
@@ -50,12 +46,12 @@ class RealTimeCalibrationEngine:
         volatility: float,
         confidence: float,
         score: float,
-        market_regime: Optional[str] = None,
-        underlying: Optional[str] = None,
+        market_regime: str | None = None,
+        underlying: str | None = None,
         drift_strength: float = 0.0,
-        drift_direction: Optional[str] = None,
-        premium_behavior: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        drift_direction: str | None = None,
+        premium_behavior: str | None = None,
+    ) -> dict[str, Any]:
         """
         Perform real-time calibration of all parameters.
 

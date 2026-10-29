@@ -18,13 +18,12 @@ Config: storage/config/dhan_blended_training_v3_config.json (optional)
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import joblib
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -44,7 +43,7 @@ BLENDED_MODELS_DIR.mkdir(parents=True, exist_ok=True)
 CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load training config or use defaults."""
     defaults = {
         "max_synthetic_rows_per_underlying": 600,
@@ -63,7 +62,7 @@ def load_config() -> Dict[str, Any]:
     return defaults
 
 
-def load_training_data(config: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
+def load_training_data(config: dict[str, Any]) -> dict[str, pd.DataFrame]:
     """
     Load and combine synthetic + real data per underlying.
 
@@ -141,8 +140,8 @@ def load_training_data(config: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
 
 def prepare_features_labels(
     df: pd.DataFrame,
-    selected_features: Optional[List[str]] = None,
-) -> tuple[Optional[pd.DataFrame], Optional[pd.Series], Optional[List[str]]]:
+    selected_features: list[str] | None = None,
+) -> tuple[pd.DataFrame | None, pd.Series | None, list[str] | None]:
     """Prepare features and labels from DataFrame."""
     if df.empty:
         return None, None, None
@@ -221,8 +220,8 @@ def prepare_features_labels(
 def train_model_for_underlying(
     underlying: str,
     df: pd.DataFrame,
-    config: Dict[str, Any],
-) -> Dict[str, Any]:
+    config: dict[str, Any],
+) -> dict[str, Any]:
     """Train blended model for one underlying."""
     print(f"\n[TRAIN] {underlying}...")
 

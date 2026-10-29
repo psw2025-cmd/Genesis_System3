@@ -13,7 +13,6 @@ Menu Option: 97
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -26,7 +25,7 @@ ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 LIVE_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _load_latest_signals() -> Optional[pd.DataFrame]:
+def _load_latest_signals() -> pd.DataFrame | None:
     """Load latest signals CSV."""
     signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
     if not signals_csv.exists():
@@ -44,7 +43,7 @@ def _load_latest_signals() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_ultra_decisions() -> Optional[pd.DataFrame]:
+def _load_ultra_decisions() -> pd.DataFrame | None:
     """Load Ultra fused decisions."""
     ultra_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if not ultra_csv.exists():
@@ -179,7 +178,7 @@ def main() -> None:
         print(f"[PHASE 34][ERROR] {e}")
         error_path = ULTRA_DIR / "phase34_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 34 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 34 Error\n\n{e!s}\n")
         print(f"[PHASE 34] Error details saved to: {error_path}")
 
 

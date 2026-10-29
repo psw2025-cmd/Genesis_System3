@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -52,7 +52,7 @@ PHASE_CATALOG = {
 }
 
 
-def run_phase146_index_catalog() -> Dict[str, Any]:
+def run_phase146_index_catalog() -> dict[str, Any]:
     """
     Generate phase index catalog.
 

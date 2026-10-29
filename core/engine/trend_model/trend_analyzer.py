@@ -2,7 +2,6 @@
 Trend Analyzer - Compute RSI, MACD, VWAP, SuperTrend, multi-timeframe trends
 """
 
-from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
@@ -22,7 +21,7 @@ def compute_rsi(prices: pd.Series, period: int = 14) -> pd.Series:
     return rsi.fillna(50.0)
 
 
-def compute_macd(prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> Dict[str, pd.Series]:
+def compute_macd(prices: pd.Series, fast: int = 12, slow: int = 26, signal: int = 9) -> dict[str, pd.Series]:
     """Compute MACD (Moving Average Convergence Divergence)."""
     if len(prices) < slow:
         return {
@@ -49,7 +48,7 @@ def compute_vwap(prices: pd.Series, volumes: pd.Series = None) -> pd.Series:
     return vwap.fillna(prices.mean())
 
 
-def compute_supertrend(prices: pd.Series, period: int = 10, multiplier: float = 3.0) -> Dict[str, pd.Series]:
+def compute_supertrend(prices: pd.Series, period: int = 10, multiplier: float = 3.0) -> dict[str, pd.Series]:
     """Compute SuperTrend indicator."""
     if len(prices) < period:
         return {"supertrend": prices, "direction": pd.Series([1] * len(prices), index=prices.index)}

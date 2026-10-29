@@ -9,9 +9,8 @@ Provides a self-test endpoint for the signal engine that validates:
 
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 # Ensure project root is in path
@@ -53,7 +52,7 @@ def create_test_snapshot() -> pd.DataFrame:
     return pd.DataFrame(test_data)
 
 
-def run_self_test() -> Dict[str, Any]:
+def run_self_test() -> dict[str, Any]:
     """
     Run self-test on signal engine.
 
@@ -111,7 +110,7 @@ def run_self_test() -> Dict[str, Any]:
                     results["status"] = "FAIL"
                 else:
                     results["checks"]["required_columns_present"] = True
-                    print(f"   ✅ Required columns present")
+                    print("   ✅ Required columns present")
 
                     # Check signal distribution
                     if "signal" in processed_df.columns:

@@ -9,7 +9,6 @@ Supports both column layouts:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -111,7 +110,7 @@ def dataframe_from_dhan_csv(df: pd.DataFrame, derivatives_only: bool = True) -> 
     )
 
 
-def resolve_master_csv() -> Optional[Path]:
+def resolve_master_csv() -> Path | None:
     for path in (SYNCED_DETAILED, SYNCED_COMPACT, BUNDLED_CSV):
         if path.exists() and path.stat().st_size > 1000:
             return path

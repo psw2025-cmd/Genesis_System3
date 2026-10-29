@@ -8,8 +8,8 @@ Never logs or returns raw secret values except as the function's return value.
 from __future__ import annotations
 
 import os
+from collections.abc import Callable
 from functools import lru_cache
-from typing import Callable
 
 _CLIENT_FACTORY: Callable[[], object] | None = None
 
@@ -64,7 +64,7 @@ def load_secret(env_var: str, secret_id: str | None = None, *, version: str = "l
         name = f"projects/{_project_id()}/secrets/{resolved_secret_id}/versions/{version}"
         response = client.access_secret_version(request={"name": name})
         value = response.payload.data.decode("utf-8").strip()
-    except Exception as exc:  # noqa: BLE001 - surfaced as SecretNotFoundError below
+    except Exception as exc:
         raise SecretNotFoundError(
             f"{env_var} not set and Secret Manager lookup for '{resolved_secret_id}' failed: {exc}"
         ) from exc

@@ -25,7 +25,7 @@ def add_advanced_features(df: pd.DataFrame) -> pd.DataFrame:
     spot_chg = out.get("spot_chg_1_pct")
     ltp_std = out.get("ltp_roll_std_5")
     spot_std = out.get("spot_roll_std_5")
-    ce_pe_ratio = out.get("ce_pe_ratio")
+    out.get("ce_pe_ratio")
 
     spot_safe = spot.astype(float) if spot is not None else None
     ltp_safe = ltp.astype(float) if ltp is not None else None

@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -44,7 +44,7 @@ def resolve_conflicts(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def run_phase372(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase372(context: dict[str, Any] = None) -> dict[str, Any]:
     """Execute Phase 372: Signal Conflict Resolver."""
     logger.info("=== Phase 372: Signal Conflict Resolver ===")
 

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -36,7 +36,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 LATENCY_THRESHOLD_MS = 500.0  # 500ms threshold
 
 
-def load_data() -> Dict[str, pd.DataFrame]:
+def load_data() -> dict[str, pd.DataFrame]:
     """Load trade plan and PnL data."""
     data = {}
 
@@ -61,7 +61,7 @@ def load_data() -> Dict[str, pd.DataFrame]:
     return data
 
 
-def compute_latency_ms(snapshot_ts: str, decision_ts: str) -> Optional[float]:
+def compute_latency_ms(snapshot_ts: str, decision_ts: str) -> float | None:
     """Compute latency in milliseconds between two timestamps."""
     try:
         snapshot_dt = date_parser.parse(snapshot_ts)
@@ -72,7 +72,7 @@ def compute_latency_ms(snapshot_ts: str, decision_ts: str) -> Optional[float]:
         return None
 
 
-def analyze_latency() -> Dict[str, Any]:
+def analyze_latency() -> dict[str, Any]:
     """Analyze tick-to-trade latency."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 83 - TICK-TO-TRADE LATENCY MONITOR")
@@ -160,7 +160,7 @@ def analyze_latency() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 83 - Tick-to-Trade Latency Report\n\n")
@@ -198,7 +198,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = analyze_latency()
+        analyze_latency()
         print("\n[PH83] Tick-to-trade latency analysis complete.")
         return 0
     except Exception as e:

@@ -1,0 +1,5 @@
+﻿C:\Genesis_System3\dashboard\backend\security_policy.py:131:        "PUBLIC_DASHBOARD_READ_ONLY",
+C:\Genesis_System3\dashboard\backend\secure_app.py:98:        "PUBLIC_DASHBOARD_READ_ONLY",
+C:\Genesis_System3\tests\test_security_policy.py:37:                self.assertEqual(decision.code, "PUBLIC_DASHBOARD_READ_ONLY")
+C:\Genesis_System3\tests\test_security_policy.py:115:        self.assertEqual(decision.code, "PUBLIC_DASHBOARD_READ_ONLY")
+C:\Genesis_System3\tests\test_secure_app_contract.py:20:        self.assertIn("PUBLIC_DASHBOARD_READ_ONLY", source)

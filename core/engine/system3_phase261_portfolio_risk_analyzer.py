@@ -8,9 +8,8 @@ Computes position concentration, correlation risk, and overall portfolio exposur
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_portfolio_risk_analysis.md"
 
 
-def run_phase261(**kwargs) -> Dict[str, Any]:
+def run_phase261(**kwargs) -> dict[str, Any]:
     """
     Run Phase 261: Portfolio Risk Analyzer.
 

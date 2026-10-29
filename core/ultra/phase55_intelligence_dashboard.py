@@ -13,9 +13,8 @@ Menu Option: 117
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -24,7 +23,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_phase_outputs() -> Dict[str, Any]:
+def load_phase_outputs() -> dict[str, Any]:
     """Load outputs from all Ultra phases."""
     outputs = {}
 
@@ -145,7 +144,7 @@ def load_phase_outputs() -> Dict[str, Any]:
     return outputs
 
 
-def generate_dashboard(phase_outputs: Dict[str, Any]) -> str:
+def generate_dashboard(phase_outputs: dict[str, Any]) -> str:
     """Generate comprehensive dashboard markdown."""
     md_parts = [
         "# System3 Ultra Intelligence Dashboard\n\n",
@@ -263,9 +262,9 @@ def run_phase55_intelligence_dashboard() -> None:
     print(f"[SAVE] Dashboard data saved to: {dashboard_data_json}")
 
     # Summary
-    print(f"\n=== INTELLIGENCE DASHBOARD SUMMARY ===")
+    print("\n=== INTELLIGENCE DASHBOARD SUMMARY ===")
     print(f"Phases aggregated: {len(phase_outputs)}")
-    print(f"\nPhase Status:")
+    print("\nPhase Status:")
     for phase_name, phase_data in phase_outputs.items():
         print(f"  {phase_name}: ✅ Data available")
 

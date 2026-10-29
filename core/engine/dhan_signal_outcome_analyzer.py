@@ -7,7 +7,7 @@ AUTO-UPDATE: DISABLED - Only analyzes and reports.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -18,7 +18,7 @@ REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def analyze_signal_vs_outcome() -> Dict[str, Any]:
+def analyze_signal_vs_outcome() -> dict[str, Any]:
     """
     Analyze signal quality vs actual outcomes.
 
@@ -53,7 +53,7 @@ def analyze_signal_vs_outcome() -> Dict[str, Any]:
     }
 
 
-def _analyze_pnl_by_confidence(df: pd.DataFrame) -> Dict[str, Any]:
+def _analyze_pnl_by_confidence(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze PnL by confidence buckets."""
     if "signal_confidence" not in df.columns or "pnl_pct" not in df.columns:
         return {}
@@ -78,7 +78,7 @@ def _analyze_pnl_by_confidence(df: pd.DataFrame) -> Dict[str, Any]:
     return bucket_stats
 
 
-def _analyze_pnl_by_score(df: pd.DataFrame) -> Dict[str, Any]:
+def _analyze_pnl_by_score(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze PnL by score buckets."""
     if "score" not in df.columns or "pnl_pct" not in df.columns:
         return {}
@@ -103,7 +103,7 @@ def _analyze_pnl_by_score(df: pd.DataFrame) -> Dict[str, Any]:
     return bucket_stats
 
 
-def _analyze_pnl_by_moneyness(df: pd.DataFrame) -> Dict[str, Any]:
+def _analyze_pnl_by_moneyness(df: pd.DataFrame) -> dict[str, Any]:
     """Analyze PnL by moneyness/ATM distance."""
     # Simplified: use strike vs entry price as proxy
     if "strike" not in df.columns or "entry_price" not in df.columns or "pnl_pct" not in df.columns:
@@ -131,7 +131,7 @@ def _analyze_pnl_by_moneyness(df: pd.DataFrame) -> Dict[str, Any]:
     return bucket_stats
 
 
-def _build_confusion_table(df: pd.DataFrame) -> Dict[str, Any]:
+def _build_confusion_table(df: pd.DataFrame) -> dict[str, Any]:
     """Build confusion-like table: signal vs actual direction."""
     if "pnl_pct" not in df.columns:
         return {}
@@ -156,7 +156,7 @@ def _build_confusion_table(df: pd.DataFrame) -> Dict[str, Any]:
     return confusion
 
 
-def save_analysis_report(analysis: Dict[str, Any]) -> Path:
+def save_analysis_report(analysis: dict[str, Any]) -> Path:
     """
     Save analysis report to CSV.
 

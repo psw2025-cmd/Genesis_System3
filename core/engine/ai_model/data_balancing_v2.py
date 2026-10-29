@@ -14,9 +14,8 @@ Date: 2025-12-08
 """
 
 import logging
-from typing import Any, Dict, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 # Configure logging
@@ -61,18 +60,18 @@ def load_engineered_features(path: str) -> pd.DataFrame:
         if "signal" not in df.columns:
             raise ValueError("Required column 'signal' not found in input CSV")
 
-        logger.info(f"✓ Input validation passed (signal column present)")
+        logger.info("✓ Input validation passed (signal column present)")
         return df
 
     except FileNotFoundError:
         logger.error(f"✗ File not found: {path}")
         raise
     except Exception as e:
-        logger.error(f"✗ Error loading CSV: {str(e)}")
+        logger.error(f"✗ Error loading CSV: {e!s}")
         raise
 
 
-def balance_multiclass_signals(df: pd.DataFrame, label_col: str = "signal") -> Tuple[pd.DataFrame, Dict[str, Any]]:
+def balance_multiclass_signals(df: pd.DataFrame, label_col: str = "signal") -> tuple[pd.DataFrame, dict[str, Any]]:
     """
     Balance multiclass signals using SMOTE or upsampling.
 
@@ -160,7 +159,7 @@ def balance_multiclass_signals(df: pd.DataFrame, label_col: str = "signal") -> T
     }
 
     logger.info(f"\n{'='*70}")
-    logger.info(f"BALANCING COMPLETE")
+    logger.info("BALANCING COMPLETE")
     logger.info(f"  Method: {method}")
     logger.info(f"  Rows added: {output_total - filtered_count}")
     logger.info(f"  Synthetic samples: {synthetic_count}")
@@ -169,7 +168,7 @@ def balance_multiclass_signals(df: pd.DataFrame, label_col: str = "signal") -> T
     return df_balanced, metrics
 
 
-def _balance_with_smote(X: pd.DataFrame, y: pd.Series, label_col: str) -> Tuple[pd.DataFrame, int]:
+def _balance_with_smote(X: pd.DataFrame, y: pd.Series, label_col: str) -> tuple[pd.DataFrame, int]:
     """
     Apply SMOTE oversampling to balance classes.
 
@@ -206,12 +205,12 @@ def _balance_with_smote(X: pd.DataFrame, y: pd.Series, label_col: str) -> Tuple[
         return X_smote_df, synthetic_count
 
     except Exception as e:
-        logger.error(f"✗ SMOTE failed: {str(e)}")
+        logger.error(f"✗ SMOTE failed: {e!s}")
         logger.info("  Falling back to upsampling...")
         return _balance_with_upsampling(X, y, label_col)
 
 
-def _balance_with_upsampling(X: pd.DataFrame, y: pd.Series, label_col: str) -> Tuple[pd.DataFrame, int]:
+def _balance_with_upsampling(X: pd.DataFrame, y: pd.Series, label_col: str) -> tuple[pd.DataFrame, int]:
     """
     Fallback: Simple class-based upsampling to balance classes.
 

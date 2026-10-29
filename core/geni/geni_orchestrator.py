@@ -7,13 +7,11 @@ High-level coordinator for GENI operations.
 import json
 import subprocess
 from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 from .geni_config import (
     AUTO_EXECUTE_REAL_TRADES,
     AUTO_PROMOTE_MODELS,
-    AUTO_UPDATE_CONFIGS,
     GENI_LAST_RUN_JSON,
     GENI_LAST_RUN_MD,
     GENI_ULTRA_LIVE_MODE,
@@ -21,12 +19,12 @@ from .geni_config import (
     PROJECT_ROOT,
     validate_paths,
 )
-from .geni_state import GeniState, load_state, save_state
-from .geni_tasks import get_all_tasks, get_task
-from .geni_validator import ValidationResult, run_full_validation, run_quick_validation
+from .geni_state import load_state, save_state
+from .geni_tasks import get_task
+from .geni_validator import run_full_validation, run_quick_validation
 
 
-def _run_task(task_name: str) -> Dict[str, Any]:
+def _run_task(task_name: str) -> dict[str, Any]:
     """
     Run a registered task.
 
@@ -72,7 +70,7 @@ def _run_task(task_name: str) -> Dict[str, Any]:
         }
 
 
-def _write_summary(mode: str, results: Dict[str, Any]) -> None:
+def _write_summary(mode: str, results: dict[str, Any]) -> None:
     """
     Write summary JSON and MD files.
 
@@ -152,7 +150,7 @@ def run_geni_master(mode: str = "status") -> int:
     if path_warnings:
         state.pending_issues.extend(path_warnings)
 
-    results: Dict[str, Any] = {
+    results: dict[str, Any] = {
         "success": True,
         "warnings": path_warnings.copy(),
     }

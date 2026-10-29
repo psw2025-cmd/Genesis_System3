@@ -7,7 +7,7 @@ AUTO-UPDATE: DISABLED - Only logs, never modifies configs.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -30,7 +30,7 @@ def log_trade_outcome(
     reason_exit: str,
     signal_confidence: float,
     score: float,
-    thresholds_used: Dict[str, float],
+    thresholds_used: dict[str, float],
     regime: str,
     model_version: str,
     snapshot_index: int,
@@ -109,7 +109,7 @@ def load_outcomes() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def get_outcome_summary() -> Dict[str, Any]:
+def get_outcome_summary() -> dict[str, Any]:
     """
     Get summary statistics from outcomes.
 

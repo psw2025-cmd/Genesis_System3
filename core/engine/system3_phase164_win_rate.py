@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase164_win_rate.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase164_win_rate_report.md"
 
 
-def run_phase164_win_rate() -> Dict[str, Any]:
+def run_phase164_win_rate() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["underlying", "win_rate_pct", "total_trades", "winning_trades"])
@@ -37,7 +37,7 @@ def run_phase164_win_rate() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase164: Win Rate Analysis")
+    print("Phase164: Win Rate Analysis")
     result = run_phase164_win_rate()
     return 0 if result["status"] == "OK" else 1
 

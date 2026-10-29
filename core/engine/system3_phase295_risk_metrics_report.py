@@ -7,7 +7,7 @@ Generates comprehensive risk metrics report.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_risk_metrics_report.md"
 
 
-def run_phase295(**kwargs) -> Dict[str, Any]:
+def run_phase295(**kwargs) -> dict[str, Any]:
     """Run Phase 295: Risk Metrics Report."""
     errors = []
 

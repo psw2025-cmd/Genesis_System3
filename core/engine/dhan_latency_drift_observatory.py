@@ -7,11 +7,10 @@ SAFE MODE ONLY - Read-only observation.
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -23,7 +22,7 @@ ULTRA_OBS_DIR = REPORTS_DIR / "ultra_obs"
 ULTRA_OBS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def analyze_latency_drift() -> Dict[str, Any]:
+def analyze_latency_drift() -> dict[str, Any]:
     """
     Analyze latency and drift in signals.
 
@@ -149,7 +148,7 @@ def _classify_drift_severity(drift_ratio: float) -> str:
         return "LOW"
 
 
-def save_latency_drift_analysis(analysis: Dict[str, Any]) -> Path:
+def save_latency_drift_analysis(analysis: dict[str, Any]) -> Path:
     """
     Save latency/drift analysis to JSON.
 
@@ -202,7 +201,7 @@ def main() -> None:
             print("\n=== CONFIDENCE DRIFT ===")
             conf_drift = analysis["confidence_drift"]
             if conf_drift.get("detected"):
-                print(f"⚠️  Confidence Drift Detected")
+                print("⚠️  Confidence Drift Detected")
                 print(f"   Drift Ratio: {conf_drift['drift_ratio']:.3f}")
             else:
                 print("✅ No significant confidence drift detected")

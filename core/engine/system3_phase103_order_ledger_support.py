@@ -8,7 +8,7 @@ Bridges Phase 102 (schema definition) and Phase 104 (order construction).
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -63,7 +63,7 @@ def log_message(message: str) -> None:
         print(f"Warning: Could not write to log file: {e}")
 
 
-def validate_ledger_schema() -> Tuple[bool, str]:
+def validate_ledger_schema() -> tuple[bool, str]:
     """
     Validate that ledger CSV exists and has correct schema.
 
@@ -95,12 +95,12 @@ def validate_ledger_schema() -> Tuple[bool, str]:
         return True, "Schema validation passed"
 
     except Exception as e:
-        error_msg = f"Schema validation error: {str(e)}"
+        error_msg = f"Schema validation error: {e!s}"
         log_message(error_msg)
         return False, error_msg
 
 
-def initialize_ledger() -> Tuple[bool, str]:
+def initialize_ledger() -> tuple[bool, str]:
     """
     Initialize ledger CSV if it doesn't exist.
 
@@ -120,12 +120,12 @@ def initialize_ledger() -> Tuple[bool, str]:
         return True, msg
 
     except Exception as e:
-        error_msg = f"Ledger initialization failed: {str(e)}"
+        error_msg = f"Ledger initialization failed: {e!s}"
         log_message(error_msg)
         return False, error_msg
 
 
-def check_ledger_integrity() -> Tuple[bool, List[str]]:
+def check_ledger_integrity() -> tuple[bool, list[str]]:
     """
     Perform basic integrity checks on ledger data.
 
@@ -173,13 +173,13 @@ def check_ledger_integrity() -> Tuple[bool, List[str]]:
             return True, []
 
     except Exception as e:
-        error_msg = f"Integrity check error: {str(e)}"
+        error_msg = f"Integrity check error: {e!s}"
         issues.append(error_msg)
         log_message(error_msg)
         return False, issues
 
 
-def run_phase103() -> Dict[str, Any]:
+def run_phase103() -> dict[str, Any]:
     """
     Execute Phase 103: Order Ledger Support.
 
@@ -261,7 +261,7 @@ def run_phase103() -> Dict[str, Any]:
         return {"phase": 103, "status": status, "details": details, "outputs": outputs, "errors": errors}
 
     except Exception as e:
-        error_msg = f"Phase 103 unexpected error: {str(e)}"
+        error_msg = f"Phase 103 unexpected error: {e!s}"
         errors.append(error_msg)
         log_message(error_msg)
 

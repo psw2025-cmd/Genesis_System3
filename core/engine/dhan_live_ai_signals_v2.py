@@ -7,7 +7,7 @@ compatibility with existing code.
 
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -87,7 +87,7 @@ def run_once_with_snapshot(df_snap: pd.DataFrame, use_new_engine: bool = True) -
 
 
 # Maintain compatibility with existing code
-def predict_for_snapshot_df(df_snap: pd.DataFrame, models: Dict[str, Dict[str, Any]] = None) -> pd.DataFrame:
+def predict_for_snapshot_df(df_snap: pd.DataFrame, models: dict[str, dict[str, Any]] = None) -> pd.DataFrame:
     """
     Compatibility wrapper - uses new engine by default.
     """

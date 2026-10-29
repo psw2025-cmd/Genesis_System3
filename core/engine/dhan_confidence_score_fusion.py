@@ -4,16 +4,14 @@ Dhan Index Options - Confidence-Score Fusion Layer
 Fuses confidence and score into unified signal strength metric.
 """
 
-from typing import Any, Dict
 
-import numpy as np
 import pandas as pd
 
 
 def fuse_confidence_score(
     confidence: float,
     score: float,
-    weights: Dict[str, float] | None = None,
+    weights: dict[str, float] | None = None,
 ) -> float:
     """
     Fuse confidence and score into single metric.

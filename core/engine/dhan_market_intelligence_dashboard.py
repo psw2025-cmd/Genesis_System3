@@ -4,12 +4,11 @@ Dhan Index Options - Market Intelligence Dashboard
 Combines all market intelligence modules into unified dashboard.
 """
 
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 
-from core.engine.dhan_breakout_predictor import detect_breakout_signal, predict_breakout
+from core.engine.dhan_breakout_predictor import predict_breakout
 from core.engine.dhan_iv_estimator import refine_iv_estimate
 from core.engine.dhan_microtrend_recognizer import (
     classify_trend_direction,

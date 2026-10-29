@@ -14,7 +14,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -70,12 +70,12 @@ def calculate_optimal_position_size(
     confidence: float,
     iv: float,
     capital: float = 100000.0,
-    win_rate: Optional[float] = None,
-    avg_win_pct: Optional[float] = None,
-    avg_loss_pct: Optional[float] = None,
-    atr: Optional[float] = None,
-    spot: Optional[float] = None,
-) -> Dict[str, Any]:
+    win_rate: float | None = None,
+    avg_win_pct: float | None = None,
+    avg_loss_pct: float | None = None,
+    atr: float | None = None,
+    spot: float | None = None,
+) -> dict[str, Any]:
     """
     Calculate optimal position size using Kelly Criterion and multiple methods.
 
@@ -148,7 +148,7 @@ def calculate_optimal_position_size(
     }
 
 
-def run_phase275(**kwargs) -> Dict[str, Any]:
+def run_phase275(**kwargs) -> dict[str, Any]:
     """Run Phase 275: Position Sizing Optimizer (UPGRADED with Kelly Criterion)."""
     errors = []
 

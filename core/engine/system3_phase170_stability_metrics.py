@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase170_stability_metrics.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase170_stability_metrics_report.md"
 
 
-def run_phase170_stability_metrics() -> Dict[str, Any]:
+def run_phase170_stability_metrics() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["metric_name", "value", "stability_score", "trend"])
@@ -37,7 +37,7 @@ def run_phase170_stability_metrics() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase170: Stability Metrics Summary")
+    print("Phase170: Stability Metrics Summary")
     result = run_phase170_stability_metrics()
     return 0 if result["status"] == "OK" else 1
 

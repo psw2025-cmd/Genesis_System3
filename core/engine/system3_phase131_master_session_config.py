@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -38,7 +38,7 @@ SAFE_DEFAULTS = {
 }
 
 
-def run_phase131_master_session_config(mode: str = "ANGEL_ONLY") -> Dict[str, Any]:
+def run_phase131_master_session_config(mode: str = "ANGEL_ONLY") -> dict[str, Any]:
     """
     Build master session configuration.
 

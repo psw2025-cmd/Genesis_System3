@@ -5,7 +5,7 @@ Enhanced validation of complete trade lifecycle.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -13,7 +13,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 LIFECYCLE_LOG_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_trade_lifecycle_log.csv"
 
 
-def validate_trade_lifecycle(trade_id: str, lifecycle_log: pd.DataFrame) -> Dict[str, Any]:
+def validate_trade_lifecycle(trade_id: str, lifecycle_log: pd.DataFrame) -> dict[str, Any]:
     """
     Validate complete trade lifecycle.
 
@@ -64,7 +64,7 @@ def validate_trade_lifecycle(trade_id: str, lifecycle_log: pd.DataFrame) -> Dict
     }
 
 
-def check_lifecycle_completeness(events: List[str]) -> bool:
+def check_lifecycle_completeness(events: list[str]) -> bool:
     """
     Check if lifecycle is complete.
 
@@ -78,7 +78,7 @@ def check_lifecycle_completeness(events: List[str]) -> bool:
     return all(e in events for e in required)
 
 
-def detect_lifecycle_anomalies(trade_row: pd.Series) -> List[str]:
+def detect_lifecycle_anomalies(trade_row: pd.Series) -> list[str]:
     """
     Detect anomalies in trade lifecycle.
 
@@ -103,7 +103,6 @@ def detect_lifecycle_anomalies(trade_row: pd.Series) -> List[str]:
     # Check timestamp
     if "ts" in trade_row.index:
         try:
-            from datetime import datetime
 
             ts = pd.to_datetime(trade_row["ts"])
             if ts > pd.Timestamp.now():

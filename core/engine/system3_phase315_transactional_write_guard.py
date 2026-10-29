@@ -9,7 +9,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -40,7 +40,7 @@ EXPECTED_COLUMNS = {
 }
 
 
-def validate_csv(file_path: Path, expected_cols: List[str]) -> tuple[bool, List[str]]:
+def validate_csv(file_path: Path, expected_cols: list[str]) -> tuple[bool, list[str]]:
     """
     Validate CSV file structure.
 
@@ -72,11 +72,11 @@ def validate_csv(file_path: Path, expected_cols: List[str]) -> tuple[bool, List[
         return len(validation_errors) == 0, validation_errors
 
     except Exception as e:
-        validation_errors.append(f"Failed to load CSV: {str(e)}")
+        validation_errors.append(f"Failed to load CSV: {e!s}")
         return False, validation_errors
 
 
-def transactional_write_csv(df: pd.DataFrame, target_path: Path, expected_cols: List[str]) -> tuple[bool, str]:
+def transactional_write_csv(df: pd.DataFrame, target_path: Path, expected_cols: list[str]) -> tuple[bool, str]:
     """
     Write CSV with transactional semantics.
 
@@ -112,7 +112,7 @@ def transactional_write_csv(df: pd.DataFrame, target_path: Path, expected_cols: 
         return False, str(e)
 
 
-def run_phase315(**kwargs) -> Dict[str, Any]:
+def run_phase315(**kwargs) -> dict[str, Any]:
     """
     Run Phase 315: Transactional Write Guard
 
@@ -188,7 +188,7 @@ def run_phase315(**kwargs) -> Dict[str, Any]:
         return {
             "phase": 315,
             "status": "ERROR",
-            "details": f"Phase 315 failed: {str(e)}",
+            "details": f"Phase 315 failed: {e!s}",
             "outputs": outputs,
             "errors": [str(e)],
         }

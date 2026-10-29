@@ -127,7 +127,7 @@ def main():
         df_sample = df_u.sample(n=n_rows, random_state=42).copy()
 
         X = df_sample[feature_cols_final].astype(float)
-        y_true = df_sample.get("label", pd.Series([""] * len(df_sample))).astype(str)
+        df_sample.get("label", pd.Series([""] * len(df_sample))).astype(str)
 
         y_pred_int = model.predict(X)
         if hasattr(model, "predict_proba"):

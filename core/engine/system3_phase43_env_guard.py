@@ -14,7 +14,7 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -45,7 +45,7 @@ def _log(message: str) -> None:
         print(f"[Phase43][WARN] Failed to write log: {e}")
 
 
-def load_env_config() -> Dict[str, Any]:
+def load_env_config() -> dict[str, Any]:
     """Load or create environment config."""
     default_config = {"dhan_system3_enabled": True, "binance_system3_enabled": False}
 
@@ -67,12 +67,12 @@ def load_env_config() -> Dict[str, Any]:
         return default_config
 
 
-def check_dhan_env_vars() -> Dict[str, Any]:
+def check_dhan_env_vars() -> dict[str, Any]:
     """Check Angel environment variables."""
     result = {"present": [], "missing": [], "status": "PASS"}
 
     for var in ANGEL_ENV_VARS:
-        if var in os.environ and os.environ[var]:
+        if os.environ.get(var):
             result["present"].append(var)
         else:
             result["missing"].append(var)
@@ -83,12 +83,12 @@ def check_dhan_env_vars() -> Dict[str, Any]:
     return result
 
 
-def check_binance_env_vars() -> Dict[str, Any]:
+def check_binance_env_vars() -> dict[str, Any]:
     """Check Binance environment variables."""
     result = {"present": [], "missing": [], "status": "PASS"}
 
     for var in BINANCE_ENV_VARS:
-        if var in os.environ and os.environ[var]:
+        if os.environ.get(var):
             result["present"].append(var)
         else:
             result["missing"].append(var)
@@ -96,7 +96,7 @@ def check_binance_env_vars() -> Dict[str, Any]:
     return result
 
 
-def check_code_imports() -> Dict[str, Any]:
+def check_code_imports() -> dict[str, Any]:
     """Check for obvious mixed broker usage in code."""
     result = {"binance_imports_found": False, "status": "PASS"}
 
@@ -210,7 +210,7 @@ def run_phase43_env_guard() -> None:
 
     _log(f"Report written to {report_file}")
 
-    print(f"\n[OK] Phase 43 Environment Guard completed")
+    print("\n[OK] Phase 43 Environment Guard completed")
     print(f"[SAVE] Report: {report_file}")
     print(f"\n[STATUS] Overall: {overall_status}")
 

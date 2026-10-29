@@ -6,12 +6,9 @@ Tasks reference existing scripts and validators.
 """
 
 from dataclasses import dataclass
-from pathlib import Path
-from typing import List, Optional
 
 from .geni_config import (
     FULL_VERIFICATION,
-    PROJECT_ROOT,
     SYSTEM3_ULTRA_ENTRY,
     ULTRA_DAILY_RUNNER,
     ULTRA_VALIDATION,
@@ -24,8 +21,8 @@ class GeniTask:
 
     name: str
     description: str
-    command_line: List[str]
-    expected_logs: List[str]
+    command_line: list[str]
+    expected_logs: list[str]
     estimated_runtime_sec: int
 
 
@@ -86,7 +83,7 @@ def get_all_tasks() -> dict[str, GeniTask]:
     return _TASKS.copy()
 
 
-def get_task(name: str) -> Optional[GeniTask]:
+def get_task(name: str) -> GeniTask | None:
     """
     Get a specific task by name.
 

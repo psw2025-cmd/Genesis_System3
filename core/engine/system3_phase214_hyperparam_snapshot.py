@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -25,7 +25,7 @@ REPORT_PATH = LOG_DIR / "system3_hyperparam_history.md"
 MODELS_DIR = PROJECT_ROOT / "core" / "models"
 
 
-def run_phase214(**kwargs) -> Dict[str, Any]:
+def run_phase214(**kwargs) -> dict[str, Any]:
     """
     Run Phase 214: Model Hyperparameter Snapshotter.
 

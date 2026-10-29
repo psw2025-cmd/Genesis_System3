@@ -11,9 +11,8 @@ import logging
 from collections import Counter
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
-import joblib
 import numpy as np
 import pandas as pd
 
@@ -73,7 +72,7 @@ def _get_loader_logger() -> logging.Logger:
     return loader_logger
 
 
-def load_training_data(path: Path, min_samples: int = MIN_TRAINING_SAMPLES) -> Optional[pd.DataFrame]:
+def load_training_data(path: Path, min_samples: int = MIN_TRAINING_SAMPLES) -> pd.DataFrame | None:
     """
     Robust loader for training history CSV.
 
@@ -136,7 +135,7 @@ def load_training_data(path: Path, min_samples: int = MIN_TRAINING_SAMPLES) -> O
         return None
 
 
-def get_training_dataframe(prefer_curated: bool = True) -> Optional[pd.DataFrame]:
+def get_training_dataframe(prefer_curated: bool = True) -> pd.DataFrame | None:
     """
     Select an appropriate DataFrame for ML training.
 
@@ -255,7 +254,7 @@ def prepare_features_for_ml(df: pd.DataFrame) -> pd.DataFrame:
 
 def train_ml_model(
     df: pd.DataFrame, model_type: str = "xgboost", target_col: str = "direction", days_back: int = 30
-) -> Optional[Any]:
+) -> Any | None:
     """
     Train ML model (XGBoost or RandomForest) on historical data.
 

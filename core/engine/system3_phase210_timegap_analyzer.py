@@ -5,9 +5,9 @@ Detects gaps in historical data timestamps.
 """
 
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -27,7 +27,7 @@ SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 GAP_THRESHOLD_MINUTES = 2
 
 
-def run_phase210(**kwargs) -> Dict[str, Any]:
+def run_phase210(**kwargs) -> dict[str, Any]:
     """
     Run Phase 210: Historical Timegap Analyzer.
 
@@ -45,7 +45,6 @@ def run_phase210(**kwargs) -> Dict[str, Any]:
         }
     """
     errors = []
-    gaps = []
 
     try:
         if not SIGNALS_CSV.exists():

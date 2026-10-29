@@ -10,9 +10,8 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -48,7 +47,7 @@ REQUIRED_COLUMNS = {
 CRITICAL_COLUMNS = ["underlying", "symbol", "signal", "final_score", "ts"]
 
 
-def check_file_integrity(file_path: Path, required_cols: List[str]) -> Dict[str, Any]:
+def check_file_integrity(file_path: Path, required_cols: list[str]) -> dict[str, Any]:
     """
     Check integrity of a single signal CSV file.
 
@@ -107,9 +106,7 @@ def check_file_integrity(file_path: Path, required_cols: List[str]) -> Dict[str,
                 warnings.append(f"Unexpected signal values: {list(invalid_signals)[:5]}")
 
         # Determine status
-        if issues:
-            status = "WARN"
-        elif warnings:
+        if issues or warnings:
             status = "WARN"
         else:
             status = "OK"
@@ -126,13 +123,13 @@ def check_file_integrity(file_path: Path, required_cols: List[str]) -> Dict[str,
         logger.error(f"Error checking {file_path}: {e}")
         return {
             "status": "ERROR",
-            "issues": [f"Failed to read file: {str(e)}"],
+            "issues": [f"Failed to read file: {e!s}"],
             "warnings": [],
             "row_count": 0,
         }
 
 
-def run_phase331_signal_integrity(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase331_signal_integrity(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 331: Signal Input Integrity Scanner
 

@@ -9,9 +9,8 @@ import json
 import sys
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 # Ensure project root is in path
@@ -34,7 +33,7 @@ DOMINANCE_THRESHOLD = 0.80  # 80% of signals from one underlying
 SUPPORTED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_thresholds() -> Tuple[Dict[str, Any], List[str]]:
+def load_thresholds() -> tuple[dict[str, Any], list[str]]:
     """
     Load live thresholds from JSON.
 
@@ -69,7 +68,7 @@ def load_thresholds() -> Tuple[Dict[str, Any], List[str]]:
     return thresholds, errors
 
 
-def load_latest_snapshot() -> Tuple[Optional[pd.DataFrame], List[str]]:
+def load_latest_snapshot() -> tuple[pd.DataFrame | None, list[str]]:
     """
     Load latest snapshot from signals CSV or create a test snapshot.
 
@@ -124,8 +123,8 @@ def load_latest_snapshot() -> Tuple[Optional[pd.DataFrame], List[str]]:
 
 
 def apply_thresholds_and_count_signals(
-    df: pd.DataFrame, thresholds: Dict[str, Any]
-) -> Tuple[Dict[str, Dict[str, int]], Dict[str, pd.DataFrame]]:
+    df: pd.DataFrame, thresholds: dict[str, Any]
+) -> tuple[dict[str, dict[str, int]], dict[str, pd.DataFrame]]:
     """
     Apply thresholds and count signals per underlying.
 
@@ -188,8 +187,8 @@ def apply_thresholds_and_count_signals(
 
 
 def analyze_score_distribution_near_thresholds(
-    df: pd.DataFrame, thresholds: Dict[str, Any], band: float = 0.05
-) -> Dict[str, Any]:
+    df: pd.DataFrame, thresholds: dict[str, Any], band: float = 0.05
+) -> dict[str, Any]:
     """
     Analyze score distribution near thresholds.
 
@@ -217,7 +216,7 @@ def analyze_score_distribution_near_thresholds(
     }
 
 
-def perform_safety_checks(counts: Dict[str, Dict[str, int]]) -> Tuple[bool, List[str], List[str]]:
+def perform_safety_checks(counts: dict[str, dict[str, int]]) -> tuple[bool, list[str], list[str]]:
     """
     Perform safety checks on signal counts.
 
@@ -258,13 +257,13 @@ def perform_safety_checks(counts: Dict[str, Dict[str, int]]) -> Tuple[bool, List
 
 
 def generate_pre_market_report(
-    thresholds: Dict[str, Any],
-    counts: Dict[str, Dict[str, int]],
-    distribution: Dict[str, Any],
+    thresholds: dict[str, Any],
+    counts: dict[str, dict[str, int]],
+    distribution: dict[str, Any],
     is_safe: bool,
-    failures: List[str],
-    warnings: List[str],
-    errors: List[str],
+    failures: list[str],
+    warnings: list[str],
+    errors: list[str],
 ) -> str:
     """
     Generate pre-market report markdown.

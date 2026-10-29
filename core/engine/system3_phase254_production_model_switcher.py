@@ -13,7 +13,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -26,7 +26,7 @@ LOGS_DIR = PROJECT_ROOT / "logs"
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def promote_shadow_model(underlying: str) -> Dict[str, Any]:
+def promote_shadow_model(underlying: str) -> dict[str, Any]:
     """
     Promote validated shadow LSTM model to production.
 
@@ -86,7 +86,7 @@ def promote_shadow_model(underlying: str) -> Dict[str, Any]:
         }
 
 
-def run_phase254(**kwargs) -> Dict[str, Any]:
+def run_phase254(**kwargs) -> dict[str, Any]:
     """
     Run Phase 254: Production Model Switcher.
 
@@ -110,7 +110,7 @@ def run_phase254(**kwargs) -> Dict[str, Any]:
             }
 
         # Get latest validation log
-        latest_log = max(validation_logs, key=lambda p: p.stat().st_mtime)
+        max(validation_logs, key=lambda p: p.stat().st_mtime)
 
         # Parse validation results (STUB: would parse actual log)
         # For now, assume no promotable models (validation would set this)
@@ -137,7 +137,7 @@ def run_phase254(**kwargs) -> Dict[str, Any]:
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
         with log_file.open("w", encoding="utf-8") as f:
-            f.write(f"Phase 254: Model Promotion Log\n")
+            f.write("Phase 254: Model Promotion Log\n")
             f.write(f"Timestamp: {datetime.now().isoformat()}\n\n")
             for underlying, res in results.items():
                 f.write(f"{underlying}: {res['status']}\n")

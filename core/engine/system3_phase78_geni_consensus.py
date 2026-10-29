@@ -5,11 +5,10 @@ Combine Baseline model, Ultra model, and any heuristic signals into a single
 consensus signal per option leg.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -35,7 +34,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 HIGH_THRESHOLD = 0.85  # For consensus when one says BUY and other HOLD
 
 
-def load_predictions() -> Dict[str, pd.DataFrame]:
+def load_predictions() -> dict[str, pd.DataFrame]:
     """Load baseline and ultra predictions."""
     data = {}
 
@@ -62,7 +61,7 @@ def load_predictions() -> Dict[str, pd.DataFrame]:
     return data
 
 
-def compute_heuristic_label(row: pd.Series) -> Optional[str]:
+def compute_heuristic_label(row: pd.Series) -> str | None:
     """Derive heuristic label from simple rule-based logic."""
     # Simple heuristic: if expected_move_score > 0.3, suggest BUY_CE, else HOLD
     expected_move = row.get("expected_move_score", 0.0)
@@ -74,8 +73,8 @@ def compute_heuristic_label(row: pd.Series) -> Optional[str]:
 
 
 def compute_consensus(
-    baseline_row: pd.Series, ultra_row: Optional[pd.Series], heuristic_label: Optional[str]
-) -> Dict[str, Any]:
+    baseline_row: pd.Series, ultra_row: pd.Series | None, heuristic_label: str | None
+) -> dict[str, Any]:
     """Compute consensus signal from baseline, ultra, and heuristic."""
     baseline_label = baseline_row.get("pred_label", "HOLD")
     baseline_conf = baseline_row.get("pred_confidence", 0.0)
@@ -226,7 +225,7 @@ def generate_markdown(df: pd.DataFrame) -> None:
 def main():
     """Main entry point."""
     try:
-        df = generate_consensus()
+        generate_consensus()
         print("\n[PH78] Consensus generation complete.")
         return 0
     except Exception as e:

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_realtime_performance.md"
 
 
-def run_phase281(**kwargs) -> Dict[str, Any]:
+def run_phase281(**kwargs) -> dict[str, Any]:
     """Run Phase 281: Real-Time Performance Monitor."""
     errors = []
 

@@ -2,13 +2,12 @@
 Signal Scorer - Combine all signals into final score
 """
 
-from typing import Dict
 
 import numpy as np
 import pandas as pd
 
 
-def compute_final_score(df: pd.DataFrame, weights: Dict[str, float] | None = None) -> pd.DataFrame:
+def compute_final_score(df: pd.DataFrame, weights: dict[str, float] | None = None) -> pd.DataFrame:
     """
     Compute final score by combining all signal components.
 
@@ -280,7 +279,7 @@ def generate_signals(
         logger.warning(
             f"  ⚠️  NO ACTION SIGNALS: final_score range=[{score_min:.4f}, {score_max:.4f}], mean={score_mean:.4f}"
         )
-        logger.warning(f"      Thresholds may be too strict. Check thresholds_by_underlying or adjust defaults.")
+        logger.warning("      Thresholds may be too strict. Check thresholds_by_underlying or adjust defaults.")
 
     # Signal strength (absolute score)
     df["signal_strength"] = np.abs(score).values

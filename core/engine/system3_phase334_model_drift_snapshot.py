@@ -5,14 +5,12 @@ Creates daily snapshot of key model performance stats for drift detection.
 No retraining here, just logging performance metrics.
 """
 
-import json
 import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -55,7 +53,7 @@ def compute_hit_rate(df: pd.DataFrame, signal_type: str) -> float:
     return hit_rate
 
 
-def run_phase334_model_drift_snapshot(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase334_model_drift_snapshot(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 334: Model Drift Snapshot Builder
 

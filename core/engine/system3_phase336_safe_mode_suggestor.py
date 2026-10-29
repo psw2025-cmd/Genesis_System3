@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 CRITICAL_DRIFT_THRESHOLD = 2  # Number of drift signals to trigger critical mode
 
 
-def run_phase336_safe_mode_suggestor(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase336_safe_mode_suggestor(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 336: Safe-Mode Suggestor (Based on Drift)
 

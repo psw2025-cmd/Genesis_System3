@@ -13,9 +13,8 @@ Outputs:
 Menu Option: 79
 """
 
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -33,7 +32,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def grid_search_thresholds() -> Dict[str, Any]:
+def grid_search_thresholds() -> dict[str, Any]:
     """
     Grid search threshold combinations on shadow dataset.
 

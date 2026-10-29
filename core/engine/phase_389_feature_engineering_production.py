@@ -28,7 +28,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -465,7 +465,7 @@ def add_multiframe_features(df: pd.DataFrame) -> pd.DataFrame:
 # ============================================================================
 
 
-def validate_feature_schema(df: pd.DataFrame) -> Dict[str, Any]:
+def validate_feature_schema(df: pd.DataFrame) -> dict[str, Any]:
     """
     Validate engineered features against schema.
 
@@ -547,7 +547,7 @@ def validate_feature_schema(df: pd.DataFrame) -> Dict[str, Any]:
     return validation_results
 
 
-def calculate_feature_statistics(df: pd.DataFrame) -> Dict[str, Any]:
+def calculate_feature_statistics(df: pd.DataFrame) -> dict[str, Any]:
     """Calculate detailed statistics for all engineered features."""
     stats = {
         "timestamp": datetime.utcnow().isoformat(),
@@ -582,7 +582,7 @@ def calculate_feature_statistics(df: pd.DataFrame) -> Dict[str, Any]:
 # ============================================================================
 
 
-def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
+def run_phase_389(input_csv_path: str | None = None) -> dict[str, Any]:
     """
     Phase 389: Feature Engineering v2.0
 
@@ -657,7 +657,7 @@ def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
         new_cols = len(df.columns)
         features_added = new_cols - original_cols
 
-        logger.info(f"\n✓ Feature engineering complete!")
+        logger.info("\n✓ Feature engineering complete!")
         logger.info(f"  Columns: {original_cols} → {new_cols} (+{features_added} engineered)")
         logger.info(f"  Features: {len(ALL_FEATURES)} defined, {features_added} added")
 
@@ -751,7 +751,7 @@ def run_phase_389(input_csv_path: Optional[str] = None) -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Phase 389 execution failed: {e}", exc_info=True)
-        result.update({"status": "error", "message": f"Feature engineering failed: {str(e)}", "error": str(e)})
+        result.update({"status": "error", "message": f"Feature engineering failed: {e!s}", "error": str(e)})
         return result
 
 

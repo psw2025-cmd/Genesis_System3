@@ -8,7 +8,7 @@ SAFE MODE ONLY - Read-only logging, no execution.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -30,7 +30,7 @@ LIVE_SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.cs
 LEARNING_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def record_market_regime() -> Dict[str, Any]:
+def record_market_regime() -> dict[str, Any]:
     """
     Record current market regime classification.
 
@@ -114,7 +114,7 @@ def record_market_regime() -> Dict[str, Any]:
         }
 
 
-def get_regime_log_stats() -> Dict[str, Any]:
+def get_regime_log_stats() -> dict[str, Any]:
     """
     Get regime log statistics (read-only).
 
@@ -160,8 +160,8 @@ def main() -> None:
 
     if result["status"] == "SUCCESS":
         record = result["record"]
-        print(f"[SUCCESS] Market regime recorded")
-        print(f"\n=== REGIME RECORD ===")
+        print("[SUCCESS] Market regime recorded")
+        print("\n=== REGIME RECORD ===")
         print(f"Volatility Regime: {record['volatility_regime']}")
         print(f"Trend Direction: {record['trend_direction']}")
         print(f"Market Regime: {record['market_regime']}")
@@ -171,7 +171,7 @@ def main() -> None:
         # Show stats
         stats = get_regime_log_stats()
         if stats["status"] == "SUCCESS":
-            print(f"\n=== REGIME LOG STATISTICS ===")
+            print("\n=== REGIME LOG STATISTICS ===")
             print(f"Total Records: {stats['total_records']}")
             if "regime_distribution" in stats:
                 print("\nMarket Regime Distribution:")

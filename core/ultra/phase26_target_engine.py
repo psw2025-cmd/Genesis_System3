@@ -13,9 +13,7 @@ Menu Option: 89
 """
 
 from pathlib import Path
-from typing import Any, Dict
-
-import numpy as np
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
@@ -32,7 +30,7 @@ def compute_target(
     risk_level: str,
     volatility: float,
     score: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute adaptive target percentage.
 

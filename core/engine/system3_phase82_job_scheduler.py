@@ -15,10 +15,9 @@ import threading
 import time
 import urllib.error
 import urllib.request
-from datetime import date as _date_cls
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -77,7 +76,7 @@ def create_default_config() -> None:
     print(f"[PH82] Created default config: {CONFIG_JSON}")
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """
     Load job scheduler config.
 
@@ -135,7 +134,7 @@ def _alert_scheduler_config_issue(message: str) -> None:
         pass
 
 
-def load_state() -> Dict[str, Any]:
+def load_state() -> dict[str, Any]:
     """Load job scheduler state."""
     if not STATE_JSON.exists():
         return {"jobs": {}}
@@ -147,13 +146,13 @@ def load_state() -> Dict[str, Any]:
         return {"jobs": {}}
 
 
-def save_state(state: Dict[str, Any]) -> None:
+def save_state(state: dict[str, Any]) -> None:
     """Save job scheduler state."""
     with STATE_JSON.open("w", encoding="utf-8") as f:
         json.dump(state, f, indent=2)
 
 
-def run_job(job: Dict[str, Any]) -> Dict[str, Any]:
+def run_job(job: dict[str, Any]) -> dict[str, Any]:
     """Run a single job.
     Supports two formats:
       module-based: {"module": "core.engine.foo"}  → python -m core.engine.foo
@@ -270,7 +269,7 @@ def run_single_job(job_id: str) -> None:
     generate_log_md(state, config)
 
 
-def generate_log_md(state: Dict[str, Any], config: Dict[str, Any]) -> None:
+def generate_log_md(state: dict[str, Any], config: dict[str, Any]) -> None:
     """Generate markdown log."""
     with LOG_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 82 - Job Scheduler Log\n\n")
@@ -339,7 +338,7 @@ def interval_job_due(last_run, now, minutes: int) -> bool:
         return False
 
 
-def _push_scheduler_health(state: Dict[str, Any], timeout_s: float = 20.0) -> None:
+def _push_scheduler_health(state: dict[str, Any], timeout_s: float = 20.0) -> None:
     """Push daemon heartbeat to the local API. Local launcher sets WORKER_PUSH_TOKEN."""
     base = _local_api_base()
     if not base:

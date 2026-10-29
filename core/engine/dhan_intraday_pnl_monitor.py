@@ -5,8 +5,6 @@ Monitors PnL of active trades in real-time during market hours.
 Provides alerts and updates on trade performance.
 """
 
-import os
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd

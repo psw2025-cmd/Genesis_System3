@@ -7,7 +7,7 @@ Calculates slippage from DRY-RUN ledger fills.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -27,7 +27,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase142_slippage_results.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase142_slippage_summary.md"
 
 
-def run_phase142_slippage_calculator() -> Dict[str, Any]:
+def run_phase142_slippage_calculator() -> dict[str, Any]:
     """
     Calculate slippage from DRY-RUN ledger.
 
@@ -54,10 +54,10 @@ def run_phase142_slippage_calculator() -> Dict[str, Any]:
                 errors.append(f"Error reading ledger: {e}")
 
         # Load spread metrics (optional)
-        df_spread = pd.DataFrame()
+        pd.DataFrame()
         if SPREAD_METRICS_CSV.exists():
             try:
-                df_spread = pd.read_csv(SPREAD_METRICS_CSV)
+                pd.read_csv(SPREAD_METRICS_CSV)
             except Exception:
                 pass  # Optional
 

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -27,7 +27,7 @@ OUTPUT_JSON_PATH = STORAGE_ULTRA / "phase200_master_status_snapshot.json"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase200_master_status_snapshot.md"
 
 
-def run_phase200_master_status_snapshot() -> Dict[str, Any]:
+def run_phase200_master_status_snapshot() -> dict[str, Any]:
     """
     Generate master status snapshot.
 
@@ -70,9 +70,7 @@ def run_phase200_master_status_snapshot() -> Dict[str, Any]:
 
         # Determine overall status
         overall_status = "GOOD"
-        if health_snapshot.get("overall_status") == "ERROR":
-            overall_status = "ERROR"
-        elif safety_state.get("kill_switch_active", False):
+        if health_snapshot.get("overall_status") == "ERROR" or safety_state.get("kill_switch_active", False):
             overall_status = "ERROR"
         elif health_snapshot.get("overall_status") == "WARN":
             overall_status = "WARN"

@@ -3,7 +3,6 @@ Greeks Calculator - Compute delta, gamma, theta, vega for options
 """
 
 from math import exp, log, sqrt
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -79,7 +78,7 @@ def compute_greeks(
     volatility: float,
     option_type: str,
     option_price: float = None,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute all Greeks for an option.
 

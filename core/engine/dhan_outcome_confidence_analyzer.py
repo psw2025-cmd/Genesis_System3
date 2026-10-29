@@ -6,7 +6,7 @@ SAFE MODE ONLY - Read-only analysis.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -18,7 +18,7 @@ REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def analyze_confidence_curve() -> Dict[str, Any]:
+def analyze_confidence_curve() -> dict[str, Any]:
     """
     Analyze confidence curve vs actual outcomes.
 
@@ -109,7 +109,7 @@ def _compute_calibration_score(df: pd.DataFrame) -> float:
     return float(correlation) if not np.isnan(correlation) else 0.0
 
 
-def _generate_confidence_recommendations(curve_analysis: Dict[str, Any]) -> List[str]:
+def _generate_confidence_recommendations(curve_analysis: dict[str, Any]) -> list[str]:
     """Generate recommendations based on confidence curve."""
     recommendations = []
 

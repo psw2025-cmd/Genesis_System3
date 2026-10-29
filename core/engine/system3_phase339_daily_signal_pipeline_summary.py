@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 logger = logging.getLogger(__name__)
 
 
-def load_diagnostic_file(file_path: Path) -> Dict[str, Any]:
+def load_diagnostic_file(file_path: Path) -> dict[str, Any]:
     """Load a diagnostic JSON file, return empty dict if not found."""
     if not file_path.exists():
         return {}
@@ -31,7 +31,7 @@ def load_diagnostic_file(file_path: Path) -> Dict[str, Any]:
         return {}
 
 
-def run_phase339_daily_signal_pipeline_summary(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase339_daily_signal_pipeline_summary(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 339: Daily Signal Pipeline Summary Report
 
@@ -49,7 +49,7 @@ def run_phase339_daily_signal_pipeline_summary(root_path: str = None, **kwargs) 
     integrity_report = load_diagnostic_file(diagnostics_dir / "signal_integrity_report.json")
     volume_summary = load_diagnostic_file(diagnostics_dir / "signal_volume_summary.json")
     consistency_report = load_diagnostic_file(diagnostics_dir / "signal_consistency_report.json")
-    drift_snapshot = load_diagnostic_file(diagnostics_dir / "model_drift_daily.csv")  # Will be empty dict
+    load_diagnostic_file(diagnostics_dir / "model_drift_daily.csv")  # Will be empty dict
     drift_status = load_diagnostic_file(diagnostics_dir / "model_drift_status.json")
     safety_recommendation = load_diagnostic_file(diagnostics_dir / "next_day_safety_recommendation.json")
     forward_quality = load_diagnostic_file(diagnostics_dir / "forward_return_quality_report.json")

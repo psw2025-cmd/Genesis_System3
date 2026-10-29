@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -43,7 +43,7 @@ def calculate_position_size(capital: float, risk_pct: float, entry_price: float,
     return max(1, quantity)  # At least 1
 
 
-def generate_position_sizing() -> Dict[str, Any]:
+def generate_position_sizing() -> dict[str, Any]:
     """Generate position sizing rules and examples."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 86 - POSITION SIZING ENGINE")
@@ -111,7 +111,7 @@ def generate_position_sizing() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 86 - Position Sizing Examples\n\n")
@@ -131,7 +131,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_position_sizing()
+        generate_position_sizing()
         print("\n[PH86] Position sizing generation complete.")
         return 0
     except Exception as e:

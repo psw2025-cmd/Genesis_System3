@@ -2,13 +2,12 @@
 Breakout Detector - Detect H-L breakouts, CPR, ORB, support/resistance breaks
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 
-def compute_cpr_levels(high: pd.Series, low: pd.Series, close: pd.Series) -> Dict[str, float]:
+def compute_cpr_levels(high: pd.Series, low: pd.Series, close: pd.Series) -> dict[str, float]:
     """
     Compute Central Pivot Range (CPR) levels.
 
@@ -44,7 +43,7 @@ def compute_cpr_levels(high: pd.Series, low: pd.Series, close: pd.Series) -> Dic
     return {"pivot": float(pivot), "top": float(top), "bottom": float(bottom)}
 
 
-def compute_orb_signals(prices: pd.Series, lookback: int = 20) -> Dict[str, Any]:
+def compute_orb_signals(prices: pd.Series, lookback: int = 20) -> dict[str, Any]:
     """
     Compute Opening Range Breakout (ORB) signals.
 
@@ -78,7 +77,7 @@ def compute_orb_signals(prices: pd.Series, lookback: int = 20) -> Dict[str, Any]
     }
 
 
-def detect_support_resistance(prices: pd.Series, window: int = 20) -> Dict[str, float]:
+def detect_support_resistance(prices: pd.Series, window: int = 20) -> dict[str, float]:
     """
     Detect support and resistance levels.
 

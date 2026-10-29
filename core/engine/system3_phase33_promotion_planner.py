@@ -12,7 +12,7 @@ Menu Option: 96
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def _load_comparison_data() -> Optional[pd.DataFrame]:
+def _load_comparison_data() -> pd.DataFrame | None:
     """Load Phase 32 comparison data."""
     comparison_csv = ULTRA_DIR / "phase32_ultra_vs_baseline_comparison.csv"
     if not comparison_csv.exists():
@@ -36,7 +36,7 @@ def _load_comparison_data() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_baseline_thresholds() -> Dict[str, Any]:
+def _load_baseline_thresholds() -> dict[str, Any]:
     """Load baseline thresholds (read-only)."""
     thresholds_json = CONFIG_DIR / "thresholds_auto.json"
     if thresholds_json.exists():
@@ -51,7 +51,7 @@ def _load_baseline_thresholds() -> Dict[str, Any]:
 def _evaluate_eligibility(
     underlying: str,
     df_comparison: pd.DataFrame,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Evaluate if underlying is eligible for promotion.
 
@@ -74,7 +74,7 @@ def _evaluate_eligibility(
 
     # Compute metrics
     baseline_trades = df_u[df_u["baseline_action"].isin(["BUY_CE", "BUY_PE"])]
-    ultra_trades = df_u[df_u["ultra_action"].isin(["BUY_CE", "BUY_PE", "STRONG_BUY_CE", "STRONG_BUY_PE"])]
+    df_u[df_u["ultra_action"].isin(["BUY_CE", "BUY_PE", "STRONG_BUY_CE", "STRONG_BUY_PE"])]
 
     baseline_pnl = baseline_trades["baseline_pnl"].dropna()
     if baseline_pnl.empty:
@@ -152,8 +152,8 @@ def run_phase33_promotion_planner() -> str:
     print(f"[LOAD] Loaded comparison data: {len(df_comparison)} rows")
 
     # Load baseline thresholds (read-only)
-    baseline_thresholds = _load_baseline_thresholds()
-    print(f"[LOAD] Loaded baseline thresholds (read-only)")
+    _load_baseline_thresholds()
+    print("[LOAD] Loaded baseline thresholds (read-only)")
 
     # Evaluate each underlying
     promotion_plan = {}
@@ -203,7 +203,7 @@ def run_phase33_promotion_planner() -> str:
 
     # Print summary
     eligible_count = sum(1 for p in promotion_plan.values() if p["eligible"])
-    print(f"\n=== PROMOTION PLAN SUMMARY ===")
+    print("\n=== PROMOTION PLAN SUMMARY ===")
     print(f"Eligible for promotion: {eligible_count}/{len(UNDERLYINGS)}")
     for underlying, plan in promotion_plan.items():
         status = "ELIGIBLE" if plan["eligible"] else "NOT ELIGIBLE"
@@ -223,7 +223,7 @@ def main() -> None:
         print(f"[PHASE 33][ERROR] {e}")
         error_path = ULTRA_DIR / "phase33_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 33 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 33 Error\n\n{e!s}\n")
         print(f"[PHASE 33] Error details saved to: {error_path}")
 
 

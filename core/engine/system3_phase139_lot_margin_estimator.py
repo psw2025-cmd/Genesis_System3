@@ -7,7 +7,7 @@ Estimates lot sizes and margins for each underlying (approximate metadata).
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ EST_MARGIN_PER_LOT = {
 }
 
 
-def run_phase139_lot_margin_estimator() -> Dict[str, Any]:
+def run_phase139_lot_margin_estimator() -> dict[str, Any]:
     """
     Estimate lot sizes and margins.
 

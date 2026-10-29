@@ -13,7 +13,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -150,7 +150,7 @@ def create_sequences(df: pd.DataFrame, underlying: str) -> tuple:
     return np.array(sequences, dtype=np.float32), labels_array
 
 
-def train_lstm_for_underlying(underlying: str, df: pd.DataFrame) -> Dict[str, Any]:
+def train_lstm_for_underlying(underlying: str, df: pd.DataFrame) -> dict[str, Any]:
     """
     Train LSTM model for a single underlying (SHADOW MODEL ONLY).
 
@@ -163,8 +163,7 @@ def train_lstm_for_underlying(underlying: str, df: pd.DataFrame) -> Dict[str, An
     """
     try:
         import torch
-        import torch.nn as nn
-        import torch.optim as optim
+        from torch import nn, optim
         from torch.utils.data import DataLoader, TensorDataset
     except ImportError:
         return {
@@ -213,7 +212,7 @@ def train_lstm_for_underlying(underlying: str, df: pd.DataFrame) -> Dict[str, An
     # Define LSTM model (inline for simplicity)
     class SimpleLSTM(nn.Module):
         def __init__(self, input_size, hidden_size=64, num_layers=2, num_classes=2):
-            super(SimpleLSTM, self).__init__()
+            super().__init__()
             self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=0.2)
             self.fc = nn.Linear(hidden_size, num_classes)
 
@@ -296,7 +295,7 @@ def train_lstm_for_underlying(underlying: str, df: pd.DataFrame) -> Dict[str, An
     }
 
 
-def run_phase249(**kwargs) -> Dict[str, Any]:
+def run_phase249(**kwargs) -> dict[str, Any]:
     """
     Run Phase 249: LSTM Forward Returns Predictor (SHADOW MODEL).
 
@@ -344,7 +343,7 @@ def run_phase249(**kwargs) -> Dict[str, Any]:
 
         # Generate shadow predictions (for validation only)
         # NOTE: These predictions do NOT impact live trading decisions
-        print(f"\n[PHASE 249] Generating shadow predictions...")
+        print("\n[PHASE 249] Generating shadow predictions...")
         df_with_lstm = df.copy()
         # Remove duplicate header rows and 1970 dummy rows from input before write
         if "underlying" in df_with_lstm.columns:
@@ -385,11 +384,11 @@ def run_phase249(**kwargs) -> Dict[str, Any]:
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
         with log_file.open("w", encoding="utf-8") as f:
-            f.write(f"Phase 249: LSTM Training Log\n")
+            f.write("Phase 249: LSTM Training Log\n")
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
             f.write(f"Input: {INPUT_CSV}\n")
             f.write(f"Output: {OUTPUT_CSV}\n\n")
-            f.write(f"Results:\n")
+            f.write("Results:\n")
             for underlying, res in results.items():
                 f.write(f"  {underlying}: {res['status']}")
                 if res["status"] == "SUCCESS":

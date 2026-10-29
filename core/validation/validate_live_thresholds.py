@@ -7,9 +7,8 @@ This is a pre-market check to ensure thresholds are safe before market opens.
 
 import json
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -37,7 +36,7 @@ MAX_THRESHOLD = 1.0
 SUPPORTED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_thresholds_json() -> Tuple[Dict[str, Any], List[str]]:
+def load_thresholds_json() -> tuple[dict[str, Any], list[str]]:
     """
     Load and validate thresholds JSON structure.
 
@@ -127,7 +126,7 @@ def load_thresholds_json() -> Tuple[Dict[str, Any], List[str]]:
     return thresholds, errors
 
 
-def load_ev_ready_csv() -> Tuple[pd.DataFrame, List[str]]:
+def load_ev_ready_csv() -> tuple[pd.DataFrame, list[str]]:
     """
     Load EV-ready CSV for signal counting.
 
@@ -164,8 +163,8 @@ def load_ev_ready_csv() -> Tuple[pd.DataFrame, List[str]]:
 
 
 def count_signals_at_thresholds(
-    df: pd.DataFrame, thresholds: Dict[str, Any]
-) -> Tuple[Dict[str, Dict[str, int]], List[str]]:
+    df: pd.DataFrame, thresholds: dict[str, Any]
+) -> tuple[dict[str, dict[str, int]], list[str]]:
     """
     Count BUY/SELL signals at given thresholds.
 
@@ -225,7 +224,7 @@ def count_signals_at_thresholds(
     return counts, errors
 
 
-def validate_signal_counts(counts: Dict[str, Dict[str, int]], thresholds: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def validate_signal_counts(counts: dict[str, dict[str, int]], thresholds: dict[str, Any]) -> tuple[bool, list[str]]:
     """
     Validate signal counts match expectations.
 

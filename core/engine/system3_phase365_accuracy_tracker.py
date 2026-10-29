@@ -10,9 +10,8 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -46,7 +45,7 @@ def load_signals_with_forward_returns() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def compute_hit_rate(df: pd.DataFrame, signal_col: str = "signal") -> Dict[str, Any]:
+def compute_hit_rate(df: pd.DataFrame, signal_col: str = "signal") -> dict[str, Any]:
     """
     Compute hit rate for each signal type.
     Hit = signal direction matches forward return direction.
@@ -106,7 +105,7 @@ def compute_hit_rate(df: pd.DataFrame, signal_col: str = "signal") -> Dict[str, 
     return hit_rate_results
 
 
-def compute_per_symbol_performance(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_per_symbol_performance(df: pd.DataFrame) -> dict[str, Any]:
     """Compute performance metrics grouped by underlying symbol."""
     if "underlying" not in df.columns:
         return {"error": "No 'underlying' column found"}
@@ -150,7 +149,7 @@ def compute_per_symbol_performance(df: pd.DataFrame) -> Dict[str, Any]:
     return symbol_performance
 
 
-def compute_time_window_performance(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_time_window_performance(df: pd.DataFrame) -> dict[str, Any]:
     """Compute performance for different time windows."""
     time_windows = {"all_time": len(df), "today": 0, "last_7_days": 0, "last_30_days": 0}
 
@@ -190,7 +189,7 @@ def compute_time_window_performance(df: pd.DataFrame) -> Dict[str, Any]:
     return time_windows
 
 
-def load_virtual_orders_pnl() -> Dict[str, Any]:
+def load_virtual_orders_pnl() -> dict[str, Any]:
     """Load virtual orders and compute PnL if available."""
     virtual_orders_file = STORAGE_LIVE / "dhan_virtual_orders.csv"
 
@@ -220,7 +219,7 @@ def load_virtual_orders_pnl() -> Dict[str, Any]:
         return {"status": "error", "error": str(e)}
 
 
-def run_phase365(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase365(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 365: Live Accuracy Tracker.
 
@@ -305,12 +304,9 @@ def run_phase365(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write("| Signal Type | Count | Hits | Hit Rate | Avg Return | Med Return |\n")
                 f.write("|-------------|-------|------|----------|------------|------------|\n")
 
-                for signal_type, metrics in sorted(hit_rates.items(), key=lambda x: x[1]["hit_rate_pct"], reverse=True):
-                    f.write(
-                        f"| {signal_type} | {metrics['count']} | {metrics['hits']} | "
+                f.writelines(f"| {signal_type} | {metrics['count']} | {metrics['hits']} | "
                         f"{metrics['hit_rate_pct']:.2f}% | {metrics['avg_return']:.4f} | "
-                        f"{metrics['median_return']:.4f} |\n"
-                    )
+                        f"{metrics['median_return']:.4f} |\n" for signal_type, metrics in sorted(hit_rates.items(), key=lambda x: x[1]["hit_rate_pct"], reverse=True))
                 f.write("\n")
             else:
                 f.write(f"*{hit_rates.get('error', 'No data available')}*\n\n")
@@ -322,14 +318,11 @@ def run_phase365(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write("| Symbol | Count | Wins | Losses | Win Rate | Avg Return | Total Return |\n")
                 f.write("|--------|-------|------|--------|----------|------------|-------------|\n")
 
-                for symbol, metrics in sorted(
-                    symbol_performance.items(), key=lambda x: x[1]["win_rate_pct"], reverse=True
-                ):
-                    f.write(
-                        f"| {symbol} | {metrics['count']} | {metrics['wins']} | "
+                f.writelines(f"| {symbol} | {metrics['count']} | {metrics['wins']} | "
                         f"{metrics['losses']} | {metrics['win_rate_pct']:.2f}% | "
-                        f"{metrics['avg_return']:.4f} | {metrics['total_return']:.4f} |\n"
-                    )
+                        f"{metrics['avg_return']:.4f} | {metrics['total_return']:.4f} |\n" for symbol, metrics in sorted(
+                    symbol_performance.items(), key=lambda x: x[1]["win_rate_pct"], reverse=True
+                ))
                 f.write("\n")
             else:
                 f.write(f"*{symbol_performance.get('error', 'No data available')}*\n\n")

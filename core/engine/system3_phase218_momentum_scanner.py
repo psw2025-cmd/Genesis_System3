@@ -7,9 +7,8 @@ Detects momentum patterns using technical indicators.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -37,7 +36,7 @@ def compute_rsi(prices: pd.Series, window: int = 14) -> pd.Series:
     return rsi
 
 
-def run_phase218(**kwargs) -> Dict[str, Any]:
+def run_phase218(**kwargs) -> dict[str, Any]:
     """
     Run Phase 218: Momentum Pattern Scanner.
 

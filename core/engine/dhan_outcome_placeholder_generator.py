@@ -8,7 +8,7 @@ SAFE MODE ONLY - Read-only placeholders, no execution.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ OUTCOME_PLACEHOLDERS_CSV = LEARNING_DIR / "outcome_placeholders.csv"
 LEARNING_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def generate_outcome_placeholders() -> Dict[str, Any]:
+def generate_outcome_placeholders() -> dict[str, Any]:
     """
     Generate placeholders for Monday outcomes.
 
@@ -86,7 +86,7 @@ def generate_outcome_placeholders() -> Dict[str, Any]:
         }
 
 
-def get_placeholder_stats() -> Dict[str, Any]:
+def get_placeholder_stats() -> dict[str, Any]:
     """
     Get placeholder statistics (read-only).
 
@@ -135,7 +135,7 @@ def main() -> None:
         # Show stats
         stats = get_placeholder_stats()
         if stats["status"] == "SUCCESS":
-            print(f"\n=== PLACEHOLDER STATISTICS ===")
+            print("\n=== PLACEHOLDER STATISTICS ===")
             print(f"Total Placeholders: {stats['total_placeholders']}")
             if "by_status" in stats:
                 print("\nBy Status:")

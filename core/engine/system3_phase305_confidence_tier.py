@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ def load_csv_robust(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def load_json_safe(path: Path) -> Dict:
+def load_json_safe(path: Path) -> dict:
     """Load JSON file safely."""
     if not path.exists():
         return {}
@@ -53,7 +53,7 @@ def load_json_safe(path: Path) -> Dict:
         return {}
 
 
-def compute_confidence_score(row: pd.Series, decay_data: Dict, regime_data: Dict) -> float:
+def compute_confidence_score(row: pd.Series, decay_data: dict, regime_data: dict) -> float:
     """Compute confidence score for a signal row."""
     score = 0.0
 
@@ -111,7 +111,7 @@ def tier_from_score(score: float) -> str:
         return "LOW"
 
 
-def run_phase305(**kwargs) -> Dict[str, Any]:
+def run_phase305(**kwargs) -> dict[str, Any]:
     """Run Phase 305: Confidence Tier Tagger."""
     errors = []
 

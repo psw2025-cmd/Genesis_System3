@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -27,7 +27,7 @@ SESSION_PLAN_PATH = STORAGE_ULTRA / "phase134_master_session_plan.json"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase135_master_session_summary.md"
 
 
-def run_phase135_master_session_summary() -> Dict[str, Any]:
+def run_phase135_master_session_summary() -> dict[str, Any]:
     """
     Generate human-readable master session summary.
 
@@ -121,7 +121,7 @@ def run_phase135_master_session_summary() -> Dict[str, Any]:
             if safety_state:
                 kill_switch = safety_state.get("kill_switch_active", True)
                 f.write(f"- **Kill Switch**: {'ACTIVE' if kill_switch else 'INACTIVE'}\n")
-                f.write(f"- **Live Trading Allowed**: FALSE (MASTER MODE)\n")
+                f.write("- **Live Trading Allowed**: FALSE (MASTER MODE)\n")
                 f.write(f"- **Max Risk Percent/Day**: {safety_state.get('max_risk_percent_per_day', 'N/A')}%\n")
                 if safety_state.get("kill_switch_reasons"):
                     f.write("- **Kill Switch Reasons**:\n")
@@ -148,8 +148,8 @@ def run_phase135_master_session_summary() -> Dict[str, Any]:
             # Final summary
             f.write("## Final Summary\n\n")
             f.write(f"- **MASTER_SESSION_READY**: {master_session_ready}\n")
-            f.write(f"- **DRY_RUN_ONLY**: YES ✅\n")
-            f.write(f"- **BROKER**: DHAN ✅\n")
+            f.write("- **DRY_RUN_ONLY**: YES ✅\n")
+            f.write("- **BROKER**: DHAN ✅\n")
 
         status = "OK" if not errors else "ERROR"
         details = f"Master session summary generated: READY={master_session_ready}"

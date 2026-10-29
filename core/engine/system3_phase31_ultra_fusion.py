@@ -13,7 +13,7 @@ Menu Option: 94
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def _load_live_signals() -> Optional[pd.DataFrame]:
+def _load_live_signals() -> pd.DataFrame | None:
     """Load latest live signals CSV."""
     signals_csv = LIVE_DIR / "dhan_index_ai_signals.csv"
     if not signals_csv.exists():
@@ -44,7 +44,7 @@ def _load_live_signals() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_ultra_artifacts() -> Dict[str, Any]:
+def _load_ultra_artifacts() -> dict[str, Any]:
     """Load Ultra artifacts from phases 21-30."""
     artifacts = {}
 
@@ -87,8 +87,8 @@ def _load_ultra_artifacts() -> Dict[str, Any]:
 
 def _compute_risk_components(
     row: pd.Series,
-    artifacts: Dict[str, Any],
-) -> Dict[str, Any]:
+    artifacts: dict[str, Any],
+) -> dict[str, Any]:
     """Compute risk components from Ultra artifacts."""
     # Default values
     risk_score = 0.5
@@ -137,8 +137,8 @@ def _compute_risk_components(
 
 def _compute_sl_tp(
     row: pd.Series,
-    artifacts: Dict[str, Any],
-) -> Dict[str, float]:
+    artifacts: dict[str, Any],
+) -> dict[str, float]:
     """Compute SL/TP from calibration or defaults."""
     sl_pct = 0.10  # Default 10%
     tp_pct = 0.20  # Default 20%
@@ -348,12 +348,12 @@ def run_phase31_fusion(max_rows: int = 1000) -> str:
     action_counts = df_fused["final_action"].value_counts()
     risk_counts = df_fused["final_risk_flag"].value_counts()
 
-    print(f"\n=== FUSION SUMMARY ===")
+    print("\n=== FUSION SUMMARY ===")
     print(f"Total decisions: {len(df_fused)}")
-    print(f"\nFinal Action Distribution:")
+    print("\nFinal Action Distribution:")
     for action, count in action_counts.items():
         print(f"  {action}: {count}")
-    print(f"\nRisk Flag Distribution:")
+    print("\nRisk Flag Distribution:")
     for risk, count in risk_counts.items():
         print(f"  {risk}: {count}")
 
@@ -384,7 +384,7 @@ def main() -> None:
         print(f"[PHASE 31][ERROR] {e}")
         error_path = ULTRA_DIR / "phase31_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 31 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 31 Error\n\n{e!s}\n")
         print(f"[PHASE 31] Error details saved to: {error_path}")
 
 

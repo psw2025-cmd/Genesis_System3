@@ -7,12 +7,12 @@ SAFE MODE ONLY - Read-only checks, no actions.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 
-def run_pre_market_diagnostic() -> Dict[str, Any]:
+def run_pre_market_diagnostic() -> dict[str, Any]:
     """
     Run comprehensive pre-market diagnostic.
 

@@ -4,13 +4,12 @@ Dhan Index Options - Signal Quality Meter
 Measures and classifies signal quality.
 """
 
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 
-def measure_signal_quality(signal_row: pd.Series) -> Dict[str, Any]:
+def measure_signal_quality(signal_row: pd.Series) -> dict[str, Any]:
     """
     Measure signal quality for a single signal.
 

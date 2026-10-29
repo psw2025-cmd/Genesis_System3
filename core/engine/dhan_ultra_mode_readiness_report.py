@@ -9,7 +9,7 @@ SAFE MODE ONLY - Read-only report, no activation.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
@@ -20,7 +20,7 @@ REAL_OUTCOMES_CSV = LEARNING_DIR / "real_outcomes.csv"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def generate_readiness_report() -> Dict[str, Any]:
+def generate_readiness_report() -> dict[str, Any]:
     """
     Generate Ultra-Mode readiness report.
 
@@ -43,7 +43,7 @@ def generate_readiness_report() -> Dict[str, Any]:
 
     # Check 1: Models
     if MODELS_DIR.exists():
-        models = list(MODELS_DIR.glob("*_model.pkl"))
+        list(MODELS_DIR.glob("*_model.pkl"))
         expected_models = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
         model_status = {}
 
@@ -125,7 +125,7 @@ def generate_readiness_report() -> Dict[str, Any]:
     return requirements
 
 
-def save_readiness_report(requirements: Dict[str, Any]) -> Path:
+def save_readiness_report(requirements: dict[str, Any]) -> Path:
     """
     Save readiness report to JSON.
 
@@ -183,7 +183,7 @@ def main() -> None:
         print(f"  Auto-Execute: {config.get('auto_execute', False)}")
 
     # Overall
-    print(f"\n=== OVERALL READINESS ===")
+    print("\n=== OVERALL READINESS ===")
     if requirements["overall_ready"]:
         print("✅ System meets requirements for Ultra-Mode")
     else:

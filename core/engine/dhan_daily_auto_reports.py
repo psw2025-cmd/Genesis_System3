@@ -5,14 +5,12 @@ Generates automated daily reports (read-only).
 AUTO-UPDATE: DISABLED - Only reads and reports.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import pandas as pd
+from typing import Any
 
 from core.engine.dhan_daily_learning_report import generate_daily_learning_report
-from core.engine.dhan_real_outcome_logger import get_outcome_summary, load_outcomes
+from core.engine.dhan_real_outcome_logger import get_outcome_summary
 from core.engine.dhan_rolling_learning_dashboard import generate_rolling_dashboard
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -20,7 +18,7 @@ REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def generate_daily_auto_report() -> Dict[str, Any]:
+def generate_daily_auto_report() -> dict[str, Any]:
     """
     Generate comprehensive daily auto-report (read-only).
 
@@ -135,7 +133,7 @@ def _generate_quick_summary() -> Path:
     return summary_path
 
 
-def schedule_daily_reports() -> Dict[str, Any]:
+def schedule_daily_reports() -> dict[str, Any]:
     """
     Schedule daily reports (read-only check).
 
@@ -158,9 +156,9 @@ def main() -> None:
 
     if result["status"] == "SUCCESS":
         print(f"\n[SUCCESS] Generated {len(result['reports'])} reports")
-        print(f"[INFO] All reports are READ-ONLY. No auto-updates performed.")
+        print("[INFO] All reports are READ-ONLY. No auto-updates performed.")
     else:
-        print(f"[ERROR] Report generation failed")
+        print("[ERROR] Report generation failed")
 
 
 if __name__ == "__main__":

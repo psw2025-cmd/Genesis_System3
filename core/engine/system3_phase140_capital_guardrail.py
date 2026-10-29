@@ -7,7 +7,7 @@ Computes capital guardrails for 1-lot-only test mode.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -25,7 +25,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase140_capital_guardrail.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase140_capital_guardrail.md"
 
 
-def run_phase140_capital_guardrail(total_test_capital: float = 50000.0) -> Dict[str, Any]:
+def run_phase140_capital_guardrail(total_test_capital: float = 50000.0) -> dict[str, Any]:
     """
     Compute capital guardrails for 1-lot-only test mode.
 
@@ -103,7 +103,7 @@ def run_phase140_capital_guardrail(total_test_capital: float = 50000.0) -> Dict[
 
             f.write("## Capital Configuration\n\n")
             f.write(f"- **Total Test Capital**: ₹{total_test_capital:,.2f}\n")
-            f.write(f"- **Mode**: ONE-LOT ONLY TEST MODE ACTIVE ✅\n\n")
+            f.write("- **Mode**: ONE-LOT ONLY TEST MODE ACTIVE ✅\n\n")
 
             f.write("## Per-Underlying Guardrails\n\n")
             f.write("| Underlying | Est Margin/Lot | Capital Usage % | Max Lots Allowed |\n")

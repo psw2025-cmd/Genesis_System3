@@ -7,7 +7,7 @@ Generates trade execution quality report.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_trade_execution_report.md"
 
 
-def run_phase297(**kwargs) -> Dict[str, Any]:
+def run_phase297(**kwargs) -> dict[str, Any]:
     """Run Phase 297: Trade Execution Report."""
     errors = []
 
@@ -60,7 +60,7 @@ def run_phase297(**kwargs) -> Dict[str, Any]:
         # Calculate execution metrics
         total_orders = len(df)
         approved_orders = (
-            len(df[df.get("approved", pd.Series([False] * len(df))) == True]) if "approved" in df.columns else 0
+            len(df[df.get("approved", pd.Series([False] * len(df)))]) if "approved" in df.columns else 0
         )
         fill_rate = approved_orders / total_orders * 100 if total_orders > 0 else 0.0
 

@@ -16,7 +16,7 @@ Menu Option: 74
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -148,7 +148,7 @@ def add_ultra_features(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def build_ultra_training_dataset() -> Dict[str, Any]:
+def build_ultra_training_dataset() -> dict[str, Any]:
     """
     Build Ultra training dataset with extended features.
 
@@ -262,7 +262,7 @@ def build_ultra_training_dataset() -> Dict[str, Any]:
             df_ultra.to_parquet(ULTRA_TRAINING_PARQUET, index=False, engine="pyarrow")
             print(f"[SAVE] Ultra training Parquet: {ULTRA_TRAINING_PARQUET} ({len(df_ultra)} rows)")
         except ImportError:
-            print(f"[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
+            print("[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
         except Exception as e:
             print(f"[WARN] Parquet save failed: {e}. CSV saved successfully.")
 
@@ -290,7 +290,7 @@ def main() -> None:
     result = build_ultra_training_dataset()
 
     if result["status"] == "SUCCESS":
-        print(f"\n=== BUILD SUMMARY ===")
+        print("\n=== BUILD SUMMARY ===")
         print(f"Synthetic Rows: {result['synthetic_rows']}")
         print(f"Shadow Rows: {result['shadow_rows']}")
         print(f"Total Rows: {result['total_rows']}")

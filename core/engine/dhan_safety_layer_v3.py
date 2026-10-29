@@ -6,7 +6,7 @@ SAFE MODE ONLY - Read-only validation.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -19,7 +19,7 @@ class OverfitGuard:
     """Guards against overfitting in model predictions."""
 
     @staticmethod
-    def detect_overfitting(df_signals: pd.DataFrame) -> Dict[str, Any]:
+    def detect_overfitting(df_signals: pd.DataFrame) -> dict[str, Any]:
         """
         Detect potential overfitting in signals.
 
@@ -98,7 +98,7 @@ class NoiseSuppressor:
         return df
 
 
-def run_safety_checks_v3() -> Dict[str, Any]:
+def run_safety_checks_v3() -> dict[str, Any]:
     """
     Run Safety Layer V3 checks.
 

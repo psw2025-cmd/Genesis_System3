@@ -7,7 +7,7 @@ Provide a text/MD live dashboard snapshot of System3.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -33,7 +33,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase91_live_dashboard.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def get_system_status() -> Dict[str, Any]:
+def get_system_status() -> dict[str, Any]:
     """Get current system status."""
     try:
         from core.engine.dhan_automation_config import AUTOMATION_CONFIG
@@ -57,7 +57,7 @@ def get_system_status() -> Dict[str, Any]:
         }
 
 
-def get_today_stats() -> Dict[str, int]:
+def get_today_stats() -> dict[str, int]:
     """Get today's statistics."""
     today = datetime.now().strftime("%Y-%m-%d")
 
@@ -109,7 +109,7 @@ def get_today_stats() -> Dict[str, int]:
     }
 
 
-def get_geni_recommendations() -> List[str]:
+def get_geni_recommendations() -> list[str]:
     """Get top 3 GENI recommendations from Phase 80."""
     if not PHASE80_JSON.exists():
         return []
@@ -125,7 +125,7 @@ def get_geni_recommendations() -> List[str]:
         return []
 
 
-def get_risk_flags() -> List[str]:
+def get_risk_flags() -> list[str]:
     """Get HIGH risk flags from Phase 88."""
     if not PHASE88_JSON.exists():
         return []
