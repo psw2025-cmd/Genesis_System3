@@ -185,8 +185,6 @@ export default function Signals() {
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
   }, [])
 
   if (isLoading && !signal && !authRequired) {

@@ -4,6 +4,7 @@ import { API_BASE, API_HEADERS } from '../config'
 import { PriceCell } from './ui/PriceCell'
 import { fmt, cn } from '../lib/utils'
 import { isAcceptableDhanChain } from '../lib/sourceQuality'
+import { requiredChainCounts } from '../lib/lifecycleTruth'
 
 const CORE_INDICES = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX']
 
@@ -345,7 +346,8 @@ export function OptionChain() {
   return <div className="flex flex-col h-full">
     <SymbolControls chainSymbol={chainSymbol} setChainSymbol={setChainSymbol} universe={universe} discovery={discovery} discoveryError={discoveryError} />
     <div className="flex flex-wrap items-center gap-3 px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
-      <span className={cn('pill text-[10px] border', stale ? 'bg-amber/10 text-amber border-amber/20' : 'bg-surface-2 text-text-secondary border-border')}>{marketOpen ? (stale ? 'STALE / DEGRADED' : 'BROKER SESSION') : 'SESSION SNAPSHOT'}</span>
+      <span className={cn('pill text-[10px] border', 'bg-amber/10 text-amber border-amber/20')}>{(() => { const counts = requiredChainCounts(chain); return `required_ready ${counts.requiredReady}/${counts.total} · safe_no_trade ${counts.safeNoTrade}/${counts.total} · TRADABLE ${counts.tradableLabel}` })()}</span>
+      <span className={cn('pill text-[10px] border', 'bg-surface-2 text-text-secondary border-border')}>SESSION SNAPSHOT</span>
       <label className="flex items-center gap-1.5"><span className="text-text-muted text-xs">EXPIRY</span><select aria-label="Option expiry" value={selectedExpiry} onChange={event => { setSelectedExpiry(event.target.value); setRange(10) }} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value="">AUTO / NEAREST</option>{harvestedExpiries.map(expiry => <option value={expiry} key={expiry}>{expiry}</option>)}</select></label>
       <div><span className="text-text-muted text-xs"> SYMBOL </span><span className="num text-sm font-semibold">{chainSymbol}</span></div>
       <div><span className="text-text-muted text-xs"> SPOT </span><span className="num text-sm font-semibold">{spot != null ? fmt(spot, 2) : '--'}</span></div>

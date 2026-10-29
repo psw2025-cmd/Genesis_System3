@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality",
+    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality && npm run test:lifecycle-display",
+    "test:lifecycle-display": "node scripts/lifecycle_display_contract.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",

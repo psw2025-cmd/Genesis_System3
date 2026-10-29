@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
+import { useStore } from "../store"
+import { PendingLifecycleBanner } from "./PendingLifecycleBanner"
+import { liveTradingValue, orderAllowedValue } from "../lib/lifecycleTruth"
 
 interface AutoGate {
   gate_id?: string
@@ -43,27 +46,25 @@ function truthBadge(pass: boolean | null, yes: string, no: string, pending = "CH
 }
 
 export function LiveTradingGate() {
-  const [autoGates, setAutoGates] = useState<AutoGateStatus | null>(null)
+  const storeHealth = useStore((s) => s.health) as HealthStatus | null
+  const storeState = useStore((s) => s.state)
+  const storeGates = useStore((s) => s.autoGates) as AutoGateStatus | null
+  const storeBroker = useStore((s) => s.brokerStatus)
+  const autoGates = storeGates
+  const health = storeHealth
   const [approval, setApproval] = useState<ApprovalStatus | null>(null)
-  const [health, setHealth] = useState<HealthStatus | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
       try {
-        const [autoGateResponse, approvalResponse, healthResponse] = await Promise.all([
-          fetch("/api/auto_gates"),
+        const [approvalResponse] = await Promise.all([
           fetch("/api/approval/status"),
-          fetch("/api/health"),
         ])
-        if (!autoGateResponse.ok) throw new Error(`Technical readiness proof unavailable (HTTP ${autoGateResponse.status})`)
         if (!approvalResponse.ok) throw new Error(`Owner approval proof unavailable (HTTP ${approvalResponse.status})`)
-        if (!healthResponse.ok) throw new Error(`Execution mode proof unavailable (HTTP ${healthResponse.status})`)
 
-        setAutoGates(await autoGateResponse.json())
         setApproval(await approvalResponse.json())
-        setHealth(await healthResponse.json())
         setError(null)
       } catch (err: any) {
         setError(err?.message || "Execution truth unavailable")
@@ -96,16 +97,16 @@ export function LiveTradingGate() {
   const ownerApproved = approval ? approval.human_approval === true : null
   const liveArmed = approval ? approval.live_trading_env_flip_authorized === true : null
   const runtimeLiveEnabled = Boolean(health?.live_trading_enabled ?? health?.safety?.live_trading_enabled ?? health?.live_allowed)
-  const executionMode = String(health?.mode ?? health?.safety?.execution_mode ?? "UNKNOWN").toUpperCase()
+  const executionMode = String(health?.mode ?? health?.safety?.execution_mode ?? storeState?.mode ?? "UNKNOWN").toUpperCase()
+  const observedLive = liveTradingValue(storeState, storeBroker, health)
+  const observedOrders = orderAllowedValue(storeState, storeBroker)
 
   const ownerBadge = truthBadge(ownerApproved, "APPROVED", "PENDING")
   const readinessBadge = truthBadge(technicalReady, "PASSED", "NOT READY")
   const armingBadge = truthBadge(liveArmed, "ARMED", "NOT ARMED")
   const overallLabel = runtimeLiveEnabled
     ? "LIVE ENABLED"
-    : technicalReady
-      ? "PAPER · LIVE TECH READY"
-      : "PAPER · LIVE NOT READY"
+    : "PAPER LOCKED"
 
   const truthCards = [
     {
@@ -142,6 +143,12 @@ export function LiveTradingGate() {
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
+      <PendingLifecycleBanner />
+      <div className="card p-4" data-testid="live-gate-flags">
+        <div style={{ fontSize: ".75rem", fontWeight: 800 }}>LIVE_TRADING_ENABLED={observedLive === null ? "null" : String(observedLive)}</div>
+        <div style={{ fontSize: ".75rem", fontWeight: 800, marginTop: 4 }}>order_allowed={observedOrders === null ? "null" : String(observedOrders)}</div>
+        <div style={{ fontSize: ".7rem", color: "var(--text-mut)", marginTop: 6 }}>Health and auto-gates come from the shared poller. This tab does not open a second broker burst.</div>
+      </div>
       {error && (
         <div className="card p-4" style={{ color: "var(--down)" }}>
           {error}. Real-money LIVE execution remains locked.

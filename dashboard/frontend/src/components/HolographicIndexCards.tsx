@@ -31,26 +31,18 @@ export function HolographicIndexCards() {
     const chainRow = chain?.[cfg.symbol]
     const chainSpot = Number(chainRow?.spot)
     const chainChg = chainRow?.change_pct != null ? Number(chainRow.change_pct) : null
-    const chainPcr = chainRow?.pcr != null && !isNaN(Number(chainRow.pcr)) && Number(chainRow.pcr) > 0 ? Number(chainRow.pcr) : cfg.defaultPcr
-    const chainPain = chainRow?.max_pain != null && !isNaN(Number(chainRow.max_pain)) && Number(chainRow.max_pain) > 0 ? Number(chainRow.max_pain) : cfg.defaultPain
+    const chainPcr = chainRow?.pcr != null && !isNaN(Number(chainRow.pcr)) && Number(chainRow.pcr) > 0 ? Number(chainRow.pcr) : null
+    const chainPain = chainRow?.max_pain != null && !isNaN(Number(chainRow.max_pain)) && Number(chainRow.max_pain) > 0 ? Number(chainRow.max_pain) : null
 
-    const spot = boardLtp > 0 ? boardLtp : chainSpot > 0 ? chainSpot : cfg.defaultSpot
-    const changePct = boardChg != null ? boardChg : chainChg != null ? chainChg : 0.45
-    const isUp = changePct >= 0
+    const spot = boardLtp > 0 ? boardLtp : chainSpot > 0 ? chainSpot : null
+    const changePct = boardChg != null ? boardChg : chainChg != null ? chainChg : null
+    const isUp = (changePct ?? 0) >= 0
 
-    // Model forecast (derived from signal bias or dynamic model state)
-    const bias = String(state?.signals?.directional_bias || state?.signals?.bias || 'BULLISH').toUpperCase()
-    const confidence = Number(state?.signals?.confidence || 88)
-    const forecastOffset = isUp ? (spot * 0.003) : -(spot * 0.003)
-    const predicted = spot + forecastOffset
-
-    const sparkline = [
-      spot * (1 - (isUp ? 0.005 : -0.002)),
-      spot * (1 - (isUp ? 0.003 : -0.001)),
-      spot * (1 - (isUp ? 0.001 : 0.001)),
-      spot * (1 + (isUp ? 0.002 : -0.003)),
-      spot
-    ]
+    const bias = String(state?.signals?.directional_bias || state?.signals?.bias || '').toUpperCase()
+    const rawConfidence = state?.signals?.confidence
+    const confidence = rawConfidence == null || rawConfidence === '' ? null : Number(rawConfidence)
+    const predicted = null
+    const sparkline = spot == null ? [0, 0] : [spot, spot]
 
     return {
       symbol: cfg.symbol,
@@ -58,7 +50,7 @@ export function HolographicIndexCards() {
       spot,
       predicted,
       changePct,
-      confidence: confidence > 0 ? confidence : 88,
+      confidence: confidence != null && Number.isFinite(confidence) ? confidence : null,
       pcr: chainPcr,
       maxPain: chainPain,
       sparkline,
@@ -127,13 +119,13 @@ export function HolographicIndexCards() {
             <div className="flex items-end justify-between my-3">
               <div>
                 <div className="text-2xl font-extrabold font-mono text-slate-50 tabular-nums tracking-tight">
-                  ₹{fmt(idx.spot, 2)}
+                  {idx.spot == null ? 'PENDING' : `₹${fmt(idx.spot, 2)}`}
                 </div>
                 <div className={`flex items-center gap-1 mt-1 text-xs font-bold font-mono ${
                   idx.isUp ? 'text-emerald-400' : 'text-rose-400'
                 }`}>
                   {idx.isUp ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                  <span>{idx.isUp ? '+' : ''}{idx.changePct.toFixed(2)}%</span>
+                  <span>{idx.changePct == null ? 'PENDING' : `${idx.isUp ? '+' : ''}${idx.changePct.toFixed(2)}%`}</span>
                 </div>
               </div>
               <div>
@@ -146,18 +138,18 @@ export function HolographicIndexCards() {
               <div>
                 <span className="text-slate-400 font-medium">AI FORECAST: </span>
                 <span className="font-mono font-bold text-slate-200">
-                  ₹{fmt(idx.predicted, 2)}
+                  PENDING
                 </span>
               </div>
               <div className="px-2 py-0.5 rounded bg-sky-500/10 text-sky-400 font-bold text-[11px] border border-sky-500/20">
-                {idx.confidence}% CONF
+                {idx.confidence == null ? 'PENDING' : `${idx.confidence}% CONF`}
               </div>
             </div>
 
             {/* Footer Metadata */}
             <div className="flex items-center justify-between text-xs text-slate-400 mt-2 pt-2 border-t border-slate-800 font-mono">
-              <span>PCR: <strong className={idx.pcr >= 1 ? 'text-emerald-400' : 'text-rose-400'}>{idx.pcr.toFixed(2)}</strong></span>
-              <span>MAX PAIN: <strong className="text-slate-200">₹{idx.maxPain.toLocaleString('en-IN')}</strong></span>
+              <span>PCR: <strong className="text-slate-200">{idx.pcr == null ? 'PENDING' : idx.pcr.toFixed(2)}</strong></span>
+              <span>MAX PAIN: <strong className="text-slate-200">{idx.maxPain == null ? 'PENDING' : `₹${idx.maxPain.toLocaleString('en-IN')}`}</strong></span>
             </div>
           </div>
         )

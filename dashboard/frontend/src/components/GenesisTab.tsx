@@ -4,6 +4,8 @@ import { Activity, Brain, Database, Shield, Sparkles, TrendingUp, CheckCircle2 }
 import { API_BASE, API_HEADERS } from '../config'
 import { useStore } from '../store'
 import { fmt, asPct } from '../lib/utils'
+import { brokerPermissionLabel } from '../lib/lifecycleTruth'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 type GenesisState = {
   brief?: any
@@ -135,17 +137,24 @@ export function GenesisTab() {
   const liveAllowed = Boolean(sharedState?.live_trading_enabled ?? effectiveHealth?.live_allowed ?? effectiveHealth?.live_trading_enabled)
   const brokerOk = brokerStatus?.connected === true || brokerConnected === true || effectiveHealth?.broker?.connected === true
 
-  // Authoritative dynamic data resolution
-  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score ?? effectiveHealth?.truth_score ?? 94)
-  const rawConfidence = pct(data.brain?.confidence ?? data.brain?.prediction_confidence ?? sharedState?.signals?.confidence ?? 88)
-  const confidence = rawConfidence != null ? rawConfidence : 88.0
-  const rawAccuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct ?? paper?.summary?.win_rate ?? 68)
-  const accuracy = rawAccuracy != null ? rawAccuracy : 68.0
-  const rawHitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate ?? 74)
-  const hitRate = rawHitRate != null ? rawHitRate : 74.0
-  const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown ?? paper?.summary?.max_drawdown ?? 1.8)
-  const profitFactor = Number(data.brain?.profit_factor ?? effectiveSystem?.profit_factor ?? paper?.summary?.profit_factor ?? 1.85)
-  const drift = Number(data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi ?? 0.042)
+  const permission = brokerPermissionLabel({
+    brokerConnected,
+    brokerStatus,
+    health: effectiveHealth,
+    state: sharedState,
+  })
+  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score ?? effectiveHealth?.truth_score)
+  const confidence = pct(data.brain?.confidence ?? data.brain?.prediction_confidence ?? sharedState?.signals?.confidence)
+  const accuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct ?? paper?.summary?.win_rate)
+  const hitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate)
+  const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown ?? paper?.summary?.max_drawdown)
+  const profitRaw = data.brain?.profit_factor ?? effectiveSystem?.profit_factor ?? paper?.summary?.profit_factor ?? 'N/A - NO_PREDICTION'
+  const profitFactor = profitRaw == null || profitRaw === '' || profitRaw === 'N/A - NO_PREDICTION' ? null : Number(profitRaw)
+  const profitDisplay = profitRaw === 'N/A - NO_PREDICTION' ? 'N/A - NO_PREDICTION' : showNum(profitFactor)
+  const driftRaw = data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi
+  const drift = driftRaw == null || driftRaw === '' ? null : Number(driftRaw)
+  const showPct = (value: number | null) => value == null || !Number.isFinite(value) ? 'N/A' : `${value.toFixed(1)}%`
+  const showNum = (value: number | null, digits = 2) => value == null || !Number.isFinite(value) ? 'N/A - NO_PREDICTION' : value.toFixed(digits)
 
   const rankingRows = useMemo(() => {
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []
@@ -157,26 +166,26 @@ export function GenesisTab() {
   const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
   const biasTone = /bull|up|long/i.test(bias) ? 'up' : /bear|down|short/i.test(bias) ? 'down' : 'warn'
 
-  const modules = [
-    ['Shared Local Truth', sharedHealth || sharedState ? 'ACTIVE' : 'READY', 100],
-    ['Dhan Broker', brokerOk ? 'CONNECTED' : 'STANDBY', 100],
-    ['Genesis Brain', 'ACTIVE', 96],
-    ['Data Truth', 'ACTIVE', truthScore],
-    ['System Health', 'ACTIVE', 100],
-    ['Never Die Monitor', 'ACTIVE', 100],
-    ['Research / Sources', 'ACTIVE', 100],
-  ] as const
+  const modules: Array<[string, string, number | null]> = [
+    ['Shared Local Truth', sharedHealth || sharedState ? 'PRESENT' : 'PENDING', null],
+    ['Dhan Broker', permission, null],
+    ['Genesis Brain', 'PENDING', null],
+    ['Data Truth', truthScore == null ? 'PENDING' : 'PRESENT', truthScore],
+    ['System Health', effectiveHealth ? 'PRESENT' : 'PENDING', null],
+    ['Never Die Monitor', data.monitor && !data.monitor?.error ? 'PRESENT' : 'PENDING', null],
+    ['Research / Sources', research ? 'PRESENT' : 'PENDING', null],
+  ]
 
-  const verifiedReasons = [
-    'Dhan broker connected with read-only latency verified (<15ms)',
-    'Live option chain contracts validated for core indices',
-    'PCR, Max Pain, and OI buildup telemetry synchronized',
-    'Directional bias bound to System3 multi-model consensus',
-    'Liquidity and slippage risk bounds strictly enforced',
+  const evidenceLines = [
+    `Broker permission: ${permission}. A read-only session is not a tradable connection.`,
+    'Option-chain rows are market data. safe_no_trade stays PENDING, not ACTIVE.',
+    'Model confidence, hit rate, and profit factor render only when the payload has them.',
+    'Lifecycle proof is BLOCKED until scripts/run_paper_validation.py exists and the checklist passes.',
   ]
 
   return (
     <div className="workspace-shell" data-testid="genesis-brain-live">
+      <PendingLifecycleBanner />
       {data.loading && (
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-mono mb-3">
           <span className="font-bold text-blue-400">BACKGROUND REFRESH</span>
@@ -201,13 +210,11 @@ export function GenesisTab() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
-            <span className={`px-2.5 py-1 rounded-lg border font-bold ${
-              brokerOk ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-            }`}>
-              DHAN {brokerOk ? 'CONNECTED' : 'STANDBY'}
+            <span className="px-2.5 py-1 rounded-lg border font-bold bg-amber-500/10 text-amber-400 border-amber-500/30">
+              DHAN {permission}
             </span>
             <span className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 font-bold">
-              CANDIDATES {rankingRows.length || 4}
+              CANDIDATE ROWS {rankingRows.length}
             </span>
             <button
               onClick={load}
@@ -223,19 +230,19 @@ export function GenesisTab() {
           </div>
         </div>
         <div className="text-[11px] text-slate-500 font-mono mt-2 pt-2 border-t border-slate-800/80">
-          Shared truth sync: {lastSync || new Date().toISOString()} · All signals verified
+          Shared truth sync: {lastSync || 'PENDING'} · candidate rows are not trades or profit
         </div>
       </div>
 
       {/* Top 7 Metric Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
         <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'After-hours standby'} tone={marketOpen ? 'up' : 'accent'} />
-        <Metric label="Prediction Confidence" value={`${confidence.toFixed(1)}%`} sub="Ensemble consensus" tone="accent" />
-        <Metric label="Model Ensemble" value="ACTIVE" sub="Multi-agent voting" tone="up" />
-        <Metric label="Truth Score" value={`${truthScore.toFixed(0)}%`} sub="Data integrity" tone="up" />
-        <Metric label="Drift Detection" value={drift.toFixed(3)} sub="PSI stable (<0.10)" tone="up" />
-        <Metric label="Anomaly State" value="NORMAL" sub="Zero pattern faults" tone="up" />
-        <Metric label="Retraining" value="STANDBY" sub="Model converged" tone="accent" />
+        <Metric label="Prediction Confidence" value={showPct(confidence)} sub="Payload or PENDING" tone="accent" />
+        <Metric label="Model Ensemble" value="PENDING" sub="Not a live-trade state" tone="warn" />
+        <Metric label="Truth Score" value={truthScore == null ? 'PENDING' : `${truthScore.toFixed(0)}%`} sub="Payload or PENDING" tone="accent" />
+        <Metric label="Drift Detection" value={showNum(drift, 3)} sub="Payload or PENDING" tone="warn" />
+        <Metric label="Anomaly State" value="PENDING" sub="No fabricated normal state" tone="warn" />
+        <Metric label="Retraining" value="PENDING" sub="Not claimed converged" tone="accent" />
       </div>
 
       {/* Main Analysis Grid */}
@@ -249,9 +256,9 @@ export function GenesisTab() {
             Directional conviction derived from institutional options flow & multi-timeframe ML features.
           </p>
           <div className="space-y-2">
-            {verifiedReasons.map((reason, index) => (
-              <div key={index} className="flex items-start gap-2 text-xs text-slate-300">
-                <CheckCircle2 size={14} className="text-emerald-400 shrink-0 mt-0.5" />
+            {evidenceLines.map((reason) => (
+              <div key={reason} className="flex items-start gap-2 text-xs text-slate-300">
+                <CheckCircle2 size={14} className="text-amber-400 shrink-0 mt-0.5" />
                 <span>{reason}</span>
               </div>
             ))}
@@ -261,23 +268,23 @@ export function GenesisTab() {
         {/* Panel 2: Scenario / Confidence */}
         <Panel title="Scenario / Confidence" icon={<Activity size={16} />}>
           <div className="space-y-3">
-            <Metric label="Confidence" value={`${confidence.toFixed(1)}%`} sub="Current model consensus" tone="accent" />
-            <Metric label="Accuracy (OOS)" value={`${accuracy.toFixed(1)}%`} sub="Out-of-sample backtest" tone="up" />
-            <Metric label="Hit Rate" value={`${hitRate.toFixed(1)}%`} sub="Target strike prediction" tone="up" />
+            <Metric label="Confidence" value={showPct(confidence)} sub="Payload or PENDING" tone="accent" />
+            <Metric label="Accuracy (OOS)" value={showPct(accuracy)} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Hit Rate" value={showPct(hitRate)} sub="Payload or PENDING" tone="warn" />
           </div>
         </Panel>
 
         {/* Panel 3: Model Performance / Quality */}
         <Panel title="Model Performance / Quality" icon={<Brain size={16} />}>
           <div className="grid grid-cols-2 gap-2 mb-3">
-            <Metric label="Profit Factor" value={profitFactor.toFixed(2)} sub="Gross profit/loss" tone="up" />
-            <Metric label="Max Drawdown" value={`${Math.abs(drawdown).toFixed(2)}%`} sub="Risk envelope" tone="up" />
-            <Metric label="Truth Score" value={`${truthScore.toFixed(0)}%`} sub="Data quality" tone="up" />
-            <Metric label="Memory Events" value="1,420" sub="Vector knowledge" tone="accent" />
+            <Metric label="Profit Factor" value={profitDisplay} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Max Drawdown" value={drawdown == null ? 'PENDING' : `${Math.abs(drawdown).toFixed(2)}%`} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Truth Score" value={truthScore == null ? 'PENDING' : `${truthScore.toFixed(0)}%`} sub="Payload or PENDING" tone="accent" />
+            <Metric label="Memory Events" value="PENDING" sub="Not invented" tone="accent" />
           </div>
           <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800">
-            <div className="text-xs font-semibold text-slate-300 mb-1">Model Trajectory Confidence</div>
-            <div className="text-[11px] text-emerald-400 font-mono">● High conviction on core index momentum</div>
+            <div className="text-xs font-semibold text-slate-300 mb-1">Model trajectory</div>
+            <div className="text-[11px] text-amber-400 font-mono">PENDING — no fabricated conviction</div>
           </div>
         </Panel>
 

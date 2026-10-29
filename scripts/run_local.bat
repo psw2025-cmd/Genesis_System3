@@ -39,13 +39,15 @@ pip install -q uvicorn[standard] fastapi 2>nul
 REM Step 3: Check and clear ports
 echo.
 echo [3/4] Checking ports...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING"') do (
-    echo   Killing process on port 8000 (PID: %%a)
-    taskkill /F /PID %%a >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0..\tools\port8000_guard.ps1" -Mode reuse
+set PORT_RC=!ERRORLEVEL!
+if "!PORT_RC!"=="20" (
+    echo   Port 8000 belongs to another process. Not stopping it.
+    goto :skip_backend
 )
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":3000.*LISTENING"') do (
-    echo   Killing process on port 3000 (PID: %%a)
-    taskkill /F /PID %%a >nul 2>&1
+if "!PORT_RC!"=="10" (
+    echo   Reusing the System3 uvicorn already listening on port 8000.
+    goto :skip_backend
 )
 timeout /t 2 /nobreak >nul
 
@@ -56,9 +58,10 @@ echo.
 
 REM Start backend
 echo   Starting backend (port 8000)...
-start "Dashboard Backend" /MIN cmd /c "cd /d %SCRIPT_DIR%\dashboard\backend && call %SCRIPT_DIR%\venv\Scripts\activate.bat && python -m uvicorn app:app --host 127.0.0.1 --port 8000 --reload"
+start "Dashboard Backend" /MIN cmd /c "cd /d %SCRIPT_DIR% && call %SCRIPT_DIR%\venv\Scripts\activate.bat && python -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000"
 timeout /t 8 /nobreak >nul
 
+:skip_backend
 REM Start frontend
 echo   Starting frontend (port 3000)...
 cd dashboard\frontend

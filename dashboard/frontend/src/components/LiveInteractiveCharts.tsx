@@ -23,26 +23,16 @@ export interface TimeSeriesPoint {
 }
 
 export function NiftyIntradayChart({
-  spot = 24175.65,
-  changePct = 0.42,
+  spot,
+  changePct,
   title = "NIFTY 50 Intraday Dynamics"
 }: {
   spot?: number
   changePct?: number | null
   title?: string
 }) {
-  const base = spot > 0 ? spot : 24175.65
-  // Generate authentic time-series intraday curve around spot
-  const data = [
-    { time: '09:15', price: base * 0.996, vol: 14500 },
-    { time: '10:00', price: base * 0.998, vol: 28900 },
-    { time: '11:00', price: base * 0.995, vol: 18200 },
-    { time: '12:00', price: base * 0.997, vol: 12400 },
-    { time: '13:00', price: base * 1.001, vol: 19800 },
-    { time: '14:00', price: base * 1.003, vol: 34500 },
-    { time: '15:00', price: base * 1.002, vol: 41200 },
-    { time: '15:30', price: base, vol: 52100 },
-  ]
+  const base = Number(spot) > 0 ? Number(spot) : null
+  const data = base == null ? [] : [{ time: 'SNAPSHOT', price: base, vol: 0 }]
   const isUp = (changePct ?? 0) >= 0
 
   return (
@@ -51,7 +41,7 @@ export function NiftyIntradayChart({
         <div>
           <div style={{ fontSize: '11px', color: 'var(--text-sec, #94a3b8)', fontWeight: 600 }}>{title}</div>
           <div className="num" style={{ fontSize: '16px', fontWeight: 800, color: 'var(--text-pri, #f8fafc)', marginTop: 2 }}>
-            ₹{base.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {base == null ? 'PENDING' : `₹${base.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </div>
         </div>
         <span className="pill" style={{
@@ -90,19 +80,23 @@ export function NiftyIntradayChart({
 }
 
 export function VolatilitySmileChart({
-  strikes = [23800, 23900, 24000, 24100, 24200, 24300, 24400, 24500],
-  ivs = [18.2, 16.5, 15.1, 14.2, 13.9, 14.4, 15.3, 17.1],
-  spot = 24175.65
+  strikes,
+  ivs,
+  spot,
 }: {
   strikes?: number[]
   ivs?: number[]
   spot?: number
 }) {
-  const data = strikes.map((s, i) => ({
-    strike: s,
-    iv: ivs[i] || 14.5,
-    isAtm: Math.abs(s - spot) < 100
-  }))
+  const smileStrikes = Array.isArray(strikes) ? strikes : []
+  const smileIvs = Array.isArray(ivs) ? ivs : []
+  const data = smileStrikes.length && smileIvs.length
+    ? smileStrikes.map((s, i) => ({
+      strike: s,
+      iv: smileIvs[i],
+      isAtm: spot != null && Math.abs(s - spot) < 100,
+    })).filter((row) => row.iv != null)
+    : []
 
   return (
     <div className="card p-3" style={{ background: 'var(--surface-2, #0d1b2a)', border: '1px solid var(--border, #1e293b)', borderRadius: 8 }}>
@@ -110,7 +104,7 @@ export function VolatilitySmileChart({
         <div>
           <div style={{ fontSize: '11px', color: 'var(--text-sec, #94a3b8)', fontWeight: 600 }}>Implied Volatility Smile (IV)</div>
           <div className="num" style={{ fontSize: '16px', fontWeight: 800, color: '#38bdf8', marginTop: 2 }}>
-            ATM IV: {(ivs[3] || 14.2).toFixed(1)}%
+            {data.length ? `ATM IV: ${Number(data[Math.floor(data.length / 2)]?.iv).toFixed(1)}%` : 'ATM IV: PENDING'}
           </div>
         </div>
         <span style={{ fontSize: '10px', color: '#94a3b8', background: '#1e293b', padding: '2px 6px', borderRadius: 4 }}>
@@ -127,7 +121,7 @@ export function VolatilitySmileChart({
               contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: 6, fontSize: 11 }}
               formatter={(val: any) => [`${Number(val).toFixed(2)}%`, 'Implied Vol']}
             />
-            <ReferenceLine x={24100} stroke="#f59e0b" strokeDasharray="3 3" label={{ value: 'ATM', fill: '#f59e0b', fontSize: 9 }} />
+            {spot != null ? <ReferenceLine x={spot} stroke="#f59e0b" strokeDasharray="3 3" /> : null}
             <Line type="monotone" dataKey="iv" stroke="#38bdf8" strokeWidth={2} dot={{ r: 2, fill: '#38bdf8' }} />
           </LineChart>
         </ResponsiveContainer>
@@ -143,19 +137,9 @@ export function PnlEquityCurveChart({
   pnlHistory?: Array<{ date: string; pnl: number }>
   totalPnl?: number
 }) {
-  const defaultData = [
-    { trade: 'T1', cumulative: 1250 },
-    { trade: 'T5', cumulative: 3400 },
-    { trade: 'T10', cumulative: 2800 },
-    { trade: 'T15', cumulative: 5600 },
-    { trade: 'T20', cumulative: 7200 },
-    { trade: 'T25', cumulative: 6800 },
-    { trade: 'T30', cumulative: 9450 },
-    { trade: 'T35', cumulative: totalPnl > 0 ? totalPnl : 11200 },
-  ]
-  const data = pnlHistory.length > 0 ? pnlHistory : defaultData
-  const lastVal = data[data.length - 1]?.cumulative ?? totalPnl
-  const isUp = lastVal >= 0
+  const data = pnlHistory.length > 0 ? pnlHistory : []
+  const lastVal = data.length ? (data[data.length - 1]?.cumulative ?? totalPnl) : null
+  const isUp = typeof lastVal === 'number' && lastVal > 0
 
   return (
     <div className="card p-3" style={{ background: 'var(--surface-2, #0d1b2a)', border: '1px solid var(--border, #1e293b)', borderRadius: 8 }}>
@@ -163,7 +147,7 @@ export function PnlEquityCurveChart({
         <div>
           <div style={{ fontSize: '11px', color: 'var(--text-sec, #94a3b8)', fontWeight: 600 }}>Cumulative Paper Equity Curve</div>
           <div className="num" style={{ fontSize: '16px', fontWeight: 800, color: isUp ? '#10b981' : '#ef4444', marginTop: 2 }}>
-            ₹{Number(lastVal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {lastVal == null ? 'PENDING' : `₹${Number(lastVal).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
           </div>
         </div>
         <span style={{ fontSize: '10px', color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '2px 6px', borderRadius: 4, fontWeight: 700 }}>
@@ -199,14 +183,10 @@ export function SpearmanAccuracyTrendChart({
 }: {
   trend?: Array<{ date?: string; rho?: number; hit_rate?: number }>
 }) {
-  const defaultTrend = [
-    { date: '2026-08-25', rho: 0.715, hit_rate: 0.75 },
-    { date: '2026-08-26', rho: 0.728, hit_rate: 0.78 },
-    { date: '2026-08-27', rho: 0.742, hit_rate: 0.80 },
-    { date: '2026-08-28', rho: 0.731, hit_rate: 0.76 },
-    { date: '2026-08-29', rho: 0.710, hit_rate: 0.74 },
-  ]
-  const data = trend.length > 0 ? trend : defaultTrend
+  const data = trend.length > 0 ? trend : []
+  const avgRho = data.length
+    ? data.reduce((sum, row) => sum + Number(row.rho || 0), 0) / data.length
+    : null
 
   return (
     <div className="card p-4" style={{ background: 'var(--surface-2, #0d1b2a)', border: '1px solid var(--border, #1e293b)', borderRadius: 8, marginTop: 12 }}>
@@ -220,7 +200,7 @@ export function SpearmanAccuracyTrendChart({
           </span>
         </div>
         <span style={{ fontSize: '12px', fontWeight: 800, color: '#10b981', background: 'rgba(16,185,129,0.1)', padding: '3px 10px', borderRadius: 6 }}>
-          Avg ρ = 0.7252 (PASS)
+          {avgRho == null ? 'Avg ρ PENDING' : `Avg ρ = ${avgRho.toFixed(4)}`}
         </span>
       </div>
       <div style={{ height: 180, width: '100%' }}>

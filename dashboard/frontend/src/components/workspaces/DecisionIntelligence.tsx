@@ -3,13 +3,16 @@ import { Activity, AlertTriangle, Database, Shield, Zap } from 'lucide-react';
 import { useStore } from '../../store';
 import { MetricTile, StatusChip } from './TruthUI';
 import { brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
+import { brokerPermissionLabel } from '../../lib/lifecycleTruth';
 import { formatAgeSec, formatInr, formatIstStamp, shortSha } from '../../lib/formatLive';
+import { PendingLifecycleBanner } from '../PendingLifecycleBanner';
 
 export const DecisionIntelligence: React.FC = () => {
   const {
-    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper, setActiveTab,
+    health, state, brokerConnected, brokerStatus, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper, setActiveTab,
   } = useStore();
-  const dhanOk = brokerIsConnected(health, brokerConnected)
+  const dhanOk = brokerIsConnected(health, brokerConnected, brokerStatus)
+  const brokerLabel = brokerPermissionLabel({ brokerConnected, brokerStatus, health, state })
   const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok' || Boolean(health?.mode)
   const predictorRaw = String(health?.predictor?.status || '').toLowerCase()
   const predictorValue = predictorRaw || (paperModeActive(health) ? 'ANALYZER' : 'N/A')
@@ -70,6 +73,7 @@ export const DecisionIntelligence: React.FC = () => {
       </header>
 
       <div style={sectionStyle}>
+        <PendingLifecycleBanner />
         {!marketOpen && (
           <div
             data-testid="closed-market-ops-board"
@@ -132,7 +136,7 @@ export const DecisionIntelligence: React.FC = () => {
           <MetricTile label="Reconciliation" value={recon || '—'} tone={recon === 'OK' || recon === 'PASS' ? 'ok' : 'warn'} />
           <MetricTile label="Tick age" value={formatAgeSec(tickAge)} sub={marketOpen ? 'Market hours' : 'After hours poll'} />
           <MetricTile label="Cycle" value={cycle != null ? String(cycle) : '—'} sub={formatIstStamp(state?.last_fetch_ts_iso)} />
-          <MetricTile label="Broker latency" value={brokerMs != null ? `${brokerMs} ms` : '—'} tone={Number(brokerMs) < 200 ? 'ok' : 'warn'} />
+          <MetricTile label="Broker latency" value={brokerMs != null ? `${brokerMs} ms` : '—'} tone="warn" sub="Read-only. Fast latency is not trade permission." />
           <MetricTile label="Next open" value={String(nextOpen || '—')} sub={String(marketReason || '')} tone={marketOpen ? 'ok' : 'mut'} />
         </div>
 
@@ -147,7 +151,7 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Truth Control</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="BROKER" value={dhanOk ? 'CONNECTED' : 'DISCONNECTED'} status={dhanOk ? 'ok' : 'error'} />
+              <StatusChip label="BROKER" value={brokerLabel} status={brokerLabel === 'ORDER FLAG REVIEW' ? 'error' : 'warn'} />
               <StatusChip label="WS" value={wsStatus.toUpperCase()} status={wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'} />
               <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'mut'} />
             </div>
@@ -171,7 +175,7 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Data Sources</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="DHAN" value={dhanOk ? 'AUTH OK' : 'NO AUTH'} status={dhanOk ? 'ok' : 'error'} />
+              <StatusChip label="DHAN" value={dhanOk ? 'READ-ONLY' : brokerLabel} status="warn" />
               <StatusChip label="SOURCE" value={state?.data_source || health?.data_source || 'UNKNOWN'} status={state?.data_source || health?.data_source ? 'ok' : 'mut'} />
               <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'unknown')} status="ok" />
             </div>
@@ -209,6 +213,7 @@ export const DecisionIntelligence: React.FC = () => {
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('options-intel')}>OPTIONS INTEL</button>
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('risk-scenarios')}>RISK & SCENARIOS</button>
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('data-integrity')}>DATA INTEGRITY</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('system-readiness')}>SYSTEM READINESS</button>
           </div>
         </div>
       </div>

@@ -10,9 +10,11 @@ import json
 import math
 import os
 import re
+import subprocess
 import sys
 import threading
 import time
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -138,7 +140,7 @@ except ImportError:
     )
     from dashboard_truth import classify_overview_data_source  # type: ignore
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
 # pandas lazy-loaded — only import when actually needed
@@ -4129,6 +4131,14 @@ async def batch_positions_holdings():
 @app.get("/api/memory")
 async def get_memory():
     """Real-time memory usage — RSS vs Starter limit (512MB)."""
+    if sys.platform == "win32":
+        return {
+            "status": "SKIPPED",
+            "reason": "resource module is not available on Windows",
+            "rss_mb": None,
+            "limit_mb": None,
+            "pct_used": None,
+        }
     try:
         import resource, gc
         rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
@@ -7716,23 +7726,50 @@ async def world_class_30min_tracker_loop():
         await asyncio.sleep(1800)
 
 
+_async_worker_missing_logged = False
+
+
+def _start_async_background_worker_if_present() -> None:
+    """Start the optional cache worker. Log once when the module is absent."""
+    global _async_worker_missing_logged
+    try:
+        from src.core.async_background_worker import start_async_background_worker
+    except ModuleNotFoundError:
+        if not _async_worker_missing_logged:
+            print("[async-worker] skipped: src.core.async_background_worker is not installed")
+            _async_worker_missing_logged = True
+        return
+    except Exception as exc:
+        print(f"[async-worker] Failed to start background worker: {exc}")
+        return
+    try:
+        start_async_background_worker()
+        print("[async-worker] Non-blocking cached background worker started.")
+    except Exception as exc:
+        print(f"[async-worker] Failed to start background worker: {exc}")
+
+
 @app.on_event("startup")
 async def startup():
     """Store event loop on startup and start background tasks"""
     set_event_loop(asyncio.get_running_loop())
 
-    # Log startup memory so we know baseline RSS
-    try:
-        import resource, gc
-        gc.collect()  # Clean up before measuring
-        rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
-        print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
-        if rss_mb > 350:
-            print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
-        else:
-            print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
-    except Exception as e:
-        print(f"[startup] Memory check skipped: {e}")
+    # resource is a Unix module. Windows must skip it without raising.
+    if sys.platform == "win32":
+        print("[startup] Memory check skipped on Windows")
+    else:
+        try:
+            import resource
+            import gc
+            gc.collect()  # Clean up before measuring
+            rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
+            print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
+            if rss_mb > 350:
+                print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
+            else:
+                print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
+        except Exception as e:
+            print(f"[startup] Memory check skipped: {e}")
 
     # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
     # Fired as a background task (never awaited here) so a slow/hung Dhan
@@ -7763,13 +7800,8 @@ async def startup():
     asyncio.create_task(broker_self_heal_loop())
     print('[self-heal] scheduled')
 
-    # Start World-Class Non-Blocking Async Background Worker (<5ms UI reads)
-    try:
-        from src.core.async_background_worker import start_async_background_worker
-        start_async_background_worker()
-        print('[async-worker] Non-blocking cached background worker started.')
-    except Exception as _w_exc:
-        print(f'[async-worker] Failed to start background worker: {_w_exc}')
+    # Optional worker. Missing module is skipped once; do not invent the worker.
+    _start_async_background_worker_if_present()
 
     # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
     # Default ON for Cloud so Paper/Performance tabs are not permanently zero.
@@ -8712,7 +8744,7 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
             "missing matured prediction history / post-market validation."
         )
         if blockers:
-            message = f"{message} Blocker: {blockers[0]}"
+            message = f"{message} Blocker: {' '.join(blockers)}"
         message = f"{message} {live_reason}"
         status = "BLOCKED"
     else:
@@ -8785,13 +8817,37 @@ async def get_ml_performance(model_name: Optional[str] = None):
     summary = _ml_models_proof_summary(models)
     performance["models"] = models
     performance.update(summary)
+    truth = ml_router._validation_truth_payload()
+    acc = models.get("model_accuracy_report") if isinstance(models.get("model_accuracy_report"), dict) else {}
+    blocker_reasons = [
+        {"model": name, "blocker_reason": rec.get("blocker_reason")}
+        for name, rec in models.items()
+        if isinstance(rec, dict) and rec.get("blocker_reason")
+    ]
+    performance["ready_for_live"] = truth["ready_for_live"]
+    performance["ready_for_live_reason"] = truth["ready_for_live_reason"]
+    performance["validations_checklist"] = truth["validations_checklist"]
+    performance["rho"] = truth["rho"]
+    performance["hit_rate"] = truth["hit_rate"]
+    performance["proof_pass_count"] = acc.get("proof_pass_count") if isinstance(acc, dict) and "proof_pass_count" in acc else None
+    performance["generated_at_utc"] = acc.get("generated_at_utc") if isinstance(acc, dict) else None
+    performance["blocker_reason"] = acc.get("blocker_reason") if isinstance(acc, dict) else None
+    performance["blocker_reasons"] = blocker_reasons
     return {
         "status": "ok",
         "performance": performance,
         "model_proof_ready": summary["model_proof_ready"],
         "proof_status": summary["status"],
         "message": summary["message"],
-        "ready_for_live": bool(summary.get("ready_for_live")),
+        "ready_for_live": bool(truth["ready_for_live"]),
+        "ready_for_live_reason": truth["ready_for_live_reason"],
+        "validations_checklist": truth["validations_checklist"],
+        "rho": truth["rho"],
+        "hit_rate": truth["hit_rate"],
+        "proof_pass_count": performance["proof_pass_count"],
+        "generated_at_utc": performance["generated_at_utc"],
+        "blocker_reason": performance["blocker_reason"],
+        "blocker_reasons": blocker_reasons,
     }
 
 
@@ -8849,6 +8905,316 @@ async def compare_ml_models():
         "proof_status": summary["status"],
         "message": summary["message"],
         "ready_for_live": bool(summary.get("ready_for_live")),
+    }
+
+
+_CLOUD_ML_PERFORMANCE_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/ml/performance"
+_READINESS_BANNER = (
+    "Deploy is not allowed until this checklist is visible and ready_for_live is still false."
+)
+
+
+def _git_rev_parse(ref: str) -> Dict[str, Any]:
+    """Read a local git ref. Does not fetch."""
+    try:
+        proc = subprocess.run(
+            ["git", "rev-parse", ref],
+            cwd=str(ROOT_DIR),
+            timeout=5,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception as exc:
+        return {"ref": ref, "sha": None, "error": str(exc)[:300]}
+    if proc.returncode != 0:
+        err = (proc.stderr or proc.stdout or "git rev-parse failed").strip()
+        return {"ref": ref, "sha": None, "error": err[:300]}
+    sha = (proc.stdout or "").strip()
+    return {"ref": ref, "sha": sha or None, "error": None}
+
+
+def _dockerignore_validation_exceptions() -> Dict[str, Any]:
+    path = ROOT_DIR / ".dockerignore"
+    if not path.is_file():
+        return {
+            "present": False,
+            "market_validations_exception": False,
+            "paper_validations_exception": False,
+            "both": False,
+        }
+    text = path.read_text(encoding="utf-8", errors="replace")
+    market = "!state/market_validations/" in text or "!state/market_validations\n" in text
+    paper = "!state/paper_validations/" in text or "!state/paper_validations\n" in text
+    return {
+        "present": True,
+        "market_validations_exception": market,
+        "paper_validations_exception": paper,
+        "both": market and paper,
+    }
+
+
+def _owner_approval_status() -> Dict[str, Any]:
+    """Report the approval date only when that paragraph is actually in the file."""
+    rel = "docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md"
+    path = ROOT_DIR / rel
+    if not path.is_file():
+        return {
+            "present": False,
+            "approved_at": None,
+            "committed": None,
+            "detail": "directive file is missing",
+        }
+    text = path.read_text(encoding="utf-8", errors="replace")
+    heading = "OWNER EXPLICIT APPROVAL" in text
+    match = re.search(r"^Approved at:\s*(.+)$", text, flags=re.MULTILINE)
+    approved_at = match.group(1).strip() if match else None
+    head_text = ""
+    git_error = None
+    try:
+        proc = subprocess.run(
+            ["git", "show", f"HEAD:{rel}"],
+            cwd=str(ROOT_DIR),
+            timeout=5,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if proc.returncode == 0:
+            head_text = proc.stdout or ""
+        else:
+            git_error = (proc.stderr or "git show failed").strip()[:300]
+    except Exception as exc:
+        git_error = str(exc)[:300]
+    in_head = bool(approved_at) and approved_at in head_text and "OWNER EXPLICIT APPROVAL" in head_text
+    if heading and approved_at:
+        if git_error and not head_text:
+            detail = "approval paragraph is in the working tree; git commit state is UNKNOWN"
+            committed = None
+        elif in_head:
+            detail = "approval paragraph is in the file and in HEAD"
+            committed = True
+        else:
+            detail = "approval paragraph is in the working tree and is not in HEAD (uncommitted)"
+            committed = False
+        return {
+            "present": True,
+            "approved_at": approved_at,
+            "committed": committed,
+            "detail": detail,
+            "source": rel,
+        }
+    return {
+        "present": False,
+        "approved_at": None,
+        "committed": False if head_text or text else None,
+        "detail": "approval paragraph is missing from the directive file",
+        "source": rel,
+    }
+
+
+def _run_readonly_command(args: List[str], timeout: int = 15, max_stdout: int = 6000) -> Dict[str, Any]:
+    try:
+        proc = subprocess.run(
+            args,
+            cwd=str(ROOT_DIR),
+            timeout=timeout,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return {"ok": False, "error": f"{args[0]} is not installed", "stdout": "", "stderr": ""}
+    except subprocess.TimeoutExpired:
+        return {"ok": False, "error": f"{' '.join(args[:3])} timed out", "stdout": "", "stderr": ""}
+    except Exception as exc:
+        return {"ok": False, "error": str(exc)[:300], "stdout": "", "stderr": ""}
+    return {
+        "ok": proc.returncode == 0,
+        "exit_code": proc.returncode,
+        "error": None if proc.returncode == 0 else (proc.stderr or proc.stdout or "command failed").strip()[:500],
+        "stdout": (proc.stdout or "")[:max_stdout],
+        "stderr": (proc.stderr or "")[:1000],
+    }
+
+
+def _summarize_pull_requests(payload: Any) -> List[Dict[str, Any]]:
+    """Keep check names and conclusions. Drop URLs and timestamps from the gh rollup."""
+    if not isinstance(payload, list):
+        return []
+    summarized: List[Dict[str, Any]] = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        checks = []
+        rollup = item.get("statusCheckRollup")
+        if isinstance(rollup, list):
+            for row in rollup:
+                if not isinstance(row, dict):
+                    continue
+                checks.append(
+                    {
+                        "name": row.get("name") or row.get("context"),
+                        "status": row.get("status"),
+                        "conclusion": row.get("conclusion") or row.get("state"),
+                    }
+                )
+        summarized.append(
+            {
+                "number": item.get("number"),
+                "title": item.get("title"),
+                "url": item.get("url"),
+                "headRefName": item.get("headRefName"),
+                "checks": checks,
+            }
+        )
+    return summarized
+
+
+def _github_required_checks() -> Dict[str, Any]:
+    """Read-only gh. Failures stay as errors; nothing is marked green without a response."""
+    pr = _run_readonly_command(
+        [
+            "gh",
+            "pr",
+            "list",
+            "--repo",
+            "psw2025-cmd/Genesis_System3",
+            "--state",
+            "open",
+            "--limit",
+            "10",
+            "--json",
+            "number,title,url,headRefName,statusCheckRollup",
+        ],
+        max_stdout=500000,
+    )
+    main_status = _run_readonly_command(
+        ["gh", "api", "repos/psw2025-cmd/Genesis_System3/commits/main/status"],
+        max_stdout=200000,
+    )
+    pull_requests: Any = None
+    main_payload: Any = None
+    errors: List[str] = []
+    if pr.get("ok"):
+        try:
+            pull_requests = _summarize_pull_requests(json.loads(pr.get("stdout") or "[]"))
+        except json.JSONDecodeError:
+            errors.append("open PR JSON was not parseable")
+    else:
+        errors.append(str(pr.get("error") or "gh pr list failed"))
+    if main_status.get("ok"):
+        try:
+            raw = json.loads(main_status.get("stdout") or "{}")
+            statuses = raw.get("statuses") if isinstance(raw, dict) else None
+            main_payload = {
+                "state": raw.get("state") if isinstance(raw, dict) else None,
+                "sha": raw.get("sha") if isinstance(raw, dict) else None,
+                "statuses": [
+                    {"context": row.get("context"), "state": row.get("state")}
+                    for row in statuses
+                    if isinstance(row, dict)
+                ] if isinstance(statuses, list) else [],
+            }
+        except json.JSONDecodeError:
+            errors.append("main status JSON was not parseable")
+    else:
+        errors.append(str(main_status.get("error") or "gh api main status failed"))
+    return {
+        "ok": not errors,
+        "error": "; ".join(errors) if errors else None,
+        "pull_requests": pull_requests,
+        "main_status": main_payload,
+    }
+
+
+def _fetch_cloud_ml_performance() -> Dict[str, Any]:
+    """Read-only GET of the known Cloud Run performance URL. Does not log the body."""
+    try:
+        req = urllib.request.Request(
+            _CLOUD_ML_PERFORMANCE_URL,
+            headers={"Accept": "application/json", "User-Agent": "system3-readiness-readonly"},
+            method="GET",
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            raw = resp.read(200_000)
+        data = json.loads(raw.decode("utf-8", errors="replace"))
+    except Exception as exc:
+        return {
+            "ok": False,
+            "url": _CLOUD_ML_PERFORMANCE_URL,
+            "ready_for_live": None,
+            "status": None,
+            "message": None,
+            "error": str(exc)[:300],
+        }
+    if not isinstance(data, dict):
+        return {
+            "ok": False,
+            "url": _CLOUD_ML_PERFORMANCE_URL,
+            "ready_for_live": None,
+            "status": None,
+            "message": None,
+            "error": "cloud payload was not an object",
+        }
+    perf = data.get("performance") if isinstance(data.get("performance"), dict) else {}
+    return {
+        "ok": True,
+        "url": _CLOUD_ML_PERFORMANCE_URL,
+        "ready_for_live": data.get("ready_for_live", perf.get("ready_for_live")),
+        "status": data.get("proof_status") or perf.get("status") or data.get("status"),
+        "message": data.get("message") or perf.get("message"),
+        "error": None,
+    }
+
+
+def _local_ml_readiness_view(perf: Dict[str, Any]) -> Dict[str, Any]:
+    performance = perf.get("performance") if isinstance(perf.get("performance"), dict) else {}
+    return {
+        "ready_for_live": perf.get("ready_for_live", performance.get("ready_for_live")),
+        "status": perf.get("proof_status") or performance.get("status"),
+        "message": perf.get("message") or performance.get("message"),
+        "ready_for_live_reason": perf.get("ready_for_live_reason") or performance.get("ready_for_live_reason"),
+        "rho": perf.get("rho", performance.get("rho")),
+        "hit_rate": perf.get("hit_rate", performance.get("hit_rate")),
+        "proof_pass_count": perf.get("proof_pass_count", performance.get("proof_pass_count")),
+        "generated_at_utc": perf.get("generated_at_utc", performance.get("generated_at_utc")),
+        "blocker_reason": perf.get("blocker_reason", performance.get("blocker_reason")),
+        "blocker_reasons": perf.get("blocker_reasons", performance.get("blocker_reasons")),
+        "validations_checklist": perf.get("validations_checklist") or performance.get("validations_checklist") or [],
+    }
+
+
+@app.get("/dashboard/system-readiness", include_in_schema=False)
+async def system_readiness_page():
+    """Bookmark path. The SPA router is /ui/?tab=system-readiness."""
+    return RedirectResponse(url="/ui/?tab=system-readiness", status_code=307)
+
+
+@app.get("/api/system/readiness")
+async def get_system_readiness():
+    """Read-only pre-deploy facts. Does not deploy and does not change LIVE_TRADING_ENABLED."""
+    perf = await get_ml_performance()
+    cloud = await asyncio.to_thread(_fetch_cloud_ml_performance)
+    github_checks = await asyncio.to_thread(_github_required_checks)
+    live_raw = os.environ.get("LIVE_TRADING_ENABLED")
+    live_display = "unset" if live_raw is None or str(live_raw).strip() == "" else str(live_raw).strip()
+    pin_set = bool(os.environ.get("DHAN_PIN", "").strip())
+    return {
+        "deploy_allowed": False,
+        "banner": _READINESS_BANNER,
+        "local_git": {
+            "head": _git_rev_parse("HEAD"),
+            "origin_main": _git_rev_parse("origin/main"),
+        },
+        "live_trading_enabled": live_display,
+        "dhan_pin_set": pin_set,
+        "dhan_pin_warning": None if pin_set else "DHAN_PIN is not set; token refresh skipped",
+        "dockerignore": _dockerignore_validation_exceptions(),
+        "owner_approval": _owner_approval_status(),
+        "github_checks": github_checks,
+        "local_ml_performance": _local_ml_readiness_view(perf if isinstance(perf, dict) else {}),
+        "cloud_ml_performance": cloud,
     }
 
 

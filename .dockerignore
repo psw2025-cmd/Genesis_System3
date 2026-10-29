@@ -21,7 +21,18 @@ agent_memory
 dashboard/backend/logs
 # Runtime state stays out of the image. Later exceptions keep real validation JSON.
 state/*
+!state
 !state/market_validations/
 !state/market_validations/*.json
 !state/paper_validations/
 !state/paper_validations/*.json
+
+# PERMANENT FIX - Never bake live data - 2026-10-29
+**/moneycontrol_option_gainers.json
+**/moneycontrol_*.json
+reports/latest/*.json
+state/market_validations/*.json
+!state/market_validations/.gitkeep
+state/paper_validations/*.json
+!state/paper_validations/.gitkeep
+!reports/latest/.gitkeep

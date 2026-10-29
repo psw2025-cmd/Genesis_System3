@@ -1,6 +1,8 @@
 import { Activity, Database, Shield, Wallet } from 'lucide-react'
 import { useStore } from '../store'
 import { BrokerPanel } from './BrokerPanel'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
+import { availableBalance, brokerPermissionLabel, orderAllowedValue } from '../lib/lifecycleTruth'
 
 function fmtTime(value: any) {
   if (!value) return 'PENDING PROOF'
@@ -37,9 +39,13 @@ export function BrokerProofPanel() {
   const tokenHealthy = proof?.expired === false && (hours == null || Number(hours) > 0)
   const sourceOk = Boolean(proof?.source)
   const liveOff = !Boolean(state?.live_trading_enabled || state?.liveTradingEnabled || brokerStatus?.live_trading_enabled || brokerStatus?.order_placement_allowed)
+  const permission = brokerPermissionLabel({ brokerConnected, brokerStatus, state, brokerFunds })
+  const available = availableBalance(brokerFunds)
+  const orderAllowed = orderAllowedValue(state, brokerStatus)
 
   return (
     <div className="workspace-shell" style={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+      <PendingLifecycleBanner />
       <div className="card" style={{ padding: 12, flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14, flexWrap: 'wrap' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -50,9 +56,9 @@ export function BrokerProofPanel() {
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-            <span className="pill" style={{ color: brokerConnected ? 'var(--up)' : 'var(--amber)', border: `1px solid ${brokerConnected ? 'rgba(24,215,130,.26)' : 'rgba(245,165,36,.26)'}`, background: brokerConnected ? 'rgba(24,215,130,.06)' : 'rgba(245,165,36,.06)' }}>
-              <span className="status-dot" style={{ color: brokerConnected ? 'var(--up)' : 'var(--amber)' }} />
-              {brokerConnected ? 'CONNECTED' : 'PENDING PROOF'}
+            <span className="pill" data-testid="broker-permission-badge" style={{ color: 'var(--amber)', border: '1px solid rgba(245,165,36,.45)', background: 'rgba(245,165,36,.08)' }}>
+              <span className="status-dot" style={{ color: 'var(--amber)' }} />
+              {permission}
             </span>
             <span className="pill" style={{ color: liveOff ? 'var(--up)' : 'var(--down)', border: `1px solid ${liveOff ? 'rgba(24,215,130,.22)' : 'rgba(255,73,100,.24)'}`, background: liveOff ? 'rgba(24,215,130,.05)' : 'rgba(255,73,100,.06)' }}>
               <Shield size={11} /> {liveOff ? 'READ-ONLY / LIVE OFF' : 'LIVE FLAG REVIEW'}
@@ -61,7 +67,9 @@ export function BrokerProofPanel() {
         </div>
 
         <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', marginTop: 10 }}>
-          <ProofMetric label="API / Broker" value={brokerConnected ? `CONNECTED · ${brokerStatus?.latency_ms ?? '-'}ms` : String(brokerStatus?.error || 'WAITING')} ok={brokerConnected} icon={<Activity size={13} />} />
+          <ProofMetric label="API / Broker" value={`${permission}${brokerStatus?.latency_ms != null ? ` · ${brokerStatus.latency_ms}ms read-only` : ''}`} ok={false} icon={<Activity size={13} />} />
+          <ProofMetric label="order_allowed" value={orderAllowed === null ? 'null' : String(orderAllowed)} ok={false} icon={<Shield size={13} />} />
+          <ProofMetric label="Available" value={available === null ? 'PENDING' : String(available)} ok={false} icon={<Wallet size={13} />} />
           <ProofMetric label="Token Source" value={proof?.source || 'PENDING'} ok={sourceOk} icon={<Shield size={13} />} />
           <ProofMetric label="Secret Version" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'PENDING'} ok={Boolean(proof?.secret_version)} icon={<Database size={13} />} />
           <ProofMetric label="Token Loaded" value={fmtTime(proof?.loaded_at_utc)} ok={Boolean(proof?.loaded_at_utc)} icon={<Activity size={13} />} />
