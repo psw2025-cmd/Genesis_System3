@@ -1,52 +1,24 @@
 {
-  "generated_utc": "2026-08-29T18:22:15.380567Z",
+  "generated_utc": "2026-10-29T08:11:49.207517Z",
   "gates": {
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
       "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-      "pass": true,
-      "days_recorded": 5,
-      "days_passing_threshold": 5,
+      "pass": false,
+      "days_recorded": 1,
+      "days_passing_threshold": 0,
       "days_required": 5,
       "threshold": 0.7,
-      "latest_rho": 0.71,
-      "consecutive_pass_days": 5,
-      "blocker_id": null,
+      "latest_rho": 0.2,
+      "consecutive_pass_days": 0,
+      "blocker_id": "SYS3-BLK-005",
       "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
       "days": [
         {
-          "date": "2026-08-25",
-          "rho": 0.715,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-26",
-          "rho": 0.728,
-          "hit_rate": 0.8,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-27",
-          "rho": 0.742,
-          "hit_rate": 0.8,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-28",
-          "rho": 0.731,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
-        },
-        {
-          "date": "2026-08-29",
-          "rho": 0.71,
-          "hit_rate": 0.75,
-          "status": "PASS",
-          "pass": true
+          "date": "2026-06-12",
+          "rho": 0.2,
+          "hit_rate": 0.6667,
+          "status": "RETRAIN_NEEDED",
+          "pass": false
         }
       ]
     },
@@ -86,8 +58,8 @@
       "pass": true,
       "report_exists": true,
       "rows": 1,
-      "validation_days": 5,
-      "spearman_days_passing": 5,
+      "validation_days": 1,
+      "spearman_days_passing": 0,
       "blocker_id": null,
       "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
     },
@@ -102,18 +74,19 @@
     "EQUITY_FO_ELIGIBILITY_PROVEN": {
       "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
       "pass": true,
-      "underlying_count": 211,
+      "underlying_count": 219,
       "blocker_id": null,
       "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
     }
   },
-  "gates_passing": 5,
+  "gates_passing": 4,
   "gates_total": 7,
   "open_blockers": [
     "PROFIT_BLOCKER",
+    "SYS3-BLK-005",
     "SYS3-BLK-008"
   ],
-  "prediction_accuracy_blocked": false,
+  "prediction_accuracy_blocked": true,
   "profit_blocked": true,
   "lifecycle_blocked": true,
   "human_approval": true,
@@ -121,10 +94,12 @@
   "trade_ready": false,
   "analyzer_ready": true,
   "technical_gates_still_required": [
+    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
     "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF"
   ],
   "recommended_auto_actions": [
+    "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
     "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
     "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
   ],

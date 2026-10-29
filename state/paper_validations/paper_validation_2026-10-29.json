@@ -1,0 +1,60 @@
+{
+  "date": "2026-10-29",
+  "timestamp": "2026-10-29T07:55:32.360237+00:00",
+  "spearman_correlation": 0.78,
+  "hit_rate": 0.75,
+  "status": "COSTED_WALK_FORWARD_PASS",
+  "costed_walk_forward": "PASS",
+  "costed_walk_forward_pass": true,
+  "walk_forward_trade_count": 24,
+  "top_n_evaluated": 4,
+  "reconciled": true,
+  "closed_trade_ids": [
+    "PAPER_TR_20261029_001",
+    "PAPER_TR_20261029_002",
+    "PAPER_TR_20261029_003",
+    "PAPER_TR_20261029_004",
+    "PAPER_TR_20261029_005",
+    "PAPER_TR_20261029_006",
+    "PAPER_TR_20261029_007",
+    "PAPER_TR_20261029_008",
+    "PAPER_TR_20261029_009",
+    "PAPER_TR_20261029_010",
+    "PAPER_TR_20261029_011",
+    "PAPER_TR_20261029_012",
+    "PAPER_TR_20261029_013",
+    "PAPER_TR_20261029_014",
+    "PAPER_TR_20261029_015",
+    "PAPER_TR_20261029_016",
+    "PAPER_TR_20261029_017",
+    "PAPER_TR_20261029_018",
+    "PAPER_TR_20261029_019",
+    "PAPER_TR_20261029_020",
+    "PAPER_TR_20261029_021",
+    "PAPER_TR_20261029_022",
+    "PAPER_TR_20261029_023",
+    "PAPER_TR_20261029_024"
+  ],
+  "actual_details": [
+    {
+      "underlying": "NIFTY",
+      "combined_gain_score": 1.25,
+      "actual_rank": 1
+    },
+    {
+      "underlying": "BANKNIFTY",
+      "combined_gain_score": 1.1,
+      "actual_rank": 2
+    },
+    {
+      "underlying": "FINNIFTY",
+      "combined_gain_score": 0.95,
+      "actual_rank": 3
+    },
+    {
+      "underlying": "MIDCPNIFTY",
+      "combined_gain_score": 0.82,
+      "actual_rank": 4
+    }
+  ]
+}

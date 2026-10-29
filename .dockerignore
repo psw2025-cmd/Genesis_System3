@@ -1,4 +1,4 @@
-﻿.git
+.git
 .venv
 venv
 __pycache__
@@ -24,8 +24,6 @@ state/*
 !state
 !state/market_validations/
 !state/market_validations/*.json
-!state/paper_validations/
-!state/paper_validations/*.json
 
 # PERMANENT FIX - Never bake live data - 2026-10-29
 **/moneycontrol_option_gainers.json
@@ -33,6 +31,9 @@ state/*
 reports/latest/*.json
 state/market_validations/*.json
 !state/market_validations/.gitkeep
-state/paper_validations/*.json
-!state/paper_validations/.gitkeep
 !reports/latest/.gitkeep
+!state/market_validations/*.json
+!scripts/run_paper_validation.py
+!state/paper_validations/
+!state/paper_validations/*.json
+!state/paper_validations/.gitkeep
