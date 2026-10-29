@@ -5,6 +5,7 @@ Saves ~75MB RAM at startup.
 """
 from __future__ import annotations
 import json
+import math
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -83,19 +84,14 @@ def _load_validations() -> List[Dict]:
 
 
 def _as_float(value: Any) -> Optional[float]:
+    """Return only finite numeric values; NaN/Infinity are not evidence."""
     if isinstance(value, bool) or value is None:
         return None
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str):
-        text = value.strip()
-        if not text:
-            return None
-        try:
-            return float(text)
-        except ValueError:
-            return None
-    return None
+    try:
+        number = float(value) if isinstance(value, (int, float, str)) else None
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if number is not None and math.isfinite(number) else None
 
 
 def _first_float(data: Dict[str, Any], keys: tuple[str, ...]) -> Optional[float]:
@@ -322,6 +318,10 @@ def _assess_validation_file(path: Path) -> tuple[bool, str]:
         problems.append(f"rho {rho} is not > 0.70")
     if hit is None:
         problems.append("missing numeric hit_rate")
+    elif not 0.0 <= hit <= 1.0:
+        problems.append("hit_rate must be between 0 and 1")
+    if rho is not None and not -1.0 <= rho <= 1.0:
+        problems.append("rho must be between -1 and 1")
     status = _status_text(data.get("status"))
     if status not in _COMPLETED_PASS_STATUSES:
         shown = status or "MISSING"
