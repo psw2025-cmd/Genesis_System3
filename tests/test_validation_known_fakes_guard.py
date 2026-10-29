@@ -22,3 +22,11 @@ def test_market_rank_study_does_not_prove_paper_trade_lifecycle():
     text = ast.get_source_segment(source, func)
     assert "real_bhavcopy_5day_validation.py" in text
     assert "market ranking study is not closed paper-trade reconciliation" in text
+
+
+def test_validation_requires_source_record_hashes():
+    source = ROUTER.read_text(encoding="utf-8")
+    func = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "_assess_validation_file")
+    text = ast.get_source_segment(source, func)
+    for field in ("source_evidence", "predictions_sha256", "outcomes_sha256", "closed_trades_sha256"):
+        assert field in text
