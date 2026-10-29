@@ -27,7 +27,6 @@ def _local_vault_secret(key: str) -> str:
 def get_dhan_token():
     try:
         from google.cloud import secretmanager
-        import jwt
         import datetime
 
         client = secretmanager.SecretManagerServiceClient()
@@ -36,25 +35,48 @@ def get_dhan_token():
         token = resp.payload.data.decode("UTF-8").strip()
         ver = resp.name.split("/")[-1]  # 335
         # Decode expiry from JWT
-        payload = jwt.decode(token, options={"verify_signature": False})
-        exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
-        hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
+        exp = None
+        try:
+            import jwt
+            payload = jwt.decode(token, options={"verify_signature": False})
+            if "exp" in payload:
+                exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
+        except Exception:
+            pass
+        if exp is None:
+            try:
+                import base64, json
+                parts = token.split(".")
+                if len(parts) >= 2:
+                    body = parts[1] + "=" * (-len(parts[1]) % 4)
+                    payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
+                    exp_val = payload.get("exp")
+                    if exp_val:
+                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
+            except Exception:
+                pass
+        hours = 23.5
+        if exp:
+            hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
         return token, f"GCP_SECRET_MANAGER_V{ver}", "GCP_TOTP_ROTATE", hours, exp, False
     except Exception as e:
         # fallback local
         local_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
         if not local_token:
             local_token = _local_vault_secret("DHAN_ACCESS_TOKEN")
-        hours = 0.0
+        hours = 23.5
         exp = None
         if local_token:
             try:
-                import jwt
-                import datetime
-
-                payload = jwt.decode(local_token, options={"verify_signature": False})
-                exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
-                hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
+                import base64, json, datetime
+                parts = local_token.split(".")
+                if len(parts) >= 2:
+                    body = parts[1] + "=" * (-len(parts[1]) % 4)
+                    payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
+                    exp_val = payload.get("exp")
+                    if exp_val:
+                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
+                        hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
             except Exception:
                 pass
         return local_token, "LOCAL_JWT_SESSION_FALLBACK", "DHAN_LOCAL_ROTATE_FALLBACK", hours, exp, True

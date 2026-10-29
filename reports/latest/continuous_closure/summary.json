@@ -1,6 +1,6 @@
 {
   "schema": "continuous_closure_v1",
-  "generated_at_utc": "2026-10-28T21:42:48.329463Z",
+  "generated_at_utc": "2026-10-29T08:11:13.066005Z",
   "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
   "phases": {
     "repo_first_scan": {
@@ -27,7 +27,7 @@
         "broker_connected": true
       },
       "auto_gates": {
-        "generated_utc": "2026-10-28T21:42:44.825933Z",
+        "generated_utc": "2026-10-29T08:11:12.842143Z",
         "gates": {
           "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
             "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
@@ -135,7 +135,7 @@
           "LIVE_TRADING_DISABLED_BY_DESIGN"
         ]
       },
-      "checked_at_utc": "2026-10-28T21:42:48.328466Z",
+      "checked_at_utc": "2026-10-29T08:11:13.063008Z",
       "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
     },
     "watchdog": {
