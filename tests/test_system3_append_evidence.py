@@ -46,7 +46,7 @@ class AppendOnlyEvidenceTests(unittest.TestCase):
         probe=subprocess.run(["git","show","origin/main:SYSTEM3/02_EVIDENCE/EVIDENCE.ndjson"],
                              cwd=ROOT,capture_output=True,check=False)
         if probe.returncode == 0:
-            self.assertTrue(current.startswith(probe.stdout),"Evidence history was rewritten or truncated")
+            self.assertTrue(current.replace(b"\r\n", b"\n").startswith(probe.stdout.replace(b"\r\n", b"\n")),"Evidence history was rewritten or truncated")
         else:
             self.assertGreaterEqual(len(current.splitlines()),8)
 

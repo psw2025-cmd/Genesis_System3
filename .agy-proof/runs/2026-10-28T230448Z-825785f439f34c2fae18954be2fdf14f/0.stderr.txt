@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3\tests\check_permanent_moneycontrol_fix.py", line 51, in <module>
+    main()
+  File "C:\Genesis_System3\tests\check_permanent_moneycontrol_fix.py", line 28, in main
+    from dashboard.backend.services.moneycontrol_live import get_live_data
+  File "C:\Genesis_System3\dashboard\backend\services\moneycontrol_live.py", line 1, in <module>
+    import os, json, time, requests
+ModuleNotFoundError: No module named 'requests'

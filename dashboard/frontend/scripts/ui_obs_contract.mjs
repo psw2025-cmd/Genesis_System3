@@ -28,6 +28,7 @@ const expectedTabs = [
   'broker',
   'alerts',
   'system',
+  'system-readiness',
   'gates',
 ]
 
@@ -49,7 +50,7 @@ for (const tab of expectedTabs) {
   assert.match(sidebar, new RegExp(`id:\\s*'${tab}'`), `Sidebar must expose ${tab}`)
   assert.match(app, new RegExp(`case\\s+'${tab}'`), `App must render ${tab}`)
 }
-assert.equal((sidebar.match(/\{\s*id:\s*'/g) || []).length, 22, 'canonical tab count must remain 22')
+assert.equal((sidebar.match(/\{\s*id:\s*'/g) || []).length, 23, 'canonical tab count must remain 23')
 
 assert.match(dataIntegrity, /<SystemProgressPanel\s*\/>/, 'Data Integrity must render progress truth')
 for (const path of [

@@ -1,0 +1,140 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "44d9fbb1-7029-4840-aa80-dd79b18c349c",
+  "turn": "59d440ec02604f35907feaf8fac1f2c8",
+  "run_id": "d6999d8e700240449375a67e7ed3cdcb",
+  "observed_utc": "2026-10-29T06:49:52Z",
+  "workspace": "C:\\Genesis_System3",
+  "scope": "Verify Genesis System3 Forensic Fix end-to-end across Laptop, GitHub PR #488, and Google Cloud Run genesis-system3-web",
+  "limitations": [
+    "Read-only verification and PAPER trading mode permanently locked (LIVE_TRADING_ENABLED=0)",
+    "No real capital risk or order placement allowed"
+  ],
+  "gate_sha256": "b27c10c10947dfd816bd1a6f28adf72034aeb90b978a7d8b8aa2de2049bda944",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3\\.agy-proof\\contract.json",
+    "sha256": "1ca6db42a47171ef5fcae5bf218f636a541018219383fe72773fda227838a64c"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3\\.dockerignore",
+      "sha256": "d3aebadc757e64e864ad78064e3cb7c4952758a856602191fba1052a8ae7750d"
+    },
+    {
+      "path": "C:\\Genesis_System3\\Dockerfile",
+      "sha256": "fa95aeea12bb06b9f2f99c25e8400a3a045b185a7fa04349aa6685ccf41d50af"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\backend\\services\\moneycontrol_live.py",
+      "sha256": "d76de7b39cec5c065b45f022838fb30500bc364bd77da72d93fb824a3b3b925c"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\GenesisTab.tsx",
+      "sha256": "f0d4ce92ae5162d6eaac415b5b6b0aac1b801b29a4d6380bb4777976a0a07d13"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\OptionChain.tsx",
+      "sha256": "7a119b3666e2333b8ac22fa2cdfcecd778041744dda17704da3aad0107052801"
+    },
+    {
+      "path": "C:\\Genesis_System3\\tests\\check_permanent_moneycontrol_fix.py",
+      "sha256": "b4a0c7100b58485df68999849d101063ea9d4bf30b86da1f4c2c87b19d84dab3"
+    },
+    {
+      "path": "C:\\Genesis_System3\\tests\\check_full_forensic_laptop_github_cloud.py",
+      "sha256": "b5cd0d46cf3fa1d7c2597eea2da2369fb0c4acf34037044963d96970053056ef"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-29T064949Z-63f004c980bf41e7ade79efc8865637e\\0.stdout.txt",
+      "sha256": "2295cbfa354c4eec58a1f257f086a5323356289e3cd6c342ef3eba960718d399"
+    },
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-29T064949Z-63f004c980bf41e7ade79efc8865637e\\0.stderr.txt",
+      "sha256": "8afb90ce982c6c3d653c7cd764973e4a634c7ec1e40356576395f33fc5dac865"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": ".dockerignore contains moneycontrol exclusion and unblocks !state",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "dashboard/backend/services/moneycontrol_live.py exists and returns Path B live data",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Dockerfile has no COPY of moneycontrol json",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "C:\\Temp\\Genesis_Forensic\\PERMANENT_FIX_DONE.txt created with full proof",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Zero occurrences of fake metrics (88.0%, 74.0%, 68.0%, 1.85) in dashboard/frontend/src",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R6",
+      "description": "GitHub PR #488 merged to main and synced on Laptop",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R7",
+      "description": "Google Cloud Run deployed and healthy with LIVE_TRADING_ENABLED=0 and ready_for_live=false",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3\\.venv\\Scripts\\python.exe",
+        "tests/check_full_forensic_laptop_github_cloud.py"
+      ],
+      "cwd": "C:\\Genesis_System3",
+      "started_utc": "2026-10-29T06:49:49Z",
+      "elapsed_seconds": 3.282,
+      "exit_code": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "actual": true,
+        "expected": true
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "0cde1b3993a1de500044952c402cff976eba571c9f4eadc9d464e32ce1ad5b23"
+}

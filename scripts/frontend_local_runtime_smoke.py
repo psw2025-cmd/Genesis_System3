@@ -216,9 +216,11 @@ def main() -> int:
 
     preview_port = _free_port()
     base_url = f"http://{HOST}:{preview_port}/ui/"
+    npm_cmd = shutil.which("npm.cmd") or shutil.which("npm") or "npm"
     preview = subprocess.Popen(
-        ["npm", "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"],
+        [npm_cmd, "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"],
         cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+        shell=(sys.platform == "win32"),
     )
     failures: list[str] = []
     captured = 0

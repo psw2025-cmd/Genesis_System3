@@ -1,21 +1,78 @@
 {
-  "generated_at_utc": "2026-07-02T12:15:00+00:00",
-  "generated_at_ist": "2026-07-02T17:45:00+05:30",
-  "checks": [
-    {"n": 1, "check": "all required files exist", "status": "PASS", "evidence": "12 JSON + matching MD files across runtime_authority, safety_lock, scheduler_catchup, api_health, broker_truth, market_session, instrument_tradability, analyzer_signal, analyzer_paper_lifecycle_proof, dashboard_truth, full_trading_pipeline_readiness"},
-    {"n": 2, "check": "JSON files valid", "status": "PASS", "evidence": "All 12 JSON files parsed successfully with python json.load"},
-    {"n": 3, "check": "safety flags remain disabled", "status": "PASS", "evidence": "ANALYZE_MODE=1, LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0 hardcoded in render.yaml; SYSTEM3_REAL_ONLY defaults to 1 in code. Verified in safety_lock_summary.json."},
-    {"n": 4, "check": "broker proof is real or honestly marked not proven", "status": "PASS", "evidence": "broker_truth_summary.json reports BROKER_CONNECTED_REAL with real API evidence, and honestly documents the web/worker token divergence architecture gap rather than hiding it."},
-    {"n": 5, "check": "market session proof exists", "status": "PASS", "evidence": "market_session_summary.json - Thursday, trading day, currently POST_MARKET_CLOSED, next-day command provided."},
-    {"n": 6, "check": "valid option contract proof exists or blocker remains", "status": "PASS", "evidence": "instrument_tradability_summary.json - blocker honestly recorded (MARKET_CLOSED_NO_EOD_DATA_YET), not faked."},
-    {"n": 7, "check": "paper lifecycle proof exists or blocker remains", "status": "PASS", "evidence": "analyzer_paper_lifecycle_proof/summary.json - BLOCKED_MARKET_CLOSED, historical evidence preserved and correctly labeled as self-test, trade_ready=false."},
-    {"n": 8, "check": "P&L reconciliation exists or blocker remains", "status": "PASS", "evidence": "pnl_reconciliation.json - all fields null with honest explanation, no fabricated figures."},
-    {"n": 9, "check": "dashboard screenshots tied to API/DB/report truth", "status": "PARTIAL", "evidence": "1 of 10 required panels captured (user-provided screenshot), cross-checked against API truth in the same time window. Remaining 9 honestly documented as not captured (no browser automation tooling this session)."},
-    {"n": 10, "check": "scheduler catch-up policy and tests exist", "status": "PASS", "evidence": "config/system3_scheduler_catchup_policy.json (23 jobs) + tests/test_scheduler_catchup.py (14 new tests, all 10 required scenarios covered, 33/33 total tests passing)."},
-    {"n": 11, "check": "no secrets leaked", "status": "PASS", "evidence": "grep scan of entire reports/latest/ tree for DHAN_ACCESS_TOKEN/PIN/TOTP/WORKER_PUSH_TOKEN value patterns: zero matches."},
-    {"n": 12, "check": "no live trading enabled", "status": "PASS", "evidence": "Confirmed via safety_lock_summary.json, api_health responses (live_allowed:false throughout), and order-placement code path analysis (two independent unconditional blocks)."}
+  "auto_closed_count": 0,
+  "broker_manual_required": true,
+  "closure_items": [
+    {
+      "blocker": "live_market_analyzer_paper_trade_not_proven",
+      "safe_to_auto_fix": false,
+      "status": "MANUAL_RUNTIME_PROOF_REQUIRED",
+      "why": "Requires market-day broker-connected analyzer/paper lifecycle with valid expiry, strike, order/fill/exit/PnL reconciliation."
+    },
+    {
+      "blocker": "full_signal_to_exit_pnl_lifecycle_not_proven",
+      "safe_to_auto_fix": false,
+      "status": "MANUAL_RUNTIME_PROOF_REQUIRED",
+      "why": "A PASS with simulated exit or invalid contract fields is analyzer proof only, not trade-readiness proof."
+    },
+    {
+      "blocker": "valid_option_contract_not_proven",
+      "safe_to_auto_fix": false,
+      "status": "CLOSED",
+      "why": "Current lifecycle output has empty expiry or strike 0; paper proof must use a real tradable option contract."
+    },
+    {
+      "blocker": "lifecycle_proof_broker_not_connected",
+      "safe_to_auto_fix": false,
+      "status": "MANUAL_BROKER_LOGIN_REQUIRED",
+      "why": "Broker session/secrets must stay outside repo and CI logs."
+    },
+    {
+      "blocker": "browser_screenshot_truth_not_proven_in_ci",
+      "safe_to_auto_fix": true,
+      "status": "PROOF_REQUIRED",
+      "why": "Can be closed by generating dashboard browser proof and endpoint coverage artifacts in CI/local runner."
+    },
+    {
+      "blocker": "positive_costed_expectancy_not_proven",
+      "safe_to_auto_fix": false,
+      "status": "LAPTOP_BHAVCOPY_RUN_REQUIRED",
+      "why": "Requires real bhavcopy/costed backtest evidence; seed estimates do not prove edge."
+    }
   ],
-  "overall_status": "PASS_WITH_ONE_PARTIAL",
-  "partial_item": "Check 9 (dashboard screenshots) is PARTIAL, not FAIL - real evidence exists for the one panel captured, honestly disclosed gap for the rest, no fabrication anywhere.",
-  "closure_gate_pass": true
+  "core_artifacts": {
+    "blockers": "reports/latest/auto_recovery_blockers/auto_recovery_blockers.json",
+    "lifecycle": "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+    "matrix": "reports/latest/proof_status_matrix/proof_status_matrix.json",
+    "pipeline": "reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json"
+  },
+  "final_verdict": "PROOF_INFRASTRUCTURE_READY_MANUAL_RUNTIME_PROOF_REQUIRED",
+  "generated_utc": "2026-10-29T12:01:28.716545+00:00",
+  "live_trading_enabled": false,
+  "malformed_core_artifacts": [],
+  "malformed_secondary_artifacts": [],
+  "manual_runtime_required_count": 4,
+  "missing_core_artifacts": [],
+  "missing_secondary_artifacts": [],
+  "mode": "ANALYZER_PAPER_ONLY",
+  "next_safe_command": "python scripts/paper_lifecycle_proof.py --force on broker-enabled market-day runtime with a valid option contract; then run python scripts/system3_master_proof_orchestrator.py",
+  "open_item_count": 5,
+  "safety_flags": {
+    "ANALYZE_MODE": "1",
+    "LIVE_TRADING_ENABLED": "0",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+    "analyze_mode_truthy": true,
+    "live_trading_allowed_truthy": false,
+    "live_trading_enabled_truthy": false,
+    "safe": true
+  },
+  "secondary_artifacts": {
+    "broker_validation": "reports/latest/broker_trader_validation/summary.json",
+    "dashboard_browser": "reports/latest/dashboard_browser_proof/summary.json",
+    "dashboard_truth": "reports/latest/dashboard_truth_proof/summary.json",
+    "endpoint_coverage": "reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json",
+    "expectancy": "reports/latest/friction_expectancy/summary.json",
+    "real_market_data": "reports/latest/real_market_data_proof/summary.json"
+  },
+  "status": "PASS_WITH_MANUAL_RUNTIME_ITEMS",
+  "trade_ready": false
 }

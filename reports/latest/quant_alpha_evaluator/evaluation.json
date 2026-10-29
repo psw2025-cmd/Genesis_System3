@@ -1,0 +1,59 @@
+{
+  "blockers": [
+    "benchmark_not_supplied",
+    "daily_return_series_not_supplied",
+    "directional_accuracy_not_measured",
+    "frozen_holdout_manifest_not_supplied",
+    "insufficient_oos_days:5<60",
+    "insufficient_oos_trades:8<100",
+    "negative_net_pnl",
+    "selection_bias_adjustment_not_supplied",
+    "top_decile_precision_not_measured"
+  ],
+  "destructive_git_reset_allowed": false,
+  "evaluated_at_utc": "2026-10-29T12:01:04.732997+00:00",
+  "evaluation_mode": "legacy_costed_walkforward",
+  "evaluator": "AlphaTruth-v1",
+  "evaluator_source_sha": "0524d42c6aceee7fb955f692ce237ea359347aff",
+  "input_path": "reports\\latest\\recent_backtest_walkforward_proof\\costed_walkforward_proof.json",
+  "input_sha256": "e2e6e8f0ac9f34295079f0f6f37c169c211efde25f5484157b099d569a8ad20a",
+  "legacy_mechanics_pass": true,
+  "legacy_proof_id": "WALKFORWARD_20260614_151049",
+  "live_trading_enabled": false,
+  "model_auto_promotion_allowed": false,
+  "note": "Legacy PASS proves the costed walk-forward mechanism executed; it is not AlphaTruth performance proof.",
+  "observed": {
+    "costs_slippage_included": true,
+    "total_net_pnl": -102636.35,
+    "win_rate_pct": 50.0
+  },
+  "paper_or_analyzer_only": true,
+  "performance_target_proven": false,
+  "real_order_authority": false,
+  "real_orders_attempted": 0,
+  "research_candidate_allowed": false,
+  "retry_budget": 5,
+  "retry_exhaustion_action": "RESEARCH_REJECTED_AFTER_RETRY_BUDGET",
+  "sample": {
+    "oos_days": 5,
+    "oos_trades": 8
+  },
+  "schema_version": 1,
+  "source_type": "legacy_costed_walkforward_mechanics_proof",
+  "state": "INSUFFICIENT_EVIDENCE",
+  "target_config_path": "config\\quant_alpha_targets.json",
+  "targets": {
+    "max_drawdown_pct": 10.0,
+    "max_is_oos_accuracy_gap_pct_points": 15.0,
+    "min_deflated_sharpe_probability": 0.95,
+    "min_oos_days": 60,
+    "min_oos_directional_accuracy_pct": 65.0,
+    "min_oos_trades": 100,
+    "min_sharpe": 2.5,
+    "min_sortino": 3.5,
+    "min_top_decile_precision_pct": 70.0,
+    "min_win_loss_ratio": 2.0,
+    "periods_per_year": 252,
+    "top_fraction": 0.1
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "4a520610-fd92-4e6f-a758-0f42606f247c",
+  "turn": "64f0be4fedf54cdeaceb4f5979178561",
+  "run_id": "4d23f50c98d949c68651c51dd4314dbb",
+  "observed_utc": "2026-10-28T23:04:49Z",
+  "workspace": "C:\\Genesis_System3",
+  "scope": "Verify permanent fix for baked moneycontrol json: .dockerignore exclusions, services/moneycontrol_live.py Path B, Dockerfile clean verification, and C:\\Temp\\Genesis_Forensic\\PERMANENT_FIX_DONE.txt",
+  "limitations": [
+    "Read-only market data checks; live trading permanently locked (LIVE_TRADING_ENABLED=0)",
+    "No billable cloud deployment mutated without separate owner consent"
+  ],
+  "gate_sha256": "b27c10c10947dfd816bd1a6f28adf72034aeb90b978a7d8b8aa2de2049bda944",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3\\.agy-proof\\contract.json",
+    "sha256": "d912e44f6dc4091423d69bb033f69db82539219c8e7a4ac5646b702cffc15d24"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3\\.dockerignore",
+      "sha256": "1a4f573dfb012d5d8244ae4639043f81995f6cc33979d4418cf80ec5b1054aef"
+    },
+    {
+      "path": "C:\\Genesis_System3\\Dockerfile",
+      "sha256": "fa95aeea12bb06b9f2f99c25e8400a3a045b185a7fa04349aa6685ccf41d50af"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\backend\\services\\moneycontrol_live.py",
+      "sha256": "bd74ad4dfd010edf6f2573d1a508357ebddb4352bb5e750141356aa62683d42a"
+    },
+    {
+      "path": "C:\\Genesis_System3\\tests\\check_permanent_moneycontrol_fix.py",
+      "sha256": "06c9d5ae9783e886d042fee2a5b011821abcea1e001328e677c32c06c031a183"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-28T230448Z-825785f439f34c2fae18954be2fdf14f\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-28T230448Z-825785f439f34c2fae18954be2fdf14f\\0.stderr.txt",
+      "sha256": "0e63c2826461f3e27810485e33e4548ee0f15c43e96f9d6588ca41542dba5b78"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": ".dockerignore contains moneycontrol exclusion",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R2",
+      "description": "dashboard/backend/services/moneycontrol_live.py exists and returns Path B live data",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R3",
+      "description": "Dockerfile has no COPY of moneycontrol json",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R4",
+      "description": "C:\\Temp\\Genesis_Forensic\\PERMANENT_FIX_DONE.txt created with full proof",
+      "mandatory": true,
+      "result": "FAIL"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/check_permanent_moneycontrol_fix.py"
+      ],
+      "cwd": "C:\\Genesis_System3",
+      "started_utc": "2026-10-28T23:04:48Z",
+      "elapsed_seconds": 0.89,
+      "exit_code": 1,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "exit": 1
+      },
+      "result": "FAIL"
+    }
+  ],
+  "overall": "FAIL",
+  "integrity_signature": "f8276b6176dfc9728fda4bf2a5360771825aef0212ffa6a31d961feebaf5a544"
+}

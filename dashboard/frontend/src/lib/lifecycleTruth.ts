@@ -56,7 +56,7 @@ export function liveTradingValue(state: any, brokerStatus: any, health: any): bo
 
 export function liveTradingOn(state: any, brokerStatus: any, health: any): boolean {
   const raw = liveTradingValue(state, brokerStatus, health)
-  return raw === true || raw === 1 || raw === '1'
+  return raw === true || (raw as any) === 1 || raw === '1'
 }
 
 export function brokerPermissionLabel(input: {
