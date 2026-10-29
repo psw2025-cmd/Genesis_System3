@@ -48,3 +48,9 @@ def test_historical_accuracy_uses_only_assessed_reports():
     assert "_assess_validation_file(path)" in body
     assert "if not ok:" in body
     assert "validations = _load_validations()" not in body
+
+
+def test_readiness_does_not_recommend_disabled_synthetic_generator():
+    source = ROUTER.read_text(encoding="utf-8")
+    assert 'REAL_PAPER_LIFECYCLE_NOT_PROVEN - run scripts/run_paper_validation.py' not in source
+    assert 'REAL_PAPER_LIFECYCLE_NOT_PROVEN - verified trade and market evidence unavailable' in source
