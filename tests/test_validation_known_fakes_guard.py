@@ -61,3 +61,11 @@ def test_nonfinite_and_out_of_range_accuracy_is_rejected():
     assert "math.isfinite(number)" in source
     assert '"hit_rate must be between 0 and 1"' in source
     assert '"rho must be between -1 and 1"' in source
+
+
+def test_reconciliation_checklist_does_not_accept_unassessed_json():
+    source = ROUTER.read_text(encoding="utf-8")
+    func = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "_validations_checklist")
+    body = ast.get_source_segment(source, func)
+    assert "verified, _reason = _assess_validation_file(path)" in body
+    assert "if not verified:" in body
