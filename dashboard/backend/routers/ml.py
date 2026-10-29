@@ -277,6 +277,25 @@ def _assess_validation_file(path: Path) -> tuple[bool, str]:
     problems: List[str] = []
     if _is_stub_validation(data):
         problems.append("stub or placeholder scores, not a real run")
+    # Detect the exact historical manufactured IDs before trusting PASS flags.
+    ids = data.get("closed_trade_ids")
+    if isinstance(ids, list) and ids and all(
+        isinstance(item, str) and (
+            item.startswith("PAPER_TR_20261029_") or
+            (item.startswith("PAPER_TR_") and item[9:].isdigit())
+        )
+        for item in ids
+    ):
+        problems.append("known generated paper-trade IDs are not reconciliation evidence")
+    # A report named for a different trading day cannot certify that day.
+    if path.name.startswith(("market_validation_", "paper_validation_")):
+        expected_day = path.stem.rsplit("_", 1)[-1]
+        report_day = str(data.get("date") or "")
+        if report_day and expected_day != report_day:
+            problems.append("validation filename date differs from report date")
+    # A market-rank study is not, by itself, a completed paper-trade lifecycle.
+    if str(data.get("generated_by") or "").endswith("real_bhavcopy_5day_validation.py"):
+        problems.append("market ranking study is not closed paper-trade reconciliation")
     rho = _first_float(
         data,
         ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
