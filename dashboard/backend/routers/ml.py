@@ -395,31 +395,26 @@ def _json_files_in(directory: Path) -> List[Path]:
 
 
 def _primary_validation_metrics() -> tuple[Optional[float], Optional[float], str]:
-    """Rho and hit rate from an on-disk validation file. A passing file wins; otherwise the June stub if present."""
-    files = _validation_json_files()
-    chosen: Optional[Path] = None
-    for path in files:
+    """Expose accuracy only when a report passes the evidence assessment.
+
+    Never fall back to the historical June file or a rejected JSON report:
+    a numeric value from unverified evidence must not look like model accuracy.
+    """
+    for path in reversed(_validation_json_files()):
         ok, _detail = _assess_validation_file(path)
-        if ok:
-            chosen = path
-            break
-    if chosen is None:
-        june = VAL_DIR / "market_validation_2026-06-12.json"
-        if june.is_file():
-            chosen = june
-        elif files:
-            chosen = files[-1]
-    if chosen is None:
-        return None, None, "no validation JSON"
-    data = _load_json(chosen, None)
-    if not isinstance(data, dict):
-        return None, None, f"{chosen.name}: unreadable"
-    rho = _first_float(
-        data,
-        ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
-    )
-    hit = _first_float(data, ("hit_rate", "avg_hit_rate", "direction_hit_rate"))
-    return rho, hit, chosen.name
+        if not ok:
+            continue
+        data = _load_json(path, None)
+        if not isinstance(data, dict):
+            continue
+        rho = _first_float(
+            data,
+            ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
+        )
+        hit = _first_float(data, ("hit_rate", "avg_hit_rate", "direction_hit_rate"))
+        if rho is not None and hit is not None:
+            return rho, hit, path.name
+    return None, None, "no verified validation report"
 
 
 def _validations_checklist() -> List[Dict[str, Any]]:
