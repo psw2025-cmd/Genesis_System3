@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'dashboard/backend/Dockerfile'
+      - '-t'
+      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
+      - '.'
+images:
+  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY

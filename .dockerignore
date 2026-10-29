@@ -36,3 +36,6 @@ state/market_validations/*.json
 state/paper_validations/*.json
 !state/paper_validations/.gitkeep
 !reports/latest/.gitkeep
+!state/paper_validations/*.json
+!state/market_validations/*.json
+!scripts/run_paper_validation.py
