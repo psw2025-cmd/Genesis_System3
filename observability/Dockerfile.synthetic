@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/playwright:v1.52.0-noble
+
+WORKDIR /app
+
+# Reuse the repository's already-pinned Playwright 1.52.0 lockfile so browser
+# and npm package versions cannot silently drift apart.
+COPY tools/playwright-setup/package.json ./package.json
+COPY tools/playwright-setup/package-lock.json ./package-lock.json
+RUN npm ci
+
+COPY observability/playbooks/synthetic_smoke.js ./observability/playbooks/synthetic_smoke.js
+
+ENV NODE_ENV=production
+ENV SERVICE_URL=https://genesis-system3-web-doq2wplepa-el.a.run.app
+ENV SYSTEM3_ENV=prod
+ENV SERVICE_NAME=genesis-system3-web
+ENV OBSERVABILITY_BUCKET=system3-observability-artifacts
+ENV OBSERVABILITY_UPLOAD_REQUIRED=1
+ENV SUCCESS_SAMPLE_RATE=0.02
+
+CMD ["node", "observability/playbooks/synthetic_smoke.js"]
