@@ -604,9 +604,18 @@ def _options_model_record() -> Dict | None:
 
 
 def _validation_metrics() -> Dict:
-    validations = _load_validations()
-    rhos = [float(v["spearman_correlation"]) for v in validations if v.get("spearman_correlation") is not None]
-    hit_rates = [float(v["hit_rate"]) for v in validations if v.get("hit_rate") is not None]
+    # Aggregate only reports that passed evidence assessment. Merely loading a
+    # JSON document (or a Firestore row) is not independent validation.
+    validations = []
+    for path in _validation_json_files():
+        ok, _detail = _assess_validation_file(path)
+        if not ok:
+            continue
+        data = _load_json(path, None)
+        if isinstance(data, dict):
+            validations.append({**data, "_file": path.name})
+    rhos = [float(v["spearman_correlation"]) for v in validations if _as_float(v.get("spearman_correlation")) is not None]
+    hit_rates = [float(v["hit_rate"]) for v in validations if _as_float(v.get("hit_rate")) is not None]
     avg_rho = sum(rhos) / len(rhos) if rhos else None
     avg_hit = sum(hit_rates) / len(hit_rates) if hit_rates else None
     predictions = _load_history()
