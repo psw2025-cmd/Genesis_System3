@@ -1,0 +1,81 @@
+name: Cloud Live UI Paper Prediction Check
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Dashboard backend base URL"
+        required: false
+        default: "https://genesis-system3-backend.onrender.com"
+      run_screenshot:
+        description: "Install Playwright and capture /ui screenshot"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  cloud-live-ui-paper-prediction-check:
+    name: Read-only cloud proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SYSTEM3_CLOUD_BASE: ${{ github.event.inputs.base_url || 'https://genesis-system3-backend.onrender.com' }}
+      SYSTEM3_PROOF_DIR: reports/latest/cloud_live_ui_paper_prediction_check
+      SYSTEM3_PLAYWRIGHT_SCREENSHOT: ${{ github.event.inputs.run_screenshot == 'true' && '1' || '0' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Playwright for optional screenshot
+        if: ${{ github.event.inputs.run_screenshot == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Run read-only cloud proof checker
+        run: |
+          python tools/cloud_live_ui_paper_prediction_check.py
+
+      - name: Show proof summary
+        if: always()
+        run: |
+          echo "----- instrument master repo check -----"
+          cat reports/latest/cloud_live_ui_paper_prediction_check/instrument_master_repo_check.json || true
+          echo "----- summary.md -----"
+          cat reports/latest/cloud_live_ui_paper_prediction_check/summary.md || true
+          echo "----- verdict -----"
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('reports/latest/cloud_live_ui_paper_prediction_check/summary.json')
+          if p.exists():
+              data = json.loads(p.read_text())
+              print(json.dumps(data.get('verdict', {}), indent=2))
+          else:
+              print('summary.json missing')
+          PY
+
+      - name: Upload proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-live-ui-paper-prediction-check
+          path: reports/latest/cloud_live_ui_paper_prediction_check
+          if-no-files-found: warn
