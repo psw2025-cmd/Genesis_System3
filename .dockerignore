@@ -1,4 +1,4 @@
-ï»¿.git
+.git
 .venv
 venv
 __pycache__
@@ -6,7 +6,7 @@ __pycache__
 .mypy_cache
 node_modules
 
-# Reports â€“ keep only latest
+# Reports – keep only latest
 reports/*
 !reports/latest/
 !reports/latest/**
@@ -26,14 +26,9 @@ agent_memory
 dashboard/backend/logs
 
 # -------------------------------------------------
-# State folder â€“ exclude everything by default
+# State folder – exclude everything by default
 # then explicitly re-include the validation folders
 # -------------------------------------------------
-state/**
-!state/paper_validations/
-!state/paper_validations/**
-!state/market_validations/
-!state/market_validations/**
 
 # Never bake live / volatile data
 **/moneycontrol_option_gainers.json
@@ -44,3 +39,10 @@ state/**
 !scripts/paper_lifecycle_proof.py
 !scripts/system3_model_accuracy_tracker.py
 !scripts/system3_option_visibility_audit.py
+
+# Runtime state validations
+state/*
+!state/market_validations/
+!state/market_validations/*.json
+!state/paper_validations/
+!state/paper_validations/*.json
