@@ -39,3 +39,12 @@ def test_unverified_accuracy_never_falls_back_to_june_stub():
     assert "market_validation_2026-06-12.json" not in body
     assert '"no verified validation report"' in body
     assert "_assess_validation_file(path)" in body
+
+
+def test_historical_accuracy_uses_only_assessed_reports():
+    source = ROUTER.read_text(encoding="utf-8")
+    func = next(n for n in ast.parse(source).body if isinstance(n, ast.FunctionDef) and n.name == "_validation_metrics")
+    body = ast.get_source_segment(source, func)
+    assert "_assess_validation_file(path)" in body
+    assert "if not ok:" in body
+    assert "validations = _load_validations()" not in body
