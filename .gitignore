@@ -103,7 +103,7 @@ reports/*
 reports/latest/manual_*
 
 # Runtime state files
-state/
+state/*
 chrome_profile/
 chrome_profile*/
 **/chrome_profile*
@@ -114,3 +114,7 @@ live-production-ui-proof/**/chrome_profile*
 # Excel may hold the operator issue CSV open; the governed writer replays this
 # metadata-only spool and removes it after a successful atomic CSV update.
 audit/live_agent_issue_ledger/*.pending.jsonl
+
+# Un-ignore paper validations for Cloud Run deployment
+!state/paper_validations/
+!state/paper_validations/*.json
