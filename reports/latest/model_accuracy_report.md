@@ -1,13 +1,13 @@
 # System3 Model Accuracy Report
 
-Generated UTC: `2026-10-29T08:09:45.006733+00:00`
+Generated UTC: `2026-10-29T10:19:23.666606+00:00`
 
 ## Summary
 
-- **Sources**: `none`
-- **Rows**: `1`
+- **Sources**: `api:/api/gain_rank`
+- **Rows**: `4`
 - **Proof pass count**: `0`
-- **Blocked count**: `1`
+- **Blocked count**: `4`
 - **Direction known count**: `0`
 - **Direction hit rate**: `None`
 
@@ -15,7 +15,10 @@ Generated UTC: `2026-10-29T08:09:45.006733+00:00`
 
 | Symbol | Type | Direction | CE/PE | Confidence | Strike | 5m | 15m | 30m | EOD | Direction Correct | Option Profitable | Proof | Blocker |
 |---|---|---|---|---:|---|---:|---:|---:|---:|---:|---:|---|---|
-| `NO_PREDICTION_FOUND` | `UNKNOWN` | `UNKNOWN` | `UNKNOWN` | `None` | `` | `None` | `None` | `None` | `None` | `None` | `None` | `BLOCKED` | `NO_PREDICTION_SOURCE_FOUND` |
+| `NIFTY` | `INDEX` | `DOWN` | `PE` | `61.09` | `` | `None` | `None` | `None` | `None` | `None` | `None` | `BLOCKED` | `STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING` |
+| `FINNIFTY` | `INDEX` | `DOWN` | `PE` | `59.89` | `` | `None` | `None` | `None` | `None` | `None` | `None` | `BLOCKED` | `STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING` |
+| `MIDCPNIFTY` | `INDEX` | `DOWN` | `PE` | `35.32` | `` | `None` | `None` | `None` | `None` | `None` | `None` | `BLOCKED` | `STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING` |
+| `BANKNIFTY` | `INDEX` | `DOWN` | `PE` | `31.71` | `` | `None` | `None` | `None` | `None` | `None` | `None` | `BLOCKED` | `STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING` |
 
 ## Pass Rule
 

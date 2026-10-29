@@ -1,22 +1,24 @@
 {
   "summary": {
-    "generated_at_utc": "2026-10-29T08:09:45.006733+00:00",
-    "sources": [],
-    "rows": 1,
+    "generated_at_utc": "2026-10-29T10:19:23.666606+00:00",
+    "sources": [
+      "api:/api/gain_rank"
+    ],
+    "rows": 4,
     "proof_pass_count": 0,
-    "blocked_count": 1,
+    "blocked_count": 4,
     "direction_known_count": 0,
     "direction_hit_rate": null,
     "option_profitable_known_count": 0
   },
   "rows": [
     {
-      "prediction_ts_ist": "UNKNOWN",
-      "symbol": "NO_PREDICTION_FOUND",
-      "symbol_type": "UNKNOWN",
-      "direction": "UNKNOWN",
-      "option_side": "UNKNOWN",
-      "confidence": null,
+      "prediction_ts_ist": "2026-09-01T03:45:40.046952",
+      "symbol": "NIFTY",
+      "symbol_type": "INDEX",
+      "direction": "DOWN",
+      "option_side": "PE",
+      "confidence": 61.09,
       "selected_strike": "",
       "actual_5m": null,
       "actual_15m": null,
@@ -27,7 +29,64 @@
       "max_favorable_move": null,
       "max_adverse_move": null,
       "proof_status": "BLOCKED",
-      "blocker_reason": "NO_PREDICTION_SOURCE_FOUND"
+      "blocker_reason": "STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING"
+    },
+    {
+      "prediction_ts_ist": "2026-09-01T03:45:40.046952",
+      "symbol": "FINNIFTY",
+      "symbol_type": "INDEX",
+      "direction": "DOWN",
+      "option_side": "PE",
+      "confidence": 59.89,
+      "selected_strike": "",
+      "actual_5m": null,
+      "actual_15m": null,
+      "actual_30m": null,
+      "actual_eod": null,
+      "direction_correct": null,
+      "option_profitable": null,
+      "max_favorable_move": null,
+      "max_adverse_move": null,
+      "proof_status": "BLOCKED",
+      "blocker_reason": "STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING"
+    },
+    {
+      "prediction_ts_ist": "2026-09-01T03:45:40.046952",
+      "symbol": "MIDCPNIFTY",
+      "symbol_type": "INDEX",
+      "direction": "DOWN",
+      "option_side": "PE",
+      "confidence": 35.32,
+      "selected_strike": "",
+      "actual_5m": null,
+      "actual_15m": null,
+      "actual_30m": null,
+      "actual_eod": null,
+      "direction_correct": null,
+      "option_profitable": null,
+      "max_favorable_move": null,
+      "max_adverse_move": null,
+      "proof_status": "BLOCKED",
+      "blocker_reason": "STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING"
+    },
+    {
+      "prediction_ts_ist": "2026-09-01T03:45:40.046952",
+      "symbol": "BANKNIFTY",
+      "symbol_type": "INDEX",
+      "direction": "DOWN",
+      "option_side": "PE",
+      "confidence": 31.71,
+      "selected_strike": "",
+      "actual_5m": null,
+      "actual_15m": null,
+      "actual_30m": null,
+      "actual_eod": null,
+      "direction_correct": null,
+      "option_profitable": null,
+      "max_favorable_move": null,
+      "max_adverse_move": null,
+      "proof_status": "BLOCKED",
+      "blocker_reason": "STRIKE_NOT_LINKED;ACTUAL_OUTCOME_WINDOW_MISSING"
     }
   ]
 }
