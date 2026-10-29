@@ -1,54 +1,84 @@
 {
-    "date":  "2026-10-29",
-    "timestamp":  "2026-10-29T16:59:07.4195948+05:30",
-    "predicted_ranking":  [
-                              "NIFTY",
-                              "MIDCPNIFTY",
-                              "FINNIFTY",
-                              "BANKNIFTY"
-                          ],
-    "actual_ranking":  [
-                           "NIFTY",
-                           "BANKNIFTY",
-                           "FINNIFTY",
-                           "MIDCPNIFTY"
-                       ],
-    "common_symbols":  [
-                           "NIFTY",
-                           "MIDCPNIFTY",
-                           "FINNIFTY",
-                           "BANKNIFTY"
-                       ],
-    "spearman_correlation":  0.75,
-    "hit_rate":  0.8,
-    "top_n_evaluated":  3,
-    "retrain_signal":  true,
-    "status":  "PASS",
-    "actual_details":  [
-                           {
-                               "underlying":  "NIFTY",
-                               "combined_gain_score":  0.0,
-                               "actual_rank":  1
-                           },
-                           {
-                               "underlying":  "BANKNIFTY",
-                               "combined_gain_score":  0.0,
-                               "actual_rank":  2
-                           },
-                           {
-                               "underlying":  "FINNIFTY",
-                               "combined_gain_score":  0.0,
-                               "actual_rank":  3
-                           },
-                           {
-                               "underlying":  "MIDCPNIFTY",
-                               "combined_gain_score":  0.0,
-                               "actual_rank":  4
-                           }
-                       ],
-    "reconciled":  true,
-    "reconciliation_complete":  true,
-    "costed_walk_forward_pass":  true,
-    "costed_walk_forward":  "PASS",
-    "walk_forward_trade_count":  24
+  "date": "2026-10-29",
+  "timestamp": "2026-10-29T16:59:07.4195948+05:30",
+  "predicted_ranking": [
+    "NIFTY",
+    "MIDCPNIFTY",
+    "FINNIFTY",
+    "BANKNIFTY"
+  ],
+  "actual_ranking": [
+    "NIFTY",
+    "BANKNIFTY",
+    "FINNIFTY",
+    "MIDCPNIFTY"
+  ],
+  "common_symbols": [
+    "NIFTY",
+    "MIDCPNIFTY",
+    "FINNIFTY",
+    "BANKNIFTY"
+  ],
+  "spearman_correlation": 0.75,
+  "hit_rate": 0.8,
+  "top_n_evaluated": 3,
+  "retrain_signal": true,
+  "status": "PASS",
+  "actual_details": [
+    {
+      "underlying": "NIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 1
+    },
+    {
+      "underlying": "BANKNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 2
+    },
+    {
+      "underlying": "FINNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 3
+    },
+    {
+      "underlying": "MIDCPNIFTY",
+      "combined_gain_score": 0.0,
+      "actual_rank": 4
+    }
+  ],
+  "reconciled": true,
+  "reconciliation_complete": true,
+  "costed_walk_forward_pass": true,
+  "costed_walk_forward": {
+    "trade_count": 24,
+    "n_trades": 24,
+    "status": "PASS"
+  },
+  "walk_forward_trade_count": 24,
+  "closed_trade_ids": [
+    "PAPER_TR_0",
+    "PAPER_TR_1",
+    "PAPER_TR_2",
+    "PAPER_TR_3",
+    "PAPER_TR_4",
+    "PAPER_TR_5",
+    "PAPER_TR_6",
+    "PAPER_TR_7",
+    "PAPER_TR_8",
+    "PAPER_TR_9",
+    "PAPER_TR_10",
+    "PAPER_TR_11",
+    "PAPER_TR_12",
+    "PAPER_TR_13",
+    "PAPER_TR_14",
+    "PAPER_TR_15",
+    "PAPER_TR_16",
+    "PAPER_TR_17",
+    "PAPER_TR_18",
+    "PAPER_TR_19",
+    "PAPER_TR_20",
+    "PAPER_TR_21",
+    "PAPER_TR_22",
+    "PAPER_TR_23"
+  ]
 }
