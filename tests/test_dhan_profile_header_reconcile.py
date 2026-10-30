@@ -59,7 +59,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         self.assertEqual(len(result["probe_header_attempts"]), 1)
         self.assertEqual(snapshot()["rejection_count"], 0)
 
-    def test_docs_906_does_not_multiply_profile_requests(self):
+    def test_docs_906_reconciles_once_with_sdk_header(self):
         calls = []
 
         def handler(access_token, client_id, *, timeout_s, contract):
@@ -71,16 +71,16 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         module, _ = _module(handler)
         result = get_cloud_status(module)
 
-        self.assertFalse(result["connected"])
-        self.assertEqual(result["error"], "DHAN_REQUEST_REJECTED_906")
-        self.assertEqual(calls, ["docs-access-token-only"])
-        self.assertEqual(result["probe_header_contract"], "access-token-only")
-        self.assertEqual(result["probe_header_variant"], "docs-access-token-only")
-        self.assertEqual(len(result["probe_header_attempts"]), 1)
+        self.assertTrue(result["connected"])
+        self.assertIsNone(result["error"])
+        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
+        self.assertEqual(result["probe_header_contract"], "access-token-plus-dhanClientId")
+        self.assertEqual(result["probe_header_variant"], "sdk-dhanClientId")
+        self.assertEqual(len(result["probe_header_attempts"]), 2)
         self.assertEqual(snapshot()["rejection_count"], 0)
         self.assertTrue(all(item["credential_value_exposed"] is False for item in result["probe_header_attempts"]))
 
-    def test_906_remains_non_auth_single_request_and_is_ttl_cached(self):
+    def test_906_remains_non_auth_bounded_reconcile_and_is_ttl_cached(self):
         calls = []
 
         def handler(access_token, client_id, *, timeout_s, contract):
@@ -94,7 +94,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         self.assertEqual(first["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(first["upstream_classification"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(first["upstream_code"], 906)
-        self.assertEqual(calls, ["docs-access-token-only"])
+        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
         self.assertEqual(first["probe_header_variant"], "docs-access-token-only")
         self.assertEqual(snapshot()["rejection_count"], 0)
 
@@ -104,7 +104,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
         self.assertTrue(second["cache_hit"])
         self.assertEqual(second["error"], "DHAN_REQUEST_REJECTED_906")
         self.assertEqual(calls, [])
-        self.assertEqual(len(second["probe_header_attempts"]), 1)
+        self.assertEqual(len(second["probe_header_attempts"]), 2)
 
     def test_rate_limit_never_multiplies_requests_and_is_ttl_cached(self):
         calls = []
