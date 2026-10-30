@@ -1,6 +1,6 @@
 # System3 Option Strike Visibility Audit
 
-Generated UTC: `2026-10-30T06:07:11.659382+00:00`
+Generated UTC: `2026-10-30T09:56:38.576534+00:00`
 
 ## Summary
 
@@ -15,7 +15,7 @@ Generated UTC: `2026-10-30T06:07:11.659382+00:00`
 | Underlying | Type | Score | CE/PE | Eligible | Expiry | Strike | Token | LTP | Spread % | Paper Allowed | Blocker Reason |
 |---|---|---:|---|---:|---|---|---|---:|---:|---:|---|
 | `NIFTY` | `INDEX` | `0.85` | `CE` | `True` | `` | `` | `543323` | `125.0` | `0.8` | `False` | `EXPIRY_NOT_FOUND;STRIKE_NOT_FOUND` |
-| `BANKNIFTY` | `INDEX` | `0.82` | `CE` | `True` | `2026-06-30 14:30:00` | `65400.00000` | `35000` | `125.0` | `0.8` | `True` | `PASS` |
+| `BANKNIFTY` | `INDEX` | `0.82` | `CE` | `True` | `2026-12-29 14:30:00` | `69400.00000` | `35000` | `125.0` | `0.8` | `True` | `PASS` |
 | `RELIANCE` | `EQUITY` | `0.78` | `CE` | `False` | `` | `` | `` | `None` | `None` | `False` | `OPTION_ELIGIBILITY_NOT_PROVEN;EXPIRY_NOT_FOUND;STRIKE_NOT_FOUND;TOKEN_SECURITY_ID_NOT_FOUND;LTP_NOT_AVAILABLE` |
 
 ## Verdict Rule

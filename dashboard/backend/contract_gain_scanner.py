@@ -578,3 +578,6 @@ def diagnose_market_top_gap(expected_symbols: Optional[List[str]] = None) -> Dic
         ],
         "live_trading_enabled": False,
     }
+
+def equity_gainer_seed_symbols():
+    return ['RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK']

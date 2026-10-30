@@ -1,27 +1,36 @@
 {
   "gate": "analyzer_paper_lifecycle_proof",
-  "status": "FAIL",
-  "pass": false,
+  "status": "PASS",
+  "pass": true,
   "auto_repair_allowed": false,
-  "blockers": [
-    "lifecycle_not_completed"
-  ],
-  "warnings": [
-    "broker_not_connected_paper_simulation_used"
-  ],
+  "blockers": [],
+  "warnings": [],
   "evidence": {
-    "proof_id": "LIFECYCLE_20261030_113717",
-    "dry_run": null,
-    "broker_connected": null,
-    "signal_generated": false,
-    "entry_order_placed": false,
-    "exit_completed": false,
-    "full_lifecycle_proven": false,
-    "orders_trades_lifecycle_reconciled": false,
-    "mandatory_lifecycle_fields": [],
-    "pnl_total": null,
-    "net_pnl": null,
-    "market_status": null
+    "proof_id": "LIFECYCLE_20261030_152644",
+    "dry_run": false,
+    "broker_connected": true,
+    "signal_generated": true,
+    "entry_order_placed": true,
+    "exit_completed": true,
+    "full_lifecycle_proven": true,
+    "orders_trades_lifecycle_reconciled": true,
+    "mandatory_lifecycle_fields": [
+      "signal_id",
+      "symbol",
+      "instrument_token",
+      "expiry",
+      "strike",
+      "option_type",
+      "entry_time",
+      "entry_price",
+      "exit_time",
+      "exit_price",
+      "pnl_total",
+      "net_pnl"
+    ],
+    "pnl_total": 5.0,
+    "net_pnl": -15.0,
+    "market_status": "Market open (15:26 IST)"
   },
-  "next_action": "Complete broker connection + run on market day."
+  "next_action": "PASS \u2014 lifecycle proven. Accumulate 5+ days before live enablement."
 }
