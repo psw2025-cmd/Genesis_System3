@@ -13,6 +13,7 @@ import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
 import logging
+import math
 logger = logging.getLogger(__name__)
 
 INDEX_SEGMENTS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
@@ -111,6 +112,10 @@ def compute_contract_gain(contract: Dict[str, Any]) -> Tuple[Optional[float], Op
 
     change_rs = None
     gain_pct = None
+    if not math.isfinite(ltp):
+        ltp = 0.0
+    if not math.isfinite(prev):
+        prev = 0.0
     if ltp > 0 and prev > 0:
         change_rs = round(ltp - prev, 4)
         gain_pct = round((ltp - prev) / prev * 100.0, 4)
@@ -124,7 +129,7 @@ def compute_contract_gain(contract: Dict[str, Any]) -> Tuple[Optional[float], Op
                 pct = float(val)
             except (TypeError, ValueError):
                 continue
-            if abs(pct) > 1e-9:
+            if math.isfinite(pct) and abs(pct) > 1e-9:
                 gain_pct = round(pct, 4)
                 break
     return (ltp if ltp > 0 else None, prev if prev > 0 else None, change_rs, gain_pct)
@@ -134,8 +139,11 @@ def is_actionable_gainer_row(row: Any) -> bool:
     """True if row represents a tradeable option gainer, filtering zero volume or sub-penny spikes."""
     if not isinstance(row, dict):
         return False
-    ltp = float(row.get("ltp") or row.get("close") or row.get("last_price") or 0.0)
-    if ltp < 0.5:
+    try:
+        ltp = float(row.get("ltp") or row.get("close") or row.get("last_price") or 0.0)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    if not math.isfinite(ltp) or ltp < 0.5:
         return False
     return True
 
@@ -148,6 +156,8 @@ def compute_contract_gain_pct(contract: Dict[str, Any]) -> Optional[float]:
 
 def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, change_rs: Optional[float], ltp: float, prev: Optional[float]) -> Dict[str, Any]:
     opt = str(contract.get("option_type", "")).upper()
+    source = str(contract.get("source") or "UNKNOWN").strip()
+    live_source = source.upper() in {"DHAN_OPTION_CHAIN_LIVE", "DHAN_LIVE"}
     return {
         "underlying": underlying.upper(),
         "symbol": underlying.upper(),
@@ -164,9 +174,9 @@ def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, ch
         "volume": contract.get("volume"),
         "gain_pct": gain_pct,
         "security_id": contract.get("security_id"),
-        "source": contract.get("source") or "dhan",
-        "data_provenance": "DHAN_OPTION_CHAIN_LIVE",
-        "market_match_note": f"LIVE DHAN GAINER (+{gain_pct:.2f}%)",
+        "source": source,
+        "data_provenance": "DHAN_OPTION_CHAIN_LIVE" if live_source else "SOURCE_UNVERIFIED_OR_CACHED",
+        "market_match_note": f"{'LIVE DHAN' if live_source else 'UNVERIFIED SOURCE'} GAINER (+{gain_pct:.2f}%)",
     }
 
 
