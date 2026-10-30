@@ -130,3 +130,29 @@ def test_scan_all_segments_implementation_matrix():
     assert "BANKNIFTY" in report["missing_segments"]
     assert report["market_wide"]["top_ce"]["underlying"] == "FINNIFTY"
     assert len(INDEX_SEGMENTS) == 4
+
+
+def test_nonfinite_prices_never_enter_gain_rankings():
+    assert compute_contract_gain_pct({"ltp": float("nan"), "previous_close_price": 10}) is None
+    assert compute_contract_gain_pct({"ltp": 20, "previous_close_price": float("inf")}) is None
+    assert compute_contract_gain_pct({"ltp": 20, "change_percent": "nan"}) is None
+
+
+def test_unknown_source_is_not_claimed_as_live_dhan():
+    result = scan_segment_contracts(
+        [{"option_type": "CE", "strike": 24000, "ltp": 120,
+          "previous_close_price": 100, "source": "VERIFIED_DHAN_SNAPSHOT"}],
+        "NIFTY",
+    )
+    row = result["top_ce"]
+    assert row["data_provenance"] == "SOURCE_UNVERIFIED_OR_CACHED"
+    assert not row["market_match_note"].startswith("LIVE DHAN")
+
+
+def test_explicit_live_source_keeps_live_label():
+    result = scan_segment_contracts(
+        [{"option_type": "PE", "strike": 24000, "ltp": 120,
+          "previous_close_price": 100, "source": "DHAN_OPTION_CHAIN_LIVE"}],
+        "NIFTY",
+    )
+    assert result["top_pe"]["data_provenance"] == "DHAN_OPTION_CHAIN_LIVE"

@@ -1,0 +1,72 @@
+{
+  "scope": "Verify Genesis System3 Forensic Fix end-to-end across Laptop, GitHub PR #488, and Google Cloud Run genesis-system3-web",
+  "limitations": [
+    "Read-only verification and PAPER trading mode permanently locked (LIVE_TRADING_ENABLED=0)",
+    "No real capital risk or order placement allowed"
+  ],
+  "subject_files": [
+    ".dockerignore",
+    "Dockerfile",
+    "dashboard/backend/services/moneycontrol_live.py",
+    "dashboard/frontend/src/components/GenesisTab.tsx",
+    "dashboard/frontend/src/components/OptionChain.tsx",
+    "tests/check_permanent_moneycontrol_fix.py",
+    "tests/check_full_forensic_laptop_github_cloud.py"
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": ".dockerignore contains moneycontrol exclusion and unblocks !state",
+      "mandatory": true
+    },
+    {
+      "id": "R2",
+      "description": "dashboard/backend/services/moneycontrol_live.py exists and returns Path B live data",
+      "mandatory": true
+    },
+    {
+      "id": "R3",
+      "description": "Dockerfile has no COPY of moneycontrol json",
+      "mandatory": true
+    },
+    {
+      "id": "R4",
+      "description": "C:\\Temp\\Genesis_Forensic\\PERMANENT_FIX_DONE.txt created with full proof",
+      "mandatory": true
+    },
+    {
+      "id": "R5",
+      "description": "Zero occurrences of fake metrics (88.0%, 74.0%, 68.0%, 1.85) in dashboard/frontend/src",
+      "mandatory": true
+    },
+    {
+      "id": "R6",
+      "description": "GitHub PR #488 merged to main and synced on Laptop",
+      "mandatory": true
+    },
+    {
+      "id": "R7",
+      "description": "Google Cloud Run deployed and healthy with LIVE_TRADING_ENABLED=0 and ready_for_live=false",
+      "mandatory": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3\\.venv\\Scripts\\python.exe",
+        "tests/check_full_forensic_laptop_github_cloud.py"
+      ],
+      "cwd": ".",
+      "timeout": 120,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      }
+    }
+  ]
+}

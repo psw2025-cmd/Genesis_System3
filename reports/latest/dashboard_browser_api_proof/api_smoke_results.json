@@ -1,0 +1,70 @@
+{
+  "api_candidates": [
+    {
+      "file": "tools/audit_live_ui_full_22_tabs.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/auto_dashboard_repo_snap.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/cloud_runtime_check.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dashboard_full_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dhan_advance_platform_verification_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/extract_live_dashboard_tab_evidence.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/generate_master_mri_flowchart.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/generate_micro_mri_inventory.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/multi_agent_production_coordinator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/pending_tasks_closure.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/production_daily_cycle.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/qc_runtime_anomaly_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/reconcile_live_full_mri.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_truth_bridge_powershell.ps1",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_safe_repair_runner.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_windows_self_hosted_full_system_proof.py",
+      "hit": "content"
+    }
+  ],
+  "reason": "local backend/frontend browser run not executed by static script",
+  "status": "BLOCKED"
+}

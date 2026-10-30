@@ -1,0 +1,236 @@
+{
+  "lifecycle_candidates": [
+    {
+      "file": "tools/audit_live_ui_full_22_tabs.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/auto_dashboard_repo_snap.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/broker_trader_validation.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/build_ultra_intelligence_dashboard.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/capture_live_chart_tabs_visual_proof.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/check_outputs.ps1",
+      "hit": "content"
+    },
+    {
+      "file": "tools/cloud_runtime_check.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/compute_mark_to_market_pnl.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/dashboard_deploy_provenance_gate.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dashboard_full_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dashboard_visual_contract_check.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dashboard_visual_loading_postflight.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dashboard_visual_settle_normalizer.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dhan_advance_platform_verification_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/dry_run_smoke_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/extract_live_dashboard_tab_evidence.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/generate_audit_reports.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/generate_master_mri_flowchart.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/generate_micro_mri_inventory.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/issue_188_master_parity_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/local_ci_runner.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/local_code_review.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/model_benchmark_leaderboard.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/multi_agent_production_coordinator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/pending_tasks_closure.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/permanent_repo_render_safety.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/playwright-setup/verify_all_ui_tabs.spec.ts",
+      "hit": "content"
+    },
+    {
+      "file": "tools/production_daily_cycle.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/qc_runtime_anomaly_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/quick_inspector.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/reconcile_live_full_mri.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/replay_market_dryrun_simulator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_all_tests.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_consolidated_evidence_workflow.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_paper_trading_e2e_test.py",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/run_phases_381_388_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_phases_389_400_block_test.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/run_truth_bridge_powershell.ps1",
+      "hit": "content"
+    },
+    {
+      "file": "tools/storage/live/live_orders_ledger.csv",
+      "hit": "path+content"
+    },
+    {
+      "file": "tools/strict_production_truth_auditor.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_auto_coordinator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_autopilot_proof_board.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_broker_chain_semantic_gate.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_experimental_solution_planner.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_dry_run_launcher.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_live_runtime_verification.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_parallel_root_cause_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_readiness_evidence_normalizer.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_safe_repair_runner.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_secure_install_credential_audit.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_todo_status_updater.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_windows_self_hosted_full_system_proof.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/system3_windows_self_hosted_workflow_migrator.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_all_routes_auditable.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_cursor_agent_bugs.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_deep_backend_ui_parity.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/verify_live_production_deployment.py",
+      "hit": "content"
+    },
+    {
+      "file": "tools/visualize_live_fills.py",
+      "hit": "path+content"
+    }
+  ]
+}

@@ -36,7 +36,7 @@ function firstCandidateFromScanner(scanner: any): any | null {
     scanner?.market_wide?.top_pe,
   ]
   const bySegment = scanner?.by_segment || {}
-  for (const seg of Object.values(bySegment) as unknown[]) {
+  for (const seg of Object.values(bySegment) as any[]) {
     paths.push(seg?.top_ce, seg?.top_pe)
     if (Array.isArray(seg?.top_ce_list)) paths.push(...seg.top_ce_list)
     if (Array.isArray(seg?.top_pe_list)) paths.push(...seg.top_pe_list)
@@ -96,7 +96,7 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
 
 export default function Signals() {
   const [signal, setSignal] = useState<SignalView | null>(null)
-  const [qc, setQc] = useState<unknown>(null)
+  const [qc, setQc] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<{endpoint: string, status?: number, message: string} | null>(null)
@@ -110,7 +110,7 @@ export default function Signals() {
       ])
 
       if (stateRes.status === 'rejected') {
-        const status = (stateRes.reason as unknown)?.response?.status || null
+        const status = (stateRes.reason as any)?.response?.status || null
         if (status === 401) {
           setAuthRequired(true)
           setError(null)
@@ -149,8 +149,8 @@ export default function Signals() {
       const scannerTotal = Number(scanner?.segments_total || 0)
       const qcFailures = [
         ...(state.qc?.qc_failures || state.qc?.failures || []),
-        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as unknown)?.message || 'unknown'}`] : []),
-        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as unknown)?.message || 'unknown'}`] : []),
+        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as any)?.message || 'unknown'}`] : []),
+        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as any)?.message || 'unknown'}`] : []),
       ]
 
       const qcData = {
@@ -300,6 +300,8 @@ export default function Signals() {
       </div>
 
       {!isTrade && qc && (
+        // @ts-ignore
+
         <div className="bg-red-900 p-6 rounded-lg">
           <h3 className="text-xl font-bold mb-4">What Is Preventing Trading?</h3>
           <div className="space-y-2">

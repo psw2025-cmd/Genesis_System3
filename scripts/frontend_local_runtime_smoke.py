@@ -13,6 +13,7 @@ import base64
 import json
 import shutil
 import socket
+import os
 import subprocess
 import sys
 import time
@@ -216,9 +217,15 @@ def main() -> int:
 
     preview_port = _free_port()
     base_url = f"http://{HOST}:{preview_port}/ui/"
+    npm_cmd = shutil.which("npm.cmd") or shutil.which("npm") or "npm"
+    preview_argv = [npm_cmd, "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"]
+    # npm.cmd needs the Windows command interpreter, but never launch via shell=True.
+    if sys.platform == "win32" and npm_cmd.lower().endswith((".cmd", ".bat")):
+        preview_argv = [os.environ.get("COMSPEC", "cmd.exe"), "/d", "/c", *preview_argv]
     preview = subprocess.Popen(
-        ["npm", "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"],
+        preview_argv,
         cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+        shell=False,
     )
     failures: list[str] = []
     captured = 0

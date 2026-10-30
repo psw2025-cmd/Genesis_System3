@@ -1,0 +1,38 @@
+﻿apiVersion: run.googleapis.com/v1
+kind: Job
+metadata:
+  annotations:
+    run.googleapis.com/creator: warghade2012@gmail.com
+    run.googleapis.com/lastModifier: warghade2012@gmail.com
+  labels:
+    cloud.googleapis.com/location: asia-south1
+    run.googleapis.com/lastUpdatedTime: '2026-10-28T08:12:54.393720Z'
+    run.googleapis.com/satisfiesPzs: 'true'
+  name: daily-gain-validate-job
+  namespace: '802404398783'
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/client-name: gcloud
+        run.googleapis.com/client-version: 590.0.0
+        run.googleapis.com/execution-environment: gen2
+      labels:
+        client.knative.dev/nonce: ban_ror_kav
+    spec:
+      taskCount: 1
+      template:
+        spec:
+          containers:
+          - args:
+            - scripts/generate_qc_verification.py
+            command:
+            - python
+            image: gcr.io/system3-openalgo-safe/genesis-system3-web
+            resources:
+              limits:
+                cpu: 1000m
+                memory: 512Mi
+          maxRetries: 3
+          serviceAccountName: 802404398783-compute@developer.gserviceaccount.com
+          timeoutSeconds: '600'

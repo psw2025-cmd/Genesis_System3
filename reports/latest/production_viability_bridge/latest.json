@@ -13,6 +13,26 @@
       "severity": "CRITICAL"
     },
     {
+      "action": "Run market-session analyzer paper lifecycle proof.",
+      "code": "REAL_MARKET_PAPER_LIFECYCLE_MISSING",
+      "message": "Real market paper lifecycle is not proven.",
+      "proof": {
+        "broker_connected": null,
+        "dry_run": null,
+        "entry_order_placed": false,
+        "exit_completed": false,
+        "full_lifecycle_proven": false,
+        "mandatory_lifecycle_fields": [],
+        "market_status": null,
+        "net_pnl": null,
+        "orders_trades_lifecycle_reconciled": false,
+        "pnl_total": null,
+        "proof_id": "LIFECYCLE_20261029_154751",
+        "signal_generated": false
+      },
+      "severity": "CRITICAL"
+    },
+    {
       "action": "Do not mark production ready from dry-run proof.",
       "code": "RAW_LIFECYCLE_DRY_RUN",
       "message": "Raw lifecycle proof is simulation/dry-run.",
@@ -91,7 +111,7 @@
       "severity": "HIGH"
     }
   ],
-  "generated_utc": "2026-07-24T03:53:15.666356+00:00",
+  "generated_utc": "2026-10-29T13:56:37.979653+00:00",
   "inputs": {
     "dashboard_truth": {
       "auto_repair_allowed": true,
@@ -460,38 +480,27 @@
     },
     "lifecycle_summary": {
       "auto_repair_allowed": false,
-      "blockers": [],
+      "blockers": [
+        "lifecycle_not_completed"
+      ],
       "evidence": {
-        "broker_connected": false,
-        "dry_run": false,
-        "entry_order_placed": true,
-        "exit_completed": true,
-        "full_lifecycle_proven": true,
-        "mandatory_lifecycle_fields": [
-          "signal_id",
-          "symbol",
-          "instrument_token",
-          "expiry",
-          "strike",
-          "option_type",
-          "entry_time",
-          "entry_price",
-          "exit_time",
-          "exit_price",
-          "pnl_total",
-          "net_pnl"
-        ],
-        "market_status": "Market open (09:23 IST)",
-        "net_pnl": -15.0,
-        "orders_trades_lifecycle_reconciled": true,
-        "pnl_total": 5.0,
-        "proof_id": "LIFECYCLE_20260724_092306",
-        "signal_generated": true
+        "broker_connected": null,
+        "dry_run": null,
+        "entry_order_placed": false,
+        "exit_completed": false,
+        "full_lifecycle_proven": false,
+        "mandatory_lifecycle_fields": [],
+        "market_status": null,
+        "net_pnl": null,
+        "orders_trades_lifecycle_reconciled": false,
+        "pnl_total": null,
+        "proof_id": "LIFECYCLE_20261029_154751",
+        "signal_generated": false
       },
       "gate": "analyzer_paper_lifecycle_proof",
-      "next_action": "PASS \u2014 lifecycle proven. Accumulate 5+ days before live enablement.",
-      "pass": true,
-      "status": "PASS",
+      "next_action": "Complete broker connection + run on market day.",
+      "pass": false,
+      "status": "FAIL",
       "warnings": [
         "broker_not_connected_paper_simulation_used"
       ]
@@ -662,7 +671,7 @@
         "live_market_analyzer_paper_trade_not_proven"
       ],
       "dhanhq_dependency_present": true,
-      "generated_utc": "2026-07-24T03:51:16.070230+00:00",
+      "generated_utc": "2026-07-24T04:10:25.441827+00:00",
       "logzero_dependency_present": true,
       "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
       "master_control_plane_verdict": "TRADE_READY_BLOCKED",
@@ -676,7 +685,7 @@
       "verdict": "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR"
     },
     "proof_matrix": {
-      "generated_utc": "2026-07-24T03:51:16.039008+00:00",
+      "generated_utc": "2026-07-24T04:10:25.433826+00:00",
       "mode": "Analyzer/Paper only; live trading disabled",
       "optional_missing_count": 0,
       "pending_count": 0,
@@ -774,12 +783,12 @@
     }
   },
   "summary": {
-    "blocker_count": 9,
+    "blocker_count": 10,
     "highest_severity": "CRITICAL",
     "paper_analyzer_allowed": true,
     "production_live_ready": false,
     "severity_counts": {
-      "CRITICAL": 2,
+      "CRITICAL": 3,
       "HIGH": 7,
       "MEDIUM": 3
     },

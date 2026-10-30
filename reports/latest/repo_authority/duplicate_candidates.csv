@@ -1,0 +1,2 @@
+basename,count,paths
+package.json,2,tools/package.json | tools/playwright-setup/package.json

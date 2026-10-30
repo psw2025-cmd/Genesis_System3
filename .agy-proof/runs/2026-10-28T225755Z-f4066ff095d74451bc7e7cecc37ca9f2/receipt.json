@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "105f82e7-f19c-44ab-a420-12c9fd6b56d1",
+  "turn": "5bb6a4c7cff54a4dbaf327cd3179a955",
+  "run_id": "a5860b66377740a5b8c4511bb0b691d6",
+  "observed_utc": "2026-10-28T22:57:55Z",
+  "workspace": "C:\\Genesis_System3",
+  "scope": "Genesis System3 forensic verification and honest evidence integrity in GenesisTab.tsx and SystemTruthControl.tsx",
+  "limitations": [
+    "Read-only broker connection; live trading permanently locked (LIVE_TRADING_ENABLED=0)",
+    "Cloud Run deployed instance verified via API; local stack server is offline"
+  ],
+  "gate_sha256": "b27c10c10947dfd816bd1a6f28adf72034aeb90b978a7d8b8aa2de2049bda944",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3\\.agy-proof\\contract.json",
+    "sha256": "32a21d0548fdf072d0c92860068096a73309ffce26722ee04e3aaa4c1f668d62"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\GenesisTab.tsx",
+      "sha256": "8fa59d6c1cea8a3c2f1611124db7f6c1918dda02b7ef841b2b3d5433be36dd1e"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\SystemTruthControl.tsx",
+      "sha256": "45d4fe4a3c879aacfab15f0929e8cab0f162d3d86f1c4089213a45391f17e1e0"
+    },
+    {
+      "path": "C:\\Genesis_System3\\scripts\\verify_forensic_evidence.py",
+      "sha256": "d725ae5a54d099139d04395a09ceabce9d4a2c9a886d097a8976454dc14f6046"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-28T225755Z-f4066ff095d74451bc7e7cecc37ca9f2\\0.stdout.txt",
+      "sha256": "62aafee35654a717f508cc0b6f405bd074d78caf51692651d4149f01c10652d2"
+    },
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-28T225755Z-f4066ff095d74451bc7e7cecc37ca9f2\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "GenesisTab.tsx shows N/A - NO_PREDICTION and zero occurrences of hardcoded 1.85",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "SystemTruthControl.tsx preserves honest messaging for candidate_rows zero, read-path presence, and single bounded poller",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Forensic verification artifacts produced and verified in C:/Temp/Genesis_Forensic",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "scripts/verify_forensic_evidence.py"
+      ],
+      "cwd": "C:\\Genesis_System3",
+      "started_utc": "2026-10-28T22:57:55Z",
+      "elapsed_seconds": 0.312,
+      "exit_code": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "actual": true,
+        "expected": true
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "ac8386a45f19c0a19ca1f6acf48e8e18d5112c05358ed8387c2e7aa32aa8cd87"
+}

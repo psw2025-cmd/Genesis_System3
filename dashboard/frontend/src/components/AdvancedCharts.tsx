@@ -7,10 +7,10 @@ const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
 
 export default function AdvancedCharts() {
   const [selectedUnderlying, setSelectedUnderlying] = useState('NIFTY')
-  const [heatmapData, setHeatmapData] = useState<unknown>(null)
-  const [ivSurface, setIvSurface] = useState<unknown>(null)
-  const [greeksData, setGreeksData] = useState<unknown>(null)
-  const [pcrData, setPcrData] = useState<unknown>(null)
+  const [heatmapData, setHeatmapData] = useState<any>(null)
+  const [ivSurface, setIvSurface] = useState<any>(null)
+  const [greeksData, setGreeksData] = useState<any>(null)
+  const [pcrData, setPcrData] = useState<any>(null)
   const [selectedMetric, setSelectedMetric] = useState('oi')
   const [selectedGreek, setSelectedGreek] = useState('delta')
 

@@ -26,9 +26,9 @@ function safeText(value: any, fallback = 'N/A'): string {
 }
 
 export default function AgentConsole() {
-  const [agentMemory, setAgentMemory] = useState<unknown>(null)
-  const [upgradePlan, setUpgradePlan] = useState<unknown>(null)
-  const [testResults, setTestResults] = useState<unknown>(null)
+  const [agentMemory, setAgentMemory] = useState<any>(null)
+  const [upgradePlan, setUpgradePlan] = useState<any>(null)
+  const [testResults, setTestResults] = useState<any>(null)
   const [issues, setIssues] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [lastError, setLastError] = useState<string | null>(null)
@@ -151,7 +151,7 @@ export default function AgentConsole() {
   const handleDownloadProofPack = async () => {
     try {
       if (window.electronAPI) {
-        const result = await window.electronAPI.downloadProofPack()
+        const result: any = await (window as any).electronAPI.downloadProofPack()
         if (result?.success) {
           window.open(`${API_BASE}/api/proof-pack`, '_blank')
         }

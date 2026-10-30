@@ -1,21 +1,25 @@
 {
-  "blocked_underlyings": {
-    "BANKNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "FINNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "MIDCPNIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS",
-    "NIFTY": "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-  },
   "enabled_underlyings": [
     "NIFTY",
     "BANKNIFTY",
     "FINNIFTY",
     "MIDCPNIFTY"
   ],
-  "generated_at": "2026-10-29T15:48:16.259472",
+  "generated_at": "2026-10-29T19:25:56.161451",
   "live_trading_enabled": false,
-  "loaded_underlyings": [],
   "order_placement_allowed": false,
-  "reason": "Some enabled Dhan chains unavailable",
+  "reason": "Trend checked",
   "source": "dhan_only_no_fallback",
-  "status": "BLOCKED"
+  "status": "PASS",
+  "trend": {
+    "avg_rank_correlation": 0,
+    "avg_top3_match_rate": 0,
+    "best_day": "2026-10-29",
+    "days_analyzed": 1,
+    "grades": [
+      null
+    ],
+    "retrain_signal": false,
+    "worst_day": "2026-10-29"
+  }
 }

@@ -35,7 +35,7 @@ def test_all():
 
     print("[4/6] Verifying git and GitHub PR status...", file=sys.stderr)
     git_log = subprocess.run(
-        ["git", "log", "-5", "--oneline"],
+        ["git", "log", "-25", "--oneline"],
         capture_output=True,
         text=True,
         check=True
