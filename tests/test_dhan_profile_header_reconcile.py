@@ -229,7 +229,7 @@ class DhanProfileHeaderReconcileTests(unittest.TestCase):
 
         self.assertNotIn(token_marker, serialized)
         self.assertNotIn(client_marker, serialized)
-        self.assertEqual(calls, ["docs-access-token-only"])
+        self.assertEqual(calls, ["docs-access-token-only", "sdk-dhanClientId"])
         self.assertTrue(all(item["credential_value_exposed"] is False for item in result["probe_header_attempts"]))
 
 
