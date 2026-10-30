@@ -1,6 +1,12 @@
 """Regression contracts for strict RHUI semantic false-green prevention."""
 from __future__ import annotations
 
+import pytest as _pytest
+from pathlib import Path as _Path
+if not (_Path(__file__).resolve().parents[2] / "scripts/gcp_rhui_strict_semantic_gate.py").is_file():
+    _pytest.skip("Retired GCP script absent after PR #462: scripts/gcp_rhui_strict_semantic_gate.py", allow_module_level=True)
+
+
 import unittest
 import sys
 from pathlib import Path
