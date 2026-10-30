@@ -505,9 +505,12 @@ def get_funds() -> dict:
         try:
             data = client.get_fund_limits()
             payload_error = _payload_error(data)
-            if payload_error:
+            if payload_error and payload_error != "DHAN_REQUEST_REJECTED_906":
                 return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
-            return {"success": True, "source": "sdk", "data": data}
+            if not payload_error:
+                return {"success": True, "source": "sdk", "data": data}
+            # DH-906 is a request-contract rejection, not token expiry.
+            # Try one documented read-only REST variant; never retry auth/rate errors.
         except Exception:
             pass
 
@@ -539,9 +542,12 @@ def get_positions() -> dict:
         try:
             data = client.get_positions()
             payload_error = _payload_error(data)
-            if payload_error:
+            if payload_error and payload_error != "DHAN_REQUEST_REJECTED_906":
                 return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
-            return {"success": True, "source": "sdk", "data": data}
+            if not payload_error:
+                return {"success": True, "source": "sdk", "data": data}
+            # DH-906 is a request-contract rejection, not token expiry.
+            # Try one documented read-only REST variant; never retry auth/rate errors.
         except Exception:
             pass
 
@@ -568,9 +574,12 @@ def get_holdings() -> dict:
         try:
             data = client.get_holdings()
             payload_error = _payload_error(data)
-            if payload_error:
+            if payload_error and payload_error != "DHAN_REQUEST_REJECTED_906":
                 return {"success": False, "error": payload_error, "data": data, "source": "sdk"}
-            return {"success": True, "source": "sdk", "data": data}
+            if not payload_error:
+                return {"success": True, "source": "sdk", "data": data}
+            # DH-906 is a request-contract rejection, not token expiry.
+            # Try one documented read-only REST variant; never retry auth/rate errors.
         except Exception:
             pass
 
