@@ -42,7 +42,7 @@ def test_excel_register():
             assert act is not None and str(act).strip() != "", f"Missing actual result for {iid}"
             assert close in ["PASS", "PARTIAL", "OPEN", "BLOCKED"], f"Invalid closure status for {iid}: {close}"
             
-    assert count == 113, f"Expected 113 checks in MASTER TRACKER, found {count}"
+    assert count == 121, f"Expected 121 checks in MASTER TRACKER, found {count}"
     log(f"  Excel register verified: 23 tabs, {count} checks with evidence.")
 
 def test_production_safety_locks():
@@ -67,10 +67,10 @@ def test_backend_recovery_api():
         data = json.load(f)
         
     summary = data.get("summary", {})
-    assert summary.get("total_issues") == 113, f"Expected 113 total issues, got {summary.get('total_issues')}"
-    assert summary.get("p0_count") == 21, f"Expected 21 P0 issues, got {summary.get('p0_count')}"
+    assert summary.get("total_issues") == 121, f"Expected 121 total issues, got {summary.get('total_issues')}"
+    assert summary.get("p0_count") == 26, f"Expected 26 P0 issues, got {summary.get('p0_count')}"
     assert data.get("market_label") in ["LAST VERIFIED MARKET CLOSE", "MARKET OPEN"]
-    assert len(data.get("items", [])) == 113
+    assert len(data.get("items", [])) == 121
     
     with open("dashboard/backend/app.py", "r", encoding="utf-8") as f:
         app_content = f.read()
@@ -112,6 +112,5 @@ if __name__ == "__main__":
     test_frontend_recovery_tab()
     test_master_closure_report()
     log("\nALL 5 RECOVERY VERIFICATION CHECKS PASSED SUCCESSFULLY!")
-    # Output strictly the JSON assertion payload to stdout
-    sys.stdout.write(json.dumps({"verified": True, "total_issues": 113, "safety": "PAPER_LOCKED"}))
+    sys.stdout.write(json.dumps({"verified": True, "total_issues": 121, "safety": "PAPER_LOCKED"}))
     sys.stdout.flush()

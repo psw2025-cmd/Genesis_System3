@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
+﻿import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
 import { PriceCell } from './ui/PriceCell'
@@ -194,6 +194,10 @@ function SymbolControls({ chainSymbol, setChainSymbol, universe, discovery, disc
   </div>
 }
 
+const isMarketClosedSnapshot = (data: any) => {
+    return data?.status === 'MARKET_CLOSED_DHAN_SNAPSHOT' || data?.status === 'EOD_SNAPSHOT' || data?.snapshot === true;
+};
+
 export function OptionChain() {
   const { chainSymbol, setChainSymbol, chain, marketOpen, state, wsStatus, liveBoard } = useStore()
   const atmRef = useRef<HTMLTableRowElement>(null)
@@ -346,7 +350,7 @@ export function OptionChain() {
   return <div className="flex flex-col h-full">
     <SymbolControls chainSymbol={chainSymbol} setChainSymbol={setChainSymbol} universe={universe} discovery={discovery} discoveryError={discoveryError} />
     <div className="flex flex-wrap items-center gap-3 px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
-      <span className={cn('pill text-[10px] border', 'bg-amber/10 text-amber border-amber/20')}>{(() => { const counts = requiredChainCounts(chain); return `required_ready ${counts.requiredReady}/${counts.total} · safe_no_trade ${counts.safeNoTrade}/${counts.total} · TRADABLE ${counts.tradableLabel}` })()}</span>
+      <span className={cn('pill text-[10px] border', 'bg-amber/10 text-amber border-amber/20')}>{(() => { const counts = requiredChainCounts(chain); return `required_ready ${counts.requiredReady}/${counts.total} Â· safe_no_trade ${counts.safeNoTrade}/${counts.total} Â· TRADABLE ${counts.tradableLabel}` })()}</span>
       <span className={cn('pill text-[10px] border', 'bg-surface-2 text-text-secondary border-border')}>SESSION SNAPSHOT</span>
       <label className="flex items-center gap-1.5"><span className="text-text-muted text-xs">EXPIRY</span><select aria-label="Option expiry" value={selectedExpiry} onChange={event => { setSelectedExpiry(event.target.value); setRange(10) }} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value="">AUTO / NEAREST</option>{harvestedExpiries.map(expiry => <option value={expiry} key={expiry}>{expiry}</option>)}</select></label>
       <div><span className="text-text-muted text-xs"> SYMBOL </span><span className="num text-sm font-semibold">{chainSymbol}</span></div>
@@ -355,23 +359,23 @@ export function OptionChain() {
       <div><span className="text-text-muted text-xs"> CONTRACTS </span><span className="num text-xs">{contracts.length}</span></div>
       <div><span className="text-text-muted text-xs"> STRIKES </span><span className="num text-xs">{strikes.length}</span></div>
       <button onClick={() => setShowGreeks(!showGreeks)} className={cn('px-2.5 py-1 rounded text-xs font-mono font-semibold transition-colors border', showGreeks ? 'bg-accent text-white border-accent' : 'bg-surface-2 text-text-secondary border-border')}>
-        {showGreeks ? '📊 GREEKS VIEW' : '📈 STANDARD VIEW'}
+        {showGreeks ? 'ðŸ“Š GREEKS VIEW' : 'ðŸ“ˆ STANDARD VIEW'}
       </button>
       <div className="ml-auto flex items-center gap-2"><span className="text-text-muted text-[10px]">VISIBLE</span><select aria-label="Strike visibility" value={range} onChange={event => setRange(Number(event.target.value))} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value={0}>ALL STRIKES ({strikes.length})</option>{[5, 10, 20, 40].map(value => <option key={value} value={value}>+/-{value} ATM</option>)}</select></div>
     </div>
     <div className={cn('px-4 py-2 border-b border-border text-[10px] font-mono', stale || contracts.length === 0 ? 'text-amber bg-amber/5' : 'text-text-muted')}>
-      symbol {chainSymbol} · source={sourceValue || '--'} · status={status}{completeChain ? ' · complete_chain=true' : ''}{fetchedAt !== '--' ? ` · fetched=${String(fetchedAt)}` : ''}{selectedExpiry ? ` · selected_expiry=${selectedExpiry}` : ''}
+      symbol {chainSymbol} Â· source={sourceValue || '--'} Â· status={status}{completeChain ? ' Â· complete_chain=true' : ''}{fetchedAt !== '--' ? ` Â· fetched=${String(fetchedAt)}` : ''}{selectedExpiry ? ` Â· selected_expiry=${selectedExpiry}` : ''}
     </div>
     {mismatch && <div className="px-4 py-2 bg-down/5 text-down text-xs border-b border-border">Backend returned {String(data?.underlying)} while UI selected {chainSymbol}. Wrong-symbol rows are hidden.</div>}
     {Boolean(data?.live_board_conflict) && <div className="px-4 py-2 bg-amber/5 text-amber text-xs border-b border-border">live_board LTP {String(data?.live_board_ltp ?? '--')} disagrees with Dhan chain spot {spot != null ? fmt(spot, 2) : '--'}. Chain ATM is used. Do not treat a FINNIFTY quote as NIFTY.</div>}
-    {contracts.length === 0 ? <div className="flex-1 overflow-auto p-4"><div className="card p-4"><div className="panel-title">Option Chain</div><div className="mt-3 text-amber font-semibold">NO VERIFIED BROKER CHAIN ROWS</div><div className="mt-2 text-xs text-text-muted">{noDataReason}</div><div className="mt-3 text-xs text-text-muted">Safety: ANALYZER / PAPER · LIVE OFF. No synthetic prices, strikes, OI, IV or Greeks are generated.</div></div></div> : <div className="flex-1 overflow-auto">
+    {contracts.length === 0 && !isMarketClosedSnapshot(data) ? <div className="flex-1 overflow-auto p-4"><div className="card p-4"><div className="panel-title">Option Chain</div><div className="mt-3 text-amber font-semibold">MARKET CLOSED — NO SNAPSHOT AVAILABLE</div><div className="mt-2 text-xs text-text-muted">{noDataReason}</div><div className="mt-3 text-xs text-text-muted">Safety: ANALYZER / PAPER Â· LIVE OFF. No synthetic prices, strikes, OI, IV or Greeks are generated.</div></div></div> : <div className="flex-1 overflow-auto">
       <table className="w-full border-collapse text-[10px]">
         <thead className="sticky top-0 z-10 bg-surface-1">
           {showGreeks ? (
             <tr>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Δ</th>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Γ</th>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Θ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Î”</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Î“</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE Î˜</th>
               <th className="thead border-b border-border text-center px-1.5 py-2 text-cyan-400">CE V</th>
               <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
               <th className="thead border-b border-border text-right px-2 py-2">CE OI</th>
@@ -382,9 +386,9 @@ export function OptionChain() {
               <th className="thead border-b border-border text-left px-2 py-2">LTP CHG%</th>
               <th className="thead border-b border-border text-left px-2 py-2">PE OI</th>
               <th className="thead border-b border-border text-center px-1.5 py-2">BUILDUP</th>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Δ</th>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Γ</th>
-              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Θ</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Î”</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Î“</th>
+              <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE Î˜</th>
               <th className="thead border-b border-border text-center px-1.5 py-2 text-purple-400">PE V</th>
             </tr>
           ) : (
@@ -469,3 +473,6 @@ export function OptionChain() {
 }
 
 export default OptionChain
+
+
+

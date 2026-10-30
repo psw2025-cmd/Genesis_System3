@@ -1,0 +1,8 @@
+{
+  "status": "BLOCKED",
+  "reason": "NO_LEDGER_EVIDENCE",
+  "spearman_correlation": 0.0,
+  "hit_rate": 0.0,
+  "closed_trade_count": 0,
+  "timestamp": "2026-10-30T03:41:49.667273"
+}

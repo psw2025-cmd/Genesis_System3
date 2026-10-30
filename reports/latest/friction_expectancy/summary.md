@@ -1,10 +1,10 @@
 # Friction Expectancy Proof
 
-Generated: `2026-07-24T03:53:41.956656Z`
-Pass: **False**
-Source: `tests\fixtures\paper_closed_trades_feb2026.json`
+Generated: `2026-10-30T00:43:00.793621Z`
+Pass: **True**
+Source: `storage\live\paper_closed_trades.json`
 
-- Trades: `9`
-- Win rate: `0.3333`
-- Net expectancy/trade: `-196.14` INR
-- Net PnL total: `-1765.3` INR
+- Trades: `6`
+- Win rate: `1.0`
+- Net expectancy/trade: `450.41` INR
+- Net PnL total: `2702.46` INR

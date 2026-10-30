@@ -1,0 +1,62 @@
+{
+  "scope": "System3 Genesis Recovery Progress and Audit Verification",
+  "limitations": [
+    "Production Cloud Run read-only audit; live trading permanently disabled; Dhan broker Data API requires external subscription"
+  ],
+  "subject_files": [
+    "dashboard/backend/app.py",
+    "dashboard/frontend/src/App.tsx",
+    "dashboard/frontend/src/components/Sidebar.tsx",
+    "dashboard/frontend/src/components/RecoveryProgressTab.tsx",
+    "scripts/get_token_official.py",
+    "tests/test_recovery_audit_and_progress.py",
+    "reports/latest/recovery_progress.json",
+    "reports/latest/MASTER_RECOVERY_CLOSURE.md"
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "23-tab Excel audit register with 121 micro-checks has valid structure, evidence and closure statuses",
+      "mandatory": true
+    },
+    {
+      "id": "R2",
+      "description": "Production Cloud Run runtime enforces PAPER mode, live_allowed=false, and order_placement_allowed=false",
+      "mandatory": true
+    },
+    {
+      "id": "R3",
+      "description": "Backend exposes /api/recovery/progress serving durable verified recovery progress JSON with 121 checks",
+      "mandatory": true
+    },
+    {
+      "id": "R4",
+      "description": "Frontend wires RecoveryProgressTab in Sidebar, App and builds clean production bundle",
+      "mandatory": true
+    },
+    {
+      "id": "R5",
+      "description": "Master Recovery Closure report documents root causes, Dhan Data API Error 806, token generation fix, and deployment matrix",
+      "mandatory": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": ["R1", "R2", "R3", "R4", "R5"],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3\\.venv\\Scripts\\python.exe",
+        "tests/test_recovery_audit_and_progress.py"
+      ],
+      "cwd": ".",
+      "timeout": 60,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      }
+    }
+  ]
+}

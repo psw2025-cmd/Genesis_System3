@@ -2,6 +2,7 @@
 """
 System3 Genesis Streamlit Dashboard
 Autonomous analyzer/paper operator console. Real-money execution stays gated.
+FIXED: DeltaGenerator bug removed
 """
 
 from __future__ import annotations
@@ -49,20 +50,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 def money(value: Any) -> str:
     try:
         return f"{INR_SYMBOL}{float(value):,.2f}"
     except Exception:
         return f"{INR_SYMBOL}0.00"
 
-
 def pct(value: Any) -> str:
     try:
         return f"{float(value):.2f}%"
     except Exception:
         return "0.00%"
-
 
 def api(path: str, method: str = "GET", json: Optional[Dict[str, Any]] = None, timeout: int = 20) -> Dict[str, Any]:
     url = f"{BACKEND_URL}{path}"
@@ -84,7 +82,6 @@ def api(path: str, method: str = "GET", json: Optional[Dict[str, Any]] = None, t
         st.error(f"Backend error on {path}: {exc}")
         return {"error": str(exc)}
 
-
 components.html(
     """
     <script>
@@ -102,9 +99,16 @@ with st.sidebar:
     st.title("System3 Genesis")
     health = api("/health", timeout=8)
     connected = not bool(health.get("error"))
-    st.success("Backend connected") if connected else st.error("Backend disconnected")
+    if connected:
+        st.success("Backend connected")
+    else:
+        st.error("Backend disconnected")
     dhan = api("/dhan-health", timeout=8) if connected else {}
-    st.caption(f"Dhan connected: {bool(dhan.get('connected') or dhan.get('broker_connected'))}")
+    dhan_connected = bool(dhan.get('connected') or dhan.get('broker_connected'))
+    if dhan_connected:
+        st.success("Dhan connected: True")
+    else:
+        st.warning("Dhan connected: False")
     symbol = st.selectbox("Symbol", SYMBOLS, index=0)
     expiry = st.selectbox("Expiry", ["nearest", "2026-07-09", "2026-07-16", "2026-07-30"], index=0)
     st.divider()
@@ -334,5 +338,3 @@ if selected_page == "Truth & Control":
 
 st.divider()
 st.caption(f"{VERSION} | Backend: {BACKEND_URL} | Analyzer/Paper first | Currency: INR | Percent format: 2 decimals")
-print("DEPLOY READY: git push && render deploy")
-

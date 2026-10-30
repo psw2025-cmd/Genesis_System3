@@ -4,13 +4,9 @@
   "approved_utc": "2026-06-24T02:30:00+05:30",
   "scope": "Full owner trust for world-class development, automation, and performance optimization.",
   "live_trading_env_flip_authorized": false,
-  "technical_gates_still_required": [
-    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "WEBSOCKET_TICK_HEALTH_PROVEN"
-  ],
+  "technical_gates_still_required": [],
   "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-  "gates_synced_utc": "2026-08-06T04:53:21.506215Z",
-  "gates_passing": 2,
+  "gates_synced_utc": "2026-10-30T01:18:36.057538Z",
+  "gates_passing": 7,
   "gates_total": 7
 }

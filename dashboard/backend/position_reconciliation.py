@@ -1,4 +1,4 @@
-"""
+﻿"""
 Position Reconciliation Module
 Reconciles broker positions, internal ledger, and UI state.
 """
@@ -66,7 +66,7 @@ class PositionReconciliation:
             return []
 
         try:
-            data = json.loads(positions_file.read_text())
+            data = json.loads(positions_file.read_text(encoding="utf-8-sig"))
             if isinstance(data, dict):
                 return data.get("positions", [])
             if isinstance(data, list):

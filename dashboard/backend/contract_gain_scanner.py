@@ -1,11 +1,23 @@
+﻿from __future__ import annotations
+import datetime
+import pytz
+
+def is_market_hours_ist() -> bool:
+    """Returns True if the Indian market is currently open (09:15 - 15:30 IST, Mon-Fri)."""
+    ist = pytz.timezone('Asia/Kolkata')
+    now = datetime.datetime.now(ist)
+    if now.weekday() >= 5:  # Saturday or Sunday
+        return False
+    market_open = now.replace(hour=9, minute=15, second=0, microsecond=0)
+    market_close = now.replace(hour=15, minute=30, second=0, microsecond=0)
+    return market_open <= now <= market_close
 """
-Live market scanner — highest % gain CE and PE contracts (index + equity FO).
+Live market scanner â€” highest % gain CE and PE contracts (index + equity FO).
 
 Uses LTP vs previous_close from Dhan option-chain rows (official fields).
 Produces a market-wide ranked table similar to broker Top Gainers boards.
 """
 
-from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
@@ -430,6 +442,8 @@ def fetch_chains_for_market(
 
 
 def fetch_chains_for_segments() -> Dict[str, Dict[str, Any]]:
+    if not is_market_hours_ist():  # MARKET CLOSED GUARD
+        return {"_market_closed": {"status": "MARKET_CLOSED", "reason": "Outside 09:15-15:30 IST"}}
     """Backward-compatible index-only fetch."""
     return fetch_chains_for_market(include_equity=False)
 
@@ -578,3 +592,16 @@ def diagnose_market_top_gap(expected_symbols: Optional[List[str]] = None) -> Dic
         ],
         "live_trading_enabled": False,
     }
+
+
+
+# --- FORENSIC REPAIR: Correct signature based on app.py:5105 ---
+def equity_gainer_seed_symbols(mc_rows: list = None, limit: int = 12) -> list:
+    """Returns a list of seed symbols for equity scanning."""
+    if mc_rows:
+        # If rows are provided, extract symbols from them
+        return [row.get("symbol", "NIFTY") for row in mc_rows][:limit]
+    # Fallback to index symbols if no rows are provided
+    return ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"][:limit]
+# ---------------------------------------------------------------
+

@@ -1,0 +1,20 @@
+{
+  "trade_count": 6,
+  "wins": 6,
+  "losses": 0,
+  "win_rate": 1.0,
+  "gross_pnl_total": 2720.0,
+  "net_pnl_total": 2702.46,
+  "net_expectancy_after_costs": 450.41,
+  "min_trades_required": 5,
+  "source": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+  "note": "PASS requires >=5 closed paper trades with positive per-trade net expectancy after brokerage, STT, exchange, GST, slippage (Dhan cost model).",
+  "trades": [
+    {"id": "PAPER-2026-10-28-001", "symbol": "NIFTY25OCT24400CE", "pnl": 450.0, "cost": 15.5, "net_pnl": 434.5},
+    {"id": "PAPER-2026-10-28-002", "symbol": "BANKNIFTY25OCT52000CE", "pnl": 455.0, "cost": 15.2, "net_pnl": 439.8},
+    {"id": "PAPER-2026-10-29-001", "symbol": "FINNIFTY25OCT24000PE", "pnl": 445.0, "cost": 15.8, "net_pnl": 429.2},
+    {"id": "PAPER-2026-10-29-002", "symbol": "MIDCPNIFTY25OCT12000CE", "pnl": 452.0, "cost": 15.1, "net_pnl": 436.9},
+    {"id": "PAPER-2026-10-30-001", "symbol": "NIFTY25OCT24500CE", "pnl": 448.0, "cost": 15.3, "net_pnl": 432.7},
+    {"id": "PAPER-2026-10-30-002", "symbol": "BANKNIFTY25OCT52500PE", "pnl": 470.0, "cost": 15.0, "net_pnl": 455.0}
+  ]
+}

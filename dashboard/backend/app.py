@@ -739,6 +739,24 @@ async def get_state():
     return state
 
 
+@app.get("/api/recovery/progress")
+async def get_recovery_progress():
+    """
+    Read-only Recovery Progress API exposing durable verified results for the 121 Excel micro-checks.
+    Shows each Excel issue ID, status, root cause, last verification, evidence timestamp, and deployed revision.
+    Shows LAST VERIFIED MARKET CLOSE when exchange is closed; distinguishes stale, unavailable, and live market data.
+    """
+    recovery_file = ROOT_DIR / "reports" / "latest" / "recovery_progress.json"
+    if recovery_file.exists():
+        try:
+            data = json.loads(recovery_file.read_text(encoding="utf-8"))
+            return data
+        except Exception as e:
+            logger.error(f"Error reading recovery_progress.json: {e}")
+            raise HTTPException(status_code=500, detail=f"Error reading recovery progress: {e}")
+    raise HTTPException(status_code=404, detail="Recovery progress data not generated yet")
+
+
 @app.get("/api/state/history")
 async def get_state_history(limit: int = 100):
     """

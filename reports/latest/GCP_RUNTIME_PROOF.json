@@ -1,0 +1,131 @@
+{
+  "timestamp_ist": "2026-10-30T11:20:40+05:30",
+  "project_id": "system3-openalgo-safe",
+  "region": "asia-south1",
+  "verified_by": "AGY Pair Programmer",
+  "mode_safety": {
+    "ANALYZE_MODE": "1",
+    "PAPER_MODE": "1",
+    "LIVE_TRADING_ENABLED": "0",
+    "SYSTEM3_LIVE_TRADING_ALLOWED": "0",
+    "AUTO_EXECUTE_TRADES": "0",
+    "LIVE_ORDER_AUTHORITY": "0",
+    "status": "PASS - Fully locked to PAPER/ANALYZE mode"
+  },
+  "cloud_run_services": {
+    "genesis-system3-web": {
+      "status": "HEALTHY",
+      "latest_ready_revision": "genesis-system3-web-00053-cbv",
+      "deployed_git_sha": "9b5761f",
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:9b5761f",
+      "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+      "asia_south1_url": "https://genesis-system3-web-802404398783.asia-south1.run.app",
+      "endpoints_tested": {
+        "/": "200 OK",
+        "/ui": "200 OK (text/html)",
+        "/api/health": "200 OK (broker_connected_market_open, live_allowed=false)",
+        "/api/status": "200 OK",
+        "/api/recovery/progress": "200 OK (total_issues=113, pass_count=9, partial_count=104)",
+        "/api/chain/NIFTY": "200 OK (NO_DHAN_DATA, blocked=true, reason=NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS)",
+        "/api/chain/BANKNIFTY": "200 OK (NO_DHAN_DATA, blocked=true)",
+        "/api/paper/status": "200 OK (DISABLED, engine=paper_cloud_sim)",
+        "/api/paper/trades": "200 OK",
+        "/api/positions": "200 OK (data_mode=PAPER, source=firestore:system3_paper_positions)",
+        "/api/signals": "200 OK (action=NO_TRADE)"
+      }
+    },
+    "genesis-system3": {
+      "url": "https://genesis-system3-802404398783.asia-south1.run.app"
+    },
+    "dhan-rotator": {
+      "url": "https://dhan-rotator-802404398783.asia-south1.run.app"
+    }
+  },
+  "cloud_run_jobs": {
+    "daily-gain-validate-job": {
+      "status": "SUCCESS",
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web@sha256:dbc9836c82a44508f1a4ec91fed978ac9630ac59140c95ba5ffcccfe78dbf46f",
+      "command": "python scripts/generate_qc_verification.py",
+      "last_execution": "daily-gain-validate-job-j4l5w",
+      "last_outcome": "EXECUTION_SUCCEEDED",
+      "last_completion_time": "2026-10-29T14:01:46Z"
+    },
+    "daily-gain-validate-real": {
+      "status": "PRESENT"
+    },
+    "genesis-system3-dhan-token-rotate": {
+      "status": "FAILED",
+      "image": "asia-south1-docker.pkg.dev/system3-openalgo-safe/system3-containers/genesis-system3-web:latest",
+      "command": "python scripts/gcp_dhan_token_rotation_job.py",
+      "last_execution": "genesis-system3-dhan-token-rotate-s4bn8",
+      "last_outcome": "EXECUTION_FAILED",
+      "last_completion_time": "2026-10-30T03:25:22Z",
+      "root_cause": "Container image lacks /app/scripts/gcp_dhan_token_rotation_job.py (FileNotFoundError, Exit 2). Addressed in pending PR #497."
+    }
+  },
+  "cloud_schedulers": {
+    "dhan_rotation_duplicate_check": {
+      "duplicate_detected": true,
+      "schedules": [
+        {
+          "name": "dhan-auto-rotate",
+          "schedule": "0 */20 * * *",
+          "state": "PAUSED",
+          "target_type": "HTTP OIDC",
+          "target_uri": "https://asia-south1-system3-openalgo-safe.cloudfunctions.net/dhan-rotator",
+          "evaluation": "DEAD TARGET: Cloud function endpoint does not exist. Correctly PAUSED."
+        },
+        {
+          "name": "dhan-daily-token-refresh",
+          "schedule": "55 8 * * *",
+          "state": "ENABLED",
+          "target_type": "HTTP OAuth",
+          "target_uri": "https://asia-south1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/system3-openalgo-safe/jobs/genesis-system3-dhan-token-rotate:run",
+          "evaluation": "ACTIVE BUT FAILING: Targets Cloud Run Job genesis-system3-dhan-token-rotate which fails with code 2 due to missing script in image."
+        }
+      ],
+      "recommendation": "Retain dhan-daily-token-refresh once image is patched via PR #497; delete or keep dhan-auto-rotate permanently PAUSED."
+    },
+    "forecast_job": {
+      "name": "genesis-system3-forecast-daily",
+      "schedule": "0 4 * * *",
+      "state": "PAUSED",
+      "target_uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/REPLACE-WITH-REAL-FORECAST-JOB:run",
+      "evaluation": "BROKEN PLACEHOLDER TARGET: Points to REPLACE-WITH-REAL-FORECAST-JOB. Must remain PAUSED until valid job exists."
+    },
+    "rank_job": {
+      "name": "genesis-system3-rank-daily",
+      "schedule": "45 3 * * MON-FRI",
+      "state": "PAUSED",
+      "target_uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-rank:run",
+      "evaluation": "Target Cloud Run Job genesis-system3-rank does not exist. Must remain PAUSED."
+    },
+    "validate_job": {
+      "name": "genesis-system3-validate-daily",
+      "schedule": "5 10 * * MON-FRI",
+      "state": "PAUSED",
+      "target_uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-validate:run",
+      "evaluation": "Target Cloud Run Job genesis-system3-validate does not exist. (daily-gain-validate-job exists and is scheduled by daily-gain-validate-auto). Must remain PAUSED."
+    },
+    "signals_job": {
+      "name": "genesis-system3-signals-daily",
+      "schedule": "15 13 * * MON-FRI",
+      "state": "PAUSED",
+      "target_uri": "https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/jobs/genesis-system3-signals:run",
+      "evaluation": "Target Cloud Run Job genesis-system3-signals does not exist. Must remain PAUSED."
+    },
+    "daily_gain_validate_auto": {
+      "name": "daily-gain-validate-auto",
+      "schedule": "40 15 * * 1-5",
+      "state": "ENABLED",
+      "target_uri": "https://asia-south1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/system3-openalgo-safe/jobs/daily-gain-validate-job:run",
+      "evaluation": "HEALTHY & OPERATIONAL: Successfully triggers daily-gain-validate-job at 15:40 IST Mon-Fri."
+    }
+  },
+  "secret_manager_permissions": {
+    "account": "warghade2012@gmail.com",
+    "secretmanager.versions.access": "ALLOWED (reads client ID, pin, totp-secret, tokens successfully)",
+    "secretmanager.versions.add": "DENIED (HTTP 403: requires Secret Manager Version Manager role to push new tokens autonomously)",
+    "remediation": "Owner can grant roles/secretmanager.secretVersionManager to warghade2012@gmail.com or let Cloud Run Job service account genesis-system3-dhan-rotator@system3-openalgo-safe.iam.gserviceaccount.com handle token updates."
+  }
+}

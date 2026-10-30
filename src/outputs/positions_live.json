@@ -1,0 +1,35 @@
+{
+  "positions": [
+    {
+      "position_id": "PV8-b1ca604b4134",
+      "paper_order_id": "b1ca604b4134cde3dc16",
+      "underlying": "NIFTY",
+      "symbol": "NIFTY-Nov2026-17350-CE",
+      "qty": 65,
+      "entry_price": 2986.85,
+      "current_price": 2986.85,
+      "unrealized_pnl": 0.0,
+      "status": "PAPER_OPEN",
+      "entry_time": "2026-10-29T14:25:21.540147+00:00",
+      "signal_source": "core_pipeline_v8",
+      "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE"
+    },
+    {
+      "position_id": "PV8-6cfef34aa5a9",
+      "paper_order_id": "6cfef34aa5a9c23aaa4f",
+      "underlying": "BANKNIFTY",
+      "symbol": "BANKNIFTY-Nov2026-72600-CE",
+      "qty": 30,
+      "entry_price": 11407.6,
+      "current_price": 11407.6,
+      "unrealized_pnl": 0.0,
+      "status": "PAPER_OPEN",
+      "entry_time": "2026-10-29T14:25:21.745405+00:00",
+      "signal_source": "core_pipeline_v8",
+      "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE"
+    }
+  ],
+  "open_count": 2,
+  "timestamp": "2026-10-29T14:25:21.814681+00:00",
+  "source": "core_pipeline_v8"
+}

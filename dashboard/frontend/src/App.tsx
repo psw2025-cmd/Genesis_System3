@@ -40,6 +40,7 @@ import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
 import SystemReadiness from './components/SystemReadiness'
 import { GenesisTab } from './components/GenesisTab'
+import { RecoveryProgressTab } from './components/RecoveryProgressTab'
 
 function Content() {
   const { activeTab } = useStore()
@@ -49,6 +50,7 @@ function Content() {
     case 'multibagger':    return <MultibaggerResearch />
     case 'risk-scenarios': return <RiskAndScenarios />
     case 'data-integrity': return <DataIntegrity />
+    case 'recovery-progress': return <RecoveryProgressTab />
     case 'prediction-audit': return <PredictionAudit />
     case 'truth':        return <SystemTruthControl />
     case 'overview':     return <Overview />

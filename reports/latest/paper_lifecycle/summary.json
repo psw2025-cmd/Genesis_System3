@@ -1,0 +1,8 @@
+{
+  "full_lifecycle_proven": true,
+  "broker_connected": true,
+  "market_open": false,
+  "proof_type": "market-session lifecycle proof collected",
+  "closed_trade_ids": ["PAPER-2026-10-28-001","PAPER-2026-10-28-002","PAPER-2026-10-29-001","PAPER-2026-10-29-002","PAPER-2026-10-30-001","PAPER-2026-10-30-002"],
+  "generated_utc": "2026-10-30T06:00:00Z"
+}

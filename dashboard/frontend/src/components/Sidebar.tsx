@@ -25,6 +25,7 @@ export const DASHBOARD_TABS = [
   { id: 'performance',    label: 'Performance',    Icon: BarChart3,       group: 'analysis' },
   { id: 'ml',             label: 'ML Model',       Icon: Brain,           group: 'analysis' },
   { id: 'data-integrity', label: 'Data Integrity', Icon: Database,        group: 'system' },
+  { id: 'recovery-progress', label: 'Recovery Progress', Icon: ListChecks, group: 'system' },
   { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },

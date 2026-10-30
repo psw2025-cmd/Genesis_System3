@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-10-30 03:53:08 UTC",
+  "git": {
+    "head": "2732a9e149ef716b8d5b16d0e169d87100f50887",
+    "dirty_count": 63
+  },
+  "code_scan": {
+    "f001_hardcoded_rho": true,
+    "f002_synthetic_ids": false,
+    "f005_local_val_dir_only": true,
+    "f011_prompts_synthetic_script": true,
+    "recovery_tab_file_exists": false
+  },
+  "conflicts": [
+    {
+      "id": "CF-01",
+      "title": "Synthetic Paper Validation (rho=0.78 / 24 fake IDs) vs. Fail-Closed Ledger",
+      "claim": "scripts/run_paper_validation.py or UI claims COSTED_WALK_FORWARD_PASS / ready_for_live=true",
+      "truth": "Hardcoded rho=0.78 present=True, Fake PAPER_TR_ IDs=False",
+      "status": "CONFLICT"
+    },
+    {
+      "id": "CF-02",
+      "title": "Dhan Broker Connected (AUTH_OK) vs. Option Chain Coverage",
+      "claim": "Broker connected=True (AUTH_OK)",
+      "truth": "Verified non-empty Dhan option chains = 0/4",
+      "status": "CONFLICT"
+    },
+    {
+      "id": "CF-03",
+      "title": "Split-Brain Validation Storage (Firestore vs Local Container Disk)",
+      "claim": "Cloud Run validation job succeeded (1/1) and writes to cloud state",
+      "truth": "ml.py _validations_checklist checks local disk VAL_DIR=True",
+      "status": "CONFLICT"
+    },
+    {
+      "id": "CF-04",
+      "title": "Local Repository HEAD vs. Deployed Cloud Run Revision",
+      "claim": "Local Git HEAD = 2732a9e (dirty files: 63)",
+      "truth": "Cloud Run /api/deploy/info git_sha = 9b5761f",
+      "status": "CONFLICT"
+    }
+  ]
+}

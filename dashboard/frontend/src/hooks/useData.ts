@@ -1,3 +1,4 @@
+﻿import { shouldRenderSnapshot } from '../lib/sourceQuality';
 import { useEffect, useRef, useCallback } from 'react'
 import { useStore } from '../store'
 import { API_BASE, API_HEADERS } from '../config'
@@ -425,7 +426,7 @@ export function useData() {
         })
         return
       }
-      // After-hours / cold-cache warm is expected — never paint sticky NETWORK_ERROR.
+      // After-hours / cold-cache warm is expected â€” never paint sticky NETWORK_ERROR.
       if (isChainWarmingPayload(data)) {
         setChain(sym, {
           underlying: sym,
@@ -450,7 +451,7 @@ export function useData() {
       return
     }
     markSuccess(`chain_${sym}`)
-    const isSnapshot = data?.snapshot === true || data?.live === false || /MARKET_CLOSED/i.test(String(data?.status || ''))
+    const isSnapshot = shouldRenderSnapshot(data?.status, data)
     setChain(sym, {
       ...data,
       stale: Boolean(data?.stale),
@@ -725,7 +726,7 @@ export function useData() {
         }
         if (m.type === 'heartbeat') {
           // WS transport is healthy if the socket is open. Cache-age stream_ok=false
-          // means paced Dhan refresh is catching up — keep LIVE, not a false
+          // means paced Dhan refresh is catching up â€” keep LIVE, not a false
           // "WebSocket error / Disconnected" top-bar state.
           const socketOpen = wsRef.current?.readyState === WebSocket.OPEN
           if (socketOpen) setWsStatus('live')
@@ -833,3 +834,4 @@ export function useData() {
     }
   }, [chainSymbol, pollChain, pollAllChains])
 }
+

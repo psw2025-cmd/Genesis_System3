@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+﻿import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 
@@ -44,7 +44,7 @@ export default function ChainAnalytics() {
   }
 
   // Handle broker not ready - show NOT_READY status
-  const isNotReady = chainData.data_source === 'not_ready' || chainData.status === 'NOT_READY'
+  const isNotReady = (chainData.data_source === 'not_ready' || chainData.status === 'NOT_READY') 
 
   if (chainData.message && chainData.total_contracts === 0) {
     return (
@@ -99,12 +99,12 @@ export default function ChainAnalytics() {
         <h2 className="text-3xl font-bold">Option Chain Analytics</h2>
         {isNotReady && (
           <div className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-sm">
-            ⚠️ BROKER NOT READY
+            âš ï¸ BROKER NOT READY
           </div>
         )}
         {!isNotReady && (chainData.data_source === 'real' || chainData.data_source === 'live') && (
           <div className="bg-green-500 text-white px-4 py-2 rounded-lg font-bold text-sm">
-            ✅ LIVE MARKET DATA
+            âœ… LIVE MARKET DATA
           </div>
         )}
       </div>
@@ -126,7 +126,7 @@ export default function ChainAnalytics() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Spot Price</div>
-          <div className="text-2xl font-bold">₹{spot.toFixed(2)}</div>
+          <div className="text-2xl font-bold">â‚¹{spot.toFixed(2)}</div>
         </div>
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Put-Call Ratio</div>
@@ -172,7 +172,7 @@ export default function ChainAnalytics() {
                 onChange={(e) => setFilters({...filters, nearATM: e.target.checked})}
                 className="mr-2"
               />
-              Near ATM (±5%)
+              Near ATM (Â±5%)
             </label>
           </div>
           <div>
@@ -221,7 +221,7 @@ export default function ChainAnalytics() {
               <tr key={idx} className="border-b border-gray-700 hover:bg-gray-700">
                 <td className="p-2">{contract.strike || 'N/A'}</td>
                 <td className="p-2">{contract.option_type || 'N/A'}</td>
-                <td className="text-right p-2">₹{contract.ltp?.toFixed(2) || 'N/A'}</td>
+                <td className="text-right p-2">â‚¹{contract.ltp?.toFixed(2) || 'N/A'}</td>
                 <td className="text-right p-2">{contract.oi?.toLocaleString() || 'N/A'}</td>
                 <td className="text-right p-2">{contract.volume?.toLocaleString() || 'N/A'}</td>
                 <td className="text-right p-2">{contract.iv ? (contract.iv * 100).toFixed(2) + '%' : 'N/A'}</td>
@@ -238,3 +238,5 @@ export default function ChainAnalytics() {
     </div>
   )
 }
+
+

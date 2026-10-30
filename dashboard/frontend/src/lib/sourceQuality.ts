@@ -1,4 +1,4 @@
-/** Central source-quality arbitration for dashboard truth surfaces.
+﻿/** Central source-quality arbitration for dashboard truth surfaces.
  *
  * Rank authentic local API payloads. Never invent prices, gate PASSes, or LIVE.
  * Stale/after-hours snapshots remain visible as SNAPSHOT, not as zeros.
@@ -133,13 +133,14 @@ export function gatesDisplay(autoGates: any): {
 }
 
 export function isAcceptableDhanChain(data: any): boolean {
+  if (!data) return false;
   if (!data || typeof data !== 'object') return false
   if (isFabricatedSource(data)) return false
   const status = String(data.status || '').toUpperCase()
   const source = String(data.data_source || data.source || '').toLowerCase()
   const priority = String(data.source_priority || '').toLowerCase()
   const contracts = Number(data.total_contracts || (Array.isArray(data.contracts) ? data.contracts.length : 0))
-  const spot = Number(data.spot || 0)
+  const spot = Number(data.spot || data.spot_price || (Array.isArray(data.contracts) && data.contracts[0]?.spot_price) || 0)
   if (!(spot > 0 && contracts > 0)) return false
   const closedSnapshot = /MARKET_CLOSED|SNAPSHOT|DHAN_SNAPSHOT/i.test(status) || data.snapshot === true || data.live === false
   const dhanish = source === 'dhan' || priority.startsWith('dhan') || priority.includes('worker_push') || closedSnapshot
@@ -188,3 +189,11 @@ export function rankMultibagger(workspace: any, research: any): Ranked<any> {
       : 'No multibagger candidates are proven.',
   }
 }
+// --- AUTO-REPAIR: Force snapshot display after hours ---
+export function shouldRenderSnapshot(status: string, data: any): boolean {
+    const isSnapshot = /MARKET_CLOSED|SNAPSHOT|EOD/i.test(status) || data?.snapshot === true || data?.live === false;
+    // If it's a snapshot, we MUST render it, regardless of market hours.
+    return isSnapshot;
+}
+// -----------------------------------------------------
+

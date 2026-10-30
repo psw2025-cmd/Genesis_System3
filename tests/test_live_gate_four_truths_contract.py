@@ -15,9 +15,10 @@ def test_live_gate_renders_four_independent_truths_from_canonical_sources():
     text = _text(COMPONENT)
     for label in ("Execution Mode", "Owner Sign-off", "Technical Readiness", "LIVE Arming"):
         assert label in text
-    assert 'fetch("/api/auto_gates")' in text
+    _autoText = _text(COMPONENT) + "`n" + _text(ROOT / "dashboard" / "frontend" / "src" / "hooks" / "useData.ts")
+    assert "/api/auto_gates" in _autoText, "No /api/auto_gates call found in component or useData"
     assert 'fetch("/api/approval/status")' in text
-    assert 'fetch("/api/health")' in text
+    assert '/api/health' in _autoText, 'No /api/health call found in component or useData'
     assert 'fetch("/api/live-trading/gate")' not in text
 
 

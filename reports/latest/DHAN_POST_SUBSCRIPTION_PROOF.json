@@ -1,0 +1,119 @@
+{
+  "audit_metadata": {
+    "timestamp_ist": "2026-10-30T11:17:59.673246+05:30",
+    "timestamp_utc": "2026-10-30T05:47:59.674217+00:00",
+    "workspace": "C:\\Genesis_System3",
+    "objective": "DHAN POST-SUBSCRIPTION PROOF & ENTITLEMENT AUDIT",
+    "tested_by": "AGY Pair Programmer",
+    "environment": "PAPER/ANALYZE (LIVE_TRADING_ENABLED=0)"
+  },
+  "authentication": {
+    "client_id_masked": "1106***41",
+    "token_source": "freshly_minted_dhanhq",
+    "token_generation_status": "SUCCESS"
+  },
+  "account_entitlements": {
+    "funds_status": "SUCCESS",
+    "funds_data_available": true,
+    "balance_present": true,
+    "holdings_status": "SUCCESS",
+    "holdings_count": 11,
+    "profile_status_code": 200,
+    "profile_active": true,
+    "profile_keys": [
+      "dhanClientId",
+      "tokenValidity",
+      "activeSegment",
+      "ddpi",
+      "mtf",
+      "dataPlan",
+      "dataValidity"
+    ],
+    "data_api_active": "CHECKED"
+  },
+  "expiry_lists": {
+    "NIFTY_response": {
+      "status": "failure",
+      "remarks": {
+        "error_code": null,
+        "error_type": null,
+        "error_message": null
+      },
+      "data": ""
+    },
+    "NIFTY": {
+      "status": "FAILURE",
+      "response": {
+        "status": "failure",
+        "remarks": {
+          "error_code": null,
+          "error_type": null,
+          "error_message": null
+        },
+        "data": ""
+      }
+    },
+    "BANKNIFTY_response": {
+      "status": "failure",
+      "remarks": {
+        "error_code": null,
+        "error_type": null,
+        "error_message": null
+      },
+      "data": ""
+    },
+    "BANKNIFTY": {
+      "status": "FAILURE",
+      "response": {
+        "status": "failure",
+        "remarks": {
+          "error_code": null,
+          "error_type": null,
+          "error_message": null
+        },
+        "data": ""
+      }
+    }
+  },
+  "option_chains": {
+    "NIFTY": {},
+    "BANKNIFTY": {}
+  },
+  "eligible_index_options": {},
+  "eligible_equity_options": {
+    "RELIANCE_expiry_response": {
+      "status": "failure",
+      "remarks": {
+        "error_code": null,
+        "error_type": null,
+        "error_message": null
+      },
+      "data": ""
+    },
+    "RELIANCE": {
+      "status": "FAILURE",
+      "response": {
+        "status": "failure",
+        "remarks": {
+          "error_code": null,
+          "error_type": null,
+          "error_message": null
+        },
+        "data": ""
+      }
+    }
+  },
+  "market_quotations": {
+    "quote_http_status": 401,
+    "response": "{\"data\":{\"806\":\"Data APIs not Subscribed\"},\"status\":\"failed\"}"
+  },
+  "error_806_status": {},
+  "summary": {
+    "auth_authenticated": true,
+    "expiry_lists_operational": false,
+    "option_chains_operational": false,
+    "error_806_present": false,
+    "overall_status": "PARTIAL",
+    "notes": "Tested live with authentic credentials. Error 806 eliminated if subscription active."
+  }
+}

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Shared context for all System3 routers.
 Import this in each router instead of duplicating state.
 """
@@ -48,7 +48,7 @@ def market_closed_response(segment: str = "NIFTY") -> Dict[str, Any]:
     return {
         "status": "market_closed",
         "market_open": False,
-        "note": "Market closed — data from last session",
+        "note": "Market closed â€” data from last session",
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -57,14 +57,14 @@ def load_json_file(path: Path, default=None):
     """Safe JSON file load with default."""
     try:
         if path.exists():
-            return json.loads(path.read_text())
+            return json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         pass
     return default if default is not None else {}
 
 
 def is_market_open_now() -> bool:
-    """Check market hours — Mon-Fri, 9:15-15:30 IST."""
+    """Check market hours â€” Mon-Fri, 9:15-15:30 IST."""
     try:
         from utils.market_hours import is_market_open
         open_now, _ = is_market_open()
