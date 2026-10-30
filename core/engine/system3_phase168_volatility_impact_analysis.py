@@ -7,7 +7,7 @@ Analysis-only phase - reads from existing data and writes analysis.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase168_volatility_impact_analysis.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase168_volatility_impact_analysis_report.md"
 
 
-def run_phase168_volatility_impact_analysis() -> Dict[str, Any]:
+def run_phase168_volatility_impact_analysis() -> dict[str, Any]:
     """
     Volatility Impact Analysis.
 
@@ -63,7 +63,7 @@ def run_phase168_volatility_impact_analysis() -> Dict[str, Any]:
 def main():
     """CLI entry point."""
     print("=" * 70)
-    print(f"SYSTEM3 PHASE 168 - VOLATILITY IMPACT ANALYSIS")
+    print("SYSTEM3 PHASE 168 - VOLATILITY IMPACT ANALYSIS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     result = run_phase168_volatility_impact_analysis()

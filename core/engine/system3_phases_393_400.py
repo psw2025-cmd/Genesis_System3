@@ -141,7 +141,7 @@ def run_phase_397():
             "phase": 397,
             "timestamp": datetime.utcnow().isoformat(),
             "dynamic_thresholds": thresholds,
-            "confidence_thresholds": {k: 0.60 for k in thresholds.keys()},
+            "confidence_thresholds": {k: 0.60 for k in thresholds},
         }
 
         Path("storage/metrics").mkdir(parents=True, exist_ok=True)

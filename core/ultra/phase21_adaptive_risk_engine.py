@@ -14,12 +14,9 @@ Zero Auto-execution, Zero Auto-updates.
 Menu Option: 84
 """
 
-import json
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -42,7 +39,7 @@ class AdaptiveRiskEngine:
         # Load historical win-rate if available
         self.historical_win_rate = self._load_historical_win_rate()
 
-    def _load_historical_win_rate(self) -> Dict[str, float]:
+    def _load_historical_win_rate(self) -> dict[str, float]:
         """Load historical win-rate per underlying."""
         win_rates = {}
 
@@ -77,9 +74,9 @@ class AdaptiveRiskEngine:
         volatility: float,
         confidence: float,
         score: float,
-        market_regime: Optional[str] = None,
-        underlying: Optional[str] = None,
-    ) -> Dict[str, Any]:
+        market_regime: str | None = None,
+        underlying: str | None = None,
+    ) -> dict[str, Any]:
         """
         Compute adaptive risk level.
 
@@ -171,7 +168,7 @@ class AdaptiveRiskEngine:
             },
         }
 
-    def evaluate_sample(self, samples: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def evaluate_sample(self, samples: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """
         Evaluate multiple samples.
 
@@ -248,7 +245,7 @@ def main() -> None:
         print(f"  Risk Level: {result['risk_level']}")
         print(f"  Risk Score: {result['risk_score']:.3f}")
         print(f"  Reasons: {', '.join(result['reason'])}")
-        print(f"  Components:")
+        print("  Components:")
         for comp, value in result["components"].items():
             print(f"    {comp}: {value:.3f}")
 

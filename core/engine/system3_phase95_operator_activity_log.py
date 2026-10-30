@@ -10,7 +10,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -30,14 +30,9 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 action_counts = defaultdict(int)
 
 
-def log_operator_action(action: str, details: Dict[str, Any]) -> None:
+def log_operator_action(action: str, details: dict[str, Any]) -> None:
     """Log an operator action."""
     timestamp = datetime.now().isoformat()
-    entry = {
-        "timestamp": timestamp,
-        "action": action,
-        "details": details,
-    }
 
     # Write to log
     log_entry = f"[{timestamp}] ACTION={action} {json.dumps(details)}\n"
@@ -81,7 +76,7 @@ def self_test() -> None:
     # Generate MD summary
     generate_md_summary()
 
-    print(f"[PH95] Logged sample operator actions")
+    print("[PH95] Logged sample operator actions")
     print(f"[PH95] Activity log: {OUTPUT_LOG}")
 
 

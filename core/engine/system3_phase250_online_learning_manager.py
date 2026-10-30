@@ -30,7 +30,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -74,8 +74,7 @@ class OnlineLearningManager:
 
         try:
             import torch
-            import torch.nn as nn
-            import torch.optim as optim
+            from torch import nn, optim
             from torch.utils.data import DataLoader, TensorDataset
 
             self.torch = torch
@@ -102,7 +101,7 @@ class OnlineLearningManager:
             logger.error(f"[OLM] Error loading Phase 221 data: {e}")
             return None
 
-    def get_new_samples(self, df: pd.DataFrame, last_row_processed: int) -> Tuple[pd.DataFrame, int]:
+    def get_new_samples(self, df: pd.DataFrame, last_row_processed: int) -> tuple[pd.DataFrame, int]:
         """Extract new samples added since last burst."""
         if last_row_processed >= len(df):
             return None, last_row_processed
@@ -113,7 +112,7 @@ class OnlineLearningManager:
         logger.info(f"[OLM] Found {len(new_data)} new samples since last burst")
         return new_data, updated_index
 
-    def create_incremental_sequences(self, df: pd.DataFrame, underlying: str) -> Tuple[np.ndarray, np.ndarray]:
+    def create_incremental_sequences(self, df: pd.DataFrame, underlying: str) -> tuple[np.ndarray, np.ndarray]:
         """Create training sequences from incremental data (same logic as Phase 249)."""
         sequences = []
         labels = []
@@ -166,7 +165,7 @@ class OnlineLearningManager:
 
         return np.array(sequences, dtype=np.float32), np.array(labels, dtype=np.int64)
 
-    def load_model_and_meta(self, underlying: str) -> Tuple[Any, Dict]:
+    def load_model_and_meta(self, underlying: str) -> tuple[Any, dict]:
         """Load trained LSTM model and metadata from Phase 249."""
         model_path = MODELS_DIR / f"{underlying}_lstm_model.pth"
         meta_path = MODELS_DIR / f"{underlying}_lstm_meta.json"
@@ -203,7 +202,7 @@ class OnlineLearningManager:
 
     def train_incremental_burst(
         self, model: Any, X_new: np.ndarray, y_new: np.ndarray, underlying: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Perform one incremental training burst on new samples. Fail-closed: no update on NaN/inf."""
         if len(X_new) == 0:
             return {"status": "SKIP", "reason": "No new data", "underlying": underlying}
@@ -270,7 +269,7 @@ class OnlineLearningManager:
             logger.error(f"[OLM] Training error for {underlying}: {e}")
             return {"status": "ERROR", "underlying": underlying, "error": str(e)}
 
-    def save_updated_model(self, model: Any, meta: Dict, underlying: str, burst_metrics: Dict) -> bool:
+    def save_updated_model(self, model: Any, meta: dict, underlying: str, burst_metrics: dict) -> bool:
         """Save updated model and metadata after incremental training."""
         if meta is None:
             meta = {
@@ -306,7 +305,7 @@ class OnlineLearningManager:
             logger.error(f"[OLM] Error saving model {underlying}: {e}")
             return False
 
-    def run_training_burst(self, burst_mode: str = "automatic") -> Dict[str, Any]:
+    def run_training_burst(self, burst_mode: str = "automatic") -> dict[str, Any]:
         """Execute one complete incremental training burst across all underlyings."""
         logger.info(f"\n[OLM] ===== TRAINING BURST START ({burst_mode} mode) =====")
 
@@ -384,7 +383,7 @@ class OnlineLearningManager:
                         except:
                             pass
 
-        logger.info(f"\n[OLM] ===== TRAINING BURST COMPLETE =====")
+        logger.info("\n[OLM] ===== TRAINING BURST COMPLETE =====")
         logger.info(f"[OLM] Underlyings trained: {len(burst_results['underlyings_trained'])}")
         for result in burst_results["underlyings_trained"]:
             loss_val = result.get("loss")
@@ -405,7 +404,7 @@ def check_torch_available() -> bool:
         return False
 
 
-def run_phase250(**kwargs) -> Dict[str, Any]:
+def run_phase250(**kwargs) -> dict[str, Any]:
     """
     Run Phase 250: Online Learning Manager (SHADOW MODEL).
 
@@ -487,7 +486,7 @@ def main():
     print(f"[PHASE 250] Details: {result['details']}")
 
     if result["outputs"]:
-        print(f"[PHASE 250] Results:")
+        print("[PHASE 250] Results:")
         print(json.dumps(result["outputs"].get("results", {}), indent=2))
 
 

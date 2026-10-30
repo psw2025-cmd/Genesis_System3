@@ -20,7 +20,6 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.utils.timestamp_parser import (
-    normalize_timestamp_column_strict,
     normalize_timestamp_column_strict_enhanced,
 )
 
@@ -312,7 +311,7 @@ def run_phase220(days_back: int = 14) -> dict:
         merge_metrics = {
             "timestamp": datetime.now().isoformat(),
             "phase": 220,
-            "total_rows": int(len(merged_df)),
+            "total_rows": len(merged_df),
             "null_key_rows": int(null_key_rows),
             "null_key_rate": round(null_key_rate, 6),
             "threshold": 0.01,

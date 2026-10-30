@@ -7,9 +7,8 @@ Analyzes drawdowns: max drawdown, drawdown duration, recovery time.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -24,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_drawdown_analysis.md"
 
 
-def run_phase267(**kwargs) -> Dict[str, Any]:
+def run_phase267(**kwargs) -> dict[str, Any]:
     """Run Phase 267: Drawdown Analyzer."""
     errors = []
 

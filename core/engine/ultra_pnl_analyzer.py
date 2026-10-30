@@ -14,9 +14,8 @@ Menu Option: 82
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -31,7 +30,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def analyze_ultra_pnl() -> Dict[str, Any]:
+def analyze_ultra_pnl() -> dict[str, Any]:
     """
     Analyze Ultra simulator PnL.
 

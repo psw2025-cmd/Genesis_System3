@@ -4,11 +4,10 @@ System3 Phase 202 - Permission Self-Repair
 Attempts read/write tests on key directories and repairs permissions if needed.
 """
 
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -60,7 +59,7 @@ def test_read_write(dir_path: Path) -> tuple[bool, bool, str]:
     return read_ok, write_ok, error_msg
 
 
-def run_phase202(**kwargs) -> Dict[str, Any]:
+def run_phase202(**kwargs) -> dict[str, Any]:
     """
     Run Phase 202: Permission Self-Repair.
 
@@ -84,7 +83,7 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
 
     try:
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Permission Self-Repair Log\n")
+            f.write("System3 Permission Self-Repair Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
 
@@ -95,7 +94,7 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
                 if not dir_path.exists():
                     try:
                         dir_path.mkdir(parents=True, exist_ok=True)
-                        f.write(f"  Created directory\n")
+                        f.write("  Created directory\n")
                     except Exception as e:
                         f.write(f"  ERROR: Failed to create: {e}\n")
                         errors.append(f"Failed to create {dir_path}: {e}")
@@ -119,7 +118,6 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
 
                 if not (read_ok and write_ok):
                     # Attempt repair (on Windows, try to adjust permissions)
-                    repair_attempted = False
                     if sys.platform == "win32":
                         try:
                             # On Windows, we can try to create a fallback
@@ -128,7 +126,6 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
                                 fallback_dir.mkdir(parents=True, exist_ok=True)
                                 f.write(f"  Created fallback directory: {fallback_dir}\n")
                                 fallback_created = True
-                                repair_attempted = True
                         except Exception as e:
                             f.write(f"  Fallback creation failed: {e}\n")
 
@@ -138,7 +135,7 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
                     f.write(f"  After repair attempt: {after_status}\n")
 
                     if not (read_ok_after and write_ok_after):
-                        f.write(f"  WARNING: Permissions still insufficient\n")
+                        f.write("  WARNING: Permissions still insufficient\n")
                         failed_dirs.append(str(dir_path))
                         test_results.append(
                             {
@@ -150,7 +147,7 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
                             }
                         )
                     else:
-                        f.write(f"  SUCCESS: Permissions repaired\n")
+                        f.write("  SUCCESS: Permissions repaired\n")
                         test_results.append(
                             {
                                 "path": str(dir_path),
@@ -161,7 +158,7 @@ def run_phase202(**kwargs) -> Dict[str, Any]:
                             }
                         )
                 else:
-                    f.write(f"  OK: Permissions sufficient\n")
+                    f.write("  OK: Permissions sufficient\n")
                     test_results.append(
                         {
                             "path": str(dir_path),

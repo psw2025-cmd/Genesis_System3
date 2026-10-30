@@ -9,7 +9,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -46,7 +46,7 @@ CHAOS_SCENARIOS = [
 ]
 
 
-def run_chaos_scenario(scenario: Dict[str, Any]) -> Dict[str, Any]:
+def run_chaos_scenario(scenario: dict[str, Any]) -> dict[str, Any]:
     """Run a chaos scenario in protected mode."""
     scenario_name = scenario["name"]
     module_name = scenario["module"]
@@ -99,7 +99,7 @@ def run_chaos_scenario(scenario: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 
-def generate_chaos_test() -> Dict[str, Any]:
+def generate_chaos_test() -> dict[str, Any]:
     """Generate chaos test report."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 96 - CHAOS TEST ENGINE")
@@ -129,7 +129,7 @@ def generate_chaos_test() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 96 - Chaos Test Report\n\n")
@@ -148,7 +148,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_chaos_test()
+        generate_chaos_test()
         print("\n[PH96] Chaos testing complete.")
         return 0
     except Exception as e:

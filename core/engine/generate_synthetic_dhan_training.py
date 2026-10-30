@@ -1,6 +1,5 @@
 # core/engine/generate_synthetic_dhan_training.py
 
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 

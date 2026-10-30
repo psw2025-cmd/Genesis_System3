@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any
 
 from core.brokers.dhan.nse_option_symbol import enrich_option_row, parse_trading_symbol
 
 
-def _as_list(raw: Any, keys: tuple[str, ...]) -> List[Dict[str, Any]]:
+def _as_list(raw: Any, keys: tuple[str, ...]) -> list[dict[str, Any]]:
     if raw is None:
         return []
     if isinstance(raw, list):
@@ -22,15 +22,15 @@ def _as_list(raw: Any, keys: tuple[str, ...]) -> List[Dict[str, Any]]:
     return []
 
 
-def normalize_holdings_payload(raw: Any) -> List[Dict[str, Any]]:
+def normalize_holdings_payload(raw: Any) -> list[dict[str, Any]]:
     return _as_list(raw, ("data", "holdings"))
 
 
-def normalize_positions_payload(raw: Any) -> List[Dict[str, Any]]:
+def normalize_positions_payload(raw: Any) -> list[dict[str, Any]]:
     return _as_list(raw, ("data", "positions"))
 
 
-def normalize_funds_payload(raw: Any) -> Dict[str, Any]:
+def normalize_funds_payload(raw: Any) -> dict[str, Any]:
     if raw is None:
         return {}
     if isinstance(raw, dict):
@@ -45,7 +45,7 @@ def normalize_funds_payload(raw: Any) -> Dict[str, Any]:
     return {}
 
 
-def normalize_holding_row(item: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_holding_row(item: dict[str, Any]) -> dict[str, Any]:
     qty = item.get("totalQty") or item.get("quantity") or item.get("availableQty") or 0
     avg = item.get("avgCostPrice") or item.get("averagePrice") or item.get("costPrice") or 0
     ltp = item.get("lastTradedPrice") or item.get("ltp") or item.get("lastPrice") or 0
@@ -68,7 +68,7 @@ def normalize_holding_row(item: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def normalize_position_row(item: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_position_row(item: dict[str, Any]) -> dict[str, Any]:
     qty = item.get("netQty") or item.get("netQuantity") or item.get("quantity") or 0
     try:
         qty_f = float(qty)
@@ -104,7 +104,7 @@ def normalize_position_row(item: Dict[str, Any]) -> Dict[str, Any]:
     return enrich_option_row(row)
 
 
-def normalize_funds_row(item: Dict[str, Any]) -> Dict[str, Any]:
+def normalize_funds_row(item: dict[str, Any]) -> dict[str, Any]:
     avail = item.get("availabelBalance")
     if avail is None:
         avail = item.get("availableBalance") or item.get("available_balance")

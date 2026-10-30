@@ -4,9 +4,7 @@ Dhan Index Options - Risk Event Scanner
 Scans for risk events including big index moves.
 """
 
-from typing import Any, Dict
 
-import numpy as np
 import pandas as pd
 
 

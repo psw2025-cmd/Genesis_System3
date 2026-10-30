@@ -7,14 +7,12 @@ Created By: Gemini CLI Laptop & Codex
 Last Edited By: Gemini CLI Laptop
 """
 
-import os
-import sys
-import json
 import base64
 import ctypes
+import json
+import os
 from ctypes import wintypes
 from pathlib import Path
-from typing import Optional, Dict, Any
 
 VAULT_DIR = Path(os.environ.get("USERPROFILE", "C:\\Users\\ADMIN")) / ".genesis_vault"
 VAULT_FILE = VAULT_DIR / "secrets.bin"
@@ -53,14 +51,14 @@ def _dpapi_decrypt(ciphertext: bytes) -> bytes:
     LocalFree(data_out.pbData)
     return buf
 
-def _read_all_secrets() -> Dict[str, str]:
+def _read_all_secrets() -> dict[str, str]:
     """Read and decrypt all secrets from local vault file."""
     if not VAULT_FILE.exists():
         return {}
     raw = VAULT_FILE.read_bytes()
     if not raw:
         return {}
-    
+
     # 1. Try Native DPAPI Decrypt
     try:
         dec = _dpapi_decrypt(raw)
@@ -84,7 +82,7 @@ def _read_all_secrets() -> Dict[str, str]:
     except Exception:
         return {}
 
-def _write_all_secrets(secrets: Dict[str, str]) -> bool:
+def _write_all_secrets(secrets: dict[str, str]) -> bool:
     """Encrypt and write all secrets to local vault file."""
     try:
         VAULT_DIR.mkdir(parents=True, exist_ok=True)
@@ -103,7 +101,7 @@ def save_secret(key: str, value: str) -> bool:
     secrets[key] = value
     return _write_all_secrets(secrets)
 
-def get_secret(key: str, default: Optional[str] = None) -> Optional[str]:
+def get_secret(key: str, default: str | None = None) -> str | None:
     """Retrieve and decrypt a secret using Windows DPAPI."""
     # 1. Environment variable override
     if val := os.environ.get(key):

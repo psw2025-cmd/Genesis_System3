@@ -11,12 +11,11 @@ Avoid blocking execution of main workflow.
 
 import json
 import logging
-import os
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -37,13 +36,13 @@ class PipelineProfiler:
     """Lightweight pipeline profiler."""
 
     def __init__(self):
-        self.timings: Dict[str, List[float]] = {}
-        self.file_sizes: Dict[str, int] = {}
+        self.timings: dict[str, list[float]] = {}
+        self.file_sizes: dict[str, int] = {}
 
-    def measure_file_io(self, filepath: Path) -> Dict[str, Any]:
+    def measure_file_io(self, filepath: Path) -> dict[str, Any]:
         """Measure file size and read time."""
 
-        start_time = time.time()
+        time.time()
 
         try:
             # Check file size
@@ -66,7 +65,7 @@ class PipelineProfiler:
         except FileNotFoundError:
             return {"exists": False, "size_bytes": 0, "size_mb": 0, "read_time_ms": 0, "io_throughput_mbps": 0}
 
-    def profile_signal_files(self) -> Dict[str, Dict[str, Any]]:
+    def profile_signal_files(self) -> dict[str, dict[str, Any]]:
         """Profile all critical signal files."""
 
         files_to_profile = [
@@ -84,7 +83,7 @@ class PipelineProfiler:
 
         return profile_results
 
-    def estimate_memory_usage(self, file_size_mb: float) -> Dict[str, float]:
+    def estimate_memory_usage(self, file_size_mb: float) -> dict[str, float]:
         """
         Estimate memory usage for file processing.
 
@@ -103,7 +102,7 @@ class PipelineProfiler:
             "total_estimated_mb": round(total_estimated_mb, 2),
         }
 
-    def compute_pipeline_metrics(self, profiles: Dict[str, Dict[str, Any]]) -> Dict[str, Any]:
+    def compute_pipeline_metrics(self, profiles: dict[str, dict[str, Any]]) -> dict[str, Any]:
         """Compute aggregate pipeline metrics."""
 
         total_size_mb = sum(p.get("size_mb", 0) for p in profiles.values() if p.get("exists"))
@@ -135,7 +134,7 @@ class PipelineProfiler:
         }
 
 
-def identify_bottlenecks(profiles: Dict[str, Dict[str, Any]], metrics: Dict[str, Any]) -> List[Dict[str, Any]]:
+def identify_bottlenecks(profiles: dict[str, dict[str, Any]], metrics: dict[str, Any]) -> list[dict[str, Any]]:
     """
     Identify bottlenecks in pipeline.
     """
@@ -189,7 +188,7 @@ def identify_bottlenecks(profiles: Dict[str, Dict[str, Any]], metrics: Dict[str,
 
 
 def generate_markdown_report(
-    profiles: Dict[str, Dict[str, Any]], metrics: Dict[str, Any], bottlenecks: List[Dict[str, Any]]
+    profiles: dict[str, dict[str, Any]], metrics: dict[str, Any], bottlenecks: list[dict[str, Any]]
 ) -> str:
     """Generate markdown report for pipeline profiling."""
 
@@ -202,9 +201,9 @@ def generate_markdown_report(
 This phase profiles the entire signal processing pipeline to identify performance
 bottlenecks and resource usage patterns.
 
-**Total Pipeline Size:** {size:.2f} MB  
-**Estimated Processing Time:** {time:.2f}s  
-**Estimated Peak Memory:** {memory:.0f} MB  
+**Total Pipeline Size:** {size:.2f} MB
+**Estimated Processing Time:** {time:.2f}s
+**Estimated Peak Memory:** {memory:.0f} MB
 **Files Processed:** {files}
 
 """.format(
@@ -266,8 +265,8 @@ bottlenecks and resource usage patterns.
 
             report += f"""### {severity_icon} {bottleneck['type'].replace("_", " ").title()}{file_info}
 
-**Description:** {bottleneck['description']}  
-**Severity:** {bottleneck['severity'].upper()}  
+**Description:** {bottleneck['description']}
+**Severity:** {bottleneck['severity'].upper()}
 **Recommendation:** {bottleneck['recommendation']}
 
 """
@@ -298,15 +297,15 @@ bottlenecks and resource usage patterns.
 
 ---
 
-**Status:** [OK] Profiling Complete (DRY-RUN)  
-**Mode:** Read-only analysis  
+**Status:** [OK] Profiling Complete (DRY-RUN)
+**Mode:** Read-only analysis
 **Next Profile:** After major code changes or data volume increases
 """
 
     return report
 
 
-def run_phase369(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase369(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 369 - Pipeline Profiler
 

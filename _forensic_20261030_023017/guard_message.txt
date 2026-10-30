@@ -1,0 +1,5 @@
+﻿C:\Genesis_System3\dashboard\backend\security_policy.py:123:            "Separate mutation authority is required but unavailable",
+C:\Genesis_System3\dashboard\backend\security_policy.py:130:        "Public dashboard is read-only; mutation authority is separate",
+C:\Genesis_System3\dashboard\backend\secure_app.py:8:Public visibility never becomes mutation authority. MutationPolicy owns every
+C:\Genesis_System3\dashboard\backend\secure_app.py:97:        "Public dashboard is read-only; mutation authority is separate",
+C:\Genesis_System3\dashboard\backend\mutation_policy.py:308:            "Public PAPER dashboard is read-only; separate mutation authority is required",

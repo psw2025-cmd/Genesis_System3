@@ -7,7 +7,7 @@ Generates ML model performance report.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_model_performance_report.md"
 
 
-def run_phase296(**kwargs) -> Dict[str, Any]:
+def run_phase296(**kwargs) -> dict[str, Any]:
     """Run Phase 296: Model Performance Report."""
     errors = []
 
@@ -87,7 +87,7 @@ def run_phase296(**kwargs) -> Dict[str, Any]:
                     try:
                         report_lines.append(f"- {k}: {v}\n")
                     except Exception:
-                        report_lines.append(f"- {k}: {repr(v)}\n")
+                        report_lines.append(f"- {k}: {v!r}\n")
             elif value is None or (isinstance(value, float) and pd.isna(value)):
                 report_lines.append(f"**{metric}**: N/A\n")
             else:

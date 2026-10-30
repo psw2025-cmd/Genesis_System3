@@ -13,7 +13,7 @@ Menu Option: 113
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_recent_predictions() -> Optional[pd.DataFrame]:
+def load_recent_predictions() -> pd.DataFrame | None:
     """Load recent predictions for probability computation."""
     fused_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if fused_csv.exists():
@@ -35,7 +35,7 @@ def load_recent_predictions() -> Optional[pd.DataFrame]:
     return None
 
 
-def compute_probability_distribution(confidence: float, score: float, action: str) -> Dict[str, float]:
+def compute_probability_distribution(confidence: float, score: float, action: str) -> dict[str, float]:
     """
     Compute probability distribution for BUY_CE, BUY_PE, HOLD.
 
@@ -81,7 +81,7 @@ def compute_probability_distribution(confidence: float, score: float, action: st
     }
 
 
-def generate_probability_forecasts(df: pd.DataFrame, horizon: int = 5) -> List[Dict[str, Any]]:
+def generate_probability_forecasts(df: pd.DataFrame, horizon: int = 5) -> list[dict[str, Any]]:
     """
     Generate probability forecasts for next N steps.
 
@@ -201,7 +201,7 @@ def run_phase51_probability_engine() -> None:
         forecasts = generate_probability_forecasts(forecast_df, horizon=5)
     else:
         forecasts = []
-    df_forecasts = pd.DataFrame(forecasts)
+    pd.DataFrame(forecasts)
 
     # Save results
     output_csv = OUTPUT_DIR / "phase51_probability_distributions.csv"
@@ -223,15 +223,15 @@ def run_phase51_probability_engine() -> None:
     print(f"[SAVE] Probability forecasts saved to: {forecasts_json}")
 
     # Summary
-    print(f"\n=== PROBABILITY ENGINE SUMMARY ===")
+    print("\n=== PROBABILITY ENGINE SUMMARY ===")
     print(f"Total distributions computed: {len(df_distributions)}")
-    print(f"\nAverage probabilities:")
+    print("\nAverage probabilities:")
     print(f"  BUY_CE: {df_distributions['prob_buy_ce'].mean():.2%}")
     print(f"  BUY_PE: {df_distributions['prob_buy_pe'].mean():.2%}")
     print(f"  HOLD: {df_distributions['prob_hold'].mean():.2%}")
     print(f"\nForecasts generated: {len(forecasts)}")
     if forecasts:
-        print(f"Next step forecast:")
+        print("Next step forecast:")
         next_forecast = forecasts[0]
         print(f"  Most likely: {next_forecast['most_likely']}")
         print(

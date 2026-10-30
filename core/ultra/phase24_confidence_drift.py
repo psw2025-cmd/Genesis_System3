@@ -11,7 +11,7 @@ Menu Option: 87
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 def analyze_confidence_drift(
     confidence_series: pd.Series,
     window_size: int = 50,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Analyze confidence drift from time series.
 
@@ -117,7 +117,7 @@ def analyze_confidence_drift(
     }
 
 
-def load_recent_signals(n: int = 200) -> Optional[pd.DataFrame]:
+def load_recent_signals(n: int = 200) -> pd.DataFrame | None:
     """
     Load last N signals from available sources.
 

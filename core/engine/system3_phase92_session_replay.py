@@ -8,7 +8,7 @@ import argparse
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -30,7 +30,7 @@ PNL_LOG_CSV = STORAGE_LIVE / "dhan_index_ai_pnl_log.csv"
 SESSION_REPLAY_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_data_for_date(date_str: str) -> List[Dict[str, Any]]:
+def load_data_for_date(date_str: str) -> list[dict[str, Any]]:
     """Load all data for a specific date."""
     events = []
 

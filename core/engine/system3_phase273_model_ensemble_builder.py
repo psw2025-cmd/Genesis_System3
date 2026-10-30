@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_ensemble_builder.md"
 
 
-def run_phase273(**kwargs) -> Dict[str, Any]:
+def run_phase273(**kwargs) -> dict[str, Any]:
     """Run Phase 273: Model Ensemble Builder."""
     errors = []
 

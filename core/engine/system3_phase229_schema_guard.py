@@ -4,11 +4,10 @@ System3 Phase 229 - Data Shape and Schema Guard
 Verifies CSV/JSON files match expected schemas.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -29,7 +28,7 @@ EXPECTED_SIGNALS_SCHEMA = {
 }
 
 
-def run_phase229(**kwargs) -> Dict[str, Any]:
+def run_phase229(**kwargs) -> dict[str, Any]:
     """
     Run Phase 229: Data Shape and Schema Guard.
 
@@ -78,7 +77,7 @@ def run_phase229(**kwargs) -> Dict[str, Any]:
 
         # Log results
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Schema Guard Log\n")
+            f.write("System3 Schema Guard Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
             f.write(f"Files Checked: {len(files_checked)}\n")

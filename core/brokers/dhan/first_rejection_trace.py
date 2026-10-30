@@ -10,7 +10,7 @@ from __future__ import annotations
 import os
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 _LOCK = threading.RLock()
@@ -28,7 +28,7 @@ _STATE: dict[str, Any] = {
 def _utc(epoch: float) -> str | None:
     if not epoch:
         return None
-    return datetime.fromtimestamp(epoch, tz=timezone.utc).isoformat()
+    return datetime.fromtimestamp(epoch, tz=UTC).isoformat()
 
 
 def record_auth_rejection(

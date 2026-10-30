@@ -12,9 +12,6 @@ Produces:
 """
 
 import json
-import math
-import os
-import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -24,9 +21,7 @@ import pandas as pd
 
 from core.engine.dhan_live_ai_signals import (
     _ensure_features_for_df,
-    load_models_and_meta,
 )
-from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
 from core.engine.train_dhan_models import ROOT_DIR as _ROOT_DIR
 
 PROJECT_ROOT = Path(_ROOT_DIR)
@@ -301,7 +296,7 @@ def run_models_on_snapshot(df_snapshot: pd.DataFrame, models: dict) -> pd.DataFr
 
             # Compute score
             spot = float(row.get("spot", 0.0))
-            strike = float(row.get("strike", 0.0))
+            float(row.get("strike", 0.0))
             moneyness = float(row.get("moneyness", 0.0))
 
             if signal == "BUY_CE":
@@ -571,7 +566,7 @@ def run_backtest(
             all_trades.append(trade_record)
 
     # Print signal statistics
-    print(f"\n[BACKTEST] Signal Statistics:")
+    print("\n[BACKTEST] Signal Statistics:")
     print(f"  Total signals: {signal_stats['total']}")
     print(f"  BUY_CE: {signal_stats['BUY_CE']}, BUY_PE: {signal_stats['BUY_PE']}, HOLD: {signal_stats['HOLD']}")
     if conf_values:
@@ -584,7 +579,7 @@ def run_backtest(
 
     if not all_trades:
         print("\n[BACKTEST] No trades generated in backtest.")
-        print(f"[BACKTEST] Pipeline is healthy; try profile='DEV' for more trades.")
+        print("[BACKTEST] Pipeline is healthy; try profile='DEV' for more trades.")
         return
 
     # Build DataFrames

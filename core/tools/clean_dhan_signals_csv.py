@@ -8,9 +8,7 @@ Produces clean and EV-ready versions of the CSV file.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -122,7 +120,7 @@ def load_raw_csv() -> pd.DataFrame:
         raise
 
 
-def remove_bad_rows(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
+def remove_bad_rows(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
     """
     Remove duplicate header rows and invalid rows.
 
@@ -155,7 +153,7 @@ def remove_bad_rows(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
 
     stats["total_removed"] = initial_count - len(df)
 
-    print(f"\n📋 Bad Row Removal:")
+    print("\n📋 Bad Row Removal:")
     print(f"  Duplicate headers removed: {stats['duplicate_headers']}")
     print(f"  Invalid rows removed: {stats['invalid_rows']}")
     print(f"  Total removed: {stats['total_removed']}")
@@ -164,7 +162,7 @@ def remove_bad_rows(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
     return df, stats
 
 
-def convert_numeric_columns(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, int]]:
+def convert_numeric_columns(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
     """
     Convert numeric-like columns to proper numeric types.
 
@@ -184,13 +182,13 @@ def convert_numeric_columns(df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, i
             new_nulls = after_nulls - before_nulls
             conversion_stats[col] = new_nulls
 
-    print(f"\n🔢 Type Conversion:")
+    print("\n🔢 Type Conversion:")
     print(f"  Columns converted: {len(conversion_stats)}")
     total_new_nulls = sum(conversion_stats.values())
     print(f"  Total new nulls created: {total_new_nulls}")
 
     if conversion_stats:
-        print(f"\n  Top columns with new nulls:")
+        print("\n  Top columns with new nulls:")
         sorted_stats = sorted(conversion_stats.items(), key=lambda x: x[1], reverse=True)[:10]
         for col, new_nulls in sorted_stats:
             if new_nulls > 0:
@@ -217,13 +215,13 @@ def fix_moneyness(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[valid_mask, "moneyness"] = spot[valid_mask] / strike[valid_mask]
 
     fixed_count = valid_mask.sum()
-    print(f"\n💰 Moneyness Fix:")
+    print("\n💰 Moneyness Fix:")
     print(f"  Rows recalculated: {fixed_count:,}")
 
     return df
 
 
-def remove_outliers(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def remove_outliers(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Remove extreme forward return outliers.
 
@@ -240,12 +238,12 @@ def remove_outliers(df: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
     outliers_df = df[mask_outliers].copy()
     df_clean = df[~mask_outliers].copy()
 
-    print(f"\n🚨 Outlier Removal:")
+    print("\n🚨 Outlier Removal:")
     print(f"  Outliers removed: {len(outliers_df)}")
     print(f"  Rows remaining: {len(df_clean):,}")
 
     if len(outliers_df) > 0:
-        print(f"\n  Outlier statistics:")
+        print("\n  Outlier statistics:")
         for col in ["fwd_ret_1", "fwd_ret_3", "fwd_ret_5"]:
             if col in outliers_df.columns:
                 outliers_col = outliers_df[col].dropna()
@@ -290,14 +288,14 @@ def detect_sell_anomalies(df: pd.DataFrame) -> pd.DataFrame:
 
     if anomaly_indices:
         anomalies_df = df.loc[anomaly_indices].copy()
-        print(f"\n⚠️ SELL Signal Anomalies Detected:")
+        print("\n⚠️ SELL Signal Anomalies Detected:")
         print(f"  Anomaly rows: {len(anomalies_df)}")
         print(f"  Saving to: {CSV_SELL_ANOMALIES}")
         CSV_SELL_ANOMALIES.parent.mkdir(parents=True, exist_ok=True)
         anomalies_df.to_csv(CSV_SELL_ANOMALIES, index=False)
     else:
         anomalies_df = pd.DataFrame()
-        print(f"\n✅ No SELL signal anomalies detected")
+        print("\n✅ No SELL signal anomalies detected")
 
     return anomalies_df
 
@@ -309,7 +307,7 @@ def create_ev_ready_subset(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         Filtered DataFrame ready for EV analysis
     """
-    print(f"\n📊 Creating EV-Ready Subset:")
+    print("\n📊 Creating EV-Ready Subset:")
 
     initial_count = len(df)
 
@@ -344,7 +342,7 @@ def create_ev_ready_subset(df: pd.DataFrame) -> pd.DataFrame:
     mask_combined = mask_fwd & mask_signal & mask_range & mask_required
     df_ev = df[mask_combined].copy()
 
-    print(f"\n  EV-Ready Subset:")
+    print("\n  EV-Ready Subset:")
     print(f"    Initial rows: {initial_count:,}")
     print(f"    Final rows: {len(df_ev):,}")
     print(f"    Rows removed: {initial_count - len(df_ev):,}")
@@ -354,7 +352,7 @@ def create_ev_ready_subset(df: pd.DataFrame) -> pd.DataFrame:
 
 def save_clean_files(df_clean: pd.DataFrame, df_ev: pd.DataFrame) -> None:
     """Save cleaned and EV-ready CSV files."""
-    print(f"\n💾 Saving Clean Files:")
+    print("\n💾 Saving Clean Files:")
 
     # Save clean CSV
     print(f"  Clean CSV: {CSV_CLEAN}")
@@ -366,10 +364,10 @@ def save_clean_files(df_clean: pd.DataFrame, df_ev: pd.DataFrame) -> None:
     df_ev.to_csv(CSV_EV_READY, index=False)
     print(f"    Rows: {len(df_ev):,}")
 
-    print(f"\n✅ All clean files saved successfully")
+    print("\n✅ All clean files saved successfully")
 
 
-def run_cleaning_pipeline() -> Dict:
+def run_cleaning_pipeline() -> dict:
     """
     Run the complete cleaning pipeline.
 
@@ -433,7 +431,7 @@ def run_cleaning_pipeline() -> Dict:
     print("\n" + "=" * 80)
     print("CLEANING PIPELINE COMPLETE")
     print("=" * 80)
-    print(f"\n📊 Summary:")
+    print("\n📊 Summary:")
     print(f"  Initial rows: {stats['initial_rows']:,}")
     print(f"  After bad row removal: {stats['after_bad_rows']:,}")
     print(f"  After outlier removal: {stats['after_outliers']:,}")

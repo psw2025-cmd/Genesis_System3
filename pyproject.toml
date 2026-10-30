@@ -39,3 +39,14 @@ testpaths = ["core", "tools", "phases", "dashboard", "tests"]
 addopts = "-q --disable-warnings --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts"
 norecursedirs = [".git", ".venv", "__pycache__", "node_modules", "tests/auto/system3_generated_tests"]
 
+
+
+
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501", "E722", "S110", "S112", "E402", "BLE001", "E701", "E702", "S101", "S311", "F401", "E741", "F811", "S301", "S603", "S310", "S607"]

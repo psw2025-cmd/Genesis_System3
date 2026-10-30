@@ -13,7 +13,7 @@ Menu Option: 112
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_predictions() -> Optional[pd.DataFrame]:
+def load_predictions() -> pd.DataFrame | None:
     """Load recent Ultra predictions."""
     fused_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if fused_csv.exists():
@@ -36,8 +36,8 @@ def load_predictions() -> Optional[pd.DataFrame]:
 
 
 def compute_feature_importance_simple(
-    prediction: Dict[str, Any], features: Optional[Dict[str, float]] = None
-) -> Dict[str, float]:
+    prediction: dict[str, Any], features: dict[str, float] | None = None
+) -> dict[str, float]:
     """
     Compute simple feature importance for a prediction.
 
@@ -73,7 +73,7 @@ def compute_feature_importance_simple(
     return importance
 
 
-def generate_explanation(prediction: Dict[str, Any], feature_importance: Dict[str, float]) -> str:
+def generate_explanation(prediction: dict[str, Any], feature_importance: dict[str, float]) -> str:
     """
     Generate human-readable explanation for a prediction.
 
@@ -211,9 +211,9 @@ def run_phase50_prediction_explainer() -> None:
     print(f"[SAVE] Feature importance saved to: {importance_json}")
 
     # Summary
-    print(f"\n=== PREDICTION EXPLAINER SUMMARY ===")
+    print("\n=== PREDICTION EXPLAINER SUMMARY ===")
     print(f"Total predictions explained: {len(df_explanations)}")
-    print(f"\nTop contributing features:")
+    print("\nTop contributing features:")
     for feat, importance in sorted(feature_importance_summary.items(), key=lambda x: x[1], reverse=True)[:5]:
         print(f"  {feat}: {importance:.2%}")
 

@@ -10,7 +10,7 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -32,14 +32,14 @@ logger = logging.getLogger(__name__)
 class AutoTestGenerator:
     """Auto-generates test files for phases."""
 
-    def __init__(self, registry_path: Optional[Path] = None):
+    def __init__(self, registry_path: Path | None = None):
         """Initialize test generator."""
         self.registry_path = registry_path or (PROJECT_ROOT / "storage" / "meta" / "system3_phase_registry.json")
         self.registry = self._load_registry()
         self.tests_dir = PROJECT_ROOT / "tests" / "auto" / "system3_generated_tests"
         self.tests_dir.mkdir(parents=True, exist_ok=True)
 
-    def _load_registry(self) -> Dict[str, Any]:
+    def _load_registry(self) -> dict[str, Any]:
         """Load phase registry."""
         try:
             if self.registry_path.exists():
@@ -50,7 +50,7 @@ class AutoTestGenerator:
             logger.error(f"Failed to load registry: {e}")
             return {"phases": {}}
 
-    def generate_test_for_phase(self, phase_num: int) -> Optional[Path]:
+    def generate_test_for_phase(self, phase_num: int) -> Path | None:
         """Generate a test file for a single phase."""
         # Registry structure: phases are top-level keys, or nested under "phases"
         phases_dict = self.registry.get("phases", self.registry)
@@ -102,7 +102,7 @@ class AutoTestGenerator:
             logger.error(f"Failed to generate test for phase {phase_num}: {e}")
             return None
 
-    def _generate_test_content(self, phase_num: int, module_name: str, func_name: str, phase_info: Dict) -> str:
+    def _generate_test_content(self, phase_num: int, module_name: str, func_name: str, phase_info: dict) -> str:
         """Generate test file content."""
         spec_file = phase_info.get("spec_file", "")
         spec_content = ""
@@ -136,14 +136,14 @@ if str(PROJECT_ROOT) not in sys.path:
 
 class TestPhase{phase_num}(unittest.TestCase):
     """Test suite for Phase {phase_num}."""
-    
+
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
         cls.phase_num = {phase_num}
         cls.module_name = "{module_name}"
         cls.func_name = "{func_name}"
-        
+
         # Try to import module
         try:
             module_parts = cls.module_name.split('.')
@@ -158,51 +158,51 @@ class TestPhase{phase_num}(unittest.TestCase):
             cls.phase_func = None
             cls._phase_func_raw = None
             cls.import_error = str(e)
-    
+
     def test_module_import(self):
         """Test that phase module can be imported."""
         self.assertIsNotNone(
             self.phase_module,
             f"Failed to import module {{self.module_name}}: {{getattr(self, 'import_error', 'Unknown error')}}"
         )
-    
+
     def test_function_exists(self):
         """Test that phase function exists."""
         self.assertIsNotNone(
             self.phase_func,
             f"Function {{self.func_name}} not found in module {{self.module_name}}"
         )
-    
+
     def test_phase_execution(self):
         """Test that phase can be executed."""
         if not self.phase_func:
             self.skipTest("Phase function not available")
-        
+
         try:
             # Call function directly (not as bound method) to avoid passing self
             # Use the raw function reference stored in setUpClass
             func = type(self)._phase_func_raw
             if func is None:
                 self.skipTest("Phase function not available")
-            
+
             # Call function directly - it accepts **kwargs, so we can call with no args
             result = func()
-            
+
             # Check result structure
             self.assertIsInstance(result, dict, "Phase result should be a dictionary")
-            
+
             # Check required fields
             self.assertIn("phase", result, "Result should contain 'phase' field")
             self.assertIn("status", result, "Result should contain 'status' field")
             self.assertIn("details", result, "Result should contain 'details' field")
-            
+
             # Check phase number matches
             self.assertEqual(
                 result.get("phase"),
                 self.phase_num,
                 f"Phase number mismatch: expected {{self.phase_num}}, got {{result.get('phase')}}"
             )
-            
+
             # Check status is valid
             valid_statuses = ["OK", "WARN", "ERROR", "KILL"]
             self.assertIn(
@@ -210,22 +210,22 @@ class TestPhase{phase_num}(unittest.TestCase):
                 valid_statuses,
                 f"Invalid status: {{result.get('status')}}"
             )
-            
+
         except Exception as e:
             self.fail(f"Phase execution failed: {{e}}")
-    
+
     def test_phase_outputs(self):
         """Test that phase produces expected outputs."""
         if not self.phase_func:
             self.skipTest("Phase function not available")
-        
+
         try:
             # Call function directly (not as bound method)
             func = type(self)._phase_func_raw
             if func is None:
                 self.skipTest("Phase function not available")
             result = func()
-            
+
             # Check outputs field exists
             if "outputs" in result:
                 self.assertIsInstance(
@@ -233,25 +233,25 @@ class TestPhase{phase_num}(unittest.TestCase):
                     dict,
                     "Outputs should be a dictionary"
                 )
-            
+
             # Check for expected output files if specified
 {self._generate_output_checks(expected_outputs)}
-            
+
         except Exception as e:
             self.fail(f"Output validation failed: {{e}}")
-    
+
     def test_phase_error_handling(self):
         """Test that phase handles errors gracefully."""
         if not self.phase_func:
             self.skipTest("Phase function not available")
-        
+
         try:
             # Call function directly (not as bound method)
             func = type(self)._phase_func_raw
             if func is None:
                 self.skipTest("Phase function not available")
             result = func()
-            
+
             # Check errors field exists
             if "errors" in result:
                 self.assertIsInstance(
@@ -259,7 +259,7 @@ class TestPhase{phase_num}(unittest.TestCase):
                     list,
                     "Errors should be a list"
                 )
-            
+
             # If status is ERROR, should have errors
             if result.get("status") == "ERROR":
                 self.assertGreater(
@@ -267,26 +267,26 @@ class TestPhase{phase_num}(unittest.TestCase):
                     0,
                     "ERROR status should have at least one error"
                 )
-            
+
         except Exception as e:
             self.fail(f"Error handling test failed: {{e}}")
-    
+
     def test_phase_dry_run_safety(self):
         """Test that phase is DRY-RUN safe."""
         if not self.phase_func:
             self.skipTest("Phase function not available")
-        
+
         try:
             # Call function directly (not as bound method)
             func = type(self)._phase_func_raw
             if func is None:
                 self.skipTest("Phase function not available")
             result = func()
-            
+
             # Check that phase doesn't enable live trading
             outputs = result.get("outputs", {{}})
             details = result.get("details", "")
-            
+
             # Should not contain live trading flags
             live_flags = ["LIVE_TRADING_ENABLED", "USE_LIVE_EXECUTION", "AUTO_EXECUTE"]
             for flag in live_flags:
@@ -295,7 +295,7 @@ class TestPhase{phase_num}(unittest.TestCase):
                     str(outputs).upper() + details.upper(),
                     f"Phase should not enable {{flag}}"
                 )
-            
+
         except Exception as e:
             self.fail(f"DRY-RUN safety test failed: {{e}}")
 
@@ -308,35 +308,35 @@ def run_phase_test():
     print(f"Module: {{module_name}}")
     print(f"Function: {{func_name}}")
     print()
-    
+
     try:
         module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
-        
+
         print("Executing phase...")
         # Call function directly - it accepts **kwargs, so we can call with no args
         result = func()
-        
+
         print(f"Status: {{result.get('status', 'UNKNOWN')}}")
         print(f"Details: {{result.get('details', 'N/A')}}")
-        
+
         if result.get("outputs"):
             print(f"Outputs: {{len(result['outputs'])}} items")
             for key, value in result["outputs"].items():
                 print(f"  - {{key}}: {{value}}")
-        
+
         if result.get("errors"):
             print(f"Errors: {{len(result['errors'])}} items")
             for error in result["errors"]:
                 print(f"  - {{error}}")
-        
+
         print()
         print("=" * 70)
         print("TEST COMPLETE")
         print("=" * 70)
-        
+
         return result.get("status") in ("OK", "WARN")
-        
+
     except Exception as e:
         print(f"TEST FAILED: {{e}}")
         import traceback
@@ -350,7 +350,7 @@ if __name__ == "__main__":
 '''
         return test_content
 
-    def _extract_expected_outputs(self, spec_content: str) -> List[str]:
+    def _extract_expected_outputs(self, spec_content: str) -> list[str]:
         """Extract expected output files from spec."""
         outputs = []
 
@@ -372,7 +372,7 @@ if __name__ == "__main__":
 
         return list(set(outputs))  # Remove duplicates
 
-    def _generate_output_checks(self, expected_outputs: List[str]) -> str:
+    def _generate_output_checks(self, expected_outputs: list[str]) -> str:
         """Generate output validation checks."""
         if not expected_outputs:
             return "            # No specific output files expected"
@@ -393,7 +393,7 @@ if __name__ == "__main__":
             return "\n".join(checks)
         return "            # No specific output files expected"
 
-    def generate_tests_for_range(self, start: int, end: int) -> Dict[str, Any]:
+    def generate_tests_for_range(self, start: int, end: int) -> dict[str, Any]:
         """Generate tests for a range of phases."""
         logger.info(f"Generating tests for phases {start}-{end}...")
 
@@ -425,7 +425,7 @@ if __name__ == "__main__":
         logger.info(f"Generated {len(generated)} tests, skipped {len(skipped)}, errors {len(errors)}")
         return result
 
-    def generate_range_test_file(self, start: int, end: int) -> Optional[Path]:
+    def generate_range_test_file(self, start: int, end: int) -> Path | None:
         """Generate a single test file for a range of phases."""
         test_file = self.tests_dir / f"test_phases_{start}_{end}.py"
 
@@ -465,7 +465,7 @@ if __name__ == "__main__":
             logger.error(f"Failed to generate range test: {e}")
             return None
 
-    def _generate_range_test_content(self, start: int, end: int, phases: List[Dict]) -> str:
+    def _generate_range_test_content(self, start: int, end: int, phases: list[dict]) -> str:
         """Generate content for range test file."""
         phase_tests = []
         for phase in phases:
@@ -476,11 +476,11 @@ if __name__ == "__main__":
         module = __import__("{phase["module"]}", fromlist=["{phase["func"]}"])
         func = getattr(module, "{phase["func"]}")
         result = func()
-        
+
         assert isinstance(result, dict), "Result should be a dictionary"
         assert "status" in result, "Result should have status"
         assert result.get("phase") == {phase["num"]}, "Phase number mismatch"
-        
+
         return {{
             "phase": {phase["num"]},
             "status": result.get("status"),
@@ -524,7 +524,7 @@ def main():
     print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"Total Phases: {len(phases)}")
     print()
-    
+
     results = {{}}
     for phase_num in range({start}, {end + 1}):
         func_name = f"test_phase_{{phase_num}}"
@@ -543,28 +543,28 @@ def main():
                 }}
         else:
             print(f"Skipping Phase {{phase_num}} (not implemented)")
-    
+
     print()
     print("=" * 70)
     print("TEST SUMMARY")
     print("=" * 70)
-    
+
     ok_count = sum(1 for r in results.values() if r.get("status") == "OK")
     warn_count = sum(1 for r in results.values() if r.get("status") == "WARN")
     error_count = sum(1 for r in results.values() if r.get("status") == "ERROR")
-    
+
     print(f"✅ OK: {{ok_count}}")
     print(f"⚠️  WARN: {{warn_count}}")
     print(f"❌ ERROR: {{error_count}}")
     print(f"Total: {{len(results)}}")
-    
+
     if error_count > 0:
         print()
         print("ERROR DETAILS:")
         for phase_num, result in results.items():
             if result.get("status") == "ERROR":
                 print(f"  Phase {{phase_num}}: {{result.get('details', 'Unknown error')}}")
-    
+
     return error_count == 0
 
 
@@ -573,7 +573,7 @@ if __name__ == "__main__":
     sys.exit(0 if success else 1)
 '''
 
-    def generate_all_tests(self) -> Dict[str, Any]:
+    def generate_all_tests(self) -> dict[str, Any]:
         """Generate tests for all implemented phases."""
         logger.info("Generating tests for all implemented phases...")
 

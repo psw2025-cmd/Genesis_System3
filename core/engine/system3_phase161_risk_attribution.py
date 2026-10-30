@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase161_risk_attribution.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase161_risk_attribution_report.md"
 
 
-def run_phase161_risk_attribution() -> Dict[str, Any]:
+def run_phase161_risk_attribution() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["risk_source", "underlying", "attribution_pct"])
@@ -37,7 +37,7 @@ def run_phase161_risk_attribution() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase161: Risk Attribution Analysis")
+    print("Phase161: Risk Attribution Analysis")
     result = run_phase161_risk_attribution()
     return 0 if result["status"] == "OK" else 1
 

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -37,7 +37,7 @@ CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load operator override config."""
     if not CONFIG_JSON.exists():
         # Create default
@@ -62,7 +62,7 @@ def load_config() -> Dict[str, Any]:
         }
 
 
-def evaluate_overrides() -> Dict[str, Any]:
+def evaluate_overrides() -> dict[str, Any]:
     """Evaluate operator overrides on today's signals/trades."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 93 - OPERATOR OVERRIDE ENGINE")
@@ -167,7 +167,7 @@ def evaluate_overrides() -> Dict[str, Any]:
     return state
 
 
-def generate_log_md(state: Dict[str, Any]) -> None:
+def generate_log_md(state: dict[str, Any]) -> None:
     """Generate markdown log."""
     with LOG_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 93 - Operator Override Log\n\n")
@@ -194,7 +194,7 @@ def generate_log_md(state: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        state = evaluate_overrides()
+        evaluate_overrides()
         print("\n[PH93] Operator override evaluation complete.")
         return 0
     except Exception as e:

@@ -8,7 +8,7 @@ SAFE MODE ONLY - Read-only validation.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
@@ -18,7 +18,7 @@ ULTRA_OBS_DIR = REPORTS_DIR / "ultra_obs"
 ULTRA_OBS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def audit_execution_readiness() -> Dict[str, Any]:
+def audit_execution_readiness() -> dict[str, Any]:
     """
     Audit system execution readiness.
 
@@ -119,7 +119,7 @@ def audit_execution_readiness() -> Dict[str, Any]:
     return audit_results
 
 
-def save_audit_report(audit_results: Dict[str, Any]) -> Path:
+def save_audit_report(audit_results: dict[str, Any]) -> Path:
     """
     Save audit report to JSON.
 
@@ -147,7 +147,7 @@ def main() -> None:
         print(f"{status_icon} {check['check']}{critical_mark}: {check['status']}")
         print(f"   {check['message']}")
 
-    print(f"\n=== OVERALL READINESS ===")
+    print("\n=== OVERALL READINESS ===")
     if audit_results["overall_ready"]:
         print("✅ System is READY for execution (safe mode)")
     else:

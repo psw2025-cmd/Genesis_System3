@@ -7,9 +7,8 @@ Estimates expected value of BUY/SELL signals.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -23,7 +22,7 @@ REPORT_PATH = LOG_DIR / "system3_signal_edge_report.md"
 SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_with_forward.csv"
 
 
-def run_phase222(**kwargs) -> Dict[str, Any]:
+def run_phase222(**kwargs) -> dict[str, Any]:
     """
     Run Phase 222: Signal Edge Estimator.
 

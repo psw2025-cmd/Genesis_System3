@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase167_time_of_day.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase167_time_of_day_report.md"
 
 
-def run_phase167_time_of_day() -> Dict[str, Any]:
+def run_phase167_time_of_day() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["time_slot", "underlying", "avg_pnl_pct", "trade_count"])
@@ -37,7 +37,7 @@ def run_phase167_time_of_day() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase167: Time-of-Day Analysis")
+    print("Phase167: Time-of-Day Analysis")
     result = run_phase167_time_of_day()
     return 0 if result["status"] == "OK" else 1
 

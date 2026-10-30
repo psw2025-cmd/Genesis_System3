@@ -7,9 +7,8 @@ SAFE MODE ONLY - Read-only analysis.
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -17,7 +16,7 @@ LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 
 
-def build_volatility_map(days: int = 7) -> Dict[str, Any]:
+def build_volatility_map(days: int = 7) -> dict[str, Any]:
     """
     Build adaptive volatility map from recent signals.
 

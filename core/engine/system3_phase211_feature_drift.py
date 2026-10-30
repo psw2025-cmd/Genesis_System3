@@ -7,9 +7,8 @@ Monitors feature distribution shifts over time.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ DRIFT_THRESHOLD_SIGMA = 3.0
 KEY_FEATURES = ["delta", "gamma", "theta", "vega", "iv", "iv_rank", "iv_percentile"]
 
 
-def run_phase211(**kwargs) -> Dict[str, Any]:
+def run_phase211(**kwargs) -> dict[str, Any]:
     """
     Run Phase 211: Feature Drift Monitor.
 

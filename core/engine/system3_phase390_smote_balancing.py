@@ -17,10 +17,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import numpy as np
-import pandas as pd
+from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -80,7 +77,7 @@ def run_phase_390(
     output_csv: str = "storage/datasets/phase_390_balanced_features.csv",
     metrics_json: str = "storage/metrics/phase_390_smote_report.json",
     label_col: str = "signal",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Execute Phase 390: SMOTE Data Balancing.
 
@@ -121,7 +118,7 @@ def run_phase_390(
             return result
 
         # ===== STEP 1: Load engineered features =====
-        logger.info(f"\n[STEP 1] Loading engineered features from Phase 389")
+        logger.info("\n[STEP 1] Loading engineered features from Phase 389")
         logger.info(f"  Input: {input_csv}")
 
         df_engineered = load_engineered_features(input_csv)
@@ -130,7 +127,7 @@ def run_phase_390(
         result["metrics"]["input_columns"] = len(df_engineered.columns)
 
         # ===== STEP 2: Balance multiclass signals =====
-        logger.info(f"\n[STEP 2] Balancing multiclass signals")
+        logger.info("\n[STEP 2] Balancing multiclass signals")
 
         df_balanced, balance_metrics = balance_multiclass_signals(df_engineered, label_col=label_col)
 
@@ -140,15 +137,15 @@ def run_phase_390(
         result["metrics"]["output_columns"] = len(df_balanced.columns)
 
         # ===== STEP 3: Create output directories =====
-        logger.info(f"\n[STEP 3] Creating output directories")
+        logger.info("\n[STEP 3] Creating output directories")
 
         Path(output_csv).parent.mkdir(parents=True, exist_ok=True)
         Path(metrics_json).parent.mkdir(parents=True, exist_ok=True)
 
-        logger.info(f"  ✓ Output directories ready")
+        logger.info("  ✓ Output directories ready")
 
         # ===== STEP 4: Write balanced dataset CSV =====
-        logger.info(f"\n[STEP 4] Writing balanced dataset to CSV")
+        logger.info("\n[STEP 4] Writing balanced dataset to CSV")
         logger.info(f"  Output: {output_csv}")
 
         df_balanced.to_csv(output_csv, index=False)
@@ -158,7 +155,7 @@ def run_phase_390(
         logger.info(f"  ✓ File size: {csv_size_mb:.2f} MB")
 
         # ===== STEP 5: Write metrics JSON =====
-        logger.info(f"\n[STEP 5] Writing metrics report to JSON")
+        logger.info("\n[STEP 5] Writing metrics report to JSON")
         logger.info(f"  Output: {metrics_json}")
 
         metrics_report = {
@@ -191,13 +188,13 @@ def run_phase_390(
         logger.info(f"  ✓ Metrics written ({json_size_kb:.1f} KB)")
 
         # ===== STEP 6: Validation checks =====
-        logger.info(f"\n[STEP 6] Validation checks")
+        logger.info("\n[STEP 6] Validation checks")
 
         # Check output CSV exists and is non-empty
         if not Path(output_csv).exists():
             raise RuntimeError(f"Output CSV not created: {output_csv}")
         if len(df_balanced) == 0:
-            raise RuntimeError(f"Output dataframe is empty")
+            raise RuntimeError("Output dataframe is empty")
 
         # Check JSON exists
         if not Path(metrics_json).exists():
@@ -207,8 +204,8 @@ def run_phase_390(
         if label_col not in df_balanced.columns:
             raise RuntimeError(f"Target column '{label_col}' missing from output")
 
-        logger.info(f"  ✓ Output CSV exists and non-empty")
-        logger.info(f"  ✓ Metrics JSON exists and valid")
+        logger.info("  ✓ Output CSV exists and non-empty")
+        logger.info("  ✓ Metrics JSON exists and valid")
         logger.info(f"  ✓ Target column present: '{label_col}'")
 
         # ===== COMPLETION =====
@@ -221,7 +218,7 @@ def run_phase_390(
         result["message"] = f"Phase 390 complete: {len(df_balanced)} balanced samples generated"
 
         logger.info(f"\n{'='*80}")
-        logger.info(f"PHASE 390 SUCCESS")
+        logger.info("PHASE 390 SUCCESS")
         logger.info(f"  Input: {result['metrics']['input_rows']} rows")
         logger.info(f"  Output: {result['metrics']['output_rows']} rows (balanced)")
         logger.info(f"  Synthetic samples: {result['metrics']['synthetic_samples_generated']}")
@@ -232,15 +229,15 @@ def run_phase_390(
         return result
 
     except FileNotFoundError as e:
-        logger.error(f"✗ File not found: {str(e)}")
+        logger.error(f"✗ File not found: {e!s}")
         result["status"] = "error"
-        result["message"] = f"File not found: {str(e)}"
+        result["message"] = f"File not found: {e!s}"
         return result
 
     except Exception as e:
-        logger.error(f"✗ Phase 390 failed: {str(e)}")
+        logger.error(f"✗ Phase 390 failed: {e!s}")
         result["status"] = "error"
-        result["message"] = f"Phase 390 error: {str(e)}"
+        result["message"] = f"Phase 390 error: {e!s}"
         return result
 
 
@@ -260,7 +257,7 @@ if __name__ == "__main__":
 
     if result["status"] == "complete":
         m = result["metrics"]
-        print(f"\nMetrics:")
+        print("\nMetrics:")
         print(f"  Input rows: {m.get('input_rows', 'N/A')}")
         print(f"  Output rows: {m.get('output_rows', 'N/A')}")
         print(f"  Rows added: {m.get('rows_added', 'N/A')}")
@@ -269,11 +266,11 @@ if __name__ == "__main__":
         print(f"  Duration: {result.get('duration_ms', 'N/A')} ms")
 
         if "input_class_counts" in m and "output_class_counts" in m:
-            print(f"\nClass distribution:")
+            print("\nClass distribution:")
             print(f"  Before: {m['input_class_counts']}")
             print(f"  After: {m['output_class_counts']}")
 
-    print(f"\nOutput files:")
+    print("\nOutput files:")
     print(f"  CSV: {result['output_file']}")
     print(f"  JSON: {result['metrics_file']}")
     print("=" * 80 + "\n")

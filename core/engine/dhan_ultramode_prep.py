@@ -9,7 +9,7 @@ AUTO-UPDATE: DISABLED
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -32,7 +32,7 @@ class UltraModeConfig:
         self.emergency_stop_enabled = True  # ✅ Enabled for safety
         self.read_only_mode = True  # ✅ Read-only by default
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
         return {
             "live_execution_enabled": self.live_execution_enabled,
@@ -48,7 +48,7 @@ class UltraModeConfig:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "UltraModeConfig":
+    def from_dict(cls, data: dict[str, Any]) -> "UltraModeConfig":
         """Create from dictionary."""
         config = cls()
         config.live_execution_enabled = data.get("live_execution_enabled", False)
@@ -92,7 +92,7 @@ def save_ultramode_config(config: UltraModeConfig) -> bool:
         return False
 
 
-def check_ultramode_readiness() -> Dict[str, Any]:
+def check_ultramode_readiness() -> dict[str, Any]:
     """
     Check system readiness for Ultra-Mode (read-only check).
 

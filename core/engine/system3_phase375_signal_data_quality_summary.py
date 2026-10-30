@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -22,7 +22,7 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 logger = logging.getLogger(__name__)
 
 
-def load_phase_results(phase_num: int) -> Dict[str, Any]:
+def load_phase_results(phase_num: int) -> dict[str, Any]:
     """Load results from a previous phase."""
     metrics_files = {
         370: "schema_normalization_370.json",
@@ -44,7 +44,7 @@ def load_phase_results(phase_num: int) -> Dict[str, Any]:
         return {"status": "error", "error": str(e)}
 
 
-def run_phase375(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase375(context: dict[str, Any] = None) -> dict[str, Any]:
     """Execute Phase 375: Signal Data Quality Summary."""
     logger.info("=== Phase 375: Signal Data Quality Summary ===")
 

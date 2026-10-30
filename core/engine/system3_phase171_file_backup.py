@@ -4,7 +4,7 @@ import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -15,7 +15,7 @@ STORAGE_BACKUPS.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase171_file_backup_report.md"
 
 
-def run_phase171_file_backup() -> Dict[str, Any]:
+def run_phase171_file_backup() -> dict[str, Any]:
     errors = []
     try:
         backup_count = 0

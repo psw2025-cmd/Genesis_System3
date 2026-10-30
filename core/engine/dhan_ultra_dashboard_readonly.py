@@ -9,7 +9,7 @@ SAFE MODE ONLY - No changes, display only.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
@@ -18,7 +18,7 @@ ULTRA_OBS_DIR = REPORTS_DIR / "ultra_obs"
 ULTRA_OBS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def generate_dashboard() -> Dict[str, Any]:
+def generate_dashboard() -> dict[str, Any]:
     """
     Generate read-only dashboard with summaries.
 
@@ -117,7 +117,7 @@ def generate_dashboard() -> Dict[str, Any]:
     return dashboard
 
 
-def save_dashboard(dashboard: Dict[str, Any]) -> Path:
+def save_dashboard(dashboard: dict[str, Any]) -> Path:
     """
     Save dashboard to JSON.
 

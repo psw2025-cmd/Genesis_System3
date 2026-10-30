@@ -13,7 +13,7 @@ Menu Option: 114
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -34,7 +34,7 @@ class BrokerAbstraction:
         self.connected = True
         return True
 
-    def get_market_data(self, symbol: str) -> Dict[str, Any]:
+    def get_market_data(self, symbol: str) -> dict[str, Any]:
         """Get market data (shadow-only, returns mock data)."""
         if not self.connected:
             return {"error": "Not connected"}
@@ -47,7 +47,7 @@ class BrokerAbstraction:
             "source": "shadow",
         }
 
-    def place_order(self, order: Dict[str, Any]) -> Dict[str, Any]:
+    def place_order(self, order: dict[str, Any]) -> dict[str, Any]:
         """Place order (shadow-only, no real order)."""
         if not self.connected:
             return {"error": "Not connected"}
@@ -65,7 +65,7 @@ class BrokerAbstraction:
         self.connected = False
 
 
-def test_broker_compatibility() -> Dict[str, Any]:
+def test_broker_compatibility() -> dict[str, Any]:
     """Test broker abstraction compatibility (shadow-only)."""
     brokers = ["Dhan", "Binance", "Zerodha"]
     results = {}
@@ -152,7 +152,7 @@ def run_phase52_multi_broker() -> None:
     print(f"[SAVE] Compatibility report saved to: {report_md}")
 
     # Summary
-    print(f"\n=== MULTI-BROKER ABSTRACTION SUMMARY ===")
+    print("\n=== MULTI-BROKER ABSTRACTION SUMMARY ===")
     for broker_name, result in compatibility_results.items():
         print(f"\n{broker_name}:")
         print(f"  Connection: {result['connection']}")

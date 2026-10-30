@@ -12,8 +12,8 @@ from pathlib import Path
 __version__ = "1.0.0"
 __all__ = [
     "geni_config",
+    "geni_orchestrator",
     "geni_state",
     "geni_tasks",
     "geni_validator",
-    "geni_orchestrator",
 ]

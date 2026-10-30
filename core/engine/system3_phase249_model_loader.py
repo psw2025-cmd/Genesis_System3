@@ -11,10 +11,10 @@ Date: 2025-12-06
 """
 
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 
 class SimpleLSTM(nn.Module):
@@ -30,7 +30,7 @@ class SimpleLSTM(nn.Module):
             num_layers: Number of LSTM layers
             num_classes: Number of output classes
         """
-        super(SimpleLSTM, self).__init__()
+        super().__init__()
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True, dropout=0.2)
         self.fc = nn.Linear(hidden_size, num_classes)
 
@@ -41,7 +41,7 @@ class SimpleLSTM(nn.Module):
         return out
 
 
-def load_model_from_state_dict(model_path: Path, input_size: int = 10) -> Tuple[Any, bool]:
+def load_model_from_state_dict(model_path: Path, input_size: int = 10) -> tuple[Any, bool]:
     """
     Load a Phase 249 saved model (state dict) and reconstruct full model.
 
@@ -76,7 +76,7 @@ def main():
     model, success = load_model_from_state_dict(model_path)
 
     if success:
-        print(f"✓ Model loaded successfully")
+        print("✓ Model loaded successfully")
         print(f"  Model type: {type(model)}")
         print(f"  Model structure:\n{model}")
     else:

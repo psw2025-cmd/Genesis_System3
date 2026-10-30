@@ -16,7 +16,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -79,8 +79,8 @@ def _fill_expiry(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def run_phase305(**kwargs: Any) -> Dict[str, Any]:
-    errors: List[str] = []
+def run_phase305(**kwargs: Any) -> dict[str, Any]:
+    errors: list[str] = []
     try:
         if not FORWARD_CSV.exists():
             return {
@@ -116,8 +116,8 @@ def run_phase305(**kwargs: Any) -> Dict[str, Any]:
             "phase": 305,
             "timestamp": datetime.now().isoformat(),
             "input_rows": original_rows,
-            "output_rows": int(len(df_valid)),
-            "invalid_rows": int(len(invalid_rows)),
+            "output_rows": len(df_valid),
+            "invalid_rows": len(invalid_rows),
             "ts_missing": ts_missing,
             "expiry_missing": expiry_missing,
             "side_counts": side_counts,

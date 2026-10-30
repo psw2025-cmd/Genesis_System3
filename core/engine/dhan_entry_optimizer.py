@@ -4,9 +4,7 @@ Dhan Index Options - Entry Optimizer
 Optimizes trade entry timing and price.
 """
 
-from typing import Any, Dict
 
-import numpy as np
 import pandas as pd
 
 
@@ -24,8 +22,7 @@ def optimize_entry_timing(df_signals: pd.DataFrame, lookback: int = 5) -> pd.Dat
     if df_signals.empty:
         return df_signals
 
-    if lookback < 2:
-        lookback = 2
+    lookback = max(lookback, 2)
 
     df = df_signals.copy()
 

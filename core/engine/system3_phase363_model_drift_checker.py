@@ -10,10 +10,9 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
-import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -29,7 +28,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def load_signal_history(days_back: int = 7) -> List[Dict[str, Any]]:
+def load_signal_history(days_back: int = 7) -> list[dict[str, Any]]:
     """Load historical signal snapshots from Phase 361 outputs."""
     history = []
 
@@ -61,7 +60,7 @@ def load_signal_history(days_back: int = 7) -> List[Dict[str, Any]]:
     return history
 
 
-def compute_drift_metrics(current_metrics: Dict[str, Any], historical: List[Dict[str, Any]]) -> Dict[str, Any]:
+def compute_drift_metrics(current_metrics: dict[str, Any], historical: list[dict[str, Any]]) -> dict[str, Any]:
     """Compare current metrics against historical baseline."""
     drift_analysis = {"drift_detected": False, "drift_signals": [], "metrics_comparison": {}}
 
@@ -131,7 +130,7 @@ def compute_drift_metrics(current_metrics: Dict[str, Any], historical: List[Dict
     return drift_analysis
 
 
-def analyze_forward_return_drift() -> Dict[str, Any]:
+def analyze_forward_return_drift() -> dict[str, Any]:
     """Check if forward return calibration has drifted."""
     calibration_file = STORAGE_METRICS / "forward_calibration_362.json"
 
@@ -167,7 +166,7 @@ def analyze_forward_return_drift() -> Dict[str, Any]:
         return {"status": "error", "error": str(e), "drift_detected": False}
 
 
-def run_phase363(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase363(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 363: Model Drift Checker.
 
@@ -250,8 +249,7 @@ def run_phase363(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write("## ⚠️ DRIFT DETECTED\n\n")
                 f.write(f"**Status:** {result['status'].upper()}\n\n")
                 f.write("**Drift Signals:**\n\n")
-                for signal in all_drift_signals:
-                    f.write(f"- ⚠️ {signal}\n")
+                f.writelines(f"- ⚠️ {signal}\n" for signal in all_drift_signals)
                 f.write("\n")
             else:
                 f.write("## ✅ NO DRIFT DETECTED\n\n")
@@ -265,11 +263,8 @@ def run_phase363(context: Dict[str, Any] = None) -> Dict[str, Any]:
                 f.write("| Metric | Current | Baseline | Change |\n")
                 f.write("|--------|---------|----------|--------|\n")
 
-                for metric_name, metric_data in comparison.items():
-                    f.write(
-                        f"| {metric_name} | {metric_data['current']} | "
-                        f"{metric_data['baseline']} | {metric_data['change_pct']:+.1f}% |\n"
-                    )
+                f.writelines(f"| {metric_name} | {metric_data['current']} | "
+                        f"{metric_data['baseline']} | {metric_data['change_pct']:+.1f}% |\n" for metric_name, metric_data in comparison.items())
                 f.write("\n")
 
             f.write("---\n\n")

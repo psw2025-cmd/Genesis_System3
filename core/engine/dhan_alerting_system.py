@@ -10,10 +10,9 @@ Monitors system and sends alerts for:
 """
 
 import logging
-import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from core.engine.dhan_automation_config import AUTOMATION_CONFIG
 
@@ -37,7 +36,7 @@ class AlertingSystem:
         level: str,
         category: str,
         message: str,
-        details: Dict[str, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """
         Generate an alert.
@@ -76,7 +75,7 @@ class AlertingSystem:
         if level == "CRITICAL":
             print(f"[ALERT CRITICAL] {category}: {message}")
 
-    def check_pipeline_health(self) -> List[Dict[str, Any]]:
+    def check_pipeline_health(self) -> list[dict[str, Any]]:
         """Check pipeline health and generate alerts if needed."""
         alerts = []
 
@@ -105,7 +104,7 @@ class AlertingSystem:
 
         return alerts
 
-    def check_risk_limits(self) -> List[Dict[str, Any]]:
+    def check_risk_limits(self) -> list[dict[str, Any]]:
         """Check if risk limits are being approached."""
         alerts = []
 

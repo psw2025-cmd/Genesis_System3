@@ -8,7 +8,6 @@ import json
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 from .geni_config import GENI_STATE_FILE
 
@@ -22,7 +21,7 @@ class GeniState:
     validation_passed: bool
     last_validation_summary: str
     live_loop_running: bool
-    pending_issues: List[str]
+    pending_issues: list[str]
 
     @classmethod
     def default(cls) -> "GeniState":
@@ -37,7 +36,7 @@ class GeniState:
         )
 
 
-def load_state(path: Optional[Path] = None) -> GeniState:
+def load_state(path: Path | None = None) -> GeniState:
     """
     Load GENI state from file.
 
@@ -70,7 +69,7 @@ def load_state(path: Optional[Path] = None) -> GeniState:
         return GeniState.default()
 
 
-def save_state(state: GeniState, path: Optional[Path] = None) -> None:
+def save_state(state: GeniState, path: Path | None = None) -> None:
     """
     Save GENI state to file.
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 import pytz
@@ -96,5 +96,5 @@ def part_object_path(instrument_type: str, trading_date: str, part_filename: str
 
 
 def default_part_filename(now_utc: datetime | None = None) -> str:
-    now_utc = now_utc or datetime.now(timezone.utc)
+    now_utc = now_utc or datetime.now(UTC)
     return f"part-{now_utc.strftime('%Y%m%dT%H%M%S%f')}.parquet"

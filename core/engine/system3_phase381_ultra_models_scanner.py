@@ -9,7 +9,6 @@ Safety: DRY-RUN only, no live trading, no safety config changes
 
 import json
 import sys
-from datetime import datetime
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
@@ -108,7 +107,7 @@ def run_phase_381() -> dict:
 
     except Exception as e:
         logger.error(f"Phase 381 ERROR: {e}")
-        return {"status": "error", "message": f"Phase 381 failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Phase 381 failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

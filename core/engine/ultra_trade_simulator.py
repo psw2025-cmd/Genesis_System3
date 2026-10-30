@@ -18,7 +18,7 @@ Menu Option: 81
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -42,7 +42,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def simulate_ultra_trades() -> Dict[str, Any]:
+def simulate_ultra_trades() -> dict[str, Any]:
     """
     Simulate Ultra-only trades on historical data.
 

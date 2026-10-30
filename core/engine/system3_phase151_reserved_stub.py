@@ -7,7 +7,7 @@ RESERVED FOR FUTURE USE – NO ACTIVE LOGIC
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -21,7 +21,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase151_stub_report.md"
 
 
-def run_phase151_stub() -> Dict[str, Any]:
+def run_phase151_stub() -> dict[str, Any]:
     """
     Reserved stub phase.
 

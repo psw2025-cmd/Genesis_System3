@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase168_volatility_impact.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase168_volatility_impact_report.md"
 
 
-def run_phase168_volatility_impact() -> Dict[str, Any]:
+def run_phase168_volatility_impact() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["volatility_regime", "underlying", "avg_pnl_pct", "impact_score"])
@@ -37,7 +37,7 @@ def run_phase168_volatility_impact() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase168: Volatility Impact Analysis")
+    print("Phase168: Volatility Impact Analysis")
     result = run_phase168_volatility_impact()
     return 0 if result["status"] == "OK" else 1
 

@@ -17,7 +17,7 @@ Menu Option: 100
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -29,7 +29,7 @@ CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
 ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _load_thresholds() -> Dict[str, Any]:
+def _load_thresholds() -> dict[str, Any]:
     """Load thresholds (read-only)."""
     thresholds_json = CONFIG_DIR / "thresholds_auto.json"
     if thresholds_json.exists():
@@ -41,7 +41,7 @@ def _load_thresholds() -> Dict[str, Any]:
     return {}
 
 
-def _load_audit_results() -> Optional[pd.DataFrame]:
+def _load_audit_results() -> pd.DataFrame | None:
     """Load Phase 35 audit results."""
     audit_csv = ULTRA_DIR / "phase35_decision_audit.csv"
     if not audit_csv.exists():
@@ -52,7 +52,7 @@ def _load_audit_results() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_shadow_trades() -> Optional[pd.DataFrame]:
+def _load_shadow_trades() -> pd.DataFrame | None:
     """Load shadow Ultra trades."""
     shadow_csv = LIVE_DIR / "dhan_index_ai_ultra_trades_shadow.csv"
     if not shadow_csv.exists():
@@ -78,7 +78,7 @@ def run_phase37_policy_risk_dashboard() -> str:
     df_audit = _load_audit_results()
     df_shadow = _load_shadow_trades()
 
-    print(f"[LOAD] Loaded thresholds (read-only)")
+    print("[LOAD] Loaded thresholds (read-only)")
     if df_audit is not None:
         print(f"[LOAD] Loaded audit results: {len(df_audit)} decisions")
     if df_shadow is not None:
@@ -172,7 +172,7 @@ def main() -> None:
         print(f"[PHASE 37][ERROR] {e}")
         error_path = ULTRA_DIR / "phase37_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 37 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 37 Error\n\n{e!s}\n")
         print(f"[PHASE 37] Error details saved to: {error_path}")
 
 

@@ -18,7 +18,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 
@@ -48,7 +48,7 @@ class NumpyEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
-def aggregate_health_metrics() -> Dict[str, Any]:
+def aggregate_health_metrics() -> dict[str, Any]:
     """Aggregate health metrics from all phases."""
     metrics = {"health_scores": {}, "data_quality_scores": {}, "average_health": 0, "average_quality": 0}
 
@@ -86,7 +86,7 @@ def aggregate_health_metrics() -> Dict[str, Any]:
     return metrics
 
 
-def validate_data_integrity() -> Dict[str, Any]:
+def validate_data_integrity() -> dict[str, Any]:
     """Validate data integrity across all signal files."""
     results = {"files": {}, "overall_status": "OK", "issues": []}
 
@@ -145,7 +145,7 @@ def validate_data_integrity() -> Dict[str, Any]:
     return results
 
 
-def analyze_phase_outputs() -> Dict[str, Any]:
+def analyze_phase_outputs() -> dict[str, Any]:
     """Analyze outputs from all 15 phases."""
     results = {"phases": {}, "missing_outputs": [], "total_files": 0}
 
@@ -181,7 +181,7 @@ def analyze_phase_outputs() -> Dict[str, Any]:
             if filepath.exists():
                 try:
                     with open(filepath, "r") as f:
-                        data = json.load(f)
+                        json.load(f)
                     results["phases"][phase_num] = {"status": "OK", "file": pattern, "size": filepath.stat().st_size}
                     results["total_files"] += 1
                     found = True
@@ -198,7 +198,7 @@ def analyze_phase_outputs() -> Dict[str, Any]:
     return results
 
 
-def assess_production_readiness() -> Dict[str, Any]:
+def assess_production_readiness() -> dict[str, Any]:
     """Assess overall production readiness."""
     assessment = {"status": "READY", "checks": {}, "blockers": [], "warnings": []}
 
@@ -259,7 +259,7 @@ def assess_production_readiness() -> Dict[str, Any]:
     return assessment
 
 
-def generate_markdown_report(all_data: Dict[str, Any]) -> str:
+def generate_markdown_report(all_data: dict[str, Any]) -> str:
     """Generate comprehensive validation report."""
     report = "# System3 Phase 377 - Comprehensive Validation Report\n\n"
     report += f"**Generated:** {datetime.now().isoformat()}\n\n"
@@ -333,7 +333,7 @@ def generate_markdown_report(all_data: Dict[str, Any]) -> str:
     return report
 
 
-def run_phase377(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase377(context: dict[str, Any] = None) -> dict[str, Any]:
     """Main phase executor."""
     logger.info("=" * 70)
     logger.info("Phase 377: Validation Report Generator")

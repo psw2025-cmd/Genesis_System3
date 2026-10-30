@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase159_threshold_drift.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase159_threshold_drift_report.md"
 
 
-def run_phase159_threshold_drift() -> Dict[str, Any]:
+def run_phase159_threshold_drift() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["timestamp", "threshold_name", "value", "drift_pct"])

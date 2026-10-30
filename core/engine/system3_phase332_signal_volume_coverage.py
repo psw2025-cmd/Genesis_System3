@@ -9,7 +9,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ MIN_SIGNAL_TYPE_ROWS = 3
 EXPECTED_INDICES = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"]
 
 
-def run_phase332_signal_volume_coverage(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase332_signal_volume_coverage(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 332: Signal Volume & Coverage Monitor
 
@@ -142,7 +142,7 @@ def run_phase332_signal_volume_coverage(root_path: str = None, **kwargs) -> Dict
             "status": "ERROR",
             "outputs": {
                 "error": str(e),
-                "warnings": [f"Failed to process signals: {str(e)}"],
+                "warnings": [f"Failed to process signals: {e!s}"],
             },
         }
 

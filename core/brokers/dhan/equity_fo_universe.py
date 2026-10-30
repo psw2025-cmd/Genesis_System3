@@ -14,7 +14,7 @@ import hashlib
 import math
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Set
+from typing import Any
 
 from core.data.instruments_master import resolve_master_csv
 
@@ -91,7 +91,7 @@ PAPER_PREDICTION_HORIZONS = (
 )
 
 
-def _option_underlying(row: Dict[str, str]) -> str:
+def _option_underlying(row: dict[str, str]) -> str:
     """Use the exchange trading prefix; BSE's symbol-name field is an alias."""
     trading = (row.get("SEM_TRADING_SYMBOL") or row.get("TRADING_SYMBOL") or "").strip().upper()
     if "-" in trading:
@@ -100,7 +100,7 @@ def _option_underlying(row: Dict[str, str]) -> str:
 
 
 @lru_cache(maxsize=1)
-def load_equity_market_coverage() -> Dict[str, Any]:
+def load_equity_market_coverage() -> dict[str, Any]:
     """Account for every NSE/BSE cash and stock-option master row.
 
     This is a read-only ingestion/scan plan, not a claim that every instrument
@@ -117,14 +117,14 @@ def load_equity_market_coverage() -> Dict[str, Any]:
             "stock_options": {},
         }
 
-    cash_ids: Dict[str, Set[str]] = {"NSE": set(), "BSE": set()}
-    cash_symbols: Dict[str, Set[str]] = {"NSE": set(), "BSE": set()}
-    option_names: Dict[str, Set[str]] = {"NSE": set(), "BSE": set()}
-    option_sides: Dict[str, Dict[str, int]] = {
+    cash_ids: dict[str, set[str]] = {"NSE": set(), "BSE": set()}
+    cash_symbols: dict[str, set[str]] = {"NSE": set(), "BSE": set()}
+    option_names: dict[str, set[str]] = {"NSE": set(), "BSE": set()}
+    option_sides: dict[str, dict[str, int]] = {
         "NSE": {"CE": 0, "PE": 0},
         "BSE": {"CE": 0, "PE": 0},
     }
-    sides_by_underlying: Dict[str, Set[str]] = {}
+    sides_by_underlying: dict[str, set[str]] = {}
 
     with master_path.open(encoding="utf-8", errors="replace") as handle:
         for row in csv.DictReader(handle):
@@ -165,7 +165,7 @@ def load_equity_market_coverage() -> Dict[str, Any]:
         }
         for exchange in ("NSE", "BSE")
     }
-    stock_options: Dict[str, Any] = {
+    stock_options: dict[str, Any] = {
         exchange: {
             "underlying_count": len(option_names[exchange]),
             "contract_count": option_sides[exchange]["CE"] + option_sides[exchange]["PE"],
@@ -222,11 +222,11 @@ def load_equity_market_coverage() -> Dict[str, Any]:
 
 
 @lru_cache(maxsize=1)
-def load_equity_fo_universe() -> Dict[str, Any]:
+def load_equity_fo_universe() -> dict[str, Any]:
     """Load the union of NSE/BSE stock-option underlyings from Dhan master."""
-    underlyings: Set[str] = set()
+    underlyings: set[str] = set()
     contract_count = 0
-    sample_contracts: List[Dict[str, Any]] = []
+    sample_contracts: list[dict[str, Any]] = []
 
     master_path = resolve_equity_security_master()
     if not master_path.exists():
@@ -271,7 +271,7 @@ def load_equity_fo_universe() -> Dict[str, Any]:
     priority = [s for s in PRIORITY_EQUITY_FO if s in underlyings]
     momentum = [s for s in HIGH_MOMENTUM_EQUITY_FO if s in underlyings]
     # Momentum first for Moneycontrol-parity scanning, then classic liquid names.
-    scan_priority: List[str] = []
+    scan_priority: list[str] = []
     for name in momentum + priority:
         if name not in scan_priority:
             scan_priority.append(name)

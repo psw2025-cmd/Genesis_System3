@@ -7,11 +7,10 @@ Consolidates all data quality improvements into production-ready files.
 
 import json
 import logging
-import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -27,7 +26,7 @@ REPORTS_DIR = PROJECT_ROOT / "reports"
 logger = logging.getLogger(__name__)
 
 
-def run_phase373(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase373(context: dict[str, Any] = None) -> dict[str, Any]:
     """Execute Phase 373: Clean Signal Curated Builder."""
     logger.info("=== Phase 373: Clean Signal Curated Builder ===")
 
@@ -69,8 +68,7 @@ def run_phase373(context: Dict[str, Any] = None) -> Dict[str, Any]:
             f.write("# Clean Signal Curated Build - Phase 373\n\n")
             f.write(f"**Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             f.write(f"**Curated Files Created:** {len(result['curated_files'])}\n\n")
-            for cf in result["curated_files"]:
-                f.write(f"- `{cf['output']}` ({cf['rows']} rows, {cf['columns']} cols)\n")
+            f.writelines(f"- `{cf['output']}` ({cf['rows']} rows, {cf['columns']} cols)\n" for cf in result["curated_files"])
 
         result["outputs"]["report"] = str(md_output)
         return result

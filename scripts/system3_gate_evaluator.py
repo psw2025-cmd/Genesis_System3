@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+﻿#!/usr/bin/env python3
 """
 Evaluate prediction-accuracy, profit, and lifecycle gates from on-disk proof artifacts.
 
@@ -43,7 +43,7 @@ def _read_json(path: Path) -> Optional[Dict[str, Any]]:
     if not path.exists():
         return None
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         return None
 
@@ -230,7 +230,7 @@ def eval_tick_health_gate(root: Path, live_state: Optional[Dict[str, Any]] = Non
         "last_tick_age_sec": tick_age,
         "refresh_interval_sec": refresh,
         "blocker_id": None if ok else "TICK_HEALTH_BLOCKER",
-        "auto_action": "REST poll ≤10s counts for analyzer; WebSocket stream for live execution",
+        "auto_action": "REST poll â‰¤10s counts for analyzer; WebSocket stream for live execution",
     }
 
 

@@ -4,16 +4,16 @@ Dhan Index Options - Multi-Model Agreement Filter
 Filters signals based on agreement across multiple models or timeframes.
 """
 
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 
 def check_model_agreement(
-    predictions: List[str],
-    confidences: List[float],
-) -> Dict[str, Any]:
+    predictions: list[str],
+    confidences: list[float],
+) -> dict[str, Any]:
     """
     Check agreement across multiple model predictions.
 
@@ -63,7 +63,7 @@ def check_model_agreement(
     }
 
 
-def compute_agreement_score(predictions: List[str]) -> float:
+def compute_agreement_score(predictions: list[str]) -> float:
     """
     Compute simple agreement score.
 

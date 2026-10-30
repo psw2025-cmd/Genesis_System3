@@ -12,7 +12,10 @@ import logging
 import os
 import threading
 import time
-from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
+from collections.abc import Iterable, Mapping, MutableMapping, Sequence
+from typing import (
+    Any,
+)
 
 logger = logging.getLogger("dhan_market_ltp")
 
@@ -26,8 +29,8 @@ _DHAN_QUOTE_URL = "https://api.dhan.co/v2/marketfeed/quote"
 # A provider 429/805 is also shared as a short negative cooldown so the next
 # browser poll does not immediately extend the throttle window.
 _MARKETFEED_COORD_LOCK = threading.Lock()
-_MARKETFEED_INFLIGHT: Dict[Tuple[Tuple[str, Tuple[str, ...]], ...], threading.Event] = {}
-_MARKETFEED_CACHE: Dict[Tuple[Tuple[str, Tuple[str, ...]], ...], Tuple[float, Dict[str, Dict[str, Any]]]] = {}
+_MARKETFEED_INFLIGHT: dict[tuple[tuple[str, tuple[str, ...]], ...], threading.Event] = {}
+_MARKETFEED_CACHE: dict[tuple[tuple[str, tuple[str, ...]], ...], tuple[float, dict[str, dict[str, Any]]]] = {}
 _MARKETFEED_CACHE_TTL_S = max(1.0, float(os.environ.get("DHAN_MARKETFEED_CACHE_TTL_S", "8")))
 _MARKETFEED_RATE_LIMIT_COOLDOWN_S = max(
     1.0, float(os.environ.get("DHAN_MARKETFEED_RATE_LIMIT_COOLDOWN_S", "20"))
@@ -36,7 +39,7 @@ _MARKETFEED_COOLDOWN_UNTIL = 0.0
 _MARKETFEED_LAST_RATE_LIMIT_AT = 0.0
 
 # Official IDX_I security IDs (DhanHQ docs / instrument master)
-INDEX_SECURITY_IDS: Dict[str, str] = {
+INDEX_SECURITY_IDS: dict[str, str] = {
     "NIFTY": "13",
     "BANKNIFTY": "25",
     "INDIAVIX": "26",
@@ -45,7 +48,7 @@ INDEX_SECURITY_IDS: Dict[str, str] = {
     "SENSEX": "51",
 }
 
-INDEX_LABELS: Dict[str, str] = {
+INDEX_LABELS: dict[str, str] = {
     "NIFTY": "Nifty 50",
     "BANKNIFTY": "Nifty Bank",
     "INDIAVIX": "India VIX",
@@ -54,7 +57,7 @@ INDEX_LABELS: Dict[str, str] = {
     "SENSEX": "Sensex",
 }
 
-DEFAULT_INDEX_BOARD: Tuple[str, ...] = (
+DEFAULT_INDEX_BOARD: tuple[str, ...] = (
     "NIFTY",
     "BANKNIFTY",
     "FINNIFTY",
@@ -63,7 +66,7 @@ DEFAULT_INDEX_BOARD: Tuple[str, ...] = (
 )
 
 
-def _as_float(val: Any) -> Optional[float]:
+def _as_float(val: Any) -> float | None:
     try:
         if val is None or val == "":
             return None
@@ -72,7 +75,7 @@ def _as_float(val: Any) -> Optional[float]:
         return None
 
 
-def _unwrap_feed(payload: Any) -> Dict[str, Any]:
+def _unwrap_feed(payload: Any) -> dict[str, Any]:
     if not isinstance(payload, dict):
         return {}
     data = payload.get("data")
@@ -81,7 +84,7 @@ def _unwrap_feed(payload: Any) -> Dict[str, Any]:
     return payload
 
 
-def _parse_quote_blob(blob: Any) -> Dict[str, Any]:
+def _parse_quote_blob(blob: Any) -> dict[str, Any]:
     if not isinstance(blob, dict):
         return {}
     ltp = _as_float(
@@ -114,10 +117,10 @@ def _parse_quote_blob(blob: Any) -> Dict[str, Any]:
     }
 
 
-def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> Dict[str, List[str]]:
-    cleaned: Dict[str, List[str]] = {}
+def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> dict[str, list[str]]:
+    cleaned: dict[str, list[str]] = {}
     for seg, ids in securities.items():
-        bucket: List[str] = []
+        bucket: list[str] = []
         for sid in ids or []:
             s = str(sid).strip()
             if s and s not in bucket:
@@ -127,7 +130,7 @@ def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> Dict[str, 
     return cleaned
 
 
-def _marketfeed_key(cleaned: Mapping[str, Sequence[str]]) -> Tuple[Tuple[str, Tuple[str, ...]], ...]:
+def _marketfeed_key(cleaned: Mapping[str, Sequence[str]]) -> tuple[tuple[str, tuple[str, ...]], ...]:
     """Stable same-request identity independent of mapping/list order."""
     return tuple(
         sorted((str(seg), tuple(sorted(str(sid) for sid in ids))) for seg, ids in cleaned.items())
@@ -166,8 +169,8 @@ def _reset_marketfeed_coordination_for_tests() -> None:
     _set_marketfeed_meta()
 
 
-def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
-    out: Dict[str, Dict[str, Any]] = {}
+def _flatten_quotes(payload: Any) -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
     data = _unwrap_feed(payload)
     for key, val in data.items():
         if isinstance(val, dict) and any(
@@ -192,7 +195,7 @@ def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
     return out
 
 
-def _is_rate_limit_error(error: Optional[str]) -> bool:
+def _is_rate_limit_error(error: str | None) -> bool:
     """Return true for Dhan marketfeed throttle signals.
 
     A rate-limit response is terminal for this fetch. Retrying alternate request
@@ -207,9 +210,10 @@ def _is_rate_limit_error(error: Optional[str]) -> bool:
     )
 
 
-def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple[Optional[Any], Optional[str]]:
+def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> tuple[Any | None, str | None]:
     try:
         import requests
+
         from core.brokers.dhan.dhan_readonly import get_dhan_credentials
     except Exception as exc:
         return None, f"import:{type(exc).__name__}"
@@ -262,9 +266,9 @@ def _rest_marketfeed(url: str, securities: Mapping[str, Sequence[str]]) -> Tuple
 
 def _fetch_market_quotes_uncached(
     cleaned: Mapping[str, Sequence[str]],
-) -> Tuple[Dict[str, Dict[str, Any]], List[str], bool]:
+) -> tuple[dict[str, dict[str, Any]], list[str], bool]:
     """Provider acquisition only. Caller owns coalescing/cache/cooldown."""
-    errors: List[str] = []
+    errors: list[str] = []
     rate_limited = False
 
     # Prefer REST — Cloud Run SDK marketfeed methods are inconsistent across dhanhq versions.
@@ -312,7 +316,7 @@ def _fetch_market_quotes_uncached(
     return {}, errors, False
 
 
-def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Dict[str, Any]]:
+def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> dict[str, dict[str, Any]]:
     """Batch OHLC/quote via Dhan marketfeed with bounded demand coordination.
 
     Same-key concurrent callers coalesce to one provider acquisition. Successful
@@ -331,7 +335,7 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
     key = _marketfeed_key(cleaned)
     now = time.monotonic()
     owner = False
-    event: Optional[threading.Event] = None
+    event: threading.Event | None = None
 
     with _MARKETFEED_COORD_LOCK:
         cached = _MARKETFEED_CACHE.get(key)
@@ -380,8 +384,8 @@ def fetch_market_quotes(securities: Mapping[str, Sequence[Any]]) -> Dict[str, Di
         )
         return {}
 
-    result: Dict[str, Dict[str, Any]] = {}
-    errors: List[str] = []
+    result: dict[str, dict[str, Any]] = {}
+    errors: list[str] = []
     rate_limited = False
     try:
         result, errors, rate_limited = _fetch_market_quotes_uncached(cleaned)
@@ -423,16 +427,16 @@ fetch_market_quotes.last_meta = {  # type: ignore[attr-defined]
 
 
 def build_index_board(
-    symbols: Optional[Iterable[str]] = None,
-    fallback_spots: Optional[Mapping[str, Mapping[str, Any]]] = None,
-) -> Dict[str, Any]:
+    symbols: Iterable[str] | None = None,
+    fallback_spots: Mapping[str, Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
     """Live index ribbon matching Dhan web (LTP + change %)."""
     wanted = [str(s).upper() for s in (symbols or DEFAULT_INDEX_BOARD)]
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
     quotes = fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
     feed_errors = list(getattr(fetch_market_quotes, "last_errors", []) or [])
     feed_meta = dict(getattr(fetch_market_quotes, "last_meta", {}) or {})
-    rows: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
     for sym in wanted:
         sid = INDEX_SECURITY_IDS.get(sym)
         q = quotes.get(str(sid), {}) if sid else {}
@@ -475,9 +479,9 @@ def build_index_board(
     }
 
 
-def enrich_positions_with_market_ltp(rows: Sequence[MutableMapping[str, Any]]) -> List[Dict[str, Any]]:
+def enrich_positions_with_market_ltp(rows: Sequence[MutableMapping[str, Any]]) -> list[dict[str, Any]]:
     """Fill missing position LTP from marketfeed; else derive from unrealized P&L."""
-    need: Dict[str, List[str]] = {}
+    need: dict[str, list[str]] = {}
     for row in rows:
         try:
             if float(row.get("ltp") or 0) > 0:
@@ -498,7 +502,7 @@ def enrich_positions_with_market_ltp(rows: Sequence[MutableMapping[str, Any]]) -
             need[seg].append(sid)
 
     quotes = fetch_market_quotes(need) if need else {}
-    out: List[Dict[str, Any]] = []
+    out: list[dict[str, Any]] = []
     for row in rows:
         item = dict(row)
         try:

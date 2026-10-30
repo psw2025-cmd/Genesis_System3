@@ -1,0 +1,68 @@
+﻿C:\Genesis_System3\.github\scripts\root_architecture_gate.py:17:DIFF_DEBUG_JSON = OUT_DIR / "changed_files_debug.json"
+C:\Genesis_System3\.github\scripts\root_architecture_gate.py:57:DIFF_DEBUG: list[dict] = []
+C:\Genesis_System3\.github\scripts\root_architecture_gate.py:109:        DIFF_DEBUG.append(
+C:\Genesis_System3\.github\scripts\root_architecture_gate.py:119:            DIFF_DEBUG_JSON.write_text(json.dumps(DIFF_DEBUG, indent=2), encoding="utf-8")
+C:\Genesis_System3\.github\scripts\root_architecture_gate.py:121:    DIFF_DEBUG_JSON.write_text(json.dumps(DIFF_DEBUG, indent=2), encoding="utf-8")
+C:\Genesis_System3\dashboard\backend\state_sync_service.py:400:        # BUG FIX: old code used updates["broker"] which is missing when health.json absent
+C:\Genesis_System3\core\engine\system3_signal_engine.py:1028:                            open_positions=0,  # TODO: Get from execution engine
+C:\Genesis_System3\core\engine\system3_signal_engine.py:1029:                            pending_signals=0,  # TODO: Get from execution engine
+C:\Genesis_System3\core\engine\system3_phases_331_360_registry.py:19:# Existing phases 331-340 use run_phase_XXX format, new phases 341-360 use run_phase_XXX_name format
+C:\Genesis_System3\core\engine\system3_phase79_adaptive_thresholds.py:69:    # TODO: Use actual regime classifier from Phase 14/46/49 if available
+C:\Genesis_System3\core\engine\system3_phase390_smote_balancing.py:34:logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+C:\Genesis_System3\core\engine\system3_phase345_warn_root_cause_tracker.py:4:Converts generic "Phase XXX: WARN" into structured root-cause reports.
+C:\Genesis_System3\tools\visualize_live_fills.py:12:    market price feed; see the TODOs in the script to integrate a price API.
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:5:Tracks failed GitHub Actions workflows into a persistent Markdown/JSON TODO list.
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:21:TODO_MD = ROOT / "docs" / "SYSTEM3_WORKFLOW_FAILURE_TODO.md"
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:52:        "note": "Workflow failure tracker. Failed workflows remain TODO until a later successful run is proven.",
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:95:        "# System3 Workflow Failure TODO",
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:104:        "Any failed workflow is a TODO item until a later successful run proves it is fixed.",
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:107:        "## Failed workflow TODO list",
+C:\Genesis_System3\tools\system3_workflow_failure_tracker.py:125:    TODO_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
+C:\Genesis_System3\tools\system3_windows_self_hosted_workflow_migrator.py:28:TODO_MD = ROOT / "docs" / "SYSTEM3_WINDOWS_SELF_HOSTED_WORKFLOW_TODO.md"
+C:\Genesis_System3\tools\system3_windows_self_hosted_workflow_migrator.py:86:    TODO_MD.parent.mkdir(parents=True, exist_ok=True)
+C:\Genesis_System3\tools\system3_windows_self_hosted_workflow_migrator.py:172:        "# System3 Windows Self-Hosted Workflow TODO",
+C:\Genesis_System3\tools\system3_windows_self_hosted_workflow_migrator.py:194:    TODO_MD.write_text("\n".join(todo) + "\n", encoding="utf-8")
+C:\Genesis_System3\core\engine\ai_model\data_balancing_v2.py:24:logger.setLevel(logging.DEBUG)
+C:\Genesis_System3\tools\system3_todo_status_updater.py:3:System3 1000+ TODO Status Updater
+C:\Genesis_System3\tools\system3_todo_status_updater.py:9:  docs/SYSTEM3_PRODUCTION_GRADE_1000_POINT_QC_TODO.md
+C:\Genesis_System3\tools\system3_todo_status_updater.py:11:  System3_Production_Grade_1000_Point_QC_TODO.md in repo root
+C:\Genesis_System3\tools\system3_todo_status_updater.py:16:  reports/latest/todo_status_update/System3_Production_Grade_1000_Point_QC_TODO_STATUS.md
+C:\Genesis_System3\tools\system3_todo_status_updater.py:30:DEFAULT_TODO = ROOT / "docs" / "SYSTEM3_PRODUCTION_GRADE_1000_POINT_QC_TODO.md"
+C:\Genesis_System3\tools\system3_todo_status_updater.py:31:FALLBACK_TODO = ROOT / "System3_Production_Grade_1000_Point_QC_TODO.md"
+C:\Genesis_System3\tools\system3_todo_status_updater.py:218:        "# System3 Production Grade 1000+ TODO ÔÇö Proof Status Update",
+C:\Genesis_System3\tools\system3_todo_status_updater.py:246:    ap.add_argument("--todo", default="", help="Input TODO markdown path")
+C:\Genesis_System3\tools\system3_todo_status_updater.py:247:    ap.add_argument("--output-name", default="System3_Production_Grade_1000_Point_QC_TODO_STATUS.md")
+C:\Genesis_System3\tools\system3_todo_status_updater.py:250:    todo_path = Path(args.todo) if args.todo else DEFAULT_TODO
+C:\Genesis_System3\tools\system3_todo_status_updater.py:252:        todo_path = FALLBACK_TODO
+C:\Genesis_System3\tools\system3_todo_status_updater.py:262:            "reason": f"TODO file not found or empty: {todo_path}",
+C:\Genesis_System3\tools\system3_todo_status_updater.py:269:        (OUT / "summary.md").write_text(f"# TODO Status Update\n\nStatus: **BLOCKED**\n\nReason: `{payload['reason']}`\n", encoding="utf-8")
+C:\Genesis_System3\tools\system3_todo_status_updater.py:292:        "# System3 1000+ TODO Status Summary",
+C:\Genesis_System3\tools\system3_todo_status_updater.py:296:        f"Input TODO: `{payload['todo_path']}`",
+C:\Genesis_System3\tools\system3_todo_status_updater.py:297:        f"Output TODO status file: `{payload['output_markdown']}`",
+C:\Genesis_System3\tools\system3_secure_install_credential_audit.py:192:    md += ["", "## TODO", ""]
+C:\Genesis_System3\tools\system3_readiness_evidence_normalizer.py:20:TODO = ROOT / "reports/latest/todo_status_update/summary.json"
+C:\Genesis_System3\tools\system3_readiness_evidence_normalizer.py:34:    todo = load(TODO)
+C:\Genesis_System3\tools\system3_readiness_evidence_normalizer.py:99:        "## 1000+ TODO",
+C:\Genesis_System3\tests\evals\test_render_hosting_retired.py:138:    ROOT / "docs" / "SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md",
+C:\Genesis_System3\tools\system3_experimental_solution_planner.py:91:        "Read workflow_failure_tracker TODO.",
+C:\Genesis_System3\tools\system3_experimental_solution_planner.py:93:        "Keep failed workflows in TODO until later successful run proves fixed.",
+C:\Genesis_System3\tools\system3_autopilot_proof_board.py:127:        report_status("todo_status_update", read_json("reports/latest/todo_status_update/summary.json"), "1000+ TODO status updater has not run."),
+C:\Genesis_System3\tools\system3_autopilot_proof_board.py:185:            "github_workflow_failures": "docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md",
+C:\Genesis_System3\tools\system3_autopilot_proof_board.py:187:            "workflow_failures": "docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md",
+C:\Genesis_System3\tools\system3_autopilot_proof_board.py:206:        "- Backend, frontend, live dashboard UI, GitHub/Cloud Run health, workflow health, TODO status, and final truth must be proven by automation.",
+C:\Genesis_System3\scripts\dashboard_production_audit.py:69:    (r"TODO|FIXME|HACK", "TODO_MARKER", "Unresolved TODO/FIXME"),
+C:\Genesis_System3\scripts\dashboard_production_audit.py:142:                if fid == "TODO_MARKER" and "dashboard/frontend/dist" in rel:
+C:\Genesis_System3\scripts\run_phase_orchestrator.py:9:  - Calls the corresponding `run_phaseXXX` function from diagnostics/engine.
+C:\Genesis_System3\scripts\run_phase_orchestrator.py:142:            "Open system3_phase_231_260_diagnostics.py and the corresponding core/engine/system3_phaseXXX_*.py module.",
+C:\Genesis_System3\scripts\run_signal_engine_from_bhavcopy.py:189:        logging.getLogger().setLevel(logging.DEBUG)
+C:\Genesis_System3\scripts\system3_blocker_finder.py:9:1. Scan repo for known blocker patterns (comments, TODOs, errors)
+C:\Genesis_System3\scripts\system3_blocker_finder.py:35:        (r"TODO.*CRITICAL", "critical_todo"),
+C:\Genesis_System3\scripts\system3_blocker_finder.py:36:        (r"FIXME.*urgent", "urgent_fixme"),
+C:\Genesis_System3\scripts\system3_blocker_finder.py:37:        (r"XXX.*bug|BUG.*XXX", "critical_bug_marker"),
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:501:        print("[DEBUG] SmartLiveChainRunner found in globals()", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:504:        print("[DEBUG] SmartLiveChainRunner found in module", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:515:        print(f"[DEBUG] SmartLiveChainRunner class verified: {test_runner}", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:538:        print("[DEBUG] About to create SmartLiveChainRunner instance...", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:542:        print("[DEBUG] Runner instance created successfully", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:548:        print("[DEBUG] About to call runner.run()...", flush=True)
+C:\Genesis_System3\scripts\smart_live_chain_runner.py:550:        print("[DEBUG] runner.run() returned", flush=True)

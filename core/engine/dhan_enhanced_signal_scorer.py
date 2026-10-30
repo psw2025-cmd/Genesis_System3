@@ -9,12 +9,10 @@ Includes:
 - Historical performance weighting
 """
 
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
-
-from core.engine.dhan_trade_config import DEFAULT_THRESHOLDS
 
 
 class EnhancedSignalScorer:
@@ -30,7 +28,7 @@ class EnhancedSignalScorer:
             "risk_reward": 0.10,
         }
 
-    def compute_enhanced_score(self, signal_row: pd.Series) -> Dict[str, Any]:
+    def compute_enhanced_score(self, signal_row: pd.Series) -> dict[str, Any]:
         """
         Compute enhanced score for a signal.
 

@@ -24,7 +24,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Add project root to path for imports
 project_root = Path(__file__).parent.parent.parent
@@ -62,7 +62,7 @@ def verify_safety_flags() -> bool:
             logger.error(f"  [FAIL] {env_var}={actual_val} (expected {expected_val})")
             return False
 
-    logger.info(f"  [OK] All safety flags verified (DRY-RUN mode)")
+    logger.info("  [OK] All safety flags verified (DRY-RUN mode)")
     return True
 
 
@@ -71,7 +71,7 @@ def verify_safety_flags() -> bool:
 # ============================================================================
 
 
-def run_phase_391(context: Optional[Dict] = None) -> Dict[str, Any]:
+def run_phase_391(context: dict | None = None) -> dict[str, Any]:
     """
     Execute Phase 391: XGBoost Model Training per Underlying.
 
@@ -208,19 +208,19 @@ def run_phase_391(context: Optional[Dict] = None) -> Dict[str, Any]:
 
         # ===== SUMMARY LOGGING =====
         logger.info(f"\n{'='*80}")
-        logger.info(f"PHASE 391 SUMMARY")
+        logger.info("PHASE 391 SUMMARY")
         logger.info(f"  Status: {result['status'].upper()}")
         logger.info(f"  Models trained: {len(result['underlyings_trained'])} - {result['underlyings_trained']}")
         logger.info(f"  Models skipped: {len(result['underlyings_skipped'])} - {result['underlyings_skipped']}")
 
         if result["underlyings_trained"]:
-            logger.info(f"  Per-underlying metrics:")
+            logger.info("  Per-underlying metrics:")
             for underlying in result["underlyings_trained"]:
                 metrics = training_result["metrics"][underlying]
                 logger.info(f"    {underlying}: accuracy={metrics['accuracy']:.4f}, macro_f1={metrics['macro_f1']:.4f}")
 
         if result["warnings"]:
-            logger.info(f"  Warnings:")
+            logger.info("  Warnings:")
             for w in result["warnings"]:
                 logger.info(f"    - {w}")
 
@@ -230,13 +230,13 @@ def run_phase_391(context: Optional[Dict] = None) -> Dict[str, Any]:
         return result
 
     except Exception as e:
-        logger.error(f"[FAIL] Phase 391 failed: {str(e)}", exc_info=True)
+        logger.error(f"[FAIL] Phase 391 failed: {e!s}", exc_info=True)
         phase_end = datetime.now()
         duration_ms = int((phase_end - phase_start).total_seconds() * 1000)
 
         result["status"] = "error"
         result["success"] = False
-        result["message"] = f"Phase 391 error: {str(e)}"
+        result["message"] = f"Phase 391 error: {e!s}"
         result["duration_ms"] = duration_ms
         return result
 

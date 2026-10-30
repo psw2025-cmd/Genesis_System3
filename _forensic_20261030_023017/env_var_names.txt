@@ -1,0 +1,33 @@
+﻿C:\Genesis_System3\.env.example:5:LIVE_TRADING_ENABLED=0
+C:\Genesis_System3\.env.example:6:SYSTEM3_LIVE_TRADING_ALLOWED=0
+C:\Genesis_System3\.env.example:35:SYSTEM3_ENABLE_PAPER_JOB=0
+C:\Genesis_System3\config\system3_global_config.yml:11:  LIVE_TRADING_ENABLED: false
+C:\Genesis_System3\config\.env.example:24:# TRADING MODE (Safety Settings)
+C:\Genesis_System3\config\.env.example:28:SYSTEM3_LIVE_TRADING_ALLOWED=0
+C:\Genesis_System3\.github\workflows\workflow-priority-guard.yml:45:  LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\workflow-priority-guard.yml:46:  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\system3-runbook-audit.yml:3:# HISTORICAL_NON_AUTHORITY for local-laptop runtime (2026-09-16 Batch 1).
+C:\Genesis_System3\.github\workflows\security-audit.yml:18:  LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\security-audit.yml:19:  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\repo-clean-forensic-toolkit.yml:44:      LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\repo-clean-forensic-toolkit.yml:45:      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\repo-clean-forensic-toolkit.yml:102:          test "${LIVE_TRADING_ENABLED}" = "0"
+C:\Genesis_System3\.github\workflows\repo-clean-forensic-toolkit.yml:103:          test "${SYSTEM3_LIVE_TRADING_ALLOWED}" = "0"
+C:\Genesis_System3\.github\workflows\live-proof-center.yml:3:# HISTORICAL_NON_AUTHORITY for local-laptop runtime (2026-09-16 Batch 1).
+C:\Genesis_System3\.github\workflows\live-proof-center.yml:36:  LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\live-proof-center.yml:37:  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\live-proof-center.yml:39:  CLOUDSDK_CORE_DISABLE_PROMPTS: "1"
+C:\Genesis_System3\.github\workflows\frontend-runtime-smoke.yml:21:  LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\frontend-runtime-smoke.yml:22:  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\docker-compose.oracle.yml:16:      LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\ci.yml:24:  LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\ci.yml:25:  SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\ci.yml:112:          if grep -nE "LIVE_TRADING_ENABLED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?|SYSTEM3_LIVE_TRADING_ALLOWED:[[:space:]]*[\"']?(1|true|TRUE|yes|YES)[\"']?" "${workflows[@]}"; then
+C:\Genesis_System3\.github\workflows\ci.yml:117:          grep -q 'LIVE_TRADING_ENABLED: "0"' .github/workflows/ci.yml || { echo "FAIL: LIVE_TRADING_ENABLED=0 missing from ci.yml"; exit 1; }
+C:\Genesis_System3\.github\workflows\ci.yml:118:          grep -q 'SYSTEM3_LIVE_TRADING_ALLOWED: "0"' .github/workflows/ci.yml || { echo "FAIL: SYSTEM3_LIVE_TRADING_ALLOWED=0 missing from ci.yml"; exit 1; }
+C:\Genesis_System3\.github\workflows\ci.yml:174:      LIVE_TRADING_ENABLED: "0"
+C:\Genesis_System3\.github\workflows\ci.yml:175:      SYSTEM3_LIVE_TRADING_ALLOWED: "0"
+C:\Genesis_System3\.github\workflows\ci.yml:258:          os.environ["LIVE_TRADING_ENABLED"] = "0"
+C:\Genesis_System3\.github\workflows\ci.yml:259:          os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] = "0"
+C:\Genesis_System3\.github\workflows\ci.yml:265:          assert os.environ["LIVE_TRADING_ENABLED"] == "0", "LIVE_TRADING_ENABLED safety check failed"
+C:\Genesis_System3\.github\workflows\ci.yml:266:          assert os.environ["SYSTEM3_LIVE_TRADING_ALLOWED"] == "0", "SYSTEM3_LIVE_TRADING_ALLOWED safety check failed"

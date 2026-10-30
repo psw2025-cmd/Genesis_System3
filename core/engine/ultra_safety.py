@@ -7,7 +7,6 @@ All auto-features disabled by default.
 
 import json
 from pathlib import Path
-from typing import Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "core" / "config"
@@ -23,7 +22,7 @@ DEFAULT_SAFETY = {
 }
 
 
-def load_ultra_safety() -> Dict[str, bool]:
+def load_ultra_safety() -> dict[str, bool]:
     """
     Load Ultra safety switches.
 

@@ -8,7 +8,7 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -49,7 +49,7 @@ def count_fallback_usage(log_dir: Path) -> tuple[int, list[str]]:
     return fallback_count, list(set(reasons))
 
 
-def run_phase230(**kwargs) -> Dict[str, Any]:
+def run_phase230(**kwargs) -> dict[str, Any]:
     """
     Run Phase 230: AI Fallback Behavior Auditor.
 

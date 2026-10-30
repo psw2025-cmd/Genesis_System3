@@ -8,7 +8,7 @@ import sys
 from collections import Counter
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ REPORT_PATH = LOG_DIR / "system3_label_quality_report.md"
 SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 
 
-def run_phase212(**kwargs) -> Dict[str, Any]:
+def run_phase212(**kwargs) -> dict[str, Any]:
     """
     Run Phase 212: Label Quality Inspector.
 

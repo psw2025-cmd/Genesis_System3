@@ -4,11 +4,10 @@ System3 Phase 204 - Python Environment Validator
 Checks Python version and required packages.
 """
 
-import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -50,7 +49,7 @@ def check_package(package_name: str) -> tuple[bool, str]:
         return False, str(e)
 
 
-def run_phase204(**kwargs) -> Dict[str, Any]:
+def run_phase204(**kwargs) -> dict[str, Any]:
     """
     Run Phase 204: Python Environment Validator.
 
@@ -72,7 +71,7 @@ def run_phase204(**kwargs) -> Dict[str, Any]:
 
     try:
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Environment Validator Log\n")
+            f.write("System3 Environment Validator Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
 

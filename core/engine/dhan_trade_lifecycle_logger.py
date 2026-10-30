@@ -6,10 +6,9 @@ Provides detailed audit trail for monitoring and debugging.
 """
 
 import json
-import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -31,7 +30,7 @@ class TradeLifecycleLogger:
         underlying: str | None = None,
         strike: float | None = None,
         side: str | None = None,
-        details: Dict[str, Any] | None = None,
+        details: dict[str, Any] | None = None,
     ) -> None:
         """
         Log a lifecycle event.

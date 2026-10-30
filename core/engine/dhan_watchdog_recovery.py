@@ -8,9 +8,7 @@ Monitors system health and recovers from failures:
 - Sends alerts for critical issues
 """
 
-import os
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent

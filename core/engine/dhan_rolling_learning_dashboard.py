@@ -7,7 +7,7 @@ AUTO-UPDATE: DISABLED - Only reads and reports.
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -18,7 +18,7 @@ REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def generate_rolling_dashboard(days: int = 7) -> Dict[str, Any]:
+def generate_rolling_dashboard(days: int = 7) -> dict[str, Any]:
     """
     Generate rolling learning dashboard.
 
@@ -114,7 +114,7 @@ def generate_rolling_dashboard(days: int = 7) -> Dict[str, Any]:
     }
 
 
-def save_dashboard_csv(dashboard: Dict[str, Any]) -> Path:
+def save_dashboard_csv(dashboard: dict[str, Any]) -> Path:
     """
     Save dashboard to CSV.
 

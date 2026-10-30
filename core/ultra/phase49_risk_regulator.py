@@ -13,9 +13,8 @@ Menu Option: 111
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -25,7 +24,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_current_risk_params() -> Dict[str, Any]:
+def load_current_risk_params() -> dict[str, Any]:
     """Load current risk parameters."""
     # Try to load from config
     config_path = CONFIG_DIR / "dhan_trade_config.json"
@@ -48,7 +47,7 @@ def load_current_risk_params() -> Dict[str, Any]:
     }
 
 
-def load_performance_metrics() -> Dict[str, float]:
+def load_performance_metrics() -> dict[str, float]:
     """Load recent performance metrics."""
     # Try to load from PnL logs
     pnl_path = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_pnl_log.csv"
@@ -72,7 +71,7 @@ def load_performance_metrics() -> Dict[str, float]:
     }
 
 
-def generate_risk_suggestions(current_params: Dict[str, Any], performance: Dict[str, float]) -> List[Dict[str, Any]]:
+def generate_risk_suggestions(current_params: dict[str, Any], performance: dict[str, float]) -> list[dict[str, Any]]:
     """
     Generate AI-powered risk adjustment suggestions.
 
@@ -164,11 +163,11 @@ def run_phase49_risk_regulator() -> None:
 
     # Load current risk parameters
     current_params = load_current_risk_params()
-    print(f"[LOAD] Current risk parameters loaded")
+    print("[LOAD] Current risk parameters loaded")
 
     # Load performance metrics
     performance = load_performance_metrics()
-    print(f"[LOAD] Performance metrics loaded")
+    print("[LOAD] Performance metrics loaded")
     print(f"  Win rate: {performance['win_rate']:.2%}")
     print(f"  Avg PnL: {performance['avg_pnl']:.2f}%")
     print(f"  Total trades: {performance['total_trades']}")
@@ -220,7 +219,7 @@ def run_phase49_risk_regulator() -> None:
     print(f"[SAVE] Risk analysis report saved to: {analysis_md}")
 
     # Summary
-    print(f"\n=== RISK REGULATOR SUMMARY ===")
+    print("\n=== RISK REGULATOR SUMMARY ===")
     print(f"Suggestions generated: {len(suggestions)}")
     if suggestions:
         for i, sug in enumerate(suggestions, 1):

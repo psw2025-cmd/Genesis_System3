@@ -12,7 +12,6 @@ History: up to 5 years (Dhan Data APIs plan)
 import logging
 from datetime import date, timedelta
 from pathlib import Path
-from typing import List, Optional
 
 logger = logging.getLogger("history_fetcher")
 
@@ -35,6 +34,7 @@ def _load_dhan():
     try:
         from dhanhq import dhanhq
         from dhanhq.dhan_context import DhanContext
+
         from core.utils.env_loader import get_dhan_credentials
         creds = get_dhan_credentials()
         client_id = (creds.get("client_id") or "").strip().lstrip("﻿")
@@ -52,9 +52,9 @@ def get_history(
     symbol: str = "NIFTY",
     interval: str = "D",
     days: int = 365,
-    from_date: Optional[str] = None,
-    to_date: Optional[str] = None,
-) -> Optional[List[dict]]:
+    from_date: str | None = None,
+    to_date: str | None = None,
+) -> list[dict] | None:
     """
     Fetch OHLCV candles for an NSE index.
 

@@ -5,10 +5,8 @@ Provides market state detection including holidays, weekends, and special tradin
 """
 
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from datetime import time as dt_time
-from datetime import timedelta
-from typing import Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
@@ -49,21 +47,21 @@ class MarketState:
     CLOSED_NIGHT = "CLOSED_NIGHT"
 
 
-def is_trading_holiday(check_date: Optional[date] = None) -> bool:
+def is_trading_holiday(check_date: date | None = None) -> bool:
     """Check if given date is a trading holiday."""
     if check_date is None:
         check_date = datetime.now().date()
     return check_date in NSE_HOLIDAYS_2025
 
 
-def is_weekend(check_date: Optional[date] = None) -> bool:
+def is_weekend(check_date: date | None = None) -> bool:
     """Check if given date is weekend (Saturday=5, Sunday=6)."""
     if check_date is None:
         check_date = datetime.now().date()
     return check_date.weekday() >= 5
 
 
-def get_market_state(check_time: Optional[datetime] = None) -> Tuple[str, str]:
+def get_market_state(check_time: datetime | None = None) -> tuple[str, str]:
     """
     Get current market state.
 
@@ -97,7 +95,7 @@ def get_market_state(check_time: Optional[datetime] = None) -> Tuple[str, str]:
         return MarketState.CLOSED_NIGHT, "Market closed (After hours)"
 
 
-def should_run_autopilot(check_time: Optional[datetime] = None) -> Tuple[bool, str]:
+def should_run_autopilot(check_time: datetime | None = None) -> tuple[bool, str]:
     """
     Determine if autopilot should be running.
 

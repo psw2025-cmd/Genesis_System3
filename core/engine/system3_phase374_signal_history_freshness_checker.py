@@ -7,9 +7,9 @@ Monitors data freshness and triggers warnings for stale files.
 import json
 import logging
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 FRESHNESS_THRESHOLD_HOURS = 24
 
 
-def run_phase374(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase374(context: dict[str, Any] = None) -> dict[str, Any]:
     """Execute Phase 374: Signal History Freshness Checker."""
     logger.info("=== Phase 374: Signal History Freshness Checker ===")
 

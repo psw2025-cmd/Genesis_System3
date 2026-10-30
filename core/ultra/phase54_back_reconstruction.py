@@ -13,7 +13,7 @@ Menu Option: 116
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
+def load_predictions_and_outcomes() -> pd.DataFrame | None:
     """Load predictions and actual outcomes."""
     # Load predictions
     predictions_path = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
@@ -65,8 +65,8 @@ def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
 
 
 def reconstruct_optimal_decision(
-    prediction: str, outcome: str, confidence: float, actual_pnl: Optional[float] = None
-) -> Dict[str, Any]:
+    prediction: str, outcome: str, confidence: float, actual_pnl: float | None = None
+) -> dict[str, Any]:
     """
     Reconstruct what the optimal decision should have been.
 
@@ -187,7 +187,7 @@ def run_phase54_back_reconstruction() -> None:
     print(f"[SAVE] What-if analysis saved to: {what_if_json}")
 
     # Summary
-    print(f"\n=== BACK-RECONSTRUCTION SUMMARY ===")
+    print("\n=== BACK-RECONSTRUCTION SUMMARY ===")
     print(f"Total reconstructions: {len(reconstructions)}")
     correct = sum(1 for r in reconstructions if r["was_correct"])
     incorrect = len(reconstructions) - correct

@@ -255,8 +255,8 @@ def _train_model_for_underlying(
         "created_at": datetime.utcnow().isoformat(),
         "features": feature_cols,
         "classes": sorted([str(c) for c in pd.unique(y)]),
-        "train_samples": int(len(y_train)),
-        "test_samples": int(len(y_test)),
+        "train_samples": len(y_train),
+        "test_samples": len(y_test),
         "test_accuracy": float(acc),
     }
 

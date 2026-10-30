@@ -14,7 +14,7 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -44,7 +44,7 @@ def _log(message: str) -> None:
         print(f"[Phase39][WARN] Failed to write log: {e}")
 
 
-def load_config() -> Dict[str, Any]:
+def load_config() -> dict[str, Any]:
     """Load campaign parameters from JSON config file."""
     default_config = {"loops": 60, "sleep_seconds": 30}
 
@@ -194,7 +194,7 @@ def run_phase39_shadow_campaign() -> None:
             f.write(summary_content)
 
         _log(f"Summary written to: {summary_file}")
-        print(f"\n[OK] Phase 39 Shadow Campaign completed")
+        print("\n[OK] Phase 39 Shadow Campaign completed")
         print(f"[SAVE] Summary saved to: {summary_file}")
 
     except KeyboardInterrupt:

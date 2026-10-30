@@ -6,9 +6,8 @@ Detects excessive trading activity.
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -18,7 +17,7 @@ EXEC_LOG_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_trades_exec_lo
 def detect_overtrading(
     exec_log: pd.DataFrame,
     time_window_min: int = 60,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Detect overtrading in execution log.
 

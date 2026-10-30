@@ -6,9 +6,7 @@ Each phase reads from existing data and writes analysis only.
 """
 
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -62,7 +60,7 @@ OUTPUT_MD_PATH = STORAGE_ULTRA / "phase{phase_num}_{phase_name.lower().replace('
 def run_phase{phase_num}_{phase_name.lower().replace(' ', '_')}() -> Dict[str, Any]:
     """
     {phase_name}.
-    
+
     Returns:
         dict: {{
             "phase": {phase_num},

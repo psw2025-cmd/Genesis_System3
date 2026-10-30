@@ -20,11 +20,7 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-import joblib
-import numpy as np
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
@@ -40,7 +36,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_model_meta(model_dir: Path, underlying: str, prefix: str = "") -> Optional[Dict[str, Any]]:
+def load_model_meta(model_dir: Path, underlying: str, prefix: str = "") -> dict[str, Any] | None:
     """Load model metadata."""
     meta_file = model_dir / f"{underlying}{prefix}_model_meta.json"
     if not meta_file.exists():
@@ -53,7 +49,7 @@ def load_model_meta(model_dir: Path, underlying: str, prefix: str = "") -> Optio
         return None
 
 
-def load_safety_config() -> Dict[str, bool]:
+def load_safety_config() -> dict[str, bool]:
     """Load safety configuration."""
     if not SAFETY_JSON.exists():
         return {"AUTO_PROMOTE_MODELS": False}
@@ -65,7 +61,7 @@ def load_safety_config() -> Dict[str, bool]:
         return {"AUTO_PROMOTE_MODELS": False}
 
 
-def show_comparison() -> Dict[str, Any]:
+def show_comparison() -> dict[str, Any]:
     """
     Show side-by-side comparison of Baseline vs Ultra models.
 
@@ -156,7 +152,7 @@ def interactive_promote() -> None:
 
     # Parse command
     if not user_input.startswith("PROMOTE_"):
-        print(f"[ERROR] Invalid command. Must start with 'PROMOTE_'")
+        print("[ERROR] Invalid command. Must start with 'PROMOTE_'")
         return
 
     underlying = user_input.replace("PROMOTE_", "").upper()
@@ -177,7 +173,7 @@ def interactive_promote() -> None:
     baseline_meta_file = MODELS_DIR / f"{underlying}_model_meta.json"
 
     if not baseline_model_file.exists():
-        print(f"[WARN] Baseline model not found - will create new")
+        print("[WARN] Baseline model not found - will create new")
 
     # Confirm
     print(f"\n[CONFIRM] Promote Ultra {underlying} model to baseline?")

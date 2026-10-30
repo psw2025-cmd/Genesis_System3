@@ -9,7 +9,7 @@ SAFE MODE ONLY - No changes, prediction only.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 MODELS_DIR = PROJECT_ROOT / "core" / "models" / "dhan"
@@ -21,7 +21,7 @@ LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 ULTRA_OBS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def predict_failure_points() -> Dict[str, Any]:
+def predict_failure_points() -> dict[str, Any]:
     """
     Predict weak points in pipeline.
 
@@ -165,7 +165,7 @@ def predict_failure_points() -> Dict[str, Any]:
     }
 
 
-def save_failure_point_analysis(analysis: Dict[str, Any]) -> Path:
+def save_failure_point_analysis(analysis: dict[str, Any]) -> Path:
     """
     Save failure point analysis to JSON.
 

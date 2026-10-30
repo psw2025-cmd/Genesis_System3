@@ -4,11 +4,10 @@ System3 Phase 287 - Resource Usage Monitor
 Monitors system resource usage: CPU, memory, disk, file sizes.
 """
 
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import psutil
 
@@ -21,7 +20,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_resource_usage.md"
 
 
-def run_phase287(**kwargs) -> Dict[str, Any]:
+def run_phase287(**kwargs) -> dict[str, Any]:
     """Run Phase 287: Resource Usage Monitor."""
     errors = []
 

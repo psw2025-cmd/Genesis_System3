@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -25,7 +25,7 @@ ONE_LOT_HEALTH_PATH = STORAGE_ULTRA / "phase145_one_lot_health_report.md"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase196_dry_run_readiness_report.md"
 
 
-def run_phase196_dry_run_readiness() -> Dict[str, Any]:
+def run_phase196_dry_run_readiness() -> dict[str, Any]:
     """
     Verify DRY-RUN readiness.
 

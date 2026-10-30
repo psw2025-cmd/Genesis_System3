@@ -26,7 +26,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -351,14 +351,14 @@ def engineer_all_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info(f"Total columns: {original_cols} → {new_cols}")
 
     # Calculate feature variance statistics
-    variance_stats = calculate_feature_variance(df)
+    calculate_feature_variance(df)
 
     logger.info("=" * 60)
 
     return df
 
 
-def calculate_feature_variance(df: pd.DataFrame) -> Dict[str, Any]:
+def calculate_feature_variance(df: pd.DataFrame) -> dict[str, Any]:
     """
     Calculate variance statistics for all features.
 
@@ -410,7 +410,7 @@ def calculate_feature_variance(df: pd.DataFrame) -> Dict[str, Any]:
     return stats
 
 
-def run_phase_389() -> Dict[str, Any]:
+def run_phase_389() -> dict[str, Any]:
     """
     Phase 389 entry point: Feature Engineering Upgrade.
 
@@ -486,7 +486,7 @@ def run_phase_389() -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Phase 389 failed: {e}", exc_info=True)
-        return {"status": "error", "message": f"Feature engineering failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Feature engineering failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

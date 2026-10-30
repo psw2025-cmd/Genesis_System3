@@ -7,7 +7,7 @@ Performs safe read-only API calls to validate broker connectivity.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -24,7 +24,7 @@ def mask_sensitive(value: str) -> str:
     return value[:2] + "*" * (len(value) - 4) + value[-2:]
 
 
-def run_phase205(**kwargs) -> Dict[str, Any]:
+def run_phase205(**kwargs) -> dict[str, Any]:
     """
     Run Phase 205: Broker Credential Self-Tester.
 
@@ -67,7 +67,7 @@ def run_phase205(**kwargs) -> Dict[str, Any]:
                 dhan_status = "MODULE_NOT_FOUND"
                 errors.append("env_loader module not found")
             except Exception as e:
-                f.write(f"Status: ERROR\nError: {str(e)}\n")
+                f.write(f"Status: ERROR\nError: {e!s}\n")
                 dhan_status = "ERROR"
                 errors.append(f"Dhan test error: {e}")
 

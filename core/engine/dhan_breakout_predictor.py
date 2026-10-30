@@ -4,9 +4,8 @@ Dhan Index Options - Breakout Prediction Engine
 Predicts price breakouts above resistance or below support.
 """
 
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 
@@ -14,7 +13,7 @@ def predict_breakout(
     df_signals: pd.DataFrame,
     resistance: float,
     support: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Predict breakout probability and direction.
 

@@ -21,7 +21,7 @@ import time
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -36,7 +36,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def test_phase_execution() -> Dict[str, Any]:
+def test_phase_execution() -> dict[str, Any]:
     """Test that all predecessor phases execute successfully."""
     results = {"passed": 0, "failed": 0, "phases": {}}
 
@@ -73,7 +73,7 @@ def test_phase_execution() -> Dict[str, Any]:
     return results
 
 
-def test_json_outputs() -> Dict[str, Any]:
+def test_json_outputs() -> dict[str, Any]:
     """Test that all phase JSON outputs are valid."""
     results = {"passed": 0, "failed": 0, "files": {}}
 
@@ -111,7 +111,7 @@ def test_json_outputs() -> Dict[str, Any]:
     return results
 
 
-def test_csv_files() -> Dict[str, Any]:
+def test_csv_files() -> dict[str, Any]:
     """Test that all CSV data files are readable and valid."""
     results = {"passed": 0, "failed": 0, "files": {}}
 
@@ -146,7 +146,7 @@ def test_csv_files() -> Dict[str, Any]:
     return results
 
 
-def test_safety_flags() -> Dict[str, Any]:
+def test_safety_flags() -> dict[str, Any]:
     """Test that all safety flags are properly disabled."""
     results = {"passed": 0, "failed": 0, "checks": {}}
 
@@ -183,7 +183,7 @@ def test_safety_flags() -> Dict[str, Any]:
     return results
 
 
-def test_no_live_trading() -> Dict[str, Any]:
+def test_no_live_trading() -> dict[str, Any]:
     """Test that no live trading code exists in phase files."""
     results = {"passed": 0, "failed": 0, "phases": {}}
 
@@ -221,7 +221,7 @@ def test_no_live_trading() -> Dict[str, Any]:
     return results
 
 
-def test_performance() -> Dict[str, Any]:
+def test_performance() -> dict[str, Any]:
     """Test that phases execute within acceptable time bounds."""
     results = {"passed": 0, "failed": 0, "phases": {}}
 
@@ -271,7 +271,7 @@ def test_performance() -> Dict[str, Any]:
     return results
 
 
-def generate_markdown_report(all_results: Dict[str, Any]) -> str:
+def generate_markdown_report(all_results: dict[str, Any]) -> str:
     """Generate markdown test report."""
     report = "# System3 Phase 376 - Self-Test Suite Report\n\n"
     report += f"**Generated:** {datetime.now().isoformat()}\n\n"
@@ -336,7 +336,7 @@ def generate_markdown_report(all_results: Dict[str, Any]) -> str:
     return report
 
 
-def run_phase376(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase376(context: dict[str, Any] = None) -> dict[str, Any]:
     """Main phase executor."""
     logger.info("=" * 70)
     logger.info("Phase 376: Self-Test Suite")
@@ -383,7 +383,7 @@ def run_phase376(context: Dict[str, Any] = None) -> Dict[str, Any]:
         total_failed = json_output["summary"]["total_failed"]
         if total_failed == 0:
             status = "ok"
-            logger.info(f"Phase 376 complete: All tests passed")
+            logger.info("Phase 376 complete: All tests passed")
         else:
             status = "warn"
             logger.warning(f"Phase 376 complete: {total_failed} test(s) failed")

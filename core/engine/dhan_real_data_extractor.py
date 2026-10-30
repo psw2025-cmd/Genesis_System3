@@ -6,7 +6,6 @@ AUTO-UPDATE: DISABLED - Only extracts, never auto-trains.
 """
 
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 
@@ -31,7 +30,6 @@ def extract_real_training_data() -> pd.DataFrame:
         return pd.DataFrame()
 
     # Load original signals to get features
-    from pathlib import Path
 
     LIVE_DIR = PROJECT_ROOT / "storage" / "live"
     SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"

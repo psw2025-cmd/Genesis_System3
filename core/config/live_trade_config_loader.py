@@ -7,7 +7,7 @@ Load and validate live trading configuration.
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -30,7 +30,7 @@ DEFAULT_CONFIG = {
 }
 
 
-def load_live_trade_config() -> Dict[str, Any]:
+def load_live_trade_config() -> dict[str, Any]:
     """
     Load live trading configuration from JSON file.
 

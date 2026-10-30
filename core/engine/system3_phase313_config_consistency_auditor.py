@@ -16,7 +16,7 @@ except ImportError:
     YAML_AVAILABLE = False
 import logging
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -71,12 +71,12 @@ def load_yaml_file(file_path: Path) -> tuple[bool, Any, str]:
             data = yaml.safe_load(f)
         return True, data, ""
     except yaml.YAMLError as e:
-        return False, None, f"YAML syntax error: {str(e)}"
+        return False, None, f"YAML syntax error: {e!s}"
     except Exception as e:
-        return False, None, f"Failed to load: {str(e)}"
+        return False, None, f"Failed to load: {e!s}"
 
 
-def check_required_keys(data: Any, required: List[str]) -> List[str]:
+def check_required_keys(data: Any, required: list[str]) -> list[str]:
     """Check for missing required keys."""
     if not isinstance(data, dict):
         return required
@@ -88,7 +88,7 @@ def check_required_keys(data: Any, required: List[str]) -> List[str]:
     return missing
 
 
-def extract_safety_values(data: Any, prefix: str = "") -> Dict[str, Any]:
+def extract_safety_values(data: Any, prefix: str = "") -> dict[str, Any]:
     """Recursively extract safety-critical flag values."""
     values = {}
 
@@ -106,7 +106,7 @@ def extract_safety_values(data: Any, prefix: str = "") -> Dict[str, Any]:
     return values
 
 
-def run_phase313(**kwargs) -> Dict[str, Any]:
+def run_phase313(**kwargs) -> dict[str, Any]:
     """
     Run Phase 313: Config Consistency Auditor
 
@@ -268,7 +268,7 @@ def run_phase313(**kwargs) -> Dict[str, Any]:
         return {
             "phase": 313,
             "status": "ERROR",
-            "details": f"Phase 313 failed: {str(e)}",
+            "details": f"Phase 313 failed: {e!s}",
             "outputs": outputs,
             "errors": [str(e)],
         }

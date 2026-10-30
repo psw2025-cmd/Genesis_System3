@@ -9,7 +9,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ if str(PROJECT_ROOT) not in sys.path:
 logger = logging.getLogger(__name__)
 
 
-def run_phase333_signal_consistency(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase333_signal_consistency(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 333: Signal Consistency & Duplicate Detector
 

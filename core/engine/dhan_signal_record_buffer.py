@@ -8,7 +8,7 @@ SAFE MODE ONLY - Read-only buffer, no overwrites.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -77,7 +77,7 @@ def buffer_signal(
         return False
 
 
-def get_buffer_stats() -> Dict[str, Any]:
+def get_buffer_stats() -> dict[str, Any]:
     """
     Get buffer statistics (read-only).
 
@@ -116,7 +116,7 @@ def main() -> None:
     stats = get_buffer_stats()
 
     if stats["status"] == "SUCCESS":
-        print(f"Buffer Status: ✅ ACTIVE")
+        print("Buffer Status: ✅ ACTIVE")
         print(f"Signals Buffered: {stats['count']}")
         if stats["first_timestamp"]:
             print(f"First Signal: {stats['first_timestamp']}")

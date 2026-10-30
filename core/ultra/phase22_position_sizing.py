@@ -14,9 +14,7 @@ Menu Option: 85
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-import numpy as np
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
@@ -34,7 +32,7 @@ def compute_position_size(
     confidence: float,
     score: float,
     volatility: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compute dynamic position size.
 

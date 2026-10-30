@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -28,7 +28,7 @@ CURATED_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals_curated
 ARCHIVE_DIR = PROJECT_ROOT / "storage" / "live" / "archive"
 
 
-def evaluate_window(df: pd.DataFrame, window_days: int) -> Dict[str, Any]:
+def evaluate_window(df: pd.DataFrame, window_days: int) -> dict[str, Any]:
     """Evaluate a training window."""
     if len(df) == 0:
         return {"rows": 0, "label_diversity": 0.0, "has_gaps": True, "score": 0.0}
@@ -51,14 +51,14 @@ def evaluate_window(df: pd.DataFrame, window_days: int) -> Dict[str, Any]:
     score = float(len(df) * 0.5 + label_diversity * 100 - (100 if has_gaps else 0))
 
     return {
-        "rows": int(len(df)),
+        "rows": len(df),
         "label_diversity": float(label_diversity),
         "has_gaps": bool(has_gaps),
         "score": float(score),
     }
 
 
-def run_phase213(**kwargs) -> Dict[str, Any]:
+def run_phase213(**kwargs) -> dict[str, Any]:
     """
     Run Phase 213: Training Window Selector.
 
@@ -169,7 +169,7 @@ def run_phase213(**kwargs) -> Dict[str, Any]:
 
         # Log evaluation metrics
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Training Window Selection Log\n")
+            f.write("System3 Training Window Selection Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
             for eval_result in evaluations:

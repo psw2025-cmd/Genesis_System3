@@ -1,4 +1,4 @@
-"""
+﻿"""
 System3 Ultra Dashboard Backend
 FastAPI service for real-time system monitoring and control
 """
@@ -40,7 +40,7 @@ logger = logging.getLogger("system3.app")
 
 IST = pytz.timezone("Asia/Kolkata")
 
-# Timeouts for sync broker/scanner work — must not block the asyncio event loop.
+# Timeouts for sync broker/scanner work â€” must not block the asyncio event loop.
 _BROKER_IO_TIMEOUT_S = 8.0
 _SCANNER_IO_TIMEOUT_S = 120.0
 _SCANNER_EOD_TIMEOUT_S = 180.0
@@ -50,7 +50,7 @@ _EOD_SCANNER_TTL_S = 1800.0
 
 # Dedicated small executor for the spot-price background refresh, isolated
 # from the shared default asyncio.to_thread() executor. asyncio.wait_for()
-# timing out does NOT cancel the underlying OS thread — it just stops
+# timing out does NOT cancel the underlying OS thread â€” it just stops
 # waiting on it. If the Yahoo Finance calls inside hang (rate-limited cloud
 # IPs, slow socket), previously that orphaned thread piled up in the SAME
 # shared executor pool every other blocking call in this app depends on
@@ -58,7 +58,7 @@ _EOD_SCANNER_TTL_S = 1800.0
 # growing memory unbounded until OOM. A small dedicated pool caps how many
 # stuck Yahoo-fetch threads can accumulate and stops them from starving
 # unrelated request handling.
-_SPOT_REFRESH_EXECUTOR = None  # Yahoo Finance disabled — ThreadPoolExecutor no longer needed
+_SPOT_REFRESH_EXECUTOR = None  # Yahoo Finance disabled â€” ThreadPoolExecutor no longer needed
 
 
 def _market_open_from_state() -> bool:
@@ -143,12 +143,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from pydantic import BaseModel
 
-# pandas lazy-loaded — only import when actually needed
+# pandas lazy-loaded â€” only import when actually needed
 # Saves ~45MB at startup
 pd = None  # Will be imported lazily when needed
 
 def _get_pd():
-    """Lazy pandas import — call this instead of using pd directly."""
+    """Lazy pandas import â€” call this instead of using pd directly."""
     global pd
     if pd is None:
         try:
@@ -159,8 +159,8 @@ def _get_pd():
     return pd
 import sqlite3
 
-# numpy removed — was only used for synthetic data (np.random.normal)
-# Use random.gauss() instead — saves ~25MB
+# numpy removed â€” was only used for synthetic data (np.random.normal)
+# Use random.gauss() instead â€” saves ~25MB
 
 # Import market detection and synthetic data generator
 try:
@@ -173,7 +173,7 @@ except ImportError as e:
     # Market status can be determined from other sources (health.json, QC reports)
     pass
 
-# Synthetic data generator REMOVED — file deleted; REAL_ONLY is the only mode.
+# Synthetic data generator REMOVED â€” file deleted; REAL_ONLY is the only mode.
 SYNTHETIC_DATA_AVAILABLE = False
 
 # Import performance predictor and live validator
@@ -295,7 +295,7 @@ AUDIT_DIR.mkdir(parents=True, exist_ok=True)
 DB_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# ── Modular routers (memory-efficient, lazy imports) ─────────────────────
+# â”€â”€ Modular routers (memory-efficient, lazy imports) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 import sys as _sys
 _backend_dir = str(Path(__file__).resolve().parent)
 if _backend_dir not in _sys.path:
@@ -309,7 +309,7 @@ from fo_eligibility_filter import get_fo_eligibility_filter
 from option_strike_visibility_audit import OptionVisibilityAuditor, generate_sample_audit_report
 from gain_rank_spot_enrichment import enrich_gain_rank_rows_with_authenticated_spots
 
-# ── Memory guard middleware ────────────────────────────────────────────────
+# â”€â”€ Memory guard middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 from middleware.memory_guard import memory_guard_middleware, get_memory_stats
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -322,15 +322,15 @@ try:
 except Exception as _chain_bridge_exc:
     print(f"[startup] chain legacy bridge deferred/failed: {type(_chain_bridge_exc).__name__}: {_chain_bridge_exc}")
 
-# ── Modular routers DISABLED — they duplicated 19 existing routes and
+# â”€â”€ Modular routers DISABLED â€” they duplicated 19 existing routes and
 # overrode the rich endpoint versions the frontend depends on, breaking
 # all dashboard tabs. Proper modularization requires MOVING code out of
 # app.py (delete old versions), not adding parallel simplified copies.
-# app.include_router(broker_router.router)   # disabled — duplicate routes
-# app.include_router(chain_router.router)    # disabled — duplicate routes
-# app.include_router(ml_router.router)       # disabled — duplicate routes
+# app.include_router(broker_router.router)   # disabled â€” duplicate routes
+# app.include_router(chain_router.router)    # disabled â€” duplicate routes
+# app.include_router(ml_router.router)       # disabled â€” duplicate routes
 
-# ── MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) ─────────────
+# â”€â”€ MemoryGuard middleware (auto-GC at 420MB, warn at 380MB) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 from starlette.middleware.base import BaseHTTPMiddleware
 app.add_middleware(BaseHTTPMiddleware, dispatch=memory_guard_middleware)
 
@@ -358,7 +358,7 @@ if SSOT_AVAILABLE:
 else:
     state_store = None
 
-# Warm instruments master — sync from Dhan CDN if stale, then load cache.
+# Warm instruments master â€” sync from Dhan CDN if stale, then load cache.
 # Set DEFER_INSTRUMENT_WARMUP=1 on Render to skip eager load at startup and
 # save ~150-200 MB peak RAM (instruments still lazy-load via /api/instruments/health).
 if os.environ.get("DEFER_INSTRUMENT_WARMUP", "0").strip().lower() not in ("1", "true", "yes", "on"):
@@ -371,7 +371,7 @@ if os.environ.get("DEFER_INSTRUMENT_WARMUP", "0").strip().lower() not in ("1", "
             import json as _json
             from datetime import datetime, timezone
 
-            meta = _json.loads(META_JSON.read_text(encoding="utf-8"))
+            meta = _json.loads(META_JSON.read_text(encoding="utf-8-sig"))
             synced = meta.get("synced_utc")
             if synced:
                 age_h = (
@@ -543,7 +543,7 @@ def _get_worker_push_token() -> str:
     token_file = ROOT_DIR / "state" / "local_worker_push_token"
     if token_file.is_file():
         try:
-            tok = token_file.read_text(encoding="utf-8").strip()
+            tok = token_file.read_text(encoding="utf-8-sig").strip()
             if tok:
                 globals()["_WORKER_PUSH_TOKEN"] = tok
                 return tok
@@ -628,9 +628,9 @@ try:
         )
         print(f"[frontend] React dist mounted from {_REACT_DIST_DIR}")
     else:
-        print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} — serving legacy Vue")
+        print(f"[frontend] React dist NOT found at {_REACT_DIST_DIR} â€” serving legacy Vue")
 except Exception as _e:
-    print(f"[frontend] StaticFiles mount failed: {_e} — serving legacy Vue")
+    print(f"[frontend] StaticFiles mount failed: {_e} â€” serving legacy Vue")
 
 
 # Root route - helpful message. Cloud-permanent hosts must never advertise localhost.
@@ -663,7 +663,7 @@ async def root():
 @app.get("/ui/", include_in_schema=False)
 @app.get("/ui/{path:path}", include_in_schema=False)
 async def serve_dashboard_index(path: str = ""):
-    """Serve React SPA — React dist takes priority over legacy Vue."""
+    """Serve React SPA â€” React dist takes priority over legacy Vue."""
     # Try React dist first
     react_index = _REACT_DIST_DIR / "index.html"
     if react_index.exists():
@@ -728,7 +728,7 @@ async def get_state():
             "live_allowed": False,
             "broker": {"connected": False},
             "market": {"is_open": False},
-            "message": "SSOT get_state timed out — returning safe PAPER stub",
+            "message": "SSOT get_state timed out â€” returning safe PAPER stub",
         }
     # Gate: if broker not connected or data not real, force mode to PAPER for UI consistency
     broker_connected = state.get("broker", {}).get("connected", False)
@@ -761,7 +761,7 @@ async def get_state_history(limit: int = 100):
 
         for snapshot_file in snapshot_files:
             try:
-                data = json.loads(snapshot_file.read_text())
+                data = json.loads(snapshot_file.read_text(encoding="utf-8-sig"))
                 history.append(data)
             except (json.JSONDecodeError, ValueError) as e:
                 logger.warning(f"Failed to parse snapshot {snapshot_file.name}: {e}")
@@ -832,7 +832,7 @@ async def get_broker_status():
         if isinstance(status, dict):
             status = _enrich_broker_status(status, client_id_val)
 
-        # Only persist definitive results to SSOT — never write timeout/error noise.
+        # Only persist definitive results to SSOT â€” never write timeout/error noise.
         if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
             if status.get("connected") is True or status.get("error") in (
                 "TOKEN_EXPIRED_OR_INVALID",
@@ -928,7 +928,7 @@ async def get_dhan_broker_status():
 
 @app.get("/api/broker/truth")
 async def get_broker_truth():
-    """Multi-validated broker trader truth — holdings, positions, funds."""
+    """Multi-validated broker trader truth â€” holdings, positions, funds."""
     _hit = _cache_get("broker_truth", _TTL_BROKER_TRUTH)
     if _hit is not None:
         if isinstance(_hit, dict):
@@ -949,7 +949,7 @@ async def get_broker_truth():
 
 @app.get("/api/broker/holdings")
 async def get_broker_holdings():
-    """Dhan equity holdings — read-only. No orders."""
+    """Dhan equity holdings â€” read-only. No orders."""
     _hit = _cache_get("broker_holdings", _TTL_BROKER)
     if _hit is not None:
         return _hit
@@ -986,7 +986,7 @@ async def get_broker_holdings():
 
 @app.get("/api/broker/funds")
 async def get_broker_funds():
-    """Dhan fund limits / available balance — read-only. No orders."""
+    """Dhan fund limits / available balance â€” read-only. No orders."""
     _hit = _cache_get("broker_funds", _TTL_BROKER)
     if _hit is not None:
         return _hit
@@ -1022,13 +1022,13 @@ async def get_broker_funds():
 
 @app.get("/api/holdings")
 async def api_holdings_alias():
-    """Canonical dashboard alias → read-only broker holdings (PEND-011)."""
+    """Canonical dashboard alias â†’ read-only broker holdings (PEND-011)."""
     return await get_broker_holdings()
 
 
 @app.get("/api/funds")
 async def api_funds_alias():
-    """Canonical dashboard alias → read-only broker funds (PEND-011)."""
+    """Canonical dashboard alias â†’ read-only broker funds (PEND-011)."""
     return await get_broker_funds()
 
 
@@ -1058,10 +1058,10 @@ async def get_broker_diagnose():
     token_status = "not_set"
     if token:
         if len(token) < 20:
-            issues.append("DHAN_ACCESS_TOKEN too short — likely invalid")
+            issues.append("DHAN_ACCESS_TOKEN too short â€” likely invalid")
             token_status = "too_short"
         elif token.startswith("Bearer "):
-            issues.append("DHAN_ACCESS_TOKEN has 'Bearer ' prefix — remove it")
+            issues.append("DHAN_ACCESS_TOKEN has 'Bearer ' prefix â€” remove it")
             token_status = "has_bearer_prefix"
         else:
             token_status = "present"
@@ -1113,7 +1113,7 @@ async def get_broker_diagnose():
         "fix_action": (
             "Update DHAN_ACCESS_TOKEN in GCP Secret Manager (dhan-access-token) and "
             "let Cloud Run remount latest. Prefer PIN+TOTP auto-heal on genesis-system3-web. "
-            "Token expires daily — DHAN_PIN + DHAN_TOTP_SECRET enable auto-refresh."
+            "Token expires daily â€” DHAN_PIN + DHAN_TOTP_SECRET enable auto-refresh."
             if issues
             else "No issues found"
         ),
@@ -1122,7 +1122,7 @@ async def get_broker_diagnose():
 
 @app.get("/api/broker/positions/live")
 async def get_broker_positions_live():
-    """Dhan open positions — read-only. No orders. LTP enriched via marketfeed when missing."""
+    """Dhan open positions â€” read-only. No orders. LTP enriched via marketfeed when missing."""
     _hit = _cache_get("broker_positions", _TTL_BROKER)
     if _hit is not None:
         return _hit
@@ -1168,7 +1168,7 @@ async def get_broker_positions_live():
 async def get_market_live_board():
     """
     Dhan-parity live board: index ribbon (Nifty/Bank/Fin/VIX) + equity watch from holdings.
-    Continuous poll target for TopBar — not static snapshots.
+    Continuous poll target for TopBar â€” not static snapshots.
     """
     _hit = _cache_get("market_live_board", 3.0)
     if _hit is not None:
@@ -1436,7 +1436,7 @@ async def get_trader_requirements():
 
 @app.get("/api/approval/status")
 async def get_approval_status():
-    """Human approval gate — owner sign-off status (does not enable live trading)."""
+    """Human approval gate â€” owner sign-off status (does not enable live trading)."""
     try:
         from dashboard.backend.human_approval_service import build_approval_status
     except ImportError:
@@ -1459,7 +1459,7 @@ async def get_metrics():
 
 @app.get("/api/kill-switch/status")
 async def get_kill_switch_status():
-    """Kill switch status — the same storage/live/kill_switch.json the batch
+    """Kill switch status â€” the same storage/live/kill_switch.json the batch
     session loop checks every cycle, and that order_management.create_order
     now also checks before creating any (currently paper-only) order."""
     try:
@@ -1555,7 +1555,7 @@ async def get_status():
         try:
             health_file = OUTPUTS_DIR / "health.json"
             if health_file.exists():
-                health_data = json.loads(health_file.read_text())
+                health_data = json.loads(health_file.read_text(encoding="utf-8-sig"))
         except (ValueError, TypeError, KeyError, AttributeError) as e:
             logger.warning(f'Error handled: {e}')
         except Exception as e:
@@ -1623,7 +1623,7 @@ async def get_status():
         }
 
 
-# ─── System3 Analytics Endpoints ─────────────────────────────────────────────
+# â”€â”€â”€ System3 Analytics Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 GAIN_RANK_FILE = ROOT_DIR / "state" / "gain_rank_history.json"
 VALIDATION_DIR = ROOT_DIR / "state" / "market_validations"
@@ -1635,7 +1635,7 @@ JOB_SCHED_CFG = ROOT_DIR / "config" / "system3_job_scheduler.json"
 
 @app.get("/api/instruments/health")
 async def get_instruments_health():
-    """Instrument master freshness — Dhan CDN sync status."""
+    """Instrument master freshness â€” Dhan CDN sync status."""
     try:
         from core.data.instruments_cache import ensure_instruments_loaded
         from core.data.instruments_master import META_JSON
@@ -1643,7 +1643,7 @@ async def get_instruments_health():
         metrics = ensure_instruments_loaded()
         meta = {}
         if META_JSON.exists():
-            meta = json.loads(META_JSON.read_text(encoding="utf-8"))
+            meta = json.loads(META_JSON.read_text(encoding="utf-8-sig"))
         stale = True
         if meta.get("synced_utc"):
             from datetime import datetime, timezone
@@ -1890,7 +1890,7 @@ async def get_gain_rank(refresh: bool = False):
 
         # Live fallback: build today's rankings from contract-gain scanner so
         # Signals/Trade tabs are not permanently empty when history file is missing.
-        # Bound tightly — never block /api/batch/market-data for 60s+ on equity fan-out.
+        # Bound tightly â€” never block /api/batch/market-data for 60s+ on equity fan-out.
         if (stale or latest is None) and not durable_required:
             try:
                 scan = await asyncio.wait_for(
@@ -1959,7 +1959,7 @@ async def get_gain_rank(refresh: bool = False):
                         "rankings": rankings,
                         "predictions": rankings,
                         "source": "live_scanner_fallback",
-                        "note": "File history missing — live scanner rankings used for dashboard visibility",
+                        "note": "File history missing â€” live scanner rankings used for dashboard visibility",
                     }
                     stale = False
             except Exception as scan_err:
@@ -1978,7 +1978,7 @@ async def get_gain_rank(refresh: bool = False):
         latest = dict(latest)
         raw_rows = (latest.get("rankings") or latest.get("predictions") or [])
         kept, rejected = _filter_rows_fo(raw_rows if isinstance(raw_rows, list) else [])
-        # Authenticated chain/snapshot spots only — never BASE_SPOT / synthetic.
+        # Authenticated chain/snapshot spots only â€” never BASE_SPOT / synthetic.
         spot_lookup: Dict[str, Dict[str, Any]] = {}
         for row in kept:
             if not isinstance(row, dict):
@@ -2169,7 +2169,7 @@ async def get_top_contract_gainers(
             return usable
     if _MARKET_TOP_STATE_FILE.exists():
         try:
-            disk = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+            disk = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8-sig"))
             if int(disk.get("contracts_scored_total") or 0) > 0:
                 usable = _usable_actionable_market_top(disk)
                 if usable is not None:
@@ -2268,7 +2268,7 @@ async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = Fals
         )
         if isinstance(report, dict) and not _market_open_from_state():
             report["market_open"] = False
-            report.setdefault("note", "Market closed — equity rows from last Dhan quotes / bhavcopy")
+            report.setdefault("note", "Market closed â€” equity rows from last Dhan quotes / bhavcopy")
         if isinstance(report, dict):
             report = _sanitize_nans(report)
             return _cache_set(cache_key, report)
@@ -2281,7 +2281,7 @@ async def get_equity_options_scanner(top_n: int = 10, priority_only: bool = Fals
 
 @app.get("/api/scanner/moneycontrol_gainers")
 async def get_moneycontrol_option_gainers(top_n: int = 25, refresh: bool = False):
-    """Moneycontrol All Options Top Gainers — LIVE_SCRAPED reference only (not live trading truth)."""
+    """Moneycontrol All Options Top Gainers â€” LIVE_SCRAPED reference only (not live trading truth)."""
     top_n = min(max(int(top_n or 25), 1), 50)
     cache_key = f"moneycontrol_gainers:{top_n}"
     if not refresh:
@@ -2291,7 +2291,7 @@ async def get_moneycontrol_option_gainers(top_n: int = 25, refresh: bool = False
         disk = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
         if disk.exists():
             try:
-                data = json.loads(disk.read_text(encoding="utf-8"))
+                data = json.loads(disk.read_text(encoding="utf-8-sig"))
                 if isinstance(data, dict) and data.get("market_top_table"):
                     return _cache_set(cache_key, data)
             except Exception:
@@ -2349,7 +2349,7 @@ async def get_scanner_segments():
 
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
-    """Spearman ρ trend aligned with auto_gates (local + Firestore validation days)."""
+    """Spearman Ï trend aligned with auto_gates (local + Firestore validation days)."""
     _hit = _cache_get("accuracy_trend", _TTL_ACCURACY)
     if _hit is not None:
         return _hit
@@ -2384,7 +2384,7 @@ async def get_world_class_tracker():
     if not path.exists():
         return {"status": "MISSING", "path": str(path), "live_trading_enabled": False}
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception as exc:
         return {"status": "UNREADABLE", "error": str(exc), "live_trading_enabled": False}
     if not isinstance(data, dict):
@@ -2563,7 +2563,7 @@ def _hydrate_scheduler_health_from_local_daemon() -> Optional[Dict[str, Any]]:
     if not _SCHEDULER_STATE_JSON.exists():
         return None
     try:
-        data = json.loads(_SCHEDULER_STATE_JSON.read_text(encoding="utf-8"))
+        data = json.loads(_SCHEDULER_STATE_JSON.read_text(encoding="utf-8-sig"))
     except Exception:
         return None
     if not isinstance(data, dict):
@@ -2582,7 +2582,7 @@ def _hydrate_scheduler_health_from_local_daemon() -> Optional[Dict[str, Any]]:
     pid_alive = _pid_is_alive(pid)
     if not pid_alive and _SCHEDULER_PID_FILE.exists():
         try:
-            pid_alive = _pid_is_alive(_SCHEDULER_PID_FILE.read_text(encoding="utf-8").strip())
+            pid_alive = _pid_is_alive(_SCHEDULER_PID_FILE.read_text(encoding="utf-8-sig").strip())
         except Exception:
             pid_alive = False
     if not pid_alive:
@@ -2649,11 +2649,11 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Chain push — worker precomputes the small set of default-underlying option
+# Chain push â€” worker precomputes the small set of default-underlying option
 # chains and pushes them here, same pattern as scheduler health push above.
 # GET /api/chain/{underlying} (see _get_chain_uncached) serves straight from
 # this in-memory snapshot for anything fresh enough, instead of doing the
-# expensive DataSourceManager() + live Dhan fetch inline on the web dyno —
+# expensive DataSourceManager() + live Dhan fetch inline on the web dyno â€”
 # that inline path is what was crash-looping the 512MB web container during
 # market hours (2026-07-02 forensic investigation, see CHANGE_LOG.md).
 # Falls back to the old inline fetch only for underlyings the worker doesn't
@@ -2661,7 +2661,7 @@ async def push_scheduler_health(payload: Dict[str, Any], request: Request):
 #
 # The worker pushes off-hours too, at a much slower cadence, since the
 # EOD/bhavcopy snapshot it fetches then barely changes between ticks (see
-# cloud_worker.py's Thread 5 docstring — this used to be market-hours-only,
+# cloud_worker.py's Thread 5 docstring â€” this used to be market-hours-only,
 # which meant every after-hours page view fell back to the slow inline fetch
 # below and frequently surfaced as a permanent "Market Closed" screen with no
 # data at all, even though EOD data was available). Each push carries a
@@ -2684,7 +2684,7 @@ try:
         _snap_f = ROOT_DIR / "state" / "chain_cache" / f"{_sym}.json"
         if _snap_f.exists():
             try:
-                _data = json.loads(_snap_f.read_text(encoding="utf-8"))
+                _data = json.loads(_snap_f.read_text(encoding="utf-8-sig"))
                 _PUSHED_CHAIN_CACHE[_sym] = {
                     "data": _data,
                     "received_at": time.time(),
@@ -2761,7 +2761,7 @@ _CHAIN_LIVE_TIMEOUT_CLOSED_S = 8.0
 
 # core.data.datasource_manager already serializes real Dhan OC HTTP calls with
 # its own threading.Lock (_DHAN_OC_LOCK there, a distinct object from any lock
-# here) — an app-level asyncio.Lock on top of a single-worker executor was
+# here) â€” an app-level asyncio.Lock on top of a single-worker executor was
 # redundant and reproduced exactly the deadlock this comment used to warn
 # against: a call that times out at the asyncio.wait_for layer does not cancel
 # the underlying thread, so the one worker can stay stuck running it forever
@@ -2809,7 +2809,7 @@ async def get_deploy_info():
     try:
         cfg_path = ROOT_DIR / "config" / "cloud_runtime.json"
         if cfg_path.exists():
-            loaded = json.loads(cfg_path.read_text(encoding="utf-8"))
+            loaded = json.loads(cfg_path.read_text(encoding="utf-8-sig"))
             if isinstance(loaded, dict):
                 cfg = loaded
     except Exception:
@@ -2817,7 +2817,7 @@ async def get_deploy_info():
 
     git_sha = (os.environ.get("DEPLOY_GIT_SHA") or "").strip()
     if not git_sha:
-        # No cloud deploy pipeline set this env var (e.g. running locally) —
+        # No cloud deploy pipeline set this env var (e.g. running locally) â€”
         # fall back to the actual checked-out commit instead of leaving this blank.
         try:
             import subprocess
@@ -2904,7 +2904,7 @@ async def api_paper_chart(symbol: str = "NIFTY"):
     # Dynamic vector SVG chart fallback for headless container environments
     svg_content = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
   <rect width="100%" height="100%" fill="#0f172a"/>
-  <text x="400" y="40" fill="#f8fafc" font-size="18" font-weight="bold" text-anchor="middle" font-family="system-ui, sans-serif">Genesis System3 — Live Spot vs ML Prediction [STANDBY SNAPSHOT]</text>
+  <text x="400" y="40" fill="#f8fafc" font-size="18" font-weight="bold" text-anchor="middle" font-family="system-ui, sans-serif">Genesis System3 â€” Live Spot vs ML Prediction [STANDBY SNAPSHOT]</text>
   <text x="400" y="70" fill="#94a3b8" font-size="13" text-anchor="middle" font-family="system-ui, sans-serif">Symbol: {symbol} | Market: Pre-Market Standby | Frequency: 2s Intervals</text>
   <line x1="80" y1="100" x2="720" y2="100" stroke="#334155" stroke-dasharray="4"/>
   <line x1="80" y1="180" x2="720" y2="180" stroke="#334155" stroke-dasharray="4"/>
@@ -2933,7 +2933,7 @@ async def api_paper_chart(symbol: str = "NIFTY"):
 
 
 # ---------------------------------------------------------------------------
-# Live Trading Gate — evaluates ALL conditions before allowing live mode
+# Live Trading Gate â€” evaluates ALL conditions before allowing live mode
 # ---------------------------------------------------------------------------
 
 _LIVE_APPROVAL_FILE = ROOT_DIR / "config" / "kill_switch.json"
@@ -2965,7 +2965,7 @@ async def get_live_trading_gate():
 
     # Gate 2: Kill switch
     try:
-        ks = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        ks = json.loads(_LIVE_APPROVAL_FILE.read_text(encoding="utf-8-sig")) if _LIVE_APPROVAL_FILE.exists() else {}
         gate(
             "kill_switch_off",
             not ks.get("kill_switch_activated", False),
@@ -2983,15 +2983,15 @@ async def get_live_trading_gate():
     except Exception as e:
         gate("kill_switch_readable", False, f"Cannot read kill_switch.json: {e}")
 
-    # Gate 3: ML accuracy — durable Firestore validation days in cloud mode.
+    # Gate 3: ML accuracy â€” durable Firestore validation days in cloud mode.
     try:
         from scripts.system3_gate_evaluator import load_spearman_days
 
         validation_rows, _, _ = load_spearman_days(ROOT_DIR)
         rhos = [float(v["rho"]) for v in validation_rows if v.get("rho") is not None]
         avg_rho = sum(rhos) / len(rhos) if rhos else 0.0
-        gate("validation_days", len(validation_rows) >= 3, f"{len(validation_rows)} validation days (need ≥3)")
-        gate("ml_accuracy_rho", avg_rho >= 0.10, f"Avg Spearman ρ={avg_rho:.3f} (need ≥0.10)")
+        gate("validation_days", len(validation_rows) >= 3, f"{len(validation_rows)} validation days (need â‰¥3)")
+        gate("ml_accuracy_rho", avg_rho >= 0.10, f"Avg Spearman Ï={avg_rho:.3f} (need â‰¥0.10)")
     except Exception as e:
         gate("ml_accuracy_readable", False, f"Cannot read validation data: {e}")
 
@@ -2999,12 +2999,12 @@ async def get_live_trading_gate():
     try:
         # Use kill_switch.json for max_loss (avoid yaml dependency)
         # Risk config also in kill_switch since both updated together
-        ks_data = json.loads(_LIVE_APPROVAL_FILE.read_text()) if _LIVE_APPROVAL_FILE.exists() else {}
+        ks_data = json.loads(_LIVE_APPROVAL_FILE.read_text(encoding="utf-8-sig")) if _LIVE_APPROVAL_FILE.exists() else {}
         max_loss = ks_data.get("max_daily_loss_inr", 0)
         gate(
             "max_loss_configured",
             max_loss > 0 and max_loss <= 10000,
-            f"Max daily loss = ₹{max_loss} hardcoded in kill_switch.json",
+            f"Max daily loss = â‚¹{max_loss} hardcoded in kill_switch.json",
         )
     except Exception as e:
         gate("max_loss_configured", False, f"Could not read max loss config: {e}")
@@ -3015,11 +3015,11 @@ async def get_live_trading_gate():
         "summary": f"{sum(1 for g in gates if g['passed'])}/{len(gates)} gates passed",
         "verdict": "LIVE_TRADING_ALLOWED" if gate_open else "LIVE_TRADING_BLOCKED",
         "message": (
-            "All gates pass — ready for live trading after human approval"
+            "All gates pass â€” ready for live trading after human approval"
             if gate_open
-            else "Live trading blocked — see failed gates above"
+            else "Live trading blocked â€” see failed gates above"
         ),
-        "live_trading_status": "OFF — remains off until all gates pass",
+        "live_trading_status": "OFF â€” remains off until all gates pass",
     }
 
 
@@ -3028,7 +3028,7 @@ async def approve_live_trading(payload: Dict[str, Any]):
     """
     Human approval endpoint. Requires exact phrase to prevent accidental activation.
     Even after approval, LIVE_TRADING_ENABLED env var must be manually set to 1
-    on Render dashboard — this cannot be done via API.
+    on Render dashboard â€” this cannot be done via API.
     """
     REQUIRED_PHRASE = "I APPROVE LIVE TRADING WITH MAX LOSS RS 5000"
     phrase = payload.get("approval_phrase", "").strip().upper()
@@ -3042,7 +3042,7 @@ async def approve_live_trading(payload: Dict[str, Any]):
 
     try:
         ks_path = ROOT_DIR / "config" / "kill_switch.json"
-        ks = json.loads(ks_path.read_text()) if ks_path.exists() else {}
+        ks = json.loads(ks_path.read_text(encoding="utf-8-sig")) if ks_path.exists() else {}
         ks["live_trading_approved"] = True
         ks["live_trading_approval_phrase"] = phrase
         ks["approval_timestamp"] = datetime.now(timezone.utc).isoformat()
@@ -3053,8 +3053,8 @@ async def approve_live_trading(payload: Dict[str, Any]):
             "message": "Approval recorded. IMPORTANT: You must STILL manually set "
             "LIVE_TRADING_ENABLED=1 on Cloud Run (GCP) to actually enable live trading. "
             "This approval alone does NOT enable live trading. Default remains OFF.",
-            "next_step": "Cloud Run → genesis-system3-web → Variables & Secrets → "
-            "LIVE_TRADING_ENABLED → change to 1 → Deploy (owner-only; keep OFF unless explicit)",
+            "next_step": "Cloud Run â†’ genesis-system3-web â†’ Variables & Secrets â†’ "
+            "LIVE_TRADING_ENABLED â†’ change to 1 â†’ Deploy (owner-only; keep OFF unless explicit)",
         }
     except Exception as e:
         return {"approved": False, "message": f"Failed to save approval: {e}"}
@@ -3102,7 +3102,7 @@ async def get_scheduler_health(refresh: bool = False):
     if not state.get("received"):
         healthy = False
         reasons.append(
-            "local job scheduler daemon has never started — launcher must spawn core/engine/system3_phase82_job_scheduler.py --daemon"
+            "local job scheduler daemon has never started â€” launcher must spawn core/engine/system3_phase82_job_scheduler.py --daemon"
         )
     else:
         try:
@@ -3118,7 +3118,7 @@ async def get_scheduler_health(refresh: bool = False):
         healthy = False
         reasons.append(f"worker reports config alert: {state['config_alert'].get('message', state['config_alert'])}")
 
-    # NOTE: state["jobs"] is execution HISTORY — it only gains an entry for
+    # NOTE: state["jobs"] is execution HISTORY â€” it only gains an entry for
     # a job_id once that job fires for the first time since daemon start.
     # A freshly (re)started worker legitimately has jobs={} for hours
     # (e.g. restarted at 01:00 IST, next job doesn't fire until pre-market)
@@ -3135,7 +3135,7 @@ async def get_scheduler_health(refresh: bool = False):
     # job into fired/pending/missed/catchup_eligible/skipped for today,
     # re-evaluating live against the current moment for jobs not yet fired
     # (see core/engine/system3_scheduler_catchup.py). jobs={} alone is never
-    # treated as fatal here if nothing was due yet — only a genuine
+    # treated as fatal here if nothing was due yet â€” only a genuine
     # missed_jobs_today entry (past its catch-up window, never fired) marks
     # unhealthy.
     try:
@@ -3199,7 +3199,7 @@ async def get_system_health():
         token_status = {"status": "unknown", "log_line": "log not found"}
         try:
             if WATCHDOG_LOG.exists():
-                lines = WATCHDOG_LOG.read_text().strip().splitlines()
+                lines = WATCHDOG_LOG.read_text(encoding="utf-8-sig").strip().splitlines()
                 last_line = lines[-1] if lines else ""
                 token_status = {"status": "ok" if "Token OK" in last_line else "warning", "log_line": last_line}
         except Exception:
@@ -3210,7 +3210,7 @@ async def get_system_health():
         ds_resilience = "UNKNOWN"
         try:
             if DS_HEALTH_FILE.exists():
-                ds_health = json.loads(DS_HEALTH_FILE.read_text())
+                ds_health = json.loads(DS_HEALTH_FILE.read_text(encoding="utf-8-sig"))
                 ds_resilience = ds_health.get("resilience", "UNKNOWN")
         except Exception:
             pass
@@ -3219,12 +3219,12 @@ async def get_system_health():
         jobs_summary = []
         scheduler_daemon = {"started_at": None, "heartbeat": None, "pid": None, "active": False}
         try:
-            cfg = json.loads(JOB_SCHED_CFG.read_text())
+            cfg = json.loads(JOB_SCHED_CFG.read_text(encoding="utf-8-sig"))
             scheduler_state = {}
             scheduler_state_file = ROOT_DIR / "storage" / "ultra" / "ph76_ph100" / "phase82_job_scheduler_state.json"
             if scheduler_state_file.exists():
                 try:
-                    scheduler_state = json.loads(scheduler_state_file.read_text())
+                    scheduler_state = json.loads(scheduler_state_file.read_text(encoding="utf-8-sig"))
                     scheduler_daemon["started_at"] = scheduler_state.get("daemon_started_at")
                     scheduler_daemon["heartbeat"] = scheduler_state.get("daemon_heartbeat")
                     scheduler_daemon["pid"] = scheduler_state.get("daemon_pid")
@@ -3287,7 +3287,7 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
 
     # Load scheduler config to verify job ID
     try:
-        cfg = json.loads(JOB_SCHED_CFG.read_text())
+        cfg = json.loads(JOB_SCHED_CFG.read_text(encoding="utf-8-sig"))
         job = next((j for j in cfg.get("jobs", []) if j.get("id") == job_id), None)
         if not job:
             raise HTTPException(status_code=404, detail=f"Job '{job_id}' not found in scheduler config")
@@ -3328,7 +3328,7 @@ async def trigger_scheduler_job(job_id: str, background_tasks: BackgroundTasks, 
 
 # WebSocket connections
 active_connections: List[WebSocket] = []
-_MAX_WS_CONNECTIONS = 20  # hard cap — this is a small-team dashboard, not a
+_MAX_WS_CONNECTIONS = 20  # hard cap â€” this is a small-team dashboard, not a
 # consumer product. Each open connection runs its own dedicated per-second
 # loop on the single Render worker process (--workers 1, 512MB Starter box);
 # an unbounded number of stale/reconnecting tabs is an unbounded amount of
@@ -3558,8 +3558,8 @@ def ingest_cycle_metrics():
         if not perf_file.exists() or not health_file.exists():
             return
 
-        perf = json.loads(perf_file.read_text())
-        health = json.loads(health_file.read_text())
+        perf = json.loads(perf_file.read_text(encoding="utf-8-sig"))
+        health = json.loads(health_file.read_text(encoding="utf-8-sig"))
 
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
@@ -3630,11 +3630,11 @@ class HealthResponse(BaseModel):
     performance_sla: Dict[str, Any]
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# TTL CACHE — Prevents Render 503 cascade on cold-start and poll overload
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# TTL CACHE â€” Prevents Render 503 cascade on cold-start and poll overload
 # Heavy APIs cache their results. Cache is in-process dict (no Redis needed).
 # TTLs chosen for trading: broker data 30s, scanner 60s, accuracy 120s.
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 import time as _time_module
 
 _API_CACHE: dict = {}  # {key: (timestamp, data)}
@@ -3663,20 +3663,20 @@ def _cache_set(key: str, value):
 
 
 # TTL constants (seconds)
-_TTL_BROKER = 30  # holdings, positions, funds — Dhan API calls
-_TTL_PAPER = 15  # paper positions/pnl — changes each tick
-_TTL_SCANNER = 20  # market top CE/PE — micro-refreshed by background loop
+_TTL_BROKER = 30  # holdings, positions, funds â€” Dhan API calls
+_TTL_PAPER = 15  # paper positions/pnl â€” changes each tick
+_TTL_SCANNER = 20  # market top CE/PE â€” micro-refreshed by background loop
 _MARKET_TOP_STATE_FILE = ROOT_DIR / "state" / "market_top_ce_pe.json"
 _MARKET_TOP_MICRO_INTERVAL_S = 30.0  # leave Dhan OC budget for index chain stream
 _WS_MARKET_TOP_PUSH_S = 3.0
 _WS_CHAIN_PUSH_S_OPEN = 3.0
 _WS_CHAIN_PUSH_S_CLOSED = 15.0
-_TTL_ACCURACY = 120  # accuracy trend — file read, slow
+_TTL_ACCURACY = 120  # accuracy trend â€” file read, slow
 _TTL_PERF = 120  # performance data
 _TTL_PORTFOLIO = 30  # portfolio/unified
-_TTL_AUTO_GATES = 60  # auto gates — reads several files
+_TTL_AUTO_GATES = 60  # auto gates â€” reads several files
 _TTL_BROKER_TRUTH = 30  # broker truth validator
-_TTL_BATCH = 8.0  # dashboard batch endpoints — 5–10s window
+_TTL_BATCH = 8.0  # dashboard batch endpoints â€” 5â€“10s window
 
 
 def _slim_health(h: Any) -> Dict[str, Any]:
@@ -3832,7 +3832,7 @@ def _slim_gates(g: Any) -> Dict[str, Any]:
 
 
 def _slim_token_proof(proof: Any) -> Dict[str, Any]:
-    """Safe token provenance for System tab — never include raw access tokens."""
+    """Safe token provenance for System tab â€” never include raw access tokens."""
     if not isinstance(proof, dict):
         return {}
     out: Dict[str, Any] = {}
@@ -3937,7 +3937,7 @@ def _slim_rows_payload(payload: Any, keys: Tuple[str, ...]) -> Dict[str, Any]:
 
 @app.get("/api/batch/market-data")
 async def batch_market_data():
-    """Dashboard boot batch #1 — slim health/state/paper/rank/pnl/gates/alerts (8s TTL)."""
+    """Dashboard boot batch #1 â€” slim health/state/paper/rank/pnl/gates/alerts (8s TTL)."""
     hit = _cache_get("batch_market_data_v2", _TTL_BATCH)
     if hit is not None:
         out = dict(hit)
@@ -4041,7 +4041,7 @@ async def batch_market_data():
 
 @app.get("/api/batch/positions-holdings")
 async def batch_positions_holdings():
-    """Dashboard boot batch #2 — slim broker status/funds/holdings/positions (8s TTL)."""
+    """Dashboard boot batch #2 â€” slim broker status/funds/holdings/positions (8s TTL)."""
     hit = _cache_get("batch_positions_holdings_v1", _TTL_BATCH)
     if hit is not None:
         out = dict(hit)
@@ -4143,7 +4143,7 @@ async def batch_positions_holdings():
 # API Endpoints
 @app.get("/api/memory")
 async def get_memory():
-    """Real-time memory usage — RSS vs Starter limit (512MB)."""
+    """Real-time memory usage â€” RSS vs Starter limit (512MB)."""
     if sys.platform == "win32":
         return {
             "status": "SKIPPED",
@@ -4181,7 +4181,7 @@ async def orch_cloud_ready():
     """Cloud-native readiness for System3boat / ORCH (replaces localhost:5000).
 
     WhatsApp/ORCH scanners that probe flask_port_5000 should call this URL on
-    Cloud Run instead — never a laptop Flask port.
+    Cloud Run instead â€” never a laptop Flask port.
     """
     try:
         health = await get_health()
@@ -4209,7 +4209,7 @@ async def orch_cloud_ready():
         "scanner_hint": "/api/scanner/top_contract_gainers?top_n=5&market_top_n=10&include_equity=1",
         "ui": "/ui/?tab=genesis",
         "recommended_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
-        "message": "Use Cloud Run — do not probe localhost:5000",
+        "message": "Use Cloud Run â€” do not probe localhost:5000",
     }
 
 
@@ -4266,7 +4266,7 @@ def read_qc_status() -> tuple:
         return "NOT_READY", ["NO_QC_DATA"]
 
     try:
-        qc_data = json.loads(qc_file.read_text())
+        qc_data = json.loads(qc_file.read_text(encoding="utf-8-sig"))
     except (OSError, ValueError):
         return "NOT_READY", ["QC_REPORT_UNREADABLE"]
 
@@ -4318,7 +4318,7 @@ async def get_health():
                 else:
                     health_file = OUTPUTS_DIR / "health.json"
                     if health_file.exists():
-                        health_cached = json.loads(health_file.read_text())
+                        health_cached = json.loads(health_file.read_text(encoding="utf-8-sig"))
                         broker_connected = bool(
                             health_cached.get("is_connected")
                             or health_cached.get("broker_status") == "connected"
@@ -4328,7 +4328,7 @@ async def get_health():
             except Exception:
                 pass
 
-            # Dhan is the only broker — no AngelOne fallback
+            # Dhan is the only broker â€” no AngelOne fallback
 
             # If broker not ready, return explicit NOT_READY state
             if not broker_connected:
@@ -4408,7 +4408,7 @@ async def get_health():
 
         health = {}
         if health_file.exists():
-            health = json.loads(health_file.read_text())
+            health = json.loads(health_file.read_text(encoding="utf-8-sig"))
 
         if SSOT_AVAILABLE and state_store:
             ssot_state = state_store.get_state()
@@ -4428,7 +4428,7 @@ async def get_health():
 
         qc_data = {}
         if qc_file.exists():
-            qc_data = json.loads(qc_file.read_text())
+            qc_data = json.loads(qc_file.read_text(encoding="utf-8-sig"))
 
         # Determine market status from data
         if qc_data.get("status") == "MARKET_CLOSED":
@@ -4442,7 +4442,7 @@ async def get_health():
         perf_file = OUTPUTS_DIR / "perf_metrics.json"
         perf = {}
         if perf_file.exists():
-            perf = json.loads(perf_file.read_text())
+            perf = json.loads(perf_file.read_text(encoding="utf-8-sig"))
 
         # CRITICAL: ALWAYS use paper_pnl_summary.json as PRIMARY source for PnL
         # This is the single source of truth for PnL calculations
@@ -4453,7 +4453,7 @@ async def get_health():
         pnl_summary_file = OUTPUTS_DIR / "paper_pnl_summary.json"
         if pnl_summary_file.exists():
             try:
-                pnl_summary = json.loads(pnl_summary_file.read_text())
+                pnl_summary = json.loads(pnl_summary_file.read_text(encoding="utf-8-sig"))
                 # PRIMARY SOURCE: Use paper_pnl_summary.json values
                 total_pnl = float(pnl_summary.get("total_pnl", 0.0))
                 daily_pnl = float(pnl_summary.get("total_realized_pnl", 0.0))
@@ -4472,7 +4472,7 @@ async def get_health():
         positions_file = OUTPUTS_DIR / "positions_live.json"
         if positions_file.exists():
             try:
-                pos_data = json.loads(positions_file.read_text())
+                pos_data = json.loads(positions_file.read_text(encoding="utf-8-sig"))
                 if isinstance(pos_data, dict):
                     open_positions = pos_data.get("open_count", open_positions)
             except Exception:
@@ -4485,7 +4485,7 @@ async def get_health():
         # PERMANENT SAFETY: live_allowed is ALWAYS False in analyzer mode
         # Even if broker+market are ready, live trading requires ENV change + human approval
         live_allowed = False
-        live_blockers = ["Live trading permanently disabled — analyzer/paper mode only"]
+        live_blockers = ["Live trading permanently disabled â€” analyzer/paper mode only"]
         # live_blockers already set above (permanent)
         mode_raw = mode if SSOT_AVAILABLE and state_store else health.get("mode", "UNKNOWN")
         mode_effective = mode_raw or "PAPER"
@@ -4541,7 +4541,7 @@ async def get_qc():
                 logger.error(f'Unexpected error: {e}', exc_info=True)
                 pass
 
-        # Market closed — do not surface stale FAIL from last session (before broker gate)
+        # Market closed â€” do not surface stale FAIL from last session (before broker gate)
         if not market_is_open:
             return JSONResponse(
                 content={
@@ -4549,7 +4549,7 @@ async def get_qc():
                     "skipped": True,
                     "overall_passed": None,
                     "qc_passed": None,
-                    "message": "QC skipped — market closed (stale spread checks not applied)",
+                    "message": "QC skipped â€” market closed (stale spread checks not applied)",
                     "data_source": "skipped",
                     "total_contracts": 0,
                     "underlying_count": 0,
@@ -4566,7 +4566,7 @@ async def get_qc():
             else:
                 health_file = OUTPUTS_DIR / "health.json"
                 if health_file.exists():
-                    health = json.loads(health_file.read_text())
+                    health = json.loads(health_file.read_text(encoding="utf-8-sig"))
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
@@ -4595,7 +4595,7 @@ async def get_qc():
                 "data_source": "real",
             }
 
-        data = json.loads(qc_file.read_text())
+        data = json.loads(qc_file.read_text(encoding="utf-8-sig"))
         data["data_source"] = "real"
         # Ensure all required fields exist
         if "qc_passed" not in data:
@@ -4833,7 +4833,7 @@ async def get_underlyings():
     return {"underlyings": DEFAULT_UNDERLYINGS}
 
 
-_TTL_CHAIN = 20  # local dyno cache — keep longer so UI/WS do not stampede Dhan
+_TTL_CHAIN = 20  # local dyno cache â€” keep longer so UI/WS do not stampede Dhan
 
 
 def _csv_or_fallback_chain(result: Any) -> bool:
@@ -4856,7 +4856,7 @@ def _last_good_dhan_chain(sym: str) -> Optional[Dict[str, Any]]:
         out["stale"] = True
         out["live"] = False
         out["status"] = "DHAN_LAST_GOOD"
-        out["message"] = "Dhan OC timed out — last good Dhan option chain"
+        out["message"] = "Dhan OC timed out â€” last good Dhan option chain"
         return out
     ttl = _cache_get(f"chain_{sym}", 86400.0)
     if _usable_chain_snapshot(ttl) and not _csv_or_fallback_chain(ttl):
@@ -4864,7 +4864,7 @@ def _last_good_dhan_chain(sym: str) -> Optional[Dict[str, Any]]:
         out["stale"] = True
         out["live"] = False
         out["status"] = "DHAN_LAST_GOOD"
-        out["message"] = "Dhan OC timed out — last good Dhan option chain"
+        out["message"] = "Dhan OC timed out â€” last good Dhan option chain"
         return out
     return None
 
@@ -4954,7 +4954,7 @@ def _warming_chain_placeholder(sym: str) -> Dict[str, Any]:
         "live": False,
         "snapshot": True,
         "stale": True,
-        "message": "Index chain warming from micro-loop — UI must not wait on live Dhan OC",
+        "message": "Index chain warming from micro-loop â€” UI must not wait on live Dhan OC",
     }
 
 
@@ -4969,7 +4969,7 @@ def _resolve_batch_chain_entry(sym: str) -> Dict[str, Any]:
     snap_file = ROOT_DIR / "state" / "chain_cache" / f"{sym.upper()}.json"
     if snap_file.exists():
         try:
-            snap = json.loads(snap_file.read_text(encoding="utf-8"))
+            snap = json.loads(snap_file.read_text(encoding="utf-8-sig"))
             if _usable_chain_snapshot(snap):
                 return _store_index_chain_snapshot(sym, snap, False)
         except Exception:
@@ -5096,7 +5096,7 @@ def _equity_gainer_rotation_symbols() -> List[str]:
         mc_path = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
         if mc_path.exists():
             try:
-                payload = json.loads(mc_path.read_text(encoding="utf-8"))
+                payload = json.loads(mc_path.read_text(encoding="utf-8-sig"))
                 mc_rows = [r for r in (payload.get("market_top_table") or []) if isinstance(r, dict)]
             except Exception:
                 mc_rows = []
@@ -5216,7 +5216,7 @@ def _paper_market_top_rows() -> List[Dict[str, Any]]:
         mt = _cache_get("scanner_gainers:5:25:1", 90.0)
     if (not isinstance(mt, dict) or not (mt.get("market_top_table") or [])) and _MARKET_TOP_STATE_FILE.exists():
         try:
-            mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+            mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8-sig"))
         except Exception:
             mt = None
     rows = list((mt or {}).get("market_top_table") or [])
@@ -5252,7 +5252,7 @@ async def get_six_index_truth():
 @app.get("/api/chains")
 @app.get("/api/batch/chains")
 async def batch_chains():
-    """Index chains for TopBar/Overview — cache/push only, never blocks on Dhan OC.
+    """Index chains for TopBar/Overview â€” cache/push only, never blocks on Dhan OC.
 
     Incomplete required-symbol payloads are not cached. Caching CHAIN_CACHE_WARMING
     for 8s is what made FINNIFTY/MIDCPNIFTY look permanently cold during smoke.
@@ -5289,7 +5289,7 @@ async def get_chain(underlying: str):
     Preference order: (1) fresh/stale-but-usable push/micro-loop snapshot;
     (2) short local TTL cache; (3) after hours only, paced snapshot fetch.
     During market hours HTTP never competes with index_chain_micro_loop for
-    live Dhan OC — that inline wait is what painted 10s NIFTY GETs in Chrome.
+    live Dhan OC â€” that inline wait is what painted 10s NIFTY GETs in Chrome.
     """
     sym = underlying.upper()
     pushed = _chain_from_push_cache(sym)
@@ -5332,7 +5332,7 @@ async def get_chain(underlying: str):
             "live": False,
             "snapshot": True,
             "stale": True,
-            "message": f"Option chain fetch timed out after {live_timeout:.0f}s — keeping UI responsive",
+            "message": f"Option chain fetch timed out after {live_timeout:.0f}s â€” keeping UI responsive",
         }
     if isinstance(result, dict) and float(result.get("spot") or 0) > 0:
         _PUSHED_CHAIN_CACHE[sym] = {
@@ -5341,7 +5341,7 @@ async def get_chain(underlying: str):
             "market_open": bool(result.get("live", open_now)),
         }
         return _cache_set(cache_key, result)
-    # Never cache empty/failed OC — that poisons /api/chain for the TTL window.
+    # Never cache empty/failed OC â€” that poisons /api/chain for the TTL window.
     return result
 
 
@@ -5370,7 +5370,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 for _snap_file in _candidates:
                     if not _snap_file.exists():
                         continue
-                    _snap = json.loads(_snap_file.read_text(encoding="utf-8"))
+                    _snap = json.loads(_snap_file.read_text(encoding="utf-8-sig"))
                     _contracts = _snap.get("contracts") or []
                     if not _contracts:
                         continue
@@ -5387,7 +5387,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                         _snap.get("total_contracts") or len(_contracts)
                     )
                     _snap["message"] = (
-                        "Market closed — last verified Dhan snapshot "
+                        "Market closed â€” last verified Dhan snapshot "
                         f"({_snap.get('snapshot_time') or _snap.get('fetched_at_utc') or _snap_file.name})"
                     )
                     from dashboard.backend.chain_adapter import normalize_index_chain_exchange
@@ -5411,7 +5411,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     _closed_dhan_chain_fetch, timeout=_closed_to
                 )
                 if closed_chain and int(closed_chain.get("total_contracts") or 0) > 0:
-                    # Dhan still returns last quotes after hours — show as snapshot, not live.
+                    # Dhan still returns last quotes after hours â€” show as snapshot, not live.
                     closed_chain["data_source"] = "dhan"
                     closed_chain["status"] = "MARKET_CLOSED_DHAN_SNAPSHOT"
                     closed_chain["live"] = False
@@ -5420,7 +5420,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                     closed_chain["source_priority"] = "dhan_last_verified_snapshot"
                     closed_chain["snapshot_time"] = datetime.now(IST).strftime("%Y-%m-%d %H:%M IST")
                     closed_chain["message"] = (
-                        "Market closed — last verified Dhan option-chain snapshot "
+                        "Market closed â€” last verified Dhan option-chain snapshot "
                         f"({closed_chain['snapshot_time']})"
                     )
                     try:
@@ -5456,7 +5456,7 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
             else:
                 health_file = OUTPUTS_DIR / "health.json"
                 if health_file.exists():
-                    health = json.loads(health_file.read_text())
+                    health = json.loads(health_file.read_text(encoding="utf-8-sig"))
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
@@ -5501,9 +5501,9 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 }
 
         # ALWAYS try Dhan P0 first when market is open (or as fallback)
-        # chain_raw_live.csv on Render is from repo clone — may be months old
-        # DSM → dhan_option_chain_parser → live Greeks, OI change, bid/ask
-        # CRITICAL: fetch_chain_for_api is sync HTTP — must run off the event loop
+        # chain_raw_live.csv on Render is from repo clone â€” may be months old
+        # DSM â†’ dhan_option_chain_parser â†’ live Greeks, OI change, bid/ask
+        # CRITICAL: fetch_chain_for_api is sync HTTP â€” must run off the event loop
         # or /ui and /api/health starve (Cloud Run "upstream request timeout").
         try:
 
@@ -5536,15 +5536,15 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
                 return _live
             else:
                 print(
-                    f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) — using CSV fallback"
+                    f"[chain/{underlying}] DSM returned empty/small ({len((_live or {}).get('contracts', []))} contracts) â€” using CSV fallback"
                 )
         except asyncio.TimeoutError:
-            print(f"[chain/{underlying}] DSM timed out — keeping last good Dhan (no CSV)")
+            print(f"[chain/{underlying}] DSM timed out â€” keeping last good Dhan (no CSV)")
             kept = _last_good_dhan_chain(str(underlying).upper())
             if kept is not None:
                 return kept
         except Exception as _dsm_err:
-            print(f"[chain/{underlying}] DSM failed: {_dsm_err} — keeping last good Dhan (no CSV)")
+            print(f"[chain/{underlying}] DSM failed: {_dsm_err} â€” keeping last good Dhan (no CSV)")
             kept = _last_good_dhan_chain(str(underlying).upper())
             if kept is not None:
                 return kept
@@ -5576,14 +5576,14 @@ async def _get_chain_uncached(underlying: str, closed_timeout_s: float | None = 
             return {
                 "underlying": underlying,
                 "contracts": [],
-                "message": "Chain data not found — Dhan fetch also failed",
+                "message": "Chain data not found â€” Dhan fetch also failed",
                 "spot": 0,
                 "pcr": 1.0,
                 "total_contracts": 0,
                 "data_source": "real",
             }
 
-        # DSM already tried above — directly read CSV as last resort
+        # DSM already tried above â€” directly read CSV as last resort
 
         # Try pandas first, fallback to csv module
         df = None
@@ -5875,7 +5875,7 @@ async def get_top_signal():
             signal_file = OUTPUTS_DIR / "top_trade_signal.json"
             if signal_file.exists():
                 try:
-                    last = json.loads(signal_file.read_text(encoding="utf-8"))
+                    last = json.loads(signal_file.read_text(encoding="utf-8-sig"))
                     if isinstance(last, dict) and last:
                         last = dict(last)
                         last["action"] = "NO_TRADE"
@@ -5884,7 +5884,7 @@ async def get_top_signal():
                         last["live"] = False
                         last["snapshot"] = True
                         last["reason"] = (
-                            "Market closed — showing last session signal snapshot; "
+                            "Market closed â€” showing last session signal snapshot; "
                             "not executable until market open"
                         )
                         last["data_source"] = last.get("data_source") or "dhan_last_session"
@@ -5908,7 +5908,7 @@ async def get_top_signal():
             else:
                 health_file = OUTPUTS_DIR / "health.json"
                 if health_file.exists():
-                    health = json.loads(health_file.read_text())
+                    health = json.loads(health_file.read_text(encoding="utf-8-sig"))
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
@@ -5926,7 +5926,7 @@ async def get_top_signal():
         if not signal_file.exists():
             return {"action": "NO_TRADE", "reason": "Signal file not found", "data_source": "real"}
 
-        data = json.loads(signal_file.read_text())
+        data = json.loads(signal_file.read_text(encoding="utf-8-sig"))
         data["data_source"] = "real"
         und = str(data.get("underlying") or data.get("symbol") or "").strip().upper()
         if und:
@@ -5977,11 +5977,11 @@ async def get_positions():
                 "as_of_utc": utc_now,
                 "freshness_seconds": 0.0,
                 "verification_status": "VERIFIED_SIMULATION",
-                "reason_if_unverified": "Market closed — zero active paper positions.",
+                "reason_if_unverified": "Market closed â€” zero active paper positions.",
                 "message": "Zero active open paper positions",
             }
 
-        data = json.loads(positions_file.read_text())
+        data = json.loads(positions_file.read_text(encoding="utf-8-sig"))
 
         # Handle different formats
         if isinstance(data, dict):
@@ -6123,7 +6123,7 @@ async def get_pnl():
         summary = {}
         if pnl_summary.exists():
             try:
-                summary = json.loads(pnl_summary.read_text())
+                summary = json.loads(pnl_summary.read_text(encoding="utf-8-sig"))
             except Exception:
                 summary = {}
         # Prefer cloud paper engine live file whenever present (includes open unrealized).
@@ -6135,7 +6135,7 @@ async def get_pnl():
         pnl_live = next((p for p in pnl_live_candidates if p.exists()), None)
         if pnl_live and pnl_live.exists():
             try:
-                live = json.loads(pnl_live.read_text(encoding="utf-8"))
+                live = json.loads(pnl_live.read_text(encoding="utf-8-sig"))
                 if isinstance(live, dict) and not is_unproven_paper_summary(live, len(csv_data)):
                     summary = live
             except Exception:
@@ -6171,12 +6171,12 @@ async def get_pnl():
                 processed_item["timestamp"] = datetime.now(IST).isoformat()
             processed_history.append(processed_item)
 
-        # ── REMOVED Feb-2026 fixture fallback ──────────────────────────────────
+        # â”€â”€ REMOVED Feb-2026 fixture fallback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # Previously: loaded paper_closed_trades_feb2026.json when no real trades.
         # This caused FAKE Feb-1 data to appear in the Paper tab as if real trades.
-        # Fix: honest empty state — no trades until cloud paper engine generates them.
+        # Fix: honest empty state â€” no trades until cloud paper engine generates them.
         if not processed_history:
-            pass  # Honest: no historical trades yet — engine will populate during market hours
+            pass  # Honest: no historical trades yet â€” engine will populate during market hours
 
         # Keep /api/pnl fast for dashboard health checks. Symbol enrichment loads the
         # instrument master and can exceed the verifier timeout when no live PnL file exists.
@@ -6243,7 +6243,7 @@ async def get_performance():
             else:
                 health_file = OUTPUTS_DIR / "health.json"
                 if health_file.exists():
-                    health = json.loads(health_file.read_text())
+                    health = json.loads(health_file.read_text(encoding="utf-8-sig"))
                     broker_connected = health.get("is_connected", False)
 
             if not broker_connected:
@@ -6268,7 +6268,7 @@ async def get_performance():
                 "data_source": "real",
             }
 
-        data = json.loads(perf_file.read_text())
+        data = json.loads(perf_file.read_text(encoding="utf-8-sig"))
 
         # Get historical data from SQLite
         history = []
@@ -6405,7 +6405,7 @@ async def get_paper():
     """Get paper trading data (combines positions and PnL).
 
     Paper is local simulation marked-to-market from live Dhan option chains.
-    Dhan has no broker-side paper sandbox for production tokens — order APIs
+    Dhan has no broker-side paper sandbox for production tokens â€” order APIs
     must remain NOT called (LIVE_TRADING_ENABLED=0).
     """
     _hit = _cache_get("paper", _TTL_PAPER)
@@ -6557,7 +6557,7 @@ async def get_paper_status():
     state_file = OUTPUTS_DIR / "paper_engine_state.json"
     if state_file.exists():
         try:
-            state = json.loads(state_file.read_text(encoding="utf-8"))
+            state = json.loads(state_file.read_text(encoding="utf-8-sig"))
             open_count = len(state.get("open_positions") or [])
             last_tick_ist = state.get("last_tick_ist")
             session_date = state.get("session_date")
@@ -6651,7 +6651,7 @@ async def get_options_intelligence_endpoint(underlying: str = "NIFTY"):
 
 @app.get("/api/charts")
 async def get_charts_index(symbol: str = "NIFTY"):
-    """Default charts endpoint — delegates to symbol-specific handler (PEND-012)."""
+    """Default charts endpoint â€” delegates to symbol-specific handler (PEND-012)."""
     return await get_chart_data(symbol)
 
 
@@ -6976,7 +6976,7 @@ async def get_simulation_live_state(scenario: str = "paper_analyzer"):
             "source": "paper_api",
         },
         "gates": gate_flags,
-        "safety_banner": "SIMULATION ONLY — no broker order APIs, live trading remains OFF",
+        "safety_banner": "SIMULATION ONLY â€” no broker order APIs, live trading remains OFF",
     }
 
 
@@ -7132,12 +7132,12 @@ async def audit_secrets():
 @app.websocket("/ws/stream")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket for real-time updates - Only active during market hours (Mon-Fri, 9:15 AM - 3:30 PM IST)"""
-    # Accept WS connection always — market status sent in first message
-    # (Previously rejected outside hours with 1008 — this broke testing and
+    # Accept WS connection always â€” market status sent in first message
+    # (Previously rejected outside hours with 1008 â€” this broke testing and
     # prevented the dashboard from showing WS as connected during dev)
     await websocket.accept()
     if len(active_connections) >= _MAX_WS_CONNECTIONS:
-        await websocket.close(code=1013, reason="Too many live connections — try again shortly")
+        await websocket.close(code=1013, reason="Too many live connections â€” try again shortly")
         return
     market_open_now = False
     market_close_reason = "unknown"
@@ -7147,7 +7147,7 @@ async def websocket_endpoint(websocket: WebSocket):
         except Exception:
             pass
     # First frame must leave immediately. Chrome Network lists an open socket as
-    # Status 101 / 0.0 kB / Pending until it closes — that is not a stall.
+    # Status 101 / 0.0 kB / Pending until it closes â€” that is not a stall.
     try:
         await websocket.send_json(
             {
@@ -7173,7 +7173,7 @@ async def websocket_endpoint(websocket: WebSocket):
     active_connections.append(websocket)
 
     try:
-        # Send initial live snapshot (API-backed — Cloud has no durable health.json)
+        # Send initial live snapshot (API-backed â€” Cloud has no durable health.json)
         try:
             health_payload = await get_health()
             await websocket.send_json(
@@ -7210,7 +7210,7 @@ async def websocket_endpoint(websocket: WebSocket):
         try:
             mt = _cache_get("scanner_gainers:5:25:1", 300.0)
             if mt is None and _MARKET_TOP_STATE_FILE.exists():
-                mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+                mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8-sig"))
             if isinstance(mt, dict) and (mt.get("market_top_table") or []):
                 await websocket.send_json(
                     {
@@ -7257,7 +7257,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 except Exception:
                     pass
 
-            # Fan out cached live board only. Never await get_market_live_board here —
+            # Fan out cached live board only. Never await get_market_live_board here â€”
             # that path can block 12s on Dhan marketfeed and stall every WS frame.
             if now - last_live_board_send >= 1.0:
                 try:
@@ -7315,7 +7315,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 try:
                     mt = _cache_get("scanner_gainers:5:25:1", 120.0)
                     if mt is None and _MARKET_TOP_STATE_FILE.exists():
-                        mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8"))
+                        mt = json.loads(_MARKET_TOP_STATE_FILE.read_text(encoding="utf-8-sig"))
                     table = (mt or {}).get("market_top_table") or []
                     if table:
                         await websocket.send_json(
@@ -7466,7 +7466,7 @@ async def index_chain_micro_loop():
     """Paced index option-chain warmer for market-hours streaming.
 
     Owns live Dhan OC for the configured NSE/BSE index stream symbols. WS + UI must
-    read `_PUSHED_CHAIN_CACHE` only — never fan-out live OC themselves.
+    read `_PUSHED_CHAIN_CACHE` only â€” never fan-out live OC themselves.
 
     Cold-start warms the four required smoke symbols back-to-back (DSM gap
     only) so batch/chains is not gated on lucky serial 20s closed-market timing.
@@ -7571,7 +7571,7 @@ async def moneycontrol_gainers_micro_loop():
 
 async def cloud_paper_trading_loop():
     """Background task: generate paper trades from live chain during market hours.
-    PAPER ONLY — never places real orders. Phantom-guarded, single-lot."""
+    PAPER ONLY â€” never places real orders. Phantom-guarded, single-lot."""
     import asyncio as _asyncio
 
     # Allow disabling via env (default ON)
@@ -7610,7 +7610,7 @@ async def cloud_paper_trading_loop():
                         continue
 
                 # Prefer today's Dhan Market Top for paper discovery
-                # (still PAPER ONLY — never places broker orders).
+                # (still PAPER ONLY â€” never places broker orders).
                 market_top_rows: list = []
                 try:
                     market_top_rows = _paper_market_top_rows()
@@ -7641,27 +7641,27 @@ async def cloud_paper_trading_loop():
 
 def _refresh_spot_prices_blocking() -> None:
     """
-    Spot price refresh — DISABLED in web process.
+    Spot price refresh â€” DISABLED in web process.
 
     Yahoo Finance via requests library was using ~150MB RAM
     (requests.Session + urllib3 connection pool stays alive).
 
     Spot prices now come from:
-    1. /api/chain/{sym} — NSE direct, polled every 5s by frontend useData
-    2. gain_rank_history.json — written by worker scheduler at 09:15 IST
+    1. /api/chain/{sym} â€” NSE direct, polled every 5s by frontend useData
+    2. gain_rank_history.json â€” written by worker scheduler at 09:15 IST
 
     This function is kept as a no-op so the executor call in
     background_data_refresh() doesn't crash. The background task
     itself now sleeps for 5 minutes between no-op calls to save CPU.
     """
-    pass  # Yahoo Finance disabled — NSE data used instead
+    pass  # Yahoo Finance disabled â€” NSE data used instead
 
 def _run_startup_token_refresh_blocking() -> None:
-    """Synchronous Dhan token refresh — only ever called via asyncio.to_thread
+    """Synchronous Dhan token refresh â€” only ever called via asyncio.to_thread
     from _startup_token_refresh_task, never awaited directly in the startup
     event handler. A hang here must never block the server from accepting
     requests (this previously ran inline in startup(), which could freeze
-    the whole single-process event loop — and the entire app — if Dhan's
+    the whole single-process event loop â€” and the entire app â€” if Dhan's
     auth endpoint was slow or unresponsive).
     """
     import importlib.util as _ilu
@@ -7689,7 +7689,7 @@ async def _startup_token_refresh_task() -> None:
     try:
         await asyncio.wait_for(asyncio.to_thread(_run_startup_token_refresh_blocking), timeout=45)
     except asyncio.TimeoutError:
-        print("[startup] Token refresh timed out after 45s (non-fatal) — continuing with existing token")
+        print("[startup] Token refresh timed out after 45s (non-fatal) â€” continuing with existing token")
     except Exception as _e:
         print(f"[startup] Token refresh error (non-fatal): {_e}")
 
@@ -7778,13 +7778,13 @@ async def startup():
             rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024
             print(f"[startup] RSS after startup: {rss_mb:.0f}MB / 512MB Starter limit")
             if rss_mb > 350:
-                print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB — OOM risk")
+                print(f"[startup] WARNING: High startup memory {rss_mb:.0f}MB â€” OOM risk")
             else:
-                print(f"[startup] Memory OK — {512-rss_mb:.0f}MB headroom remaining")
+                print(f"[startup] Memory OK â€” {512-rss_mb:.0f}MB headroom remaining")
         except Exception as e:
             print(f"[startup] Memory check skipped: {e}")
 
-    # Attempt token refresh at startup using PIN+TOTP (non-fatal — cloud mode).
+    # Attempt token refresh at startup using PIN+TOTP (non-fatal â€” cloud mode).
     # Fired as a background task (never awaited here) so a slow/hung Dhan
     # auth call cannot delay or block the server from accepting requests.
     _pin = os.environ.get("DHAN_PIN", "").strip()
@@ -7798,7 +7798,7 @@ async def startup():
         asyncio.create_task(_startup_token_refresh_task())
     else:
         if not os.environ.get("DHAN_ACCESS_TOKEN"):
-            print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set — token refresh skipped")
+            print("[startup] DHAN_PIN/DHAN_TOTP_SECRET not set â€” token refresh skipped")
         elif not _startup_refresh:
             print("[startup] token refresh disabled via SYSTEM3_STARTUP_TOKEN_REFRESH=0")
 
@@ -7810,13 +7810,13 @@ async def startup():
     if os.environ.get("SYSTEM3_WORLD_CLASS_30MIN_TRACKER", "1") not in ("0", "false", "False"):
         asyncio.create_task(world_class_30min_tracker_loop())
         print("[world-class-30min] local tracker started (1800s)")
-    asyncio.create_task(broker_self_heal_loop())
+    # asyncio.create_task(broker_self_heal_loop()) # FIXED MISSING
     print('[self-heal] scheduled')
 
     # Optional worker. Missing module is skipped once; do not invent the worker.
     _start_async_background_worker_if_present()
 
-    # Start cloud paper trading loop (PAPER ONLY — generates live paper trades)
+    # Start cloud paper trading loop (PAPER ONLY â€” generates live paper trades)
     # Default ON for Cloud so Paper/Performance tabs are not permanently zero.
     if _paper_loop_enabled():
         asyncio.create_task(cloud_paper_trading_loop())
@@ -7824,14 +7824,14 @@ async def startup():
     else:
         print("[paper-loop] disabled via CLOUD_PAPER_ENGINE=0 (not started)")
 
-    # Index chain warmer FIRST — this is what makes market-hours UI stream.
+    # Index chain warmer FIRST â€” this is what makes market-hours UI stream.
     if os.environ.get("INDEX_CHAIN_MICRO_STREAM", "1") not in ("0", "false", "False"):
         asyncio.create_task(index_chain_micro_loop())
         print("[index-chain-micro] started (INDEX_CHAIN_MICRO_STREAM enabled)")
     else:
         print("[index-chain-micro] disabled via INDEX_CHAIN_MICRO_STREAM=0")
 
-    # Ultra-micro Market Top CE/PE refresh → feeds /ws/stream + scanner cache
+    # Ultra-micro Market Top CE/PE refresh â†’ feeds /ws/stream + scanner cache
     if os.environ.get("MARKET_TOP_MICRO_STREAM", "1") not in ("0", "false", "False"):
         asyncio.create_task(market_top_micro_loop())
         asyncio.create_task(moneycontrol_gainers_micro_loop())
@@ -7920,7 +7920,7 @@ async def get_validation_status():
             return {"status": "NO_DATA", "message": "No validation reports found"}
 
         latest_report = max(reports, key=lambda p: p.stat().st_mtime)
-        data = json.loads(latest_report.read_text())
+        data = json.loads(latest_report.read_text(encoding="utf-8-sig"))
 
         return {"status": "ok", "report": data, "report_file": latest_report.name, "timestamp": data.get("timestamp")}
     except Exception as e:
@@ -8196,7 +8196,7 @@ async def _synthesize_operational_alerts() -> list:
         )
 
     try:
-        # Moneycontrol scrape (reference only — Dhan is trading truth)
+        # Moneycontrol scrape (reference only â€” Dhan is trading truth)
         mc = None
         for _mc_key in (
             "moneycontrol_gainers:25",
@@ -8211,7 +8211,7 @@ async def _synthesize_operational_alerts() -> list:
             disk = ROOT_DIR / "state" / "moneycontrol_option_gainers.json"
             if disk.exists():
                 try:
-                    mc = json.loads(disk.read_text(encoding="utf-8"))
+                    mc = json.loads(disk.read_text(encoding="utf-8-sig"))
                 except Exception:
                     mc = None
         if isinstance(mc, dict) and str(mc.get("status") or "").upper() in {
@@ -8247,7 +8247,7 @@ async def _synthesize_operational_alerts() -> list:
                 {"symbols": cold},
             )
 
-        # Live gate blockers (informational — must stay blocked)
+        # Live gate blockers (informational â€” must stay blocked)
         try:
             gate = await get_live_trading_gate()
         except Exception:
@@ -8610,7 +8610,7 @@ async def run_backtest_endpoint(strategy_config: Dict[str, Any], historical_data
 def _ml_accuracy_report_record(report_json: Path) -> Dict[str, Any]:
     """Build an honest proof record from model_accuracy_report.json (fail-closed)."""
     try:
-        rep = json.loads(report_json.read_text(encoding="utf-8"))
+        rep = json.loads(report_json.read_text(encoding="utf-8-sig"))
     except Exception as exc:
         return {
             "status": "ERROR",
@@ -8658,7 +8658,7 @@ def _ml_accuracy_report_record(report_json: Path) -> Dict[str, Any]:
 def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
     """Normalize options_ml_training_summary.json into UI-compatible proof fields."""
     try:
-        data = json.loads(options_ml.read_text(encoding="utf-8"))
+        data = json.loads(options_ml.read_text(encoding="utf-8-sig"))
     except Exception as exc:
         return {
             "status": "ERROR",
@@ -8753,7 +8753,7 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
             status = "PROVEN_ANALYZER_ONLY"
     elif usable:
         message = (
-            f"Loaded {len(usable)} blocked accuracy artifact(s). Model not proven — "
+            f"Loaded {len(usable)} blocked accuracy artifact(s). Model not proven â€” "
             "missing matured prediction history / post-market validation."
         )
         if blockers:
@@ -8795,7 +8795,7 @@ async def get_ml_performance(model_name: Optional[str] = None):
     except Exception as e:
         performance["error"] = str(e)[:200]
 
-    # Always merge file proof so ML tab is not blank on Cloud — but fail-closed on readiness.
+    # Always merge file proof so ML tab is not blank on Cloud â€” but fail-closed on readiness.
     report_json = ROOT_DIR / "reports" / "latest" / "model_accuracy_report.json"
     options_ml = ROOT_DIR / "reports" / "latest" / "options_ml_training_summary.json"
     models = performance.get("models") if isinstance(performance.get("models"), dict) else {}
@@ -8824,7 +8824,7 @@ async def get_ml_performance(model_name: Optional[str] = None):
             "total_predictions": 0,
             "avg_accuracy": None,
             "avg_confidence": None,
-            "message": "No proven ML artifacts yet — analyzer/paper only until validation days exist",
+            "message": "No proven ML artifacts yet â€” analyzer/paper only until validation days exist",
             "blocker_reason": "NO_ML_ARTIFACTS",
         }
     summary = _ml_models_proof_summary(models)
@@ -9258,12 +9258,12 @@ async def get_backtest_results():
     costed = {}
     try:
         if summary_path.exists():
-            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+            summary = json.loads(summary_path.read_text(encoding="utf-8-sig"))
     except Exception as exc:
         summary = {"error": str(exc)[:160]}
     try:
         if costed_path.exists():
-            costed = json.loads(costed_path.read_text(encoding="utf-8"))
+            costed = json.loads(costed_path.read_text(encoding="utf-8-sig"))
     except Exception as exc:
         costed = {"error": str(exc)[:160]}
     # Operator view: never dump repo file-path "candidates_sample" as trade evidence.
@@ -9527,7 +9527,7 @@ async def create_order(order_data: Dict[str, Any]):
             }
 
         try:
-            live_cfg = json.loads((ROOT_DIR / "config" / "live_trade_config.json").read_text())
+            live_cfg = json.loads((ROOT_DIR / "config" / "live_trade_config.json").read_text(encoding="utf-8-sig"))
         except Exception:
             live_cfg = {}
         risk_limits = {
@@ -9655,7 +9655,7 @@ async def get_today_trades():
         def _today_match(ts: str) -> bool:
             return today in (ts or "")
 
-        # Cloud paper CSV tape (OPEN/CLOSE) — primary exit evidence for PAPER_CLOUD_SIM
+        # Cloud paper CSV tape (OPEN/CLOSE) â€” primary exit evidence for PAPER_CLOUD_SIM
         try:
             import csv as _csv
 
@@ -9729,14 +9729,14 @@ async def get_today_trades():
         lifecycle_summary = ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof" / "summary.json"
         if lifecycle_summary.exists():
             try:
-                proof = json.loads(lifecycle_summary.read_text(encoding="utf-8"))
+                proof = json.loads(lifecycle_summary.read_text(encoding="utf-8-sig"))
                 started = (proof.get("evidence") or {}).get("proof_id") or ""
                 if proof.get("pass") and _today_match(started):
                     proof_file = sorted(
                         (ROOT_DIR / "reports" / "latest" / "analyzer_paper_lifecycle_proof").glob("LIFECYCLE_*.json")
                     )
                     if proof_file:
-                        detail = json.loads(proof_file[-1].read_text(encoding="utf-8"))
+                        detail = json.loads(proof_file[-1].read_text(encoding="utf-8-sig"))
                         oid = (detail.get("entry_order") or {}).get("order_id")
                         if oid and not any(t.get("position_id") == oid for t in trades):
                             sig = detail.get("signal") or {}
@@ -9840,7 +9840,7 @@ async def get_agent_memory():
 
         memory_file = ROOT_DIR / "agent_memory" / "tasks.json"
         if memory_file.exists():
-            return json.loads(memory_file.read_text())
+            return json.loads(memory_file.read_text(encoding="utf-8-sig"))
         return {"status": "ok", "tasks": [], "run_id": "NONE"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -9880,7 +9880,7 @@ async def get_upgrade_plan():
         )
 
         if plan_files:
-            plan = json.loads(plan_files[0].read_text())
+            plan = json.loads(plan_files[0].read_text(encoding="utf-8-sig"))
             if plan.get("status") in ["draft", "ready"]:
                 return {"status": "ok", **plan}
 
@@ -9932,7 +9932,7 @@ async def apply_upgrade(plan_data: Dict[str, Any]):
         if not plan_file.exists():
             return {"status": "error", "message": "Plan not found"}
 
-        plan = json.loads(plan_file.read_text())
+        plan = json.loads(plan_file.read_text(encoding="utf-8-sig"))
         test_results = upgrade_agent.run_tests(plan)
         result = upgrade_agent.apply_upgrade(plan, test_results)
 
@@ -9953,7 +9953,7 @@ async def rollback_upgrade():
         )
 
         for plan_file in plan_files:
-            plan = json.loads(plan_file.read_text())
+            plan = json.loads(plan_file.read_text(encoding="utf-8-sig"))
             if plan.get("status") == "applied":
                 plan["status"] = "rolled_back"
                 plan["rolled_back_at"] = datetime.now(IST).isoformat()
@@ -9973,7 +9973,7 @@ async def get_test_results(plan_id: str):
     try:
         test_file = ROOT_DIR / "agent_memory" / "test_runs" / f"test_{plan_id}.json"
         if test_file.exists():
-            return json.loads(test_file.read_text())
+            return json.loads(test_file.read_text(encoding="utf-8-sig"))
         return {"status": "error", "message": "Test results not found"}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -10310,12 +10310,12 @@ async def runner_status():
     import time
 
     try:
-        # Read heartbeat file directly — spawning runner.py as subprocess is
+        # Read heartbeat file directly â€” spawning runner.py as subprocess is
         # unsafe on 512Mi Render (imports all modules, spikes RAM to OOM).
         heartbeat_file = ROOT_DIR / "system3_daily_heartbeat.json"
         if heartbeat_file.exists():
             try:
-                hb = json.loads(heartbeat_file.read_text())
+                hb = json.loads(heartbeat_file.read_text(encoding="utf-8-sig"))
                 hb_age = time.time() - heartbeat_file.stat().st_mtime
                 return {
                     "runner": "RUNNING" if hb_age < 120 else "STALE",
@@ -10332,7 +10332,7 @@ async def runner_status():
         return {
             "runner": "NOT_STARTED",
             "runner_script_exists": runner_script.exists(),
-            "message": "No heartbeat file found — runner has not run yet",
+            "message": "No heartbeat file found â€” runner has not run yet",
         }
     except Exception as e:
         return {"runner": "ERROR", "error": str(e)}
@@ -10602,7 +10602,7 @@ def _get_runtime_state() -> Dict[str, Any]:
     try:
         path = OUTPUTS_DIR / "runtime_state.json"
         if path.exists():
-            data = json.loads(path.read_text(encoding="utf-8"))
+            data = json.loads(path.read_text(encoding="utf-8-sig"))
             if isinstance(data, dict):
                 return data
     except Exception:
@@ -10669,7 +10669,7 @@ def _compat_ml_signal_for_symbol(symbol: str) -> Optional[Dict[str, Any]]:
 def _compat_read_json(path: Path, default: Any):
     try:
         if path.exists():
-            return json.loads(path.read_text(encoding="utf-8"))
+            return json.loads(path.read_text(encoding="utf-8-sig"))
     except Exception:
         pass
     return default
@@ -10830,7 +10830,7 @@ async def broker_self_heal_loop():
                         ):
                             print(
                                 "[self-heal] token refresh disabled via "
-                                "BROKER_SELF_HEAL_TOKEN_REFRESH=0 — keeping mounted secret"
+                                "BROKER_SELF_HEAL_TOKEN_REFRESH=0 â€” keeping mounted secret"
                             )
                             _BROKER_HEAL_IN_PROGRESS = False
                             # Disabled recovery must retain the failure poll backoff.
@@ -10841,7 +10841,7 @@ async def broker_self_heal_loop():
                             from core.brokers.dhan.token_manager import refresh_token
 
                             result = await asyncio.wait_for(
-                                # Never force-generate here — that invalidates the live
+                                # Never force-generate here â€” that invalidates the live
                                 # Cloud Run secret token (DH-906) and kills option-chain.
                                 asyncio.to_thread(refresh_token, False),
                                 timeout=60.0,
@@ -11199,7 +11199,7 @@ def _genesis_read_memory(limit: int = 200) -> List[Dict[str, Any]]:
         return []
     rows = []
     try:
-        for line in _GENESIS_MEMORY_FILE.read_text(encoding="utf-8").splitlines()[-limit:]:
+        for line in _GENESIS_MEMORY_FILE.read_text(encoding="utf-8-sig").splitlines()[-limit:]:
             try:
                 rows.append(json.loads(line))
             except Exception:
@@ -11773,7 +11773,7 @@ async def get_ml_predictions():
             _hist_path = ROOT_DIR / "state" / "gain_rank_history.json"
             if _hist_path.is_file():
                 try:
-                    _hist_data = json.loads(_hist_path.read_text(encoding="utf-8"))
+                    _hist_data = json.loads(_hist_path.read_text(encoding="utf-8-sig"))
                     if isinstance(_hist_data, list) and _hist_data:
                         _last_entry = _hist_data[-1]
                         _h_rows = _last_entry.get("predictions") if isinstance(_last_entry, dict) else []

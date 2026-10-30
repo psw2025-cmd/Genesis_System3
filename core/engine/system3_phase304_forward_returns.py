@@ -17,7 +17,7 @@ import json
 import math
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -71,7 +71,7 @@ def _load_forward_source() -> pd.DataFrame:
     return pd.read_csv(path, engine="python", on_bad_lines="skip")
 
 
-def _ensure_ts(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
+def _ensure_ts(df: pd.DataFrame, errors: list[str]) -> pd.DataFrame:
     """Guarantee ts is populated for all rows."""
     df = df.copy()
     if "ts" in df.columns:
@@ -103,7 +103,7 @@ def _ensure_ts(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
     return df
 
 
-def _normalize_side(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
+def _normalize_side(df: pd.DataFrame, errors: list[str]) -> pd.DataFrame:
     """Normalize side column to BUY/SELL/HOLD using SIDE_MAP and option_type hints."""
     df = df.copy()
     if "side" not in df.columns:
@@ -135,7 +135,7 @@ def _normalize_side(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
     return df
 
 
-def _fill_expiry(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
+def _fill_expiry(df: pd.DataFrame, errors: list[str]) -> pd.DataFrame:
     """Fill expiry using time_to_expiry + ts where missing."""
     df = df.copy()
     if "expiry" not in df.columns:
@@ -155,7 +155,7 @@ def _fill_expiry(df: pd.DataFrame, errors: List[str]) -> pd.DataFrame:
     return df
 
 
-def _write_invalid_rows(df: pd.DataFrame, errors: List[str]) -> int:
+def _write_invalid_rows(df: pd.DataFrame, errors: list[str]) -> int:
     """Persist unrecoverable rows and return count."""
     invalid_mask = df["expiry"].isna() | df["ts"].isna()
     invalid_rows = df[invalid_mask].copy()
@@ -167,9 +167,9 @@ def _write_invalid_rows(df: pd.DataFrame, errors: List[str]) -> int:
     return count
 
 
-def run_phase304(**kwargs: Any) -> Dict[str, Any]:
+def run_phase304(**kwargs: Any) -> dict[str, Any]:
     """Execute Phase 304 forward signal repair."""
-    errors: List[str] = []
+    errors: list[str] = []
     try:
         df = _load_forward_source()
         original_rows = len(df)
@@ -196,7 +196,7 @@ def run_phase304(**kwargs: Any) -> Dict[str, Any]:
             "phase": 304,
             "timestamp": datetime.now().isoformat(),
             "input_rows": original_rows,
-            "output_rows": int(len(df_valid)),
+            "output_rows": len(df_valid),
             "invalid_rows": int(invalid_count),
             "ts_missing": ts_missing,
             "expiry_missing": expiry_missing,

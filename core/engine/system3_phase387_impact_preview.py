@@ -91,18 +91,18 @@ def run_phase_387() -> dict:
             f.write("## Current Performance (Delta Fallback)\n\n")
             f.write(f"- **Win Rate:** {BASELINE_WIN_RATE}% (documented baseline)\n")
             f.write(f"- **Average Signal Strength:** {BASELINE_SIGNAL_STRENGTH:.2f}\n")
-            f.write(f"- **Mechanism:** Delta-based scoring (Greeks-driven)\n\n")
+            f.write("- **Mechanism:** Delta-based scoring (Greeks-driven)\n\n")
 
             f.write("## Projected Performance (Ultra Models)\n\n")
             if avg_improvement > 0:
                 f.write(f"- **Estimated Win Rate:** {estimated_new_win_rate:.1f}%\n")
                 f.write(f"- **Average Signal Strength:** {BASELINE_SIGNAL_STRENGTH + avg_improvement:.2f}\n")
                 f.write(f"- **Improvement:** +{estimated_improvement_pct:.1f} percentage points\n")
-                f.write(f"- **Mechanism:** Per-underlying pre-trained RandomForest models\n\n")
+                f.write("- **Mechanism:** Per-underlying pre-trained RandomForest models\n\n")
             else:
                 f.write(f"- **Estimated Win Rate:** ~{BASELINE_WIN_RATE:.1f}% (neutral or slight degradation)\n")
                 f.write(f"- **Average Signal Strength:** ~{BASELINE_SIGNAL_STRENGTH:.2f}\n")
-                f.write(f"- **Improvement:** Minimal to none detected in backtest\n\n")
+                f.write("- **Improvement:** Minimal to none detected in backtest\n\n")
 
             f.write("## Impact by Underlying\n\n")
             f.write("| Underlying | Current (Delta) | Projected (Ultra) | Change |\n")
@@ -204,7 +204,7 @@ def run_phase_387() -> dict:
 
     except Exception as e:
         logger.error(f"Phase 387 ERROR: {e}")
-        return {"status": "error", "message": f"Phase 387 failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Phase 387 failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

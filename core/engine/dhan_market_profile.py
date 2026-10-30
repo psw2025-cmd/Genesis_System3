@@ -4,9 +4,7 @@ Dhan Index Options - Multi-Timeframe Market Profile
 Builds market profile maps for different timeframes.
 """
 
-from typing import Any, Dict, List
 
-import numpy as np
 import pandas as pd
 
 
@@ -49,7 +47,7 @@ def build_timeframe_profile(
 def compute_profile_levels(
     df: pd.DataFrame,
     num_levels: int = 5,
-) -> Dict[str, List[float]]:
+) -> dict[str, list[float]]:
     """
     Compute support/resistance levels from profile.
 
@@ -106,7 +104,7 @@ def compute_profile_levels(
 
 def classify_price_location(
     price: float,
-    profile_levels: Dict[str, List[float]],
+    profile_levels: dict[str, list[float]],
 ) -> str:
     """
     Classify price location relative to profile levels.

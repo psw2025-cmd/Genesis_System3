@@ -8,7 +8,6 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -70,7 +69,7 @@ def run_phase116(market_close_time_str: str = None, **kwargs) -> dict:
                 json.dump(kill_data, f, indent=2)
 
             status = "OK"
-            details = f"Market closed - kill switch activated"
+            details = "Market closed - kill switch activated"
         else:
             status = "OK"
             details = f"Market still open (closes at {close_time})"

@@ -8,7 +8,7 @@ Auto-creates missing non-critical directories.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -53,7 +53,7 @@ NON_CRITICAL_DIRS = [
 ]
 
 
-def run_phase201(**kwargs) -> Dict[str, Any]:
+def run_phase201(**kwargs) -> dict[str, Any]:
     """
     Run Phase 201: Filesystem Integrity Verifier.
 

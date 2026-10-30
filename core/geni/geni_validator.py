@@ -7,11 +7,9 @@ Runs validation routines and parses results.
 import re
 import subprocess
 from dataclasses import dataclass
-from pathlib import Path
-from typing import List, Optional
 
 from .geni_config import FULL_VERIFICATION, PROJECT_ROOT, ULTRA_VALIDATION
-from .geni_state import GeniState, load_state, save_state
+from .geni_state import load_state, save_state
 
 
 @dataclass
@@ -22,8 +20,8 @@ class ValidationResult:
     total_checks: int
     passed: int
     failed: int
-    warnings: List[str]
-    details: List[str]
+    warnings: list[str]
+    details: list[str]
     raw_output: str = ""
 
 
@@ -141,9 +139,7 @@ def _parse_validation_output(output: str) -> ValidationResult:
     if result.total_checks == 0:
         if "ALL VERIFICATIONS PASSED" in output or "✓ ALL" in output:
             result.success = True
-        elif "SOME VERIFICATIONS FAILED" in output or "⚠ SOME" in output:
-            result.success = False
-        elif "error" in output.lower() or "failed" in output.lower():
+        elif "SOME VERIFICATIONS FAILED" in output or "⚠ SOME" in output or "error" in output.lower() or "failed" in output.lower():
             result.success = False
         elif "ok" in output.lower() or "complete" in output.lower():
             result.success = True

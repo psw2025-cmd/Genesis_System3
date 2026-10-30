@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 
@@ -43,7 +42,7 @@ class TradeRuleEngine:
         final_score = base / m_penalty
         return float(final_score)
 
-    def evaluate(self, row: pd.Series) -> Dict[str, Any]:
+    def evaluate(self, row: pd.Series) -> dict[str, Any]:
         """
         Evaluate one signal row and decide if it's a trade candidate.
 
@@ -62,7 +61,7 @@ class TradeRuleEngine:
         moneyness = float(row.get("moneyness", 0.0) or 0.0)
 
         # Default response
-        decision: Dict[str, Any] = {
+        decision: dict[str, Any] = {
             "eligible": False,
             "reason": "",
             "action": "HOLD",

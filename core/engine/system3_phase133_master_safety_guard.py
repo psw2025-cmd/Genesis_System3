@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -27,7 +27,7 @@ OUTPUT_JSON_PATH = STORAGE_CONFIG / "system3_master_safety_state.json"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase133_master_safety_report.md"
 
 
-def run_phase133_master_safety_guard() -> Dict[str, Any]:
+def run_phase133_master_safety_guard() -> dict[str, Any]:
     """
     Compute master safety flags and kill-switch state.
 
@@ -63,11 +63,10 @@ def run_phase133_master_safety_guard() -> Dict[str, Any]:
                 errors.append(f"Error reading health snapshot: {e}")
 
         # Load safety config (optional)
-        safety_config = {}
         if SAFETY_CONFIG_PATH.exists():
             try:
                 with SAFETY_CONFIG_PATH.open("r", encoding="utf-8") as f:
-                    safety_config = json.load(f)
+                    json.load(f)
             except Exception:
                 pass  # Optional file
 
@@ -122,7 +121,7 @@ def run_phase133_master_safety_guard() -> Dict[str, Any]:
 
             f.write("## Safety Flags\n\n")
             f.write(f"- **kill_switch_active**: {kill_switch_active}\n")
-            f.write(f"- **live_trading_allowed**: FALSE (MASTER MODE)\n")
+            f.write("- **live_trading_allowed**: FALSE (MASTER MODE)\n")
             f.write(f"- **max_risk_percent_per_day**: {max_risk_percent_per_day}%\n")
             f.write(f"- **dry_run_only**: {safety_state['safety_flags']['dry_run_only']}\n")
             f.write(f"- **dhan_only**: {safety_state['safety_flags']['dhan_only']}\n")

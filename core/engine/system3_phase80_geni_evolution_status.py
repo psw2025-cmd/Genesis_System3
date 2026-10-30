@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -32,7 +32,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase80_geni_evolution_status.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def load_phase_outputs() -> Dict[str, Any]:
+def load_phase_outputs() -> dict[str, Any]:
     """Load outputs from phases 76-79."""
     outputs = {}
 
@@ -69,7 +69,7 @@ def load_phase_outputs() -> Dict[str, Any]:
     return outputs
 
 
-def generate_evolution_status() -> Dict[str, Any]:
+def generate_evolution_status() -> dict[str, Any]:
     """Generate evolution status report."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 80 - GENI EVOLUTION STATUS")
@@ -155,7 +155,7 @@ def generate_evolution_status() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 80 - GENI Evolution Status\n\n")
@@ -202,7 +202,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_evolution_status()
+        generate_evolution_status()
         print("\n[PH80] Evolution status generation complete.")
         return 0
     except Exception as e:

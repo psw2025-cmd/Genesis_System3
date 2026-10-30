@@ -8,9 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -25,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_threshold_auto_tune.md"
 
 
-def run_phase274(**kwargs) -> Dict[str, Any]:
+def run_phase274(**kwargs) -> dict[str, Any]:
     """Run Phase 274: Threshold Auto-Tuner."""
     errors = []
 
@@ -44,7 +42,7 @@ def run_phase274(**kwargs) -> Dict[str, Any]:
 
         try:
             with EXISTING_THRESHOLDS.open("r", encoding="utf-8") as f:
-                existing_data = json.load(f)
+                json.load(f)
         except Exception as e:
             return {
                 "phase": 274,

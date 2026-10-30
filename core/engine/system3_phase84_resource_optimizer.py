@@ -9,7 +9,7 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Optional import for psutil (for actual resource monitoring)
 try:
@@ -34,7 +34,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase84_resource_usage.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def measure_module_resources(module_name: str) -> Dict[str, float]:
+def measure_module_resources(module_name: str) -> dict[str, float]:
     """Measure CPU and memory usage for a module run."""
     if not PSUTIL_AVAILABLE:
         # Return simulated metrics if psutil is not available
@@ -68,7 +68,7 @@ def measure_module_resources(module_name: str) -> Dict[str, float]:
     }
 
 
-def analyze_resource_usage() -> Dict[str, Any]:
+def analyze_resource_usage() -> dict[str, Any]:
     """Analyze resource usage."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 84 - RESOURCE OPTIMIZER")
@@ -106,7 +106,7 @@ def analyze_resource_usage() -> Dict[str, Any]:
     # Save JSON
     with OUTPUT_JSON.open("w", encoding="utf-8") as f:
         json.dump(report, f, indent=2)
-    print(f"[PH84] Resource usage analysis completed")
+    print("[PH84] Resource usage analysis completed")
 
     # Generate MD
     generate_markdown(report)
@@ -115,7 +115,7 @@ def analyze_resource_usage() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 84 - Resource Usage Report\n\n")
@@ -139,7 +139,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = analyze_resource_usage()
+        analyze_resource_usage()
         print("\n[PH84] Resource optimization analysis complete.")
         return 0
     except Exception as e:

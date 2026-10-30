@@ -13,9 +13,8 @@ from __future__ import annotations
 import json
 import logging
 import os
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +25,7 @@ DEFAULT_FIRESTORE_PROJECT = os.getenv("SYSTEM3_FIRESTORE_PROJECT", "system3-open
 class CloudPersistenceManager:
     """Manages Cloud-Only artifact and runtime persistence."""
 
-    def __init__(self, bucket_name: Optional[str] = None, project_id: Optional[str] = None):
+    def __init__(self, bucket_name: str | None = None, project_id: str | None = None):
         self.bucket_name = bucket_name or DEFAULT_GCS_BUCKET
         self.project_id = project_id or DEFAULT_FIRESTORE_PROJECT
         self._gcs_client = None
@@ -50,18 +49,18 @@ class CloudPersistenceManager:
                 logger.debug(f"Firestore client initialization skipped: {e}")
         return self._firestore_client
 
-    def persist_paper_order(self, order: Dict[str, Any]) -> bool:
+    def persist_paper_order(self, order: dict[str, Any]) -> bool:
         """Persist paper trading order to Firestore collection 'paper_orders'."""
         client = self._get_firestore_client()
         if not client:
             return False
         try:
-            order_id = order.get("order_id") or f"PAPER-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S%f')}"
+            order_id = order.get("order_id") or f"PAPER-{datetime.now(UTC).strftime('%Y%m%d%H%M%S%f')}"
             doc_ref = client.collection("system3_paper_orders").document(order_id)
             doc_ref.set({
                 **order,
                 "order_id": order_id,
-                "created_at_utc": datetime.now(timezone.utc).isoformat(),
+                "created_at_utc": datetime.now(UTC).isoformat(),
                 "mode": "PAPER_TRADING",
                 "live_trading_enabled": False,
             })
@@ -70,14 +69,14 @@ class CloudPersistenceManager:
             logger.warning(f"Failed to persist paper order to Firestore: {e}")
             return False
 
-    def persist_chain_snapshot(self, underlying: str, chain_payload: Dict[str, Any]) -> Optional[str]:
+    def persist_chain_snapshot(self, underlying: str, chain_payload: dict[str, Any]) -> str | None:
         """Upload compressed option chain snapshot to GCS bucket."""
         client = self._get_gcs_client()
         if not client:
             return None
         try:
-            today_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-            time_str = datetime.now(timezone.utc).strftime("%H%M%S")
+            today_str = datetime.now(UTC).strftime("%Y-%m-%d")
+            time_str = datetime.now(UTC).strftime("%H%M%S")
             blob_path = f"market_data/option_chain/{underlying.upper()}/{today_str}/{time_str}.json"
             bucket = client.bucket(self.bucket_name)
             blob = bucket.blob(blob_path)
@@ -92,13 +91,13 @@ class CloudPersistenceManager:
             logger.warning(f"Failed to persist option chain snapshot to GCS: {e}")
             return None
 
-    def export_backtest_manifest(self, strategy_id: str, results: Dict[str, Any]) -> Optional[str]:
+    def export_backtest_manifest(self, strategy_id: str, results: dict[str, Any]) -> str | None:
         """Upload backtest execution results and manifest to GCS."""
         client = self._get_gcs_client()
         if not client:
             return None
         try:
-            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+            ts = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
             blob_path = f"backtests/{strategy_id}/{ts}_results.json"
             bucket = client.bucket(self.bucket_name)
             blob = bucket.blob(blob_path)

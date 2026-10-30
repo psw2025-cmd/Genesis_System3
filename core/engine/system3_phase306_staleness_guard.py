@@ -6,9 +6,9 @@ AUTO-HEAL INTEGRATED: Automatically triggers recovery actions.
 """
 
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -78,7 +78,7 @@ def trigger_auto_heal(reason: str, severity: str = "MEDIUM") -> None:
         pass
 
 
-def run_phase306(**kwargs) -> Dict[str, Any]:
+def run_phase306(**kwargs) -> dict[str, Any]:
     """Run Phase 306: Real-Time Staleness & Latency Guard.
 
     AUTO-HEAL: Triggers healing if EXPIRED data detected.

@@ -4,14 +4,11 @@ System3 Phase 87 - Expected Value Calculator
 Compute Expected Value (EV) per signal/trade based on historical performance.
 """
 
-import json
 import sys
-from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 # Ensure project root is in path
@@ -45,7 +42,7 @@ def load_pnl_data() -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def compute_ev_by_group(pnl_df: pd.DataFrame, group_key: str) -> List[Dict[str, Any]]:
+def compute_ev_by_group(pnl_df: pd.DataFrame, group_key: str) -> list[dict[str, Any]]:
     """Compute EV for each group."""
     ev_results = []
 
@@ -164,7 +161,7 @@ def generate_markdown(df: pd.DataFrame) -> None:
 def main():
     """Main entry point."""
     try:
-        df = generate_expected_value()
+        generate_expected_value()
         print("\n[PH87] Expected value calculation complete.")
         return 0
     except Exception as e:

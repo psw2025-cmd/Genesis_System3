@@ -1,0 +1,8 @@
+﻿C:\Genesis_System3\dashboard\backend\routers\trading.py:15:router = APIRouter(tags=["trading"])
+C:\Genesis_System3\dashboard\backend\routers\ml.py:17:router = APIRouter(tags=["ml"])
+C:\Genesis_System3\dashboard\backend\routers\chain.py:24:router = APIRouter(tags=["chain"])
+C:\Genesis_System3\dashboard\backend\routers\chain.py:310:# ``app = FastAPI(...)`` exists, so the bridge would no-op and leave
+C:\Genesis_System3\dashboard\backend\routers\chain.py:377:    """Public startup hook for app.py after FastAPI() construction."""
+C:\Genesis_System3\dashboard\backend\routers\broker.py:12:router = APIRouter(prefix="/api/broker", tags=["broker"])
+C:\Genesis_System3\dashboard\backend\app.py:316:app = FastAPI(title="System3 Genesis API")
+C:\Genesis_System3\tests\test_optionchain_ui_universe_contract.py:187:        app = FastAPI()

@@ -1,0 +1,36 @@
+﻿C:\Genesis_System3\check_build_requirements.py:92:            out = subprocess.run([cmd, "--version"], capture_output=True, text=True, timeout=15, shell=True)
+C:\Genesis_System3\reports\latest\live_current_issue_check\live_current_issue_check.py:37:    p = subprocess.run(cmd, shell=True, cwd=ROOT, capture_output=True, text=True, timeout=timeout)
+C:\Genesis_System3\evaluate_phase249_models.py:158:            model.eval()
+C:\Genesis_System3\evaluate_phase249_models.py:186:            model.eval()
+C:\Genesis_System3\core\engine\system3_phase249_model_loader.py:65:        model.eval()
+C:\Genesis_System3\core\engine\system3_phase249_lstm_forward_predictor.py:251:    model.eval()
+C:\Genesis_System3\scripts\continuous_auto_agent.py:162:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\combined_auto_system_fixed.py:35:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\combined_auto_system.py:33:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\dashboard_online_verifier.py:46:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\keep_monitoring.py:40:    subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)
+C:\Genesis_System3\scripts\master_auto_system.py:32:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\live_paper_trading_monitor.py:25:    os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\monitor_10min.py:33:    os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\monitor_paper_trades.py:32:    os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\monitor_live_simulation.py:20:    os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\tests\test_ui_tab_visual_proof_contract.py:24:                        value = ast.literal_eval(node.value)
+C:\Genesis_System3\tests\test_dhan_single_token_authority.py:146:        exec(compile(module, str(CANONICAL), "exec"), cls.ns)
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:20:    row = _finding("B605", '9 def clear():\n10     os.system("cls" if os.name == "nt" else "clear")\n')
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:21:    assert _bandit_finding_source_line(row) == 'os.system("cls" if os.name == "nt" else "clear")'
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:33:        '10 subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)\n',
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:42:    row = _finding("B605", "10     os.system(user_supplied_command)\n")
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:50:    row = _finding("B602", "10     subprocess.run(command, shell=True)\n")
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:58:        '9 os.system("cls" if os.name == "nt" else "clear")\n10 os.system(user_supplied_command)\n11 return None\n',
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:61:    assert _bandit_finding_source_line(row) == "os.system(user_supplied_command)"
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:69:        '9 subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)\n'
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:70:        '10 subprocess.run(command, shell=True)\n',
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:73:    assert _bandit_finding_source_line(row) == "subprocess.run(command, shell=True)"
+C:\Genesis_System3\tests\test_security_audit_static_shell_review.py:81:        'os.system("cls" if os.name == "nt" else "clear")\nos.system(user_supplied_command)\n',
+C:\Genesis_System3\scripts\visible_auto_monitor.py:37:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\profit_focused_monitor.py:27:    os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\self_activate_analyze_improve.py:40:        os.system("cls" if os.name == "nt" else "clear")
+C:\Genesis_System3\scripts\security_audit_summary.py:127:    terminal_clear = 'os.system("cls" if os.name == "nt" else "clear")'
+C:\Genesis_System3\scripts\security_audit_summary.py:131:    taskkill = 'subprocess.run(["taskkill", "/F", "/IM", "python.exe", "/T"], capture_output=True, shell=True)'
+C:\Genesis_System3\tests\evals\test_eval_runtime_identity_schedule.py:23:                    return ast.literal_eval(node.value)
+C:\Genesis_System3\tests\evals\test_eval_rotation_job_906_exclusion.py:31:    exec(compile(module, str(ROTATION_JOB), "exec"), ns)

@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -37,7 +37,7 @@ def validate_json_file(file_path: Path) -> tuple[bool, dict, str]:
         return False, {}, f"Error reading file: {e}"
 
 
-def run_phase203(**kwargs) -> Dict[str, Any]:
+def run_phase203(**kwargs) -> dict[str, Any]:
     """
     Run Phase 203: Config Consistency Check.
 
@@ -86,7 +86,7 @@ def run_phase203(**kwargs) -> Dict[str, Any]:
 
                 if not is_valid:
                     invalid_files.append(str(json_file))
-                    f.write(f"**Status**: ❌ INVALID\n\n")
+                    f.write("**Status**: ❌ INVALID\n\n")
                     f.write(f"**Error**: {error_msg}\n\n")
 
                     # Attempt repair: backup and create minimal default
@@ -106,12 +106,12 @@ def run_phase203(**kwargs) -> Dict[str, Any]:
                             json.dump(default_data, wf, indent=2)
 
                         repaired_files.append(str(json_file))
-                        f.write(f"**Repaired**: Created minimal default schema\n\n")
+                        f.write("**Repaired**: Created minimal default schema\n\n")
                     except Exception as e:
                         errors.append(f"Failed to repair {json_file}: {e}")
                         f.write(f"**Repair Failed**: {e}\n\n")
                 else:
-                    f.write(f"**Status**: ✅ VALID JSON\n\n")
+                    f.write("**Status**: ✅ VALID JSON\n\n")
 
                     # Check for required keys (if config type is known)
                     missing_keys = []
@@ -124,7 +124,7 @@ def run_phase203(**kwargs) -> Dict[str, Any]:
                     if missing_keys:
                         f.write(f"**Warning**: Missing required keys: {', '.join(missing_keys)}\n\n")
                     else:
-                        f.write(f"**Keys**: All required keys present\n\n")
+                        f.write("**Keys**: All required keys present\n\n")
 
                 f.write("\n")
 

@@ -1,0 +1,6 @@
+﻿C:\Genesis_System3\sitecustomize.py:38:            status = _tm.verify_token()
+C:\Genesis_System3\sitecustomize.py:44:                "source": "verify_token_alias",
+C:\Genesis_System3\sitecustomize.py:47:            return {"valid": False, "reason": str(exc)[:120], "source": "verify_token_alias_error"}
+C:\Genesis_System3\core\brokers\dhan\token_manager.py:48:def verify_token() -> dict:
+C:\Genesis_System3\core\brokers\dhan\token_manager.py:80:    return verify_token()
+C:\Genesis_System3\core\brokers\dhan\token_manager.py:108:    print(json.dumps(verify_token(), sort_keys=True))

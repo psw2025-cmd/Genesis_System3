@@ -169,7 +169,7 @@ def summarize_daily_pnl(df: pd.DataFrame, source: str = "live", is_today: bool =
     if "exit_reason" in df.columns or "result" in df.columns:
         reason_col = "exit_reason" if "exit_reason" in df.columns else "result"
         reason_counts = df[reason_col].value_counts()
-        print(f"\n--- Exit Reasons ---")
+        print("\n--- Exit Reasons ---")
         for reason, count in reason_counts.items():
             print(f"  {reason}: {count}")
 
@@ -196,7 +196,7 @@ def main() -> None:
 
     # No data found
     print("[PNL] No PnL data found.")
-    print(f"[PNL] Checked:")
+    print("[PNL] Checked:")
     print(f"  - {PNL_LOG_CSV}")
     print(f"  - {BACKTEST_CSV}")
 

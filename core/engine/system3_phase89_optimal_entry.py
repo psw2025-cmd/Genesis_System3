@@ -4,11 +4,9 @@ System3 Phase 89 - Optimal Entry Engine
 Assess quality of entry timing for trades.
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -38,7 +36,7 @@ def evaluate_entry_quality(row: pd.Series) -> str:
     # Otherwise GOOD
 
     max_fav_pct = row.get("max_fav_pct", 0.0)
-    entry_price = row.get("entry_price", 0.0)
+    row.get("entry_price", 0.0)
 
     # Heuristic: if max favorable was >20% but we entered early, could have been better
     if max_fav_pct > 20.0:
@@ -135,7 +133,7 @@ def generate_markdown(df: pd.DataFrame) -> None:
 def main():
     """Main entry point."""
     try:
-        df = generate_entry_analysis()
+        generate_entry_analysis()
         print("\n[PH89] Entry quality evaluation complete.")
         return 0
     except Exception as e:

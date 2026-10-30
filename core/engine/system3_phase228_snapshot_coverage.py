@@ -7,7 +7,7 @@ Verifies snapshot coverage for expected time buckets.
 import sys
 from datetime import datetime, time
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -29,7 +29,7 @@ TRADING_HOURS_START = time(9, 15)
 TRADING_HOURS_END = time(15, 30)
 
 
-def run_phase228(**kwargs) -> Dict[str, Any]:
+def run_phase228(**kwargs) -> dict[str, Any]:
     """
     Run Phase 228: Snapshot Coverage Auditor.
 

@@ -5,9 +5,7 @@ Trains models using both synthetic and real market data.
 Blends training datasets for improved model performance.
 """
 
-import os
 from pathlib import Path
-from typing import Dict
 
 import pandas as pd
 

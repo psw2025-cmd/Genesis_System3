@@ -7,7 +7,6 @@ Check ledger sanity before any live execution.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
 
 import pandas as pd
 
@@ -38,11 +37,11 @@ def ensure_ledger_header() -> bool:
         df = pd.DataFrame(columns=LEDGER_COLUMNS)
         df.to_csv(LEDGER_CSV, index=False)
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 
-def validate_ledger() -> tuple[bool, List[str]]:
+def validate_ledger() -> tuple[bool, list[str]]:
     """
     Validate ledger integrity.
 

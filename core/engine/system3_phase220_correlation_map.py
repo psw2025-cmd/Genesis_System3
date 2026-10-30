@@ -7,9 +7,8 @@ Computes rolling correlations between major indices.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,7 +27,7 @@ SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def run_phase220(**kwargs) -> Dict[str, Any]:
+def run_phase220(**kwargs) -> dict[str, Any]:
     """
     Run Phase 220: Cross-Underlying Correlation Map.
 

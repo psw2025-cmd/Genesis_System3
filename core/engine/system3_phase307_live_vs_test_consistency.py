@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ def load_csv_robust(path: Path) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def run_phase307(**kwargs) -> Dict[str, Any]:
+def run_phase307(**kwargs) -> dict[str, Any]:
     """Run Phase 307: Live vs Backtest Consistency Checker."""
     errors = []
 
@@ -105,7 +105,7 @@ def run_phase307(**kwargs) -> Dict[str, Any]:
             pct = (count / total_rows * 100) if total_rows > 0 else 0.0
             report_lines.append(f"- **{label}**: {count} ({pct:.1f}%)\n")
 
-        report_lines.append(f"\n## Consistency Metrics\n\n")
+        report_lines.append("\n## Consistency Metrics\n\n")
         report_lines.append(f"- **Match Rate**: {match_rate * 100:.1f}%\n")
         report_lines.append(f"- **Mismatch Rate**: {mismatch_rate * 100:.1f}%\n")
         report_lines.append(f"- **HOLD Percentage**: {hold_pct * 100:.1f}%\n")

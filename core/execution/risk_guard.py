@@ -7,7 +7,7 @@ Central risk checks for virtual orders (no real API).
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -37,7 +37,7 @@ def _log_risk(message: str, level: str = "INFO") -> None:
         pass
 
 
-def check_per_trade_limits(order: PlannedOrder, risk_config: Dict[str, Any]) -> RiskDecision:
+def check_per_trade_limits(order: PlannedOrder, risk_config: dict[str, Any]) -> RiskDecision:
     """
     Check per-trade limits for a single order.
 
@@ -93,8 +93,8 @@ def check_per_trade_limits(order: PlannedOrder, risk_config: Dict[str, Any]) -> 
 
 
 def check_daily_limits(
-    orders: List[PlannedOrder], current_pnl: float, open_positions_count: int, risk_config: Dict[str, Any]
-) -> Tuple[List[RiskDecision], Dict[str, Any]]:
+    orders: list[PlannedOrder], current_pnl: float, open_positions_count: int, risk_config: dict[str, Any]
+) -> tuple[list[RiskDecision], dict[str, Any]]:
     """
     Check daily limits across multiple orders.
 
@@ -174,8 +174,8 @@ def check_daily_limits(
 
 
 def apply_global_safety_flags(
-    orders: List[PlannedOrder], risk_config: Dict[str, Any], live_trade_config: Dict[str, Any]
-) -> List[RiskDecision]:
+    orders: list[PlannedOrder], risk_config: dict[str, Any], live_trade_config: dict[str, Any]
+) -> list[RiskDecision]:
     """
     Apply global safety flags (e.g., LIVE_TRADING_ENABLED check).
 

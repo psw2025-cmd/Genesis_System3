@@ -8,7 +8,7 @@ AUTO-UPDATE: DISABLED - Only generates suggestions, never auto-applies.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 def recommend_thresholds(
     min_trades: int = 5,
     max_drawdown_limit: float = -10.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Recommend thresholds based on real outcomes.
 
@@ -81,7 +81,7 @@ def recommend_thresholds(
 def _search_best_thresholds(
     df: pd.DataFrame,
     max_drawdown_limit: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Search for best threshold combination.
 
@@ -147,7 +147,7 @@ def _search_best_thresholds(
     return best_combo
 
 
-def save_recommendations(recommendations: Dict[str, Any]) -> Path:
+def save_recommendations(recommendations: dict[str, Any]) -> Path:
     """
     Save recommendations to JSON.
 

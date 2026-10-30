@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -28,7 +28,7 @@ REPORT_PATH = LOG_DIR / "system3_threshold_tuner_304.md"
 PROPOSALS_JSON = STORAGE_META / "system3_threshold_proposals_304.json"
 
 
-def load_json_safe(path: Path) -> Dict:
+def load_json_safe(path: Path) -> dict:
     """Load JSON file safely."""
     if not path.exists():
         return {}
@@ -39,7 +39,7 @@ def load_json_safe(path: Path) -> Dict:
         return {}
 
 
-def run_phase304(**kwargs) -> Dict[str, Any]:
+def run_phase304(**kwargs) -> dict[str, Any]:
     """Run Phase 304: Dynamic Threshold Tuner (Safe Mode)."""
     errors = []
 
@@ -47,8 +47,8 @@ def run_phase304(**kwargs) -> Dict[str, Any]:
         # Load inputs
         candidates_data = load_json_safe(THRESHOLD_CANDIDATES_JSON)
         perf_301 = load_json_safe(PERFORMANCE_301_JSON)
-        regime_302 = load_json_safe(REGIME_302_JSON)
-        decay_303 = load_json_safe(DECAY_303_JSON)
+        load_json_safe(REGIME_302_JSON)
+        load_json_safe(DECAY_303_JSON)
 
         if not candidates_data:
             return {
@@ -125,7 +125,7 @@ def run_phase304(**kwargs) -> Dict[str, Any]:
 
         if evaluated:
             # Sort by trade count
-            sorted_candidates = sorted(evaluated, key=lambda x: x["expected_trade_count"])
+            sorted(evaluated, key=lambda x: x["expected_trade_count"])
 
             # CONSERVATIVE: lowest trade count, good EV
             conservative = min(evaluated, key=lambda x: x["expected_trade_count"])

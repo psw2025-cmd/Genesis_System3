@@ -8,9 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -25,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_hyperparameter_search.md"
 
 
-def run_phase271(**kwargs) -> Dict[str, Any]:
+def run_phase271(**kwargs) -> dict[str, Any]:
     """Run Phase 271: Hyperparameter Search."""
     errors = []
 
@@ -62,7 +60,7 @@ def run_phase271(**kwargs) -> Dict[str, Any]:
             "# System3 Hyperparameter Search\n",
             f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n",
             f"**Candidates Generated**: {len(candidates)}\n",
-            f"**Model Type**: RandomForest\n",
+            "**Model Type**: RandomForest\n",
         ]
 
         with REPORT_PATH.open("w", encoding="utf-8") as f:

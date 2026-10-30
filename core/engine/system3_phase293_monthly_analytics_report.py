@@ -5,9 +5,9 @@ Generates comprehensive monthly analytics report.
 """
 
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / f"system3_monthly_analytics_{datetime.now().strftime('%Y%m')}.md"
 
 
-def run_phase293(**kwargs) -> Dict[str, Any]:
+def run_phase293(**kwargs) -> dict[str, Any]:
     """Run Phase 293: Monthly Analytics Report."""
     errors = []
 

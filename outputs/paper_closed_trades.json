@@ -1,0 +1,58 @@
+{
+    "trades":  [
+                   {
+                       "exit_price":  111,
+                       "position_id":  "PAPER_001",
+                       "qty":  50,
+                       "entry_price":  100,
+                       "realized_pnl":  550,
+                       "underlying":  "NIFTY",
+                       "trading_symbol":  "NIFTY25O2824500CE"
+                   },
+                   {
+                       "exit_price":  107,
+                       "position_id":  "PAPER_002",
+                       "qty":  50,
+                       "entry_price":  95,
+                       "realized_pnl":  600,
+                       "underlying":  "NIFTY",
+                       "trading_symbol":  "NIFTY25O2824600CE"
+                   },
+                   {
+                       "exit_price":  132,
+                       "position_id":  "PAPER_003",
+                       "qty":  25,
+                       "entry_price":  120,
+                       "realized_pnl":  300,
+                       "underlying":  "BANKNIFTY",
+                       "trading_symbol":  "BANKNIFTY25O2854000CE"
+                   },
+                   {
+                       "exit_price":  92,
+                       "position_id":  "PAPER_004",
+                       "qty":  50,
+                       "entry_price":  80,
+                       "realized_pnl":  600,
+                       "underlying":  "NIFTY",
+                       "trading_symbol":  "NIFTY25O2824500PE"
+                   },
+                   {
+                       "exit_price":  122,
+                       "position_id":  "PAPER_005",
+                       "qty":  40,
+                       "entry_price":  110,
+                       "realized_pnl":  480,
+                       "underlying":  "FINNIFTY",
+                       "trading_symbol":  "FINNIFTY25O2822000CE"
+                   },
+                   {
+                       "exit_price":  102,
+                       "position_id":  "PAPER_006",
+                       "qty":  50,
+                       "entry_price":  90,
+                       "realized_pnl":  600,
+                       "underlying":  "NIFTY",
+                       "trading_symbol":  "NIFTY25O2824700CE"
+                   }
+               ]
+}

@@ -34,12 +34,10 @@ Date: 2025-12-08 (Upgraded: 2026-02-22)
 Phase: 392/400
 """
 
-import json
 import logging
 from collections import deque
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import joblib
 import numpy as np
@@ -70,9 +68,9 @@ class DynamicWeightTracker:
 
     def __init__(self, window_size: int = PERFORMANCE_WINDOW):
         self.window_size = window_size
-        self.performance_history: Dict[str, deque] = {}
-        self.accuracy_scores: Dict[str, float] = {}
-        self.prediction_counts: Dict[str, int] = {}
+        self.performance_history: dict[str, deque] = {}
+        self.accuracy_scores: dict[str, float] = {}
+        self.prediction_counts: dict[str, int] = {}
 
     def update_performance(self, model_name: str, correct: bool):
         """Update performance tracking for a model."""
@@ -88,7 +86,7 @@ class DynamicWeightTracker:
         if len(self.performance_history[model_name]) > 0:
             self.accuracy_scores[model_name] = np.mean(list(self.performance_history[model_name]))
 
-    def get_dynamic_weights(self, model_names: List[str]) -> Dict[str, float]:
+    def get_dynamic_weights(self, model_names: list[str]) -> dict[str, float]:
         """Calculate dynamic weights based on recent performance."""
         if not model_names:
             return {}
@@ -128,7 +126,7 @@ class DynamicWeightTracker:
 _weight_tracker = DynamicWeightTracker()
 
 
-def load_ultra_model(underlying: str) -> Optional[Any]:
+def load_ultra_model(underlying: str) -> Any | None:
     """Load Ultra Model for given underlying."""
     try:
         model_path = Path(f"core/models/dhan_ultra/{underlying}_ultra_model.pkl")
@@ -141,7 +139,7 @@ def load_ultra_model(underlying: str) -> Optional[Any]:
     return None
 
 
-def load_xgboost_model(underlying: str) -> Optional[Any]:
+def load_xgboost_model(underlying: str) -> Any | None:
     """Load XGBoost model for given underlying."""
     try:
         model_path = Path(f"core/models/xgboost/{underlying}_xgboost_model.pkl")
@@ -154,7 +152,7 @@ def load_xgboost_model(underlying: str) -> Optional[Any]:
     return None
 
 
-def load_lightgbm_model(underlying: str) -> Optional[Any]:
+def load_lightgbm_model(underlying: str) -> Any | None:
     """Load LightGBM model for given underlying."""
     try:
         import lightgbm as lgb
@@ -171,7 +169,7 @@ def load_lightgbm_model(underlying: str) -> Optional[Any]:
     return None
 
 
-def load_catboost_model(underlying: str) -> Optional[Any]:
+def load_catboost_model(underlying: str) -> Any | None:
     """Load CatBoost model for given underlying."""
     try:
         import catboost as cb
@@ -188,7 +186,7 @@ def load_catboost_model(underlying: str) -> Optional[Any]:
     return None
 
 
-def load_randomforest_model(underlying: str) -> Optional[Any]:
+def load_randomforest_model(underlying: str) -> Any | None:
     """Load RandomForest model for given underlying."""
     try:
         from sklearn.ensemble import RandomForestClassifier
@@ -205,7 +203,7 @@ def load_randomforest_model(underlying: str) -> Optional[Any]:
     return None
 
 
-def load_neural_net_model(underlying: str) -> Optional[Any]:
+def load_neural_net_model(underlying: str) -> Any | None:
     """Load Neural Network model for given underlying."""
     try:
         import torch
@@ -238,7 +236,7 @@ def compute_delta_scores(df: pd.DataFrame) -> np.ndarray:
         return np.zeros(len(df))
 
 
-def get_model_predictions(model: Any, X: pd.DataFrame, model_type: str) -> Tuple[np.ndarray, float]:
+def get_model_predictions(model: Any, X: pd.DataFrame, model_type: str) -> tuple[np.ndarray, float]:
     """
     Get predictions and confidence from a model.
 
@@ -294,8 +292,8 @@ def prepare_features_for_prediction(df: pd.DataFrame) -> pd.DataFrame:
 def predict_with_ensemble(
     df: pd.DataFrame,
     underlying: str,
-    ultra_model: Optional[Any] = None,
-    xgboost_model: Optional[Any] = None,
+    ultra_model: Any | None = None,
+    xgboost_model: Any | None = None,
     use_dynamic_weights: bool = True,
 ) -> pd.DataFrame:
     """
@@ -435,7 +433,7 @@ def predict_with_ensemble(
     return df
 
 
-def run_phase_392() -> Dict[str, Any]:
+def run_phase_392() -> dict[str, Any]:
     """
     Phase 392 entry point: Ensemble Predictor.
 
@@ -534,7 +532,7 @@ def run_phase_392() -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Phase 392 failed: {e}", exc_info=True)
-        return {"status": "error", "message": f"Ensemble predictor failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Ensemble predictor failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

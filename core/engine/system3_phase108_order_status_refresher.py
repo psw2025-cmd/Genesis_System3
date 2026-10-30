@@ -7,7 +7,6 @@ Pull order statuses from Angel (or simulated now) and update ledger.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 

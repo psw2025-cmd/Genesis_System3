@@ -12,7 +12,7 @@ Modules:
 
 Usage:
   from core/monitoring/continuous_validators import ContinuousMonitor
-  
+
   monitor = ContinuousMonitor(
     watch_dir="storage/live",
     check_interval_sec=30,
@@ -29,7 +29,6 @@ import platform
 import subprocess
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -43,7 +42,7 @@ class TimestampValidator:
         self.logger = logger or logging.getLogger(__name__)
         self.metrics_dir.mkdir(parents=True, exist_ok=True)
 
-    def validate(self) -> Dict:
+    def validate(self) -> dict:
         """Convenience method to validate recent phase outputs."""
         from pathlib import Path
 
@@ -58,7 +57,7 @@ class TimestampValidator:
                 results.append(result)
         return {"passed": all(r.get("status") == "OK" for r in results), "results": results}
 
-    def validate_phase_output(self, phase_csv: Path, phase_name: str) -> Dict:
+    def validate_phase_output(self, phase_csv: Path, phase_name: str) -> dict:
         """
         Validate timestamp column in phase output.
 
@@ -98,7 +97,7 @@ class TimestampValidator:
                     parsed = pd.to_datetime(non_null, errors="coerce")
                     valid_parsed = parsed.notna().sum()
                     ts_range = (parsed.min(), parsed.max())
-                except Exception as e:
+                except Exception:
                     valid_parsed = 0
                     ts_range = (None, None)
             else:
@@ -133,7 +132,7 @@ class TimestampValidator:
                 "validation_time": datetime.utcnow().isoformat(),
             }
 
-    def _detect_formats(self, ts_col: pd.Series, sample_size: int = 100) -> List[str]:
+    def _detect_formats(self, ts_col: pd.Series, sample_size: int = 100) -> list[str]:
         """Detect timestamp formats in sample."""
         formats = set()
         sample = ts_col.dropna().head(sample_size)
@@ -151,7 +150,7 @@ class TimestampValidator:
 
         return list(formats)
 
-    def save_report(self, results: List[Dict]) -> Path:
+    def save_report(self, results: list[dict]) -> Path:
         """Save validation results to metrics/."""
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         report_path = self.metrics_dir / f"timestamp_validation_{timestamp}.json"
@@ -177,7 +176,7 @@ class MergeKeyValidator:
         self.logger = logger or logging.getLogger(__name__)
         self.metrics_dir.mkdir(parents=True, exist_ok=True)
 
-    def validate(self) -> Dict:
+    def validate(self) -> dict:
         """Convenience method to validate merge key alignment."""
         from pathlib import Path
 
@@ -189,7 +188,7 @@ class MergeKeyValidator:
         else:
             return {"passed": False, "message": "Required files not found"}
 
-    def validate_alignment(self, signals_csv: Path, orders_csv: Path) -> Dict:
+    def validate_alignment(self, signals_csv: Path, orders_csv: Path) -> dict:
         """
         Validate merge key alignment between signals and orders.
 
@@ -281,7 +280,7 @@ class MergeKeyValidator:
             self.logger.error(f"Merge key validation error: {e}")
             return {"status": "ERROR", "error": str(e), "validation_time": datetime.utcnow().isoformat()}
 
-    def save_report(self, results: Dict) -> Path:
+    def save_report(self, results: dict) -> Path:
         """Save validation results to metrics/."""
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         report_path = self.metrics_dir / f"merge_key_validation_{timestamp}.json"
@@ -310,12 +309,12 @@ class VenvLockMode:
             "wheel",
         }
 
-    def validate(self) -> Dict:
+    def validate(self) -> dict:
         """Convenience method to validate venv integrity."""
         result = self.validate_venv_integrity()
         return {"passed": result.get("status") == "OK", "result": result}
 
-    def get_installed_packages(self) -> Dict[str, str]:
+    def get_installed_packages(self) -> dict[str, str]:
         """Get list of installed packages and versions."""
         try:
             if platform.system() == "Windows":
@@ -348,7 +347,7 @@ class VenvLockMode:
         state = json.dumps(packages, sort_keys=True)
         return hashlib.sha256(state.encode()).hexdigest()
 
-    def validate_venv_integrity(self) -> Dict:
+    def validate_venv_integrity(self) -> dict:
         """
         Validate venv hasn't been modified unexpectedly.
 
@@ -401,7 +400,7 @@ class VenvLockMode:
             self.logger.error(f"Venv validation error: {e}")
             return {"status": "ERROR", "error": str(e), "timestamp": datetime.utcnow().isoformat()}
 
-    def save_report(self, results: Dict) -> Path:
+    def save_report(self, results: dict) -> Path:
         """Save validation results to metrics/."""
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         report_path = Path("storage/metrics") / f"venv_integrity_{timestamp}.json"
@@ -450,7 +449,7 @@ class ContinuousMonitor:
         self.last_check = None
         self.check_count = 0
 
-    def run_check(self) -> Dict:
+    def run_check(self) -> dict:
         """Execute all validators and return results."""
         self.logger.info("=" * 80)
         self.logger.info("CONTINUOUS VALIDATION CHECK")
@@ -502,7 +501,7 @@ class ContinuousMonitor:
 
         return results
 
-    def print_summary(self, results: Dict):
+    def print_summary(self, results: dict):
         """Print validation summary to console."""
         print(f"\n{'='*70}")
         print(f"CONTINUOUS VALIDATION REPORT - {results['check_id']}")

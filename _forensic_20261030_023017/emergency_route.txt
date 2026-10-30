@@ -1,0 +1,6 @@
+﻿C:\Genesis_System3\dashboard\backend\mutation_policy.py:103:    if p == "/emergency-exit" or p.startswith("/order/"):
+C:\Genesis_System3\dashboard\backend\app.py:11124:@app.post("/emergency-exit")
+C:\Genesis_System3\dashboard\backend\app.py:11125:async def compat_emergency_exit():
+C:\Genesis_System3\dashboard\app.py:244:            st.json(api("/emergency-exit", "POST"))
+C:\Genesis_System3\test_endpoints.py:15:    ("POST", "/emergency-exit"),
+C:\Genesis_System3\tests\test_security_policy.py:19:    ("POST", "/emergency-exit"),

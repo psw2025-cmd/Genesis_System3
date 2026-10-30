@@ -15,9 +15,8 @@ Menu Option: 77
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -74,7 +73,7 @@ def classify_regime(row: pd.Series) -> str:
     return f"{vol_regime}_{trend_regime}"
 
 
-def label_regimes() -> Dict[str, Any]:
+def label_regimes() -> dict[str, Any]:
     """
     Label regimes for Ultra training dataset.
 
@@ -134,7 +133,7 @@ def label_regimes() -> Dict[str, Any]:
             df_ultra.to_parquet(ULTRA_TRAINING_WITH_REGIME_PARQUET, index=False, engine="pyarrow")
             print(f"[SAVE] Ultra training with regime (Parquet): {ULTRA_TRAINING_WITH_REGIME_PARQUET}")
         except ImportError:
-            print(f"[WARN] Parquet save skipped: pyarrow not installed")
+            print("[WARN] Parquet save skipped: pyarrow not installed")
         except Exception as e:
             print(f"[WARN] Parquet save failed: {e}")
 
@@ -166,11 +165,11 @@ def main() -> None:
     if result["status"] == "SUCCESS":
         print("\n=== REGIME CLASSIFICATION SUMMARY ===")
         print(f"Total Rows: {result['total_rows']}")
-        print(f"\nRegime Distribution:")
+        print("\nRegime Distribution:")
         for regime, count in result["regime_distribution"].items():
             pct = count / result["total_rows"] * 100
             print(f"  {regime}: {count} ({pct:.1f}%)")
-        print(f"\n[SAVE] Regime-labeled dataset saved")
+        print("\n[SAVE] Regime-labeled dataset saved")
         print("[NOTE] No model training performed - labeling only")
     else:
         print(f"\n[INFO] {result.get('message', 'Classification not completed')}")

@@ -7,7 +7,7 @@ Classifies execution quality based on slippage.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ def classify_quality(slippage_percent: float) -> str:
         return "POOR"
 
 
-def run_phase143_execution_quality() -> Dict[str, Any]:
+def run_phase143_execution_quality() -> dict[str, Any]:
     """
     Classify execution quality from slippage data.
 

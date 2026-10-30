@@ -14,9 +14,7 @@ Menu Option: 88
 """
 
 from pathlib import Path
-from typing import Any, Dict, Optional
-
-import numpy as np
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 REPORTS_ULTRA_DIR = PROJECT_ROOT / "storage" / "reports_ultra"
@@ -33,9 +31,9 @@ def compute_stoploss(
     risk_level: str,
     volatility: float,
     drift_strength: float,
-    drift_direction: Optional[str] = None,
-    premium_behavior: Optional[str] = None,
-) -> Dict[str, Any]:
+    drift_direction: str | None = None,
+    premium_behavior: str | None = None,
+) -> dict[str, Any]:
     """
     Compute adaptive stoploss percentage.
 

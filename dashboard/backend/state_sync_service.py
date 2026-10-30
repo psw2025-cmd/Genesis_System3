@@ -1,4 +1,4 @@
-"""
+﻿"""
 State Sync Service - Periodically syncs SSOT from output files
 Ensures SSOT stays up-to-date with the trading system
 """
@@ -256,7 +256,7 @@ class StateSyncService:
                 mtime = health_file.stat().st_mtime
                 age = time.time() - mtime
                 if age < 60:
-                    health = json.loads(health_file.read_text())
+                    health = json.loads(health_file.read_text(encoding="utf-8-sig"))
 
                     updates["mode"] = health.get("mode", "PAPER")
                     if _health_broker_update_allowed(updates):
@@ -289,7 +289,7 @@ class StateSyncService:
         try:
             positions_file = self.outputs_dir / "positions_live.json"
             if positions_file.exists():
-                positions_data = json.loads(positions_file.read_text())
+                positions_data = json.loads(positions_file.read_text(encoding="utf-8-sig"))
                 positions = positions_data.get("positions", [])
                 if isinstance(positions, list):
                     updates["positions"] = positions
@@ -302,7 +302,7 @@ class StateSyncService:
         try:
             pnl_file = self.outputs_dir / "paper_pnl_summary.json"
             if pnl_file.exists():
-                pnl_data = json.loads(pnl_file.read_text())
+                pnl_data = json.loads(pnl_file.read_text(encoding="utf-8-sig"))
                 updates["pnl"] = {
                     "unrealized": pnl_data.get(
                         "total_unrealized_pnl",
@@ -322,7 +322,7 @@ class StateSyncService:
         try:
             signal_file = self.outputs_dir / "top_trade_signal.json"
             if signal_file.exists():
-                signal_data = json.loads(signal_file.read_text())
+                signal_data = json.loads(signal_file.read_text(encoding="utf-8-sig"))
                 if signal_data.get("action") == "TRADE":
                     updates["signals"] = {
                         "status": "BUY" if signal_data.get("direction") == "LONG" else "SELL",
@@ -347,7 +347,7 @@ class StateSyncService:
         try:
             qc_file = self.outputs_dir / "qc_report_live.json"
             if qc_file.exists():
-                qc_data = json.loads(qc_file.read_text())
+                qc_data = json.loads(qc_file.read_text(encoding="utf-8-sig"))
                 if "contracts_total" in qc_data:
                     updates.setdefault("qc", {})["contracts_total"] = qc_data["contracts_total"]
                 if "underlyings" in qc_data:
@@ -396,7 +396,7 @@ class StateSyncService:
         except Exception as e:
             print(f"Error computing risk metrics: {e}")
 
-        # Generate alerts — use MERGED state (current + updates), not partial updates alone
+        # Generate alerts â€” use MERGED state (current + updates), not partial updates alone
         # BUG FIX: old code used updates["broker"] which is missing when health.json absent
         # causing false BROKER_DISCONNECTED every 5 seconds even when broker is connected.
         try:
@@ -405,7 +405,7 @@ class StateSyncService:
             merged_broker = updates.get("broker") or current_state.get("broker", {})
             broker_actually_connected = merged_broker.get("connected", False)
 
-            # QC alert — any fail-closed non-PASS QC state is operationally visible.
+            # QC alert â€” any fail-closed non-PASS QC state is operationally visible.
             qc_status = str(updates.get("qc", {}).get("status") or "NOT_READY").upper()
             if qc_status != "PASS":
                 self.state_store.upsert_alert(
@@ -416,14 +416,14 @@ class StateSyncService:
             else:
                 self.state_store.resolve_alert("QC_FAIL")
 
-            # Broker alert — deduplicated (BLK-001): threshold + state tracking
+            # Broker alert â€” deduplicated (BLK-001): threshold + state tracking
             if updates.get("broker") is not None:
                 is_connected = bool(updates["broker"].get("connected", False))
                 process_broker_alert(is_connected, self.state_store, logger=_BrokerAlertLog)
             elif broker_actually_connected:
                 process_broker_alert(True, self.state_store, logger=_BrokerAlertLog)
 
-            # Synthetic mode alert — only when market open + broker unavailable
+            # Synthetic mode alert â€” only when market open + broker unavailable
             if updates.get("data_source") == "SYNTHETIC" and updates.get("market", {}).get("is_open", False):
                 self.state_store.upsert_alert(
                     "INFO", "SYNTHETIC_MODE", "Using synthetic data (market open but broker unavailable)"

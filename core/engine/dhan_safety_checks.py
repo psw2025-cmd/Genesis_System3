@@ -6,7 +6,7 @@ Ensures maximum safety for Monday's live trading.
 """
 
 from datetime import datetime
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -21,7 +21,7 @@ class SafetyValidator:
         self.max_trades_per_day = AUTOMATION_CONFIG.max_trades_per_day
         self.max_trades_per_underlying = AUTOMATION_CONFIG.max_trades_per_underlying_per_day
 
-    def validate_trade_plan(self, trade_row: pd.Series) -> Dict[str, Any]:
+    def validate_trade_plan(self, trade_row: pd.Series) -> dict[str, Any]:
         """
         Validate a single trade plan row.
 
@@ -81,7 +81,7 @@ class SafetyValidator:
 
         return result
 
-    def validate_daily_trade_limit(self, new_trades: int, underlying: str | None = None) -> Dict[str, Any]:
+    def validate_daily_trade_limit(self, new_trades: int, underlying: str | None = None) -> dict[str, Any]:
         """
         Validate daily trade limits.
 
@@ -89,7 +89,6 @@ class SafetyValidator:
         - allowed: bool
         - reason: str (if not allowed)
         """
-        import os
         from pathlib import Path
 
         PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -138,7 +137,7 @@ class SafetyValidator:
 
         return {"allowed": True, "reason": ""}
 
-    def validate_automation_enabled(self) -> Dict[str, Any]:
+    def validate_automation_enabled(self) -> dict[str, Any]:
         """Check if automation is safely enabled."""
         result = {
             "auto_execute": AUTOMATION_CONFIG.auto_execute_trades,

@@ -12,11 +12,10 @@ Helper: load_thresholds() - Returns thresholds dict for use by other modules
 """
 
 import json
-import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
@@ -49,7 +48,7 @@ def _log_message(message: str, level: str = "INFO") -> None:
         pass  # Don't fail if logging fails
 
 
-def load_thresholds(prefer_candidates: bool = True) -> Dict[str, Dict[str, float]]:
+def load_thresholds(prefer_candidates: bool = True) -> dict[str, dict[str, float]]:
     """
     Load thresholds for all underlyings.
 
@@ -120,7 +119,7 @@ def load_thresholds(prefer_candidates: bool = True) -> Dict[str, Dict[str, float
 
     # Priority 2: Try to load from candidates file
     if not THRESHOLD_CANDIDATES_PATH.exists():
-        _log_message(f"Threshold files not found. Using defaults.", "WARN")
+        _log_message("Threshold files not found. Using defaults.", "WARN")
         return result
 
     try:
@@ -189,7 +188,7 @@ def load_thresholds(prefer_candidates: bool = True) -> Dict[str, Dict[str, float
     return result
 
 
-def run_phase231() -> Dict[str, Any]:
+def run_phase231() -> dict[str, Any]:
     """
     Run Phase 231: Threshold Loader & Validator.
 
@@ -219,7 +218,7 @@ def run_phase231() -> Dict[str, Any]:
     # Try to load from JSON file
     if not THRESHOLD_CANDIDATES_PATH.exists():
         warnings.append(f"File not found: {THRESHOLD_CANDIDATES_PATH}")
-        _log_message(f"Threshold candidates file not found. Using fallback defaults.", "WARN")
+        _log_message("Threshold candidates file not found. Using fallback defaults.", "WARN")
     else:
         try:
             with THRESHOLD_CANDIDATES_PATH.open("r", encoding="utf-8") as f:

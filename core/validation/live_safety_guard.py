@@ -9,7 +9,7 @@ import sys
 from collections import defaultdict, deque
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -27,10 +27,10 @@ MAX_PENDING_SIGNALS = 100
 
 # Global state for tracking
 # Last 60 seconds
-_signal_counters: Dict[str, deque] = defaultdict(lambda: deque(maxlen=60))
+_signal_counters: dict[str, deque] = defaultdict(lambda: deque(maxlen=60))
 _total_open_positions = 0
 _pending_signals = 0
-_safety_trip_log: List[str] = []
+_safety_trip_log: list[str] = []
 
 
 def reset_counters():
@@ -45,7 +45,7 @@ def reset_counters():
     _safety_trip_log = []
 
 
-def check_signal_rate_limit(underlying: str) -> Tuple[bool, Optional[str]]:
+def check_signal_rate_limit(underlying: str) -> tuple[bool, str | None]:
     """
     Check if signal rate limit is exceeded for an underlying.
 
@@ -74,7 +74,7 @@ def check_signal_rate_limit(underlying: str) -> Tuple[bool, Optional[str]]:
     return True, None
 
 
-def check_position_limits(open_positions: int, pending_signals: int) -> Tuple[bool, Optional[str]]:
+def check_position_limits(open_positions: int, pending_signals: int) -> tuple[bool, str | None]:
     """
     Check if position limits are exceeded.
 
@@ -105,9 +105,9 @@ def check_position_limits(open_positions: int, pending_signals: int) -> Tuple[bo
 
 def log_safety_trip(
     reason: str,
-    underlying: Optional[str] = None,
-    signal_count: Optional[int] = None,
-    details: Optional[Dict[str, Any]] = None,
+    underlying: str | None = None,
+    signal_count: int | None = None,
+    details: dict[str, Any] | None = None,
 ) -> None:
     """
     Log a safety trip event.
@@ -144,7 +144,7 @@ def log_safety_trip(
 
 def check_signal_safety(
     underlying: str, signal_count: int, open_positions: int = 0, pending_signals: int = 0
-) -> Tuple[bool, Optional[str]]:
+) -> tuple[bool, str | None]:
     """
     Comprehensive safety check for signal generation.
 
@@ -177,7 +177,7 @@ def check_signal_safety(
     return True, None
 
 
-def get_safety_status() -> Dict[str, Any]:
+def get_safety_status() -> dict[str, Any]:
     """
     Get current safety status.
 

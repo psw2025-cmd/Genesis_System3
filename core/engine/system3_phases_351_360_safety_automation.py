@@ -19,8 +19,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import pandas as pd
-
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -163,7 +161,7 @@ def run_phase_354_virtual_fill_realism_checker(root_path: str = None, logger_obj
         diag_dir = Path(root_path) / "storage" / "live" / "diagnostics"
         diag_dir.mkdir(parents=True, exist_ok=True)
 
-        realism_report = {
+        {
             "timestamp": datetime.now().isoformat(),
             "unrealistic_fills": 0,
             "realism_score": 1.0,

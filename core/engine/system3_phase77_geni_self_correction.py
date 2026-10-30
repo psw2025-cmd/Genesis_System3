@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -27,7 +27,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase77_geni_self_corrections.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def load_phase76_review() -> Dict[str, Any]:
+def load_phase76_review() -> dict[str, Any]:
     """Load Phase 76 self-review JSON."""
     if not PHASE76_JSON.exists():
         print(f"[PH77] Phase 76 review not found: {PHASE76_JSON}")
@@ -41,7 +41,7 @@ def load_phase76_review() -> Dict[str, Any]:
         return {}
 
 
-def propose_corrections(review: Dict[str, Any]) -> List[Dict[str, Any]]:
+def propose_corrections(review: dict[str, Any]) -> list[dict[str, Any]]:
     """Propose corrections based on self-review."""
     recommendations = []
 
@@ -101,7 +101,7 @@ def propose_corrections(review: Dict[str, Any]) -> List[Dict[str, Any]]:
     return recommendations
 
 
-def generate_corrections() -> Dict[str, Any]:
+def generate_corrections() -> dict[str, Any]:
     """Generate self-correction recommendations."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 77 - GENI SELF-CORRECTION ENGINE")
@@ -138,7 +138,7 @@ def generate_corrections() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 77 - GENI Self-Correction Recommendations\n\n")
@@ -176,7 +176,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_corrections()
+        generate_corrections()
         print("\n[PH77] Self-correction generation complete.")
         return 0
     except Exception as e:

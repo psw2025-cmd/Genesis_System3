@@ -7,7 +7,7 @@ Estimates spread and liquidity from existing snapshot data.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -63,7 +63,7 @@ def estimate_liquidity_score(spread: float, ltp: float) -> float:
         return 0.2
 
 
-def run_phase141_spread_liquidity_estimator() -> Dict[str, Any]:
+def run_phase141_spread_liquidity_estimator() -> dict[str, Any]:
     """
     Estimate spread and liquidity from snapshot data.
 

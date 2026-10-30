@@ -8,9 +8,8 @@ SAFE MODE ONLY - Read-only analysis.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -23,7 +22,7 @@ FEATURE_DRIFT_DIR = REPORTS_DIR / "feature_drift"
 FEATURE_DRIFT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def analyze_feature_drift() -> Dict[str, Any]:
+def analyze_feature_drift() -> dict[str, Any]:
     """
     Analyze feature drift between training and live data.
 
@@ -150,7 +149,7 @@ def _classify_drift_severity(mean_drift: float, std_drift: float) -> str:
         return "LOW"
 
 
-def save_drift_analysis(analysis: Dict[str, Any]) -> Path:
+def save_drift_analysis(analysis: dict[str, Any]) -> Path:
     """
     Save drift analysis to CSV.
 
@@ -187,7 +186,7 @@ def main() -> None:
     analysis = analyze_feature_drift()
 
     if analysis["status"] == "SUCCESS":
-        print(f"=== FEATURE DRIFT ANALYSIS ===\n")
+        print("=== FEATURE DRIFT ANALYSIS ===\n")
         print(f"Total Features Analyzed: {analysis['total_features_analyzed']}")
         print(f"Features with High/Critical Drift: {len(analysis['high_drift_features'])}")
 

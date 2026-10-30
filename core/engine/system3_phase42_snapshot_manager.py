@@ -14,7 +14,7 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 SNAPSHOTS_DIR = PROJECT_ROOT / "storage" / "snapshots"
@@ -79,16 +79,16 @@ def create_snapshot() -> Path:
     if thresholds_file.exists():
         dest = config_dest / "thresholds_auto.json"
         shutil.copy2(thresholds_file, dest)
-        files_copied.append(f"configs/thresholds_auto.json")
-        _log(f"Copied: thresholds_auto.json")
+        files_copied.append("configs/thresholds_auto.json")
+        _log("Copied: thresholds_auto.json")
 
     # dhan_trade_config.py (as .txt)
     trade_config_file = PROJECT_ROOT / "core" / "engine" / "dhan_trade_config.py"
     if trade_config_file.exists():
         dest = config_dest / "dhan_trade_config.txt"
         shutil.copy2(trade_config_file, dest)
-        files_copied.append(f"configs/dhan_trade_config.txt")
-        _log(f"Copied: dhan_trade_config.py (as .txt)")
+        files_copied.append("configs/dhan_trade_config.txt")
+        _log("Copied: dhan_trade_config.py (as .txt)")
 
     # Create snapshot metadata
     metadata = {
@@ -107,7 +107,7 @@ def create_snapshot() -> Path:
     return snapshot_dir
 
 
-def list_snapshots() -> List[Dict[str, Any]]:
+def list_snapshots() -> list[dict[str, Any]]:
     """List all available snapshots."""
     snapshots = []
 
@@ -146,7 +146,7 @@ def list_snapshots() -> List[Dict[str, Any]]:
     return snapshots
 
 
-def find_latest_snapshot_dir() -> Optional[Path]:
+def find_latest_snapshot_dir() -> Path | None:
     """Find the latest snapshot directory."""
     snapshots = list_snapshots()
     if not snapshots:
@@ -166,9 +166,9 @@ def run_phase42_snapshot_create() -> None:
 
     snapshot_dir = create_snapshot()
 
-    print(f"\n[OK] Phase 42 Snapshot created")
+    print("\n[OK] Phase 42 Snapshot created")
     print(f"[SAVE] Snapshot directory: {snapshot_dir}")
-    print(f"\n[INFO] To rollback, manually copy files from snapshot directory to baseline locations")
+    print("\n[INFO] To rollback, manually copy files from snapshot directory to baseline locations")
 
 
 def run_phase42_snapshot_list() -> None:

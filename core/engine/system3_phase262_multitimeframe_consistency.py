@@ -8,7 +8,7 @@ Checks if signals align across 1min, 5min, 15min aggregations.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -24,7 +24,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_multitimeframe_consistency.md"
 
 
-def run_phase262(**kwargs) -> Dict[str, Any]:
+def run_phase262(**kwargs) -> dict[str, Any]:
     """
     Run Phase 262: Multi-Timeframe Signal Consistency Checker.
 

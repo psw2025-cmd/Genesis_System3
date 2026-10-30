@@ -7,7 +7,7 @@ Analyzes misfires (failed predictions) from DRY-RUN data.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase157_misfire_breakdown.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase157_misfire_breakdown_report.md"
 
 
-def run_phase157_misfire_breakdown() -> Dict[str, Any]:
+def run_phase157_misfire_breakdown() -> dict[str, Any]:
     """
     Analyze misfires from PnL log.
 
@@ -95,7 +95,7 @@ def run_phase157_misfire_breakdown() -> Dict[str, Any]:
 
             if not df_result.empty:
                 misfire_count = len(df_result[df_result["misfire_type"] != "NONE"])
-                f.write(f"## Summary\n\n")
+                f.write("## Summary\n\n")
                 f.write(f"- **Total Trades**: {len(df_result)}\n")
                 f.write(f"- **Misfires**: {misfire_count}\n")
                 f.write(f"- **Misfire Rate**: {(misfire_count / len(df_result) * 100):.2f}%\n")

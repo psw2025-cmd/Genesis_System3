@@ -7,7 +7,7 @@ SAFE MODE ONLY - Read-only merge, no training.
 """
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ def merge_datasets(
     synthetic_weight: float = 0.5,
     real_weight: float = 0.5,
     downsample_real: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Merge real + synthetic datasets.
 
@@ -142,7 +142,7 @@ def merge_datasets(
     }
 
 
-def get_merged_dataset_info() -> Dict[str, Any]:
+def get_merged_dataset_info() -> dict[str, Any]:
     """
     Get merged dataset information (read-only).
 
@@ -182,7 +182,7 @@ def main() -> None:
     result = merge_datasets(synthetic_weight=0.4, real_weight=0.6)
 
     if result["status"] == "SUCCESS":
-        print(f"\n=== MERGE SUMMARY ===")
+        print("\n=== MERGE SUMMARY ===")
         print(f"Synthetic Rows: {result['synthetic_rows']}")
         print(f"Real Rows: {result['real_rows']}")
         print(f"Total Rows: {result['total_rows']}")
@@ -192,7 +192,7 @@ def main() -> None:
         # Show info
         info = get_merged_dataset_info()
         if info["status"] == "SUCCESS":
-            print(f"\n=== DATASET INFO ===")
+            print("\n=== DATASET INFO ===")
             if "by_underlying" in info:
                 print("By Underlying:")
                 for u, count in info["by_underlying"].items():

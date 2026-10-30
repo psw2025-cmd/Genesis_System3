@@ -9,13 +9,13 @@ from __future__ import annotations
 
 import logging
 import sqlite3
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Tuple
+from datetime import UTC, datetime
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 # Institutional lot sizes for major Indian indices and liquid underlyings
-DEFAULT_LOT_SIZES: Dict[str, int] = {
+DEFAULT_LOT_SIZES: dict[str, int] = {
     "NIFTY": 50,
     "BANKNIFTY": 15,
     "FINNIFTY": 25,
@@ -35,7 +35,7 @@ DEFAULT_LOT_SIZES: Dict[str, int] = {
 }
 
 # Dhan Under_Security_ID mappings for Option Chain API
-DHAN_INDEX_SECURITY_IDS: Dict[str, int] = {
+DHAN_INDEX_SECURITY_IDS: dict[str, int] = {
     "NIFTY": 13,
     "BANKNIFTY": 25,
     "FINNIFTY": 27,
@@ -44,7 +44,7 @@ DHAN_INDEX_SECURITY_IDS: Dict[str, int] = {
     "BANKEX": 12,
 }
 
-DHAN_INDEX_SEGMENTS: Dict[str, str] = {
+DHAN_INDEX_SEGMENTS: dict[str, str] = {
     "NIFTY": "IDX_I",
     "BANKNIFTY": "IDX_I",
     "FINNIFTY": "IDX_I",
@@ -57,9 +57,9 @@ DHAN_INDEX_SEGMENTS: Dict[str, str] = {
 class DhanMasterCache:
     """Singleton high-speed in-memory SQLite symbol master cache."""
 
-    _instance: Optional["DhanMasterCache"] = None
+    _instance: DhanMasterCache | None = None
 
-    def __new__(cls) -> "DhanMasterCache":
+    def __new__(cls) -> DhanMasterCache:
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._init_db()
@@ -98,7 +98,7 @@ class DhanMasterCache:
 
     def _seed_default_universe(self) -> None:
         """Seed index underlyings and essential metadata into memory."""
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         records = []
         for sym, sec_id in DHAN_INDEX_SECURITY_IDS.items():
             seg = DHAN_INDEX_SEGMENTS.get(sym, "IDX_I")
@@ -129,7 +129,7 @@ class DhanMasterCache:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, records)
 
-    def upsert_instrument(self, item: Dict[str, Any]) -> None:
+    def upsert_instrument(self, item: dict[str, Any]) -> None:
         """Insert or update an instrument record dynamically."""
         sec_id = int(item.get("security_id") or item.get("SEM_SMST_SECURITY_ID") or 0)
         if not sec_id:
@@ -147,7 +147,7 @@ class DhanMasterCache:
         expiry = str(expiry) if expiry else None
         lot = int(item.get("lot_size") or item.get("SEM_LOT_UNITS") or DEFAULT_LOT_SIZES.get(underlying, 1))
         tick = float(item.get("tick_size") or item.get("SEM_TICK_SIZE") or 0.05)
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
 
         with self.conn:
             self.conn.execute("""
@@ -158,7 +158,7 @@ class DhanMasterCache:
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
             """, (sec_id, sym, tsym, underlying, exch, seg, itype, strike, opttype, expiry, lot, tick, now))
 
-    def resolve_underlying_security(self, symbol: str) -> Tuple[Optional[int], str, str]:
+    def resolve_underlying_security(self, symbol: str) -> tuple[int | None, str, str]:
         """Return (security_id, exchange_segment, exchange) for any index or stock."""
         sym = symbol.strip().upper()
         cur = self.conn.cursor()
@@ -173,7 +173,7 @@ class DhanMasterCache:
 
         return None, "NSE_FNO", "NSE"
 
-    def get_option_chain_contracts(self, underlying: str, expiry: Optional[str] = None) -> List[Dict[str, Any]]:
+    def get_option_chain_contracts(self, underlying: str, expiry: str | None = None) -> list[dict[str, Any]]:
         """Retrieve option chain contracts for an underlying with optional expiry filter."""
         sym = underlying.strip().upper()
         cur = self.conn.cursor()

@@ -13,7 +13,7 @@ Menu Option: 108
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,7 +24,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_fused_decisions() -> Optional[pd.DataFrame]:
+def load_fused_decisions() -> pd.DataFrame | None:
     """Load Phase 31 fused decisions."""
     fused_csv = ULTRA_DIR / "phase31_ultra_fused_decisions.csv"
     if fused_csv.exists():
@@ -35,7 +35,7 @@ def load_fused_decisions() -> Optional[pd.DataFrame]:
     return None
 
 
-def compute_model_weights(historical_performance: Dict[str, float]) -> Dict[str, float]:
+def compute_model_weights(historical_performance: dict[str, float]) -> dict[str, float]:
     """
     Compute weights for each model based on historical performance.
 
@@ -58,7 +58,7 @@ def compute_model_weights(historical_performance: Dict[str, float]) -> Dict[str,
     return weights
 
 
-def fuse_predictions(predictions: List[Dict[str, Any]], weights: Dict[str, float]) -> Dict[str, Any]:
+def fuse_predictions(predictions: list[dict[str, Any]], weights: dict[str, float]) -> dict[str, Any]:
     """
     Fuse multiple predictions into a single meta-prediction.
 
@@ -103,7 +103,7 @@ def fuse_predictions(predictions: List[Dict[str, Any]], weights: Dict[str, float
         weighted_score /= total_weight
 
     # Majority vote for action
-    action_votes_dict: Dict[str, float] = action_votes
+    action_votes_dict: dict[str, float] = action_votes
     meta_action = max(action_votes_dict.items(), key=lambda x: x[1])[0] if action_votes_dict else "HOLD"
 
     return {

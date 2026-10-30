@@ -13,7 +13,7 @@ Menu Option: 110
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
+def load_predictions_and_outcomes() -> pd.DataFrame | None:
     """Load predictions and actual outcomes."""
     # Try to load from various sources
     sources = [
@@ -78,7 +78,7 @@ def load_predictions_and_outcomes() -> Optional[pd.DataFrame]:
     return df_pred
 
 
-def classify_error(prediction: str, outcome: str, confidence: float) -> Dict[str, Any]:
+def classify_error(prediction: str, outcome: str, confidence: float) -> dict[str, Any]:
     """
     Classify error type.
 
@@ -133,7 +133,7 @@ def classify_error(prediction: str, outcome: str, confidence: float) -> Dict[str
             return {
                 "error_type": "DIRECTION_MISMATCH",
                 "severity": "MEDIUM",
-                "description": f"Wrong direction predicted",
+                "description": "Wrong direction predicted",
             }
 
     return {
@@ -221,13 +221,13 @@ def run_phase48_error_scanner() -> None:
     print(f"[SAVE] Error patterns saved to: {patterns_json}")
 
     # Summary
-    print(f"\n=== ERROR SCAN SUMMARY ===")
+    print("\n=== ERROR SCAN SUMMARY ===")
     print(f"Total scanned: {len(df_errors)}")
     print(f"Errors found: {error_patterns['total_errors']}")
     print(f"High severity: {error_patterns['high_severity']}")
     print(f"Medium severity: {error_patterns['medium_severity']}")
     print(f"Low severity: {error_patterns['low_severity']}")
-    print(f"\nError types:")
+    print("\nError types:")
     for error_type, count in error_patterns["error_types"].items():
         print(f"  {error_type}: {count}")
 

@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase169_confidence_calibration.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase169_confidence_calibration_report.md"
 
 
-def run_phase169_confidence_calibration() -> Dict[str, Any]:
+def run_phase169_confidence_calibration() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["confidence_bucket", "actual_win_rate", "calibration_score"])
@@ -37,7 +37,7 @@ def run_phase169_confidence_calibration() -> Dict[str, Any]:
 
 
 def main():
-    print(f"Phase169: Confidence Calibration Analysis")
+    print("Phase169: Confidence Calibration Analysis")
     result = run_phase169_confidence_calibration()
     return 0 if result["status"] == "OK" else 1
 

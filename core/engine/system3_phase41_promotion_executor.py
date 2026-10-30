@@ -14,7 +14,6 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CONFIG_DIR = PROJECT_ROOT / "storage" / "config"
@@ -46,7 +45,7 @@ def _log(message: str) -> None:
         print(f"[Phase41][WARN] Failed to write log: {e}")
 
 
-def find_latest_snapshot_dir() -> Optional[Path]:
+def find_latest_snapshot_dir() -> Path | None:
     """Find the latest snapshot directory."""
     from core.engine.system3_phase42_snapshot_manager import (
         find_latest_snapshot_dir as find_snap,
@@ -74,7 +73,7 @@ def check_promotion_flag() -> bool:
         return False
 
 
-def get_eligible_underlyings() -> List[str]:
+def get_eligible_underlyings() -> list[str]:
     """Get list of eligible underlyings from promotion plan."""
     if not PROMOTION_PLAN_FILE.exists():
         _log("Promotion plan file not found")
@@ -95,7 +94,7 @@ def get_eligible_underlyings() -> List[str]:
         return []
 
 
-def stage_ultra_model(underlying: str, snapshot_dir: Optional[Path]) -> bool:
+def stage_ultra_model(underlying: str, snapshot_dir: Path | None) -> bool:
     """Stage Ultra model for an underlying."""
     model_file = BLENDED_MODELS_DIR / f"{underlying}_model_blended_v3.pkl"
     meta_file = BLENDED_MODELS_DIR / f"{underlying}_model_blended_v3_meta.json"
@@ -209,7 +208,7 @@ def run_phase41_promotion_executor() -> None:
     report_lines.append("")
     report_lines.append(f"- **Flag File**: `{PROMOTION_FLAG_FILE}`")
     report_lines.append(f"- **Keyword**: `{REQUIRED_KEYWORD}`")
-    report_lines.append(f"- **Status**: Valid")
+    report_lines.append("- **Status**: Valid")
     report_lines.append("")
 
     report_lines.append("## Notes")
@@ -222,7 +221,7 @@ def run_phase41_promotion_executor() -> None:
     with report_file.open("w", encoding="utf-8") as f:
         f.write("\n".join(report_lines))
 
-    print(f"\n[OK] Phase 41 Promotion Executor completed")
+    print("\n[OK] Phase 41 Promotion Executor completed")
     print(f"[SAVE] Staging report: {report_file}")
 
     if staged:

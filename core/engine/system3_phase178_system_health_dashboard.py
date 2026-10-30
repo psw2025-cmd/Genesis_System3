@@ -7,7 +7,7 @@ Non-trading meta/infra module.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -19,7 +19,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase178_system_health_dashboard_report.md"
 
 
-def run_phase178_system_health_dashboard() -> Dict[str, Any]:
+def run_phase178_system_health_dashboard() -> dict[str, Any]:
     """
     System Health Dashboard.
 
@@ -35,7 +35,7 @@ def run_phase178_system_health_dashboard() -> Dict[str, Any]:
     errors = []
     try:
         with OUTPUT_MD_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"# System3 Phase 178 - System Health Dashboard\n\n")
+            f.write("# System3 Phase 178 - System Health Dashboard\n\n")
             f.write(f"**Generated**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             f.write("Non-trading meta/infra module.\n")
         return {
@@ -58,7 +58,7 @@ def run_phase178_system_health_dashboard() -> Dict[str, Any]:
 def main():
     """CLI entry point."""
     print("=" * 70)
-    print(f"SYSTEM3 PHASE 178 - SYSTEM HEALTH DASHBOARD")
+    print("SYSTEM3 PHASE 178 - SYSTEM HEALTH DASHBOARD")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     result = run_phase178_system_health_dashboard()

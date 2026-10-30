@@ -14,9 +14,8 @@ import logging
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -56,7 +55,7 @@ def load_curated_signals() -> pd.DataFrame:
     return df
 
 
-def load_phase362_metrics() -> Dict[str, Any]:
+def load_phase362_metrics() -> dict[str, Any]:
     """Load forward calibration metrics from Phase 362."""
     metrics_path = STORAGE_METRICS / "forward_calibrator_362.json"
 
@@ -68,7 +67,7 @@ def load_phase362_metrics() -> Dict[str, Any]:
         return json.load(f)
 
 
-def load_phase363_drift() -> Dict[str, Any]:
+def load_phase363_drift() -> dict[str, Any]:
     """Load model drift score from Phase 363."""
     drift_path = STORAGE_METRICS / "model_drift_363.json"
 
@@ -93,7 +92,7 @@ def infer_strategy_from_signal(row: pd.Series) -> str:
     if pd.isna(row.get("signal")):
         return "Unknown"
 
-    confidence = float(row.get("confidence", 0.5))
+    float(row.get("confidence", 0.5))
     score = float(row.get("score", 0.5))
 
     # Simple heuristic: use score value ranges
@@ -106,8 +105,8 @@ def infer_strategy_from_signal(row: pd.Series) -> str:
 
 
 def evaluate_strategy_performance(
-    df: pd.DataFrame, phase362: Dict[str, Any], phase363: Dict[str, Any]
-) -> Dict[str, Any]:
+    df: pd.DataFrame, phase362: dict[str, Any], phase363: dict[str, Any]
+) -> dict[str, Any]:
     """
     Evaluate performance of each strategy.
 
@@ -148,7 +147,7 @@ def evaluate_strategy_performance(
                 recency_score = 1.0
 
         # Weighted score: confidence * score * win_rate * recency
-        weighted_score = float((avg_confidence * avg_score * max(0.5, win_rate) * recency_score))
+        weighted_score = float(avg_confidence * avg_score * max(0.5, win_rate) * recency_score)
 
         strategies[strategy_name] = {
             "count": int(strategy_size),
@@ -176,7 +175,7 @@ def evaluate_strategy_performance(
     }
 
 
-def compute_short_long_term_comparison(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_short_long_term_comparison(df: pd.DataFrame) -> dict[str, Any]:
     """
     Compare strategy performance in short-term vs long-term windows.
     Safely handles missing columns by returning early with warning.
@@ -185,7 +184,6 @@ def compute_short_long_term_comparison(df: pd.DataFrame) -> Dict[str, Any]:
         return {"error": "No signals", "short_term_signals": 0, "long_term_signals": 0}
 
     # Check required columns first
-    required_cols = ["timestamp", "confidence", "score"]
     if "inferred_strategy" not in df.columns:
         # Infer from signal column if needed
         if "signal" in df.columns:
@@ -217,8 +215,8 @@ def compute_short_long_term_comparison(df: pd.DataFrame) -> Dict[str, Any]:
         comparison = {
             "short_term_window_days": 1,
             "long_term_window_days": 7,
-            "short_term_signals": int(len(short_term)),
-            "long_term_signals": int(len(long_term)),
+            "short_term_signals": len(short_term),
+            "long_term_signals": len(long_term),
         }
 
         # Strategy dominance in each window
@@ -243,7 +241,7 @@ def compute_short_long_term_comparison(df: pd.DataFrame) -> Dict[str, Any]:
         }
 
 
-def generate_markdown_report(evaluation: Dict[str, Any], comparison: Dict[str, Any]) -> str:
+def generate_markdown_report(evaluation: dict[str, Any], comparison: dict[str, Any]) -> str:
     """Generate markdown report for strategy ensemble evaluation."""
 
     report = """# STRATEGY ENSEMBLE EVALUATION - PHASE 366
@@ -269,7 +267,7 @@ This phase evaluates the performance of multiple internal trading strategies
     report += f"""
 ## Results
 
-**Total Signals Evaluated:** {total}  
+**Total Signals Evaluated:** {total}
 **Dominant Strategy:** {dominant}
 
 ### Strategy Performance Metrics
@@ -290,7 +288,7 @@ This phase evaluates the performance of multiple internal trading strategies
 - **Short-term:** {comparison.get('short_term_window_days', 'N/A')} day(s) with {comparison.get('short_term_signals', 0)} signals
 - **Long-term:** {comparison.get('long_term_window_days', 'N/A')} day(s) with {comparison.get('long_term_signals', 0)} signals
 
-**Short-term Dominant:** {comparison.get('short_term_dominant', 'Unknown')}  
+**Short-term Dominant:** {comparison.get('short_term_dominant', 'Unknown')}
 **Long-term Dominant:** {comparison.get('long_term_dominant', 'Unknown')}
 """
 
@@ -311,14 +309,14 @@ This phase evaluates the performance of multiple internal trading strategies
 
 ---
 
-**Status:** [OK] Analysis Complete (DRY-RUN)  
+**Status:** [OK] Analysis Complete (DRY-RUN)
 **Safety Mode:** DRY-RUN (no orders, no broker calls)
 """
 
     return report
 
 
-def run_phase366(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase366(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 366 - Strategy Ensemble Evaluator
 

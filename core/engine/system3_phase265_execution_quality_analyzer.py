@@ -7,7 +7,7 @@ Analyzes execution quality: slippage, fill rates, latency.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / "system3_execution_quality.md"
 
 
-def run_phase265(**kwargs) -> Dict[str, Any]:
+def run_phase265(**kwargs) -> dict[str, Any]:
     """Run Phase 265: Execution Quality Analyzer."""
     errors = []
 
@@ -60,7 +60,7 @@ def run_phase265(**kwargs) -> Dict[str, Any]:
         # Analyze execution quality
         total_orders = len(df)
         approved_orders = (
-            len(df[df.get("approved", pd.Series([False] * len(df))) == True]) if "approved" in df.columns else 0
+            len(df[df.get("approved", pd.Series([False] * len(df)))]) if "approved" in df.columns else 0
         )
 
         fill_rate = approved_orders / total_orders if total_orders > 0 else 0.0

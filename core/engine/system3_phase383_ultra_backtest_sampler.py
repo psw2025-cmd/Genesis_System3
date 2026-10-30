@@ -192,15 +192,15 @@ def run_phase_383() -> dict:
                 f.write("\n## Statistical Summary\n\n")
                 for underlying, result in backtest_results["results"].items():
                     f.write(f"### {underlying}\n\n")
-                    f.write(f"- **Ultra Model:**\n")
+                    f.write("- **Ultra Model:**\n")
                     f.write(f"  - Mean: {result['ultra_mean']:.4f}\n")
                     f.write(f"  - Std Dev: {result['ultra_std']:.4f}\n")
                     f.write(f"  - Range: [{result['ultra_min']:.4f}, {result['ultra_max']:.4f}]\n")
-                    f.write(f"- **Delta Fallback:**\n")
+                    f.write("- **Delta Fallback:**\n")
                     f.write(f"  - Mean: {result['delta_mean']:.4f}\n")
                     f.write(f"  - Std Dev: {result['delta_std']:.4f}\n")
                     f.write(f"  - Range: [{result['delta_min']:.4f}, {result['delta_max']:.4f}]\n")
-                    f.write(f"- **Comparison:**\n")
+                    f.write("- **Comparison:**\n")
                     f.write(f"  - Correlation: {result['correlation']:.2f}\n")
                     f.write(f"  - Improvement: {result['improvement']:.4f}\n\n")
 
@@ -235,7 +235,7 @@ def run_phase_383() -> dict:
 
     except Exception as e:
         logger.error(f"Phase 383 ERROR: {e}")
-        return {"status": "error", "message": f"Phase 383 failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Phase 383 failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

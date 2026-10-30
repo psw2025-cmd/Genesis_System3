@@ -55,7 +55,6 @@ _DHAN_SDK_OK = False
 _dhanhq_class = None
 _DhanContext = None
 try:
-    import dhanhq as _pkg
     from dhanhq import dhanhq as _dhanhq_class
     from dhanhq.dhan_context import DhanContext as _DhanContext
 
@@ -365,7 +364,7 @@ def _rest_get(
     url: str,
     access_token: str,
     client_id: str,
-    timeout: int | float = 10,
+    timeout: float = 10,
     *,
     include_client_id: bool = True,
 ) -> dict:

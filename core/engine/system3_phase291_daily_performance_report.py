@@ -7,7 +7,7 @@ Generates comprehensive daily performance report.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / f"system3_daily_performance_{datetime.now().strftime('%Y%m%d')}.md"
 
 
-def run_phase291(**kwargs) -> Dict[str, Any]:
+def run_phase291(**kwargs) -> dict[str, Any]:
     """Run Phase 291: Daily Performance Report."""
     errors = []
 

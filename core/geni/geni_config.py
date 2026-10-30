@@ -7,7 +7,6 @@ All safety flags default to False (SAFE MODE).
 """
 
 from pathlib import Path
-from typing import Optional
 
 # Project root - resolve from this file's location
 _GENI_DIR = Path(__file__).parent

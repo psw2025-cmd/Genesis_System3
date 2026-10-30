@@ -9,7 +9,7 @@ import platform
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -26,7 +26,7 @@ OUTPUT_JSON_PATH = STORAGE_ULTRA / "phase132_master_health_snapshot.json"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase132_master_health_snapshot.md"
 
 
-def check_dhan_connectivity() -> Dict[str, Any]:
+def check_dhan_connectivity() -> dict[str, Any]:
     """
     Check Dhan connectivity (safe mode, no orders).
 
@@ -55,7 +55,7 @@ def check_dhan_connectivity() -> Dict[str, Any]:
     }
 
 
-def run_phase132_master_health_snapshot() -> Dict[str, Any]:
+def run_phase132_master_health_snapshot() -> dict[str, Any]:
     """
     Gather master session health snapshot.
 
@@ -73,11 +73,10 @@ def run_phase132_master_health_snapshot() -> Dict[str, Any]:
 
     try:
         # Load master config
-        master_config = {}
         if MASTER_CONFIG_PATH.exists():
             try:
                 with MASTER_CONFIG_PATH.open("r", encoding="utf-8") as f:
-                    master_config = json.load(f)
+                    json.load(f)
             except Exception as e:
                 errors.append(f"Error reading master config: {e}")
 

@@ -10,7 +10,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -35,7 +35,7 @@ OUTPUT_MD = STORAGE_ULTRA / "phase76_geni_self_review.md"
 STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 
 
-def load_data() -> Dict[str, pd.DataFrame]:
+def load_data() -> dict[str, pd.DataFrame]:
     """Load signals, trades, and PnL data."""
     data = {}
 
@@ -72,7 +72,7 @@ def load_data() -> Dict[str, pd.DataFrame]:
     return data
 
 
-def analyze_signal(signal_row: pd.Series, trades_df: pd.DataFrame, pnl_df: pd.DataFrame) -> Dict[str, Any]:
+def analyze_signal(signal_row: pd.Series, trades_df: pd.DataFrame, pnl_df: pd.DataFrame) -> dict[str, Any]:
     """Analyze a single signal against trades and outcomes."""
     # Create unique key for matching
     signal_ts = signal_row.get("ts", "")
@@ -117,9 +117,7 @@ def analyze_signal(signal_row: pd.Series, trades_df: pd.DataFrame, pnl_df: pd.Da
 
             # Determine direction correctness
             if result_pnl != "NO_DATA" and pnl_pct != 0:
-                if pred_label == "BUY_CE" and pnl_pct > 0:
-                    result["direction_correct"] = True
-                elif pred_label == "BUY_PE" and pnl_pct > 0:
+                if pred_label == "BUY_CE" and pnl_pct > 0 or pred_label == "BUY_PE" and pnl_pct > 0:
                     result["direction_correct"] = True
                 elif pred_label in ["BUY_CE", "BUY_PE"] and pnl_pct < 0:
                     result["direction_correct"] = False
@@ -141,7 +139,7 @@ def analyze_signal(signal_row: pd.Series, trades_df: pd.DataFrame, pnl_df: pd.Da
     return result
 
 
-def compute_aggregate_metrics(signals_df: pd.DataFrame, analysis_results: List[Dict[str, Any]]) -> Dict[str, Any]:
+def compute_aggregate_metrics(signals_df: pd.DataFrame, analysis_results: list[dict[str, Any]]) -> dict[str, Any]:
     """Compute aggregate metrics overall and per underlying."""
     overall = {
         "total_signals": len(signals_df),
@@ -190,7 +188,7 @@ def compute_aggregate_metrics(signals_df: pd.DataFrame, analysis_results: List[D
     }
 
 
-def generate_self_critique() -> Dict[str, Any]:
+def generate_self_critique() -> dict[str, Any]:
     """Generate self-critique report."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 76 - GENI SELF-CRITIQUE ENGINE")
@@ -247,7 +245,7 @@ def generate_self_critique() -> Dict[str, Any]:
     return report
 
 
-def generate_markdown(report: Dict[str, Any]) -> None:
+def generate_markdown(report: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Phase 76 - GENI Self-Critique Report\n\n")
@@ -303,7 +301,7 @@ def generate_markdown(report: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        report = generate_self_critique()
+        generate_self_critique()
         print("\n[PH76] Self-critique generation complete.")
         return 0
     except Exception as e:

@@ -9,9 +9,8 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -26,7 +25,7 @@ STORAGE_METRICS.mkdir(parents=True, exist_ok=True)
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def calibrate_forward_returns(df: pd.DataFrame) -> Dict[str, Any]:
+def calibrate_forward_returns(df: pd.DataFrame) -> dict[str, Any]:
     """Calculate calibration metrics from forward returns."""
     calibration = {}
 
@@ -91,7 +90,7 @@ def calibrate_forward_returns(df: pd.DataFrame) -> Dict[str, Any]:
     return calibration
 
 
-def run_phase362(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase362(context: dict[str, Any] = None) -> dict[str, Any]:
     """
     Execute Phase 362: Live Forward-Return Calibrator.
 
@@ -211,7 +210,7 @@ def run_phase362(context: Dict[str, Any] = None) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        error_msg = f"Phase 362 failed: {str(e)}"
+        error_msg = f"Phase 362 failed: {e!s}"
         errors.append(error_msg)
         return {
             "phase": 362,

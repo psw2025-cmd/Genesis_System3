@@ -8,7 +8,7 @@ SAFE MODE ONLY - Read-only logging, no threshold changes, no config changes.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -81,7 +81,7 @@ def log_real_outcome(
         return False
 
 
-def update_placeholders_from_outcomes() -> Dict[str, Any]:
+def update_placeholders_from_outcomes() -> dict[str, Any]:
     """
     Update placeholders with actual outcomes.
 
@@ -146,7 +146,7 @@ def update_placeholders_from_outcomes() -> Dict[str, Any]:
         }
 
 
-def get_outcome_stats() -> Dict[str, Any]:
+def get_outcome_stats() -> dict[str, Any]:
     """
     Get outcome statistics (read-only).
 
@@ -214,7 +214,7 @@ def main() -> None:
     # Show stats
     stats = get_outcome_stats()
     if stats["status"] == "SUCCESS":
-        print(f"\n=== OUTCOME STATISTICS ===")
+        print("\n=== OUTCOME STATISTICS ===")
         print(f"Total Outcomes: {stats['total_outcomes']}")
         if "win_rate" in stats:
             print(f"Win Rate: {stats['win_rate']:.1f}%")

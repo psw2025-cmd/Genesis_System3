@@ -7,7 +7,7 @@ Detects overfitting in ML models.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -20,7 +20,7 @@ REPORT_PATH = LOG_DIR / "system3_overfit_sentinel_report.md"
 PERFORMANCE_GAP_THRESHOLD = 0.15  # 15% gap indicates overfitting
 
 
-def run_phase215(**kwargs) -> Dict[str, Any]:
+def run_phase215(**kwargs) -> dict[str, Any]:
     """
     Run Phase 215: Model Overfit Sentinel.
 

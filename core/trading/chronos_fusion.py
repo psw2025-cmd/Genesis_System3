@@ -14,12 +14,11 @@ from __future__ import annotations
 import importlib.util
 import json
 import logging
-import os
 import sys
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 _BASE_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _BASE_DIR.parents[1] if len(_BASE_DIR.parents) >= 2 else _BASE_DIR.parent
@@ -38,7 +37,7 @@ def discover_root() -> Path:
     return p
 
 
-def discover_by_pattern(patterns: List[str]) -> Optional[Path]:
+def discover_by_pattern(patterns: list[str]) -> Path | None:
     """Discover candidate Python modules matching multi-keyword patterns."""
     root = discover_root()
     search_dirs = [root / "core", root / "scripts", root / "models"]
@@ -53,7 +52,7 @@ def discover_by_pattern(patterns: List[str]) -> Optional[Path]:
     return None
 
 
-def load_module_safe(file_path: Optional[Path]) -> Optional[Any]:
+def load_module_safe(file_path: Path | None) -> Any | None:
     """Safely load Python module from path with structured error logging."""
     if not file_path or not file_path.exists():
         return None
@@ -90,7 +89,7 @@ class ChronosFusionEngine:
             f"L3:{self.l3_file.name if self.l3_file else 'Dynamic'}"
         )
 
-    def chronos_fusion_signal(self, symbol: str = "NIFTY") -> Dict[str, Any]:
+    def chronos_fusion_signal(self, symbol: str = "NIFTY") -> dict[str, Any]:
         """Compute fused multi-horizon conviction signal."""
         t0 = time.time()
 
@@ -161,7 +160,7 @@ class ChronosFusionEngine:
         latency_ms = round((time.time() - t0) * 1000, 2)
         payload = {
             "symbol": symbol,
-            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "timestamp_utc": datetime.now(UTC).isoformat(),
             "fused_action": fused_action,
             "fused_confidence": round(fused_conf, 4),
             "layers": {

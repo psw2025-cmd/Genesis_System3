@@ -5,7 +5,6 @@ Define structured Python models for planned orders and risk decisions.
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
 
 
 @dataclass
@@ -23,7 +22,7 @@ class PlannedOrder:
     ai_score: float
     lots: int
     reason: str
-    snapshot_id: Optional[int] = None
+    snapshot_id: int | None = None
 
 
 @dataclass
@@ -33,4 +32,4 @@ class RiskDecision:
     approved: bool
     adjusted_lots: int
     reason: str
-    risk_flags: Dict[str, str]
+    risk_flags: dict[str, str]

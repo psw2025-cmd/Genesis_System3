@@ -1,4 +1,4 @@
-"""Convert DataSourceManager chain output to normalized dashboard API contract format.
+﻿"""Convert DataSourceManager chain output to normalized dashboard API contract format.
 
 Complies with Master Option Symbol & Strike Schema (44 normalized fields).
 """
@@ -23,6 +23,13 @@ LOT_SIZES = {
     "SENSEX": 10,
     "BANKEX": 15,
 }
+
+
+def normalize_index_chain_exchange(exchange: str, default: str = 'NSE') -> str:
+    """Normalize index chain exchange string flags for the pipeline backend router."""
+    if not exchange:
+        return "NSE"
+    return str(exchange).upper().strip()
 
 
 def _configured_chain_limit() -> int:
@@ -217,134 +224,44 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         liquidity_score = max(0, min(100, liquidity_score))
 
         buildup = _classify_buildup(change_rs, oi_change)
-        unusual_flag = bool(volume > 5000 and abs(oi_change_pct) > 50.0)
-        row_source = _normalize_chain_source(row.get("source", row.get("data_source", "dhan")))
 
-        base: Dict[str, Any] = {
-            "exchange": "NSE_FNO",
-            "underlying_symbol": underlying.upper(),
-            "underlying_type": "INDEX" if underlying.upper() in LOT_SIZES else "EQUITY",
-            "expiry": row_expiry or expiry,
-            "strike": strike,
+        contracts.append({
+            "strike_price": strike,
             "option_type": opt,
-            "spot_price": spot_f,
-            "atm_reference": atm_strike,
-            "moneyness_bucket": moneyness,
-            "distance_from_atm_abs": round(dist_abs, 2),
-            "distance_from_atm_pct": round(dist_pct, 2),
             "ltp": ltp_val,
-            "change": round(change_rs, 2),
-            "change_percent": round(change_pct, 2),
-            "top_bid_price": bid,
-            "top_ask_price": ask,
-            "bid": bid,
-            "ask": ask,
-            "bid_ask_spread": round(spread, 2),
-            "bid_ask_spread_pct": round(spread_pct, 2),
-            "volume": volume,
-            "previous_volume": previous_volume,
-            "volume_change": volume_change,
-            "volume_change_percent": (
-                round(volume_change_percent, 2)
-                if volume_change_percent is not None
-                else None
-            ),
-            "oi": oi,
+            "net_change": change_rs,
+            "net_change_percent": change_pct,
+            "open_interest": oi,
             "oi_change": oi_change,
-            "oi_change_pct": round(oi_change_pct, 2),
-            "iv": float(row.get("iv", 0) or 0),
-            "iv_change": float(row.get("iv_change", 0) or 0),
-            "delta": _optional_float(row.get("delta")),
-            "gamma": _optional_float(row.get("gamma")),
-            "theta": _optional_float(row.get("theta")),
-            "vega": _optional_float(row.get("vega")),
-            "rho": _optional_float(row.get("rho")),
-            "intrinsic_value": round(intrinsic, 2),
-            "time_value": round(time_val, 2),
-            "lot_size": lot_size,
-            "turnover": round(volume * ltp_val, 2),
+            "oi_change_percent": oi_change_pct,
+            "volume": volume,
+            "volume_change": volume_change,
+            "volume_change_percent": volume_change_percent,
+            "moneyness": moneyness,
+            "intrinsic_value": intrinsic,
+            "time_value": time_val,
+            "bid_price": bid,
+            "ask_price": ask,
+            "bid_ask_spread": spread,
+            "spread_percent": spread_pct,
             "liquidity_score": liquidity_score,
-            "buildup_type": buildup,
-            "support_resistance_tag": "ATM" if moneyness == "ATM" else "",
-            "unusual_activity_flag": unusual_flag,
-            "previous_close_price": prev_close,
-            "security_id": row.get("security_id") or row.get("token"),
-            "trading_symbol": row.get("trading_symbol") or row.get("tradingSymbol") or row.get("symbol"),
-            "source": row_source,
-            "data_source": row_source,
-            "verification_status": "VERIFIED_DHAN" if row_source == "dhan" else "SIMULATED",
-        }
+            "buildup_status": buildup,
+            "lot_size": lot_size
+        })
 
-        if not base.get("trading_symbol") and chain_expiry:
-            try:
-                built = build_trading_symbol(underlying.upper(), chain_expiry, strike, opt)
-                if built:
-                    base["trading_symbol"] = built
-                    base["symbol"] = built
-            except Exception:
-                pass
-        contracts.append(base)
-
-    if not contracts:
-        return None
-
-    pe_oi = sum(c["oi"] for c in contracts if c["option_type"] == "PE")
-    ce_oi = sum(c["oi"] for c in contracts if c["option_type"] == "CE")
-    pe_vol = sum(c["volume"] for c in contracts if c["option_type"] == "PE")
-    ce_vol = sum(c["volume"] for c in contracts if c["option_type"] == "CE")
-    pcr = float(pe_oi / ce_oi) if ce_oi > 0 else 1.0
-
-    pcr_context = "BULLISH" if pcr > 1.2 else "BEARISH" if pcr < 0.8 else "NEUTRAL"
     max_pain = _calculate_max_pain(unique_strikes, ce_oi_map, pe_oi_map)
-
-    # Mark support and resistance tags based on highest PE OI (support) and highest CE OI (resistance)
-    if pe_oi_map:
-        max_pe_strike = max(pe_oi_map, key=pe_oi_map.get)
-        for c in contracts:
-            if c["strike"] == max_pe_strike and c["option_type"] == "PE":
-                c["support_resistance_tag"] = "MAJOR_SUPPORT"
-    if ce_oi_map:
-        max_ce_strike = max(ce_oi_map, key=ce_oi_map.get)
-        for c in contracts:
-            if c["strike"] == max_ce_strike and c["option_type"] == "CE":
-                c["support_resistance_tag"] = "MAJOR_RESISTANCE"
-
-    source = _normalize_chain_source(contracts[0].get("source", "dhan"))
-    configured_limit = _configured_chain_limit()
-    is_live = bool(spot_f > 0 and source == "dhan")
 
     return {
         "underlying": underlying.upper(),
-        "spot": spot_f,
+        "spot_price": spot_f,
+        "expiry_date": chain_expiry or expiry,
         "atm_strike": atm_strike,
-        "max_pain": max_pain,
-        "pcr": round(pcr, 3),
-        "pcr_context": pcr_context,
-        "total_ce_oi": ce_oi,
-        "total_pe_oi": pe_oi,
-        "total_ce_volume": ce_vol,
-        "total_pe_volume": pe_vol,
-        "contracts": contracts,
-        "total_contracts": len(contracts),
+        "max_pain_strike": max_pain,
+        "contracts_count": len(contracts),
         "broker_rows_total": broker_rows_total,
-        "liquidity_eligible_rows_total": liquidity_eligible_rows_total,
-        "liquidity_filtered_rows": liquidity_counts["filtered_total"],
-        "liquidity_filter_reasons": liquidity_counts,
-        "liquidity_filter": "oi_gt_0_and_volume_gt_0",
-        "data_source": source,
-        "data_mode": "LIVE" if is_live else "SIMULATION",
-        "verification_status": "VERIFIED_LIVE" if is_live else "VERIFIED_SIMULATION",
-        "reason_if_unverified": None if is_live else "Chain normalized from simulation/offline dataset (market closed).",
-        "as_of_utc": datetime.now(timezone.utc).isoformat(),
-        "freshness_seconds": 1.0,
-        "source_priority": "dhan_option_chain_live" if source == "dhan" else source,
-        "status": "OK",
-        "stale": False,
-        "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
-        "expiry_date": chain_expiry,
-        "requested_expiry": expiry or None,
-        "complete_chain": configured_limit <= 0 or len(contracts) >= liquidity_eligible_rows_total,
-        "limited_for_web": configured_limit > 0 and len(contracts) < liquidity_eligible_rows_total,
-        "max_contracts": configured_limit,
-        "live_trading_enabled": False,
+        "liquidity_filtered_count": liquidity_counts["filtered_total"],
+        "eligible_rows_count": liquidity_eligible_rows_total,
+        "contracts": contracts,
+        "last_updated_utc": datetime.now(timezone.utc).isoformat()
     }
+

@@ -17,9 +17,8 @@ Outputs:
 Menu Option: 73
 """
 
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -42,7 +41,7 @@ SHADOW_CSV = LEARNING_ULTRA_DIR / "dhan_ultra_shadow_master.csv"
 LEARNING_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def build_shadow_master() -> Dict[str, Any]:
+def build_shadow_master() -> dict[str, Any]:
     """
     Build shadow master dataset from available sources.
 
@@ -221,7 +220,7 @@ def build_shadow_master() -> Dict[str, Any]:
             df_shadow.to_parquet(SHADOW_PARQUET, index=False, engine="pyarrow")
             print(f"[SAVE] Shadow master Parquet: {SHADOW_PARQUET} ({len(df_shadow)} rows)")
         except ImportError:
-            print(f"[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
+            print("[WARN] Parquet save skipped: pyarrow not installed. CSV saved successfully.")
         except Exception as e:
             print(f"[WARN] Parquet save failed: {e}. CSV saved successfully.")
 
@@ -244,10 +243,10 @@ def build_shadow_master() -> Dict[str, Any]:
 
 def _build_shadow_row_from_trade(
     trade_row: pd.Series,
-    df_signals: Optional[pd.DataFrame],
-    df_pnl: Optional[pd.DataFrame],
-    df_master: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_signals: pd.DataFrame | None,
+    df_pnl: pd.DataFrame | None,
+    df_master: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build shadow row from trade plan."""
     row = {
         "underlying": trade_row.get("underlying", np.nan),
@@ -295,10 +294,10 @@ def _build_shadow_row_from_trade(
 
 def _build_shadow_row_from_signal(
     signal_row: pd.Series,
-    df_trades: Optional[pd.DataFrame],
-    df_pnl: Optional[pd.DataFrame],
-    df_master: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_trades: pd.DataFrame | None,
+    df_pnl: pd.DataFrame | None,
+    df_master: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build shadow row from signal."""
     row = {
         "underlying": signal_row.get("underlying", np.nan),
@@ -337,10 +336,10 @@ def _build_shadow_row_from_signal(
 
 def _build_shadow_row_from_pnl(
     pnl_row: pd.Series,
-    df_signals: Optional[pd.DataFrame],
-    df_trades: Optional[pd.DataFrame],
-    df_master: Optional[pd.DataFrame],
-) -> Optional[Dict[str, Any]]:
+    df_signals: pd.DataFrame | None,
+    df_trades: pd.DataFrame | None,
+    df_master: pd.DataFrame | None,
+) -> dict[str, Any] | None:
     """Build shadow row from PnL log."""
     row = {
         "underlying": pnl_row.get("underlying", np.nan),
@@ -377,7 +376,7 @@ def _build_shadow_row_from_pnl(
     return row
 
 
-def _build_shadow_row_from_master(master_row: pd.Series) -> Optional[Dict[str, Any]]:
+def _build_shadow_row_from_master(master_row: pd.Series) -> dict[str, Any] | None:
     """Build shadow row from master dataset."""
     return {
         "underlying": master_row.get("underlying", np.nan),
@@ -399,7 +398,7 @@ def _find_matching_row(
     row: pd.Series,
     df: pd.DataFrame,
     match_cols: list[str],
-) -> Optional[pd.Series]:
+) -> pd.Series | None:
     """Find matching row in DataFrame."""
     if df.empty or not match_cols:
         return None
@@ -421,7 +420,7 @@ def main() -> None:
     result = build_shadow_master()
 
     if result["status"] == "SUCCESS":
-        print(f"\n=== BUILD SUMMARY ===")
+        print("\n=== BUILD SUMMARY ===")
         print(f"Sources Found: {', '.join(result['sources_found'])}")
         if result.get("sources_missing"):
             print(f"Sources Missing: {', '.join(result['sources_missing'])}")

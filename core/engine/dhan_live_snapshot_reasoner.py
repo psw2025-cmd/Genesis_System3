@@ -6,7 +6,7 @@ SAFE MODE ONLY - Read-only analysis.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
 
@@ -15,7 +15,7 @@ LIVE_DIR = PROJECT_ROOT / "storage" / "live"
 SIGNALS_CSV = LIVE_DIR / "dhan_index_ai_signals.csv"
 
 
-def reason_about_snapshot(df_signals: pd.DataFrame) -> Dict[str, Any]:
+def reason_about_snapshot(df_signals: pd.DataFrame) -> dict[str, Any]:
     """
     Provide reasoning about current snapshot signals.
 
@@ -69,7 +69,7 @@ def reason_about_snapshot(df_signals: pd.DataFrame) -> Dict[str, Any]:
     return reasoning
 
 
-def analyze_latest_snapshot() -> Dict[str, Any]:
+def analyze_latest_snapshot() -> dict[str, Any]:
     """
     Analyze the latest snapshot from signals CSV.
 

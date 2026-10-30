@@ -13,7 +13,7 @@ Menu Option: 109
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ OUTPUT_DIR = PROJECT_ROOT / "storage" / "ultra" / "ph46_ph55"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_confidence_history(days: int = 7) -> Optional[pd.DataFrame]:
+def load_confidence_history(days: int = 7) -> pd.DataFrame | None:
     """Load confidence history for last N days."""
     # Try multiple sources
     sources = [
@@ -66,7 +66,7 @@ def load_confidence_history(days: int = 7) -> Optional[pd.DataFrame]:
     return None
 
 
-def compute_confidence_vector(confidence_series: pd.Series, window: int = 7) -> Dict[str, Any]:
+def compute_confidence_vector(confidence_series: pd.Series, window: int = 7) -> dict[str, Any]:
     """
     Compute 7-day confidence vector.
 

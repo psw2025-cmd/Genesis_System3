@@ -2,7 +2,6 @@
 Volatility Analyzer - Compute IV, IVP, IVR, volatility regimes
 """
 
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd

@@ -17,7 +17,7 @@ Menu Option: 78
 
 import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import joblib
 import numpy as np
@@ -38,7 +38,7 @@ REPORTS_ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> Optional[Dict[str, Any]]:
+def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> dict[str, Any] | None:
     """Load model and metadata."""
     model_file = model_dir / f"{underlying}{prefix}_model.pkl"
     meta_file = model_dir / f"{underlying}{prefix}_model_meta.json"
@@ -61,7 +61,7 @@ def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> 
         return None
 
 
-def run_consensus_sample() -> Dict[str, Any]:
+def run_consensus_sample() -> dict[str, Any]:
     """
     Run consensus analysis on sample data.
 
@@ -212,7 +212,7 @@ def main() -> None:
         print(f"Baseline Models: {result['baseline_models']}")
         print(f"Ultra Models: {result['ultra_models']}")
         print(f"Agreement Rate: {result['agreement_rate']:.1f}%")
-        print(f"\n[SAVE] Consensus report saved")
+        print("\n[SAVE] Consensus report saved")
         print("[NOTE] Analysis only - no trade plans generated")
     else:
         print(f"\n[INFO] {result.get('message', 'Consensus analysis not completed')}")

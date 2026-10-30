@@ -10,7 +10,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -30,14 +30,9 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 event_counts = defaultdict(int)
 
 
-def notify(event_type: str, payload: Dict[str, Any]) -> None:
+def notify(event_type: str, payload: dict[str, Any]) -> None:
     """Send a notification (writes to log only)."""
     timestamp = datetime.now().isoformat()
-    entry = {
-        "timestamp": timestamp,
-        "event_type": event_type,
-        "payload": payload,
-    }
 
     # Write to log
     log_entry = f"[{timestamp}] {event_type}: {json.dumps(payload)}\n"

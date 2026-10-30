@@ -2,7 +2,6 @@
 Momentum Analyzer - Compute rate of change, acceleration factor
 """
 
-from typing import Any, Dict
 
 import numpy as np
 import pandas as pd

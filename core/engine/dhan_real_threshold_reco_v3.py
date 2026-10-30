@@ -9,12 +9,10 @@ SAFE MODE ONLY - Read-only, no threshold application.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
-
-from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
@@ -28,7 +26,7 @@ THRESHOLD_RECO_DIR.mkdir(parents=True, exist_ok=True)
 def recommend_thresholds_v3(
     min_trades: int = 5,
     max_drawdown_limit: float = -10.0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Recommend thresholds based on real outcomes (SUGGESTIONS ONLY).
 
@@ -110,7 +108,7 @@ def recommend_thresholds_v3(
 def _search_best_thresholds_v3(
     df: pd.DataFrame,
     max_drawdown_limit: float,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """Search for best threshold combination."""
     confidence_range = np.arange(0.60, 0.96, 0.05)
     score_range = np.arange(0.10, 0.61, 0.05)
@@ -167,7 +165,7 @@ def _search_best_thresholds_v3(
     return best_combo
 
 
-def save_threshold_recommendations(recommendations: Dict[str, Any]) -> Path:
+def save_threshold_recommendations(recommendations: dict[str, Any]) -> Path:
     """
     Save threshold recommendations to JSON (suggestions only).
 

@@ -4,9 +4,7 @@ Dhan Index Options - Dynamic SL/TP Engine
 Computes dynamic stop-loss and take-profit based on volatility and ATR.
 """
 
-from typing import Any, Dict
 
-import numpy as np
 import pandas as pd
 
 
@@ -15,7 +13,7 @@ def compute_dynamic_sl_tp(
     volatility: float,
     atr: float,
     risk_reward: float = 2.0,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Compute dynamic SL and TP based on volatility.
 
@@ -64,7 +62,7 @@ def compute_dynamic_sl_tp(
 def adjust_sl_tp_dynamically(
     trade_row: pd.Series,
     market_data: pd.DataFrame,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Adjust SL/TP dynamically based on current market conditions.
 

@@ -8,9 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -26,7 +24,7 @@ LOG_DIR = PROJECT_ROOT / "logs" / "research"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_ev_tables_from_report(report_path: Path) -> List[Dict[str, Any]]:
+def load_ev_tables_from_report(report_path: Path) -> list[dict[str, Any]]:
     """Load EV tables from Phase 222 report."""
     ev_tables = []
 
@@ -80,7 +78,7 @@ def load_ev_tables_from_report(report_path: Path) -> List[Dict[str, Any]]:
     return ev_tables
 
 
-def propose_thresholds(ev_tables: List[Dict[str, Any]], min_samples: int = 20) -> Dict[str, Any]:
+def propose_thresholds(ev_tables: list[dict[str, Any]], min_samples: int = 20) -> dict[str, Any]:
     """
     Propose thresholds based on EV tables.
 
@@ -232,7 +230,7 @@ def propose_thresholds(ev_tables: List[Dict[str, Any]], min_samples: int = 20) -
     return proposals
 
 
-def save_threshold_proposals(proposals: Dict[str, Any]) -> None:
+def save_threshold_proposals(proposals: dict[str, Any]) -> None:
     """Save threshold proposals to JSON files."""
     # Save to candidates file (for compatibility)
     output_candidates = {
@@ -257,7 +255,7 @@ def save_threshold_proposals(proposals: Dict[str, Any]) -> None:
         json.dump(output_live, f, indent=2)
 
 
-def generate_threshold_log(proposals: Dict[str, Any]) -> None:
+def generate_threshold_log(proposals: dict[str, Any]) -> None:
     """Generate markdown summary log."""
     with open(THRESHOLD_OPTIMIZER_LOG, "w", encoding="utf-8") as f:
         f.write("# System3 Threshold Optimizer Summary\n\n")
@@ -271,8 +269,7 @@ def generate_threshold_log(proposals: Dict[str, Any]) -> None:
             f.write("## Per-Underlying Thresholds\n\n")
             f.write("| Underlying | BUY Threshold | SELL Threshold |\n")
             f.write("|------------|---------------|----------------|\n")
-            for underlying, thresh in sorted(proposals["per_underlying"].items()):
-                f.write(f"| {underlying} | {thresh['buy']:.3f} | {thresh['sell']:.3f} |\n")
+            f.writelines(f"| {underlying} | {thresh['buy']:.3f} | {thresh['sell']:.3f} |\n" for underlying, thresh in sorted(proposals["per_underlying"].items()))
             f.write("\n")
 
         if proposals["candidates"]:
@@ -283,11 +280,8 @@ def generate_threshold_log(proposals: Dict[str, Any]) -> None:
             f.write(
                 "|------------|---------------|----------------|-----------|------------|----------------|-----------------|\n"
             )
-            for cand in proposals["candidates"]:
-                f.write(
-                    f"| {cand['underlying']} | {cand['buy_threshold']:.3f} | {cand['sell_threshold']:.3f} | "
-                    f"{cand['buy_count']} | {cand['sell_count']} | {cand['buy_avg_return']:.4f} | {cand['sell_avg_return']:.4f} |\n"
-                )
+            f.writelines(f"| {cand['underlying']} | {cand['buy_threshold']:.3f} | {cand['sell_threshold']:.3f} | "
+                    f"{cand['buy_count']} | {cand['sell_count']} | {cand['buy_avg_return']:.4f} | {cand['sell_avg_return']:.4f} |\n" for cand in proposals["candidates"])
 
 
 def main():

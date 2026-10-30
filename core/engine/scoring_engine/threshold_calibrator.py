@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -9,7 +9,7 @@ def suggest_thresholds_from_history(
     lookback_rows: int = 2000,
     buy_quantile: float = 0.85,
     sell_quantile: float = 0.15,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     System3 AI upgrade: Suggest BUY/SELL thresholds from historical DRY-RUN scores.
 
@@ -31,7 +31,7 @@ def suggest_thresholds_from_history(
       buy = 0.40, sell = -0.40
     """
 
-    def _defaults(reason: str) -> Dict[str, Any]:
+    def _defaults(reason: str) -> dict[str, Any]:
         return {
             "buy": 0.40,
             "sell": -0.40,
@@ -85,7 +85,7 @@ def suggest_thresholds_from_history(
     return {
         "buy": buy,
         "sell": sell,
-        "rows_used": int(len(series)),
+        "rows_used": len(series),
         "raw_buy": raw_buy,
         "raw_sell": raw_sell,
         "reason": "ok",

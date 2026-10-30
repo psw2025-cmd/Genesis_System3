@@ -22,10 +22,11 @@ wires this into its daemon loop and owns actually running the job.
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from datetime import datetime
 from datetime import time as dt_time
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CATCHUP_POLICY_JSON = PROJECT_ROOT / "config" / "system3_scheduler_catchup_policy.json"
@@ -45,13 +46,13 @@ class FireStatus:
     FAILED = "FAILED"
 
 
-_DEFAULT_POLICY: Dict[str, Any] = {
+_DEFAULT_POLICY: dict[str, Any] = {
     "default": {"catchup_window_minutes": 0, "condition": "never"},
     "jobs": {},
 }
 
 
-def load_policy() -> Dict[str, Any]:
+def load_policy() -> dict[str, Any]:
     """Load the catch-up policy config. Fails safe (no catch-up for
     anything) if the file is missing or invalid — a broken policy file
     must never accidentally grant broad catch-up permission."""
@@ -65,7 +66,7 @@ def load_policy() -> Dict[str, Any]:
         return dict(_DEFAULT_POLICY)
 
 
-def get_job_policy(job_id: str, policy: Dict[str, Any]) -> Dict[str, Any]:
+def get_job_policy(job_id: str, policy: dict[str, Any]) -> dict[str, Any]:
     return policy.get("jobs", {}).get(job_id, policy.get("default", _DEFAULT_POLICY["default"]))
 
 
@@ -76,7 +77,7 @@ def make_fire_key(job_id: str, date_str: str, schedule_time: str) -> str:
     return f"{date_str}|{schedule_time}|{job_id}"
 
 
-def _parse_schedule_time(schedule_time: str) -> Optional[dt_time]:
+def _parse_schedule_time(schedule_time: str) -> dt_time | None:
     try:
         h, m = map(int, schedule_time.split(":"))
         return dt_time(h, m)
@@ -90,7 +91,7 @@ def _is_market_open_now(now: datetime, is_holiday: bool, is_weekend: bool) -> bo
     return MARKET_OPEN <= now.time() < MARKET_CLOSE
 
 
-def _upstream_paths_exist(paths: List[str]) -> bool:
+def _upstream_paths_exist(paths: list[str]) -> bool:
     for p in paths:
         full = PROJECT_ROOT / p
         if not full.exists():
@@ -121,7 +122,7 @@ def _condition_before_market_open(now: datetime, is_holiday: bool, is_weekend: b
 
 
 def _condition_before_market_open_or_before_first_lifecycle(
-    now: datetime, is_holiday: bool, is_weekend: bool, state: Dict[str, Any], **kwargs
+    now: datetime, is_holiday: bool, is_weekend: bool, state: dict[str, Any], **kwargs
 ) -> tuple:
     ok, reason = _condition_before_market_open(now=now, is_holiday=is_holiday, is_weekend=is_weekend)
     if ok:
@@ -147,7 +148,7 @@ def _condition_market_open(now: datetime, is_holiday: bool, is_weekend: bool, **
 
 
 def _condition_market_open_and_broker_and_contract_proven(
-    now: datetime, is_holiday: bool, is_weekend: bool, job_policy: Dict[str, Any], **kwargs
+    now: datetime, is_holiday: bool, is_weekend: bool, job_policy: dict[str, Any], **kwargs
 ) -> tuple:
     if not _is_market_open_now(now, is_holiday, is_weekend):
         return False, "market is not open"
@@ -166,7 +167,7 @@ def _condition_post_market_close(now: datetime, is_holiday: bool, is_weekend: bo
 
 
 def _condition_post_market_upstream_exists(
-    now: datetime, is_holiday: bool, is_weekend: bool, job_policy: Dict[str, Any], **kwargs
+    now: datetime, is_holiday: bool, is_weekend: bool, job_policy: dict[str, Any], **kwargs
 ) -> tuple:
     ok, reason = _condition_post_market_close(now=now, is_holiday=is_holiday, is_weekend=is_weekend)
     if not ok:
@@ -188,21 +189,21 @@ def _condition_post_market_api_running(
     return True, "post-market and API confirmed running"
 
 
-def _condition_retrain_signal_exists(job_policy: Dict[str, Any], **kwargs) -> tuple:
+def _condition_retrain_signal_exists(job_policy: dict[str, Any], **kwargs) -> tuple:
     required = job_policy.get("requires_upstream", ["state/retrain_signal.json"])
     if not _upstream_paths_exist(required):
         return False, "no retrain_signal.json present — nothing to catch up"
     return True, "retrain signal present"
 
 
-def _condition_bhavcopy_available(job_policy: Dict[str, Any], **kwargs) -> tuple:
+def _condition_bhavcopy_available(job_policy: dict[str, Any], **kwargs) -> tuple:
     required = job_policy.get("requires_upstream", ["storage/bhavcopy"])
     if not _upstream_paths_exist(required):
         return False, "bhavcopy not yet downloaded — nothing to run against"
     return True, "bhavcopy available"
 
 
-CONDITION_HANDLERS: Dict[str, Callable[..., tuple]] = {
+CONDITION_HANDLERS: dict[str, Callable[..., tuple]] = {
     "always": _condition_always,
     "never": _condition_never,
     "before_market_open": _condition_before_market_open,
@@ -219,14 +220,14 @@ CONDITION_HANDLERS: Dict[str, Callable[..., tuple]] = {
 
 
 def evaluate_job_fire(
-    job: Dict[str, Any],
+    job: dict[str, Any],
     now: datetime,
-    policy: Dict[str, Any],
-    state: Dict[str, Any],
+    policy: dict[str, Any],
+    state: dict[str, Any],
     is_holiday: bool = False,
     is_weekend: bool = False,
     api_health_ok: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Decide whether `job` should fire right now, on-time or as a catch-up.
 
@@ -335,14 +336,14 @@ def evaluate_job_fire(
 
 
 def summarize_scheduler_status(
-    config: Dict[str, Any],
-    state: Dict[str, Any],
-    now: Optional[datetime] = None,
-    policy: Optional[Dict[str, Any]] = None,
+    config: dict[str, Any],
+    state: dict[str, Any],
+    now: datetime | None = None,
+    policy: dict[str, Any] | None = None,
     is_holiday: bool = False,
     is_weekend: bool = False,
     api_health_ok: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Aggregate today's per-job fire status into the honest counts
     /api/scheduler/health needs. Consumed directly by that endpoint (see
@@ -357,14 +358,14 @@ def summarize_scheduler_status(
     """
     jobs = [j for j in config.get("jobs", []) if j.get("id")]
     enabled_jobs = [j for j in jobs if j.get("enabled", False)]
-    status_today: Dict[str, str] = state.get("jobs_status_today", {})
+    status_today: dict[str, str] = state.get("jobs_status_today", {})
     fired_keys_today = state.get("fired_keys_today", [])
 
-    fired_today: List[str] = []
-    pending_today: List[str] = []
-    missed_today: List[str] = []
-    catchup_eligible_today: List[str] = []
-    skipped_today: List[str] = []
+    fired_today: list[str] = []
+    pending_today: list[str] = []
+    missed_today: list[str] = []
+    catchup_eligible_today: list[str] = []
+    skipped_today: list[str] = []
 
     for job in enabled_jobs:
         job_id = job["id"]

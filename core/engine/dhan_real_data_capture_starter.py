@@ -7,7 +7,7 @@ SAFE MODE ONLY - Read-only logging, no execution.
 
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
@@ -16,7 +16,7 @@ CAPTURE_LOG_CSV = LEARNING_DIR / "real_data_capture_log.csv"
 LEARNING_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def start_real_data_capture() -> Dict[str, Any]:
+def start_real_data_capture() -> dict[str, Any]:
     """
     Start real data capture session.
 
@@ -69,7 +69,7 @@ def start_real_data_capture() -> Dict[str, Any]:
     return session
 
 
-def get_capture_status() -> Dict[str, Any]:
+def get_capture_status() -> dict[str, Any]:
     """
     Get current capture status (read-only).
 

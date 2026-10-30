@@ -3,7 +3,7 @@
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -16,7 +16,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase160_error_attribution.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase160_error_attribution_report.md"
 
 
-def run_phase160_error_attribution() -> Dict[str, Any]:
+def run_phase160_error_attribution() -> dict[str, Any]:
     errors = []
     try:
         df_result = pd.DataFrame(columns=["error_type", "underlying", "count", "attribution"])

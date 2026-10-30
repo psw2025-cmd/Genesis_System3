@@ -13,7 +13,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -29,7 +29,7 @@ PERFORMANCE_LOG = LOGS_DIR / f"phase255_model_performance_{datetime.now().strfti
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def log_prediction_metrics(underlying: str, prediction: int, confidence: float, accuracy_7d: float) -> Dict[str, Any]:
+def log_prediction_metrics(underlying: str, prediction: int, confidence: float, accuracy_7d: float) -> dict[str, Any]:
     """
     Log individual prediction metrics.
 
@@ -56,7 +56,7 @@ def log_prediction_metrics(underlying: str, prediction: int, confidence: float, 
     return metrics
 
 
-def run_phase255(**kwargs) -> Dict[str, Any]:
+def run_phase255(**kwargs) -> dict[str, Any]:
     """
     Run Phase 255: Model Performance Logger.
 
@@ -154,10 +154,10 @@ def main():
 
     # Show how to read performance log
     if PERFORMANCE_LOG.exists():
-        print(f"\n[INFO] To analyze performance log:")
-        print(f"  import pandas as pd")
+        print("\n[INFO] To analyze performance log:")
+        print("  import pandas as pd")
         print(f"  df = pd.read_json('{PERFORMANCE_LOG}', lines=True)")
-        print(f"  print(df.groupby('underlying')['accuracy_7d'].mean())")
+        print("  print(df.groupby('underlying')['accuracy_7d'].mean())")
 
 
 if __name__ == "__main__":

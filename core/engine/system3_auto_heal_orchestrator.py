@@ -15,13 +15,11 @@ NO trading operations or baseline overwrite.
 
 import json
 import logging
-import os
 import shutil
-import subprocess
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -64,7 +62,7 @@ logger = logging.getLogger(__name__)
 class AutoHealOrchestrator:
     """Orchestrates all auto-healing operations."""
 
-    def __init__(self, config: Dict[str, Any] = None):
+    def __init__(self, config: dict[str, Any] = None):
         self.config = config or HEAL_CONFIG
         self.healing_report = {
             "timestamp": datetime.now().isoformat(),
@@ -73,7 +71,7 @@ class AutoHealOrchestrator:
             "errors": [],
         }
 
-    def detect_stale_data(self) -> Optional[Dict[str, Any]]:
+    def detect_stale_data(self) -> dict[str, Any] | None:
         """Detect if data is stale."""
         try:
             staleness_csv = STORAGE_META / "system3_staleness_flags_306.csv"
@@ -160,7 +158,7 @@ class AutoHealOrchestrator:
             self.healing_report["errors"].append(f"heal_stale_data: {e}")
             return False
 
-    def detect_large_logs(self) -> List[Dict[str, Any]]:
+    def detect_large_logs(self) -> list[dict[str, Any]]:
         """Detect large log files."""
         large_logs = []
 
@@ -192,7 +190,7 @@ class AutoHealOrchestrator:
             logger.error(f"Error detecting large logs: {e}")
             return large_logs
 
-    def heal_large_logs(self, large_logs: List[Dict[str, Any]]) -> bool:
+    def heal_large_logs(self, large_logs: list[dict[str, Any]]) -> bool:
         """Auto-heal large logs by archiving."""
         try:
             if not large_logs:
@@ -231,7 +229,7 @@ class AutoHealOrchestrator:
             self.healing_report["errors"].append(f"heal_large_logs: {e}")
             return False
 
-    def detect_old_logs(self) -> List[Dict[str, Any]]:
+    def detect_old_logs(self) -> list[dict[str, Any]]:
         """Detect old log files beyond retention period."""
         old_logs = []
 
@@ -265,7 +263,7 @@ class AutoHealOrchestrator:
             logger.error(f"Error detecting old logs: {e}")
             return old_logs
 
-    def heal_old_logs(self, old_logs: List[Dict[str, Any]]) -> bool:
+    def heal_old_logs(self, old_logs: list[dict[str, Any]]) -> bool:
         """Auto-heal old logs by deleting."""
         try:
             if not old_logs:
@@ -297,7 +295,7 @@ class AutoHealOrchestrator:
             self.healing_report["errors"].append(f"heal_old_logs: {e}")
             return False
 
-    def detect_disk_space(self) -> Optional[Dict[str, Any]]:
+    def detect_disk_space(self) -> dict[str, Any] | None:
         """Detect low disk space."""
         try:
             total, used, free = shutil.disk_usage(PROJECT_ROOT)
@@ -365,7 +363,7 @@ class AutoHealOrchestrator:
             self.healing_report["errors"].append(f"heal_disk_space: {e}")
             return False
 
-    def detect_missing_heartbeat(self) -> Optional[Dict[str, Any]]:
+    def detect_missing_heartbeat(self) -> dict[str, Any] | None:
         """Detect if heartbeat is stale or missing."""
         try:
             if not HEARTBEAT_FILE.exists():
@@ -438,7 +436,7 @@ class AutoHealOrchestrator:
             self.healing_report["errors"].append(f"heal_heartbeat: {e}")
             return False
 
-    def run_full_healing_cycle(self) -> Dict[str, Any]:
+    def run_full_healing_cycle(self) -> dict[str, Any]:
         """Run complete auto-healing cycle."""
         logger.info("=" * 70)
         logger.info("AUTO-HEAL ORCHESTRATOR - STARTING FULL CYCLE")

@@ -9,7 +9,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,7 +28,7 @@ STORAGE_ULTRA.mkdir(parents=True, exist_ok=True)
 RELEASE_NAME = "SYSTEM3_ULTRA_V1"
 
 
-def get_git_commit_hash() -> Optional[str]:
+def get_git_commit_hash() -> str | None:
     """Get git commit hash if available."""
     try:
         result = subprocess.run(
@@ -53,7 +53,7 @@ def count_modules() -> int:
     return len(list(engine_dir.glob("*.py")))
 
 
-def generate_version_manifest() -> Dict[str, Any]:
+def generate_version_manifest() -> dict[str, Any]:
     """Generate version manifest."""
     print("\n" + "=" * 70)
     print("SYSTEM3 PHASE 99 - VERSION FREEZE & TAGGING")
@@ -85,7 +85,7 @@ def generate_version_manifest() -> Dict[str, Any]:
     return manifest
 
 
-def generate_markdown(manifest: Dict[str, Any]) -> None:
+def generate_markdown(manifest: dict[str, Any]) -> None:
     """Generate markdown summary."""
     with OUTPUT_MD.open("w", encoding="utf-8") as f:
         f.write("# System3 Version Manifest\n\n")
@@ -101,7 +101,7 @@ def generate_markdown(manifest: Dict[str, Any]) -> None:
 def main():
     """Main entry point."""
     try:
-        manifest = generate_version_manifest()
+        generate_version_manifest()
         print("\n[PH99] Version freeze complete.")
         return 0
     except Exception as e:

@@ -277,7 +277,7 @@ def run_phase_388() -> dict:
 
     except Exception as e:
         logger.error(f"Phase 388 ERROR: {e}")
-        return {"status": "error", "message": f"Phase 388 failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"Phase 388 failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

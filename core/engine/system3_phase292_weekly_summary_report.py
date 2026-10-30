@@ -7,7 +7,7 @@ Generates weekly summary report aggregating daily performance.
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_PATH = LOG_DIR / f"system3_weekly_summary_{datetime.now().strftime('%Y%W')}.md"
 
 
-def run_phase292(**kwargs) -> Dict[str, Any]:
+def run_phase292(**kwargs) -> dict[str, Any]:
     """Run Phase 292: Weekly Summary Report."""
     errors = []
 

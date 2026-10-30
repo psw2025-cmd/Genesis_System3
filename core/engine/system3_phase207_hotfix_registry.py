@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -23,7 +23,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 LOG_PATH = LOG_DIR / "system3_hotfix_registry.log"
 
 
-def run_phase207(**kwargs) -> Dict[str, Any]:
+def run_phase207(**kwargs) -> dict[str, Any]:
     """
     Run Phase 207: Hotfix Registry Manager.
 
@@ -64,12 +64,12 @@ def run_phase207(**kwargs) -> Dict[str, Any]:
 
         # Log summary
         with LOG_PATH.open("w", encoding="utf-8") as f:
-            f.write(f"System3 Hotfix Registry Log\n")
+            f.write("System3 Hotfix Registry Log\n")
             f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write("=" * 70 + "\n\n")
             f.write(f"Active Hotfixes: {len(active_hotfixes)}\n")
             f.write(f"Retired Hotfixes: {len(retired_hotfixes)}\n")
-            f.write(f"New Hotfixes: 0\n")
+            f.write("New Hotfixes: 0\n")
             f.write(f"\nRegistry Path: {REGISTRY_PATH}\n")
 
         status = "OK"

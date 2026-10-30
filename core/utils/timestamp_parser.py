@@ -15,7 +15,6 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Tuple, Union
 
 import pandas as pd
 
@@ -48,7 +47,7 @@ def _write_metrics(path: Path, payload: dict) -> None:
 
 def parse_timestamps(
     series: pd.Series,
-    fallback_series: Optional[pd.Series] = None,
+    fallback_series: pd.Series | None = None,
     name: str = "timestamp",
 ) -> pd.Series:
     """
@@ -115,13 +114,13 @@ def parse_timestamps(
 
 
 def parse_system3_timestamp(
-    obj: Union[pd.Series, str, float, int, None],
+    obj: pd.Series | str | float | None,
     name: str = "ts",
     tz: str = "UTC",
-    metrics_path: Optional[Path] = None,
-    allow_fallback: Optional[pd.Series] = None,
+    metrics_path: Path | None = None,
+    allow_fallback: pd.Series | None = None,
     strict: bool = True,
-) -> Union[pd.Series, pd.Timestamp, None]:
+) -> pd.Series | pd.Timestamp | None:
     """
     Canonical timestamp parser for System3 (metrics-aware, flexible fill mode).
 
@@ -168,10 +167,10 @@ def parse_system3_timestamp(
 def normalize_timestamp_column_strict(
     df: pd.DataFrame,
     col_name: str = "ts",
-    fallback_col: Optional[str] = None,
-    metrics_path: Optional[Path] = None,
+    fallback_col: str | None = None,
+    metrics_path: Path | None = None,
     name: str = "ts",
-) -> Tuple[pd.DataFrame, dict]:
+) -> tuple[pd.DataFrame, dict]:
     """
     Normalize a timestamp column using the canonical parser without forward/backfill.
     Returns dataframe copy and metrics dict.
@@ -189,7 +188,7 @@ def normalize_timestamp_column_strict(
 
     metrics = {
         "name": name,
-        "total": int(len(df)),
+        "total": len(df),
         "nat_count": int(df[col_name].isna().sum()),
         "nat_rate": round(df[col_name].isna().mean(), 6) if len(df) else 0.0,
         "column": col_name,
@@ -202,10 +201,10 @@ def normalize_timestamp_column_strict(
 def normalize_timestamp_column_strict_enhanced(
     df: pd.DataFrame,
     col_name: str = "ts",
-    fallback_col: Optional[str] = None,
-    metrics_path: Optional[Path] = None,
+    fallback_col: str | None = None,
+    metrics_path: Path | None = None,
     name: str = "enhanced_normalization",
-) -> Tuple[pd.DataFrame, dict]:
+) -> tuple[pd.DataFrame, dict]:
     """
     Enhanced timestamp normalization with recovery mechanisms for NULL timestamps.
     Includes fallback column recovery and detailed logging.
@@ -241,7 +240,7 @@ def normalize_timestamp_column_strict_enhanced(
     final_nat_count = int(df[col_name].isna().sum())
     enhanced_metrics = {
         "name": name,
-        "total": int(len(df)),
+        "total": len(df),
         "original_total": original_count,
         "nat_count": final_nat_count,
         "nat_rate": round(final_nat_count / len(df), 6) if len(df) else 0.0,
@@ -260,7 +259,7 @@ def normalize_timestamp_column_strict_enhanced(
 def normalize_timestamp_column(
     df: pd.DataFrame,
     col_name: str = "ts",
-    fallback_col: Optional[str] = "timestamp",
+    fallback_col: str | None = "timestamp",
 ) -> pd.DataFrame:
     """
     Normalize timestamp column in dataframe using robust parser.

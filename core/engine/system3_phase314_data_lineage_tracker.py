@@ -10,7 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -59,7 +59,7 @@ def count_rows(file_path: Path) -> int:
 
 
 def track_file_lineage(
-    file_path: str, producer_phase: int, producer_script: str, input_files: List[str] = None, mode: str = "unknown"
+    file_path: str, producer_phase: int, producer_script: str, input_files: list[str] = None, mode: str = "unknown"
 ) -> None:
     """
     Track lineage of a data file.
@@ -91,7 +91,7 @@ def track_file_lineage(
         logger.warning(f"Failed to write lineage record: {e}")
 
 
-def run_phase314(**kwargs) -> Dict[str, Any]:
+def run_phase314(**kwargs) -> dict[str, Any]:
     """
     Run Phase 314: Data Lineage Tracker
 
@@ -125,8 +125,8 @@ def run_phase314(**kwargs) -> Dict[str, Any]:
                 tracked_count += 1
 
         # Create daily summary
-        today = datetime.now().strftime("%Y%m%d")
-        summary_file = PROJECT_ROOT / f"SYSTEM3_DATA_LINEAGE_DAILY_SUMMARY.md"
+        datetime.now().strftime("%Y%m%d")
+        summary_file = PROJECT_ROOT / "SYSTEM3_DATA_LINEAGE_DAILY_SUMMARY.md"
 
         # Read recent lineage records
         recent_records = []
@@ -182,7 +182,7 @@ def run_phase314(**kwargs) -> Dict[str, Any]:
         return {
             "phase": 314,
             "status": "ERROR",
-            "details": f"Phase 314 failed: {str(e)}",
+            "details": f"Phase 314 failed: {e!s}",
             "outputs": outputs,
             "errors": [str(e)],
         }

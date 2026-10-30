@@ -10,9 +10,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
-
-import pandas as pd
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -54,7 +52,7 @@ def _read_live_flag(root: Path) -> bool:
     return False
 
 
-def run_phase340_signal_pipeline_regression_guard(root_path: str = None, **kwargs) -> Dict[str, Any]:
+def run_phase340_signal_pipeline_regression_guard(root_path: str = None, **kwargs) -> dict[str, Any]:
     """
     Phase 340: Signal Pipeline Regression Guard
 

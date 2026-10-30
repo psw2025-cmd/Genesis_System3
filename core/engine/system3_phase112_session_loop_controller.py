@@ -8,7 +8,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -90,7 +89,7 @@ def run_phase112(iterations: int = 1, sleep_seconds: int = 30, **kwargs) -> dict
                 continue
 
             # Run Phase 104 (build PLANNED orders)
-            result_104 = run_phase104()
+            run_phase104()
 
             # Run Phase 105 (integrity check)
             result_105 = run_phase105()

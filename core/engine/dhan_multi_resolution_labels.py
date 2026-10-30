@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 import numpy as np
 import pandas as pd
 
@@ -44,7 +42,7 @@ def generate_labels(df: pd.DataFrame) -> pd.DataFrame:
     time_col = "ts" if "ts" in work.columns else None
 
     # Compute forward returns grouped by underlying (and side if present)
-    group_keys: List[str] = ["underlying"]
+    group_keys: list[str] = ["underlying"]
     if "side" in work.columns:
         group_keys.append("side")
 

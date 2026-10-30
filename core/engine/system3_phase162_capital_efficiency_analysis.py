@@ -7,7 +7,7 @@ Analysis-only phase - reads from existing data and writes analysis.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
@@ -22,7 +22,7 @@ OUTPUT_CSV_PATH = STORAGE_ULTRA / "phase162_capital_efficiency_analysis.csv"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase162_capital_efficiency_analysis_report.md"
 
 
-def run_phase162_capital_efficiency_analysis() -> Dict[str, Any]:
+def run_phase162_capital_efficiency_analysis() -> dict[str, Any]:
     """
     Capital Efficiency Analysis.
 
@@ -63,7 +63,7 @@ def run_phase162_capital_efficiency_analysis() -> Dict[str, Any]:
 def main():
     """CLI entry point."""
     print("=" * 70)
-    print(f"SYSTEM3 PHASE 162 - CAPITAL EFFICIENCY ANALYSIS")
+    print("SYSTEM3 PHASE 162 - CAPITAL EFFICIENCY ANALYSIS")
     print("=" * 70)
     print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
     result = run_phase162_capital_efficiency_analysis()

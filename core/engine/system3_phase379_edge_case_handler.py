@@ -19,7 +19,7 @@ import sys
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -34,7 +34,7 @@ REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 logger = logging.getLogger(__name__)
 
 
-def detect_unusual_signal_patterns() -> Dict[str, Any]:
+def detect_unusual_signal_patterns() -> dict[str, Any]:
     """Detect unusual signal patterns that may indicate market extremes."""
     patterns = {
         "high_volatility_signals": [],
@@ -99,7 +99,7 @@ def detect_unusual_signal_patterns() -> Dict[str, Any]:
     return patterns
 
 
-def detect_data_anomalies() -> Dict[str, Any]:
+def detect_data_anomalies() -> dict[str, Any]:
     """Detect data quality anomalies and corruption."""
     anomalies = {
         "missing_data": [],
@@ -192,12 +192,11 @@ def detect_data_anomalies() -> Dict[str, Any]:
     return anomalies
 
 
-def detect_market_extremes() -> Dict[str, Any]:
+def detect_market_extremes() -> dict[str, Any]:
     """Detect extreme market conditions that might affect trading."""
     extremes = {"volatility_warnings": [], "liquidity_concerns": [], "recommendations": []}
 
     try:
-        import pandas as pd
 
         # Try to load broker latency data (Phase 368)
         latency_file = STORAGE_METRICS / "broker_latency_368.json"
@@ -225,7 +224,7 @@ def detect_market_extremes() -> Dict[str, Any]:
     return extremes
 
 
-def generate_edge_case_handlers() -> List[Dict[str, Any]]:
+def generate_edge_case_handlers() -> list[dict[str, Any]]:
     """Generate recommended handlers for detected edge cases."""
     handlers = [
         {
@@ -263,7 +262,7 @@ def generate_edge_case_handlers() -> List[Dict[str, Any]]:
     return handlers
 
 
-def generate_markdown_report(analysis: Dict[str, Any]) -> str:
+def generate_markdown_report(analysis: dict[str, Any]) -> str:
     """Generate edge case analysis report."""
     report = "# System3 Phase 379 - Edge Case Handler Report\n\n"
     report += f"**Generated:** {datetime.now().isoformat()}\n\n"
@@ -348,7 +347,7 @@ def generate_markdown_report(analysis: Dict[str, Any]) -> str:
     return report
 
 
-def run_phase379(context: Dict[str, Any] = None) -> Dict[str, Any]:
+def run_phase379(context: dict[str, Any] = None) -> dict[str, Any]:
     """Main phase executor."""
     logger.info("=" * 70)
     logger.info("Phase 379: Edge Case Handler")

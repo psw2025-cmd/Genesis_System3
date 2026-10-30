@@ -14,7 +14,7 @@ import os
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 LOGS_DIR = Path("logs")
 
@@ -40,14 +40,14 @@ def _history_log_path() -> Path:
     return data_clean_dir / f"cleaning_report_{ts}.log"
 
 
-def _append_history_log(lines: List[str]) -> None:
+def _append_history_log(lines: list[str]) -> None:
     log_path = _history_log_path()
     with log_path.open("a", encoding="utf-8") as f:
         for line in lines:
             f.write(line + "\n")
 
 
-def get_header_and_width(path: str) -> Tuple[List[str], int]:
+def get_header_and_width(path: str) -> tuple[list[str], int]:
     """
     Read the header row of a CSV file and return (fields, expected_width).
     """
@@ -61,7 +61,7 @@ def get_header_and_width(path: str) -> Tuple[List[str], int]:
     return header, len(header)
 
 
-def clean_csv_file(path: str, backup: bool = True) -> Dict[str, Any]:
+def clean_csv_file(path: str, backup: bool = True) -> dict[str, Any]:
     """
     Remove malformed rows (wrong column count) from a CSV file.
 
@@ -102,7 +102,7 @@ def clean_csv_file(path: str, backup: bool = True) -> Dict[str, Any]:
     total_rows = 0  # includes header
     kept_rows = 0  # includes header
     dropped_rows = 0
-    removed_line_numbers: List[int] = []
+    removed_line_numbers: list[int] = []
 
     # Backup original if requested
     if backup:
@@ -182,11 +182,11 @@ def clean_csv_file(path: str, backup: bool = True) -> Dict[str, Any]:
     return asdict(result)
 
 
-def clean_all_history_files() -> List[Dict[str, Any]]:
+def clean_all_history_files() -> list[dict[str, Any]]:
     """
     Clean malformed rows from the main live history file and all archived CSVs.
     """
-    results: List[Dict[str, Any]] = []
+    results: list[dict[str, Any]] = []
 
     # Main live file
     live_path = os.path.join("storage", "live", "dhan_index_ai_signals.csv")

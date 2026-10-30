@@ -9,12 +9,9 @@ SAFE MODE ONLY - Read-only evaluation.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
-import numpy as np
 import pandas as pd
-
-from core.engine.dhan_unified_outcome_logger_v3 import get_outcome_stats
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 LEARNING_DIR = PROJECT_ROOT / "storage" / "learning"
@@ -24,7 +21,7 @@ REPORTS_DIR = PROJECT_ROOT / "storage" / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def check_performance_consistency() -> Dict[str, Any]:
+def check_performance_consistency() -> dict[str, Any]:
     """
     Evaluate consistency of signals.
 
@@ -124,7 +121,7 @@ def check_performance_consistency() -> Dict[str, Any]:
         }
 
 
-def generate_consistency_heatmap(consistency_results: Dict[str, Any]) -> Dict[str, Any]:
+def generate_consistency_heatmap(consistency_results: dict[str, Any]) -> dict[str, Any]:
     """
     Generate consistency heatmap data.
 
@@ -152,7 +149,7 @@ def generate_consistency_heatmap(consistency_results: Dict[str, Any]) -> Dict[st
     return heatmap_data
 
 
-def save_consistency_report(analysis: Dict[str, Any]) -> Path:
+def save_consistency_report(analysis: dict[str, Any]) -> Path:
     """
     Save consistency report to JSON.
 

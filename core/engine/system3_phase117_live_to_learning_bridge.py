@@ -7,7 +7,6 @@ Connect ledger & PnL to Real Outcome files already used by phases 28–37.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
 
 import pandas as pd
 
@@ -63,7 +62,7 @@ def run_phase117(**kwargs) -> dict:
             }
 
         # Get today's date
-        today = datetime.now().strftime("%Y-%m-%d")
+        datetime.now().strftime("%Y-%m-%d")
 
         # Filter finished trades (FILLED with exit)
         finished_trades = df[(df["status"] == "FILLED") & (df["exit_reason"].notna()) & (df["exit_reason"] != "")]

@@ -5,6 +5,7 @@ NSE scraping, Yahoo Finance, bhavcopy removed to save RAM.
 fetch_option_chain() preserved for chain_adapter.py compatibility.
 """
 from __future__ import annotations
+
 import csv
 import json
 import logging
@@ -13,7 +14,8 @@ import threading
 import time
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
+
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -129,7 +131,7 @@ class DataSourceManager:
     def __init__(self):
         self._client = None
         self._cache = {}
-        self._equity_sec_ids: Dict[str, int] = {}
+        self._equity_sec_ids: dict[str, int] = {}
 
     def _get_client(self):
         from core.utils.env_loader import get_dhan_credentials
@@ -150,7 +152,7 @@ class DataSourceManager:
         return self._client
 
     @staticmethod
-    def _as_int_security_id(value: Any) -> Optional[int]:
+    def _as_int_security_id(value: Any) -> int | None:
         try:
             if value is None or value == "":
                 return None
@@ -158,7 +160,7 @@ class DataSourceManager:
         except Exception:
             return None
 
-    def _resolve_underlying(self, sym: str) -> Tuple[Optional[int], str]:
+    def _resolve_underlying(self, sym: str) -> tuple[int | None, str]:
         """Return (security_id:int, exchange_segment) for index or equity FO."""
         sym_u = sym.upper()
         env_id = self._as_int_security_id(os.environ.get(f"DHAN_SECURITY_ID_{sym_u}", ""))
@@ -336,7 +338,7 @@ class DataSourceManager:
             return master_expiry
         return self._nearest_expiry()
 
-    def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
+    def fetch_option_chain(self, symbol: str, expiry: str = "") -> tuple[Any, float] | None:
         """
         Fetch option chain — backward-compatible return: (DataFrame, spot_price).
         Uses Dhan API with multi-source mock fallback routing for unit tests.
@@ -392,7 +394,7 @@ class DataSourceManager:
 
         return None, 0.0
 
-    def _fetch_dhan_real(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
+    def _fetch_dhan_real(self, symbol: str, expiry: str = "") -> tuple[Any, float] | None:
         sym = symbol.upper()
         # Serialize ALL Dhan OC traffic (expiry_list + option_chain + retry).
         with _DHAN_OC_LOCK:
@@ -482,7 +484,7 @@ class DataSourceManager:
                 logger.warning(f"[DSM] Dhan fetch_option_chain failed for {sym}: {e}")
             return None
 
-    def get_option_chain(self, symbol: str, expiry: str = "") -> Dict[str, Any]:
+    def get_option_chain(self, symbol: str, expiry: str = "") -> dict[str, Any]:
         """New-style API — returns dict directly."""
         result = self.fetch_option_chain(symbol, expiry)
         if result is None or result[0] is None:
@@ -537,7 +539,7 @@ class DataSourceManager:
         "FinInstrmTp": "_type",
     }
 
-    def _parse_bhavcopy(self, df: pd.DataFrame, symbol: str) -> Optional[Tuple[pd.DataFrame, float]]:
+    def _parse_bhavcopy(self, df: pd.DataFrame, symbol: str) -> tuple[pd.DataFrame, float] | None:
         """
         Parse bhavcopy DataFrame (old format pre-Jul 2024 OR UDiFF post-Jul 2024).
         Standard schema: [strike, option_type, oi, oi_change, volume, ltp, iv, source]
@@ -620,29 +622,29 @@ class DataSourceManager:
 
         return pd.DataFrame(rows), spot
 
-    def _try_dhan(self, symbol: str, expiry: str = "") -> Tuple[Optional[Any], Optional[float]]:
+    def _try_dhan(self, symbol: str, expiry: str = "") -> tuple[Any | None, float | None]:
         res = self._fetch_dhan_real(symbol, expiry)
         return res if res is not None else (None, None)
 
-    def _try_nse(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_nse(self, symbol: str) -> tuple[Any | None, float | None]:
         return None, None
 
-    def _try_nsepython(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_nsepython(self, symbol: str) -> tuple[Any | None, float | None]:
         return None, None
 
-    def _try_bhavcopy(self, symbol: str, date_obj: Any) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_bhavcopy(self, symbol: str, date_obj: Any) -> tuple[Any | None, float | None]:
         return None, None
 
-    def _try_jugaad(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_jugaad(self, symbol: str) -> tuple[Any | None, float | None]:
         return None, None
 
-    def _try_yfinance(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_yfinance(self, symbol: str) -> tuple[Any | None, float | None]:
         return None, None
 
-    def _try_synthetic(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
+    def _try_synthetic(self, symbol: str) -> tuple[Any | None, float | None]:
         return None, None
 
-    def health_check(self) -> Dict[str, Any]:
+    def health_check(self) -> dict[str, Any]:
         """Dhan connectivity check."""
         try:
             dhan = self._get_client()

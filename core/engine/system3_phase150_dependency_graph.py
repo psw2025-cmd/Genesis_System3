@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 # Ensure project root is in path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -121,7 +121,7 @@ DEPENDENCY_GRAPH = {
 }
 
 
-def run_phase150_dependency_graph() -> Dict[str, Any]:
+def run_phase150_dependency_graph() -> dict[str, Any]:
     """
     Generate phase dependency graph.
 

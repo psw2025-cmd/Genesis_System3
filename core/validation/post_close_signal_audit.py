@@ -9,7 +9,7 @@ import json
 import sys
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import pandas as pd
 
@@ -32,7 +32,7 @@ REQUIRED_COLUMNS = ["underlying", "ts", "final_score", "signal", "side", "strike
 SUPPORTED_UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def load_thresholds() -> Tuple[Dict[str, Any], List[str]]:
+def load_thresholds() -> tuple[dict[str, Any], list[str]]:
     """
     Load live thresholds from JSON.
 
@@ -67,7 +67,7 @@ def load_thresholds() -> Tuple[Dict[str, Any], List[str]]:
     return thresholds, errors
 
 
-def load_today_signals(target_date: Optional[date] = None) -> Tuple[pd.DataFrame, List[str]]:
+def load_today_signals(target_date: date | None = None) -> tuple[pd.DataFrame, list[str]]:
     """
     Load signals from today's CSV.
 
@@ -115,7 +115,7 @@ def load_today_signals(target_date: Optional[date] = None) -> Tuple[pd.DataFrame
         return pd.DataFrame(), errors
 
 
-def verify_signal_consistency(df: pd.DataFrame, thresholds: Dict[str, Any]) -> Tuple[List[str], List[str]]:
+def verify_signal_consistency(df: pd.DataFrame, thresholds: dict[str, Any]) -> tuple[list[str], list[str]]:
     """
     Verify signal decisions are consistent with scores and thresholds.
 
@@ -184,7 +184,7 @@ def verify_signal_consistency(df: pd.DataFrame, thresholds: Dict[str, Any]) -> T
     return inconsistencies, warnings
 
 
-def check_missing_fields(df: pd.DataFrame) -> List[str]:
+def check_missing_fields(df: pd.DataFrame) -> list[str]:
     """
     Check for missing essential fields.
 
@@ -204,7 +204,7 @@ def check_missing_fields(df: pd.DataFrame) -> List[str]:
     return warnings
 
 
-def compute_daily_diagnostics(df: pd.DataFrame) -> Dict[str, Any]:
+def compute_daily_diagnostics(df: pd.DataFrame) -> dict[str, Any]:
     """
     Compute daily diagnostics.
 
@@ -254,11 +254,11 @@ def compute_daily_diagnostics(df: pd.DataFrame) -> Dict[str, Any]:
 
 
 def generate_audit_report(
-    thresholds: Dict[str, Any],
-    diagnostics: Dict[str, Any],
-    inconsistencies: List[str],
-    warnings: List[str],
-    missing_field_warnings: List[str],
+    thresholds: dict[str, Any],
+    diagnostics: dict[str, Any],
+    inconsistencies: list[str],
+    warnings: list[str],
+    missing_field_warnings: list[str],
     target_date: date,
 ) -> str:
     """
@@ -337,7 +337,7 @@ def generate_audit_report(
     return "".join(lines)
 
 
-def main(target_date: Optional[date] = None) -> int:
+def main(target_date: date | None = None) -> int:
     """
     Main post-close audit function.
 

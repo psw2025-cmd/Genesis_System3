@@ -13,7 +13,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -31,7 +31,7 @@ MAX_INFERENCE_TIME_MS = 500  # Maximum inference time
 UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 
-def validate_model_loads(model_path: Path) -> Dict[str, Any]:
+def validate_model_loads(model_path: Path) -> dict[str, Any]:
     """Test 1: Model loads without errors."""
     try:
         import torch
@@ -49,7 +49,7 @@ def validate_model_loads(model_path: Path) -> Dict[str, Any]:
         return {"test": "model_loads", "status": "FAIL", "reason": str(e)}
 
 
-def validate_predictions_run(model_path: Path) -> Dict[str, Any]:
+def validate_predictions_run(model_path: Path) -> dict[str, Any]:
     """Test 2: Predictions run successfully."""
     try:
         # STUB: Would actually run inference on test data
@@ -59,7 +59,7 @@ def validate_predictions_run(model_path: Path) -> Dict[str, Any]:
         return {"test": "predictions_run", "status": "FAIL", "reason": str(e)}
 
 
-def validate_accuracy(meta_path: Path) -> Dict[str, Any]:
+def validate_accuracy(meta_path: Path) -> dict[str, Any]:
     """Test 3: Accuracy above threshold."""
     try:
         if not meta_path.exists():
@@ -82,21 +82,21 @@ def validate_accuracy(meta_path: Path) -> Dict[str, Any]:
         return {"test": "accuracy", "status": "FAIL", "reason": str(e)}
 
 
-def validate_no_bias(meta_path: Path) -> Dict[str, Any]:
+def validate_no_bias(meta_path: Path) -> dict[str, Any]:
     """Test 4: No prediction bias."""
     # STUB: Would check prediction distribution on test set
     # Placeholder: Assume no bias
     return {"test": "no_bias", "status": "PASS"}
 
 
-def validate_inference_time() -> Dict[str, Any]:
+def validate_inference_time() -> dict[str, Any]:
     """Test 5: Inference time acceptable."""
     # STUB: Would measure actual inference time
     # Placeholder: Assume < 500ms
     return {"test": "inference_time", "status": "PASS", "value_ms": 42}
 
 
-def validate_retrained_model(underlying: str) -> Dict[str, Any]:
+def validate_retrained_model(underlying: str) -> dict[str, Any]:
     """
     Run full validation suite on retrained model.
 
@@ -148,7 +148,7 @@ def validate_retrained_model(underlying: str) -> Dict[str, Any]:
     }
 
 
-def run_phase253(**kwargs) -> Dict[str, Any]:
+def run_phase253(**kwargs) -> dict[str, Any]:
     """
     Run Phase 253: Shadow Model Validator.
 
@@ -198,7 +198,7 @@ def run_phase253(**kwargs) -> Dict[str, Any]:
         LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
         with log_file.open("w", encoding="utf-8") as f:
-            f.write(f"Phase 253: Shadow Model Validation\n")
+            f.write("Phase 253: Shadow Model Validation\n")
             f.write(f"Timestamp: {datetime.now().isoformat()}\n\n")
             for underlying, res in results.items():
                 f.write(f"{underlying}: {res['status']} - {res.get('recommendation', 'N/A')}\n")

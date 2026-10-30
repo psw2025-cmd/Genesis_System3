@@ -7,7 +7,7 @@ Generates human-readable checklist for manual confirmation.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -21,7 +21,7 @@ TEST_PLAN = STORAGE_ULTRA / "phase197_micro_capital_test_plan.md"
 OUTPUT_MD_PATH = STORAGE_ULTRA / "phase198_human_gate_checklist.md"
 
 
-def run_phase198_human_gate_checklist() -> Dict[str, Any]:
+def run_phase198_human_gate_checklist() -> dict[str, Any]:
     """
     Generate human gate checklist.
 

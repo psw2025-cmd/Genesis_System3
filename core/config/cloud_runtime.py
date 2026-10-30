@@ -4,12 +4,12 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 _ROOT = Path(__file__).resolve().parents[2]
 _CONFIG_PATH = _ROOT / "config" / "cloud_runtime.json"
 
-_DEFAULTS: Dict[str, Any] = {
+_DEFAULTS: dict[str, Any] = {
     "deploy_target": "local-laptop",
     "cloud_provider": "local",
     "region": "",
@@ -21,7 +21,7 @@ _DEFAULTS: Dict[str, Any] = {
 _CLOUD_DEFAULT_PUBLIC_BASE_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 
-def load_cloud_runtime() -> Dict[str, Any]:
+def load_cloud_runtime() -> dict[str, Any]:
     data = dict(_DEFAULTS)
     try:
         if _CONFIG_PATH.exists():

@@ -22,9 +22,9 @@ from __future__ import annotations
 import abc
 import asyncio
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Iterable
+from datetime import UTC, datetime
 
 from .backoff import BackoffPolicy
 from .circuit_breaker import CircuitBreaker, CircuitOpenError
@@ -61,7 +61,7 @@ class WebSocketConnection(abc.ABC):
     async def send(self, data: str | bytes) -> None: ...
 
     @abc.abstractmethod
-    def __aiter__(self) -> "WebSocketConnection": ...
+    def __aiter__(self) -> WebSocketConnection: ...
 
     @abc.abstractmethod
     async def __anext__(self) -> str | bytes: ...
@@ -90,7 +90,7 @@ class WebsocketsConnection(WebSocketConnection):
         assert self._ws is not None, "send() called before connect()"
         await self._ws.send(data)
 
-    def __aiter__(self) -> "WebsocketsConnection":
+    def __aiter__(self) -> WebsocketsConnection:
         return self
 
     async def __anext__(self) -> str | bytes:
@@ -141,7 +141,7 @@ class BrokerFeedClient(abc.ABC):
                 await self._connect_and_consume()
                 attempt = 0  # clean disconnect after a working session resets backoff
                 self.config.circuit_breaker.record_success()
-            except Exception as exc:  # noqa: BLE001 - any failure triggers backoff+breaker
+            except Exception as exc:
                 self.config.circuit_breaker.record_failure()
                 if self.config.backoff.exhausted(attempt):
                     logger.error("backoff attempts exhausted, giving up: %s", exc)
@@ -159,7 +159,7 @@ class BrokerFeedClient(abc.ABC):
             async for raw in conn:
                 if self._stop.is_set():
                     break
-                receive_ts_utc = datetime.now(timezone.utc)
+                receive_ts_utc = datetime.now(UTC)
                 record = self._parse_message(raw, receive_ts_utc)
                 if record is not None:
                     self.writer.add(record)

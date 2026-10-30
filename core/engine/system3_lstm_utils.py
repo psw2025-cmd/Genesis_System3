@@ -13,9 +13,8 @@ import glob
 import json
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -32,8 +31,8 @@ LOGS_DIR = PROJECT_ROOT / "logs"
 def read_latest_evaluation_metrics(
     eval_dir: str = "logs",
     pattern: str = "phase249_model_evaluation_*.json",
-    min_required_keys: Optional[List[str]] = None,
-) -> Optional[Dict[str, Any]]:
+    min_required_keys: list[str] | None = None,
+) -> dict[str, Any] | None:
     """
     Read the latest Phase 249 Extended evaluation JSON.
 
@@ -133,7 +132,7 @@ def read_latest_evaluation_metrics(
 
         # Validate models key is a dict
         if not isinstance(data.get("models"), dict):
-            logger.warning(f"[LSTM_UTILS] 'models' key is not a dictionary")
+            logger.warning("[LSTM_UTILS] 'models' key is not a dictionary")
             return None
 
         logger.info(f"[LSTM_UTILS] Successfully loaded evaluation metrics for {len(data['models'])} models")
@@ -148,7 +147,7 @@ def read_latest_evaluation_metrics(
         return None
 
 
-def extract_model_metrics(evaluation_data: Dict[str, Any], underlying: str) -> Optional[Dict[str, Any]]:
+def extract_model_metrics(evaluation_data: dict[str, Any], underlying: str) -> dict[str, Any] | None:
     """
     Extract metrics for a specific underlying from evaluation data.
 
@@ -180,7 +179,7 @@ def extract_model_metrics(evaluation_data: Dict[str, Any], underlying: str) -> O
 
 def compare_to_baseline(
     current_accuracy: float, baseline_accuracy: float = 0.55, degradation_threshold: float = 0.10
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compare current accuracy to baseline.
 
@@ -223,8 +222,8 @@ def compare_to_baseline(
 
 
 def write_promotion_decision(
-    decision: Dict[str, Any], decision_dir: str = "logs", filename: str = "phase251_promotion_decision.json"
-) -> Optional[Path]:
+    decision: dict[str, Any], decision_dir: str = "logs", filename: str = "phase251_promotion_decision.json"
+) -> Path | None:
     """
     Write Phase 251 promotion decision to JSON.
 
@@ -262,7 +261,7 @@ def write_promotion_decision(
 
 def read_promotion_decision(
     decision_dir: str = "logs", filename: str = "phase251_promotion_decision.json"
-) -> Optional[Dict[str, Any]]:
+) -> dict[str, Any] | None:
     """
     Read the latest Phase 251 promotion decision JSON.
 

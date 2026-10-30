@@ -16,9 +16,10 @@ import json
 import logging
 import sys
 import time
-from datetime import datetime, time as dt_time, timezone
+from datetime import UTC, datetime
+from datetime import time as dt_time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 from zoneinfo import ZoneInfo
 
 import joblib
@@ -44,7 +45,7 @@ class ModelNotReady(RuntimeError):
     """Raised when no compatible symbol-specific model can be proven."""
 
 
-def is_market_open_ist(now_dt: Optional[datetime] = None) -> bool:
+def is_market_open_ist(now_dt: datetime | None = None) -> bool:
     """Return the normal weekday NSE cash-session state.
 
     Official holiday/special-session authority belongs to the central market-session
@@ -57,7 +58,7 @@ def is_market_open_ist(now_dt: Optional[datetime] = None) -> bool:
     return dt_time(9, 15, 0) <= now.time() <= dt_time(15, 30, 0)
 
 
-def fetch_live_ltp(symbol: str = "NIFTY") -> Optional[float]:
+def fetch_live_ltp(symbol: str = "NIFTY") -> float | None:
     """Fetch an authoritative positive LTP from Dhan; return ``None`` if unavailable."""
     symbol_clean = symbol.upper()
     sec_id = INDEX_SECURITY_IDS.get(symbol_clean)
@@ -109,17 +110,17 @@ def load_prediction(model_path: Path, current_ltp: float) -> float:
 class System3PaperLiveComparator:
     """Read-only PAPER comparator with broker truth and fail-closed model semantics."""
 
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         self.root = _REPO_ROOT
         self.state_dir = output_dir or (self.root / "state" / "paper_trades")
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.ledger_file = self.state_dir / "paper_live_comparison_ledger.json"
         self.chart_file = self.state_dir / "live_vs_pred_chart.png"
 
-    def discover_model_for_symbol(self, symbol: str) -> Optional[Path]:
+    def discover_model_for_symbol(self, symbol: str) -> Path | None:
         """Return only a symbol-specific model; never fall back to an arbitrary pickle."""
         sym = symbol.upper()
-        matching_models: List[Path] = []
+        matching_models: list[Path] = []
         for p in self.root.rglob("*.pkl"):
             try:
                 if p.stat().st_size > 1000 and sym in p.name.upper():
@@ -136,22 +137,22 @@ class System3PaperLiveComparator:
         symbol: str = "NIFTY",
         iterations: int = 5,
         delay_s: float = 2.0,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Collect broker observations and PAPER comparison rows without inventing truth."""
         market_open = is_market_open_ist()
         symbol_clean = symbol.upper()
         chosen_model = self.discover_model_for_symbol(symbol_clean)
         model_name = chosen_model.name if chosen_model else None
 
-        live_ltp_series: List[float] = []
-        pred_series: List[float] = []
-        rows: List[Dict[str, Any]] = []
+        live_ltp_series: list[float] = []
+        pred_series: list[float] = []
+        rows: list[dict[str, Any]] = []
 
         for i in range(1, iterations + 1):
-            observed_at = datetime.now(timezone.utc).isoformat()
+            observed_at = datetime.now(UTC).isoformat()
             ltp = fetch_live_ltp(symbol_clean)
 
-            base_row: Dict[str, Any] = {
+            base_row: dict[str, Any] = {
                 "iteration": i,
                 "timestamp": observed_at,
                 "symbol": symbol_clean,
@@ -237,7 +238,7 @@ class System3PaperLiveComparator:
             "symbol": symbol_clean,
             "market_open_ist": market_open,
             "market_session": "NORMAL_SESSION" if market_open else "MARKET_CLOSED_STANDBY",
-            "simulated_at_utc": datetime.now(timezone.utc).isoformat(),
+            "simulated_at_utc": datetime.now(UTC).isoformat(),
             "iterations_requested": iterations,
             "iterations_recorded": len(rows),
             "model_active": model_name,
@@ -262,8 +263,8 @@ class System3PaperLiveComparator:
     def _generate_chart(
         self,
         symbol: str,
-        live_ltps: List[float],
-        preds: List[float],
+        live_ltps: list[float],
+        preds: list[float],
         market_open: bool,
     ) -> None:
         """Generate a comparison chart only from real broker observations + real inference."""

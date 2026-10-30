@@ -8,7 +8,7 @@ import json
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
@@ -88,7 +88,7 @@ def check_phase_implementation(phase_num: int) -> bool:
     return len(list(glob.glob(str(phase_file)))) > 0
 
 
-def run_phase310(**kwargs) -> Dict[str, Any]:
+def run_phase310(**kwargs) -> dict[str, Any]:
     """Run Phase 310: Ultra Health Monitor."""
     errors = []
 

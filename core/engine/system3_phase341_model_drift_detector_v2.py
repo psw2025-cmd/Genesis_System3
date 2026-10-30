@@ -19,11 +19,9 @@ import sys
 from collections import deque
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy.spatial import distance
 from scipy.stats import ks_2samp
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -90,7 +88,7 @@ class ADWIN:
             return False
 
         # Calculate mean and variance
-        mean = self.total / n
+        self.total / n
         variance = np.var(list(self.window)) if n > 1 else 0.0
 
         # Try different split points
@@ -216,9 +214,9 @@ def compute_kl_divergence(p: np.ndarray, q: np.ndarray, bins: int = 20) -> float
 def compute_drift_score(
     baseline: np.ndarray,
     live: np.ndarray,
-    adwin_detector: Optional[ADWIN] = None,
-    page_hinkley_detector: Optional[PageHinkley] = None,
-) -> Dict[str, float]:
+    adwin_detector: ADWIN | None = None,
+    page_hinkley_detector: PageHinkley | None = None,
+) -> dict[str, float]:
     """
     Compute drift score using multiple metrics including ADWIN and Page-Hinkley.
     Returns dict with individual scores and overall drift.

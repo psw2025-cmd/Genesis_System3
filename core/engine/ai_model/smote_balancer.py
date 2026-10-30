@@ -22,7 +22,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -39,7 +39,7 @@ except ImportError:
     SMOTE_AVAILABLE = False
 
 
-def get_class_distribution(df: pd.DataFrame, label_col: str = "signal") -> Dict[str, Any]:
+def get_class_distribution(df: pd.DataFrame, label_col: str = "signal") -> dict[str, Any]:
     """
     Get class distribution statistics.
 
@@ -67,7 +67,7 @@ def get_class_distribution(df: pd.DataFrame, label_col: str = "signal") -> Dict[
 
 def balance_with_smote(
     X: pd.DataFrame, y: pd.Series, random_state: int = 42, k_neighbors: int = 5, sampling_strategy: str = "auto"
-) -> Tuple[pd.DataFrame, pd.Series]:
+) -> tuple[pd.DataFrame, pd.Series]:
     """
     Apply SMOTE to balance classes.
 
@@ -115,8 +115,8 @@ def balance_with_smote(
 
 
 def prepare_training_data(
-    df: pd.DataFrame, feature_cols: Optional[list] = None, label_col: str = "signal"
-) -> Tuple[pd.DataFrame, pd.Series]:
+    df: pd.DataFrame, feature_cols: list | None = None, label_col: str = "signal"
+) -> tuple[pd.DataFrame, pd.Series]:
     """
     Prepare features and labels for SMOTE.
 
@@ -204,7 +204,7 @@ def reconstruct_dataframe(
     return df_result
 
 
-def run_phase_390() -> Dict[str, Any]:
+def run_phase_390() -> dict[str, Any]:
     """
     Phase 390 entry point: SMOTE Data Balancing.
 
@@ -309,7 +309,7 @@ def run_phase_390() -> Dict[str, Any]:
 
     except Exception as e:
         logger.error(f"Phase 390 failed: {e}", exc_info=True)
-        return {"status": "error", "message": f"SMOTE balancing failed: {str(e)}", "metrics": {}}
+        return {"status": "error", "message": f"SMOTE balancing failed: {e!s}", "metrics": {}}
 
 
 if __name__ == "__main__":

@@ -118,3 +118,7 @@ audit/live_agent_issue_ledger/*.pending.jsonl
 # Un-ignore paper validations for Cloud Run deployment
 !state/paper_validations/
 !state/paper_validations/*.json
+
+# FIX SYS3-BLK-005 - allow canonical paper pnl
+!src/outputs/
+!src/outputs/paper_pnl_summary.json

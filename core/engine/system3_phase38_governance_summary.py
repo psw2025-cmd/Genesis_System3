@@ -16,7 +16,7 @@ Menu Option: 101
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -26,7 +26,7 @@ ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
 ULTRA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _load_comparison_summary() -> Optional[str]:
+def _load_comparison_summary() -> str | None:
     """Load Phase 32 summary MD."""
     summary_md = ULTRA_DIR / "phase32_ultra_vs_baseline_summary.md"
     if summary_md.exists():
@@ -37,7 +37,7 @@ def _load_comparison_summary() -> Optional[str]:
     return None
 
 
-def _load_promotion_plan() -> Optional[Dict[str, Any]]:
+def _load_promotion_plan() -> dict[str, Any] | None:
     """Load Phase 33 promotion plan."""
     plan_json = ULTRA_DIR / "phase33_promotion_plan.json"
     if plan_json.exists():
@@ -49,7 +49,7 @@ def _load_promotion_plan() -> Optional[Dict[str, Any]]:
     return None
 
 
-def _load_audit_results() -> Optional[pd.DataFrame]:
+def _load_audit_results() -> pd.DataFrame | None:
     """Load Phase 35 audit results."""
     audit_csv = ULTRA_DIR / "phase35_decision_audit.csv"
     if not audit_csv.exists():
@@ -60,7 +60,7 @@ def _load_audit_results() -> Optional[pd.DataFrame]:
         return None
 
 
-def _load_policy_dashboard() -> Optional[str]:
+def _load_policy_dashboard() -> str | None:
     """Load Phase 37 policy dashboard."""
     dashboard_md = ULTRA_DIR / "phase37_policy_risk_dashboard.md"
     if dashboard_md.exists():
@@ -229,7 +229,7 @@ def main() -> None:
         print(f"[PHASE 38][ERROR] {e}")
         error_path = ULTRA_DIR / "phase38_error.md"
         with error_path.open("w", encoding="utf-8") as f:
-            f.write(f"# Phase 38 Error\n\n{str(e)}\n")
+            f.write(f"# Phase 38 Error\n\n{e!s}\n")
         print(f"[PHASE 38] Error details saved to: {error_path}")
 
 

@@ -7,7 +7,7 @@ Decomposes final_score into component contributions.
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -25,7 +25,7 @@ SIGNALS_CSV = PROJECT_ROOT / "storage" / "live" / "dhan_index_ai_signals.csv"
 COMPONENT_COLS = ["greeks_score", "trend_score", "volatility_score", "breakout_score", "momentum_score", "ai_score"]
 
 
-def run_phase224(**kwargs) -> Dict[str, Any]:
+def run_phase224(**kwargs) -> dict[str, Any]:
     """
     Run Phase 224: Score Component Attribution.
 

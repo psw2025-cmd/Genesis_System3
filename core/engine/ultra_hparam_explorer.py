@@ -16,9 +16,8 @@ Menu Option: 76
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
@@ -38,7 +37,7 @@ UNDERLYINGS = ["NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX"]
 
 def prepare_features_labels(
     df: pd.DataFrame,
-) -> tuple[Optional[pd.DataFrame], Optional[pd.Series], Optional[List[str]]]:
+) -> tuple[pd.DataFrame | None, pd.Series | None, list[str] | None]:
     """Prepare features and labels."""
     if df.empty:
         return None, None, None
@@ -82,7 +81,7 @@ def prepare_features_labels(
     return X, y, feature_cols
 
 
-def explore_hyperparameters() -> Dict[str, Any]:
+def explore_hyperparameters() -> dict[str, Any]:
     """
     Explore hyperparameter space for Ultra models.
 

@@ -9,9 +9,8 @@ Calling run_ultra_live_shadow_once() returns a DISABLED status immediately.
 The original 237-line implementation is preserved in git history.
 """
 
-import json
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 ULTRA_DIR = PROJECT_ROOT / "storage" / "ultra"
@@ -24,12 +23,12 @@ _DISABLED_REASON = (
 )
 
 
-def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> Optional[Dict[str, Any]]:
+def load_model_with_meta(model_dir: Path, underlying: str, prefix: str = "") -> dict[str, Any] | None:
     """Stub — no broker needed for model loading; kept for future Dhan integration."""
     return None
 
 
-def run_ultra_live_shadow_once() -> Dict[str, Any]:
+def run_ultra_live_shadow_once() -> dict[str, Any]:
     """DISABLED — Dhan broker path. Returns DISABLED status immediately."""
     print(f"[DISABLED] {_DISABLED_REASON}")
     return {"status": "DISABLED", "message": _DISABLED_REASON}

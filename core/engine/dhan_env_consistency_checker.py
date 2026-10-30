@@ -5,14 +5,13 @@ Checks Python packages, directory structure, config flags.
 SAFE MODE ONLY - Reporting only, no auto-fix.
 """
 
-import sys
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 
-def check_python_packages() -> Dict[str, Any]:
+def check_python_packages() -> dict[str, Any]:
     """
     Check required Python packages.
 
@@ -44,7 +43,7 @@ def check_python_packages() -> Dict[str, Any]:
     }
 
 
-def check_directory_structure() -> Dict[str, Any]:
+def check_directory_structure() -> dict[str, Any]:
     """
     Check directory structure consistency.
 
@@ -78,7 +77,7 @@ def check_directory_structure() -> Dict[str, Any]:
     }
 
 
-def check_config_flags() -> Dict[str, Any]:
+def check_config_flags() -> dict[str, Any]:
     """
     Check configuration flags (read-only).
 
@@ -117,7 +116,7 @@ def check_config_flags() -> Dict[str, Any]:
         }
 
 
-def run_consistency_check() -> Dict[str, Any]:
+def run_consistency_check() -> dict[str, Any]:
     """
     Run complete consistency check.
 
