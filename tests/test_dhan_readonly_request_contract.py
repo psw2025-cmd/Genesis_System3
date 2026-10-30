@@ -145,6 +145,8 @@ def test_810_is_configuration_not_token_failure():
 
 
 def test_get_funds_exposes_906_truth_not_token_expired(monkeypatch):
+    # Both independent read-only transports reject the request with DH-906.
+    monkeypatch.setattr(ro, "_rest_get", lambda *args, **kwargs: {"remarks": {"error_code": "DH-906", "error_message": "incorrect request"}, "status": "failure"})
     monkeypatch.setattr(ro, "get_dhan_credentials", _creds)
     monkeypatch.setattr(
         ro,
