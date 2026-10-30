@@ -1,3 +1,8 @@
+import pytest as _pytest
+from pathlib import Path as _Path
+if not (_Path(__file__).resolve().parents[1] / "scripts/gcp_public_dashboard_runtime_proof.py").is_file():
+    _pytest.skip("Retired GCP script absent after PR #462: scripts/gcp_public_dashboard_runtime_proof.py", allow_module_level=True)
+
 import importlib.util
 from pathlib import Path
 
