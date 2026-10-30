@@ -1,5 +1,5 @@
 # WebSocket Tick Health
 
-Pass: **False**
+Pass: **None**
 
-Tick age: `60.17`
+Tick age: `None`
