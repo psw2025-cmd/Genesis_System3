@@ -1,0 +1,12 @@
+﻿{
+  "date": "2026-10-26",
+  "timestamp": "2026-10-26T10:13:11.132932+00:00",
+  "spearman_correlation": 0.83,
+  "hit_rate": 0.75,
+  "status": "COSTED_WALK_FORWARD_PASS",
+  "costed_walk_forward_pass": true,
+  "walk_forward_trade_count": 24,
+  "closed_trade_count": 24,
+  "closed_trades": 24,
+  "reconciliation_complete": true
+}
