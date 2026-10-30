@@ -1,0 +1,18 @@
+﻿{
+  "generated_utc": "2026-10-30T00:00:00Z",
+  "spearman": {
+    "latest_rho": 0.82,
+    "days_passing_threshold": 1,
+    "days_recorded": 1,
+    "days_required": 5,
+    "rho_threshold": 0.70,
+    "passing": false
+  },
+  "paper_closed_count": 9,
+  "paper_pnl_summary": {
+    "total_trades": 9,
+    "paper_closed_count": 9
+  },
+  "blocker_id": "SYS3-BLK-005",
+  "note": "CANONICAL FIXED 2026-10-30 - spearman chain restored"
+}
