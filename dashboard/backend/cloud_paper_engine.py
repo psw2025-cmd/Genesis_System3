@@ -1,5 +1,5 @@
-"""
-Cloud Paper Trading Loop — Genesis System3
+﻿"""
+Cloud Paper Trading Loop â€” Genesis System3
 ===========================================
 Runs INSIDE the dashboard backend as a background task during market hours.
 Generates realistic single-lot paper trades from the LIVE option chain so the
@@ -112,7 +112,7 @@ class CloudPaperEngine:
     def _load_state(self):
         if self.state_file.exists():
             try:
-                s = json.loads(self.state_file.read_text())
+                s = json.loads(self.state_file.read_text(encoding="utf-8-sig"))
                 self.open_positions = s.get("open_positions", [])
                 self.closed_positions = s.get("closed_positions", [])
                 self.seq = s.get("seq", 0)
@@ -153,7 +153,7 @@ class CloudPaperEngine:
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Pick one tradeable contract by pure Dhan LTP % gain (highest first).
 
-        Near-ATM filter keeps risk bounded. OI is only a tiny tie-break — never
+        Near-ATM filter keeps risk bounded. OI is only a tiny tie-break â€” never
         the primary ranker (OI_FLOW caused wrong PE while CE was the real gainer).
         """
         contracts = chain.get("contracts", [])
@@ -356,7 +356,7 @@ class CloudPaperEngine:
         now = _now_ist()
         market_top = market_top or []
 
-        # 1. Update open positions — check SL/TP using current chain LTP
+        # 1. Update open positions â€” check SL/TP using current chain LTP
         chain_by_key = {}
         for ch in chains:
             for c in ch.get("contracts", []):
@@ -592,7 +592,7 @@ class CloudPaperEngine:
             "closed_positions": self.closed_positions,
             "data_source": "paper_cloud_sim",
         }
-        # positions_live.json — get_positions reads data.get("positions") + open_count
+        # positions_live.json â€” get_positions reads data.get("positions") + open_count
         positions_out = {
             "timestamp_ist": ts,
             "positions": self.open_positions,  # get_positions reads this key
@@ -621,7 +621,7 @@ class CloudPaperEngine:
         try:
             _atomic_write_text(self.positions_file, json.dumps(positions_out, indent=2))
             _atomic_write_text(self.pnl_file, json.dumps(pnl_out, indent=2))
-            # paper_pnl_summary.json — get_pnl reads this as the summary source
+            # paper_pnl_summary.json â€” get_pnl reads this as the summary source
             _atomic_write_text(self.out / "paper_pnl_summary.json", json.dumps(summary_block, indent=2))
         except Exception:
             pass

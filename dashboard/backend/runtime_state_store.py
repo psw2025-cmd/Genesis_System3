@@ -1,4 +1,4 @@
-"""
+﻿"""
 Runtime State Store (SSOT) - Single Source of Truth
 Provides unified, atomic, versioned state for all dashboard pages
 """
@@ -320,7 +320,7 @@ class RuntimeStateStore:
         try:
             health_file = self.outputs_dir / "health.json"
             if health_file.exists():
-                health = json.loads(health_file.read_text())
+                health = json.loads(health_file.read_text(encoding="utf-8-sig"))
 
                 updates["mode"] = "PAPER"  # Force PAPER regardless of health data
 
@@ -376,7 +376,7 @@ class RuntimeStateStore:
             try:
                 positions_file = self.outputs_dir / "positions_live.json"
                 if positions_file.exists():
-                    positions_data = json.loads(positions_file.read_text())
+                    positions_data = json.loads(positions_file.read_text(encoding="utf-8-sig"))
                     positions = positions_data.get("positions", [])
                     if isinstance(positions, list):
                         updates["positions"] = positions
@@ -387,7 +387,7 @@ class RuntimeStateStore:
         try:
             pnl_file = self.outputs_dir / "paper_pnl_summary.json"
             if pnl_file.exists():
-                pnl_data = json.loads(pnl_file.read_text())
+                pnl_data = json.loads(pnl_file.read_text(encoding="utf-8-sig"))
                 updates["pnl"] = {
                     "unrealized": pnl_data.get("unrealized_pnl", 0.0),
                     "realized": pnl_data.get("realized_pnl", 0.0),
@@ -400,7 +400,7 @@ class RuntimeStateStore:
         try:
             signal_file = self.outputs_dir / "top_trade_signal.json"
             if signal_file.exists():
-                signal_data = json.loads(signal_file.read_text())
+                signal_data = json.loads(signal_file.read_text(encoding="utf-8-sig"))
                 if signal_data.get("action") == "TRADE":
                     updates["signals"] = {
                         "status": "BUY" if signal_data.get("direction") == "LONG" else "SELL",
