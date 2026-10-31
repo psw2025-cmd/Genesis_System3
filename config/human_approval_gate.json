@@ -6,7 +6,7 @@
   "live_trading_env_flip_authorized": false,
   "technical_gates_still_required": [],
   "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-  "gates_synced_utc": "2026-10-31T09:09:15.582444Z",
+  "gates_synced_utc": "2026-10-31T09:20:42.045838Z",
   "gates_passing": 7,
   "gates_total": 7
 }
