@@ -51,16 +51,6 @@
       "severity": "HIGH"
     },
     {
-      "action": "Generate costed expectancy report from paper/live-like trade ledger.",
-      "code": "FRICTION_EXPECTANCY_NOT_PROVEN_POSITIVE",
-      "message": "Positive expectancy after brokerage, charges, spread and slippage is not proven.",
-      "proof": {
-        "found": true,
-        "path": "reports\\latest\\friction_expectancy\\summary.json"
-      },
-      "severity": "HIGH"
-    },
-    {
       "action": "Generate entry/exit delay, spread paid and slippage proof.",
       "code": "EXECUTION_QUALITY_NOT_PROVEN",
       "message": "Execution quality/slippage/spread proof is missing.",
@@ -79,19 +69,9 @@
         "path": "reports\\latest\\option_chain_integrity\\summary.json"
       },
       "severity": "HIGH"
-    },
-    {
-      "action": "Compare forecast hit rate vs trade win rate and net expectancy.",
-      "code": "MODEL_TO_TRADE_GAP_NOT_PROVEN",
-      "message": "Prediction hit rate is not proven to translate into net trade profitability.",
-      "proof": {
-        "found": true,
-        "path": "reports\\latest\\model_to_trade_gap\\summary.json"
-      },
-      "severity": "HIGH"
     }
   ],
-  "generated_utc": "2026-07-24T03:53:15.666356+00:00",
+  "generated_utc": "2026-10-31T08:32:40.687584+00:00",
   "inputs": {
     "dashboard_truth": {
       "auto_repair_allowed": true,
@@ -462,8 +442,8 @@
       "auto_repair_allowed": false,
       "blockers": [],
       "evidence": {
-        "broker_connected": false,
-        "dry_run": false,
+        "broker_connected": true,
+        "dry_run": true,
         "entry_order_placed": true,
         "exit_completed": true,
         "full_lifecycle_proven": true,
@@ -481,20 +461,18 @@
           "pnl_total",
           "net_pnl"
         ],
-        "market_status": "Market open (09:23 IST)",
-        "net_pnl": -15.0,
+        "market_status": "Pre-market (06:13 IST, opens 09:15)",
+        "net_pnl": -13.97,
         "orders_trades_lifecycle_reconciled": true,
-        "pnl_total": 5.0,
-        "proof_id": "LIFECYCLE_20260724_092306",
+        "pnl_total": 6.03,
+        "proof_id": "LIFECYCLE_20261030_061301",
         "signal_generated": true
       },
       "gate": "analyzer_paper_lifecycle_proof",
       "next_action": "PASS \u2014 lifecycle proven. Accumulate 5+ days before live enablement.",
       "pass": true,
       "status": "PASS",
-      "warnings": [
-        "broker_not_connected_paper_simulation_used"
-      ]
+      "warnings": []
     },
     "model": {
       "auto_repair_allowed": false,
@@ -662,7 +640,7 @@
         "live_market_analyzer_paper_trade_not_proven"
       ],
       "dhanhq_dependency_present": true,
-      "generated_utc": "2026-07-24T03:51:16.070230+00:00",
+      "generated_utc": "2026-07-24T04:10:25.441827+00:00",
       "logzero_dependency_present": true,
       "master_control_plane_report": "reports/latest/system3_master_control_plane/system3_master_control_plane.json",
       "master_control_plane_verdict": "TRADE_READY_BLOCKED",
@@ -676,7 +654,7 @@
       "verdict": "NOT_TRADE_READY_UNTIL_BLOCKERS_PROVEN_CLEAR"
     },
     "proof_matrix": {
-      "generated_utc": "2026-07-24T03:51:16.039008+00:00",
+      "generated_utc": "2026-07-24T04:10:25.433826+00:00",
       "mode": "Analyzer/Paper only; live trading disabled",
       "optional_missing_count": 0,
       "pending_count": 0,
@@ -774,13 +752,13 @@
     }
   },
   "summary": {
-    "blocker_count": 9,
+    "blocker_count": 7,
     "highest_severity": "CRITICAL",
     "paper_analyzer_allowed": true,
     "production_live_ready": false,
     "severity_counts": {
       "CRITICAL": 2,
-      "HIGH": 7,
+      "HIGH": 5,
       "MEDIUM": 3
     },
     "strategy_quarantined_for_live": true,

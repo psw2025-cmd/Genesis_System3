@@ -2,4 +2,4 @@
 
 Pass: **False**
 
-Tick age: `60.17`
+Tick age: `5.0`
