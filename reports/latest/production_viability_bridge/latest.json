@@ -61,7 +61,7 @@
       "severity": "HIGH"
     }
   ],
-  "generated_utc": "2026-10-31T08:45:40.171169+00:00",
+  "generated_utc": "2026-10-31T09:09:16.051814+00:00",
   "inputs": {
     "dashboard_truth": {
       "auto_repair_allowed": true,

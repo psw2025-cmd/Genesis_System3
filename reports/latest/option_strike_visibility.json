@@ -1,6 +1,6 @@
 {
   "summary": {
-    "generated_at_utc": "2026-10-30T01:19:23.708263+00:00",
+    "generated_at_utc": "2026-10-31T09:12:28.822852+00:00",
     "signal_source": "baseline-index-signals",
     "option_master_source": "security_id_list.csv",
     "rows": 3,
@@ -37,8 +37,8 @@
       "option_side": "CE",
       "option_eligible": true,
       "eligibility_source": "security_id_list.csv",
-      "expiry": "2026-06-30 14:30:00",
-      "strike": "65400.00000",
+      "expiry": "2026-12-29 14:30:00",
+      "strike": "69400.00000",
       "instrument_token": "35000",
       "ltp": 125.0,
       "bid": 124.5,

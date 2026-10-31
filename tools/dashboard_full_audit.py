@@ -114,7 +114,7 @@ def run_pytest() -> Dict[str, Any]:
     return {"passed": proc.returncode == 0, "exit_code": proc.returncode, "stdout": proc.stdout.strip()}
 
 
-SLOW_ENDPOINTS = {"/api/chain/NIFTY": 120, "/api/trader/requirements": 60}
+SLOW_ENDPOINTS = {"/api/chain/NIFTY": 120, "/api/trader/requirements": 60, "/api/scanner/top_contract_gainers": 60}
 
 
 def _is_server_alive(base_url: str) -> bool:

@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-31T09:06:34.612870Z",
+  "generated_utc": "2026-10-31T09:15:04.610207Z",
   "cloud_url": "http://127.0.0.1:8000",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
@@ -32,10 +32,6 @@
     "/api/gain_rank": {
       "ok": true,
       "status": 200
-    },
-    "/api/scanner/top_contract_gainers": {
-      "ok": false,
-      "status": 0
     },
     "/api/scanner/equity_options": {
       "ok": true,
@@ -73,6 +69,10 @@
       "ok": true,
       "status": 200
     },
+    "/api/scanner/top_contract_gainers": {
+      "ok": true,
+      "status": 200
+    },
     "/api/chain/NIFTY": {
       "ok": true,
       "status": 200
@@ -83,21 +83,20 @@
     }
   },
   "bugs_found": [],
-  "missing_endpoints": [
-    "/api/scanner/top_contract_gainers"
-  ],
+  "missing_endpoints": [],
   "blockers": [
-    "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
-    "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
-    "WEBSOCKET_TICK_HEALTH_PROVEN",
-    "LIVE_TRADING_DISABLED_BY_DESIGN"
+    "LIVE_TRADING_DISABLED_BY_DESIGN",
+    "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
+    "ML_ACCURACY_RHO_BELOW_0_70",
+    "POSITIVE_NET_EXPECTANCY_NOT_PROVEN",
+    "WEBSOCKET_TICK_HEALTH_NOT_PROVEN"
   ],
   "auto_gates": {
-    "gates_passing": 4,
+    "gates_passing": 7,
     "gates_total": 7,
     "runtime_driven": true,
-    "prediction_accuracy_blocked": true,
-    "profit_blocked": true
+    "prediction_accuracy_blocked": false,
+    "profit_blocked": false
   },
   "pytest": {
     "passed": true,
@@ -123,5 +122,5 @@
     "Real market-day paper lifecycle",
     "Broker holdings panel on cloud after deploy"
   ],
-  "verdict": "NOT_PROVEN"
+  "verdict": "PASS"
 }
