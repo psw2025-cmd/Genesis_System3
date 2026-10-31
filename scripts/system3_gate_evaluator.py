@@ -221,8 +221,19 @@ def eval_tick_health_gate(root: Path, live_state: Optional[Dict[str, Any]] = Non
             or refresh
         )
         broker_ok = (live_state.get("broker") or {}).get("connected") if broker_ok is None else broker_ok
-    rest_ok = refresh is not None and float(refresh) <= 10
-    ok = data.get("pass") is True or (rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15)
+    # Never trust a historical PASS bit as proof of a current broker tick.
+    stamp = (ev.get("last_tick_utc") or data.get("last_tick_utc") or data.get("generated_utc"))
+    try:
+        tick_time = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+        tick_time = tick_time.replace(tzinfo=timezone.utc) if tick_time.tzinfo is None else tick_time
+        age_from_stamp = (datetime.now(timezone.utc) - tick_time).total_seconds()
+        fresh = 0 <= age_from_stamp <= 15
+        rest_ok = refresh is not None and 0 < float(refresh) <= 10
+        age_ok = tick_age is not None and 0 <= float(tick_age) <= 15
+    except (TypeError, ValueError, OverflowError):
+        fresh = rest_ok = age_ok = False
+    # A real timestamp, a real connected broker and a fresh tick are all required.
+    ok = bool(fresh and rest_ok and age_ok and broker_ok)
     return {
         "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
         "pass": ok,
