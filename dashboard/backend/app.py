@@ -1440,16 +1440,28 @@ async def get_unified_portfolio():
         return {"error": "portfolio_timeout", "timeout_s": _TRUTH_IO_TIMEOUT_S}
 
 
+_TRADER_REQUIREMENTS_CACHE: tuple[float, Dict[str, Any]] = (0.0, {})
+_TRADER_REQUIREMENTS_TTL_S = 60.0
+
+
 @app.get("/api/trader/requirements")
 async def get_trader_requirements():
     """Full trader field audit mapped to available API data."""
+    global _TRADER_REQUIREMENTS_CACHE
+    now = time.time()
+    ts, cached = _TRADER_REQUIREMENTS_CACHE
+    if now - ts < _TRADER_REQUIREMENTS_TTL_S and cached:
+        return cached
     try:
         from dashboard.backend.trader_requirements_service import (
             build_trader_requirements_report,
         )
     except ImportError:
         from trader_requirements_service import build_trader_requirements_report
-    return build_trader_requirements_report(OUTPUTS_DIR)
+    loop = asyncio.get_event_loop()
+    report = await loop.run_in_executor(None, build_trader_requirements_report, OUTPUTS_DIR)
+    _TRADER_REQUIREMENTS_CACHE = (now, report)
+    return report
 
 
 @app.get("/api/approval/status")

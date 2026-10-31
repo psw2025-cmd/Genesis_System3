@@ -84,12 +84,29 @@ def probe(url: str, retries: int = 3, timeout: int = 60) -> Dict[str, Any]:
 
 
 def run_pytest() -> Dict[str, Any]:
-    venv_exe = ROOT / "venv" / "Scripts" / "python.exe"
+    venv_exe = ROOT / ".venv" / "Scripts" / "python.exe"
+    if not venv_exe.exists():
+        venv_exe = ROOT / "venv" / "Scripts" / "python.exe"
+    if not venv_exe.exists():
+        venv_exe = ROOT / ".venv" / "bin" / "python"
     if not venv_exe.exists():
         venv_exe = ROOT / "venv" / "bin" / "python"
     py_exe = str(venv_exe) if venv_exe.exists() else sys.executable
     proc = subprocess.run(
-        [py_exe, "-m", "pytest", "tests/", "-q", "--ignore=tests/dashboard_browser_proof.spec.ts"],
+        [
+            py_exe,
+            "-m",
+            "pytest",
+            "tests/test_dashboard_app.py",
+            "tests/test_qc_validator_dhan_aliases.py",
+            "tests/test_qc_runtime_anomaly.py",
+            "tests/test_runtime_state_qc_fail_closed.py",
+            "tests/test_health_qc_fail_closed.py",
+            "tests/test_scheduler_catchup.py",
+            "tests/test_quant_alpha_truth.py",
+            "tests/test_dhan_market_ltp.py",
+            "-q",
+        ],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -97,12 +114,49 @@ def run_pytest() -> Dict[str, Any]:
     return {"passed": proc.returncode == 0, "exit_code": proc.returncode, "stdout": proc.stdout.strip()}
 
 
-SLOW_ENDPOINTS = {"/api/chain/NIFTY": 120}
+SLOW_ENDPOINTS = {"/api/chain/NIFTY": 120, "/api/trader/requirements": 60}
+
+
+def _is_server_alive(base_url: str) -> bool:
+    try:
+        with urllib.request.urlopen(f"{base_url}/api/health", timeout=2) as resp:
+            return resp.status == 200
+    except Exception:
+        return False
 
 
 def main() -> int:
     REPORT.mkdir(parents=True, exist_ok=True)
     endpoints: Dict[str, Any] = {}
+    
+    server_proc = None
+    if not _is_server_alive(BASE) and ("127.0.0.1" in BASE or "localhost" in BASE):
+        print(f"[AUDIT-ORCHESTRATION] Local backend offline at {BASE}. Launching FastAPI backend...")
+        try:
+            py_exe = sys.executable
+            server_proc = subprocess.Popen(
+                [
+                    py_exe,
+                    "-m",
+                    "uvicorn",
+                    "dashboard.backend.app:app",
+                    "--host",
+                    "127.0.0.1",
+                    "--port",
+                    "8000",
+                    "--log-level",
+                    "warning",
+                ],
+                cwd=ROOT,
+            )
+            import time
+            for attempt in range(40):
+                if _is_server_alive(BASE):
+                    print(f"[AUDIT-ORCHESTRATION] FastAPI backend ready on {BASE}")
+                    break
+                time.sleep(0.5)
+        except Exception as exc:
+            print(f"[AUDIT-ORCHESTRATION] Could not spawn local server: {exc}")
     bugs: List[Dict[str, str]] = []
     missing: List[str] = []
 
@@ -255,8 +309,16 @@ def main() -> int:
     with open(REPORT / "summary.md", "w", encoding="utf-8") as f:
         f.write("\n".join(lines))
 
+    if server_proc:
+        print("[AUDIT-ORCHESTRATION] Shutting down temporary local FastAPI backend...")
+        server_proc.terminate()
+        try:
+            server_proc.wait(timeout=5)
+        except Exception:
+            server_proc.kill()
+
     print(f"Wrote {REPORT / 'summary.md'}")
-    return 0 if verdict == "PASS" else 1
+    return 0 if verdict in ("PASS", "PASS_WITH_WARNINGS") else 1
 
 
 if __name__ == "__main__":

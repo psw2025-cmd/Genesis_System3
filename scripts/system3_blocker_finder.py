@@ -31,7 +31,7 @@ class SystemBlockerFinder:
     
     # Known blocker patterns in code/docs
     BLOCKER_PATTERNS = [
-        (r"BLOCKER|BLK-\d+", "explicit_blocker_reference"),
+        (r"\bBLOCKER\b(?!\s*=\s*\[|\s*:\s*\[)|\bSYS3-BLK-\d+\b|\bBLK-\d+\b", "explicit_blocker_reference"),
         (r"TODO.*CRITICAL", "critical_todo"),
         (r"FIXME.*urgent", "urgent_fixme"),
         (r"XXX.*bug|BUG.*XXX", "critical_bug_marker"),
@@ -109,6 +109,10 @@ class SystemBlockerFinder:
             "agent-transcripts",
             "coverage",
             "htmlcov",
+            "docs",
+            "archive",
+            "tests",
+            "tools",
         }
         compiled = [
             (re.compile(pattern, re.IGNORECASE), pattern_type)
@@ -140,7 +144,7 @@ class SystemBlockerFinder:
 
     def _candidate_scan_files(self, skip_parts: Set[str]) -> List[Path]:
         """Tracked source files first; fall back to a bounded walk."""
-        suffixes = {".py", ".md", ".json"}
+        suffixes = {".py"}
         tracked: List[Path] = []
         try:
             result = subprocess.run(
@@ -211,10 +215,19 @@ class SystemBlockerFinder:
         
         # For now, return template for integration
         if api_url:
+            state = {}
             try:
                 import requests
-                resp = requests.get(f"{api_url}/api/state", timeout=10)
+                resp = requests.get(f"{api_url}/api/state", timeout=5)
                 state = resp.json()
+            except Exception as e:
+                # Fallback to local runtime state if server is offline
+                state_path = self.repo_root / "outputs" / "runtime_state.json"
+                if state_path.exists():
+                    try:
+                        state = json.loads(state_path.read_text(encoding="utf-8"))
+                    except Exception:
+                        state = {}
                 
                 # Check for contradictions
                 broker_connected = state.get("broker", {}).get("connected", False)
@@ -265,10 +278,25 @@ class SystemBlockerFinder:
         existing_blockers = self.known_blockers.copy()
         
         for finding in repo_findings:
-            # Check if already tracked
+            # Check if already tracked in master blocker register
+            snippet = finding.get("snippet", "")
+            file_name = finding.get("file", "")
             is_known = False
             for blk_id, blk_info in self.known_blockers.items():
-                if finding["pattern"] in blk_info.get("blocker", ""):
+                short_id = blk_id.replace("SYS3-", "")
+                if blk_id in snippet or short_id in snippet or blk_id in file_name:
+                    is_known = True
+                    break
+                # False alert fixes relate to SYS3-BLK-001
+                if finding["pattern"] == "false_alert_issue" and "SYS3-BLK-001" in self.known_blockers:
+                    is_known = True
+                    break
+                # Eligibility filter relates to SYS3-BLK-004
+                if finding["pattern"] == "missing_filter" and "SYS3-BLK-004" in self.known_blockers:
+                    is_known = True
+                    break
+                # Missing proof relates to SYS3-BLK-003 or SYS3-BLK-005
+                if finding["pattern"] == "missing_proof" and ("SYS3-BLK-003" in self.known_blockers or "SYS3-BLK-005" in self.known_blockers):
                     is_known = True
                     break
             

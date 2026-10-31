@@ -39,6 +39,22 @@ def _ist_now_str() -> str:
     ist = timezone(timedelta(hours=5, minutes=30))
     return datetime.now(ist).strftime("%Y-%m-%d %H:%M:%S")
 
+def is_actionable_gainer_row(row: Any) -> bool:
+    """Return True if row is a valid, actionable gainer contract (not an illiquid artifact)."""
+    if not isinstance(row, dict):
+        return False
+    ltp = row.get("ltp") or row.get("price") or row.get("close") or 0.0
+    try:
+        ltp = float(ltp)
+    except (TypeError, ValueError):
+        return False
+    if ltp <= 0.05:
+        return False
+    if not (row.get("symbol") or row.get("trading_symbol") or row.get("contract")):
+        return False
+    return True
+
+
 
 def _cloud_market_closed() -> bool:
     """Return True only when Cloud Run can prove the NSE market is closed.

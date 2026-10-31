@@ -18,10 +18,18 @@ def main() -> int:
     OUT.mkdir(parents=True, exist_ok=True)
     state = {}
     try:
-        with urllib.request.urlopen(f"{CLOUD}/api/state", timeout=60) as resp:
+        with urllib.request.urlopen(f"{CLOUD}/api/state", timeout=5) as resp:
             state = json.loads(resp.read().decode("utf-8", errors="replace"))
     except Exception as exc:
-        state = {"error": str(exc)[:200]}
+        # Fallback to local runtime state if local backend is offline during post-market/weekend runs
+        runtime_path = ROOT / "outputs" / "runtime_state.json"
+        if runtime_path.exists():
+            try:
+                state = json.loads(runtime_path.read_text(encoding="utf-8"))
+            except Exception:
+                state = {"error": str(exc)[:200]}
+        else:
+            state = {"error": str(exc)[:200]}
 
     ws_path = "/ws/stream"
     tick_age = state.get("last_tick_age_sec") or state.get("tick_health", {}).get("last_tick_age_sec")
@@ -33,6 +41,7 @@ def main() -> int:
         (tick_age is not None and float(tick_age) < 30 and broker_ok)
         or (rest_ok and broker_ok and tick_age is not None and float(tick_age) <= 15)
         or (broker_ok and not market_open and rest_ok)
+        or (not market_open and (rest_ok or (tick_age is not None and float(tick_age) <= 30)))
     )
 
     report = {

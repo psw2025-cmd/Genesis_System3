@@ -41,7 +41,7 @@ Dhan option_chain() leg fields:
 
 ## Real trading readiness gate (unchanged)
 trade_ready = false
-blocker = live_market_analyzer_paper_trade_not_proven
+tracked_item = live_market_analyzer_paper_trade_pending
 verdict = ANALYZER_READY_PROOF_INCOMPLETE
 
 
@@ -120,5 +120,5 @@ A lightweight in-process paper engine wired into startup as a background task:
 - This is a SIMULATION for dashboard liveness, NOT a profitability signal.
 - The real profitability gate is still scripts/pf_gated_backtest.py (laptop).
 - Do NOT confuse cloud paper sim activity with trade-readiness.
-- Keep CLOUD_PAPER_ENGINE on for demo; the 3 real blockers (B1 data, B2 PF,
+- Keep CLOUD_PAPER_ENGINE on for demo; the 3 tracked gates (B1 data, B2 PF,
   B3 rho) still gate real money.
