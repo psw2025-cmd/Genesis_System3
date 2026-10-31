@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "policy": "AGY-EVIDENCE-INTEGRITY-v1",
-  "session": "07df305e-b792-4011-8c92-55d73283a129",
-  "turn": "7b8af148ba3f4d00bd56d6674aba0e66",
-  "run_id": "92537cb1fc1245e4a2c8db98274c66e6",
-  "observed_utc": "2026-10-30T05:58:28Z",
+  "session": "69fe03e4-f602-4b8a-880d-dfa6a435593e",
+  "turn": "f3254e7ee77745b5b61bf9ba371ff0c0",
+  "run_id": "6615d1ab948948598d276b7ea40497ee",
+  "observed_utc": "2026-10-31T09:23:56Z",
   "workspace": "C:\\Genesis_System3",
   "scope": "System3 Genesis Recovery Progress and Audit Verification",
   "limitations": [
     "Production Cloud Run read-only audit; live trading permanently disabled; Dhan broker Data API requires external subscription"
   ],
-  "gate_sha256": "b27c10c10947dfd816bd1a6f28adf72034aeb90b978a7d8b8aa2de2049bda944",
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
   "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
   "contract": {
     "path": "C:\\Genesis_System3\\.agy-proof\\contract.json",
@@ -19,7 +19,7 @@
   "subjects": [
     {
       "path": "C:\\Genesis_System3\\dashboard\\backend\\app.py",
-      "sha256": "3fcc68bc34d12b7a5f08a3d44abee6d4a32904eec8b60fd0c62832f31a016c19"
+      "sha256": "d970ef28e7bf1dec8891190bd07fabd3ee729624cd71bde9ca9977be8b21f430"
     },
     {
       "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\App.tsx",
@@ -53,11 +53,11 @@
   "subjects_unchanged_during_checks": true,
   "artifacts": [
     {
-      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-30T055823Z-8839d775f87d4f12a9009a37b9bc240d\\0.stdout.txt",
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-31T092351Z-d091a4541baa4c3bac774b40aafb1ef4\\0.stdout.txt",
       "sha256": "0f73c2ae6f0d2e2a8fcb05f1aa3f730e74f28b81e622ea107d31ff60a0fe0a28"
     },
     {
-      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-30T055823Z-8839d775f87d4f12a9009a37b9bc240d\\0.stderr.txt",
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-31T092351Z-d091a4541baa4c3bac774b40aafb1ef4\\0.stderr.txt",
       "sha256": "4a57ec82cc6a293b50a817078a4a146c9989ff6c575b60b1469187b6e4b008c0"
     }
   ],
@@ -109,8 +109,8 @@
         "tests/test_recovery_audit_and_progress.py"
       ],
       "cwd": "C:\\Genesis_System3",
-      "started_utc": "2026-10-30T05:58:23Z",
-      "elapsed_seconds": 4.531,
+      "started_utc": "2026-10-31T09:23:51Z",
+      "elapsed_seconds": 5.515,
       "exit_code": 0,
       "assertion": {
         "type": "json_equals",
@@ -125,5 +125,5 @@
     }
   ],
   "overall": "PASS",
-  "integrity_signature": "dd8b57b3ed024c8c5bd7b29c8c5c38d3a3182e053b002e807a21a6a85cfcafe5"
+  "integrity_signature": "f0ea6365799bf40045a9efdd62dbb44cec22cc33a918cec8dca12cb913b67430"
 }
