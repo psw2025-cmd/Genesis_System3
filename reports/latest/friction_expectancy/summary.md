@@ -1,6 +1,6 @@
 # Friction Expectancy Proof
 
-Generated: `2026-10-31T08:30:51.846926Z`
+Generated: `2026-10-31T08:45:23.073861Z`
 Pass: **True**
 Source: `storage\live\paper_closed_trades.json`
 

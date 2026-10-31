@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-07-24T03:53:30.611269Z",
+  "generated_utc": "2026-10-31T09:06:34.612870Z",
   "cloud_url": "http://127.0.0.1:8000",
   "live_trading_enabled": false,
   "production_ready_for_real_money": false,
@@ -34,8 +34,8 @@
       "status": 200
     },
     "/api/scanner/top_contract_gainers": {
-      "ok": true,
-      "status": 200
+      "ok": false,
+      "status": 0
     },
     "/api/scanner/equity_options": {
       "ok": true,
@@ -65,10 +65,6 @@
       "ok": true,
       "status": 200
     },
-    "/api/trader/requirements": {
-      "ok": true,
-      "status": 200
-    },
     "/api/approval/status": {
       "ok": true,
       "status": 200
@@ -80,16 +76,16 @@
     "/api/chain/NIFTY": {
       "ok": true,
       "status": 200
+    },
+    "/api/trader/requirements": {
+      "ok": true,
+      "status": 200
     }
   },
-  "bugs_found": [
-    {
-      "id": "PAPER_HISTORY_EMPTY",
-      "severity": "MEDIUM",
-      "detail": "Paper summary exists but trade history empty"
-    }
+  "bugs_found": [],
+  "missing_endpoints": [
+    "/api/scanner/top_contract_gainers"
   ],
-  "missing_endpoints": [],
   "blockers": [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
@@ -97,16 +93,16 @@
     "LIVE_TRADING_DISABLED_BY_DESIGN"
   ],
   "auto_gates": {
-    "gates_passing": 3,
+    "gates_passing": 4,
     "gates_total": 7,
     "runtime_driven": true,
     "prediction_accuracy_blocked": true,
     "profit_blocked": true
   },
   "pytest": {
-    "passed": false,
-    "exit_code": 1,
-    "stdout": ""
+    "passed": true,
+    "exit_code": 0,
+    "stdout": "........................................................................ [ 75%]\n.......................                                                  [100%]"
   },
   "dashboard_tabs_verified": [
     "System Control",

@@ -41,16 +41,6 @@
       "severity": "HIGH"
     },
     {
-      "action": "Implement/prove tick stream, last tick age, reconnect count and REST fallback state.",
-      "code": "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
-      "message": "WebSocket tick health is not proven.",
-      "proof": {
-        "found": true,
-        "path": "reports\\latest\\websocket_tick_health\\summary.json"
-      },
-      "severity": "HIGH"
-    },
-    {
       "action": "Generate entry/exit delay, spread paid and slippage proof.",
       "code": "EXECUTION_QUALITY_NOT_PROVEN",
       "message": "Execution quality/slippage/spread proof is missing.",
@@ -71,7 +61,7 @@
       "severity": "HIGH"
     }
   ],
-  "generated_utc": "2026-10-31T08:32:40.687584+00:00",
+  "generated_utc": "2026-10-31T08:45:40.171169+00:00",
   "inputs": {
     "dashboard_truth": {
       "auto_repair_allowed": true,
@@ -752,13 +742,13 @@
     }
   },
   "summary": {
-    "blocker_count": 7,
+    "blocker_count": 6,
     "highest_severity": "CRITICAL",
     "paper_analyzer_allowed": true,
     "production_live_ready": false,
     "severity_counts": {
       "CRITICAL": 2,
-      "HIGH": 5,
+      "HIGH": 4,
       "MEDIUM": 3
     },
     "strategy_quarantined_for_live": true,

@@ -1,6 +1,6 @@
 {
-  "generated_utc": "2026-10-31T08:30:55.246656Z",
-  "pass": false,
+  "generated_utc": "2026-10-31T08:45:23.569702Z",
+  "pass": true,
   "websocket_endpoint": "/ws/stream",
   "evidence": {
     "last_tick_age_sec": 5.0,

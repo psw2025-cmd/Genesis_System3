@@ -1,14 +1,14 @@
 # Dashboard Full Audit
 
-Generated: `2026-07-24T03:53:30.611269Z`
+Generated: `2026-10-31T09:06:34.612870Z`
 Verdict: **NOT_PROVEN**
 Real money ready: **False**
 
 ## Bugs
-- [MEDIUM] PAPER_HISTORY_EMPTY: Paper summary exists but trade history empty
+- none
 
 ## Missing endpoints
-- none
+- /api/scanner/top_contract_gainers
 
 ## Blockers for live trading
 - LIVE_TRADING_DISABLED_BY_DESIGN

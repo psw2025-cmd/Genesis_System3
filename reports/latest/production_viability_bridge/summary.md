@@ -1,6 +1,6 @@
 # System3 Production Viability Bridge
 
-Generated UTC: `2026-10-31T08:32:40.687584+00:00`
+Generated UTC: `2026-10-31T08:45:40.171169+00:00`
 
 ## Summary
 
@@ -10,9 +10,9 @@ Generated UTC: `2026-10-31T08:32:40.687584+00:00`
 | `paper_analyzer_allowed` | `True` |
 | `strategy_quarantined_for_live` | `True` |
 | `highest_severity` | `CRITICAL` |
-| `blocker_count` | `7` |
+| `blocker_count` | `6` |
 | `warning_count` | `3` |
-| `severity_counts` | `{'CRITICAL': 2, 'HIGH': 5, 'MEDIUM': 3}` |
+| `severity_counts` | `{'CRITICAL': 2, 'HIGH': 4, 'MEDIUM': 3}` |
 
 ## Blockers
 
@@ -22,7 +22,6 @@ Generated UTC: `2026-10-31T08:32:40.687584+00:00`
 | CRITICAL | `RAW_LIFECYCLE_DRY_RUN` | Raw lifecycle proof is simulation/dry-run. | Do not mark production ready from dry-run proof. |
 | HIGH | `FRESH_BROKER_DATA_NOT_PROVEN` | Fresh broker live data proof is missing. | Run secure runtime broker freshness proof. |
 | HIGH | `MODEL_PROMOTION_BLOCKED` | Model promotion is blocked. | Require policy + validation proof before promotion. |
-| HIGH | `WEBSOCKET_TICK_HEALTH_NOT_PROVEN` | WebSocket tick health is not proven. | Implement/prove tick stream, last tick age, reconnect count and REST fallback state. |
 | HIGH | `EXECUTION_QUALITY_NOT_PROVEN` | Execution quality/slippage/spread proof is missing. | Generate entry/exit delay, spread paid and slippage proof. |
 | HIGH | `OPTION_CHAIN_INTEGRITY_NOT_PROVEN` | Spot/chain/Greeks synchronization proof is missing. | Prove spot, option chain and Greeks timestamps are synchronized before signals. |
 

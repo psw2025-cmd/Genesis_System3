@@ -4,11 +4,9 @@
   "approved_utc": "2026-06-24T02:30:00+05:30",
   "scope": "Full owner trust for world-class development, automation, and performance optimization.",
   "live_trading_env_flip_authorized": false,
-  "technical_gates_still_required": [
-    "WEBSOCKET_TICK_HEALTH_PROVEN"
-  ],
+  "technical_gates_still_required": [],
   "note": "Human gate PASSED. LIVE_TRADING_ENABLED remains 0 until all technical proof gates pass. Owner approval does not auto-enable real orders.",
-  "gates_synced_utc": "2026-10-31T08:31:10.489997Z",
-  "gates_passing": 6,
+  "gates_synced_utc": "2026-10-31T08:45:39.698569Z",
+  "gates_passing": 7,
   "gates_total": 7
 }
