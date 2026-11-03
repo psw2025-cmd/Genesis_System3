@@ -1,14 +1,10 @@
-# Genesis System3 — Gemini operating contract
+# Genesis System3 — Gemini Operating Contract (LOCAL FIRST, CLOUD SECOND)
 
-**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
-Active owner directive: `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`; read it and `AGENTS.md` first. September laptop-only instructions are historical.
+**Active owner directive:** Test and repair the local workstation at `C:\Genesis_System3_clean` FIRST. The "cloud-only" directive is SUSPENDED until local verification is complete.
 
-GitHub exact approved main is code authority. Intended production is cloud-only GCP `system3-openalgo-safe` / `asia-south1`; currently no deployment certified. Laptop/mobile/Cloud Shell are optional control clients only, never required runtime or user-run command loop.
-
-Broker authority: Dhan. Retired Render and Angel-era hosting/instructions are historical and non-authoritative for System3.
-
-Current owner consent: autonomous GitHub fixes, tests, CI and read-only GCP verification ONLY. Never deploy, trigger a billable cloud build or mutate Cloud Run/Scheduler/IAM/secrets/billing/artifacts without separate explicit approval. Do not introduce unapproved automatic deployment.
-
-Permanent PAPER/ANALYZE locks: `ANALYZE_MODE=1`, `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`, `SYSTEM3_LIVE_TRADING_ALLOWED=0`, `AUTO_EXECUTE_TRADES=0`, `LIVE_ORDER_AUTHORITY=0`. No real orders, no order-shaped production tests, no broker secret payloads or service-account JSON keys.
-
-A past CI check, image tag, HTTP 200 or old Cloud Run URL is historical until independently re-observed. Use fresh exact-deployed-SHA cloud API/browser/broker evidence for runtime claims. No model is sole controller; Issue #188 is context, not a substitute for proof.
+## Core Rules
+1. **Localhost is Stage 1:** The UI at `http://127.0.0.1:8008/ui` must be fully functional. 
+2. **Dhan Broker:** Ensure the Dhan API routes (`/api/dhan/summary`, `/api/depth`) return HTTP 200 OK locally.
+3. **No Fake PASS:** You MUST execute `Invoke-RestMethod` and use Playwright to prove the UI works.
+4. **PAPER_MODE:** `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`. No live orders, but paper trading MUST function and write to the database.
+5. **Cloud Gate:** Only after local E2E tests pass, you may prepare the GitHub commit and GCP deployment scripts.
