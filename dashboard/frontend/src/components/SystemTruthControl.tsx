@@ -93,7 +93,7 @@ export function SystemTruthControl() {
     const candidateCount = candidates.length
     const cePeOk = hasCePe(gainRank)
     const liveFlag = liveTradingValue(state, brokerStatus, health)
-    const liveOn = liveFlag === true || liveFlag === 1 || liveFlag === '1'
+    const liveOn = liveFlag === true || (liveFlag as any) === 1 || liveFlag === '1'
     const orderAllowed = orderAllowedValue(state, brokerStatus)
     const available = brokerFunds?.available_balance ?? brokerFunds?.normalized?.available_balance
     const used = brokerFunds?.used_margin ?? brokerFunds?.normalized?.used_margin ?? brokerFunds?.normalized?.utilized_amount
