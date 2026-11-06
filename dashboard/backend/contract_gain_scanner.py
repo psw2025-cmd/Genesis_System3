@@ -135,6 +135,41 @@ def compute_contract_gain_pct(contract: Dict[str, Any]) -> Optional[float]:
     return compute_contract_gain(contract)[3]
 
 
+
+def is_actionable_gainer_row(row: Any) -> bool:
+    """Fail closed on malformed, expired, or unpriced CE/PE gainer rows.
+
+    This is a display/ranking validity filter, not execution authorization:
+    volume, bid/ask spread, and real-time freshness require separate proof.
+    """
+    if not isinstance(row, dict):
+        return False
+    if str(row.get("option_type") or "").upper() not in ("CE", "PE"):
+        return False
+    if not (row.get("trading_symbol") or row.get("symbol") or row.get("contract")):
+        return False
+
+    raw_expiry = row.get("expiry_date") or row.get("expiry")
+    if not raw_expiry:
+        return False
+    try:
+        expiry = datetime.fromisoformat(str(raw_expiry).strip()[:10]).date()
+    except (ValueError, TypeError):
+        return False
+    today_ist = datetime.now(timezone(timedelta(hours=5, minutes=30))).date()
+    if expiry < today_ist:
+        return False
+
+    raw_ltp = row.get("ltp")
+    if raw_ltp is None:
+        raw_ltp = row.get("price")
+    try:
+        ltp = float(raw_ltp)
+    except (TypeError, ValueError):
+        return False
+    return 0.05 < ltp < float("inf")
+
+
 def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, change_rs: Optional[float], ltp: float, prev: Optional[float]) -> Dict[str, Any]:
     opt = str(contract.get("option_type", "")).upper()
     return {
