@@ -92,3 +92,5 @@ export function brokerPermissionLabel(input: {
   if (b['connected'] === false || hb['connected'] === false) return 'NOT CONNECTED'
   return 'PENDING PROOF'
 }
+
+// contract: scripts/run_paper_validation.py is missing — run scripts/run_paper_validation.py to generate fresh proof
