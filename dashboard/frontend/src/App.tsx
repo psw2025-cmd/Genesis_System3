@@ -57,6 +57,7 @@ function Content() {
     case 'chain':        return <OptionChain />
     case 'signals':      return <Signals />
     case 'paper':        return <PaperTrading />
+    case 'mobile-trader': return <MobileTradingHub />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
     case 'system-readiness': return <SystemReadiness />
