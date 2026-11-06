@@ -1,0 +1,20 @@
+# Isolated recovery build: never overwrites production genesis-system3-web tags.
+# Submit from an exact, clean Git SHA with _RECOVERY_TAG and _RECOVERY_SHA.
+steps:
+  - name: 'python:3.11-slim'
+    entrypoint: 'python'
+    args: ['scripts/cloud_run_source_integrity_gate.py', '--root', '.']
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'dashboard/backend/Dockerfile'
+      - '--label'
+      - 'org.opencontainers.image.revision=${_RECOVERY_SHA}'
+      - '-t'
+      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-recovery:${_RECOVERY_TAG}'
+      - '.'
+images:
+  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-recovery:${_RECOVERY_TAG}'
+options:
+  logging: CLOUD_LOGGING_ONLY
