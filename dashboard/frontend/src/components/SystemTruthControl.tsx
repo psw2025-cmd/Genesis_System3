@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import { useStore } from '../store'
 import { PendingLifecycleBanner } from './PendingLifecycleBanner'
+import { isLiveFlagOn } from '../lib/strictFlags';
 import { liveTradingValue, orderAllowedValue, requiredChainCounts } from '../lib/lifecycleTruth'
 
 type Status = 'PASS' | 'WAITING' | 'PARTIAL' | 'PENDING' | 'BLOCKED'
@@ -93,7 +94,7 @@ export function SystemTruthControl() {
     const candidateCount = candidates.length
     const cePeOk = hasCePe(gainRank)
     const liveFlag = liveTradingValue(state, brokerStatus, health)
-    const liveOn = liveFlag === true || liveFlag === 1 || liveFlag === '1'
+    const liveOn = isLiveFlagOn(liveFlag)
     const orderAllowed = orderAllowedValue(state, brokerStatus)
     const available = brokerFunds?.available_balance ?? brokerFunds?.normalized?.available_balance
     const used = brokerFunds?.used_margin ?? brokerFunds?.normalized?.used_margin ?? brokerFunds?.normalized?.utilized_amount
