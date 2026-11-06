@@ -5,6 +5,8 @@ import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
 import { AuthUnlock } from './AuthUnlock'
 import { MarketTopCePeTable } from './MarketTopCePeTable'
+import { asRecord, gainValue, getErrorMessage, getResponseStatus } from '../lib/strictFlags';
+type ScannerRecord = Record<string, unknown>
 
 type SignalView = {
   action: string
@@ -26,24 +28,28 @@ type SignalView = {
   raw?: any
 }
 
-function firstCandidateFromScanner(scanner: any): any | null {
-  const table = scanner?.market_top_table || scanner?.market_wide?.top_combined_list || []
-  if (Array.isArray(table) && table.length) {
+function firstCandidateFromScanner(scanner: unknown): unknown | null {
+  const s = asRecord(scanner)
+  const marketWide = asRecord(s['market_wide'])
+  const tableRaw = s['market_top_table'] ?? marketWide['top_combined_list'] ?? []
+  const table: unknown[] = Array.isArray(tableRaw) ? tableRaw : []
+  if (table.length) {
     return table[0]
   }
-  const paths = [
-    scanner?.market_wide?.top_ce,
-    scanner?.market_wide?.top_pe,
+  const paths: unknown[] = [
+    marketWide['top_ce'],
+    marketWide['top_pe'],
   ]
-  const bySegment = scanner?.by_segment || {}
-  for (const seg of Object.values(bySegment) as any[]) {
-    paths.push(seg?.top_ce, seg?.top_pe)
-    if (Array.isArray(seg?.top_ce_list)) paths.push(...seg.top_ce_list)
-    if (Array.isArray(seg?.top_pe_list)) paths.push(...seg.top_pe_list)
+  const bySegment = asRecord(s['by_segment'])
+  for (const seg of Object.values(bySegment)) {
+    const sg = asRecord(seg)
+    paths.push(sg['top_ce'], sg['top_pe'])
+    if (Array.isArray(sg['top_ce_list'])) paths.push(...(sg['top_ce_list'] as unknown[]))
+    if (Array.isArray(sg['top_pe_list'])) paths.push(...(sg['top_pe_list'] as unknown[]))
   }
   const rows = paths.filter(Boolean)
   if (!rows.length) return null
-  rows.sort((a: any, b: any) => Number(b?.gain_pct || 0) - Number(a?.gain_pct || 0))
+  rows.sort((a, b) => gainValue(b) - gainValue(a))
   return rows[0]
 }
 
@@ -110,7 +116,7 @@ export default function Signals() {
       ])
 
       if (stateRes.status === 'rejected') {
-        const status = (stateRes.reason as any)?.response?.status || null
+        const status = getResponseStatus(stateRes.reason)
         if (status === 401) {
           setAuthRequired(true)
           setError(null)
@@ -149,8 +155,8 @@ export default function Signals() {
       const scannerTotal = Number(scanner?.segments_total || 0)
       const qcFailures = [
         ...(state.qc?.qc_failures || state.qc?.failures || []),
-        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as any)?.message || 'unknown'}`] : []),
-        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as any)?.message || 'unknown'}`] : []),
+        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${getErrorMessage(scannerRes.reason)}`] : []),
+        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${getErrorMessage(gainRes.reason)}`] : []),
       ]
 
       const qcData = {
