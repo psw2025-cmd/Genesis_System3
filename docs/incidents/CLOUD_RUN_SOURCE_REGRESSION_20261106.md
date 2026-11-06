@@ -39,7 +39,7 @@ All staged runtime controls are PAPER-only and LIVE/order-disabled.
   The staging service requires authentication (no public invoker grant).
 - Staging read probes returned HTTP 200 for `/ui`, `/api/health`,
   `/api/healthz`, `/api/broker/status`,
-  `/api/batch/market-data`, `/api/chain/NIFTY`. 
+  `/api/batch/market-data`, `/api/chain/NIFTY`.
   `/api/options/gainers` returned 404. `/openapi.json` timed out
   in the short initial probe; full route enumeration is not certified.
 - Staging has `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`,
