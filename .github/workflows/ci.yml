@@ -395,6 +395,12 @@ jobs:
           set -euo pipefail
           python -m pytest tests/test_paper_quote_provenance.py -o addopts="" -v --tb=short
 
+      - name: PAPER ledger read corruption fail-closed regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_ledger_read_integrity.py -o addopts="" -v --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
