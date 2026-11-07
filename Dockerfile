@@ -4,7 +4,7 @@
 # Canonical candidate image path: dashboard/backend/Dockerfile (repo-root context).
 # Cloud build/deploy still requires separate explicit owner authorization.
 # PERMANENT FIX: Exclude baked moneycontrol JSON — live data fetched via services/moneycontrol_live.py (Path B).
-FROM python:3.10-slim
+FROM python:3.15-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
