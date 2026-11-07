@@ -10,6 +10,7 @@ POLICY_PATH = Path("docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md")
 
 AUTOMATIC = {
     "ci.yml",
+    "cloud-verify.yml",
     "codeql-security.yml",
     "command-center-access.yml",
     "frontend-runtime-smoke.yml",
