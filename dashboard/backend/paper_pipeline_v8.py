@@ -466,6 +466,27 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
         entry_price = float(quote.get("ltp") or 0)
         if entry_price <= 0:
             continue
+        # Enforce capital on the ACTUAL paper pipeline, not only the toy simulator.
+        # Fail closed on malformed configuration or invalid lot size.
+        qty = _paper_qty(contract)
+        try:
+            capital_limit = float(os.environ.get("TRADING_CAPITAL_LIMIT_INR", "50000"))
+        except (ValueError, TypeError):
+            capital_limit = float("nan")
+        order_value = entry_price * qty
+        if (not math.isfinite(capital_limit) or capital_limit <= 0
+                or not isinstance(qty, (int, float))
+                or not math.isfinite(float(qty)) or qty <= 0
+                or not math.isfinite(order_value) or order_value > capital_limit):
+            reason = "PAPER_CAPITAL_LIMIT_BLOCK"
+            blocked = {"block_id": _row_id(forecast_id, reason),
+                       "created_utc": _utc_now(), "forecast_id": forecast_id,
+                       "underlying": underlying, "reason": reason,
+                       "scope": "trade_only_forecast_kept"}
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
         paper_order_id = _row_id("PAPER", today, underlying, pred.get("option_side"), contract.get("symbol"), entry_price)
         order = {
             "paper_order_id": paper_order_id,
@@ -479,7 +500,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "token": contract.get("token"),
             "expiry": contract.get("expiry"),
             "strike": contract.get("strike"),
-            "qty": _paper_qty(contract),
+            "qty": qty,
             "entry_price": entry_price,
             "status": "PAPER_OPEN",
             "order_mode": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER",
