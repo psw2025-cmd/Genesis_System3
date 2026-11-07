@@ -139,7 +139,7 @@ export const MultibaggerResearch: React.FC = () => {
               {totalCandidatesCount}
             </div>
             <p className="hero-copy">
-              Continuously screened via Stan Weinstein Stage-2 criteria, multi-year base breakouts, and delivery volume expansion.
+              STATIC RESEARCH SHORTLIST ONLY — full Dhan equity universe not screened; price, fundamentals, targets and accuracy are NOT VERIFIED.
             </p>
           </div>
           <div className="hero-metrics">
@@ -217,7 +217,7 @@ export const MultibaggerResearch: React.FC = () => {
               {activeHorizon === 'ALL' ? 'All Multi-Horizon Candidates' : `${activeHorizon} Horizon Research Board`}
             </h2>
             <p style={{ fontSize: 12, color: 'var(--text-sec)', margin: '4px 0 0' }}>
-              Multi-factor fundamental screening, technical momentum breakout, delivery volume expansion, and catalysts.
+              Illustrative historical research fields only; not verified current Dhan equity predictions.
             </p>
           </div>
 
