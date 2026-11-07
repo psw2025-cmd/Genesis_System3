@@ -377,6 +377,12 @@ jobs:
           set -euo pipefail
           python -m pytest tests/test_paper_selftest_truth.py -o addopts="" -v --tb=short
 
+      - name: Closed market and stale forecast PAPER entry gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_pipeline_market_entry_guards.py -o addopts="" -v --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
