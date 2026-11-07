@@ -36,3 +36,13 @@ def test_forecast_and_order_persist_indian_time(tmp_path,monkeypatch):
         assert row["created_ist"].endswith("+05:30")
         assert datetime.fromisoformat(row["created_ist"]).astimezone(timezone.utc)==datetime.fromisoformat(row["created_utc"])
     assert position["entry_time_ist"]==order["created_ist"]
+
+@pytest.mark.parametrize("minute_index", range(300))
+def test_300_timestamp_roundtrip_scenarios(minute_index):
+    """300 real UTC-to-IST conversion checks spanning midnight and date rollover."""
+    from datetime import timedelta
+    utc=datetime(2026,11,6,19,0,tzinfo=timezone.utc)+timedelta(minutes=minute_index)
+    local=datetime.fromisoformat(p._ist_event_time(utc.isoformat()))
+    assert local.utcoffset()==timedelta(hours=5,minutes=30)
+    assert local.astimezone(timezone.utc)==utc
+    assert local.date().isoformat()==(utc+timedelta(hours=5,minutes=30)).date().isoformat()
