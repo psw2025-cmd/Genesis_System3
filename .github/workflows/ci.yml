@@ -454,6 +454,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_paper_position_corruption_400.py -o addopts="" --tb=short
 
+      - name: PAPER synthetic market replay 400 scenarios
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_paper_market_replay_400.py -o addopts="" --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
