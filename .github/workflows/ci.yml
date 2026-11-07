@@ -444,6 +444,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_paper_cumulative_exposure.py -o addopts="" --tb=short
 
+      - name: PAPER event IST timestamp regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_paper_ist_event_timestamps.py -o addopts="" --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
