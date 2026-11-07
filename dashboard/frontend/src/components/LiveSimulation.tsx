@@ -174,6 +174,24 @@ export function LiveSimulation() {
         )}
       </div>
 
+      <div data-testid="synthetic-trade-outcome-audit" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Trade-wise Prediction vs Outcome Audit</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>SYNTHETIC EXAMPLE ONLY — NOT NSE/BSE PERFORMANCE OR MODEL LEARNING</p>
+        <p>Scenario: {scenario} · Replay step: {replayStep} · Source: {lifecycle?.source ?? 'UNAVAILABLE'}</p>
+        <p>Predicted gain %: NOT AVAILABLE — no immutable entry-time prediction snapshot</p>
+        <p>Actual gross gain % (synthetic): {lifecycle?.closed_positions?.length && lifecycle?.fills?.length === 2 && Number(lifecycle.fills[0]?.price) > 0 && Number(lifecycle.fills[1]?.price) > 0
+          ? `${(((Number(lifecycle.fills[1].price) / Number(lifecycle.fills[0].price)) - 1) * 100).toFixed(2)}%`
+          : 'NOT AVAILABLE — synthetic closing fill required'}</p>
+        <p>Entry timestamp (UTC): {lifecycle?.fills?.[0]?.timestamp_utc ?? 'NOT AVAILABLE'}</p>
+        <p>Exit timestamp (UTC): {lifecycle?.fills?.[1]?.timestamp_utc ?? 'NOT AVAILABLE'}</p>
+        <p>Holding duration: {lifecycle?.fills?.length === 2 && Number.isFinite(Date.parse(lifecycle.fills[0]?.timestamp_utc)) && Number.isFinite(Date.parse(lifecycle.fills[1]?.timestamp_utc))
+          ? `${((Date.parse(lifecycle.fills[1].timestamp_utc) - Date.parse(lifecycle.fills[0].timestamp_utc)) / 1000).toFixed(0)} seconds`
+          : 'NOT AVAILABLE'}</p>
+        <p>Actual NSE/BSE top CE/PE gain: NOT VERIFIED · Ranking/score: NOT AVAILABLE</p>
+        <p>Gross vs market-top gap: NOT VERIFIED · Charges / net gain: NOT VERIFIED</p>
+        <p>Auto-learning: NOT TRAINED · Training examples verified: 0 in this isolated demonstration</p>
+      </div>
+
       <div data-testid="synthetic-market-replay" style={{ ...cardStyle(), marginBottom: '14px' }}>
         <h2 style={{ marginTop: 0 }}>Synthetic Market Replay · Existing Sim Live</h2>
         <p style={{ color: 'var(--amber)', fontWeight: 800 }}>SYNTHETIC TEST DATA — NOT DHAN LIVE — NO REAL BROKER ORDERS</p>
