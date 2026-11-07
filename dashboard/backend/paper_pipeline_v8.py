@@ -70,7 +70,7 @@ def _append_jsonl_once(path: Path, row: Dict[str, Any], key: str) -> bool:
         return False
     serialized = json.dumps(row, default=str, allow_nan=False)
     with path.open("a", encoding="utf-8") as f:
-        f.write(serialized + "\\n")
+        f.write(serialized + "\n")
     return True
 
 
