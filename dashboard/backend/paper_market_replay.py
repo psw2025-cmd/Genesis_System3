@@ -19,7 +19,8 @@ class MarketTick:
 def replay_paper_buy(ticks: Iterable[MarketTick], qty: int, capital_limit: float = 50000.0,
                      max_quote_age_seconds: float = 3.0) -> dict:
     """Simulate a limit-free market BUY using available ask liquidity, fail-closed."""
-    if type(qty) is not int or qty <= 0 or not isfinite(capital_limit) or capital_limit <= 0:
+    if (type(qty) is not int or qty <= 0 or not isfinite(capital_limit) or capital_limit <= 0 or
+            not isfinite(max_quote_age_seconds) or max_quote_age_seconds <= 0):
         raise ValueError("PAPER_REPLAY_INVALID_RISK")
     remaining = qty
     fills = []
