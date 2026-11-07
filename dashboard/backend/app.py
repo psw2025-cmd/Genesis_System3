@@ -9266,12 +9266,29 @@ async def get_backtest_results():
             costed = json.loads(costed_path.read_text(encoding="utf-8"))
     except Exception as exc:
         costed = {"error": str(exc)[:160]}
-    # Operator view: never dump repo file-path "candidates_sample" as trade evidence.
+    # Repository report files are not independent proof of actual backtesting.
+    # Never present their contents as verified trades, returns or P&L.
     summary = _sanitize_backtest_operator_summary(summary)
     return {
-        "status": "ok",
-        "summary": summary,
-        "costed_walkforward": costed,
+        "status": "NOT_VERIFIED",
+        "passed": False,
+        "verification_status": "NOT_VERIFIED",
+        "reason_if_unverified": (
+            "Local report artifacts exist, but historical market provenance, "
+            "fill reconciliation, cost model and walk-forward results have not "
+            "been independently verified."
+        ),
+        "summary": {
+            "total_trades": None,
+            "win_rate": None,
+            "profit_factor": None,
+            "net_pnl": None,
+            "max_drawdown_pct": None,
+            "sharpe_ratio": None,
+            "avg_trade_expectancy": None,
+            "passed": False,
+        },
+        "costed_walkforward": None,
         "source_dir": str(base),
         "live_trading_enabled": False,
     }

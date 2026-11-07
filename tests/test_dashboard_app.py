@@ -370,3 +370,18 @@ def test_order_create_rejected_when_kill_switch_active(app, monkeypatch, tmp_pat
     )
     assert data["status"] == "ERROR"
     assert "kill switch" in data["message"].lower()
+
+
+def test_actual_backtest_route_never_certifies_unverified_report_files(app):
+    """The real /api/backtest/results route must fail closed, not just a helper."""
+    status, _, body = call(app, "GET", "/api/backtest/results")
+    assert status == 200
+    result = json.loads(body)
+    assert result.get("status") in ("NOT_VERIFIED", "no_data")
+    assert result.get("passed") is not True
+    assert result.get("live_trading_enabled") is False or result.get("status") == "no_data"
+    if result.get("status") == "NOT_VERIFIED":
+        assert result["verification_status"] == "NOT_VERIFIED"
+        assert result["summary"]["net_pnl"] is None
+        assert result["summary"]["win_rate"] is None
+        assert result["costed_walkforward"] is None
