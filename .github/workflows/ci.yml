@@ -365,6 +365,12 @@ jobs:
           python -m pytest tests/test_cloud_run_source_integrity_gate.py -o addopts="" -v --tb=short
           echo "cloud_run_healthz_source_contract=PASS"
 
+      - name: Offline virtual market paper lifecycle regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_virtual_market_lifecycle.py -o addopts="" -v --tb=short
+
       - name: Upload proof pack artifact
         uses: actions/upload-artifact@v4
         if: always()
