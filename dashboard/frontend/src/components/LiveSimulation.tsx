@@ -67,6 +67,7 @@ export function LiveSimulation() {
   const [replayStep, setReplayStep] = useState(0)
   const [replay, setReplay] = useState<any>(null)
   const [lifecycle, setLifecycle] = useState<any>(null)
+  const [lifecycleError, setLifecycleError] = useState<string | null>(null)
   const [replayError, setReplayError] = useState<string | null>(null)
   const [data, setData] = useState<BackendSimState | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -99,7 +100,7 @@ export function LiveSimulation() {
     let cancelled = false
     fetch(`/api/simulation/replay/state?scenario=${encodeURIComponent(scenario)}&step=${replayStep}`, { credentials: 'include' })
       .then(res => { if (!res.ok) throw new Error(`replay API HTTP ${res.status}`); return res.json() })
-      .then(payload => { if (!cancelled) { setReplay(payload); setReplayError(null) } })
+      .then(payload => { if (!cancelled) { setReplay(payload?.scenario === scenario && payload?.step === replayStep ? payload : null); setReplayError(payload?.scenario === scenario && payload?.step === replayStep ? null : 'REPLAY_PROVENANCE_MISMATCH') } })
       .catch(err => { if (!cancelled) { setReplay(null); setReplayError(String(err)) } })
     return () => { cancelled = true }
   }, [scenario, replayStep])
@@ -108,8 +109,8 @@ export function LiveSimulation() {
     let cancelled = false
     fetch(`/api/simulation/replay/lifecycle?scenario=${encodeURIComponent(scenario)}&step=${replayStep}`, { credentials: 'include' })
       .then(res => { if (!res.ok) throw new Error(`lifecycle API HTTP ${res.status}`); return res.json() })
-      .then(payload => { if (!cancelled) setLifecycle(payload) })
-      .catch(() => { if (!cancelled) setLifecycle(null) })
+      .then(payload => { if (!cancelled) { const valid = payload?.mode === 'SYNTHETIC_PAPER_ONLY' && payload?.source === 'DETERMINISTIC_SYNTHETIC_MARKET' && payload?.broker_orders === false && payload?.scenario === scenario && payload?.step === replayStep; setLifecycle(valid ? payload : null); setLifecycleError(valid ? null : 'LIFECYCLE_PROVENANCE_MISMATCH') } })
+      .catch(err => { if (!cancelled) { setLifecycle(null); setLifecycleError(String(err)) } })
     return () => { cancelled = true }
   }, [scenario, replayStep])
 
@@ -149,7 +150,7 @@ export function LiveSimulation() {
           {([{ step: 0, label: 'Reset / Before BUY' }, { step: 5, label: 'Simulate BUY / Open' }, { step: 30, label: 'Simulate SELL / Closed' }] as const).map(stage => (
             <button type="button" key={stage.step} data-testid={`synthetic-step-${stage.step}`}
               aria-pressed={replayStep === stage.step}
-              onClick={() => { setReplayStep(stage.step); setLifecycle(null); setReplay(null) }}
+              onClick={() => { setReplayStep(stage.step); setLifecycle(null); setReplay(null); setLifecycleError(null); setReplayError(null) }}
               style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer',
                 border: replayStep === stage.step ? '2px solid var(--up)' : '1px solid var(--text-mut)',
                 background: 'rgba(15,23,42,.6)', color: 'var(--text-primary)' }}>
@@ -159,6 +160,7 @@ export function LiveSimulation() {
         </div>
         <p>Virtual market step: {replayStep} · Stage controls change synthetic evidence only, never broker or persistent PAPER ledger.</p>
 
+        {lifecycleError && <p role="alert">Synthetic lifecycle blocked: {lifecycleError}</p>}
         {!lifecycle ? <p>Lifecycle evidence unavailable</p> : (
           <>
             <p>Orders: {lifecycle.order_count} · Simulated fills: {lifecycle.fill_count} · Open positions: {lifecycle.positions?.length ?? 0} · Closed: {lifecycle.closed_positions?.length ?? 0}</p>
