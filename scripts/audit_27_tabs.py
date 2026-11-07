@@ -101,6 +101,11 @@ def audit_tabs():
         
     return report
 
+def audit_exit_code(results, strict=False):
+    """Nonzero only for failed checks in strict mode; preserve report-only mode."""
+    return 1 if strict and any(not row.get("pass", False) for row in results) else 0
+
+
 if __name__ == "__main__":
     results = audit_tabs()
     out_dir = os.environ.get("GENESIS_AUDIT_OUTPUT_DIR", os.path.join("reports", "latest", "ui_surface_static_audit"))
@@ -140,3 +145,5 @@ if __name__ == "__main__":
     print(f"JSON: {json_path}")
     print(f"TXT:  {txt_path}")
     print("\n".join(lines[:30]))
+    if os.environ.get("GENESIS_UI_AUDIT_STRICT", "0") == "1":
+        raise SystemExit(audit_exit_code(results, strict=True))
