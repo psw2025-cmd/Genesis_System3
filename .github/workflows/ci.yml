@@ -371,6 +371,12 @@ jobs:
           set -euo pipefail
           python -m pytest tests/test_paper_pipeline_ledger_integrity.py -o addopts="" -v --tb=short
 
+      - name: Paper pipeline executable self-test truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_selftest_truth.py -o addopts="" -v --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
