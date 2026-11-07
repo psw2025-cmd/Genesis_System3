@@ -474,10 +474,45 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
         except (ValueError, TypeError):
             capital_limit = float("nan")
         order_value = entry_price * qty
+        # A new order must fit alongside all existing open PAPER positions.
+        # Corrupt position evidence must never be interpreted as zero exposure.
+        try:
+            if paths["positions"].exists():
+                saved_positions = json.loads(paths["positions"].read_text(encoding="utf-8"))
+                if not isinstance(saved_positions, dict) or not isinstance(saved_positions.get("positions"), list):
+                    raise ValueError("PAPER_POSITIONS_INVALID")
+                existing_positions = saved_positions["positions"]
+            else:
+                existing_positions = []
+            open_exposure = 0.0
+            for position in existing_positions:
+                if not isinstance(position, dict):
+                    raise ValueError("PAPER_POSITION_INVALID_ROW")
+                if position.get("status") != "PAPER_OPEN":
+                    continue
+                held_qty = float(position["qty"])
+                held_price = float(position["entry_price"])
+                held_value = held_qty * held_price
+                if (not math.isfinite(held_value) or held_qty <= 0
+                        or held_price <= 0):
+                    raise ValueError("PAPER_POSITION_INVALID_VALUE")
+                open_exposure += held_value
+            if not math.isfinite(open_exposure):
+                raise ValueError("PAPER_EXPOSURE_INVALID")
+        except (OSError, ValueError, TypeError, KeyError, OverflowError) as exc:
+            reason = "PAPER_EXPOSURE_UNVERIFIED"
+            blocked = {"block_id": _row_id(forecast_id, reason),
+                       "created_utc": _utc_now(), "forecast_id": forecast_id,
+                       "underlying": underlying, "reason": reason,
+                       "scope": "trade_only_forecast_kept"}
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
         if (not math.isfinite(capital_limit) or capital_limit <= 0
                 or not isinstance(qty, (int, float))
                 or not math.isfinite(float(qty)) or qty <= 0
-                or not math.isfinite(order_value) or order_value > capital_limit):
+                or not math.isfinite(order_value) or order_value + open_exposure > capital_limit):
             reason = "PAPER_CAPITAL_LIMIT_BLOCK"
             blocked = {"block_id": _row_id(forecast_id, reason),
                        "created_utc": _utc_now(), "forecast_id": forecast_id,
