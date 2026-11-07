@@ -211,7 +211,9 @@ def scan_segment_contracts(
             continue
         ltp, prev, change_rs, gain = compute_contract_gain(c)
         if (gain is None or ltp is None or not math.isfinite(gain)
-                or not math.isfinite(ltp) or ltp < min_ltp):
+                or not math.isfinite(ltp)
+                or (prev is not None and not math.isfinite(prev))
+                or ltp < min_ltp):
             continue
         try:
             vol = int(c.get("volume") or 0)
