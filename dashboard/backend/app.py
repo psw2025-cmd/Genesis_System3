@@ -7028,6 +7028,19 @@ async def get_synthetic_market_replay_state(scenario: str = "trend", step: int =
     }
 
 
+@app.get("/api/simulation/replay/lifecycle")
+async def get_synthetic_paper_lifecycle(scenario: str = "trend", step: int = 0):
+    """Isolated synthetic lifecycle for existing Sim Live UI; no broker or real ledger writes."""
+    try:
+        from dashboard.backend.synthetic_paper_lifecycle import virtual_paper_lifecycle
+    except ImportError:
+        from synthetic_paper_lifecycle import virtual_paper_lifecycle
+    try:
+        return virtual_paper_lifecycle(scenario, step)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
 @app.post("/api/positions/{position_id}/close")
 async def close_position(position_id: str):
     """Manually close a position through the paper engine's own ledger.
