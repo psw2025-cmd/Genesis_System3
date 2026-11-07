@@ -427,6 +427,13 @@ jobs:
             tests/test_paper_quote_provenance.py \
             tests/test_paper_ledger_read_integrity.py
 
+      - name: PAPER quote 200-case input matrix
+        shell: bash
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          python -m pytest -q tests/test_paper_quote_200_matrix.py -o addopts="" --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
