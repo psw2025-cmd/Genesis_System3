@@ -1,6 +1,6 @@
 """PAPER-only scanner truth guards; no network or broker orders."""
 from datetime import datetime, timedelta, timezone
-from dashboard.backend.contract_gain_scanner import scan_segment_contracts, merge_market_top_reports
+from dashboard.backend.contract_gain_scanner import scan_segment_contracts, merge_market_top_reports, scan_all_segments_from_chains
 
 def _contract(**overrides):
     today = datetime.now(timezone(timedelta(hours=5, minutes=30))).date()
@@ -80,3 +80,14 @@ def test_negative_volume_is_never_ranked_even_without_volume_floor():
     assert result["contracts_scored"] == 1
     assert result["top_ce"] is None
     assert result["top_pe"] is not None
+
+def test_nonobject_chain_payload_is_reported_without_crashing():
+    result = scan_all_segments_from_chains({"NIFTY": "bad", "BANKNIFTY": None})
+    assert result["contracts_scored_total"] == 0
+    assert result["by_underlying"]["NIFTY"]["status"] == "INVALID_CHAIN_PAYLOAD"
+    assert result["by_underlying"]["BANKNIFTY"]["top_ce"] is None
+
+def test_nonlist_contracts_payload_is_not_iterated_as_valid_rows():
+    result = scan_all_segments_from_chains({"NIFTY": {"contracts": {"CE": _contract()}}})
+    assert result["contracts_scored_total"] == 0
+    assert result["by_underlying"]["NIFTY"]["status"] == "INVALID_CONTRACTS_PAYLOAD"
