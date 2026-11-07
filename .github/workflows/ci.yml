@@ -365,6 +365,12 @@ jobs:
           python -m pytest tests/test_cloud_run_source_integrity_gate.py -o addopts="" -v --tb=short
           echo "cloud_run_healthz_source_contract=PASS"
 
+      - name: Paper pipeline executable self-test truth
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_selftest_truth.py -o addopts="" -v --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
