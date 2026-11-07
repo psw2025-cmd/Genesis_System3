@@ -6999,8 +6999,8 @@ async def get_synthetic_market_replay_state(scenario: str = "trend", step: int =
     anchor = datetime(2026, 11, 9, 3, 45, tzinfo=timezone.utc)
     drift = {"trend": 0.4, "range": 0.0, "volatile": -0.2}[scenario]
     wiggle = ((step % 11) - 5) * {"trend": 0.2, "range": 0.8, "volatile": 2.0}[scenario]
-    ask = round(100 + drift * step + wiggle, 2)
-    bid = round(ask - 0.5, 2)
+    ask = round(max(1.0, 100 + drift * step + wiggle), 2)
+    bid = round(max(0.01, ask - 0.5), 2)
     stamp = (anchor + timedelta(seconds=step)).isoformat()
     tick = MarketTick(timestamp=stamp, bid=bid, ask=ask, available_qty=25)
     result = replay_paper_buy([tick], qty=25)
