@@ -249,7 +249,7 @@ def _is_real_dhan_chain_payload(data: Dict[str, Any]) -> bool:
 
 
 def _contract_has_dhan_source(contract: Dict[str, Any]) -> bool:
-    source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "dhan").lower()
+    source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "").lower()
     return source == "dhan"
 
 
