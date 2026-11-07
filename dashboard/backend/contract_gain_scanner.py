@@ -487,14 +487,20 @@ def merge_market_top_reports(base: Dict[str, Any], incoming: Dict[str, Any], mar
     by_key: Dict[str, Dict[str, Any]] = {}
     for report in (base, incoming):
         for row in report.get("market_top_table") or []:
-            if not isinstance(row, dict):
+            if not is_actionable_gainer_row(row):
+                continue
+            try:
+                gain = float(row.get("gain_pct"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(gain):
                 continue
             key = (
                 f"{row.get('underlying')}|{row.get('option_type')}|{row.get('strike')}|"
                 f"{row.get('expiry_date') or row.get('expiry')}"
             )
             prev = by_key.get(key)
-            if prev is None or float(row.get("gain_pct") or -1e18) >= float(prev.get("gain_pct") or -1e18):
+            if prev is None or gain >= float(prev.get("gain_pct") or 0):
                 by_key[key] = dict(row)
     combined = sorted(by_key.values(), key=lambda x: float(x.get("gain_pct") or 0), reverse=True)
     refreshed_at = incoming.get("refreshed_at") or base.get("refreshed_at") or _ist_now_str()
