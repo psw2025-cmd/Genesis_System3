@@ -236,12 +236,16 @@ def _is_real_dhan_chain_payload(data: Dict[str, Any]) -> bool:
     combined = f"{data_source} {source_priority}"
     if any(bad in combined for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse")):
         return False
-    return data_source == "dhan"
+    if data_source != "dhan":
+        return False
+    if status in ("MARKET_CLOSED", "CLOSED", "NO_DATA", "ERROR", "NOT_VERIFIED"):
+        return False
+    return True
 
 
 def _contract_has_dhan_source(contract: Dict[str, Any]) -> bool:
     source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "dhan").lower()
-    return not any(bad in source for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse"))
+    return source == "dhan"
 
 
 def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[float]) -> Tuple[Optional[Dict[str, Any]], str]:
