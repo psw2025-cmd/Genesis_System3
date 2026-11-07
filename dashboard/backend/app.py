@@ -6980,6 +6980,54 @@ async def get_simulation_live_state(scenario: str = "paper_analyzer"):
     }
 
 
+@app.get("/api/simulation/replay/state")
+async def get_synthetic_market_replay_state(scenario: str = "trend", step: int = 0):
+    """Isolated deterministic market-like PAPER evidence for existing Sim Live UI.
+
+    No broker access, no writes, no production quote or trade authority.
+    """
+    from datetime import timedelta
+    try:
+        from dashboard.backend.paper_market_replay import MarketTick, replay_paper_buy
+    except ImportError:
+        from paper_market_replay import MarketTick, replay_paper_buy
+
+    if scenario not in {"trend", "range", "volatile"}:
+        raise HTTPException(status_code=400, detail="INVALID_REPLAY_SCENARIO")
+    if step < 0 or step > 3600:
+        raise HTTPException(status_code=400, detail="INVALID_REPLAY_STEP")
+    anchor = datetime(2026, 11, 9, 3, 45, tzinfo=timezone.utc)
+    drift = {"trend": 0.4, "range": 0.0, "volatile": -0.2}[scenario]
+    wiggle = ((step % 11) - 5) * {"trend": 0.2, "range": 0.8, "volatile": 2.0}[scenario]
+    ask = round(100 + drift * step + wiggle, 2)
+    bid = round(ask - 0.5, 2)
+    stamp = (anchor + timedelta(seconds=step)).isoformat()
+    tick = MarketTick(timestamp=stamp, bid=bid, ask=ask, available_qty=25)
+    result = replay_paper_buy([tick], qty=25)
+    return {
+        "status": "SYNTHETIC_REPLAY",
+        "mode": "PAPER_SIMULATION_ONLY",
+        "scenario": scenario,
+        "step": step,
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "market_timestamp_utc": stamp,
+        "market_timestamp_ist": (anchor + timedelta(seconds=step)).astimezone(IST).isoformat(),
+        "source": "DHAN_REPLAY_SYNTHETIC",
+        "broker_connected": False,
+        "real_broker_routes_called": False,
+        "order_placement_allowed": False,
+        "quote": {"underlying": "NIFTY", "option_side": "CE", "bid": bid, "ask": ask,
+                  "available_qty": tick.available_qty, "source": tick.source},
+        "paper_order": {"paper_order_id": f"SYNTHETIC-{scenario}-{step}", "qty": 25,
+                        "status": result["status"], "source": "SYNTHETIC_REPLAY"},
+        "paper_fills": result["fills"],
+        "filled_qty": result["filled_qty"],
+        "remaining_qty": result.get("remaining_qty", 0),
+        "pnl_verification_status": "NOT_VERIFIED",
+        "reason": "Synthetic scenario only; no independently reconciled closing fills or charges",
+    }
+
+
 @app.post("/api/positions/{position_id}/close")
 async def close_position(position_id: str):
     """Manually close a position through the paper engine's own ledger.
