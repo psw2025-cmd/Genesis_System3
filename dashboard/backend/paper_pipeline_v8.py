@@ -29,6 +29,16 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _ist_event_time(utc_timestamp: str) -> str:
+    """Convert an immutable UTC event time to timezone-aware India time."""
+    from zoneinfo import ZoneInfo
+
+    parsed = datetime.fromisoformat(utc_timestamp.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("PAPER_EVENT_TIMESTAMP_MISSING_TIMEZONE")
+    return parsed.astimezone(ZoneInfo("Asia/Kolkata")).isoformat()
+
+
 def _today_ist() -> str:
     try:
         from zoneinfo import ZoneInfo
@@ -341,6 +351,7 @@ def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
             "unrealized_pnl": 0.0,
             "status": "PAPER_OPEN",
             "entry_time": order["created_utc"],
+            "entry_time_ist": order["created_ist"],
             "signal_source": "core_pipeline_v8",
             "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE",
         })
@@ -424,6 +435,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "source": prediction_source,
             "raw": pred.get("raw"),
         }
+        forecast["created_ist"] = _ist_event_time(forecast["created_utc"])
         if _append_jsonl_once(paths["forecast"], forecast, "forecast_id"):
             result["forecasts_written"] += 1
 
@@ -544,6 +556,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "quote_source_priority": quote.get("chain_source_priority"),
             "source": "core_pipeline_v8",
         }
+        order["created_ist"] = _ist_event_time(order["created_utc"])
         if _append_jsonl_once(paths["orders"], order, "paper_order_id"):
             result["paper_orders_written"] += 1
             result["paper_orders"].append(order)
