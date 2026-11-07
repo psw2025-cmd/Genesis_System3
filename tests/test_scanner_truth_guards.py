@@ -91,3 +91,11 @@ def test_nonlist_contracts_payload_is_not_iterated_as_valid_rows():
     result = scan_all_segments_from_chains({"NIFTY": {"contracts": {"CE": _contract()}}})
     assert result["contracts_scored_total"] == 0
     assert result["by_underlying"]["NIFTY"]["status"] == "INVALID_CONTRACTS_PAYLOAD"
+
+def test_top_level_malformed_chain_collection_fails_closed():
+    for payload in (None, [], "bad", 123):
+        result = scan_all_segments_from_chains(payload)
+        assert result["contracts_scored_total"] == 0
+        assert result["underlyings_scanned"] == 0
+        assert result["market_wide"]["top_ce"] is None
+        assert result["market_wide"]["top_pe"] is None
