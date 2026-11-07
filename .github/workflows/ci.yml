@@ -401,6 +401,32 @@ jobs:
           set -euo pipefail
           python -m pytest tests/test_paper_ledger_read_integrity.py -o addopts="" -v --tb=short
 
+      - name: Ten-minute actual PAPER pipeline regression gate
+        shell: bash
+        timeout-minutes: 10
+        env:
+          PAPER_MODE: '1'
+          ANALYZE_MODE: '1'
+          LIVE_TRADING_ENABLED: '0'
+          SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+          LIVE_ORDER_AUTHORITY: '0'
+          AUTO_EXECUTE_TRADES: '0'
+          ORDER_PLACEMENT_ALLOWED: 'false'
+          USE_LIVE_EXECUTION_ENGINE: '0'
+          CLOUD_PAPER_ENGINE: '0'
+          REAL_BROKER_ORDERS: '0'
+          PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
+        run: |
+          set -euo pipefail
+          python -m pytest -q -o addopts="" --tb=short \
+            tests/test_paper_pipeline_v8_dhan_only.py \
+            tests/test_paper_pipeline_ledger_integrity.py \
+            tests/test_paper_selftest_truth.py \
+            tests/test_paper_pipeline_market_entry_guards.py \
+            tests/test_paper_pnl_summary_integrity.py \
+            tests/test_paper_quote_provenance.py \
+            tests/test_paper_ledger_read_integrity.py
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
