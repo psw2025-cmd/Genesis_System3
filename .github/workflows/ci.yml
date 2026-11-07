@@ -284,6 +284,13 @@ jobs:
             tests/test_dhan_market_ltp.py \
             -v --tb=short
 
+      - name: Scanner CE PE truth and merge regression proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_scanner_truth_guards.py tests/test_actionable_gainer_contract.py -o addopts="" -v --tb=short
+          echo "scanner_truth_regression=PASS"
+
       - name: QC fail-closed targeted proof
         shell: bash
         run: |
