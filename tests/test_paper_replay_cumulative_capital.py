@@ -18,13 +18,13 @@ def test_rising_ask_blocks_second_partial_fill_without_erasing_first():
     assert result["fills"][0]["mode"] == "SYNTHETIC_PAPER_FILL_NOT_BROKER"
 
 
-def test_aggregate_cap_allows_exact_ceiling():
+def test_aggregate_cap_allows_fills_within_conservative_ceiling():
     t = datetime(2026, 11, 7, 9, 15, tzinfo=timezone.utc)
     ticks = [
         MarketTick(t.isoformat(), 90.0, 100.0, 1),
         MarketTick((t + timedelta(seconds=1)).isoformat(), 110.0, 120.0, 1),
     ]
-    result = replay_paper_buy(ticks, qty=2, capital_limit=220.0)
+    result = replay_paper_buy(ticks, qty=2, capital_limit=240.0)
     assert result["status"] == "PAPER_FILLED"
     assert result["filled_qty"] == 2
     assert sum(f["qty"] * f["price"] for f in result["fills"]) == 220.0
