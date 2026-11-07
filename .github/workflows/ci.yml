@@ -90,7 +90,8 @@ jobs:
             echo "FAIL: self-hosted runner found. Global safety CI must not execute on a laptop/local runner."
             exit 1
           fi
-          expected_hosted_jobs=5
+          # Five blocking proof jobs plus the fail-closed required ci aggregator.
+          expected_hosted_jobs=6
           actual_hosted_jobs=$(grep -cE "runs-on:[[:space:]]*ubuntu-latest" .github/workflows/ci.yml)
           test "$actual_hosted_jobs" -eq "$expected_hosted_jobs" || {
             echo "FAIL: expected ${expected_hosted_jobs} ubuntu-latest jobs, found ${actual_hosted_jobs}"
