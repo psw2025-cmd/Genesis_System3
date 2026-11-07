@@ -365,6 +365,12 @@ jobs:
           python -m pytest tests/test_cloud_run_source_integrity_gate.py -o addopts="" -v --tb=short
           echo "cloud_run_healthz_source_contract=PASS"
 
+      - name: Paper ledger integrity and invalid quote regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_pipeline_ledger_integrity.py -o addopts="" -v --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
