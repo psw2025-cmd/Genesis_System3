@@ -7,9 +7,9 @@ def row(ts):
     return OutcomeRow(ts=ts,symbol="NIFTY",side="CE",strategy="S1",return_pct=.01,source="TEST")
 
 def test_unsorted_and_timezone_offset_windows_are_chronological():
-    rows=[row("2026-01-01T09:00:00+05:30"),row("2026-01-01T04:00:00Z"),
-          row("2026-01-01T09:30:00+05:30"),row("2026-01-01T04:30:00Z"),
-          row("2026-01-01T10:00:00+05:30"),row("2026-01-01T05:00:00Z")]
+    rows=[row("2026-01-01T09:00:00+05:30"),row("2026-01-01T04:01:00Z"),
+          row("2026-01-01T09:30:00+05:30"),row("2026-01-01T04:31:00Z"),
+          row("2026-01-01T10:00:00+05:30"),row("2026-01-01T05:01:00Z")]
     windows=walk_forward_windows(list(reversed(rows)),2,2)
     assert windows
     for train,test in windows:
