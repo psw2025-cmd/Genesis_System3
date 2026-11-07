@@ -65,6 +65,7 @@ export function LiveSimulation() {
   const [scenario, setScenario] = useState<'trend' | 'range' | 'volatile'>('trend')
   const [tick, setTick] = useState(0)
   const [replay, setReplay] = useState<any>(null)
+  const [lifecycle, setLifecycle] = useState<any>(null)
   const [replayError, setReplayError] = useState<string | null>(null)
   const [data, setData] = useState<BackendSimState | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -102,6 +103,15 @@ export function LiveSimulation() {
     return () => { cancelled = true }
   }, [scenario, tick])
 
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/simulation/replay/lifecycle?scenario=${encodeURIComponent(scenario)}&step=${Math.min(tick, 3600)}`, { credentials: 'include' })
+      .then(res => { if (!res.ok) throw new Error(`lifecycle API HTTP ${res.status}`); return res.json() })
+      .then(payload => { if (!cancelled) setLifecycle(payload) })
+      .catch(() => { if (!cancelled) setLifecycle(null) })
+    return () => { cancelled = true }
+  }, [scenario, tick])
+
   const rows = data?.positions || []
   const rawPnl = data?.paper?.total_pnl ?? (rows.length ? rows.reduce((a, r) => a + Number(r.pnl ?? 0), 0) : null)
   const totalPnl = rawPnl == null ? null : Number(rawPnl)
@@ -130,6 +140,22 @@ export function LiveSimulation() {
           Backend simulation API unavailable: {error}. Expected local route: /api/simulation/live/state.
         </div>
       )}
+
+      <div data-testid="synthetic-paper-lifecycle" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Synthetic PAPER Lifecycle · Order / Fill / Position / Exit</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>ISOLATED VIRTUAL MARKET — NOT REAL TRADES OR VERIFIED PROFIT</p>
+        {!lifecycle ? <p>Lifecycle evidence unavailable</p> : (
+          <>
+            <p>Orders: {lifecycle.order_count} · Simulated fills: {lifecycle.fill_count} · Open positions: {lifecycle.positions?.length ?? 0} · Closed: {lifecycle.closed_positions?.length ?? 0}</p>
+            <p>Capital limit: ₹{lifecycle.capital_limit_inr} · Daily loss limit target: ₹{lifecycle.daily_loss_limit_inr} · Broker orders: NEVER</p>
+            <p>Order Book: {lifecycle.orders?.map((o: any) => `${o.order_id} ${o.side} ${o.status}`).join(' | ') || 'No orders yet'}</p>
+            <p>Trade Book: {lifecycle.fills?.map((f: any) => `${f.fill_id} ${f.side} ${f.qty} @ ₹${f.price}`).join(' | ') || 'No simulated fills yet'}</p>
+            <p>Position Book: {lifecycle.positions?.map((p: any) => `${p.position_id} qty ${p.qty} mark ₹${p.mark_price}`).join(' | ') || 'No open position'}</p>
+            <p>Closed gross P&amp;L (synthetic): {lifecycle.closed_positions?.map((p: any) => `₹${p.gross_pnl}`).join(', ') || 'Pending exit'}</p>
+            <p>Net P&amp;L: NOT VERIFIED · Charges: NOT VERIFIED · Source: {lifecycle.source}</p>
+          </>
+        )}
+      </div>
 
       <div data-testid="synthetic-market-replay" style={{ ...cardStyle(), marginBottom: '14px' }}>
         <h2 style={{ marginTop: 0 }}>Synthetic Market Replay · Existing Sim Live</h2>
