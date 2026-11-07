@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,21 +53,24 @@ def _write_json(path: Path, data: Any) -> None:
 
 
 def _append_jsonl_once(path: Path, row: Dict[str, Any], key: str) -> bool:
+    """Fail closed on corrupt ledgers, never silently append to unreadable history."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    if key not in row or row[key] is None or str(row[key]) == "":
+        raise ValueError("PAPER_LEDGER_MISSING_ID")
     existing = set()
     if path.exists():
-        try:
-            for line in path.read_text(encoding="utf-8").splitlines():
-                if line.strip():
-                    item = json.loads(line)
-                    if key in item:
-                        existing.add(str(item[key]))
-        except Exception:
-            pass
-    if str(row.get(key)) in existing:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            item = json.loads(line)  # Corrupt history must stop paper writes.
+            if not isinstance(item, dict) or key not in item:
+                raise ValueError("PAPER_LEDGER_INVALID_HISTORY")
+            existing.add(str(item[key]))
+    if str(row[key]) in existing:
         return False
+    serialized = json.dumps(row, default=str, allow_nan=False)
     with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(row, default=str) + "\n")
+        f.write(serialized + "\\n")
     return True
 
 
@@ -265,13 +269,15 @@ def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[flo
                 ltp_f = float(ltp)
             except Exception:
                 continue
-            if ltp_f <= 0:
+            if not math.isfinite(ltp_f) or ltp_f <= 0:
                 continue
             strike = c.get("strike") or c.get("strike_price")
             try:
                 strike_f = float(strike) if strike is not None else None
             except Exception:
                 strike_f = None
+            if strike_f is not None and not math.isfinite(strike_f):
+                continue
             rows.append((abs((strike_f or (spot or 0)) - (spot or (strike_f or 0))), c, ltp_f))
         if rows:
             rows.sort(key=lambda x: x[0])
