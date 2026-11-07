@@ -34,3 +34,16 @@ def test_no_mutation_and_default_expiry():
     result = scan_segment_contracts([row], "NIFTY", default_expiry=(today + timedelta(days=7)).isoformat())
     assert result["contracts_scored"] == 1
     assert row == original
+
+def test_nonfinite_prices_and_gains_are_not_ranked():
+    for invalid in (float("nan"), float("inf"), float("-inf")):
+        result = scan_segment_contracts([_contract(ltp=invalid)], "NIFTY")
+        assert result["contracts_scored"] == 0
+        result = scan_segment_contracts([_contract(previous_close=invalid)], "NIFTY")
+        assert result["contracts_scored"] == 0
+
+def test_valid_pe_and_ce_both_ranked():
+    result = scan_segment_contracts([_contract(), _contract(option_type="PE", trading_symbol="NIFTY-PE")], "NIFTY")
+    assert result["contracts_scored"] == 2
+    assert result["top_ce"]["option_type"] == "CE"
+    assert result["top_pe"]["option_type"] == "PE"
