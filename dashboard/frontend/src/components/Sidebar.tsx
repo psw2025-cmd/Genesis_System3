@@ -2,7 +2,7 @@ import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
   Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
-  Search, Zap, ListChecks
+  Search, Zap, ListChecks, Smartphone
 } from 'lucide-react'
 import { useStore } from '../store'
 
@@ -18,6 +18,7 @@ export const DASHBOARD_TABS = [
   { id: 'signals',        label: 'Signals',        Icon: TrendingUp,      group: 'market' },
   { id: 'trade',          label: 'Trade',          Icon: FileText,        group: 'trading' },
   { id: 'paper',          label: 'Paper Trades',   Icon: BookOpen,        group: 'trading' },
+  { id: 'mobile-trader', label: 'Mobile Trader', Icon: Smartphone, group: 'trading' },
   { id: 'positions',      label: 'Positions',      Icon: Database,        group: 'trading' },
   { id: 'risk-scenarios', label: 'Risk & Scenarios', Icon: Shield,        group: 'analysis' },
   { id: 'multibagger',    label: 'Multibagger', Icon: Sparkles,        group: 'analysis' },
