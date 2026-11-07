@@ -266,6 +266,8 @@ def scan_all_segments_from_chains(
     all_scored: List[Dict[str, Any]] = []
     refreshed_at = _ist_now_str()
 
+    if not isinstance(chains, dict):
+        chains = {}
     underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
