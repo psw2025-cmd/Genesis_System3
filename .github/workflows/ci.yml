@@ -464,6 +464,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_paper_market_replay_400.py -o addopts="" --tb=short
 
+      - name: Existing Sim Live virtual market integration 300 scenarios
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_existing_sim_live_replay_wiring.py -o addopts="" --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
