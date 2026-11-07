@@ -407,3 +407,33 @@ jobs:
             fi
           done
           exit "$rc"
+
+  
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs:
+      - workflow-policy-guard
+      - architecture-trading-safety
+      - python-compile-proof
+      - full-proof-pack-validation
+      - frontend-build
+    steps:
+      - name: Require every blocking safety job to pass
+        shell: bash
+        env:
+          POLICY: ${{ needs.workflow-policy-guard.result }}
+          ARCHITECTURE: ${{ needs.architecture-trading-safety.result }}
+          COMPILE: ${{ needs.python-compile-proof.result }}
+          PROOF: ${{ needs.full-proof-pack-validation.result }}
+          FRONTEND: ${{ needs.frontend-build.result }}
+        run: |
+          set -euo pipefail
+          for result in "$POLICY" "$ARCHITECTURE" "$COMPILE" "$PROOF" "$FRONTEND"; do
+            if [[ "$result" != "success" ]]; then
+              echo "::error::A required safety job did not pass: $result"
+              exit 1
+            fi
+          done
+          echo "ci=PASS: all five blocking safety jobs passed"
