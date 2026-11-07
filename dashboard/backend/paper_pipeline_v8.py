@@ -75,15 +75,20 @@ def _append_jsonl_once(path: Path, row: Dict[str, Any], key: str) -> bool:
 
 
 def _read_jsonl(path: Path, limit: Optional[int] = None) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+    """Never turn corrupt paper-trade evidence into a misleading empty ledger."""
     if not path.exists():
-        return rows
-    try:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                rows.append(json.loads(line))
-    except Exception:
-        return rows
+        return []
+    rows: List[Dict[str, Any]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            item = json.loads(line)
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"PAPER_LEDGER_CORRUPT:{path.name}:line_{line_number}") from exc
+        if not isinstance(item, dict):
+            raise ValueError(f"PAPER_LEDGER_INVALID_ROW:{path.name}:line_{line_number}")
+        rows.append(item)
     return rows[-limit:] if limit else rows
 
 
@@ -500,9 +505,28 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
     root = Path(root)
     paths = _pipeline_paths(root)
     status = _read_json(paths["status"], {})
-    forecasts = _read_jsonl(paths["forecast"], limit=20)
-    orders = _read_jsonl(paths["orders"], limit=20)
-    blocked = _read_jsonl(paths["blocked"], limit=20)
+    try:
+        forecasts_all = _read_jsonl(paths["forecast"])
+        orders_all = _read_jsonl(paths["orders"])
+        blocked_all = _read_jsonl(paths["blocked"])
+    except ValueError as exc:
+        return {
+            "status": "NOT_VERIFIED",
+            "pipeline": "core_pipeline_v8",
+            "generated_utc": _utc_now(),
+            "verification_status": "NOT_VERIFIED",
+            "ledger_integrity": "FAIL",
+            "reason_if_unverified": str(exc),
+            "ledger_counts": None,
+            "recent_forecasts": [],
+            "recent_paper_orders": [],
+            "recent_blockers": [],
+            "safety": {"broker_real_order_path": "not_used_by_core_pipeline_v8"},
+            "next_action": "Quarantine and repair the corrupt paper ledger with audit evidence before resuming writes.",
+        }
+    forecasts = forecasts_all[-20:]
+    orders = orders_all[-20:]
+    blocked = blocked_all[-20:]
     validation_dir = root / "state" / "market_validations"
     validation_files = sorted(validation_dir.glob("market_validation_*.json")) if validation_dir.exists() else []
     return {
@@ -516,7 +540,7 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
             "broker_real_order_path": "not_used_by_core_pipeline_v8",
         },
         "latest_run": status,
-        "ledger_counts": {"forecasts": len(_read_jsonl(paths["forecast"])), "paper_orders": len(_read_jsonl(paths["orders"])), "blocked_trades": len(_read_jsonl(paths["blocked"])), "validation_days": len(validation_files)},
+        "ledger_counts": {"forecasts": len(forecasts_all), "paper_orders": len(orders_all), "blocked_trades": len(blocked_all), "validation_days": len(validation_files)},
         "recent_forecasts": forecasts,
         "recent_paper_orders": orders,
         "recent_blockers": blocked,
