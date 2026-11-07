@@ -41,13 +41,13 @@ export function Positions() {
     <div className="flex flex-col h-full overflow-y-auto" data-testid="paper-positions-ledger">
       <div className="bg-surface-1 border-b border-border px-6 py-3 flex items-center gap-8 flex-shrink-0 flex-wrap">
         <div>
-          <span className="text-xs text-text-muted">REPORTED PAPER P&L · UNVERIFIED NET</span>
+          <span className="text-xs text-text-muted">PAPER NET P&L · REPORTED / UNVERIFIED</span>
           <div className={cn('num text-xl font-bold', signClass(totalPnl))}>
             {summaryAvailable ? fmtCr(totalPnl) : '--'}
           </div>
         </div>
         <div>
-          <span className="text-xs text-text-muted">REPORTED PAPER WIN RATE · UNVERIFIED</span>
+          <span className="text-xs text-text-muted">PAPER WIN RATE · REPORTED / UNVERIFIED</span>
           <div className={cn('num text-xl font-bold', winRate != null && winRate >= 50 ? 'text-up' : 'text-down')}>
             {summaryAvailable && winRate != null ? `${winRate.toFixed(1)}%` : '--'}
           </div>
