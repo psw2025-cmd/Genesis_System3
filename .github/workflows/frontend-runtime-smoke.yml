@@ -53,6 +53,11 @@ jobs:
         shell: bash
         run: npm run build
 
+      - name: Typecheck all frontend TypeScript before browser smoke
+        working-directory: dashboard/frontend
+        shell: bash
+        run: npm run typecheck
+
       - name: Compile browser and temporal-truth harnesses
         shell: bash
         run: |
