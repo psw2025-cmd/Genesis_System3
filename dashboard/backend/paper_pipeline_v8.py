@@ -336,7 +336,21 @@ def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
             "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE",
         })
     _write_json(pos_file, {"positions": positions, "open_count": len(positions), "timestamp": _utc_now(), "source": "core_pipeline_v8"})
-    summary = {"total_trades": 0, "winning_trades": 0, "losing_trades": 0, "win_rate": 0.0, "total_realized_pnl": 0.0, "total_unrealized_pnl": 0.0, "total_pnl": 0.0, "open_positions": len(positions), "source": "core_pipeline_v8"}
+    # Opening a PAPER position must not erase previously realized trade history.
+    # When no independent close ledger exists, unknown results stay unknown.
+    prior = _read_json(paths["pnl_summary"], {})
+    prior = prior if isinstance(prior, dict) else {}
+    realized_keys = ("total_trades", "winning_trades", "losing_trades",
+                     "win_rate", "total_realized_pnl")
+    summary = {key: prior.get(key) for key in realized_keys}
+    summary.update({
+        "total_unrealized_pnl": None,
+        "total_pnl": None,
+        "open_positions": sum(1 for p in positions if p.get("status") == "PAPER_OPEN"),
+        "source": "core_pipeline_v8",
+        "verification_status": "NOT_VERIFIED",
+        "reason_if_unverified": "No independently reconciled closing fills or mark-to-market prices",
+    })
     _write_json(paths["pnl_summary"], summary)
     paths["pnl_csv"].parent.mkdir(parents=True, exist_ok=True)
     if not paths["pnl_csv"].exists():
