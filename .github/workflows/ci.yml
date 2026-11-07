@@ -519,6 +519,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_multibagger_static_provenance.py -o addopts="" --tb=short
 
+      - name: Fail-closed UI audit contract regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_ui_audit_strict_gate.py -o addopts="" --tb=short
+
       - name: Portable 27-surface UI static audit
         shell: bash
         timeout-minutes: 5
