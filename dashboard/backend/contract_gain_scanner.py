@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+import math
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -209,7 +210,8 @@ def scan_segment_contracts(
         if opt not in ("CE", "PE"):
             continue
         ltp, prev, change_rs, gain = compute_contract_gain(c)
-        if gain is None or ltp is None or ltp < min_ltp:
+        if (gain is None or ltp is None or not math.isfinite(gain)
+                or not math.isfinite(ltp) or ltp < min_ltp):
             continue
         try:
             vol = int(c.get("volume") or 0)
