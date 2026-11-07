@@ -42,9 +42,10 @@ def replay_paper_buy(ticks: Iterable[MarketTick], qty: int, capital_limit: float
         if (not isfinite(tick.bid) or not isfinite(tick.ask) or tick.bid <= 0 or
                 tick.ask < tick.bid or type(tick.available_qty) is not int or tick.available_qty < 0):
             return {"status":"BLOCKED_INVALID_QUOTE","fills":fills,"filled_qty":qty-remaining,"remaining_qty":remaining}
-        if tick.ask * qty > capital_limit:
-            return {"status":"BLOCKED_CAPITAL_LIMIT","fills":fills,"filled_qty":qty-remaining,"remaining_qty":remaining}
         take=min(remaining,tick.available_qty)
+        # Cap aggregate synthetic fill notional, including earlier partial fills.
+        if sum(fill["qty"] * fill["price"] for fill in fills) + take * tick.ask > capital_limit:
+            return {"status":"BLOCKED_CAPITAL_LIMIT","fills":fills,"filled_qty":qty-remaining,"remaining_qty":remaining}
         if take:
             fills.append({"timestamp":tick.timestamp,"qty":take,"price":tick.ask,
                           "mode":"SYNTHETIC_PAPER_FILL_NOT_BROKER"})
