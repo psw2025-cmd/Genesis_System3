@@ -484,17 +484,69 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
 
 
 def run_self_test(proof_dir: Path | str) -> Dict[str, Any]:
+    """Execute isolated PAPER safety probes, not pre-filled PASS assertions.
+
+    This is a structural/offline self-test, NOT 30-day historical replay proof.
+    """
+    import tempfile
+
     proof_dir = Path(proof_dir)
     proof_dir.mkdir(parents=True, exist_ok=True)
-    checks = [
-        {"name": "cash_equity_forecast_not_trade", "passed": True, "detail": "Cash-only equity remains in forecast ledger and is blocked from trade with FORECAST_ONLY_CASH_EQUITY."},
-        {"name": "option_requires_real_dhan_quote", "passed": True, "detail": "Option paper order requires a non-stale Dhan chain quote; non-Dhan files are blocked with NO_LIVE_OPTION_QUOTE."},
-        {"name": "paper_only_no_broker_order", "passed": True, "detail": "Core Pipeline V8 writes JSON/CSV paper ledgers only and never calls broker order endpoints."},
-        {"name": "live_flags_safe", "passed": os.environ.get("LIVE_TRADING_ENABLED", "0") in ("0", "", "false", "False"), "detail": f"LIVE_TRADING_ENABLED={os.environ.get('LIVE_TRADING_ENABLED', '0')}"},
-    ]
-    result = {"status": "PASS" if all(c["passed"] for c in checks) else "FAIL", "checks": checks, "generated_utc": _utc_now()}
+    checks = []
+    with tempfile.TemporaryDirectory(prefix="system3_paper_selftest_") as temp:
+        root = Path(temp)
+        try:
+            contract, reason = _select_option_contract(None, "CASH_ONLY", "CE", 100)
+            checks.append({"name": "missing_instrument_blocks_trade",
+                           "passed": contract is None and reason == "INSTRUMENT_MASTER_MISSING",
+                           "detail": reason})
+        except Exception as exc:
+            checks.append({"name": "missing_instrument_blocks_trade", "passed": False,
+                           "detail": type(exc).__name__})
+        try:
+            quote, reason = _load_chain_quote(root, "NIFTY", "CE", 25000)
+            checks.append({"name": "missing_dhan_quote_blocks_trade",
+                           "passed": quote is None and reason == BLOCK_NO_LIVE_QUOTE,
+                           "detail": reason})
+        except Exception as exc:
+            checks.append({"name": "missing_dhan_quote_blocks_trade", "passed": False,
+                           "detail": type(exc).__name__})
+        try:
+            ledger = root / "paper_orders.jsonl"
+            first = _append_jsonl_once(ledger, {"paper_order_id": "probe-1"}, "paper_order_id")
+            duplicate = _append_jsonl_once(ledger, {"paper_order_id": "probe-1"}, "paper_order_id")
+            checks.append({"name": "paper_ledger_idempotent",
+                           "passed": first is True and duplicate is False and len(_read_jsonl(ledger)) == 1,
+                           "detail": "Isolated temporary ledger; no production writes"})
+        except Exception as exc:
+            checks.append({"name": "paper_ledger_idempotent", "passed": False,
+                           "detail": type(exc).__name__})
+
+    gates = ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED",
+             "LIVE_ORDER_AUTHORITY", "REAL_BROKER_ORDERS",
+             "AUTO_EXECUTE_TRADES", "USE_LIVE_EXECUTION_ENGINE")
+    unsafe = [name for name in gates if os.environ.get(name, "0").lower() not in ("0", "false", "")]
+    checks.append({"name": "live_execution_environment_disabled",
+                   "passed": not unsafe,
+                   "detail": "All inspected execution flags disabled" if not unsafe else
+                   "Unsafe environment flags: " + ",".join(unsafe)})
+
+    passed = all(c["passed"] for c in checks)
+    result = {
+        "status": "PASS" if passed else "FAIL",
+        "scope": "ISOLATED_OFFLINE_STRUCTURAL_ONLY",
+        "full_market_replay_verified": False,
+        "production_ui_verified": False,
+        "model_training_verified": False,
+        "real_broker_orders": 0,
+        "checks": checks,
+        "generated_utc": _utc_now(),
+    }
     _write_json(proof_dir / "selftest.json", result)
-    md = ["# Core Pipeline V8 Self-Test", "", f"Status: **{result['status']}**", "", "| Check | Result | Detail |", "|---|---:|---|"]
+    md = ["# Core Pipeline V8 Isolated Self-Test", "",
+          f"Status: **{result['status']}** (offline checks only)", "",
+          "Not proof of a 30-day historical replay, browser UI, or live market feed.",
+          "", "| Check | Result | Detail |", "|---|---:|---|"]
     for c in checks:
         md.append(f"| {c['name']} | {'PASS' if c['passed'] else 'FAIL'} | {c['detail']} |")
     (proof_dir / "summary.md").write_text("\n".join(md) + "\n", encoding="utf-8")
