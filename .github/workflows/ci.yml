@@ -479,6 +479,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_synthetic_sell_bid_truth.py -o addopts="" --tb=short
 
+      - name: Existing Positions paper PnL provenance
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_positions_pnl_provenance_label.py -o addopts="" --tb=short
+
       - name: Block fabricated backtest performance and provenance
         shell: bash
         run: |
