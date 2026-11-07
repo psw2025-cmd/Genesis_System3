@@ -404,6 +404,23 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
         if _append_jsonl_once(paths["forecast"], forecast, "forecast_id"):
             result["forecasts_written"] += 1
 
+        # A forecast is still auditable outside trading hours, but must never
+        # create a PAPER fill from yesterday's prediction or a closed market.
+        if not fresh or not market_open:
+            reason = BLOCK_STALE_FORECAST if not fresh else "MARKET_CLOSED_PAPER_ENTRY"
+            blocked = {
+                "block_id": _row_id(forecast_id, reason),
+                "created_utc": _utc_now(),
+                "forecast_id": forecast_id,
+                "underlying": underlying,
+                "reason": reason,
+                "scope": "forecast_only_no_paper_entry",
+            }
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
+
         contract, contract_status = _select_option_contract(df, underlying, pred.get("option_side") or "CE", pred.get("spot"))
         if not contract:
             blocked = {"block_id": _row_id(forecast_id, contract_status), "created_utc": _utc_now(), "forecast_id": forecast_id, "underlying": underlying, "reason": contract_status, "scope": "trade_only_forecast_kept"}
