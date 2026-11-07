@@ -269,7 +269,12 @@ def scan_all_segments_from_chains(
     underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
+        if not isinstance(chain, dict):
+            chain = {"status": "INVALID_CHAIN_PAYLOAD", "message": "Chain payload is not an object"}
         contracts = chain.get("contracts") or []
+        if not isinstance(contracts, list):
+            chain = {**chain, "status": "INVALID_CONTRACTS_PAYLOAD", "message": "Contracts payload is not a list"}
+            contracts = []
         if not contracts:
             missing.append(underlying)
             segments[underlying] = {
