@@ -35,6 +35,7 @@ def test_lifecycle_sell_receipt_matches_bid(scenario):
     assert len(result["fills"])==2
     entry,exit=result["fills"]
     assert entry["side"]=="BUY" and exit["side"]=="SELL"
-    assert exit["price"]<virtual_paper_lifecycle(scenario,30)["closed_positions"][0]["gross_pnl"]/25+entry["price"]+0.01
+    expected_ask=round(max(1.0,100+{"trend":0.3,"range":0.0,"volatile":-0.25}[scenario]*30+((30%9)-4)*{"trend":0.2,"range":1.2,"volatile":2.2}[scenario]),2)
+    assert exit["price"]==round(max(0.01,expected_ask-0.5),2)
     assert result["closed_positions"][0]["gross_pnl"]==round((exit["price"]-entry["price"])*25,2)
     assert result["closed_positions"][0]["net_pnl"] is None
