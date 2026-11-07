@@ -11,7 +11,7 @@ def tick(second,bid=99.0,ask=100.0,available=10,**kwargs):
 def test_market_like_partial_fills_and_liquidity(case):
     qty=1+case%40
     chunk=1+case%11
-    ticks=[tick(i,ask=90+case%20,available=chunk) for i in range((qty+chunk-1)//chunk)]
+    ticks=[tick(i,bid=89+case%20,ask=90+case%20,available=chunk) for i in range((qty+chunk-1)//chunk)]
     result=replay_paper_buy(ticks,qty)
     assert result["status"]=="PAPER_FILLED"
     assert result["filled_qty"]==qty
