@@ -3,10 +3,9 @@
 Never reads broker credentials, writes real ledgers, or claims realized broker P&L.
 """
 from datetime import datetime, timedelta, timezone
-from math import isfinite
 from typing import Any
 
-from dashboard.backend.paper_market_replay import MarketTick, replay_paper_buy
+from dashboard.backend.paper_market_replay import MarketTick, replay_paper_buy, replay_paper_sell
 
 START = datetime(2026, 11, 9, 3, 45, tzinfo=timezone.utc)
 CAPITAL_LIMIT = 50000.0
@@ -25,9 +24,10 @@ def virtual_paper_lifecycle(scenario: str, step: int) -> dict[str, Any]:
     def fill(at: int, side: str) -> dict[str, Any]:
         px=price(at)
         tick=MarketTick(timestamp=stamp(at), bid=max(.01,px-.5), ask=px, available_qty=qty)
-        result=replay_paper_buy([tick], qty, CAPITAL_LIMIT)
+        result=(replay_paper_buy([tick], qty, CAPITAL_LIMIT) if side == "BUY" else
+                replay_paper_sell([tick], qty, held_qty=qty))
         return {"fill_id":f"SYN-{scenario}-{side}-{at}", "side":side, "qty":result["filled_qty"],
-                "price":px if side=="BUY" else tick.bid, "timestamp_utc":stamp(at),
+                "price":result["fills"][0]["price"] if result["fills"] else None, "timestamp_utc":stamp(at),
                 "source":"SYNTHETIC_PAPER_FILL_NOT_BROKER", "status":result["status"]}
     orders=[]
     fills=[]
