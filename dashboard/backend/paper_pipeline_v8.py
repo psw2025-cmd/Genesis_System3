@@ -351,7 +351,7 @@ def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
             "unrealized_pnl": 0.0,
             "status": "PAPER_OPEN",
             "entry_time": order["created_utc"],
-            "entry_time_ist": order["created_ist"],
+            "entry_time_ist": _ist_event_time(order["created_utc"]),
             "signal_source": "core_pipeline_v8",
             "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE",
         })
