@@ -206,6 +206,8 @@ def scan_segment_contracts(
     """Find highest-gain CE and PE contracts for one underlying."""
     scored: List[Dict[str, Any]] = []
     for c in contracts or []:
+        if not isinstance(c, dict):
+            continue
         opt = str(c.get("option_type", "")).upper()
         if opt not in ("CE", "PE"):
             continue
@@ -219,7 +221,7 @@ def scan_segment_contracts(
             vol = int(c.get("volume") or 0)
         except (TypeError, ValueError, OverflowError):
             continue
-        if vol < min_volume:
+        if vol < 0 or vol < min_volume:
             continue
         row = _contract_row(c, underlying.upper(), gain, change_rs, ltp, prev)
         if not row.get("expiry_date") and default_expiry:
