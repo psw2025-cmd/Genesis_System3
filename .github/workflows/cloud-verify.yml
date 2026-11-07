@@ -1,0 +1,110 @@
+name: Cloud-Only Read-Only Production Verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloud-verify.yml'
+      - 'scripts/cloud_verify_readonly.py'
+      - 'dashboard/backend/paper_market_replay.py'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloud-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cloud-verify:
+    name: READ-ONLY GCP + Dhan GET + synthetic PAPER proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
+      PAPER_MODE: '1'
+      LIVE_ORDER_AUTHORITY: '0'
+      REAL_BROKER_ORDERS: '0'
+      LIVE_TRADING_ENABLED: '0'
+      ORDER_PLACEMENT_ALLOWED: 'false'
+      CLOUD_VERIFY_EVIDENCE: cloud-verify-evidence.jsonl
+      PYTHONPATH: .
+      DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+      DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
+    steps:
+      - name: Checkout immutable commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify PR 574 merge is an ancestor
+        shell: bash
+        run: |
+          git fetch --no-tags --depth=100 origin main
+          if git merge-base --is-ancestor 2fd314b8c14aac1f5f2c4c6565007c4fcf3641af HEAD; then
+            echo 'PASS: PR #574 merge commit is an ancestor of this verification run'
+          else
+            echo 'FAIL: PR #574 merge commit not proven as ancestor'
+            exit 1
+          fi
+      - name: Check WIF configuration without printing identifiers
+        shell: bash
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+        run: |
+          if [[ -z "$WIF_PROVIDER" || -z "$WIF_SERVICE_ACCOUNT" ]]; then
+            echo 'NOT VERIFIED: GitHub vars GCP_WIF_PROVIDER and/or GCP_WIF_SERVICE_ACCOUNT missing'
+            exit 1
+          fi
+          echo 'PASS: WIF configuration present'
+      - name: Authenticate to GCP via Workload Identity Federation
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+          project_id: genesis-system3
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Describe Cloud Run service (read only)
+        shell: bash
+        run: |
+          gcloud run services describe genesis --project genesis-system3 --region asia-south1 --format=json > cloud-run-describe-private.json
+          echo 'PASS: gcloud run services describe genesis --region asia-south1'
+      - name: Compare Cloud Run actual env to CI policy (never print secret values)
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          doc=json.load(open("cloud-run-describe-private.json", encoding="utf-8"))
+          containers=(doc.get("spec",{}).get("template",{}).get("spec",{}).get("containers") or
+                      doc.get("template",{}).get("containers") or [])
+          expected={"PAPER_MODE":"1","LIVE_ORDER_AUTHORITY":"0","REAL_BROKER_ORDERS":"0"}
+          if len(containers)!=1:
+              print("FAIL: cannot prove exactly one Cloud Run container"); sys.exit(1)
+          entries=containers[0].get("env",[])
+          for key,value in expected.items():
+              matched=[e for e in entries if e.get("name")==key]
+              if len(matched)!=1 or matched[0].get("value")!=value or os.getenv(key)!=value:
+                  print("FAIL: Cloud Run/CI safety mismatch for "+key)
+                  sys.exit(1)
+              print("PASS: Cloud Run and CI agree for "+key)
+          print("PASS: actual Cloud Run safety env verified (read-only)")
+          PY
+      - name: Install minimal test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Verify deterministic PAPER lifecycle and Dhan GET orders
+        run: python scripts/cloud_verify_readonly.py
+      - name: Upload sanitized evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-verify-sanitized-evidence
+          path: cloud-verify-evidence.jsonl
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove private Cloud Run description
+        if: always()
+        shell: bash
+        run: rm -f cloud-run-describe-private.json
