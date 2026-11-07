@@ -48,6 +48,15 @@ def test_rejects_missing_broker_route(tmp_path):
         guard.verify_source(tmp_path, minimum_backend_bytes=0)
 
 
+def test_rejects_missing_uptime_healthz_route(tmp_path):
+    _make_minimal_canonical_tree(
+        tmp_path,
+        routes=tuple(sorted(guard.REQUIRED_ROUTES - {"/api/healthz"})),
+    )
+    with pytest.raises(ValueError, match="/api/healthz"):
+        guard.verify_source(tmp_path, minimum_backend_bytes=0)
+
+
 def test_rejects_wrong_docker_entrypoint(tmp_path):
     _make_minimal_canonical_tree(tmp_path, routes=tuple(sorted(guard.REQUIRED_ROUTES)))
     (tmp_path / "dashboard/backend/Dockerfile").write_text(

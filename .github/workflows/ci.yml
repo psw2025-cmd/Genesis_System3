@@ -357,6 +357,14 @@ jobs:
           test -f reports/latest/proof_pack_closure_gate/summary.json
           echo "proof_pack_closure_gate=PASS"
 
+      - name: Enforce canonical Cloud Run healthz source contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/cloud_run_source_integrity_gate.py --root .
+          python -m pytest tests/test_cloud_run_source_integrity_gate.py -o addopts="" -v --tb=short
+          echo "cloud_run_healthz_source_contract=PASS"
+
       - name: Upload proof pack artifact
         uses: actions/upload-artifact@v4
         if: always()
