@@ -327,8 +327,19 @@ def _paper_qty(contract: Dict[str, Any]) -> int:
 def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
     paths = _pipeline_paths(root)
     pos_file = paths["positions"]
-    current = _read_json(pos_file, {"positions": [], "open_count": 0})
-    positions = current.get("positions", []) if isinstance(current, dict) else []
+    # Existing position evidence must never silently become an empty book.
+    if pos_file.exists():
+        try:
+            current = json.loads(pos_file.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError) as exc:
+            raise ValueError("PAPER_POSITIONS_CORRUPT") from exc
+        if not isinstance(current, dict) or not isinstance(current.get("positions"), list):
+            raise ValueError("PAPER_POSITIONS_INVALID_SCHEMA")
+        positions = current["positions"]
+        if any(not isinstance(p, dict) or not p.get("position_id") for p in positions):
+            raise ValueError("PAPER_POSITIONS_INVALID_ENTRY")
+    else:
+        positions = []
     if not any(p.get("position_id") == order["position_id"] for p in positions):
         positions.append({
             "position_id": order["position_id"],
