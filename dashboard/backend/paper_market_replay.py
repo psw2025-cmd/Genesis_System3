@@ -36,7 +36,7 @@ def replay_paper_buy(ticks: Iterable[MarketTick], qty: int, capital_limit: float
             raise ValueError("PAPER_REPLAY_NAIVE_TIMESTAMP")
         if last_time is not None:
             delta=(time-last_time).total_seconds()
-            if delta < 0 or delta > max_quote_age_seconds:
+            if delta <= 0 or delta > max_quote_age_seconds:
                 return {"status":"BLOCKED_STALE_OR_OUT_OF_ORDER","fills":fills,"filled_qty":qty-remaining,"remaining_qty":remaining}
         last_time=time
         if (not isfinite(tick.bid) or not isfinite(tick.ask) or tick.bid <= 0 or
@@ -77,7 +77,7 @@ def replay_paper_sell(ticks: Iterable[MarketTick], qty: int, held_qty: int,
             raise ValueError("PAPER_REPLAY_NAIVE_TIMESTAMP")
         if last_time is not None:
             gap=(at-last_time).total_seconds()
-            if gap < 0 or gap > max_quote_age_seconds:
+            if gap <= 0 or gap > max_quote_age_seconds:
                 return {"status":"BLOCKED_STALE_OR_OUT_OF_ORDER","fills":fills,
                         "filled_qty":qty-remaining,"remaining_qty":remaining}
         last_time=at
