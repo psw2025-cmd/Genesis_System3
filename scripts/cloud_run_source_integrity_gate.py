@@ -22,7 +22,7 @@ REQUIRED_FILES = (
     "GEMINI.md",
 )
 REQUIRED_ROUTES = frozenset(
-    ("/api/health", "/api/broker/status", "/api/batch/market-data")
+    ("/api/health", "/api/healthz", "/api/broker/status", "/api/batch/market-data")
 )
 MIN_BACKEND_BYTES = 50_000
 
