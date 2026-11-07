@@ -14,10 +14,9 @@ CAPITAL = 50_000.0
 STOP_LOSS = 5_000.0
 
 
-def ticks(scenario: str, count: int = 120):
+def ticks(scenario: str, count: int = 120, *, day_offset: int = 0):
     assert scenario in SCENARIOS
-    start = datetime(2026, 11, 9, 9, 15, tzinfo=IST)
-    previous = None
+    start = datetime(2026, 11, 9, 9, 15, tzinfo=IST) + timedelta(days=day_offset)
     for i in range(count):
         if scenario == "disconnect" and 35 <= i < 50:
             continue
@@ -29,23 +28,25 @@ def ticks(scenario: str, count: int = 120):
         price = round(100 + gap + direction * i * 0.08 + (0.02 if i % 2 else 0), 2)
         yield {"ts": ts, "price": price, "sequence": i, "scenario": scenario,
                "provenance": "SIMULATED", "broker_order": False}
-        previous = ts
 
 
-def simulate(scenario: str, path):
+def simulate(scenario: str, path, *, day_offset: int = 0):
     conn = sqlite3.connect(path)
     conn.execute("CREATE TABLE ticks (seq INTEGER PRIMARY KEY, ts TEXT NOT NULL, price REAL NOT NULL)")
     conn.execute("CREATE TABLE fills (seq INTEGER, side TEXT, price REAL, fee REAL)")
     accepted = []
     rejected = []
     previous_ts = None
-    for tick in ticks(scenario):
+    for tick in ticks(scenario, day_offset=day_offset):
         ts = tick["ts"]
         if previous_ts is not None and ts <= previous_ts:
             rejected.append((tick["sequence"], "STALE_OR_OUT_OF_ORDER"))
             continue
         if previous_ts is not None and (ts - previous_ts).total_seconds() > 2:
             rejected.append((tick["sequence"], "DISCONNECTED_GAP"))
+            # Re-establish the time baseline after detecting a dropped interval.
+            # The first reconnect tick is quarantined; subsequent fresh ticks resume.
+            previous_ts = ts
             continue
         if not math.isfinite(tick["price"]) or tick["price"] <= 0:
             rejected.append((tick["sequence"], "BAD_PRICE"))
@@ -70,7 +71,7 @@ def simulate(scenario: str, path):
     fills = conn.execute("SELECT COUNT(*) FROM fills").fetchone()[0]
     conn.close()
     chart = [t for t in accepted if t["sequence"] % 5 == 0]
-    return {"scenario": scenario, "status": "SIMULATED_ONLY", "ticks_generated": len(list(ticks(scenario))),
+    return {"scenario": scenario, "status": "SIMULATED_ONLY", "ticks_generated": len(list(ticks(scenario, day_offset=day_offset))),
             "ticks_stored": stored, "ticks_rejected": len(rejected),
             "chart_points": len(chart), "chart_interval_seconds": 5,
             "feed_target_hz": 1, "paper_fills": fills, "gross_pnl": gross,
@@ -106,3 +107,31 @@ def test_no_future_data_leakage_and_no_broker_side_effects(tmp_path):
     assert result["live_data_verified"] is False
     assert result["risk_capital_limit"] == 50_000
     assert result["daily_stop_loss_limit"] == 5_000
+
+
+@pytest.mark.parametrize("scenario", SCENARIOS)
+def test_thirty_day_virtual_paper_market_and_storage_recovery(tmp_path, scenario):
+    """30 independent daily sessions; no synthetic result may be called real."""
+    sessions = [simulate(scenario, tmp_path / f"{scenario}-{day:02d}.db", day_offset=day)
+                for day in range(30)]
+    assert len(sessions) == 30
+    assert sum(x["paper_fills"] for x in sessions) == 60
+    assert all(x["status"] == "SIMULATED_ONLY" for x in sessions)
+    assert all(x["real_broker_orders"] == 0 for x in sessions)
+    assert all(x["model_accuracy"] is None for x in sessions)
+    assert all(x["ticks_generated"] == x["ticks_stored"] + x["ticks_rejected"] for x in sessions)
+    for day, result in enumerate(sessions):
+        with sqlite3.connect(tmp_path / f"{scenario}-{day:02d}.db") as conn:
+            rows = conn.execute("SELECT seq, ts, price FROM ticks ORDER BY seq").fetchall()
+            fills = conn.execute("SELECT side, fee FROM fills ORDER BY seq").fetchall()
+        assert len(rows) == result["ticks_stored"]
+        assert [side for side, _ in fills] == ["BUY", "SELL"]
+        assert sum(fee for _, fee in fills) == result["fees"]
+        assert all(price > 0 and math.isfinite(price) for _, _, price in rows)
+        assert all(datetime.fromisoformat(ts).date() ==
+                   (datetime(2026, 11, 9, tzinfo=IST) + timedelta(days=day)).date()
+                   for _, ts, _ in rows)
+    if scenario == "disconnect":
+        assert all(x["ticks_stored"] >= 100 for x in sessions), "Reconnect must recover instead of freezing feed"
+    if scenario == "stale":
+        assert all(x["ticks_rejected"] >= 80 for x in sessions)
