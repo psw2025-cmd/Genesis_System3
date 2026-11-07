@@ -14,9 +14,29 @@ CAPITAL = 50_000.0
 STOP_LOSS = 5_000.0
 
 
+def virtual_session_date(session_index: int):
+    """Weekday-only synthetic calendar, not an NSE holiday-calendar claim."""
+    if session_index < 0:
+        raise ValueError("negative session index")
+    day = datetime(2026, 11, 9, 9, 15, tzinfo=IST)
+    while session_index:
+        day += timedelta(days=1)
+        if day.weekday() < 5:
+            session_index -= 1
+    return day
+
+
+def virtual_order_allowed(*, price: float, quantity: int, realized_pnl: float) -> bool:
+    """Offline PAPER entry gate. No live execution authority."""
+    return (math.isfinite(price) and price > 0
+            and isinstance(quantity, int) and not isinstance(quantity, bool)
+            and quantity > 0 and math.isfinite(realized_pnl)
+            and price * quantity <= CAPITAL and realized_pnl > -STOP_LOSS)
+
+
 def ticks(scenario: str, count: int = 120, *, day_offset: int = 0):
     assert scenario in SCENARIOS
-    start = datetime(2026, 11, 9, 9, 15, tzinfo=IST) + timedelta(days=day_offset)
+    start = virtual_session_date(day_offset)
     for i in range(count):
         if scenario == "disconnect" and 35 <= i < 50:
             continue
@@ -59,6 +79,7 @@ def simulate(scenario: str, path, *, day_offset: int = 0):
         entry, exit_ = accepted[0], accepted[-1]
         qty = 10
         fee_per_fill = 10.0
+        assert virtual_order_allowed(price=entry["price"], quantity=qty, realized_pnl=0.0)
         conn.executemany("INSERT INTO fills VALUES (?, ?, ?, ?)", [
             (entry["sequence"], "BUY", entry["price"], fee_per_fill),
             (exit_["sequence"], "SELL", exit_["price"], fee_per_fill)])
@@ -129,9 +150,32 @@ def test_thirty_day_virtual_paper_market_and_storage_recovery(tmp_path, scenario
         assert sum(fee for _, fee in fills) == result["fees"]
         assert all(price > 0 and math.isfinite(price) for _, _, price in rows)
         assert all(datetime.fromisoformat(ts).date() ==
-                   (datetime(2026, 11, 9, tzinfo=IST) + timedelta(days=day)).date()
+                   virtual_session_date(day).date()
                    for _, ts, _ in rows)
     if scenario == "disconnect":
         assert all(x["ticks_stored"] >= 100 for x in sessions), "Reconnect must recover instead of freezing feed"
     if scenario == "stale":
         assert all(x["ticks_rejected"] >= 80 for x in sessions)
+
+
+def test_weekends_never_generate_virtual_market_sessions():
+    dates = [virtual_session_date(i).date() for i in range(30)]
+    assert len(set(dates)) == 30
+    assert all(date.weekday() < 5 for date in dates)
+    assert dates[0].isoformat() == "2026-11-09"
+    assert dates[5].isoformat() == "2026-11-16"
+
+
+@pytest.mark.parametrize("price,quantity,pnl", [
+    (50001.0, 1, 0.0), (100.0, 501, 0.0),
+    (100.0, 1, -5000.0), (100.0, 1, -5001.0),
+    (float("nan"), 1, 0.0), (float("inf"), 1, 0.0),
+    (100.0, 0, 0.0), (100.0, -1, 0.0),
+    (100.0, True, 0.0), (100.0, 1, float("nan")),
+])
+def test_virtual_entry_rejects_risk_violations(price, quantity, pnl):
+    assert not virtual_order_allowed(price=price, quantity=quantity, realized_pnl=pnl)
+
+
+def test_virtual_entry_accepts_only_within_limits():
+    assert virtual_order_allowed(price=100.0, quantity=500, realized_pnl=-4999.0)
