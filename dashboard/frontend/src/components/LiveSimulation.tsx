@@ -64,6 +64,8 @@ export function LiveSimulation() {
   const [running, setRunning] = useState(true)
   const [scenario, setScenario] = useState<'trend' | 'range' | 'volatile'>('trend')
   const [tick, setTick] = useState(0)
+  const [replay, setReplay] = useState<any>(null)
+  const [replayError, setReplayError] = useState<string | null>(null)
   const [data, setData] = useState<BackendSimState | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -90,6 +92,15 @@ export function LiveSimulation() {
     const id = window.setInterval(() => setTick(v => v + 1), pollMs)
     return () => window.clearInterval(id)
   }, [running, data?.market?.is_open])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/simulation/replay/state?scenario=${encodeURIComponent(scenario)}&step=${Math.min(tick, 3600)}`, { credentials: 'include' })
+      .then(res => { if (!res.ok) throw new Error(`replay API HTTP ${res.status}`); return res.json() })
+      .then(payload => { if (!cancelled) { setReplay(payload); setReplayError(null) } })
+      .catch(err => { if (!cancelled) { setReplay(null); setReplayError(String(err)) } })
+    return () => { cancelled = true }
+  }, [scenario, tick])
 
   const rows = data?.positions || []
   const rawPnl = data?.paper?.total_pnl ?? (rows.length ? rows.reduce((a, r) => a + Number(r.pnl ?? 0), 0) : null)
@@ -119,6 +130,20 @@ export function LiveSimulation() {
           Backend simulation API unavailable: {error}. Expected local route: /api/simulation/live/state.
         </div>
       )}
+
+      <div data-testid="synthetic-market-replay" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Synthetic Market Replay · Existing Sim Live</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>SYNTHETIC TEST DATA — NOT DHAN LIVE — NO REAL BROKER ORDERS</p>
+        {replayError ? <p role="alert">Replay unavailable: {replayError}</p> : !replay ? <p>Loading replay evidence…</p> : (
+          <>
+            <p>IST: {replay.market_timestamp_ist} · Scenario: {replay.scenario} · Tick: {replay.step}</p>
+            <p>NIFTY CE simulated bid ₹{replay.quote?.bid} / ask ₹{replay.quote?.ask} · Available qty {replay.quote?.available_qty}</p>
+            <p>Order: {replay.paper_order?.paper_order_id} · {replay.paper_order?.status} · Simulated filled qty: {replay.filled_qty}</p>
+            <p>Trade fills: {replay.paper_fills?.length ?? 0} · Position/P&amp;L reconciliation: {replay.pnl_verification_status}</p>
+            <p style={{ color: 'var(--text-mut)' }}>{replay.reason}</p>
+          </>
+        )}
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px', marginBottom: '14px' }}>
         <div style={cardStyle('rgba(0,232,122,.28)')}>
