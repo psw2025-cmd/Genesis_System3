@@ -103,7 +103,7 @@ def audit_tabs():
 
 if __name__ == "__main__":
     results = audit_tabs()
-    out_dir = r"C:\Temp\Genesis_Forensic"
+    out_dir = os.environ.get("GENESIS_AUDIT_OUTPUT_DIR", os.path.join("reports", "latest", "ui_surface_static_audit"))
     os.makedirs(out_dir, exist_ok=True)
     
     json_path = os.path.join(out_dir, "05_27_TABS_AUDIT.json")
