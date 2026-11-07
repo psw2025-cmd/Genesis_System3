@@ -41,13 +41,13 @@ export function Positions() {
     <div className="flex flex-col h-full overflow-y-auto" data-testid="paper-positions-ledger">
       <div className="bg-surface-1 border-b border-border px-6 py-3 flex items-center gap-8 flex-shrink-0 flex-wrap">
         <div>
-          <span className="text-xs text-text-muted">PAPER NET P&L</span>
+          <span className="text-xs text-text-muted">REPORTED PAPER P&L · UNVERIFIED NET</span>
           <div className={cn('num text-xl font-bold', signClass(totalPnl))}>
             {summaryAvailable ? fmtCr(totalPnl) : '--'}
           </div>
         </div>
         <div>
-          <span className="text-xs text-text-muted">PAPER WIN RATE</span>
+          <span className="text-xs text-text-muted">REPORTED PAPER WIN RATE · UNVERIFIED</span>
           <div className={cn('num text-xl font-bold', winRate != null && winRate >= 50 ? 'text-up' : 'text-down')}>
             {summaryAvailable && winRate != null ? `${winRate.toFixed(1)}%` : '--'}
           </div>
@@ -71,7 +71,7 @@ export function Positions() {
       </div>
 
       <div className="px-6 py-2 border-b border-border bg-surface-2 text-[11px] text-text-muted">
-        This tab is intentionally the <b>PAPER positions ledger</b>. Real Dhan positions are read-only and shown separately on the Broker tab. A paper count of 0 does not mean Dhan has 0 broker positions.
+        This tab is intentionally the <b>PAPER positions ledger</b>. Reported P&amp;L and win rate are NOT independently verified unless matched to opening and closing fills, charges, and ledger evidence. Real Dhan positions are read-only and shown separately on the Broker tab. A paper count of 0 does not mean Dhan has 0 broker positions.
       </div>
 
       <div className="flex-1 p-6 space-y-6">
