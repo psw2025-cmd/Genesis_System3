@@ -292,6 +292,13 @@ jobs:
           python -m pytest tests/test_scanner_truth_guards.py tests/test_actionable_gainer_contract.py -o addopts="" -v --tb=short
           echo "scanner_truth_regression=PASS"
 
+      - name: Paper validation provenance and synthetic evidence regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_paper_validation_fail_closed.py tests/test_validation_known_fakes_guard.py -o addopts="" -v --tb=short
+          echo "paper_validation_provenance_regression=PASS"
+
       - name: QC fail-closed targeted proof
         shell: bash
         run: |
