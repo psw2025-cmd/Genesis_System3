@@ -69,3 +69,14 @@ def test_merge_rejects_missing_expiry_and_invalid_gain():
         {"market_top_table": [valid]},
     )
     assert [row["gain_pct"] for row in result["market_top_table"]] == [42.0]
+
+def test_malformed_contract_items_do_not_crash_or_hide_valid_ce():
+    result = scan_segment_contracts([None, "bad", 123, [], _contract()], "NIFTY")
+    assert result["contracts_scored"] == 1
+    assert result["top_ce"]["gain_pct"] == 100.0
+
+def test_negative_volume_is_never_ranked_even_without_volume_floor():
+    result = scan_segment_contracts([_contract(volume=-1), _contract(option_type="PE", trading_symbol="NIFTY-PE", volume=0)], "NIFTY", min_volume=0)
+    assert result["contracts_scored"] == 1
+    assert result["top_ce"] is None
+    assert result["top_pe"] is not None
