@@ -5,6 +5,7 @@ Saves ~75MB RAM at startup.
 """
 from __future__ import annotations
 import json
+import math
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -36,7 +37,7 @@ _COMPLETED_PASS_STATUSES = {
 _RECON_COMPLETE_STATUSES = {"COMPLETE", "COMPLETED", "PASS", "PASSED", "RECONCILED"}
 _WALK_FORWARD_PASS_STATUSES = {"PASS", "PASSED", "WALK_FORWARD_PASS", "COSTED_WALK_FORWARD_PASS"}
 _STUB_STATUSES = {"STUB", "PLACEHOLDER", "SYNTHETIC", "FABRICATED", "DRAFT", "SAMPLE", "MOCK"}
-_NOT_PROVEN_REASON = "REAL_PAPER_LIFECYCLE_NOT_PROVEN - run scripts/run_paper_validation.py"
+_NOT_PROVEN_REASON = "REAL_PAPER_LIFECYCLE_NOT_PROVEN - verified trade and market evidence unavailable"
 _FRESH_WINDOW = timedelta(days=14)
 _MIN_RHO = 0.70
 
@@ -83,19 +84,14 @@ def _load_validations() -> List[Dict]:
 
 
 def _as_float(value: Any) -> Optional[float]:
+    """Return only finite numeric values; NaN/Infinity are not evidence."""
     if isinstance(value, bool) or value is None:
         return None
-    if isinstance(value, (int, float)):
-        return float(value)
-    if isinstance(value, str):
-        text = value.strip()
-        if not text:
-            return None
-        try:
-            return float(text)
-        except ValueError:
-            return None
-    return None
+    try:
+        number = float(value) if isinstance(value, (int, float, str)) else None
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return number if number is not None and math.isfinite(number) else None
 
 
 def _first_float(data: Dict[str, Any], keys: tuple[str, ...]) -> Optional[float]:
@@ -277,6 +273,40 @@ def _assess_validation_file(path: Path) -> tuple[bool, str]:
     problems: List[str] = []
     if _is_stub_validation(data):
         problems.append("stub or placeholder scores, not a real run")
+    # Detect the exact historical manufactured IDs before trusting PASS flags.
+    ids = data.get("closed_trade_ids")
+    if isinstance(ids, list) and ids and all(
+        isinstance(item, str) and (
+            item.startswith("PAPER_TR_20261029_") or
+            (item.startswith("PAPER_TR_") and item[9:].isdigit())
+        )
+        for item in ids
+    ):
+        problems.append("known generated paper-trade IDs are not reconciliation evidence")
+    # A report named for a different trading day cannot certify that day.
+    if path.name.startswith(("market_validation_", "paper_validation_")):
+        expected_day = path.stem.rsplit("_", 1)[-1]
+        report_day = str(data.get("date") or "")
+        if report_day and expected_day != report_day:
+            problems.append("validation filename date differs from report date")
+    # A market-rank study is not, by itself, a completed paper-trade lifecycle.
+    if str(data.get("generated_by") or "").endswith("real_bhavcopy_5day_validation.py"):
+        problems.append("market ranking study is not closed paper-trade reconciliation")
+    # A report can self-assert PASS with invented metrics/trade counts.
+    # Require an external, content-addressed source manifest for lifecycle
+    # certification; this does not itself prove source records are genuine.
+    manifest = data.get("source_evidence")
+    if not isinstance(manifest, dict):
+        problems.append("missing independently verifiable source_evidence manifest")
+    else:
+        required = ("predictions_sha256", "outcomes_sha256", "closed_trades_sha256")
+        if not all(
+            isinstance(manifest.get(k), str)
+            and len(manifest[k]) == 64
+            and all(ch in "0123456789abcdefABCDEF" for ch in manifest[k])
+            for k in required
+        ):
+            problems.append("source_evidence manifest missing valid SHA256 references")
     rho = _first_float(
         data,
         ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
@@ -288,6 +318,10 @@ def _assess_validation_file(path: Path) -> tuple[bool, str]:
         problems.append(f"rho {rho} is not > 0.70")
     if hit is None:
         problems.append("missing numeric hit_rate")
+    elif not 0.0 <= hit <= 1.0:
+        problems.append("hit_rate must be between 0 and 1")
+    if rho is not None and not -1.0 <= rho <= 1.0:
+        problems.append("rho must be between -1 and 1")
     status = _status_text(data.get("status"))
     if status not in _COMPLETED_PASS_STATUSES:
         shown = status or "MISSING"
@@ -361,31 +395,26 @@ def _json_files_in(directory: Path) -> List[Path]:
 
 
 def _primary_validation_metrics() -> tuple[Optional[float], Optional[float], str]:
-    """Rho and hit rate from an on-disk validation file. A passing file wins; otherwise the June stub if present."""
-    files = _validation_json_files()
-    chosen: Optional[Path] = None
-    for path in files:
+    """Expose accuracy only when a report passes the evidence assessment.
+
+    Never fall back to the historical June file or a rejected JSON report:
+    a numeric value from unverified evidence must not look like model accuracy.
+    """
+    for path in reversed(_validation_json_files()):
         ok, _detail = _assess_validation_file(path)
-        if ok:
-            chosen = path
-            break
-    if chosen is None:
-        june = VAL_DIR / "market_validation_2026-06-12.json"
-        if june.is_file():
-            chosen = june
-        elif files:
-            chosen = files[-1]
-    if chosen is None:
-        return None, None, "no validation JSON"
-    data = _load_json(chosen, None)
-    if not isinstance(data, dict):
-        return None, None, f"{chosen.name}: unreadable"
-    rho = _first_float(
-        data,
-        ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
-    )
-    hit = _first_float(data, ("hit_rate", "avg_hit_rate", "direction_hit_rate"))
-    return rho, hit, chosen.name
+        if not ok:
+            continue
+        data = _load_json(path, None)
+        if not isinstance(data, dict):
+            continue
+        rho = _first_float(
+            data,
+            ("spearman_correlation", "rank_correlation_spearman", "rho", "avg_rho", "spearman_rho"),
+        )
+        hit = _first_float(data, ("hit_rate", "avg_hit_rate", "direction_hit_rate"))
+        if rho is not None and hit is not None:
+            return rho, hit, path.name
+    return None, None, "no verified validation report"
 
 
 def _validations_checklist() -> List[Dict[str, Any]]:
@@ -475,7 +504,10 @@ def _validations_checklist() -> List[Dict[str, Any]]:
     walk_detail = "NO"
     for path in paper_files + market_files:
         data = _load_json(path, None)
-        if not isinstance(data, dict) or _is_stub_validation(data):
+        if not isinstance(data, dict):
+            continue
+        verified, _reason = _assess_validation_file(path)
+        if not verified:
             continue
         if _reconciliation_complete(data) and _closed_trade_count(data) > 0:
             recon_pass = True
@@ -575,9 +607,18 @@ def _options_model_record() -> Dict | None:
 
 
 def _validation_metrics() -> Dict:
-    validations = _load_validations()
-    rhos = [float(v["spearman_correlation"]) for v in validations if v.get("spearman_correlation") is not None]
-    hit_rates = [float(v["hit_rate"]) for v in validations if v.get("hit_rate") is not None]
+    # Aggregate only reports that passed evidence assessment. Merely loading a
+    # JSON document (or a Firestore row) is not independent validation.
+    validations = []
+    for path in _validation_json_files():
+        ok, _detail = _assess_validation_file(path)
+        if not ok:
+            continue
+        data = _load_json(path, None)
+        if isinstance(data, dict):
+            validations.append({**data, "_file": path.name})
+    rhos = [float(v["spearman_correlation"]) for v in validations if _as_float(v.get("spearman_correlation")) is not None]
+    hit_rates = [float(v["hit_rate"]) for v in validations if _as_float(v.get("hit_rate")) is not None]
     avg_rho = sum(rhos) / len(rhos) if rhos else None
     avg_hit = sum(hit_rates) / len(hit_rates) if hit_rates else None
     predictions = _load_history()
