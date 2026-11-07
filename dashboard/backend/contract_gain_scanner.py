@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+import math
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -188,9 +189,9 @@ def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, ch
         "volume": contract.get("volume"),
         "gain_pct": gain_pct,
         "security_id": contract.get("security_id"),
-        "source": contract.get("source") or "dhan",
-        "data_provenance": "DHAN_OPTION_CHAIN_LIVE",
-        "market_match_note": f"LIVE DHAN GAINER (+{gain_pct:.2f}%)",
+        "source": contract.get("source") or "UNKNOWN",
+        "data_provenance": "UNVERIFIED",
+        "market_match_note": f"UNVERIFIED OPTION GAINER (+{gain_pct:.2f}%)",
     }
 
 
@@ -205,18 +206,28 @@ def scan_segment_contracts(
     """Find highest-gain CE and PE contracts for one underlying."""
     scored: List[Dict[str, Any]] = []
     for c in contracts or []:
+        if not isinstance(c, dict):
+            continue
         opt = str(c.get("option_type", "")).upper()
         if opt not in ("CE", "PE"):
             continue
         ltp, prev, change_rs, gain = compute_contract_gain(c)
-        if gain is None or ltp is None or ltp < min_ltp:
+        if (gain is None or ltp is None or not math.isfinite(gain)
+                or not math.isfinite(ltp)
+                or (prev is not None and not math.isfinite(prev))
+                or ltp < min_ltp):
             continue
-        vol = int(c.get("volume") or 0)
-        if vol < min_volume:
+        try:
+            vol = int(c.get("volume") or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if vol < 0 or vol < min_volume:
             continue
         row = _contract_row(c, underlying.upper(), gain, change_rs, ltp, prev)
         if not row.get("expiry_date") and default_expiry:
             row["expiry_date"] = default_expiry
+        if not is_actionable_gainer_row(row):
+            continue
         scored.append(row)
 
     ce_rows = sorted([r for r in scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
@@ -255,10 +266,17 @@ def scan_all_segments_from_chains(
     all_scored: List[Dict[str, Any]] = []
     refreshed_at = _ist_now_str()
 
+    if not isinstance(chains, dict):
+        chains = {}
     underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
+        if not isinstance(chain, dict):
+            chain = {"status": "INVALID_CHAIN_PAYLOAD", "message": "Chain payload is not an object"}
         contracts = chain.get("contracts") or []
+        if not isinstance(contracts, list):
+            chain = {**chain, "status": "INVALID_CONTRACTS_PAYLOAD", "message": "Contracts payload is not a list"}
+            contracts = []
         if not contracts:
             missing.append(underlying)
             segments[underlying] = {
@@ -478,14 +496,20 @@ def merge_market_top_reports(base: Dict[str, Any], incoming: Dict[str, Any], mar
     by_key: Dict[str, Dict[str, Any]] = {}
     for report in (base, incoming):
         for row in report.get("market_top_table") or []:
-            if not isinstance(row, dict):
+            if not is_actionable_gainer_row(row):
+                continue
+            try:
+                gain = float(row.get("gain_pct"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(gain):
                 continue
             key = (
                 f"{row.get('underlying')}|{row.get('option_type')}|{row.get('strike')}|"
                 f"{row.get('expiry_date') or row.get('expiry')}"
             )
             prev = by_key.get(key)
-            if prev is None or float(row.get("gain_pct") or -1e18) >= float(prev.get("gain_pct") or -1e18):
+            if prev is None or gain >= float(prev.get("gain_pct") or 0):
                 by_key[key] = dict(row)
     combined = sorted(by_key.values(), key=lambda x: float(x.get("gain_pct") or 0), reverse=True)
     refreshed_at = incoming.get("refreshed_at") or base.get("refreshed_at") or _ist_now_str()

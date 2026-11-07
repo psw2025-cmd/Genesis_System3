@@ -90,7 +90,8 @@ jobs:
             echo "FAIL: self-hosted runner found. Global safety CI must not execute on a laptop/local runner."
             exit 1
           fi
-          expected_hosted_jobs=5
+          # Five blocking proof jobs plus the fail-closed required ci aggregator.
+          expected_hosted_jobs=6
           actual_hosted_jobs=$(grep -cE "runs-on:[[:space:]]*ubuntu-latest" .github/workflows/ci.yml)
           test "$actual_hosted_jobs" -eq "$expected_hosted_jobs" || {
             echo "FAIL: expected ${expected_hosted_jobs} ubuntu-latest jobs, found ${actual_hosted_jobs}"
@@ -284,6 +285,13 @@ jobs:
             tests/test_dhan_market_ltp.py \
             -v --tb=short
 
+      - name: Scanner CE PE truth and merge regression proof
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pytest tests/test_scanner_truth_guards.py tests/test_actionable_gainer_contract.py -o addopts="" -v --tb=short
+          echo "scanner_truth_regression=PASS"
+
       - name: QC fail-closed targeted proof
         shell: bash
         run: |
@@ -400,3 +408,33 @@ jobs:
             fi
           done
           exit "$rc"
+
+  
+  ci:
+    name: ci
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs:
+      - workflow-policy-guard
+      - architecture-trading-safety
+      - python-compile-proof
+      - full-proof-pack-validation
+      - frontend-build
+    steps:
+      - name: Require every blocking safety job to pass
+        shell: bash
+        env:
+          POLICY: ${{ needs.workflow-policy-guard.result }}
+          ARCHITECTURE: ${{ needs.architecture-trading-safety.result }}
+          COMPILE: ${{ needs.python-compile-proof.result }}
+          PROOF: ${{ needs.full-proof-pack-validation.result }}
+          FRONTEND: ${{ needs.frontend-build.result }}
+        run: |
+          set -euo pipefail
+          for result in "$POLICY" "$ARCHITECTURE" "$COMPILE" "$PROOF" "$FRONTEND"; do
+            if [[ "$result" != "success" ]]; then
+              echo "::error::A required safety job did not pass: $result"
+              exit 1
+            fi
+          done
+          echo "ci=PASS: all five blocking safety jobs passed"
