@@ -504,6 +504,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_sim_live_trade_outcome_panel.py -o addopts="" --tb=short
 
+      - name: Cloud-portable UI audit evidence path regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_ui_multi_validation_portable_path.py -o addopts="" --tb=short
+
       - name: Virtual market deterministic fault injection matrix
         shell: bash
         timeout-minutes: 5
