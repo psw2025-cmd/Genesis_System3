@@ -1,39 +1,30 @@
-# Genesis System3 — agent constitution
+# Genesis System3 — Absolute Agent Constitution (Master Ruleset)
 
-**Active owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md` (`SYSTEM3_CLOUD_ONLY_OWNER_DIRECTIVE_20261018`).
-**Code authority:** `psw2025-cmd/Genesis_System3` exact approved `main` SHA.
-**Target production authority (not a readiness claim):** GCP `system3-openalgo-safe` / `asia-south1`.
-**Machine policy:** `agent_policy.yaml` (v6).
-**Temporal marker:** `SYSTEM3_TEMPORAL_TRUTH_V1` — `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
-**Broker:** Dhan. Retired Render and Angel-era deployments/instructions are historical and non-authoritative for System3.
+## 🚨 RULE 0: LOCAL FIRST, CLOUD SECOND
+1. **Stage 1 (Local):** The local laptop C:\Genesis_System3_clean is the absolute truth.
+2. **Stage 2 (Cloud):** GCP deployment is FORBIDDEN until local E2E browser tests 100% pass.
+3. **Ignore Old Rules:** Any prior instruction claiming the laptop is 'optional' is DELETED.
 
-## Priority and conflicts
-1. Latest explicit owner instruction, including the active cloud-only directive and its scoped consent.
-2. Permanent trading, secret, cost/approval and destructive-operation safety.
-3. This constitution and the active machine policy.
-4. Applicable scoped rules, runbook, current source and fresh evidence.
-5. Prior local-laptop/RUHI/GCP-exit material and historical reports as history only.
+## 🛡️ RULE 1: ZERO TRUST EVIDENCE (NO FAKE PASS)
+You are FORBIDDEN from generating static .md or .txt 'PASS' reports.
+You MUST use Invoke-RestMethod and show raw HTTP 200 OK output.
+You MUST use Playwright to launch Chromium, check the Console, and save a screenshot.
 
-The 2026-09-07 local-laptop directive and conflicting older prose are superseded. The laptop/Cloud Shell is only an optional control client. Never require a local System3 server, checkout, Windows scheduler or laptop uptime for routine operation.
+## ⚙️ RULE 2: THE TOOL MATRIX
+- **Search:** Use Ripgrep (rg.exe) for instantaneous searches.
+- **API Testing:** Use Invoke-RestMethod (never guess).
+- **Visual Testing:** Use Playwright (never trust HTTP 200 alone).
+- **Duplicates:** Use Get-FileHash to compare files.
 
-## Owner-approved actions as of 2026-10-18
-Autonomous GitHub repairs, testing, CI and read-only GCP verification ONLY. Separate explicit owner approval is required before any new billable cloud build/deployment or cloud configuration mutation (including GCP IAM, Scheduler, Cloud Run, secrets, artifact pushes, billing/budgets). A PR merge is not implicit permission to deploy. Do not enable automatic production deployment through a normal GitHub push.
+## 🚧 RULE 3: BLOCKER HALT & REPORT
+If you hit an Access Denied, a locked file, a missing Dhan API key, or a dead connection, STOP immediately and output a BLOCKER REPORT.
 
-## Permanent PAPER/analyzer safety
-```text
+## 🧠 RULE 4: DETERMINISTIC EXECUTION
+- Seed all RNGs: np.random.seed(42).
+- Hard drawdown kill-switch: if drawdown > 0.02: halt_trading().
+
+## 🔒 SAFETY LOCKS
 ANALYZE_MODE=1
 PAPER_MODE=1
-SYSTEM3_MODE=analyze
 LIVE_TRADING_ENABLED=0
-SYSTEM3_LIVE_TRADING_ALLOWED=0
-AUTO_EXECUTE_TRADES=0
 LIVE_ORDER_AUTHORITY=0
-ORDER_PLACEMENT_ALLOWED=false
-```
-No real order placement/modification/cancellation/square-off, no order-shaped real-broker test traffic, no broker secret payload in code/chat/logs/evidence, no service-account JSON keys, no bypass of safety gates. Prove real broker order counts independently before claiming zero.
-
-## GitHub and evidence discipline
-Dedicated non-destructive branch/PR from fresh main; inspect parallel PR ownership and workflow side effects before writing. Do not force-push or overwrite unrelated work. Only current independently observed cloud runtime and same-session authenticated API/browser/broker receipts can establish production truth. CI green, `reports/latest/`, historical GCP image digests and HTTP 200 alone cannot. Evidence statuses: `PASS/FAIL/BLOCKED/UNKNOWN/PARTIAL/NOT_PROVEN/HISTORICAL_ONLY`. Include UTC time, project, command, exit, exact SHA/digest and proof hash. Read-only project inventory must use explicit `--project` and region.
-
-## Delivery
-Carry out safe connected-tool work autonomously; ask the owner only at genuine owner-only approval/consent/MFA boundaries. Keep blocked and unknown facts explicit. Follow `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md` for exact pre-merge and acceptance re-reads. Full PAPER/ANALYZE PASS requires verified deployed cloud runtime, single worker lease, fresh data, 22-tab semantic UI/API parity, durable paper ledger, provenance and independent LIVE/order safety checks.

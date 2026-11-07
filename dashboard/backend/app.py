@@ -5106,20 +5106,33 @@ def _equity_gainer_rotation_symbols() -> List[str]:
 
 
 def _next_equity_gainer_symbol() -> Optional[str]:
+    """Pace verified Dhan option-chain reads across the complete equity F&O universe.
+
+    Previously the first missing priority symbol was retried indefinitely, so
+    the other ~200 equity chains never entered the Market Top cache.
+    """
     global _EQUITY_GAINER_CURSOR
-    names = _equity_gainer_rotation_symbols()
+    priority = [str(s).upper() for s in _equity_gainer_rotation_symbols() if s]
+    try:
+        from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe
+
+        universe = [
+            str(s).upper()
+            for s in (load_equity_fo_universe().get("underlyings") or [])
+            if s
+        ]
+    except Exception:
+        universe = []
+    names = list(dict.fromkeys(universe + priority))
     if not names:
         return None
-    # Warm missing Moneycontrol/momentum names first so LUPIN is not re-fetched forever.
-    for name in names:
-        sym = str(name or "").upper()
-        if not sym:
-            continue
-        if not _usable_chain_snapshot(_chain_from_push_cache(sym)):
-            return sym
-    sym = str(names[_EQUITY_GAINER_CURSOR % len(names)] or "").upper()
+    cursor = _EQUITY_GAINER_CURSOR
     _EQUITY_GAINER_CURSOR += 1
-    return sym or None
+    # Give high-risers every fourth turn, but always advance the full-universe
+    # cursor; missing/failed symbols cannot starve the rest of the stock scan.
+    if priority and cursor % 4 == 0:
+        return priority[(cursor // 4) % len(priority)]
+    return names[(cursor - cursor // 4) % len(names)]
 
 
 def _build_market_top_from_chain_cache(
@@ -5133,8 +5146,11 @@ def _build_market_top_from_chain_cache(
         extra = _equity_gainer_rotation_symbols()
     except Exception:
         extra = []
+    # Include every verified Dhan chain already warmed by the paced worker,
+    # not only the fixed index/priority seed list. No fresh broker fan-out here.
+    warmed_symbols = list(_PUSHED_CHAIN_CACHE)
     seen = set()
-    for sym in list(_INDEX_STREAM_SYMBOLS) + extra:
+    for sym in list(_INDEX_STREAM_SYMBOLS) + extra + warmed_symbols:
         if not sym or sym in seen:
             continue
         seen.add(sym)

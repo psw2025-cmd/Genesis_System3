@@ -348,3 +348,11 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         "max_contracts": configured_limit,
         "live_trading_enabled": False,
     }
+
+
+def normalize_index_chain_exchange(chain_data: dict, underlying: str = 'NIFTY') -> dict:
+    if not isinstance(chain_data, dict):
+        return {'underlying': underlying, 'contracts': [], 'total_contracts': 0}
+    chain_data.setdefault('underlying', underlying)
+    return chain_data
+

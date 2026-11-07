@@ -1,0 +1,41 @@
+﻿apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: genesis-system3
+  namespace: '802404398783'
+spec:
+  template:
+    spec:
+      containers:
+      - image: asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3@sha256:583586b5ce7107a7a39f3a5938e6774fbff9d8fe2372b74e6f4b40cef9625e98
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DHAN_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: dhan-client-id
+              key: latest
+        - name: DHAN_PIN
+          valueFrom:
+            secretKeyRef:
+              name: dhan-pin
+              key: latest
+        - name: DHAN_TOTP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dhan-totp-secret
+              key: latest
+        - name: DHAN_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dhan-access-token
+              key: latest
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+      serviceAccountName: 802404398783-compute@developer.gserviceaccount.com
+  traffic:
+  - latestRevision: true
+    percent: 100
