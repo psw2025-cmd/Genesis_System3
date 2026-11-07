@@ -188,9 +188,9 @@ def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, ch
         "volume": contract.get("volume"),
         "gain_pct": gain_pct,
         "security_id": contract.get("security_id"),
-        "source": contract.get("source") or "dhan",
-        "data_provenance": "DHAN_OPTION_CHAIN_LIVE",
-        "market_match_note": f"LIVE DHAN GAINER (+{gain_pct:.2f}%)",
+        "source": contract.get("source") or "UNKNOWN",
+        "data_provenance": "UNVERIFIED",
+        "market_match_note": f"UNVERIFIED OPTION GAINER (+{gain_pct:.2f}%)",
     }
 
 
@@ -211,12 +211,17 @@ def scan_segment_contracts(
         ltp, prev, change_rs, gain = compute_contract_gain(c)
         if gain is None or ltp is None or ltp < min_ltp:
             continue
-        vol = int(c.get("volume") or 0)
+        try:
+            vol = int(c.get("volume") or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
         if vol < min_volume:
             continue
         row = _contract_row(c, underlying.upper(), gain, change_rs, ltp, prev)
         if not row.get("expiry_date") and default_expiry:
             row["expiry_date"] = default_expiry
+        if not is_actionable_gainer_row(row):
+            continue
         scored.append(row)
 
     ce_rows = sorted([r for r in scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
