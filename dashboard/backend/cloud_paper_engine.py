@@ -417,6 +417,7 @@ class CloudPaperEngine:
                     preferred = sig
 
         still_open = []
+        just_closed: set[tuple] = set()
         for pos in self.open_positions:
             key = (pos["underlying"], pos["strike"], pos["option_type"])
             has_fresh_quote = key in chain_by_key
@@ -461,6 +462,7 @@ class CloudPaperEngine:
                     "time_ist": _ist_str(now),
                 }
                 self.master_ledger.record_close(closed, now.isoformat())
+                just_closed.add(key)
                 self.closed_positions.append(closed)
                 self._append_trade_csv(closed, "CLOSE")
                 log_trade_event(
@@ -500,7 +502,10 @@ class CloudPaperEngine:
         self.open_positions = still_open
 
         # 2. Maybe open a new position (one per tick, respect max_open)
-        if len(self.open_positions) < max_open and preferred:
+        if (len(self.open_positions) < max_open and preferred
+                and (preferred["underlying"], preferred["strike"],
+                     preferred["option_type"]) not in just_closed):
+            # Never close and immediately reopen the same contract in one tick.
             best = preferred
             dup = any(
                 p["underlying"] == best["underlying"]
@@ -581,7 +586,8 @@ class CloudPaperEngine:
                     timestamp=pos["timestamp"],
                 )
 
-        reconciliation = self.master_ledger.reconcile(self.open_positions)
+        reconciliation = self.master_ledger.reconcile(
+            self.open_positions, self.closed_positions)
         if not reconciliation["projection_matches"]:
             raise PaperEvidenceError("PAPER_MASTER_LEDGER_RECONCILIATION_FAILED")
         self._write_outputs()
