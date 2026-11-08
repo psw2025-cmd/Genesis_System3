@@ -7,11 +7,13 @@ on:
     paths:
       - '.github/workflows/cloud-verify.yml'
       - 'tests/test_cloud_verify_target_contract.py'
+      - 'scripts/cloud_discover_readonly.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/cloud-verify.yml'
       - 'scripts/cloud_verify_readonly.py'
+      - 'scripts/cloud_discover_readonly.py'
       - 'dashboard/backend/paper_market_replay.py'
 
 permissions:
@@ -36,7 +38,45 @@ jobs:
       - name: Validate target and safety without GCP credentials
         run: python -m unittest tests.test_cloud_verify_target_contract
 
+  name-discovery:
+    if: github.event_name != 'pull_request'
+    name: NAME-DISCOVERY - read-only GCP project and Cloud Run service inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      project: ${{ steps.discover.outputs.project }}
+      service: ${{ steps.discover.outputs.service }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Check WIF variables (names only)
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+        run: |
+          if [[ -z "$GCP_WIF_PROVIDER" || -z "$GCP_WIF_SERVICE_ACCOUNT" ]]; then
+            [[ -n "$GCP_WIF_PROVIDER" ]] || echo 'MISSING: GCP_WIF_PROVIDER (GitHub variable)'
+            [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || echo 'MISSING: GCP_WIF_SERVICE_ACCOUNT (GitHub variable)'
+            exit 1
+          fi
+      - name: Authenticate via WIF without a hardcoded project
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Discover visible projects and asia-south1 Cloud Run services
+        id: discover
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+        run: python scripts/cloud_discover_readonly.py
+
   cloud-verify:
+    needs: name-discovery
     if: github.event_name != 'pull_request'
     name: READ-ONLY GCP + Dhan GET + synthetic PAPER proof
     runs-on: ubuntu-latest
@@ -67,30 +107,21 @@ jobs:
           fi
       - name: Verify Cloud Run target and PAPER safety contracts
         run: python -m unittest tests.test_cloud_verify_target_contract
-      - name: Check WIF configuration without printing identifiers
-        shell: bash
-        env:
-          WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
-          WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
-        run: |
-          if [[ -z "$WIF_PROVIDER" || -z "$WIF_SERVICE_ACCOUNT" ]]; then
-            echo 'NOT VERIFIED: GitHub vars GCP_WIF_PROVIDER and/or GCP_WIF_SERVICE_ACCOUNT missing'
-            exit 1
-          fi
-          echo 'PASS: WIF configuration present'
       - name: Authenticate to GCP via Workload Identity Federation
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
-          project_id: system3-openalgo-safe
       - name: Install gcloud
         uses: google-github-actions/setup-gcloud@v2
-      - name: Describe Cloud Run service (read only)
-        shell: bash
+      - name: Describe discovered Cloud Run service (read only)
+        env:
+          DISCOVERED_PROJECT: ${{ needs.name-discovery.outputs.project }}
+          DISCOVERED_SERVICE: ${{ needs.name-discovery.outputs.service }}
         run: |
-          gcloud run services describe genesis-system3-web --project system3-openalgo-safe --region asia-south1 --format=json > cloud-run-describe-private.json
-          echo 'PASS: Cloud Run target service identity lookup completed'
+          test -n "$DISCOVERED_PROJECT" && test -n "$DISCOVERED_SERVICE"
+          gcloud run services describe "$DISCOVERED_SERVICE" --project "$DISCOVERED_PROJECT" --region asia-south1 --format=json > cloud-run-describe-private.json
+          echo "READ_ONLY_TARGET_VERIFIED project=$DISCOVERED_PROJECT service=$DISCOVERED_SERVICE"
       - name: Compare Cloud Run actual env to CI policy (never print secret values)
         shell: bash
         run: |
