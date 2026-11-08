@@ -56,12 +56,6 @@ def discover(projects, services_by_project):
 
 
 def main():
-    provider = os.getenv("GCP_WIF_PROVIDER", "")
-    account = os.getenv("GCP_WIF_SERVICE_ACCOUNT", "")
-    if not provider or not account:
-        print("NOT_VERIFIED: missing GitHub variables: " + ", ".join(
-            k for k, v in (("GCP_WIF_PROVIDER", provider), ("GCP_WIF_SERVICE_ACCOUNT", account)) if not v))
-        return 2
     try:
         projects = gcloud("projects", "list")
         services = {}
