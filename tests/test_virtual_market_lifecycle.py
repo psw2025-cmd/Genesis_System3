@@ -221,6 +221,20 @@ def test_automatic_paper_engine_gap_entry_exit_and_restart(tmp_path, monkeypatch
     recovered = engine_module.CloudPaperEngine(tmp_path)
     assert recovered.closed_positions[0]["position_id"] == closed["position_id"]
 
+    # A separate market-outcome source is consumed without manual action.
+    observed[0] = observed[0] + timedelta(minutes=1)
+    recovered.step([{
+        "underlying": "NIFTY", "spot": 25000, "contracts": [],
+        "independent_market_outcomes": [{
+            "position_id": closed["position_id"], "reference_price": 119.0,
+            "timestamp_utc": observed[0].isoformat(),
+            "source": "INDEPENDENT_EXCHANGE_SNAPSHOT",
+            "evidence_id": "test-independent-snapshot-1",
+        }],
+    }])
+    assert (recovered.master_ledger.snapshot()["outcomes"][closed["position_id"]]
+            ["validation_status"] == "SOURCE_ATTESTED")
+
 
 def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypatch):
     from dashboard.backend import cloud_paper_engine as engine_module
