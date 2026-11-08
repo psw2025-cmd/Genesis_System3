@@ -146,6 +146,9 @@ class MasterPaperLedger:
         gaps: dict[str, dict] = {}
         outcomes: dict[str, dict] = {}
         legacy_unverified = False
+        orders_created: set[str] = set()
+        entry_filled: set[str] = set()
+        exit_filled: set[str] = set()
         for event in events:
             trade, kind, data = event["trade_id"], event["type"], event["data"]
             if kind == "LEGACY_SNAPSHOT":
@@ -159,27 +162,69 @@ class MasterPaperLedger:
                 legacy_unverified = True
             elif kind == "GAP_OBSERVED":
                 gaps[trade] = data
+            elif kind == "PAPER_ORDER_CREATED":
+                if trade in orders_created or trade in trades:
+                    raise PaperEvidenceError("DUPLICATE_PAPER_ORDER")
+                if data.get("broker_order") is not False:
+                    raise PaperEvidenceError("BROKER_ORDER_FORBIDDEN")
+                orders_created.add(trade)
+            elif kind == "PAPER_ENTRY_FILL":
+                if trade not in orders_created or trade in entry_filled:
+                    raise PaperEvidenceError("ENTRY_FILL_WITHOUT_ORDER")
+                if data.get("mode") != FILL_MODE:
+                    raise PaperEvidenceError("UNVERIFIED_ENTRY_FILL_SOURCE")
+                entry_filled.add(trade)
             elif kind == "PAPER_POSITION_OPENED":
                 if trade in trades:
                     raise PaperEvidenceError("DUPLICATE_PAPER_OPEN")
-                trades[trade] = dict(data["position"])
+                if trade not in entry_filled:
+                    raise PaperEvidenceError("OPEN_WITHOUT_PAPER_FILL")
+                position = dict(data["position"])
+                if str(position.get("position_id")) != trade:
+                    raise PaperEvidenceError("OPEN_ID_MISMATCH")
+                if position.get("paper_fill_mode") != FILL_MODE:
+                    raise PaperEvidenceError("UNVERIFIED_PAPER_OPEN")
+                exposure = _positive(position.get("entry_price"), "ENTRY_PRICE") * _positive(
+                    position.get("qty"), "QTY")
+                exposure += sum(
+                    float(p.get("entry_price") or 0) * float(p.get("qty") or 0)
+                    for p in trades.values() if p.get("status") != "CLOSED")
+                if exposure > CAPITAL_LIMIT_INR:
+                    raise PaperEvidenceError("PAPER_CUMULATIVE_CAPITAL_LIMIT")
+                trades[trade] = position
             elif kind == "PAPER_POSITION_MARKED":
                 if trade not in trades or trades[trade].get("status") == "CLOSED":
                     raise PaperEvidenceError("MARK_WITHOUT_OPEN")
                 trades[trade].update(data["mark"])
+            elif kind == "PAPER_EXIT_FILL":
+                if (trade not in trades or trades[trade].get("status") == "CLOSED"
+                        or trade in exit_filled):
+                    raise PaperEvidenceError("EXIT_FILL_WITHOUT_OPEN")
+                if data.get("mode") != FILL_MODE:
+                    raise PaperEvidenceError("UNVERIFIED_EXIT_FILL_SOURCE")
+                exit_filled.add(trade)
             elif kind == "PAPER_POSITION_CLOSED":
-                if trade not in trades or trades[trade].get("status") == "CLOSED":
-                    raise PaperEvidenceError("CLOSE_WITHOUT_OPEN")
-                trades[trade] = dict(data["position"])
+                if (trade not in trades or trades[trade].get("status") == "CLOSED"
+                        or trade not in exit_filled):
+                    raise PaperEvidenceError("CLOSE_WITHOUT_EXIT_FILL")
+                position = dict(data["position"])
+                if position.get("status") != "CLOSED":
+                    raise PaperEvidenceError("CLOSED_POSITION_SCHEMA_MISMATCH")
+                trades[trade] = position
             elif kind == "OUTCOME_RECORDED":
                 if trade not in trades or trades[trade].get("status") != "CLOSED":
                     raise PaperEvidenceError("OUTCOME_WITHOUT_CLOSE")
                 outcomes[trade] = data
-            elif kind in ("PAPER_ORDER_CREATED", "PAPER_ENTRY_FILL",
-                          "PAPER_EXIT_FILL", "LEARNING_PROPOSED"):
+            elif kind == "LEARNING_PROPOSED":
+                if data.get("model_promoted") is not False:
+                    raise PaperEvidenceError("MODEL_PROMOTION_FORBIDDEN")
                 continue
             else:
                 raise PaperEvidenceError("UNKNOWN_PAPER_EVENT_TYPE")
+        if (orders_created != entry_filled or
+                any(t not in trades for t in entry_filled) or
+                any(trades[t].get("status") != "CLOSED" for t in exit_filled)):
+            raise PaperEvidenceError("INCOMPLETE_PAPER_TRANSITION")
         opened = [x for x in trades.values() if x.get("status") != "CLOSED"]
         closed = [x for x in trades.values() if x.get("status") == "CLOSED"]
         return {"open_positions": opened, "closed_positions": closed,
