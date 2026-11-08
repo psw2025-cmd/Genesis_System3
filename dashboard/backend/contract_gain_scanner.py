@@ -450,11 +450,19 @@ def fetch_chains_for_market(
         index_syms = [u for u in symbols if u in INDEX_SEGMENTS]
         equity_syms = [u for u in symbols if u not in INDEX_SEGMENTS]
 
-        with ThreadPoolExecutor(max_workers=min(4, max(1, len(index_syms)))) as pool:
-            futs = {pool.submit(_fetch_one, u): u for u in index_syms}
-            for fut in as_completed(futs, timeout=max(20.0, overall_timeout_s * 0.55)):
-                underlying, ch = fut.result()
-                chains[underlying] = ch
+        # Dhan option-chain allows one request per three seconds. Parallel
+        # index fan-out previously violated that contract even though equity
+        # requests were spaced. Serialize this scan's index requests too.
+        for underlying in index_syms:
+            if chains:
+                time.sleep(3.15)
+            if (time.monotonic() - started) >= overall_timeout_s - 3.0:
+                chains[underlying] = {
+                    "contracts": [], "underlying": underlying, "status": "SKIPPED_TIMEOUT"
+                }
+                continue
+            underlying2, ch = _fetch_one(underlying)
+            chains[underlying2] = ch
 
         remaining = overall_timeout_s - (time.monotonic() - started)
         if equity_syms and remaining > 12.0:
