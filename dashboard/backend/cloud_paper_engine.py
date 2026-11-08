@@ -588,6 +588,20 @@ class CloudPaperEngine:
                     timestamp=pos["timestamp"],
                 )
 
+        # Optional generic independent-outcome records can arrive with market
+        # frames. The ledger validates provenance and triggers learning
+        # automatically only for source-attested, post-exit observations.
+        for frame in chains:
+            for outcome in frame.get("independent_market_outcomes") or []:
+                if not isinstance(outcome, dict):
+                    raise PaperEvidenceError("INVALID_INDEPENDENT_OUTCOME_SCHEMA")
+                self.master_ledger.record_outcome(
+                    str(outcome["position_id"]),
+                    reference_price=outcome["reference_price"],
+                    at=str(outcome["timestamp_utc"]),
+                    source=str(outcome.get("source") or "UNVERIFIED"),
+                    reference_id=outcome.get("evidence_id"),
+                )
         reconciliation = self.master_ledger.reconcile(
             self.open_positions, self.closed_positions)
         if not reconciliation["projection_matches"]:
