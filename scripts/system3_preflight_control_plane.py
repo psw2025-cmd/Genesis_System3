@@ -410,13 +410,18 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
 
     workflow_inventory = []
     actionable_by_id: dict[int, dict[str, Any]] = {}
+    # Reuse the already fetched global run inventory. A separate API request for
+    # every workflow exhausts the installation rate limit on large repositories.
+    # Workflows absent from this bounded window remain UNKNOWN, never PASS.
+    latest_by_workflow: dict[int, dict[str, Any]] = {}
+    for run in recent_runs:
+        workflow_id = int(run.get("workflow_id") or 0)
+        if workflow_id and workflow_id not in latest_by_workflow:
+            latest_by_workflow[workflow_id] = run
 
     for workflow in workflow_defs:
         wid = int(workflow.get("id") or 0)
-        latest_payload = (
-            api_get(repo, f"actions/workflows/{wid}/runs", params={"per_page": 1}) if wid else {}
-        )
-        latest_raw = (latest_payload.get("workflow_runs") or [None])[0]
+        latest_raw = latest_by_workflow.get(wid)
         latest = _compact_run(latest_raw) if latest_raw else None
         if latest_raw:
             latest["relevant_failure"] = classify_failure_relevance(
