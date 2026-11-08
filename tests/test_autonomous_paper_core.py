@@ -78,7 +78,8 @@ def test_open_mark_close_recover_across_instances(tmp_path):
     assert recovered["closed_positions"][0]["pnl_verification_status"] == "COSTED_SIMULATION_NOT_BROKER_VERIFIED"
     assert master.reconcile([])["status"] == "PASS"
     assert recovered["verified_hash_chain"] is True
-    assert recovered["event_count"] == 6
+    assert recovered["event_count"] == 7
+    assert recovered["outcomes"]["PAPER-1"]["validation_status"] == "NOT_VERIFIED"
 
 
 def test_duplicate_retry_is_exactly_once(tmp_path):
@@ -195,3 +196,24 @@ def test_net_pnl_reconciliation_blocks_fake_profit(tmp_path):
         ledger.record_close(bad, stamp(12))
     assert len(ledger.snapshot()["open_positions"]) == 1
     assert not ledger.snapshot()["closed_positions"]
+
+
+
+def test_independent_outcome_cannot_precede_paper_exit(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    p = position()
+    ledger.record_open(p, stamp())
+    ledger.record_close(closed_position(p), stamp(12))
+    with pytest.raises(PaperEvidenceError, match="OUTCOME_MUST_FOLLOW_EXIT"):
+        ledger.record_outcome("PAPER-1", reference_price=110,
+                              at=stamp(12), source="INDEPENDENT_EXCHANGE_SNAPSHOT",
+                              reference_id="sample")
+    assert ledger.snapshot()["outcomes"]["PAPER-1"]["validation_status"] == "NOT_VERIFIED"
+
+
+def test_orphan_fill_is_rejected_atomically(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    with pytest.raises(PaperEvidenceError, match="ENTRY_FILL_WITHOUT_ORDER"):
+        ledger.append_batch([("orphan", "MISSING", "PAPER_ENTRY_FILL", stamp(),
+                              {"qty": 25, "mode": "SIMULATED_PAPER_FILL_NOT_BROKER"})])
+    assert ledger.snapshot()["event_count"] == 0
