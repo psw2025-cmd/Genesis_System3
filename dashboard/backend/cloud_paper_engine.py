@@ -126,10 +126,11 @@ class CloudPaperEngine:
             self.open_positions = historical["open_positions"]
             self.closed_positions = historical["closed_positions"]
         self.seq = max(
-            self.seq,
-            *(int(str(p.get("position_id") or "").rsplit("_", 1)[-1])
-              for p in self.open_positions + self.closed_positions
-              if str(p.get("position_id") or "").rsplit("_", 1)[-1].isdigit()),
+            [self.seq] + [
+                int(str(p.get("position_id") or "").rsplit("_", 1)[-1])
+                for p in self.open_positions + self.closed_positions
+                if str(p.get("position_id") or "").rsplit("_", 1)[-1].isdigit()
+            ]
         )
         self._lock = threading.Lock()
 
