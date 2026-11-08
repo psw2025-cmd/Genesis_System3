@@ -11679,13 +11679,27 @@ async def get_broker_positions():
 
 @app.get("/api/market/top-gainers")
 async def get_market_top_gainers():
+    """Read the scanner's actual ranked board, never a nonexistent 'data' field."""
     try:
-        result = await get_top_contract_gainers() if asyncio.iscoroutinefunction(get_top_contract_gainers) else get_top_contract_gainers()
-        if isinstance(result, dict) and "data" in result:
-            gainers = sorted(result["data"], key=lambda x: x.get("ce_gain_percent", 0), reverse=True)[:10]
-            return {"gainers": gainers, "status": "ok"}
-        return {"gainers": [], "status": "no_data"}
-    except: return {"gainers": [], "status": "error"}
+        result = await get_top_contract_gainers()
+        if not isinstance(result, dict):
+            return {"gainers": [], "status": "not_verified", "source": "scanner"}
+        rows = result.get("market_top_table") or []
+        return {
+            "gainers": rows[:10],
+            "status": result.get("status", "not_verified") if rows else "no_data",
+            "source": "scanner.market_top_table",
+            "market_open": result.get("market_open"),
+            "generated_utc": result.get("generated_utc"),
+        }
+    except Exception:
+        return {"gainers": [], "status": "error", "source": "scanner"}
+
+
+@app.get("/api/options/gainers")
+async def get_option_gainers():
+    """Compatibility route; retain scanner provenance and market-closed labels."""
+    return await get_top_contract_gainers()
 
 @app.get("/api/market/top-losers")
 async def get_market_top_losers():
