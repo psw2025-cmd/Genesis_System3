@@ -11,12 +11,12 @@ EXPECTED = {"PAPER_MODE": "1", "LIVE_ORDER_AUTHORITY": "0", "REAL_BROKER_ORDERS"
 HINTS = (("genesis-system3", "genesis"), ("system3-openalgo-safe", "genesis-system3-web"))
 
 
-def gcloud(*args):
+def gcloud(*args, expect_list=True):
     result = subprocess.run(["gcloud", *args, "--format=json"], capture_output=True, text=True, timeout=90)
     if result.returncode:
         raise RuntimeError("GCLOUD_READ_FAILED: " + " ".join(args[:3]))
     value = json.loads(result.stdout)
-    if not isinstance(value, list):
+    if expect_list and not isinstance(value, list):
         raise RuntimeError("GCLOUD_LIST_SCHEMA_INVALID")
     return value
 
@@ -75,7 +75,17 @@ def main():
             except (RuntimeError, subprocess.TimeoutExpired):
                 print("PROJECT_SERVICE_DISCOVERY_UNAVAILABLE=" + pid)
                 continue
-            services[pid] = entries
+            described = []
+            for svc in entries:
+                name = service_name(svc)
+                if "genesis" not in name.lower() and "system3" not in name.lower():
+                    continue
+                try:
+                    detail = gcloud("run", "services", "describe", name, "--project", pid, "--region", REGION, expect_list=False)
+                    described.append(detail)
+                except (RuntimeError, subprocess.TimeoutExpired):
+                    print("SERVICE_DESCRIPTION_UNAVAILABLE project=" + pid + " service=" + name)
+            services[pid] = described
             print("CLOUD_RUN_SERVICES=" + json.dumps({"project": pid, "region": REGION,
                   "names": sorted(service_name(s) for s in entries)}))
         matches = discover(projects, services)
