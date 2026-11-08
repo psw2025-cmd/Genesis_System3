@@ -65,6 +65,7 @@ def main():
     try:
         projects = gcloud("projects", "list")
         services = {}
+        incomplete_projects = []
         print("VISIBLE_GCP_PROJECTS=" + json.dumps(sorted(project_id(p) for p in projects if project_id(p))))
         for p in projects:
             pid = project_id(p)
@@ -74,6 +75,7 @@ def main():
                 entries = gcloud("run", "services", "list", "--project", pid, "--region", REGION)
             except (RuntimeError, subprocess.TimeoutExpired):
                 print("PROJECT_SERVICE_DISCOVERY_UNAVAILABLE=" + pid)
+                incomplete_projects.append(pid)
                 continue
             described = []
             for svc in entries:
@@ -85,9 +87,13 @@ def main():
                     described.append(detail)
                 except (RuntimeError, subprocess.TimeoutExpired):
                     print("SERVICE_DESCRIPTION_UNAVAILABLE project=" + pid + " service=" + name)
+                    incomplete_projects.append(pid)
             services[pid] = described
             print("CLOUD_RUN_SERVICES=" + json.dumps({"project": pid, "region": REGION,
                   "names": sorted(service_name(s) for s in entries)}))
+        if incomplete_projects:
+            print("NOT_VERIFIED: inventory incomplete for " + str(len(set(incomplete_projects))) + " project(s); refusing to select a potentially ambiguous target")
+            return 2
         matches = discover(projects, services)
         if len(matches) != 1:
             print("NOT_VERIFIED: expected exactly one Genesis service with explicit PAPER safety; found " + str(len(matches)))
