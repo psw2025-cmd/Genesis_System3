@@ -2,6 +2,11 @@ name: Cloud-Only Read-Only Production Verification
 
 on:
   workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloud-verify.yml'
+      - 'tests/test_cloud_verify_target_contract.py'
   push:
     branches: [main]
     paths:
@@ -18,7 +23,21 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  cloud-target-contract:
+    name: OFFLINE - Cloud Run identity and PAPER safety contract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate target and safety without GCP credentials
+        run: python -m unittest tests.test_cloud_verify_target_contract
+
   cloud-verify:
+    if: github.event_name != 'pull_request'
     name: READ-ONLY GCP + Dhan GET + synthetic PAPER proof
     runs-on: ubuntu-latest
     timeout-minutes: 12
