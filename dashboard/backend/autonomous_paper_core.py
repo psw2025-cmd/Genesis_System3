@@ -11,7 +11,7 @@ import hashlib
 import json
 import math
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -249,7 +249,7 @@ class MasterPaperLedger:
             seen = {e["event_id"]: e for e in events}
             pending = []
             for eid, trade, kind, timestamp, data in records:
-                _stamp(timestamp)
+                timestamp = _stamp(timestamp).astimezone(timezone.utc).isoformat()
                 if not eid or not trade or not kind:
                     raise PaperEvidenceError("MISSING_EVENT_IDENTITY")
                 encoded = _canonical(dict(data))
@@ -342,7 +342,7 @@ class MasterPaperLedger:
         trade = str(position["position_id"])
         _positive(position["exit_price"], "EXIT_PRICE")
         closed = dict(position, status="CLOSED", paper_fill_mode=FILL_MODE,
-                      exit_timestamp_utc=at,
+                      exit_timestamp_utc=_stamp(at).astimezone(timezone.utc).isoformat(),
                       pnl_verification_status="COSTED_SIMULATION_NOT_BROKER_VERIFIED")
         expected = estimate_costed_paper_pnl(
             float(closed["entry_price"]), float(closed["exit_price"]), int(closed["qty"]))
