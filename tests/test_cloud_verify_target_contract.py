@@ -10,13 +10,15 @@ class CloudVerifyTargetContract(unittest.TestCase):
     def setUpClass(cls):
         cls.workflow = WORKFLOW.read_text(encoding="utf-8")
 
-    def test_cloud_run_target_matches_production_identity(self):
-        self.assertIn("project_id: system3-openalgo-safe", self.workflow)
-        self.assertIn(
-            "gcloud run services describe genesis-system3-web --project system3-openalgo-safe --region asia-south1",
-            self.workflow,
-        )
-        self.assertNotIn("gcloud run services describe genesis --project genesis-system3", self.workflow)
+    def test_target_is_discovered_not_hardcoded(self):
+        self.assertIn("name-discovery:", self.workflow)
+        self.assertIn("needs: name-discovery", self.workflow)
+        self.assertIn("python scripts/cloud_discover_readonly.py", self.workflow)
+        self.assertIn("needs.name-discovery.outputs.project", self.workflow)
+        self.assertIn("needs.name-discovery.outputs.service", self.workflow)
+        self.assertIn('gcloud run services describe "$DISCOVERED_SERVICE"', self.workflow)
+        self.assertNotIn("project_id: system3-openalgo-safe", self.workflow)
+        self.assertNotIn("services describe genesis-system3-web --project", self.workflow)
 
     def test_read_only_wif_and_paper_safety_preserved(self):
         for marker in (
