@@ -6,6 +6,7 @@ import pytest
 
 from dashboard.backend.autonomous_paper_core import (
     MasterPaperLedger, PaperEvidenceError, detect_opening_gap,
+    estimate_costed_paper_pnl,
 )
 
 
@@ -26,7 +27,9 @@ def position(name="PAPER-1", entry=100.0, qty=25):
     }
 
 
-def closed_position(p, price=110.0, pnl=200.0):
+def closed_position(p, price=110.0, pnl=None):
+    if pnl is None:
+        pnl = estimate_costed_paper_pnl(p["entry_price"], price, p["qty"])
     return dict(p, status="CLOSED", exit_price=price,
                 realized_pnl=pnl, exit_reason="TARGET")
 
@@ -171,3 +174,24 @@ def test_invalid_datetime_rejected(tmp_path):
     ledger = MasterPaperLedger(tmp_path / "master.db")
     with pytest.raises(PaperEvidenceError, match="TIMEZONE"):
         ledger.record_open(position(), "2026-11-09T09:15:00")
+
+
+def test_capital_guard_counts_all_open_positions(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    p = position("A", entry=100.0, qty=300)
+    ledger.record_open(p, stamp())
+    with pytest.raises(PaperEvidenceError, match="CUMULATIVE_CAPITAL_LIMIT"):
+        ledger.record_open(position("B", entry=100.0, qty=250), stamp(1))
+    assert len(ledger.snapshot()["open_positions"]) == 1
+
+
+def test_net_pnl_reconciliation_blocks_fake_profit(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    p = position()
+    ledger.record_open(p, stamp())
+    bad = closed_position(p)
+    bad["realized_pnl"] += 10000
+    with pytest.raises(PaperEvidenceError, match="NET_PNL_RECONCILIATION"):
+        ledger.record_close(bad, stamp(12))
+    assert len(ledger.snapshot()["open_positions"]) == 1
+    assert not ledger.snapshot()["closed_positions"]
