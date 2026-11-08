@@ -39,6 +39,37 @@ jobs:
       - name: Validate target and safety without GCP credentials
         run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly
 
+  synthetic-paper-proof:
+    name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PAPER_MODE: '1'
+      LIVE_ORDER_AUTHORITY: '0'
+      REAL_BROKER_ORDERS: '0'
+      CLOUD_VERIFY_EVIDENCE: cloud-verify-synthetic-evidence.jsonl
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify deterministic synthetic lifecycle without network or broker
+        run: |
+          python - <<'PY'
+          from scripts.cloud_verify_readonly import guard, paper_lifecycle
+          guard()
+          assert paper_lifecycle(), "Synthetic PAPER replay failed"
+          PY
+      - name: Upload synthetic-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-paper-only-evidence
+          path: cloud-verify-synthetic-evidence.jsonl
+          if-no-files-found: warn
+          retention-days: 7
+
   name-discovery:
     if: github.event_name != 'pull_request'
     name: NAME-DISCOVERY - read-only GCP project and Cloud Run service inventory
