@@ -78,26 +78,44 @@ jobs:
     outputs:
       project: ${{ steps.discover.outputs.project }}
       service: ${{ steps.discover.outputs.service }}
+      auth_mode: ${{ steps.auth-mode.outputs.mode }}
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - name: Check WIF variables (names only)
+      - name: Determine configured authentication without exposing values
+        id: auth-mode
         env:
           GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
           GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+          GCP_JSON_PRESENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON != '' }}
+        shell: bash
         run: |
-          if [[ -z "$GCP_WIF_PROVIDER" || -z "$GCP_WIF_SERVICE_ACCOUNT" ]]; then
-            [[ -n "$GCP_WIF_PROVIDER" ]] || echo 'MISSING: GCP_WIF_PROVIDER (GitHub variable)'
-            [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || echo 'MISSING: GCP_WIF_SERVICE_ACCOUNT (GitHub variable)'
+          if [[ -n "$GCP_WIF_PROVIDER" && -n "$GCP_WIF_SERVICE_ACCOUNT" ]]; then
+            echo 'mode=wif' >> "$GITHUB_OUTPUT"
+            echo 'AUTH_MODE=WIF'
+          elif [[ "$GCP_JSON_PRESENT" == 'true' ]]; then
+            echo 'mode=json' >> "$GITHUB_OUTPUT"
+            echo 'AUTH_MODE=JSON_FALLBACK'
+          else
+            echo 'NOT_VERIFIED: neither complete WIF variables nor JSON fallback is configured'
+            [[ -n "$GCP_WIF_PROVIDER" ]] || echo 'MISSING_VARIABLE=GCP_WIF_PROVIDER'
+            [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || echo 'MISSING_VARIABLE=GCP_WIF_SERVICE_ACCOUNT'
+            echo 'MISSING_OR_UNAVAILABLE_SECRET=GCP_SERVICE_ACCOUNT_JSON'
             exit 1
           fi
-      - name: Authenticate via WIF without a hardcoded project
+      - name: Authenticate using keyless WIF
+        if: steps.auth-mode.outputs.mode == 'wif'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Authenticate using GitHub encrypted JSON fallback
+        if: steps.auth-mode.outputs.mode == 'json'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
       - name: Install gcloud
         uses: google-github-actions/setup-gcloud@v2
       - name: Discover visible projects and asia-south1 Cloud Run services
@@ -139,11 +157,17 @@ jobs:
           fi
       - name: Verify Cloud Run target and PAPER safety contracts
         run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly
-      - name: Authenticate to GCP via Workload Identity Federation
+      - name: Authenticate using WIF
+        if: needs.name-discovery.outputs.auth_mode == 'wif'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Authenticate using encrypted JSON fallback
+        if: needs.name-discovery.outputs.auth_mode == 'json'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
       - name: Install gcloud
         uses: google-github-actions/setup-gcloud@v2
       - name: Describe discovered Cloud Run service (read only)
