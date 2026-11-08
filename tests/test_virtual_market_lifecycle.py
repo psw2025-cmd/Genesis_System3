@@ -238,3 +238,6 @@ def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypa
     assert len(engine.open_positions) == 1
     assert not engine.closed_positions
     assert engine.open_positions[0]["paper_quote_status"] == "BLOCKED_NO_CURRENT_QUOTE"
+    restarted = engine_module.CloudPaperEngine(tmp_path)
+    assert restarted.open_positions[0]["paper_quote_status"] == "BLOCKED_NO_CURRENT_QUOTE"
+    assert restarted.master_ledger.snapshot()["verified_hash_chain"] is True
