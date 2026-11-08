@@ -62,14 +62,14 @@ jobs:
         with:
           workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
           service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
-          project_id: genesis-system3
+          project_id: system3-openalgo-safe
       - name: Install gcloud
         uses: google-github-actions/setup-gcloud@v2
       - name: Describe Cloud Run service (read only)
         shell: bash
         run: |
-          gcloud run services describe genesis --project genesis-system3 --region asia-south1 --format=json > cloud-run-describe-private.json
-          echo 'PASS: gcloud run services describe genesis --region asia-south1'
+          gcloud run services describe genesis-system3-web --project system3-openalgo-safe --region asia-south1 --format=json > cloud-run-describe-private.json
+          echo 'PASS: Cloud Run target service identity lookup completed'
       - name: Compare Cloud Run actual env to CI policy (never print secret values)
         shell: bash
         run: |
