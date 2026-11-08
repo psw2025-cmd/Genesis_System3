@@ -196,6 +196,11 @@ class MasterPaperLedger:
                 if trade not in trades or trades[trade].get("status") == "CLOSED":
                     raise PaperEvidenceError("MARK_WITHOUT_OPEN")
                 trades[trade].update(data["mark"])
+            elif kind == "PAPER_EXIT_BLOCKED":
+                if trade not in trades or trades[trade].get("status") == "CLOSED":
+                    raise PaperEvidenceError("BLOCK_WITHOUT_OPEN")
+                trades[trade]["paper_quote_status"] = data["reason"]
+                trades[trade]["last_blocked_at_utc"] = event["at"]
             elif kind == "PAPER_EXIT_FILL":
                 if (trade not in trades or trades[trade].get("status") == "CLOSED"
                         or trade in exit_filled):
@@ -322,6 +327,16 @@ class MasterPaperLedger:
                       "unrealized_pnl": position.get("unrealized_pnl"),
                       "ltp": position.get("ltp")}}
         )])
+
+    def record_exit_blocked(self, trade: str, at: str,
+                            reason: str = "BLOCKED_NO_CURRENT_QUOTE") -> bool:
+        """Preserve missed exit evidence across worker restarts."""
+        if reason not in {"BLOCKED_NO_CURRENT_QUOTE", "BLOCKED_STALE_QUOTE"}:
+            raise PaperEvidenceError("UNRECOGNIZED_EXIT_BLOCKER")
+        return self.append_batch([
+            (trade + ":blocked:" + at, trade, "PAPER_EXIT_BLOCKED", at,
+             {"reason": reason})
+        ])
 
     def record_close(self, position: dict, at: str) -> bool:
         trade = str(position["position_id"])
