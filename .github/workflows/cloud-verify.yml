@@ -46,6 +46,8 @@ jobs:
             echo 'FAIL: PR #574 merge commit not proven as ancestor'
             exit 1
           fi
+      - name: Verify Cloud Run target and PAPER safety contracts
+        run: python -m unittest tests.test_cloud_verify_target_contract
       - name: Check WIF configuration without printing identifiers
         shell: bash
         env:
