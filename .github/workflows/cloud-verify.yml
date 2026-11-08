@@ -181,7 +181,7 @@ jobs:
       - name: Compare Cloud Run actual env to CI policy (never print secret values)
         shell: bash
         run: |
-          python - <<'PY'
+          python -S - <<'PY'
           import json, os, sys
           doc=json.load(open("cloud-run-describe-private.json", encoding="utf-8"))
           containers=(doc.get("spec",{}).get("template",{}).get("spec",{}).get("containers") or
