@@ -33,7 +33,7 @@ def dhan_orders():
     token = os.getenv("DHAN_ACCESS_TOKEN", "")
     client_id = os.getenv("DHAN_CLIENT_ID", "")
     if not token or not client_id:
-        emit("dhan_orders_get", "NOT_VERIFIED", reason="missing GitHub secrets")
+        emit("dhan_orders_get", "NOT_VERIFIED", reason="missing GitHub secrets", missing_names=[name for name, value in (("DHAN_ACCESS_TOKEN", token), ("DHAN_CLIENT_ID", client_id)) if not value])
         return False
     request = Request(
         "https://api.dhan.co/v2/orders",
