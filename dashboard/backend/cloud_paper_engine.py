@@ -32,12 +32,12 @@ except ImportError:
 try:
     from dashboard.backend.autonomous_paper_core import (
         MasterPaperLedger, PaperEvidenceError, detect_opening_gap,
-        estimate_costed_paper_pnl,
+        estimate_costed_paper_pnl, FILL_MODE,
     )
 except ImportError:
     from autonomous_paper_core import (
         MasterPaperLedger, PaperEvidenceError, detect_opening_gap,
-        estimate_costed_paper_pnl,
+        estimate_costed_paper_pnl, FILL_MODE,
     )
 
 IST = timezone(timedelta(hours=5, minutes=30))
@@ -343,6 +343,9 @@ class CloudPaperEngine:
                         "status": "CLOSED",
                         "exit_price": round(cur, 2),
                         "exit_reason": "MANUAL_CLOSE",
+                        "pnl_verification_status": "COSTED_SIMULATION_NOT_BROKER_VERIFIED",
+                        "paper_fill_mode": FILL_MODE,
+                        "exit_timestamp_utc": _now_ist().astimezone(timezone.utc).isoformat(),
                         "realized_pnl": net,
                         "realized_pnl_pct": round(chg_pct, 2),
                         "time_ist": _ist_str(),
@@ -459,6 +462,9 @@ class CloudPaperEngine:
                     "status": "CLOSED",
                     "exit_price": round(cur, 2),
                     "exit_reason": exit_reason,
+                    "pnl_verification_status": "COSTED_SIMULATION_NOT_BROKER_VERIFIED",
+                    "paper_fill_mode": FILL_MODE,
+                    "exit_timestamp_utc": now.astimezone(timezone.utc).isoformat(),
                     "realized_pnl": net,
                     "realized_pnl_pct": round(chg_pct, 2),
                     "time_ist": _ist_str(now),
