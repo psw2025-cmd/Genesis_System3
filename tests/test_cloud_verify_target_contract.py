@@ -25,6 +25,8 @@ class CloudVerifyTargetContract(unittest.TestCase):
             "id-token: write",
             "vars.GCP_WIF_PROVIDER",
             "vars.GCP_WIF_SERVICE_ACCOUNT",
+            "secrets.GCP_SERVICE_ACCOUNT_JSON",
+            "needs.name-discovery.outputs.auth_mode",
             "PAPER_MODE: '1'",
             "LIVE_ORDER_AUTHORITY: '0'",
             "REAL_BROKER_ORDERS: '0'",
