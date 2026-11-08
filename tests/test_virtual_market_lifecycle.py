@@ -255,3 +255,63 @@ def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypa
     restarted = engine_module.CloudPaperEngine(tmp_path)
     assert restarted.open_positions[0]["paper_quote_status"] == "BLOCKED_NO_CURRENT_QUOTE"
     assert restarted.master_ledger.snapshot()["verified_hash_chain"] is True
+
+
+
+def test_ten_fully_automatic_paper_cycles_produce_shadow_learning(tmp_path, monkeypatch):
+    """10 market-driven entries/exits; no manual orders, closes or learning calls.
+
+    This is deterministic synthetic CI evidence. Attested outcome fixtures are
+    not independent real-world exchange verification.
+    """
+    from dashboard.backend import cloud_paper_engine as engine_module
+
+    ist = timezone(timedelta(hours=5, minutes=30))
+    start = datetime(2026, 11, 9, 9, 30, tzinfo=ist)
+    observed = [start]
+    monkeypatch.setattr(engine_module, "_now_ist", lambda: observed[0])
+    engine = engine_module.CloudPaperEngine(tmp_path)
+    frame = {
+        "underlying": "NIFTY", "spot": 25000.0,
+        "session_open_price": 25150.0, "previous_session_close": 25000.0,
+        "session_open_timestamp_ist": start.isoformat(),
+        "opening_price_source": "SESSION_OPEN",
+        "contracts": [{"strike": 25000, "option_type": "CE",
+                       "ltp": 100.0, "previous_close_price": 70.0,
+                       "volume": 100}],
+    }
+    for cycle in range(10):
+        observed[0] = start + timedelta(minutes=2 * cycle)
+        frame["contracts"][0]["ltp"] = 100.0
+        frame.pop("independent_market_outcomes", None)
+        engine.step([frame])
+        assert len(engine.open_positions) == 1
+        paper_id = engine.open_positions[0]["position_id"]
+
+        observed[0] = start + timedelta(minutes=2 * cycle + 1)
+        frame["contracts"][0]["ltp"] = 120.0
+        frame["independent_market_outcomes"] = [{
+            "position_id": paper_id, "reference_price": 119.0,
+            "timestamp_utc": (observed[0] + timedelta(seconds=1)).isoformat(),
+            "source": "INDEPENDENT_EXCHANGE_SNAPSHOT",
+            "evidence_id": f"TEST_FIXTURE_NOT_REAL_{cycle}",
+        }]
+        engine.step([frame])
+        assert not engine.open_positions
+        assert len(engine.closed_positions) == cycle + 1
+
+    recovered = engine_module.CloudPaperEngine(tmp_path)
+    result = recovered.master_ledger.snapshot()
+    assert len(result["closed_positions"]) == 10
+    assert len(result["outcomes"]) == 10
+    assert result["verified_hash_chain"] is True
+    with recovered.master_ledger._db() as db:
+        learning_events = [
+            e for e in recovered.master_ledger._verified_events(db)
+            if e["type"] == "LEARNING_PROPOSED"
+        ]
+    assert learning_events, "Automatic outcome ingestion must trigger learning"
+    last = learning_events[-1]["data"]
+    assert last["status"] == "SHADOW_ONLY"
+    assert last["train_count"] == 8 and last["holdout_count"] == 2
+    assert last["model_promoted"] is False
