@@ -335,10 +335,20 @@ class MasterPaperLedger:
             not math.isfinite(float(reported)) or abs(float(reported) - expected) > 0.011
         ):
             raise PaperEvidenceError("PAPER_NET_PNL_RECONCILIATION_FAILED")
+        # Closing a simulated trade and recording the PROVISIONAL outcome are
+        # one atomic transaction. An independent market observation may replace
+        # this provisional outcome later, but never inherits VERIFIED status.
+        provisional = {
+            "reference_price": closed["exit_price"], "reference_at": at,
+            "reference_source": "SIMULATED_PAPER_EXIT", "reference_id": None,
+            "validation_status": "NOT_VERIFIED", "paper_exit_price": closed["exit_price"],
+            "difference_from_paper_exit": 0.0,
+        }
         return self.append_batch([
             (trade + ":exit", trade, "PAPER_EXIT_FILL", at,
              {"fill_price": closed["exit_price"], "qty": closed["qty"], "mode": FILL_MODE}),
             (trade + ":close", trade, "PAPER_POSITION_CLOSED", at, {"position": closed}),
+            (trade + ":provisional-outcome", trade, "OUTCOME_RECORDED", at, provisional),
         ])
 
     def reconcile(self, current_open: list[dict]) -> dict:
@@ -382,9 +392,14 @@ class MasterPaperLedger:
         self.append_batch([(
             trade + ":outcome:" + at, trade, "OUTCOME_RECORDED", at, result
         )])
+        if verified:
+            # Autonomous shadow evaluation is triggered by an independently
+            # source-attested outcome. Production models never auto-promote.
+            result["learning"] = self.learning_proposal(at, cycle_id=trade)
         return result
 
-    def learning_proposal(self, at: str, min_samples: int = 10) -> dict:
+    def learning_proposal(self, at: str, min_samples: int = 10,
+                          cycle_id: str = "daily") -> dict:
         """Compute shadow-only diagnostics, never train/promote on self-labelled fills."""
         if min_samples < 2:
             raise PaperEvidenceError("UNSAFE_LEARNING_MIN_SAMPLES")
@@ -411,5 +426,6 @@ class MasterPaperLedger:
                     "holdout_win_rate": winrate(holdout),
                     "model_promoted": False,
                     "reason": "NO_AUTOMATIC_PRODUCTION_MODEL_PROMOTION"}
-        self.append_batch([("learning:" + at, "_learning", "LEARNING_PROPOSED", at, proposal)])
+        self.append_batch([("learning:" + cycle_id + ":" + at, "_learning",
+                            "LEARNING_PROPOSED", at, proposal)])
         return proposal
