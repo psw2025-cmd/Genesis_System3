@@ -446,6 +446,8 @@ class CloudPaperEngine:
                 exit_reason = "ROTATE_TO_MARKET_TOP_GAINER"
             if exit_reason and not has_fresh_quote:
                 # No market quote => no invented exit fill, even near session end.
+                self.master_ledger.record_exit_blocked(
+                    pos["position_id"], now.isoformat(), "BLOCKED_NO_CURRENT_QUOTE")
                 pos["paper_quote_status"] = "BLOCKED_NO_CURRENT_QUOTE"
                 still_open.append(pos)
                 continue
