@@ -327,6 +327,7 @@ class MasterPaperLedger:
         trade = str(position["position_id"])
         _positive(position["exit_price"], "EXIT_PRICE")
         closed = dict(position, status="CLOSED", paper_fill_mode=FILL_MODE,
+                      exit_timestamp_utc=at,
                       pnl_verification_status="COSTED_SIMULATION_NOT_BROKER_VERIFIED")
         expected = estimate_costed_paper_pnl(
             float(closed["entry_price"]), float(closed["exit_price"]), int(closed["qty"]))
@@ -380,9 +381,9 @@ class MasterPaperLedger:
         row = next((x for x in state["closed_positions"] if x["position_id"] == trade), None)
         if row is None:
             raise PaperEvidenceError("OUTCOME_REQUIRES_CLOSED_POSITION")
-        end = str(row.get("timestamp") or row.get("time_ist") or "")
-        if end and "T" in end and _stamp(at) < _stamp(end):
-            raise PaperEvidenceError("OUTCOME_PRECEDES_ENTRY")
+        exit_time = str(row.get("exit_timestamp_utc") or "")
+        if exit_time and _stamp(at) <= _stamp(exit_time):
+            raise PaperEvidenceError("OUTCOME_MUST_FOLLOW_EXIT")
         verified = source == "INDEPENDENT_EXCHANGE_SNAPSHOT" and bool(reference_id)
         result = {"reference_price": price, "reference_at": at, "reference_source": source,
                   "reference_id": reference_id,
