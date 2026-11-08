@@ -547,7 +547,29 @@ def main() -> int:
     parser.add_argument("--print-json", action="store_true")
     args = parser.parse_args()
 
-    snapshot = build_snapshot(args.repo, args.issue)
+    try:
+        snapshot = build_snapshot(args.repo, args.issue)
+    except RuntimeError as exc:
+        # GitHub installation rate-limit exhaustion must never become a false
+        # PASS or a missing audit artifact. Keep the control plane fail-closed.
+        message = str(exc)
+        if "HTTP 403" not in message or "rate limit" not in message.lower():
+            raise
+        snapshot = {
+            "schema": "SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1",
+            "captured_at_utc": utc_now(),
+            "repository": args.repo,
+            "main_sha": "NOT_VERIFIED",
+            "status": "BLOCKED",
+            "current_step": "GitHub API rate-limit recovery",
+            "next_action": "Wait for API quota reset; rerun the full preflight before deployment",
+            "reason": "GitHub API installation rate limit exhausted; remote evidence NOT VERIFIED",
+        }
+        json_path, md_path = write_snapshot(snapshot, Path(args.out_dir))
+        print(f"STATUS={snapshot['status']}")
+        print(f"SNAPSHOT={json_path}")
+        print(f"NEXT_ACTION_FILE={md_path}")
+        return 2
     json_path, md_path = write_snapshot(snapshot, Path(args.out_dir))
     print(f"STATUS={snapshot['status']}")
     print(f"CURRENT_STEP={snapshot['current_step']}")
