@@ -352,11 +352,14 @@ class MasterPaperLedger:
             (trade + ":provisional-outcome", trade, "OUTCOME_RECORDED", at, provisional),
         ])
 
-    def reconcile(self, current_open: list[dict]) -> dict:
+    def reconcile(self, current_open: list[dict],
+                  current_closed: list[dict] | None = None) -> dict:
+        """Compare *both* master books with engine projections, blocking silent loss."""
         snapshot = self.snapshot()
         ledger_by_id = {p["position_id"]: p for p in snapshot["open_positions"]}
         current_by_id = {p["position_id"]: p for p in current_open}
-        matches = set(ledger_by_id) == set(current_by_id)
+        matches = (len(ledger_by_id) == len(current_open)
+                   and set(ledger_by_id) == set(current_by_id))
         if matches:
             matches = all(
                 float(ledger_by_id[k].get("entry_price") or 0) ==
@@ -365,11 +368,27 @@ class MasterPaperLedger:
                 float(current_by_id[k].get("qty") or 0)
                 for k in ledger_by_id
             )
+        if current_closed is not None:
+            ledger_closed = {p["position_id"]: p for p in snapshot["closed_positions"]}
+            current_closed_ids = {p["position_id"]: p for p in current_closed}
+            matches = matches and len(current_closed_ids) == len(current_closed)
+            matches = matches and set(ledger_closed) == set(current_closed_ids)
+            if matches:
+                matches = all(
+                    float(ledger_closed[k].get("realized_pnl") or 0) ==
+                    float(current_closed_ids[k].get("realized_pnl") or 0)
+                    and float(ledger_closed[k].get("qty") or 0) ==
+                    float(current_closed_ids[k].get("qty") or 0)
+                    for k in ledger_closed
+                )
         pending_legacy = any(p.get("legacy_unverified") for p in snapshot["open_positions"])
         return {"status": "PASS" if matches and not pending_legacy else "BLOCKED",
                 "projection_matches": matches,
                 "master_open_count": len(ledger_by_id),
                 "projection_open_count": len(current_by_id),
+                "master_closed_count": len(snapshot["closed_positions"]),
+                "projection_closed_count": (
+                    len(current_closed) if current_closed is not None else None),
                 "legacy_unverified": snapshot["legacy_unverified"],
                 "verified_hash_chain": snapshot["verified_hash_chain"]}
 
