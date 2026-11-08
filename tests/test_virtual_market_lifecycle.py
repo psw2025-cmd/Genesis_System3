@@ -179,3 +179,62 @@ def test_virtual_entry_rejects_risk_violations(price, quantity, pnl):
 
 def test_virtual_entry_accepts_only_within_limits():
     assert virtual_order_allowed(price=100.0, quantity=500, realized_pnl=-4999.0)
+
+
+
+def test_automatic_paper_engine_gap_entry_exit_and_restart(tmp_path, monkeypatch):
+    """Prove automatic tick -> simulated entry -> exit -> master recovery."""
+    from dashboard.backend import cloud_paper_engine as engine_module
+
+    ist = timezone(timedelta(hours=5, minutes=30))
+    observed = [datetime(2026, 11, 9, 9, 30, tzinfo=ist)]
+    monkeypatch.setattr(engine_module, "_now_ist", lambda: observed[0])
+    engine = engine_module.CloudPaperEngine(tmp_path)
+
+    chain = {
+        "underlying": "NIFTY", "spot": 25000.0,
+        "session_open_price": 25200.0,
+        "previous_session_close": 25000.0,
+        "session_open_timestamp_ist": observed[0].isoformat(),
+        "opening_price_source": "SESSION_OPEN",
+        "contracts": [{"strike": 25000, "option_type": "CE", "ltp": 100.0,
+                       "previous_close_price": 70.0, "volume": 500, "oi_change": 100}],
+    }
+    engine.step([chain])
+    assert len(engine.open_positions) == 1
+    assert engine.master_ledger.snapshot()["gaps"]["NIFTY"]["direction"] == "GAP_UP"
+    assert engine.open_positions[0]["opening_gap_status"] == "GAP_UP"
+
+    # An exact restart reloads the hash-chain, not potentially stale UI JSON.
+    restarted = engine_module.CloudPaperEngine(tmp_path)
+    assert len(restarted.open_positions) == 1
+    assert restarted.open_positions[0]["position_id"] == engine.open_positions[0]["position_id"]
+
+    observed[0] = observed[0] + timedelta(minutes=1)
+    chain["contracts"][0]["ltp"] = 120.0
+    restarted.step([chain])
+    assert len(restarted.closed_positions) >= 1
+    closed = restarted.closed_positions[0]
+    assert closed["exit_reason"] == "TARGET"
+    assert closed["pnl_verification_status"] == "COSTED_SIMULATION_NOT_BROKER_VERIFIED"
+    assert closed["realized_pnl"] < (120.0 - 100.0) * closed["qty"]
+    recovered = engine_module.CloudPaperEngine(tmp_path)
+    assert recovered.closed_positions[0]["position_id"] == closed["position_id"]
+
+
+def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypatch):
+    from dashboard.backend import cloud_paper_engine as engine_module
+
+    ist = timezone(timedelta(hours=5, minutes=30))
+    observed = [datetime(2026, 11, 9, 9, 30, tzinfo=ist)]
+    monkeypatch.setattr(engine_module, "_now_ist", lambda: observed[0])
+    engine = engine_module.CloudPaperEngine(tmp_path)
+    chain = {"underlying": "NIFTY", "spot": 25000, "contracts": [
+        {"strike": 25000, "option_type": "CE", "ltp": 100.0,
+         "previous_close_price": 70.0, "volume": 10}]}
+    engine.step([chain])
+    observed[0] = datetime(2026, 11, 9, 15, 16, tzinfo=ist)
+    engine.step([{"underlying": "NIFTY", "spot": 25000, "contracts": []}])
+    assert len(engine.open_positions) == 1
+    assert not engine.closed_positions
+    assert engine.open_positions[0]["paper_quote_status"] == "BLOCKED_NO_CURRENT_QUOTE"
