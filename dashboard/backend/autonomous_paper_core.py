@@ -18,6 +18,25 @@ from typing import Any, Mapping
 
 GENESIS = "0" * 64
 FILL_MODE = "SIMULATED_PAPER_FILL_NOT_BROKER"
+CAPITAL_LIMIT_INR = 50_000.0
+
+
+def estimate_costed_paper_pnl(entry: float, exit_price: float, qty: int) -> float:
+    """Conservative estimated broker-style charges, NOT verified actual costs."""
+    buy = _positive(entry, "ENTRY_PRICE")
+    sell = _positive(exit_price, "EXIT_PRICE")
+    size = _positive(qty, "QTY")
+    if int(size) != size:
+        raise PaperEvidenceError("NONINTEGER_PAPER_QUANTITY")
+    gross = (sell - buy) * size
+    entry_value, exit_value = buy * size, sell * size
+    brokerage = 40.0
+    stt = exit_value * 0.000625
+    exchange = (entry_value + exit_value) * 0.0005
+    gst = (brokerage + exchange) * 0.18
+    slippage = (entry_value + exit_value) * 0.001
+    return round(gross - (brokerage + stt + exchange + gst + slippage), 2)
+
 
 
 class PaperEvidenceError(ValueError):
@@ -231,8 +250,12 @@ class MasterPaperLedger:
         qty = _positive(position["qty"], "QTY")
         if int(qty) != qty:
             raise PaperEvidenceError("NONINTEGER_PAPER_QUANTITY")
-        if self.snapshot()["legacy_unverified"]:
+        state = self.snapshot()
+        if any(p.get("legacy_unverified") for p in state["open_positions"]):
             raise PaperEvidenceError("LEGACY_RECONCILIATION_REQUIRED")
+        if sum(float(p["entry_price"]) * float(p["qty"])
+               for p in state["open_positions"]) + price * qty > CAPITAL_LIMIT_INR:
+            raise PaperEvidenceError("PAPER_CUMULATIVE_CAPITAL_LIMIT")
         entry = dict(position, status="OPEN", entry_price=price,
                      paper_fill_mode=FILL_MODE, evidence_status="SIMULATED_NOT_MARKET_VERIFIED")
         return self.append_batch([
@@ -259,6 +282,13 @@ class MasterPaperLedger:
         _positive(position["exit_price"], "EXIT_PRICE")
         closed = dict(position, status="CLOSED", paper_fill_mode=FILL_MODE,
                       pnl_verification_status="COSTED_SIMULATION_NOT_BROKER_VERIFIED")
+        expected = estimate_costed_paper_pnl(
+            float(closed["entry_price"]), float(closed["exit_price"]), int(closed["qty"]))
+        reported = closed.get("realized_pnl")
+        if reported is None or not isinstance(reported, (int, float)) or (
+            not math.isfinite(float(reported)) or abs(float(reported) - expected) > 0.011
+        ):
+            raise PaperEvidenceError("PAPER_NET_PNL_RECONCILIATION_FAILED")
         return self.append_batch([
             (trade + ":exit", trade, "PAPER_EXIT_FILL", at,
              {"fill_price": closed["exit_price"], "qty": closed["qty"], "mode": FILL_MODE}),
@@ -278,7 +308,9 @@ class MasterPaperLedger:
                 float(current_by_id[k].get("qty") or 0)
                 for k in ledger_by_id
             )
-        return {"status": "PASS" if matches and not snapshot["legacy_unverified"] else "BLOCKED",
+        pending_legacy = any(p.get("legacy_unverified") for p in snapshot["open_positions"])
+        return {"status": "PASS" if matches and not pending_legacy else "BLOCKED",
+                "projection_matches": matches,
                 "master_open_count": len(ledger_by_id),
                 "projection_open_count": len(current_by_id),
                 "legacy_unverified": snapshot["legacy_unverified"],
