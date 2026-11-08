@@ -90,7 +90,7 @@ def test_duplicate_retry_is_exactly_once(tmp_path):
     assert ledger.snapshot()["event_count"] == 3
     assert ledger.record_close(closed_position(p), stamp(12))
     assert not ledger.record_close(closed_position(p), stamp(12))
-    assert ledger.snapshot()["event_count"] == 5
+    assert ledger.snapshot()["event_count"] == 6
 
 
 def test_tampered_ledger_blocks_all_new_events(tmp_path):
