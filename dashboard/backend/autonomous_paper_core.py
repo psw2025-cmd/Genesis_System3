@@ -253,9 +253,10 @@ class MasterPaperLedger:
         state = self.snapshot()
         if any(p.get("legacy_unverified") for p in state["open_positions"]):
             raise PaperEvidenceError("LEGACY_RECONCILIATION_REQUIRED")
-        if sum(float(p["entry_price"]) * float(p["qty"])
-               for p in state["open_positions"]) + price * qty > CAPITAL_LIMIT_INR:
-            raise PaperEvidenceError("PAPER_CUMULATIVE_CAPITAL_LIMIT")
+        if not any(str(p["position_id"]) == trade for p in state["open_positions"]):
+            if sum(float(p["entry_price"]) * float(p["qty"])
+                   for p in state["open_positions"]) + price * qty > CAPITAL_LIMIT_INR:
+                raise PaperEvidenceError("PAPER_CUMULATIVE_CAPITAL_LIMIT")
         entry = dict(position, status="OPEN", entry_price=price,
                      paper_fill_mode=FILL_MODE, evidence_status="SIMULATED_NOT_MARKET_VERIFIED")
         return self.append_batch([
