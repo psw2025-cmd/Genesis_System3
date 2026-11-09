@@ -357,6 +357,11 @@ jobs:
           test -f reports/latest/proof_pack_closure_gate/summary.json
           echo "proof_pack_closure_gate=PASS"
 
+      - name: Assert public market-session route is CLOCK ONLY and read-only
+        shell: bash
+        timeout-minutes: 3
+        run: python -m unittest tests.test_secure_app_contract
+
       - name: Enforce canonical Cloud Run healthz source contract
         shell: bash
         run: |
