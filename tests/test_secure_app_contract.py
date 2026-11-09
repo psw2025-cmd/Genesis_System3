@@ -61,6 +61,7 @@ class SecureAppContractTests(unittest.TestCase):
             '"live_trading_enabled": False',
             '"CLOCK_WINDOW_ONLY_NOT_EXCHANGE_VERIFIED"',
             '"MARKET_SESSION_DETECTOR_FAILED"',
+            "from src.utils.market_hours import get_market_status as detector",
         ):
             self.assertIn(marker, body)
         self.assertNotIn("place_order(", body)
