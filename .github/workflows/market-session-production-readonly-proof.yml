@@ -1,0 +1,104 @@
+name: MARKET SESSION - Read-only Cloud Run and PAPER readiness proof
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/market-session-production-readonly-proof.yml
+permissions:
+  contents: read
+  id-token: write
+jobs:
+  cloud-proof:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'audit/market-session-production-readonly-20261109'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PROJECT: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
+      PAPER_MODE: '1'
+      LIVE_TRADING_ENABLED: '0'
+      SYSTEM3_LIVE_TRADING_ALLOWED: '0'
+      AUTO_EXECUTE_TRADES: '0'
+      LIVE_ORDER_AUTHORITY: '0'
+      REAL_BROKER_ORDERS: '0'
+    steps:
+      - name: Authenticate using validated read-only WIF
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: system3-openalgo-safe
+          workload_identity_provider: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
+          service_account: system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com
+      - name: Install Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Describe production serving revision and safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/service.json"
+          python3 - "$RUNNER_TEMP/service.json" "$RUNNER_TEMP/service-url" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          status=d.get("status") or {}
+          url=str(status.get("url") or "")
+          print("PRODUCTION_URL="+url)
+          print("LATEST_READY_REVISION="+str(status.get("latestReadyRevisionName") or "UNKNOWN"))
+          for t in status.get("traffic") or []:
+              print("PRODUCTION_TRAFFIC="+str(t.get("revisionName") or "LATEST")+"="+str(t.get("percent") or 0)+"pct")
+          spec=d.get("spec") or {}
+          template=spec.get("template") or d.get("template") or {}
+          containers=(template.get("spec") or {}).get("containers") or template.get("containers") or []
+          env={e.get("name"):e.get("value") for c in containers for e in c.get("env",[]) if e.get("value") is not None}
+          for key,expected in (("PAPER_MODE","1"),("LIVE_TRADING_ENABLED","0"),("SYSTEM3_LIVE_TRADING_ALLOWED","0"),("AUTO_EXECUTE_TRADES","0"),("LIVE_ORDER_AUTHORITY","0"),("REAL_BROKER_ORDERS","0")):
+              print("SAFETY_"+key+"="+("PASS" if env.get(key)==expected else "NOT_VERIFIED_OR_MISMATCH"))
+          assert url.startswith("https://"),"Service URL missing"
+          open(sys.argv[2],"w").write(url)
+          PY
+      - name: Probe production endpoints with GCP identity (no request bodies)
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="$(cat "$RUNNER_TEMP/service-url")"
+          token="$(gcloud auth print-identity-token --audiences="$base" 2>/dev/null || true)"
+          if [ -n "$token" ]; then echo "CLOUD_RUN_ID_TOKEN=AVAILABLE"; else echo "CLOUD_RUN_ID_TOKEN=UNAVAILABLE"; fi
+          for route in /api/market-status /api/deploy/info /api/health /api/options/gainers /api/market/top-gainers /ui; do
+            if [ -n "$token" ]; then
+              status="$(curl --silent --show-error --max-time 25 --output /dev/null --write-out '%{http_code}' -H "Authorization: Bearer $token" "$base$route" || true)"
+            else
+              status="$(curl --silent --show-error --max-time 25 --output /dev/null --write-out '%{http_code}' "$base$route" || true)"
+            fi
+            echo "ENDPOINT $route HTTP $status"
+          done
+          unset token
+      - name: Inspect cloud scheduler and run jobs read-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gcloud scheduler jobs list --project="$PROJECT" --location="$REGION" --format=json > "$RUNNER_TEMP/scheduler.json" 2>/dev/null; then
+            python3 - "$RUNNER_TEMP/scheduler.json" <<'PY'
+          import json,sys
+          jobs=json.load(open(sys.argv[1]))
+          print("SCHEDULER_LIST=PASS count="+str(len(jobs)))
+          for j in jobs:
+              name=str(j.get("name") or "").rsplit("/",1)[-1]
+              if "genesis" in name.lower() or "system3" in name.lower():
+                  print("GENESIS_SCHEDULE="+name+" state="+str(j.get("state") or "UNKNOWN"))
+          PY
+          else
+            echo "SCHEDULER_LIST=NOT_VERIFIED"
+          fi
+          if gcloud run jobs list --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/jobs.json" 2>/dev/null; then
+            python3 - "$RUNNER_TEMP/jobs.json" <<'PY'
+          import json,sys
+          jobs=json.load(open(sys.argv[1]))
+          print("CLOUD_RUN_JOB_LIST=PASS count="+str(len(jobs)))
+          for j in jobs:
+              name=str((j.get("metadata") or {}).get("name") or j.get("name") or "").rsplit("/",1)[-1]
+              if "genesis" in name.lower() or "paper" in name.lower() or "gain" in name.lower():
+                  print("GENESIS_RUN_JOB="+name)
+          PY
+          else
+            echo "CLOUD_RUN_JOB_LIST=NOT_VERIFIED"
+          fi
+          echo "READ_ONLY_NO_BROKER_ORDERS=TRUE"
