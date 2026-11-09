@@ -1,0 +1,75 @@
+name: GCP JSON credential permission proof (read-only)
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/gcp-json-readonly-permissions-proof.yml
+permissions:
+  contents: read
+jobs:
+  check-json-secret:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'audit/gcp-json-readonly-permissions-20261109'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PROJECT: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+      GCP_JSON_PRESENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON != '' }}
+      GCP_SA_KEY_PRESENT: ${{ secrets.GCP_SA_KEY != '' }}
+    steps:
+      - name: Confirm secret names without printing values
+        run: |
+          echo "GCP_JSON_PRESENT=$GCP_JSON_PRESENT"
+          echo "GCP_SA_KEY_PRESENT=$GCP_SA_KEY_PRESENT"
+          test "$GCP_JSON_PRESENT" = true
+      - name: Authenticate using encrypted JSON key only
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: system3-openalgo-safe
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Confirm project identity and Cloud Run describe
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(gcloud projects describe "$PROJECT" --format='value(projectId)')" = "$PROJECT"
+          account="$(gcloud auth list --filter='status:ACTIVE' --format='value(account)' | head -1)"
+          printf 'JSON_ACCOUNT_PREFIX=%s\n' "$(printf '%s' "$account" | cut -d@ -f1)"
+          echo 'JSON_KEY_PROJECT_AUTH=PASS'
+          revision="$(gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.latestReadyRevisionName)')"
+          test -n "$revision"
+          echo "PRODUCTION_SERVICE_READ=PASS revision=$revision"
+      - name: Read-only test of project IAM permissions
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "$RUNNER_TEMP/request.json" <<'JSON'
+          {"permissions":["run.services.get","run.services.update","run.jobs.list","run.jobs.run","cloudbuild.builds.create","cloudscheduler.jobs.list","cloudscheduler.jobs.update","logging.logEntries.list","artifactregistry.repositories.list","artifactregistry.repositories.uploadArtifacts","iam.serviceAccounts.actAs","secretmanager.secrets.list"]}
+          JSON
+          token="$(gcloud auth print-access-token)"
+          status="$(curl -fsS --max-time 30 -o "$RUNNER_TEMP/iam.json" -w '%{http_code}' -H "Authorization: Bearer $token" -H 'Content-Type: application/json' -X POST --data-binary @"$RUNNER_TEMP/request.json" "https://cloudresourcemanager.googleapis.com/v1/projects/$PROJECT:testIamPermissions" || true)"
+          unset token
+          if [ "$status" != 200 ]; then echo "IAM_PERMISSION_TEST=NOT_VERIFIED code=$status"; exit 0; fi
+          python3 - "$RUNNER_TEMP/iam.json" <<'PY'
+          import json,sys
+          allowed=set(json.load(open(sys.argv[1])).get("permissions") or [])
+          for p in ("run.services.get","run.services.update","run.jobs.list","run.jobs.run","cloudbuild.builds.create","cloudscheduler.jobs.list","cloudscheduler.jobs.update","logging.logEntries.list","artifactregistry.repositories.list","artifactregistry.repositories.uploadArtifacts","iam.serviceAccounts.actAs","secretmanager.secrets.list"):
+              print("PROJECT_IAM_"+p+"="+("YES" if p in allowed else "NO_OR_RESOURCE_SCOPED"))
+          PY
+      - name: Independently test read permissions on major GCP services
+        shell: bash
+        run: |
+          set -euo pipefail
+          probe() {
+            label="$1"; shift
+            if "$@" > /dev/null 2>&1; then printf 'READ_%s=PASS\n' "$label";
+            else printf 'READ_%s=BLOCKED_OR_UNAVAILABLE\n' "$label"; fi
+          }
+          probe CLOUD_RUN_JOBS gcloud run jobs list --project="$PROJECT" --region="$REGION" --limit=1 --format=json
+          probe CLOUD_SCHEDULER gcloud scheduler jobs list --project="$PROJECT" --location="$REGION" --format=json
+          probe CLOUD_BUILD gcloud builds list --project="$PROJECT" --region="$REGION" --limit=1 --format=json
+          probe ARTIFACT_REGISTRY gcloud artifacts repositories list --project="$PROJECT" --location="$REGION" --format=json
+          probe CLOUD_LOGGING gcloud logging read 'resource.type="cloud_run_revision"' --project="$PROJECT" --limit=1 --format=json
+          echo "READ_ONLY_PROOF_COMPLETE;NO_MUTATIONS;NO_SECRET_VALUES"
