@@ -33,6 +33,38 @@ class SecureAppContractTests(unittest.TestCase):
         self.assertFalse(Path("dashboard/frontend/src/components/LoginPage.tsx").exists())
         self.assertFalse(Path("dashboard/frontend/src/hooks/useAuth.ts").exists())
 
+    def test_market_status_route_is_read_only_and_never_fakes_live_feed(self):
+        import ast
+        source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
+        tree = ast.parse(source)
+        routes = [
+            node for node in tree.body
+            if isinstance(node, ast.AsyncFunctionDef)
+            and node.name == "market_status_readonly"
+        ]
+        self.assertEqual(len(routes), 1)
+        decorators = routes[0].decorator_list
+        self.assertTrue(any(
+            isinstance(d, ast.Call)
+            and isinstance(d.func, ast.Attribute)
+            and d.func.attr == "get"
+            and d.args and isinstance(d.args[0], ast.Constant)
+            and d.args[0].value == "/api/market-status"
+            for d in decorators
+        ))
+        body = ast.get_source_segment(source, routes[0]) or ""
+        for marker in (
+            '"market_open": None',
+            '"calendar_verified": False',
+            '"live_market_data_verified": False',
+            '"real": False',
+            '"live_trading_enabled": False',
+            '"CLOCK_WINDOW_ONLY_NOT_EXCHANGE_VERIFIED"',
+            '"MARKET_SESSION_DETECTOR_FAILED"',
+        ):
+            self.assertIn(marker, body)
+        self.assertNotIn("place_order(", body)
+
     def test_no_live_or_order_authority_added_to_secure_boundary(self):
         source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
         self.assertNotIn("place_order(", source)
