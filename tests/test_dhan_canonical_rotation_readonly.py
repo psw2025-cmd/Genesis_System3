@@ -52,6 +52,32 @@ class DhanCanonicalReadOnlyContractTests(unittest.TestCase):
         self.assertTrue(result["command_configured"])
         self.assertNotIn("PRIVATE_CLIENT_ID", json.dumps(result))
 
+    def test_production_autoheal_blocks_even_a_get_probe(self):
+        doc = {"spec": {"template": {"spec": {"containers": [{
+            "env": [
+                {"name": "DHAN_CANONICAL_ROTATION_SELF_HEAL", "value": "1"},
+                {"name": "DHAN_STATUS_AUTO_REFRESH", "value": "0"},
+            ]}]}}},
+            "status": {"url": "https://valid-service.a.run.app"}}
+        config = probe._runtime_token_source(doc)
+        self.assertIs(config["broker_status_get_without_autoheal"], False)
+        with patch.object(probe, "_production_broker_status") as get_status, \
+             patch.object(probe, "_gcloud_json") as gcloud:
+            gcloud.side_effect = [(doc, "PASS")] + [(None, "DENIED_OR_UNAVAILABLE")] * 4
+            out = probe.audit()
+            get_status.assert_not_called()
+            self.assertEqual(out["production_broker"]["http_status"],
+                             "NOT_PROBED_AUTOHEAL_MAY_ROTATE_TOKEN")
+
+    def test_broker_probe_disabled_on_unknown_secret_backed_flag(self):
+        doc = {"spec": {"template": {"spec": {"containers": [{
+            "env": [{"name": "DHAN_CANONICAL_ROTATION_SELF_HEAL",
+                     "valueFrom": {"secretKeyRef": {"name": "flag"}}}]
+        }]}}}}
+        self.assertFalse(
+            probe._runtime_token_source(doc)["broker_status_get_without_autoheal"]
+        )
+
     def test_unknown_auth_classification_fails_closed(self):
         result = probe._broker_summary({
             "connected": "yes",
