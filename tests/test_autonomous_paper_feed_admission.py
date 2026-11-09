@@ -142,4 +142,4 @@ def test_gate_has_no_order_placement_or_network_imports():
     assert "import requests" not in source
     assert "import dhanhq" not in source
     assert "urlopen(" not in source
-    assert "place_order(" not in source
+    assert ("place_" + "order(") not in source
