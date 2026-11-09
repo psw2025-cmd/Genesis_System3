@@ -14,6 +14,7 @@ FRESH_MAX_AGE_S = 90.0
 _BLOCKED_SOURCE_TOKENS = (
     "synthetic", "replay", "fixture", "sample", "demo", "mock",
     "csv", "fallback", "snapshot", "moneycontrol", "yahoo",
+    "market_closed", "last_good", "stale",
 )
 
 
@@ -76,8 +77,14 @@ def admit_paper_chains(
             if age is None or not 0 <= age <= max_age_seconds:
                 reason = "MISSING_OR_STALE_TRANSPORT_TIMESTAMP"
             else:
-                source = str(chain.get("data_source") or chain.get("source") or "").lower()
-                if "dhan" not in source or any(token in source for token in _BLOCKED_SOURCE_TOKENS):
+                source = str(chain.get("data_source") or "").lower()
+                provenance = " ".join(
+                    str(chain.get(key) or "").lower()
+                    for key in ("data_source", "source", "status", "market_data_source", "quote_source")
+                )
+                if "dhan" not in source or any(
+                    token in provenance for token in _BLOCKED_SOURCE_TOKENS
+                ):
                     reason = "SOURCE_NOT_DHAN_LIVE"
                 elif _number(chain.get("spot") or chain.get("spot_price"), positive=True) is None:
                     reason = "INVALID_SPOT"
