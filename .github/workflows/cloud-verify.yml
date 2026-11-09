@@ -8,13 +8,16 @@ on:
       - '.github/workflows/cloud-verify.yml'
       - 'tests/test_cloud_verify_target_contract.py'
       - 'tests/test_cloud_discover_readonly.py'
+      - 'tests/test_dhan_canonical_rotation_readonly.py'
       - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/dhan_canonical_rotation_readonly.py'
   push:
     branches: [main]
     paths:
       - '.github/workflows/cloud-verify.yml'
       - 'scripts/cloud_verify_readonly.py'
       - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/dhan_canonical_rotation_readonly.py'
       - 'dashboard/backend/paper_market_replay.py'
 
 permissions:
