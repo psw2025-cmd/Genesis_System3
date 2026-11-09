@@ -139,7 +139,7 @@ jobs:
           root=os.environ["URL"].rstrip("/")
           token=os.environ.get("TOKEN") or ""
           outcomes={}
-          for path in ("/ui","/api/health","/api/deploy/info","/api/market-status","/api/options/gainers","/api/market/top-gainers"):
+          for path in ("/ui","/api/health","/api/deploy/info","/api/market-status","/api/security/mutation-policy","/api/options/gainers","/api/market/top-gainers"):
               headers={"Accept":"application/json"}
               if token:headers["Authorization"]="Bearer "+token
               req=urllib.request.Request(root+path,headers=headers,method="GET")
@@ -154,6 +154,12 @@ jobs:
                   continue
               print("CANARY_ROUTE="+path+" HTTP="+str(code))
               outcomes[path]=code
+              if path=="/api/security/mutation-policy" and code==200:
+                  policy=json.loads(raw)
+                  if (policy.get("state")!="ENFORCED" or policy.get("live_mutation")!="HARD_DENY"
+                      or policy.get("public_dashboard_read_only") is not True):
+                      raise SystemExit("FAIL_PRODUCTION_CANDIDATE_MUTATION_POLICY")
+                  print("CANARY_MUTATION_POLICY=PASS")
               if path=="/api/deploy/info" and code==200:
                   try:
                       data=json.loads(raw)
