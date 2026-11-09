@@ -178,11 +178,19 @@ async def market_status_readonly():
         "live_trading_enabled": False,
         "timestamp_ist": now.isoformat(),
     }
-    if not getattr(legacy, "MARKET_DETECTION_AVAILABLE", False):
-        response["reason"] = "MARKET_SESSION_DETECTOR_UNAVAILABLE"
-        return response
+    detector = None
+    if getattr(legacy, "MARKET_DETECTION_AVAILABLE", False):
+        detector = getattr(legacy, "get_market_status", None)
+    if detector is None:
+        # Canonical repository location; the historical utils.market_hours
+        # import in legacy may not exist in a clean Cloud Run image.
+        try:
+            from src.utils.market_hours import get_market_status as detector
+        except ImportError:
+            response["reason"] = "MARKET_SESSION_DETECTOR_UNAVAILABLE"
+            return response
     try:
-        details = legacy.get_market_status(now_ist=now)
+        details = detector(now_ist=now)
     except Exception:
         response["reason"] = "MARKET_SESSION_DETECTOR_FAILED"
         return response
