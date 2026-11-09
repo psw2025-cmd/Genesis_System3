@@ -38,6 +38,22 @@ class DhanCanonicalReadOnlyContractTests(unittest.TestCase):
         self.assertEqual(result["token_provider_mode"], "SECRET_MANAGER")
         self.assertNotIn("PRIVATE_TOKEN", json.dumps(result))
 
+    def test_cloud_run_injection_reference_is_classified_without_name_leak(self):
+        doc = {"spec": {"template": {"spec": {"containers": [{
+            "env": [{"name": "DHAN_ACCESS_TOKEN", "valueFrom": {
+                "secretKeyRef": {"name": "dhan-access-token"}
+            }}]
+        }]}}}}
+        result = probe._runtime_token_source(doc)
+        self.assertEqual(result["token_injection_ref_class"], "CANONICAL")
+        self.assertTrue(result["token_secret_reference_configured"])
+
+        doc["spec"]["template"]["spec"]["containers"][0]["env"][0][
+            "valueFrom"]["secretKeyRef"]["name"] = "OTHER_PRIVATE_SECRET"
+        bad = probe._runtime_token_source(doc)
+        self.assertEqual(bad["token_injection_ref_class"], "OTHER_SECRET_REFERENCE")
+        self.assertNotIn("OTHER_PRIVATE_SECRET", json.dumps(bad))
+
     def test_rotator_config_sanitized_and_not_mutating(self):
         doc = {"spec": {"template": {"spec": {"template": {"spec": {"containers": [
             {"image": "registry.example/repo@sha256:" + "a" * 64,
