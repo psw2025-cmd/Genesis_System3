@@ -6464,6 +6464,13 @@ async def paper_engine_tick(background_tasks: BackgroundTasks, max_open: int = 3
     except ImportError:
         from cloud_paper_engine import get_paper_engine
 
+    try:
+        from dashboard.backend.paper_feed_admission import (
+            admit_paper_chains, missing_open_position_quotes,
+        )
+    except ImportError:
+        from paper_feed_admission import admit_paper_chains, missing_open_position_quotes
+
     engine = get_paper_engine(OUTPUTS_DIR)
     open_before = len(engine.open_positions)
 
@@ -6495,7 +6502,14 @@ async def paper_engine_tick(background_tasks: BackgroundTasks, max_open: int = 3
                         market_top_rows = list(mw.get("top_combined_list") or [])
             except Exception as mt_exc:
                 print(f"[paper-tick] market top fetch skipped: {mt_exc}")
-        engine.step(chains, max_open=min(max(max_open, 1), 5), market_top=market_top_rows)
+        fresh_chains, rejects = admit_paper_chains(chains)
+        uncovered = missing_open_position_quotes(engine.open_positions, fresh_chains)
+        if not fresh_chains or uncovered:
+            print(f"[paper-tick] BLOCKED_FRESH_QUOTES admitted={len(fresh_chains)} "
+                  f"rejected={len(rejects)} unquoted_positions={len(uncovered)}")
+            return
+        engine.step(fresh_chains, max_open=min(max(max_open, 1), 5),
+                    market_top=market_top_rows)
         _API_CACHE.pop("paper", None)
         print(
             f"[paper-tick] done open={len(engine.open_positions)} "
@@ -7657,6 +7671,14 @@ async def cloud_paper_trading_loop():
                     from cloud_paper_engine import get_paper_engine
 
                 engine = get_paper_engine(OUTPUTS_DIR)
+                try:
+                    from dashboard.backend.paper_feed_admission import (
+                        admit_paper_chains, missing_open_position_quotes,
+                    )
+                except ImportError:
+                    from paper_feed_admission import (
+                        admit_paper_chains, missing_open_position_quotes,
+                    )
 
                 # Prefer warmed chain cache so this loop cannot starve /ui.
                 chains = []
@@ -7686,8 +7708,19 @@ async def cloud_paper_trading_loop():
                 except Exception as seed_exc:
                     print(f"[paper-loop] high-rise seed skipped: {seed_exc}")
 
-                if chains:
-                    engine.step(chains, max_open=3, market_top=market_top_rows)
+                fresh_chains, rejects = admit_paper_chains(chains)
+                uncovered = missing_open_position_quotes(
+                    engine.open_positions, fresh_chains)
+                if not fresh_chains or uncovered:
+                    # The dashboard can still show historical quotes. Automated
+                    # PAPER entry/mark/exit must never consume those quotes.
+                    print(
+                        f"[paper-loop] BLOCKED_FRESH_QUOTES "
+                        f"admitted={len(fresh_chains)} rejected={len(rejects)} "
+                        f"unquoted_positions={len(uncovered)}"
+                    )
+                else:
+                    engine.step(fresh_chains, max_open=3, market_top=market_top_rows)
                     print(
                         f"[paper-loop] tick: {len(engine.open_positions)} open, "
                         f"{len(engine.closed_positions)} closed, "
