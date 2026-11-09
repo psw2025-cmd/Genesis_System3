@@ -45,6 +45,23 @@ def _status_code(value: Any) -> str:
     return str(value) if type(value) is int and 0 <= value <= 20 else "UNREPORTED"
 
 
+def _safe_reason(value: Any) -> str:
+    """Allowlist only machine-coded condition reasons; never print messages."""
+    text = str(value or "")
+    return text if re.fullmatch(r"[A-Za-z][A-Za-z0-9_-]{0,50}", text) else "UNREPORTED"
+
+
+def _execution_conditions(row: dict[str, Any]) -> list[dict[str, str]]:
+    status = row.get("status") or {}
+    return [{
+        "type": _safe_reason(c.get("type")),
+        "status": str(c.get("status")) if c.get("status") in (
+            "True", "False", "Unknown",
+        ) else "UNREPORTED",
+        "reason": _safe_reason(c.get("reason")),
+    } for c in (status.get("conditions") or []) if isinstance(c, dict)][:5]
+
+
 def _executable_metadata(job: dict[str, Any]) -> dict[str, Any]:
     template = (job.get("spec") or {}).get("template") or job.get("template") or {}
     task_template = template.get("spec") or template.get("template") or {}
@@ -71,6 +88,14 @@ def _runtime_token_source(service: dict[str, Any]) -> dict[str, Any]:
     env_list = containers[0].get("env") or [] if len(containers) == 1 else []
     env = {x.get("name"): x for x in env_list if isinstance(x, dict)}
     token = env.get("DHAN_ACCESS_TOKEN") or {}
+    ref = (token.get("valueFrom") or token.get("valueSource") or {}).get(
+        "secretKeyRef"
+    ) or {}
+    ref_name = ref.get("name") or ref.get("secret")
+    token_ref_class = (
+        "CANONICAL" if ref_name == CANONICAL else
+        ("OTHER_SECRET_REFERENCE" if ref_name else "UNREPORTED")
+    )
     source = str((env.get("DHAN_TOKEN_SOURCE") or {}).get("value") or "").lower()
     sid = str((env.get("DHAN_ACCESS_TOKEN_SECRET_ID") or {}).get("value") or "")
     # Broker-status GET may invoke configured auth self-heal/renewal in the
@@ -93,6 +118,7 @@ def _runtime_token_source(service: dict[str, Any]) -> dict[str, Any]:
         "service_revision": _safe_name((service.get("status") or {}).get("latestReadyRevisionName")),
         "canonical_secret_id": "CANONICAL" if sid == CANONICAL else "DEFAULT_OR_OTHER",
         "token_provider_mode": ("SECRET_MANAGER" if source in ("gcp", "gcp-secret-manager", "gcp-secret-manager-dynamic", "secret-manager") else "AUTO_OR_OTHER"),
+        "token_injection_ref_class": token_ref_class,
         "static_token_value_configured": bool(token.get("value")),
         "token_secret_reference_configured": bool(token.get("valueFrom") or token.get("valueSource")),
     }
@@ -187,7 +213,28 @@ def audit() -> dict[str, Any]:
                 "succeeded_count": int(status.get("succeededCount") or 0),
                 "failed_count": int(status.get("failedCount") or 0),
                 "completion_time": _safe_name(status.get("completionTime")),
+                "conditions": _execution_conditions(row),
             })
+        latest = executions[0] if executions else {}
+        full_name = str(
+            (latest.get("metadata") or {}).get("name")
+            or latest.get("name") or ""
+        ) if isinstance(latest, dict) else ""
+        leaf = full_name.rsplit("/", 1)[-1]
+        if re.fullmatch(r"genesis-system3-dhan-token-rotate-[a-z0-9-]{4,50}", leaf):
+            details, detail_read = _gcloud_json([
+                "run", "jobs", "executions", "describe", leaf,
+                f"--region={REGION}"
+            ])
+            report["latest_rotation_execution_detail_read"] = detail_read
+            if isinstance(details, dict):
+                report["latest_rotation_execution_conditions"] = (
+                    _execution_conditions(details)
+                )
+        else:
+            report["latest_rotation_execution_detail_read"] = (
+                "NO_VALIDATED_EXECUTION_NAME"
+            )
     scheduler, ok = _gcloud_json([
         "scheduler", "jobs", "describe", ROTATE_SCHEDULE, f"--location={REGION}"
     ])

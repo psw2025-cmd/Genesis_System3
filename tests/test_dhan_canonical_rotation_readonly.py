@@ -38,6 +38,22 @@ class DhanCanonicalReadOnlyContractTests(unittest.TestCase):
         self.assertEqual(result["token_provider_mode"], "SECRET_MANAGER")
         self.assertNotIn("PRIVATE_TOKEN", json.dumps(result))
 
+    def test_cloud_run_injection_reference_is_classified_without_name_leak(self):
+        doc = {"spec": {"template": {"spec": {"containers": [{
+            "env": [{"name": "DHAN_ACCESS_TOKEN", "valueFrom": {
+                "secretKeyRef": {"name": "dhan-access-token"}
+            }}]
+        }]}}}}
+        result = probe._runtime_token_source(doc)
+        self.assertEqual(result["token_injection_ref_class"], "CANONICAL")
+        self.assertTrue(result["token_secret_reference_configured"])
+
+        doc["spec"]["template"]["spec"]["containers"][0]["env"][0][
+            "valueFrom"]["secretKeyRef"]["name"] = "OTHER_PRIVATE_SECRET"
+        bad = probe._runtime_token_source(doc)
+        self.assertEqual(bad["token_injection_ref_class"], "OTHER_SECRET_REFERENCE")
+        self.assertNotIn("OTHER_PRIVATE_SECRET", json.dumps(bad))
+
     def test_rotator_config_sanitized_and_not_mutating(self):
         doc = {"spec": {"template": {"spec": {"template": {"spec": {"containers": [
             {"image": "registry.example/repo@sha256:" + "a" * 64,
@@ -98,6 +114,46 @@ class DhanCanonicalReadOnlyContractTests(unittest.TestCase):
         self.assertNotIn("canonical_secret_versions", report)
         self.assertEqual(report["scope"], "READ_ONLY_NO_TOKEN_PAYLOAD_NO_ORDERS")
         self.assertEqual(fake.call_count, 5)
+
+    def test_failed_rotation_reason_reads_metadata_not_message(self):
+        failed = {
+            "metadata": {"name": "genesis-system3-dhan-token-rotate-abc123"},
+            "status": {
+                "completionTime": "2026-11-09T03:25:33Z",
+                "failedCount": 1,
+                "conditions": [{
+                    "type": "Completed", "status": "False",
+                    "reason": "NonZeroExitCode",
+                    "message": "PRIVATE_TOKEN_DO_NOT_PRINT",
+                }],
+            },
+        }
+        with patch.object(probe, "_gcloud_json") as gcloud:
+            gcloud.side_effect = [
+                (None, "DENIED_OR_UNAVAILABLE"),
+                (None, "DENIED_OR_UNAVAILABLE"),
+                ([failed], "PASS"),
+                (failed, "PASS"),
+                (None, "DENIED_OR_UNAVAILABLE"),
+                (None, "DENIED_OR_UNAVAILABLE"),
+            ]
+            result = probe.audit()
+        self.assertEqual(result["latest_rotation_execution_detail_read"], "PASS")
+        self.assertEqual(
+            result["recent_rotation_executions"][0]["conditions"][0]["reason"],
+            "NonZeroExitCode",
+        )
+        self.assertNotIn("PRIVATE_TOKEN_DO_NOT_PRINT", json.dumps(result))
+
+    def test_reason_messages_are_never_exported(self):
+        row = {"status": {"conditions": [{
+            "type": "Completed", "status": "False",
+            "reason": "bad reason PRIVATE_SECRET",
+            "message": "HIGHLY_PRIVATE_MESSAGE",
+        }]}}
+        result = probe._execution_conditions(row)
+        self.assertEqual(result[0]["reason"], "UNREPORTED")
+        self.assertNotIn("PRIVATE", json.dumps(result))
 
     def test_only_validated_production_url_may_be_probed(self):
         with patch.object(probe, "_gcloud_json") as fake:
