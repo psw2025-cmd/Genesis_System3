@@ -1,0 +1,39 @@
+name: Genesis Cloud Autonomous Watch
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  cloud-watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify production UI and API
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://genesis-system3-web-doq2wplepa-el.a.run.app"
+          curl --fail --silent --show-error --max-time 25 --retry 2 "$BASE/ui" -o /tmp/genesis-ui.html
+          curl --fail --silent --show-error --max-time 25 --retry 2 "$BASE/openapi.json" -o /tmp/genesis-openapi.json
+          python3 - <<'PY'
+          import json
+          with open('/tmp/genesis-openapi.json') as f: spec=json.load(f)
+          paths=spec.get('paths',{})
+          required=['/api/market/top-gainers','/api/broker/dhan/status']
+          missing=[p for p in required if p not in paths]
+          print('RUN_EVIDENCE',json.dumps({'routes':len(paths),'required_missing':missing,'paper_only':'no broker order calls'}))
+          if missing: raise SystemExit('Missing required API routes: '+str(missing))
+          PY
+      - name: Record result on master issue
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RESULT: ${{ job.status }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        shell: bash
+        run: |
+          gh issue comment 580 --body "Cloud watch: **$RESULT** | [Run evidence]($RUN_URL) | SHA: ${GITHUB_SHA} | UTC: $(date -u +%FT%TZ). Read-only; broker orders disabled."
