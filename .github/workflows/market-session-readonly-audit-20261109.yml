@@ -1,0 +1,117 @@
+name: One-time Market Session Production Read-Only Audit
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/market-session-readonly-audit-20261109.yml
+permissions:
+  contents: read
+jobs:
+  market-session-audit:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'audit/read-only-market-session-20261109'
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      PROJECT: system3-openalgo-safe
+      REGION: asia-south1
+      SERVICE: genesis-system3-web
+    steps:
+      - name: Authenticate as existing GitHub JSON deploy identity (read-only actions)
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: system3-openalgo-safe
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install Google Cloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Read serving revision, traffic, and PAPER-only safety switches
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/service.json"
+          python3 - "$RUNNER_TEMP/service.json" <<'PY'
+          import json,sys
+          s=json.load(open(sys.argv[1]))
+          status=s.get("status") or {}
+          traffic=status.get("traffic") or []
+          print("MARKET_AUDIT_GCP_SERVICE=ACCESSIBLE")
+          print("LATEST_READY_REVISION="+str(status.get("latestReadyRevisionName") or "UNKNOWN"))
+          for t in traffic:
+              pct=t.get("percent",0)
+              if pct:
+                  print("SERVING_REVISION="+str(t.get("revisionName") or "LATEST")+" TRAFFIC_PCT="+str(pct))
+          spec=s.get("spec") or {}
+          template=spec.get("template") or {}
+          containers=((template.get("spec") or {}).get("containers") or template.get("containers") or [])
+          by_name={x.get("name"):x.get("value") for c in containers for x in c.get("env",[]) if x.get("name")}
+          expected={
+              "PAPER_MODE":"1", "ANALYZE_MODE":"1",
+              "LIVE_TRADING_ENABLED":"0", "SYSTEM3_LIVE_TRADING_ALLOWED":"0",
+              "AUTO_EXECUTE_TRADES":"0", "LIVE_ORDER_AUTHORITY":"0",
+              "REAL_BROKER_ORDERS":"0"
+          }
+          for key,val in expected.items():
+              print("SAFETY_"+key+"="+("PASS" if by_name.get(key)==val else "MISSING_OR_MISMATCH"))
+          print("SERVING_SHA_EVIDENCE=REQUIRES_DEPLOY_INFO_HTTP")
+          PY
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format='value(status.url)' > "$RUNNER_TEMP/url.txt"
+          rm -f "$RUNNER_TEMP/service.json"
+      - name: GET-only market-session backend and UI contract probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="$(cat "$RUNNER_TEMP/url.txt")"
+          test -n "$BASE"
+          TOKEN="$(gcloud auth print-identity-token --audiences="$BASE" 2>/dev/null || true)"
+          export GENESIS_SERVICE_BASE="$BASE"
+          export GENESIS_IDENTITY_TOKEN="$TOKEN"
+          python3 - <<'PY'
+          import datetime,json,os,ssl,urllib.request,urllib.error
+          from zoneinfo import ZoneInfo
+          ist=ZoneInfo("Asia/Kolkata")
+          now=datetime.datetime.now(ist)
+          print("AUDIT_UTC="+now.astimezone(datetime.timezone.utc).isoformat())
+          print("AUDIT_IST="+now.isoformat())
+          print("NSE_CLOCK_WINDOW="+("SESSION_WINDOW" if now.weekday()<5 and datetime.time(9,15)<=now.time()<datetime.time(15,30) else "OUTSIDE_CLOCK_WINDOW"))
+          paths=[
+              "/api/market-status","/api/health","/api/deploy/info",
+              "/api/options/gainers","/api/market/top-gainers",
+              "/api/chain/NIFTY","/api/paper/state",
+              "/api/simulation/status","/ui"
+          ]
+          base=os.environ["GENESIS_SERVICE_BASE"].rstrip("/")
+          token=os.environ.get("GENESIS_IDENTITY_TOKEN","")
+          allowed_scalar={"status","market_status","source","data_source","timestamp","timestamp_ist","as_of","as_of_ist","last_update_ist","last_updated","git_sha","revision","market_open","is_market_open","cloud_mode","live_trading_enabled","real","message","reason"}
+          for path in paths:
+              headers={"Accept":"application/json"}
+              if token:headers["Authorization"]="Bearer "+token
+              req=urllib.request.Request(base+path,headers=headers,method="GET")
+              try:
+                  with urllib.request.urlopen(req,timeout=22) as res:
+                      code=res.status;ct=res.headers.get("Content-Type","")
+                      raw=res.read(300_000)
+              except urllib.error.HTTPError as e:
+                  code=e.code;ct=e.headers.get("Content-Type","");raw=e.read(10000)
+              except Exception as e:
+                  print("ROUTE="+path+" HTTP=NETWORK_ERROR TYPE="+type(e).__name__)
+                  continue
+              result={"route":path,"http":code,"content_type":ct.split(";")[0]}
+              if "json" in ct.lower() and raw:
+                  try:
+                      d=json.loads(raw)
+                      if isinstance(d,dict):
+                          result["schema_keys"]=[k for k in sorted(d) if k in allowed_scalar or k in ("data","market_top_table","contracts","items","rows","gainers")]
+                          for k in sorted(allowed_scalar & d.keys()):
+                              v=d.get(k)
+                              if type(v) in (int,float,bool) or isinstance(v,str) and len(v)<80:
+                                  result[k]=v
+                          for k in ("data","contracts","market_top_table","items","rows","gainers"):
+                              v=d.get(k)
+                              if isinstance(v,list):result[k+"_count"]=len(v)
+                      elif isinstance(d,list):result["item_count"]=len(d)
+                  except ValueError:result["json_parse"]="FAILED"
+              print("GET_PROBE="+json.dumps(result,ensure_ascii=True,sort_keys=True))
+          print("GET_ONLY_NO_BROKER_ORDERS=TRUE")
+          PY
+      - name: Report clean evidence completion
+        if: always()
+        run: echo 'READ_ONLY_MARKET_AUDIT_COMPLETE;NO_DEPLOYMENT;NO_SECRET_VALUES;NO_BROKER_ORDERS'
