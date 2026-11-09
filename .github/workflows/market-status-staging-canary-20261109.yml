@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - .github/workflows/full-source-staging-canary-20261109.yml
+      - .github/workflows/market-status-staging-canary-20261109.yml
 permissions:
   contents: read
 jobs:
