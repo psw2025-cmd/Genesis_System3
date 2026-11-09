@@ -54,7 +54,30 @@ jobs:
               raise SystemExit("BLOCKED_STAGING_TRAFFIC_BASELINE_NOT_SINGLE_100_PERCENT")
           print("STAGING_BASELINE_REVISION="+active[0]["revisionName"])
           PY
+      - name: Reuse already-created isolated staging canary, never rebuild unnecessarily
+        id: reuse
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/check-existing.json"
+          if python3 - "$RUNNER_TEMP/check-existing.json" "$CANARY_TAG" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1]))
+          tag=sys.argv[2]
+          candidates=[t for t in (data.get("status") or {}).get("traffic") or []
+                      if t.get("tag")==tag and t.get("revisionName")
+                      and int(t.get("percent") or 0)==0]
+          raise SystemExit(0 if len(candidates)==1 else 1)
+          PY
+          then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            echo "EXISTING_CANARY_REUSED=TRUE"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "EXISTING_CANARY_REUSED=FALSE"
+          fi
       - name: Build immutable canonical backend/frontend source as isolated recovery image
+        if: steps.reuse.outputs.present != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -64,6 +87,7 @@ jobs:
             --timeout=45m --quiet
           echo "CANONICAL_IMAGE_BUILD=PASS"
       - name: Deploy to STAGING with NO TRAFFIC and all trading locks OFF
+        if: steps.reuse.outputs.present != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -102,7 +126,13 @@ jobs:
           set -euo pipefail
           URL="$(cat /tmp/genesis-canary-url.txt)"
           if [ -z "$URL" ]; then echo "CANARY_PRIVATE_URL_NOT_DISCOVERED"; exit 1; fi
-          TOKEN="$(gcloud auth print-identity-token --audiences="$URL" 2>/dev/null || true)"
+          BASE_URL="$(gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
+          test -n "$BASE_URL"
+          # Cloud Run expects the canonical service URL as token audience,
+          # not a tagged revision URL.
+          TOKEN="$(gcloud auth print-identity-token --audiences="$BASE_URL" 2>/dev/null || true)"
+          if [ -n "$TOKEN" ]; then echo "PRIVATE_ID_TOKEN_GENERATED=TRUE";
+          else echo "PRIVATE_ID_TOKEN_GENERATED=FALSE"; fi
           export URL TOKEN PINNED_SHA
           python3 - <<'PY'
           import json,os,urllib.request,urllib.error
