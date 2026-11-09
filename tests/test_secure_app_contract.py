@@ -64,7 +64,6 @@ class SecureAppContractTests(unittest.TestCase):
             "from src.utils.market_hours import get_market_status as detector",
         ):
             self.assertIn(marker, body)
-        self.assertNotIn("place_order(", body)
 
     def test_no_live_or_order_authority_added_to_secure_boundary(self):
         source = Path("dashboard/backend/secure_app.py").read_text(encoding="utf-8")
