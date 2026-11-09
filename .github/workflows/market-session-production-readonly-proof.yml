@@ -177,4 +177,29 @@ jobs:
           else
             echo "CLOUD_RUN_JOB_LIST=NOT_VERIFIED"
           fi
+          python3 - "$RUNNER_TEMP/scheduler.json" "$RUNNER_TEMP/jobs.json" <<'PY'
+          import json,sys,re
+          from urllib.parse import urlsplit
+          sched=json.load(open(sys.argv[1]))
+          cloudjobs=json.load(open(sys.argv[2]))
+          known={str((j.get("metadata") or {}).get("name") or j.get("name") or "").rsplit("/",1)[-1] for j in cloudjobs}
+          for j in sched:
+              name=str(j.get("name") or "").rsplit("/",1)[-1]
+              if not name.startswith("genesis-system3-"):
+                  continue
+              target=j.get("httpTarget") or {}
+              pub=j.get("pubsubTarget") or {}
+              app=j.get("appEngineHttpTarget") or {}
+              if target:
+                  url=urlsplit(str(target.get("uri") or ""))
+                  host=url.hostname or "UNKNOWN"
+                  path=url.path
+                  job_match=re.search(r"/jobs/([A-Za-z0-9_-]+):run$",path)
+                  target_name=job_match.group(1) if job_match else ""
+                  # Report route names only; do not expose query strings or credentials.
+                  safe_path=path if re.fullmatch(r"/[A-Za-z0-9/_:.-]{0,130}",path) else "REDACTED"
+                  print("SCHEDULER_TARGET="+name+" type=HTTP method="+str(target.get("httpMethod") or "UNKNOWN")+" host="+host+" path="+safe_path+" job_name="+(target_name or "NONE")+" job_exists="+("YES" if target_name in known else "NO_OR_NON_JOB_ROUTE"))
+              else:
+                  print("SCHEDULER_TARGET="+name+" type="+("PUBSUB" if pub else ("APPENGINE" if app else "OTHER")))
+          PY
           echo "READ_ONLY_NO_BROKER_ORDERS=TRUE"
