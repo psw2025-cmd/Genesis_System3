@@ -208,6 +208,98 @@ jobs:
           PY
           echo "PRODUCTION_CANARY_REVISION=$candidate"
           echo "PRODUCTION_CANARY_TRAFFIC=0_PERCENT"
+      - name: Promote only verified canonical candidate with automatic rollback
+        shell: bash
+        timeout-minutes: 12
+        run: |
+          set -Eeuo pipefail
+          CANDIDATE="$(python3 - "$RUNNER_TEMP/after.json" "$CANARY_TAG" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          rows=[x for x in (d.get("status") or {}).get("traffic") or []
+                if x.get("tag")==sys.argv[2] and int(x.get("percent") or 0)==0
+                and x.get("revisionName")]
+          if len(rows)!=1:raise SystemExit("CANDIDATE_MUST_HAVE_ZERO_TRAFFIC")
+          print(rows[0]["revisionName"])
+          PY
+          )"
+          BASELINE="$(python3 - "$RUNNER_TEMP/baseline.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          rows=[x for x in (d.get("status") or {}).get("traffic") or []
+                if int(x.get("percent") or 0)==100 and x.get("revisionName")]
+          if len(rows)!=1:raise SystemExit("NO_SINGLE_PRODUCTION_BASELINE")
+          print(rows[0]["revisionName"])
+          PY
+          )"
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/pre-switch.json"
+          python3 - "$RUNNER_TEMP/baseline.json" "$RUNNER_TEMP/pre-switch.json" <<'PY'
+          import json,sys
+          a,b=(json.load(open(x)) for x in sys.argv[1:])
+          def active(d):
+              return {x.get("revisionName"):int(x.get("percent") or 0)
+                      for x in (d.get("status") or {}).get("traffic") or []
+                      if int(x.get("percent") or 0)>0}
+          if active(a)!=active(b):raise SystemExit("PRODUCTION_TRAFFIC_CHANGED_SINCE_BASELINE")
+          print("PRODUCTION_PRE_PROMOTION_BASELINE=PASS")
+          PY
+          PROMOTED=0
+          restore_on_failure() {
+            rc=$?
+            if [ "$rc" -ne 0 ] && [ "$PROMOTED" = 1 ]; then
+              echo "PRODUCTION_ROLLBACK_ATTEMPTED=TRUE"
+              gcloud run services update-traffic "$STAGING" --project="$PROJECT" --region="$REGION" --to-revisions="$BASELINE=100" --quiet || true
+            fi
+          }
+          trap restore_on_failure EXIT
+          PROMOTED=1
+          gcloud run services update-traffic "$STAGING" --project="$PROJECT" --region="$REGION" --to-revisions="$CANDIDATE=100" --quiet
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/post-switch.json"
+          python3 - "$RUNNER_TEMP/post-switch.json" "$CANDIDATE" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          candidates=[x for x in (d.get("status") or {}).get("traffic") or []
+                      if x.get("revisionName")==sys.argv[2] and int(x.get("percent") or 0)==100]
+          if len(candidates)!=1:raise SystemExit("PROMOTION_TRAFFIC_PERCENT_NOT_100")
+          print("PRODUCTION_ACTUAL_TRAFFIC=100_PERCENT_CANONICAL")
+          PY
+          BASE_URL="$(gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
+          test -n "$BASE_URL"
+          TOKEN="$(gcloud auth print-identity-token --audiences="$BASE_URL" 2>/dev/null || true)"
+          export BASE_URL TOKEN PINNED_SHA
+          python3 - <<'PY'
+          import json,os,urllib.request
+          base=os.environ["BASE_URL"].rstrip("/")
+          token=os.environ.get("TOKEN") or ""
+          paths=("/ui","/api/health","/api/deploy/info","/api/market-status",
+                 "/api/security/mutation-policy","/api/options/gainers","/api/market/top-gainers")
+          for path in paths:
+              headers={"Accept":"application/json"}
+              if token:headers["Authorization"]="Bearer "+token
+              request=urllib.request.Request(base+path,headers=headers,method="GET")
+              with urllib.request.urlopen(request,timeout=40) as response:
+                  if response.status!=200:raise SystemExit("POST_PROMOTION_ROUTE_NOT_200:"+path)
+                  raw=response.read(200000)
+              if path=="/api/deploy/info":
+                  doc=json.loads(raw)
+                  if doc.get("git_sha")!=os.environ["PINNED_SHA"]:
+                      raise SystemExit("POST_PROMOTION_WRONG_GIT_SHA")
+              if path=="/api/security/mutation-policy":
+                  doc=json.loads(raw)
+                  if (doc.get("state")!="ENFORCED" or doc.get("live_mutation")!="HARD_DENY"
+                      or doc.get("public_dashboard_read_only") is not True):
+                      raise SystemExit("POST_PROMOTION_MUTATION_AUTHORITY_INVALID")
+              if path=="/api/market-status":
+                  doc=json.loads(raw)
+                  if doc.get("real") is not False or doc.get("calendar_verified") is not False:
+                      raise SystemExit("POST_PROMOTION_SESSION_FEED_MISLABELED")
+              print("POST_PROMOTION_GET="+path+" PASS")
+          print("PRODUCTION_CANDIDATE_SOURCE_AND_POLICY=PASS")
+          PY
+          PROMOTED=0
+          trap - EXIT
+          echo "PRODUCTION_PROMOTED_CANONICAL_REVISION=$CANDIDATE"
+          echo "REAL_BROKER_ORDERS_ENABLED=FALSE"
       - name: Final receipt
         if: always()
         run: echo 'PRODUCTION_CANDIDATE_ONLY;ZERO_TRAFFIC;NO_REAL_BROKER_ORDERS'
