@@ -232,8 +232,9 @@ def test_automatic_paper_engine_gap_entry_exit_and_restart(tmp_path, monkeypatch
             "evidence_id": "test-independent-snapshot-1",
         }],
     }])
+    # Even a claimed independent source is NOT verified without separate trust.
     assert (recovered.master_ledger.snapshot()["outcomes"][closed["position_id"]]
-            ["validation_status"] == "SOURCE_ATTESTED")
+            ["validation_status"] == "NOT_VERIFIED")
 
 
 def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypatch):
@@ -271,6 +272,12 @@ def test_ten_fully_automatic_paper_cycles_produce_shadow_learning(tmp_path, monk
     observed = [start]
     monkeypatch.setattr(engine_module, "_now_ist", lambda: observed[0])
     engine = engine_module.CloudPaperEngine(tmp_path)
+    # Synthetic test-only validator to exercise the downstream learning path.
+    # The real engine defaults to None and cannot accept forged exchange claims.
+    engine.independent_outcome_verifier = (
+        lambda trade, price, at, source, evidence:
+            source == "INDEPENDENT_EXCHANGE_SNAPSHOT"
+            and evidence.startswith("TEST_FIXTURE_NOT_REAL_"))
     frame = {
         "underlying": "NIFTY", "spot": 25000.0,
         "session_open_price": 25150.0, "previous_session_close": 25000.0,
