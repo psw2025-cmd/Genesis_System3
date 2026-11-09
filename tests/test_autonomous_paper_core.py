@@ -137,7 +137,9 @@ def test_learning_is_shadow_only_with_chronological_holdout(tmp_path):
         ledger.record_close(closed_position(p), stamp(i + 20))
         row = ledger.record_outcome(
             p["position_id"], reference_price=110, at=stamp(i + 30),
-            source="INDEPENDENT_EXCHANGE_SNAPSHOT", reference_id=f"source-{i}")
+            source="INDEPENDENT_EXCHANGE_SNAPSHOT", reference_id=f"source-{i}",
+            independent_verifier=lambda trade, price, at, source, evidence: (
+                evidence.startswith("source-") and source == "INDEPENDENT_EXCHANGE_SNAPSHOT"))
         assert row["validation_status"] == "SOURCE_ATTESTED"
     proposal = ledger.learning_proposal(stamp(100))
     assert proposal["status"] == "SHADOW_ONLY"
@@ -217,3 +219,30 @@ def test_orphan_fill_is_rejected_atomically(tmp_path):
         ledger.append_batch([("orphan", "MISSING", "PAPER_ENTRY_FILL", stamp(),
                               {"qty": 25, "mode": "SIMULATED_PAPER_FILL_NOT_BROKER"})])
     assert ledger.snapshot()["event_count"] == 0
+
+
+
+def test_untrusted_source_name_and_id_never_certify_outcome(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    p = position()
+    ledger.record_open(p, stamp())
+    ledger.record_close(closed_position(p), stamp(12))
+    outcome = ledger.record_outcome(
+        "PAPER-1", reference_price=115.0, at=stamp(20),
+        source="INDEPENDENT_EXCHANGE_SNAPSHOT", reference_id="fake-receipt")
+    assert outcome["validation_status"] == "NOT_VERIFIED"
+    assert outcome["verification_method"] == "NO_TRUSTED_VERIFIER_OR_FAILED_VALIDATION"
+    assert ledger.learning_proposal(stamp(30))["status"] == "NOT_VERIFIED"
+
+
+def test_trusted_verifier_rejection_blocks_learning(tmp_path):
+    ledger = MasterPaperLedger(tmp_path / "master.db")
+    p = position()
+    ledger.record_open(p, stamp())
+    ledger.record_close(closed_position(p), stamp(12))
+    outcome = ledger.record_outcome(
+        "PAPER-1", reference_price=115.0, at=stamp(20),
+        source="INDEPENDENT_EXCHANGE_SNAPSHOT", reference_id="bad-receipt",
+        independent_verifier=lambda *args: False)
+    assert outcome["validation_status"] == "NOT_VERIFIED"
+    assert ledger.learning_proposal(stamp(30))["status"] == "NOT_VERIFIED"
