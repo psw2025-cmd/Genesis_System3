@@ -48,12 +48,12 @@ with sync_playwright() as playwright:
         for index, name in enumerate(TABS, 1):
             row = {"tab": name, "opened": False, "screenshot": None, "error": None, "flags": [], "active_tab_verified": False}
             try:
-                page.locator(`[data-dashboard-tab="${DASHBOARD_TAB_IDS[name]}"]`).click(timeout=4000)
+                page.locator(f'[data-dashboard-tab="{DASHBOARD_TAB_IDS[name]}"]').click(timeout=4000)
                 page.wait_for_timeout(900)
                 content = page.locator("body").inner_text()
                 path = OUT / f"{index:02d}_{re.sub('[^a-zA-Z0-9]', '_', name)}.png"
                 page.screenshot(path=str(path), full_page=True, timeout=15000)
-                row.update(opened=True, screenshot=str(path), active_tab_verified=page.locator(`[data-dashboard-tab="${DASHBOARD_TAB_IDS[name]}"]`).get_attribute("aria-current") == "page", flags=[
+                row.update(opened=True, screenshot=str(path), active_tab_verified=page.locator(f'[data-dashboard-tab="{DASHBOARD_TAB_IDS[name]}"]').get_attribute("aria-current") == "page", flags=[
                     flag for flag in ("STALE", "BLOCKED", "NOT_VERIFIED", "NO_PREDICTION_SOURCE_FOUND")
                     if flag.casefold() in content.casefold()
                 ])
