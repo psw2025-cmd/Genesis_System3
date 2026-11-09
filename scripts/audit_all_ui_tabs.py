@@ -13,7 +13,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 BASE_URL = os.environ.get("GENESIS_UI_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui")
-TABS = (
+DASHBOARD_TAB_IDS = {\n    "Decision Intel": "decision-intel", "Truth Control": "truth",\n    "Genesis Brain": "genesis", "E2E Proof": "e2e-proof",\n    "Overview": "overview", "Sim Live": "sim-live",\n    "Options Intel": "options-intel", "Option Chain": "chain",\n    "Signals": "signals", "Trade": "trade", "Paper Trades": "paper",\n    "Positions": "positions", "Risk & Scenarios": "risk-scenarios",\n    "Multibagger": "multibagger", "Prediction Audit": "prediction-audit",\n    "Performance": "performance", "ML Model": "ml",\n    "Data Integrity": "data-integrity", "Broker": "broker",\n    "Alerts": "alerts", "System": "system",\n    "System readiness": "system-readiness", "Live Gate": "gates",\n}\nTABS = (
     "Decision Intel", "Truth Control", "Genesis Brain", "E2E Proof",
     "Overview", "Sim Live", "Options Intel", "Option Chain", "Signals",
     "Trade", "Paper Trades", "Positions", "Risk & Scenarios",
@@ -33,14 +33,14 @@ with sync_playwright() as playwright:
         page.goto(BASE_URL, wait_until="commit", timeout=30000)
         page.wait_for_timeout(1500)
         for index, name in enumerate(TABS, 1):
-            row = {"tab": name, "opened": False, "screenshot": None, "error": None, "flags": []}
+            row = {"tab": name, "opened": False, "screenshot": None, "error": None, "flags": [], "active_tab_verified": False}
             try:
-                page.get_by_text(name, exact=True).first.click(timeout=4000)
-                page.wait_for_timeout(350)
+                page.locator(`[data-dashboard-tab="${DASHBOARD_TAB_IDS[name]}"]`).click(timeout=4000)
+                page.wait_for_timeout(900)
                 content = page.locator("body").inner_text()
                 path = OUT / f"{index:02d}_{re.sub('[^a-zA-Z0-9]', '_', name)}.png"
                 page.screenshot(path=str(path), full_page=True, timeout=15000)
-                row.update(opened=True, screenshot=str(path), flags=[
+                row.update(opened=True, screenshot=str(path), active_tab_verified=page.locator(`[data-dashboard-tab="${DASHBOARD_TAB_IDS[name]}"]`).get_attribute("aria-current") == "page", flags=[
                     flag for flag in ("STALE", "BLOCKED", "NOT_VERIFIED", "NO_PREDICTION_SOURCE_FOUND")
                     if flag.casefold() in content.casefold()
                 ])
@@ -56,7 +56,7 @@ result = {
     "tabs_opened": sum(row["opened"] for row in rows),
     "javascript_errors": js_errors,
     "tabs": rows,
-    "ui_navigation_pass": len(rows) == len(TABS) and all(row["opened"] for row in rows) and not js_errors,
+    "ui_navigation_pass": len(rows) == len(TABS) and all(row["opened"] and row["active_tab_verified"] for row in rows) and not js_errors,
     "data_truth_pass": False,
     "data_truth_note": "Navigation and screenshots cannot certify freshness, predictions, or paper-trade lifecycle.",
 }
