@@ -24,12 +24,11 @@ jobs:
       LIVE_ORDER_AUTHORITY: '0'
       REAL_BROKER_ORDERS: '0'
     steps:
-      - name: Authenticate using validated read-only WIF
+      - name: Authenticate with preverified encrypted JSON credential
         uses: google-github-actions/auth@v2
         with:
           project_id: system3-openalgo-safe
-          workload_identity_provider: projects/802404398783/locations/global/workloadIdentityPools/github-genesis-system3/providers/github
-          service_account: system3-evidence-reader@system3-openalgo-safe.iam.gserviceaccount.com
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
       - name: Install Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
       - name: Describe production serving revision and safety
