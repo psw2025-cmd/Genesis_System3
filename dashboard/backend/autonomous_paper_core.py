@@ -13,7 +13,7 @@ import math
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 
 GENESIS = "0" * 64
@@ -408,7 +408,8 @@ class MasterPaperLedger:
                 "verified_hash_chain": snapshot["verified_hash_chain"]}
 
     def record_outcome(self, trade: str, *, reference_price: float, at: str,
-                       source: str, reference_id: str | None = None) -> dict:
+                       source: str, reference_id: str | None = None,
+                       independent_verifier: Callable[[str, float, str, str, str], bool] | None = None) -> dict:
         """Assess a CLOSED simulated trade against a later, independent market print."""
         price = _positive(reference_price, "OUTCOME_PRICE")
         state = self.snapshot()
@@ -418,10 +419,22 @@ class MasterPaperLedger:
         exit_time = str(row.get("exit_timestamp_utc") or "")
         if exit_time and _stamp(at) <= _stamp(exit_time):
             raise PaperEvidenceError("OUTCOME_MUST_FOLLOW_EXIT")
-        verified = source == "INDEPENDENT_EXCHANGE_SNAPSHOT" and bool(reference_id)
+        # Source strings and reference IDs are UNTRUSTED metadata. A separate,
+        # injected verifier must independently check origin, time and identity.
+        # Without it, a fabricated JSON payload can never manufacture learning.
+        verified = False
+        if (source == "INDEPENDENT_EXCHANGE_SNAPSHOT" and reference_id
+                and independent_verifier is not None):
+            try:
+                verified = independent_verifier(
+                    trade, price, at, source, reference_id) is True
+            except Exception as exc:
+                raise PaperEvidenceError("INDEPENDENT_OUTCOME_VERIFICATION_FAILED") from exc
         result = {"reference_price": price, "reference_at": at, "reference_source": source,
                   "reference_id": reference_id,
                   "validation_status": "SOURCE_ATTESTED" if verified else "NOT_VERIFIED",
+                  "verification_method": ("INJECTED_TRUSTED_VERIFIER" if verified
+                                          else "NO_TRUSTED_VERIFIER_OR_FAILED_VALIDATION"),
                   "paper_exit_price": row.get("exit_price"),
                   "difference_from_paper_exit": round(price - float(row["exit_price"]), 4)}
         self.append_batch([(
