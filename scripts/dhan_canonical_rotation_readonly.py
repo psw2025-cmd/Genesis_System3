@@ -73,7 +73,23 @@ def _runtime_token_source(service: dict[str, Any]) -> dict[str, Any]:
     token = env.get("DHAN_ACCESS_TOKEN") or {}
     source = str((env.get("DHAN_TOKEN_SOURCE") or {}).get("value") or "").lower()
     sid = str((env.get("DHAN_ACCESS_TOKEN_SECRET_ID") or {}).get("value") or "")
+    # Broker-status GET may invoke configured auth self-heal/renewal in the
+    # deployed application. Avoid that endpoint unless BOTH mechanisms are
+    # explicitly off (or absent with fail-closed cloud defaults).
+    def inactive(name: str) -> bool:
+        setting = env.get(name)
+        if setting is None:
+            return True  # cloud defaults are OFF
+        raw = setting.get("value")
+        return raw is not None and str(raw).strip().lower() in (
+            "", "0", "false", "no", "off",
+        )
+
     return {
+        "broker_status_get_without_autoheal": (
+            inactive("DHAN_STATUS_AUTO_REFRESH")
+            and inactive("DHAN_CANONICAL_ROTATION_SELF_HEAL")
+        ),
         "service_revision": _safe_name((service.get("status") or {}).get("latestReadyRevisionName")),
         "canonical_secret_id": "CANONICAL" if sid == CANONICAL else "DEFAULT_OR_OTHER",
         "token_provider_mode": ("SECRET_MANAGER" if source in ("gcp", "gcp-secret-manager", "gcp-secret-manager-dynamic", "secret-manager") else "AUTO_OR_OTHER"),
@@ -139,8 +155,14 @@ def audit() -> dict[str, Any]:
     service, ok = _gcloud_json(["run", "services", "describe", SERVICE, f"--region={REGION}"])
     report["service_read"] = ok
     if isinstance(service, dict):
-        report["runtime"] = _runtime_token_source(service)
-        report["production_broker"] = _production_broker_status(service)
+        runtime = _runtime_token_source(service)
+        report["runtime"] = runtime
+        if runtime["broker_status_get_without_autoheal"]:
+            report["production_broker"] = _production_broker_status(service)
+        else:
+            report["production_broker"] = {
+                "http_status": "NOT_PROBED_AUTOHEAL_MAY_ROTATE_TOKEN"
+            }
     job, ok = _gcloud_json(["run", "jobs", "describe", ROTATOR, f"--region={REGION}"])
     report["rotation_job_read"] = ok
     if isinstance(job, dict):
