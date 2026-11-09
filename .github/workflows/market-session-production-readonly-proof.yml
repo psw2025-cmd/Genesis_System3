@@ -104,6 +104,49 @@ jobs:
             echo "CLOUD_RUN_LOG_ERRORS=NOT_VERIFIED"
           fi
           echo "READ_ONLY_HEALTH_CHECK_COMPLETE"
+      - name: Read sanitized market data schema and freshness without leaking trades
+        shell: bash
+        run: |
+          set -euo pipefail
+          base="$(cat "$RUNNER_TEMP/service-url")"
+          token="$(gcloud auth print-identity-token --audiences="$base" 2>/dev/null || true)"
+          for pair in "session|/api/market-status" "options|/api/options/gainers" "movers|/api/market/top-gainers"; do
+            IFS='|' read -r kind route <<< "$pair"
+            if [ -n "$token" ]; then
+              code="$(curl --silent --show-error --max-time 12 --output "$RUNNER_TEMP/$kind.json" --write-out '%{http_code}' -H "Authorization: Bearer $token" "$base$route" || true)"
+            else
+              code="$(curl --silent --show-error --max-time 12 --output "$RUNNER_TEMP/$kind.json" --write-out '%{http_code}' "$base$route" || true)"
+            fi
+            echo "MARKET_DATA_HTTP $kind=$code"
+            if [ "$code" = 200 ]; then
+              python3 - "$RUNNER_TEMP/$kind.json" "$kind" <<'PY'
+          import json,sys
+          path,kind=sys.argv[1:]
+          try: d=json.load(open(path))
+          except Exception: print("DATA_JSON_"+kind+"=INVALID");sys.exit(0)
+          print("DATA_JSON_"+kind+"=VALID")
+          if not isinstance(d,dict):
+              print("DATA_SCHEMA_"+kind+"="+type(d).__name__)
+              sys.exit(0)
+          allowed=("status","is_open","market_open","market_status","data_status",
+                   "source","source_type","as_of_ist","timestamp_ist",
+                   "last_verified_at","last_updated_ist","generated_at",
+                   "data_source","feed_source","market_session")
+          for key in allowed:
+              value=d.get(key)
+              if isinstance(value,(str,bool,int,float)):
+                  txt=str(value)
+                  if len(txt)<=90:
+                      print("DATA_FIELD_"+kind+"_"+key+"="+txt)
+          for key in ("data","results","gainers","market_top_table","items","ce_gainers","pe_gainers"):
+              if isinstance(d.get(key),list):
+                  print("DATA_ROWS_"+kind+"_"+key+"="+str(len(d[key])))
+              elif isinstance(d.get(key),dict):
+                  print("DATA_MAP_"+kind+"_"+key+"=PRESENT")
+          PY
+            fi
+          done
+          unset token
       - name: Inspect cloud scheduler and run jobs read-only
         shell: bash
         run: |
@@ -116,7 +159,7 @@ jobs:
           for j in jobs:
               name=str(j.get("name") or "").rsplit("/",1)[-1]
               if "genesis" in name.lower() or "system3" in name.lower():
-                  print("GENESIS_SCHEDULE="+name+" state="+str(j.get("state") or "UNKNOWN"))
+                  print("GENESIS_SCHEDULE="+name+" state="+str(j.get("state") or "UNKNOWN")+" last_attempt="+str(j.get("lastAttemptTime") or "UNKNOWN")+" schedule_time="+str(j.get("scheduleTime") or "UNKNOWN")+" last_status_code="+str((j.get("status") or {}).get("code") or "UNKNOWN"))
           PY
           else
             echo "SCHEDULER_LIST=NOT_VERIFIED"
