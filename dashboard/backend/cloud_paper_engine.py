@@ -113,6 +113,9 @@ class CloudPaperEngine:
         self.trades_csv = outputs_dir / "paper_trades_live.csv"
         self.state_file = outputs_dir / "paper_engine_state.json"
         self.master_ledger = MasterPaperLedger(outputs_dir / "paper_master_ledger.sqlite3")
+        # Only a separately implemented trusted source verifier may enable
+        # market-outcome attestation. Never infer trust from inbound JSON.
+        self.independent_outcome_verifier = None
         self._load_state()
         historical = self.master_ledger.snapshot()
         if historical["event_count"]:
@@ -607,6 +610,7 @@ class CloudPaperEngine:
                     at=str(outcome["timestamp_utc"]),
                     source=str(outcome.get("source") or "UNVERIFIED"),
                     reference_id=outcome.get("evidence_id"),
+                    independent_verifier=self.independent_outcome_verifier,
                 )
         reconciliation = self.master_ledger.reconcile(
             self.open_positions, self.closed_positions)
