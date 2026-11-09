@@ -1,0 +1,207 @@
+name: One-time Canonical Production Zero-Traffic Candidate
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/canonical-prod-guarded-release-20261109.yml
+permissions:
+  contents: read
+jobs:
+  canonical-source-staging-only:
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.head_ref == 'release/canonical-prod-safe-20261109'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      PROJECT: system3-openalgo-safe
+      REGION: asia-south1
+      STAGING: genesis-system3-web
+      PINNED_SHA: 97cdfe3f81983f10515b8f4e9489fbb992973d48
+      CANARY_TAG: release-97cdfe3
+      CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
+    steps:
+      - name: Checkout the exact approved main commit, not PR code
+        uses: actions/checkout@v4
+        with:
+          ref: 97cdfe3f81983f10515b8f4e9489fbb992973d48
+          persist-credentials: false
+      - name: Reject any changed main commit or canonical source violation
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$PINNED_SHA"
+          python scripts/cloud_run_source_integrity_gate.py --root .
+          test -f cloudbuild.recovery.yaml
+          test -f dashboard/backend/Dockerfile
+          echo "CANONICAL_SOURCE_PREFLIGHT=PASS"
+      - name: Authenticate as verified JSON deploy identity
+        uses: google-github-actions/auth@v2
+        with:
+          project_id: system3-openalgo-safe
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Prove staging service and current 100 percent traffic baseline
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/baseline.json"
+          python3 - "$RUNNER_TEMP/baseline.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          ts=(d.get("status") or {}).get("traffic") or []
+          active=[t for t in ts if int(t.get("percent") or 0)>0]
+          if len(active)!=1 or int(active[0].get("percent") or 0)!=100 or not active[0].get("revisionName"):
+              raise SystemExit("BLOCKED_STAGING_TRAFFIC_BASELINE_NOT_SINGLE_100_PERCENT")
+          print("STAGING_BASELINE_REVISION="+active[0]["revisionName"])
+          PY
+      - name: Reuse already-created isolated staging canary, never rebuild unnecessarily
+        id: reuse
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/check-existing.json"
+          if python3 - "$RUNNER_TEMP/check-existing.json" "$CANARY_TAG" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1]))
+          tag=sys.argv[2]
+          candidates=[t for t in (data.get("status") or {}).get("traffic") or []
+                      if t.get("tag")==tag and t.get("revisionName")
+                      and int(t.get("percent") or 0)==0]
+          raise SystemExit(0 if len(candidates)==1 else 1)
+          PY
+          then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+            echo "EXISTING_CANARY_REUSED=TRUE"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "EXISTING_CANARY_REUSED=FALSE"
+          fi
+      - name: Build immutable canonical backend/frontend source as isolated recovery image
+        if: steps.reuse.outputs.present != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud builds submit . --project="$PROJECT" --region="$REGION" \
+            --config=cloudbuild.recovery.yaml \
+            --substitutions="_RECOVERY_TAG=$CANARY_TAG,_RECOVERY_SHA=$PINNED_SHA" \
+            --timeout=45m --quiet
+          echo "CANONICAL_IMAGE_BUILD=PASS"
+      - name: Deploy to STAGING with NO TRAFFIC and all trading locks OFF
+        if: steps.reuse.outputs.present != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT/cloud-run-source-deploy/genesis-system3-recovery:$CANARY_TAG"
+          gcloud run deploy "$STAGING" --project="$PROJECT" --region="$REGION" \
+            --image="$IMAGE" --tag="$CANARY_TAG" --no-traffic \
+            --update-env-vars="PAPER_MODE=1,ANALYZE_MODE=1,LIVE_TRADING_ENABLED=0,SYSTEM3_LIVE_TRADING_ALLOWED=0,AUTO_EXECUTE_TRADES=0,LIVE_ORDER_AUTHORITY=0,REAL_BROKER_ORDERS=0,ORDER_PLACEMENT_ALLOWED=false,USE_LIVE_EXECUTION_ENGINE=0,CLOUD_PAPER_ENGINE=0,DEPLOY_GIT_SHA=$PINNED_SHA" \
+            --quiet
+          echo "STAGING_CANARY_DEPLOYED_NO_TRAFFIC"
+      - name: Verify staging traffic unchanged and candidate receives 0 percent
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/after.json"
+          python3 - "$RUNNER_TEMP/baseline.json" "$RUNNER_TEMP/after.json" "$CANARY_TAG" <<'PY'
+          import json,sys
+          before,after=(json.load(open(f)) for f in sys.argv[1:3])
+          tag=sys.argv[3]
+          def alloc(obj):
+              return {x.get("revisionName"):int(x.get("percent") or 0)
+                      for x in (obj.get("status") or {}).get("traffic") or []
+                      if int(x.get("percent") or 0)>0}
+          if alloc(before)!=alloc(after):
+              raise SystemExit("FAIL_TRAFFIC_CHANGE_DETECTED")
+          candidates=[x for x in (after.get("status") or {}).get("traffic") or [] if x.get("tag")==tag]
+          if len(candidates)!=1 or int(candidates[0].get("percent") or 0)!=0:
+              raise SystemExit("FAIL_CANARY_TRAFFIC_NOT_ZERO")
+          print("STAGING_ORIGINAL_TRAFFIC_UNCHANGED=PASS")
+          print("CANDIDATE_TRAFFIC_PERCENT=0")
+          print("CANDIDATE_REVISION="+str(candidates[0].get("revisionName") or "UNKNOWN"))
+          open("/tmp/genesis-canary-url.txt","w").write(str(candidates[0].get("url") or ""))
+          PY
+      - name: Confirm candidate routes and provenance without broker actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="$(cat /tmp/genesis-canary-url.txt)"
+          if [ -z "$URL" ]; then echo "CANARY_PRIVATE_URL_NOT_DISCOVERED"; exit 1; fi
+          BASE_URL="$(gcloud run services describe "$STAGING" --project="$PROJECT" --region="$REGION" --format='value(status.url)')"
+          test -n "$BASE_URL"
+          # Cloud Run expects the canonical service URL as token audience,
+          # not a tagged revision URL.
+          TOKEN="$(gcloud auth print-identity-token --audiences="$BASE_URL" 2>/dev/null || true)"
+          if [ -n "$TOKEN" ]; then echo "PRIVATE_ID_TOKEN_GENERATED=TRUE";
+          else echo "PRIVATE_ID_TOKEN_GENERATED=FALSE"; fi
+          export URL TOKEN PINNED_SHA
+          python3 - <<'PY'
+          import json,os,urllib.request,urllib.error
+          root=os.environ["URL"].rstrip("/")
+          token=os.environ.get("TOKEN") or ""
+          outcomes={}
+          for path in ("/ui","/api/health","/api/deploy/info","/api/market-status","/api/options/gainers","/api/market/top-gainers"):
+              headers={"Accept":"application/json"}
+              if token:headers["Authorization"]="Bearer "+token
+              req=urllib.request.Request(root+path,headers=headers,method="GET")
+              try:
+                  with urllib.request.urlopen(req,timeout=35) as response:
+                      code=response.status;raw=response.read(200000)
+              except urllib.error.HTTPError as err:
+                  code=err.code;raw=b""
+              except Exception as err:
+                  print("CANARY_ROUTE="+path+" NETWORK="+type(err).__name__)
+                  outcomes[path]=-1
+                  continue
+              print("CANARY_ROUTE="+path+" HTTP="+str(code))
+              outcomes[path]=code
+              if path=="/api/deploy/info" and code==200:
+                  try:
+                      data=json.loads(raw)
+                      sha=data.get("git_sha")
+                      print("CANARY_DEPLOY_SHA_MATCH="+str(sha==os.environ["PINNED_SHA"]).upper())
+                      if sha != os.environ["PINNED_SHA"]: raise SystemExit("CANDIDATE_SOURCE_SHA_MISMATCH")
+                  except ValueError:
+                      print("CANARY_DEPLOY_SHA_MATCH=UNKNOWN")
+          core=("/ui","/api/health","/api/deploy/info","/api/market-status","/api/security/mutation-policy","/api/options/gainers","/api/market/top-gainers")
+          if any(outcomes.get(x)!=200 for x in core):
+              raise SystemExit("CANARY_CORE_HTTP_CONTRACT_FAIL")
+          if any(outcomes.get(x) in (404,-1) for x in ("/api/options/gainers","/api/market/top-gainers")):
+              raise SystemExit("CANARY_MARKET_API_ROUTE_MISSING")
+          print("CANDIDATE_SOURCE_API_WIRING=PASS")
+          print("BROKER_ORDERS_PLACED=0")
+          PY
+      - name: Require explicit candidate runtime PAPER safety configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          candidate="$(python3 - "$RUNNER_TEMP/after.json" "$CANARY_TAG" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          rows=[r for r in (d.get("status") or {}).get("traffic") or []
+                if r.get("tag")==sys.argv[2] and int(r.get("percent") or 0)==0]
+          if len(rows)!=1 or not rows[0].get("revisionName"):
+              raise SystemExit("CANDIDATE_REVISION_MISSING")
+          print(rows[0]["revisionName"])
+          PY
+          )"
+          gcloud run revisions describe "$candidate" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/revision.json"
+          python3 - "$RUNNER_TEMP/revision.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          containers=(d.get("spec") or {}).get("containers") or []
+          if len(containers)!=1:raise SystemExit("CANDIDATE_CONTAINER_COUNT_INVALID")
+          env={v.get("name"):v.get("value") for v in containers[0].get("env") or []}
+          wanted={"PAPER_MODE":"1","ANALYZE_MODE":"1","LIVE_TRADING_ENABLED":"0",
+                  "SYSTEM3_LIVE_TRADING_ALLOWED":"0","AUTO_EXECUTE_TRADES":"0",
+                  "LIVE_ORDER_AUTHORITY":"0","REAL_BROKER_ORDERS":"0",
+                  "ORDER_PLACEMENT_ALLOWED":"false","USE_LIVE_EXECUTION_ENGINE":"0",
+                  "CLOUD_PAPER_ENGINE":"0"}
+          for name,val in wanted.items():
+              if env.get(name)!=val:raise SystemExit("CANDIDATE_UNSAFE_FLAG_"+name)
+          print("CANDIDATE_SAFE_TRADING_LOCKS=PASS")
+          PY
+          echo "PRODUCTION_CANARY_REVISION=$candidate"
+          echo "PRODUCTION_CANARY_TRAFFIC=0_PERCENT"
+      - name: Final receipt
+        if: always()
+        run: echo 'PRODUCTION_CANDIDATE_ONLY;ZERO_TRAFFIC;NO_REAL_BROKER_ORDERS'
