@@ -13,7 +13,20 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 
 BASE_URL = os.environ.get("GENESIS_UI_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui")
-DASHBOARD_TAB_IDS = {\n    "Decision Intel": "decision-intel", "Truth Control": "truth",\n    "Genesis Brain": "genesis", "E2E Proof": "e2e-proof",\n    "Overview": "overview", "Sim Live": "sim-live",\n    "Options Intel": "options-intel", "Option Chain": "chain",\n    "Signals": "signals", "Trade": "trade", "Paper Trades": "paper",\n    "Positions": "positions", "Risk & Scenarios": "risk-scenarios",\n    "Multibagger": "multibagger", "Prediction Audit": "prediction-audit",\n    "Performance": "performance", "ML Model": "ml",\n    "Data Integrity": "data-integrity", "Broker": "broker",\n    "Alerts": "alerts", "System": "system",\n    "System readiness": "system-readiness", "Live Gate": "gates",\n}\nTABS = (
+DASHBOARD_TAB_IDS = {
+    "Decision Intel": "decision-intel", "Truth Control": "truth",
+    "Genesis Brain": "genesis", "E2E Proof": "e2e-proof",
+    "Overview": "overview", "Sim Live": "sim-live",
+    "Options Intel": "options-intel", "Option Chain": "chain",
+    "Signals": "signals", "Trade": "trade", "Paper Trades": "paper",
+    "Positions": "positions", "Risk & Scenarios": "risk-scenarios",
+    "Multibagger": "multibagger", "Prediction Audit": "prediction-audit",
+    "Performance": "performance", "ML Model": "ml",
+    "Data Integrity": "data-integrity", "Broker": "broker",
+    "Alerts": "alerts", "System": "system",
+    "System readiness": "system-readiness", "Live Gate": "gates",
+}
+TABS = (
     "Decision Intel", "Truth Control", "Genesis Brain", "E2E Proof",
     "Overview", "Sim Live", "Options Intel", "Option Chain", "Signals",
     "Trade", "Paper Trades", "Positions", "Risk & Scenarios",
