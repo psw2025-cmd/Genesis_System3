@@ -88,6 +88,14 @@ def _runtime_token_source(service: dict[str, Any]) -> dict[str, Any]:
     env_list = containers[0].get("env") or [] if len(containers) == 1 else []
     env = {x.get("name"): x for x in env_list if isinstance(x, dict)}
     token = env.get("DHAN_ACCESS_TOKEN") or {}
+    ref = (token.get("valueFrom") or token.get("valueSource") or {}).get(
+        "secretKeyRef"
+    ) or {}
+    ref_name = ref.get("name") or ref.get("secret")
+    token_ref_class = (
+        "CANONICAL" if ref_name == CANONICAL else
+        ("OTHER_SECRET_REFERENCE" if ref_name else "UNREPORTED")
+    )
     source = str((env.get("DHAN_TOKEN_SOURCE") or {}).get("value") or "").lower()
     sid = str((env.get("DHAN_ACCESS_TOKEN_SECRET_ID") or {}).get("value") or "")
     # Broker-status GET may invoke configured auth self-heal/renewal in the
@@ -110,6 +118,7 @@ def _runtime_token_source(service: dict[str, Any]) -> dict[str, Any]:
         "service_revision": _safe_name((service.get("status") or {}).get("latestReadyRevisionName")),
         "canonical_secret_id": "CANONICAL" if sid == CANONICAL else "DEFAULT_OR_OTHER",
         "token_provider_mode": ("SECRET_MANAGER" if source in ("gcp", "gcp-secret-manager", "gcp-secret-manager-dynamic", "secret-manager") else "AUTO_OR_OTHER"),
+        "token_injection_ref_class": token_ref_class,
         "static_token_value_configured": bool(token.get("value")),
         "token_secret_reference_configured": bool(token.get("valueFrom") or token.get("valueSource")),
     }
