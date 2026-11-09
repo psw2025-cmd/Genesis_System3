@@ -58,6 +58,50 @@ jobs:
           for p in ("run.services.get","run.services.update","run.jobs.list","run.jobs.run","cloudbuild.builds.create","cloudscheduler.jobs.list","cloudscheduler.jobs.update","logging.logEntries.list","artifactregistry.repositories.list","artifactregistry.repositories.uploadArtifacts","iam.serviceAccounts.actAs","secretmanager.secrets.list"):
               print("PROJECT_IAM_"+p+"="+("YES" if p in allowed else "NO_OR_RESOURCE_SCOPED"))
           PY
+      - name: Inspect actual production traffic and serving image (read only)
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/service.json"
+          python3 - "$RUNNER_TEMP/service.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          status=d.get("status") or {}
+          traffic=status.get("traffic") or []
+          print("LATEST_READY_REVISION="+str(status.get("latestReadyRevisionName") or "UNKNOWN"))
+          print("LATEST_CREATED_REVISION="+str(status.get("latestCreatedRevisionName") or "UNKNOWN"))
+          if not traffic:
+              print("TRAFFIC_ALLOCATION=NOT_VERIFIED")
+          for t in traffic:
+              print("SERVING_TRAFFIC="+str(t.get("revisionName") or "LATEST")+"="+str(t.get("percent") or 0)+"pct")
+          PY
+          revision="$(python3 - "$RUNNER_TEMP/service.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          traffic=(d.get("status") or {}).get("traffic") or []
+          entries=[x for x in traffic if int(x.get("percent") or 0)>0 and x.get("revisionName")]
+          print(entries[0]["revisionName"] if len(entries)==1 else "")
+          PY
+          )"
+          if [ -n "$revision" ]; then
+            gcloud run revisions describe "$revision" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/serving-revision.json"
+            python3 - "$RUNNER_TEMP/serving-revision.json" <<'PY'
+          import json,sys,re
+          d=json.load(open(sys.argv[1]))
+          spec=d.get("spec") or {}
+          containers=spec.get("containers") or ((spec.get("template") or {}).get("spec") or {}).get("containers") or []
+          image=str((containers[0] if containers else {}).get("image") or "")
+          status=d.get("status") or {}
+          digest=str(status.get("imageDigest") or "")
+          if not digest and "sha256:" in image:
+              digest=image.split("sha256:")[-1]
+              digest="sha256:"+digest
+          print("SERVING_REVISION_IMAGE_DIGEST="+(digest if re.fullmatch(r"sha256:[0-9a-f]{64}",digest) else "NOT_VERIFIED"))
+          print("SERVING_REVISION_CREATED_AT="+str((d.get("metadata") or {}).get("creationTimestamp") or "UNKNOWN"))
+          PY
+          fi
+          rm -f "$RUNNER_TEMP/service.json" "$RUNNER_TEMP/serving-revision.json"
+
       - name: Independently test read permissions on major GCP services
         shell: bash
         run: |
