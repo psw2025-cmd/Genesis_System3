@@ -63,13 +63,47 @@ jobs:
           if [ -n "$token" ]; then echo "CLOUD_RUN_ID_TOKEN=AVAILABLE"; else echo "CLOUD_RUN_ID_TOKEN=UNAVAILABLE"; fi
           for route in /api/market-status /api/deploy/info /api/health /api/options/gainers /api/market/top-gainers /ui; do
             if [ -n "$token" ]; then
-              status="$(curl --silent --show-error --max-time 25 --output /dev/null --write-out '%{http_code}' -H "Authorization: Bearer $token" "$base$route" || true)"
+              status="$(curl --silent --show-error --max-time 6 --output /dev/null --write-out '%{http_code}' -H "Authorization: Bearer $token" "$base$route" || true)"
             else
-              status="$(curl --silent --show-error --max-time 25 --output /dev/null --write-out '%{http_code}' "$base$route" || true)"
+              status="$(curl --silent --show-error --max-time 6 --output /dev/null --write-out '%{http_code}' "$base$route" || true)"
             fi
             echo "ENDPOINT $route HTTP $status"
           done
           unset token
+      - name: Inspect revision readiness and sanitized recent Cloud Run errors
+        shell: bash
+        run: |
+          set -euo pipefail
+          gcloud run services describe "$SERVICE" --project="$PROJECT" --region="$REGION" --format=json > "$RUNNER_TEMP/inspect-service.json"
+          python3 - "$RUNNER_TEMP/inspect-service.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1]))
+          metadata=d.get("metadata") or {}
+          status=d.get("status") or {}
+          spec=d.get("spec") or {}
+          print("CLOUD_RUN_INGRESS="+str((metadata.get("annotations") or {}).get("run.googleapis.com/ingress") or "NOT_REPORTED"))
+          print("CLOUD_RUN_READY_CONDITION="+str(next((c.get("status") for c in status.get("conditions") or [] if c.get("type")=="Ready"),"NOT_REPORTED")))
+          print("CLOUD_RUN_LATEST_READY="+str(status.get("latestReadyRevisionName") or "UNKNOWN"))
+          print("CLOUD_RUN_TIMEOUT_SECONDS="+str(((spec.get("template") or {}).get("spec") or {}).get("timeoutSeconds") or "NOT_REPORTED"))
+          PY
+          if gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=$SERVICE AND severity>=ERROR" \
+            --project="$PROJECT" --freshness=2h --limit=20 --format=json > "$RUNNER_TEMP/recent-errors.json" 2>/dev/null; then
+            python3 - "$RUNNER_TEMP/recent-errors.json" <<'PY'
+          import json,sys
+          rows=json.load(open(sys.argv[1]))
+          print("CLOUD_RUN_RECENT_ERROR_EVENTS="+str(len(rows)))
+          for row in rows[:12]:
+              status=str((row.get("httpRequest") or {}).get("status") or "")
+              severity=str(row.get("severity") or "")
+              revision=str((row.get("resource") or {}).get("labels",{}).get("revision_name") or "")
+              # Do NOT print log bodies, request URLs, user data, auth headers.
+              print("ERROR_EVENT timestamp="+str(row.get("timestamp") or "")+
+                    " revision="+revision+" severity="+severity+" http_status="+status)
+          PY
+          else
+            echo "CLOUD_RUN_LOG_ERRORS=NOT_VERIFIED"
+          fi
+          echo "READ_ONLY_HEALTH_CHECK_COMPLETE"
       - name: Inspect cloud scheduler and run jobs read-only
         shell: bash
         run: |
