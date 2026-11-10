@@ -197,7 +197,9 @@ function SymbolControls({ chainSymbol, setChainSymbol, universe, discovery, disc
 export function OptionChain() {
   const { chainSymbol, setChainSymbol, chain, marketOpen, state, wsStatus, liveBoard } = useStore()
   const atmRef = useRef<HTMLTableRowElement>(null)
-  const [range, setRange] = useState(10)
+  const mobileAtmRef = useRef<HTMLDivElement>(null)
+  const [range, setRange] = useState(() => window.matchMedia('(max-width: 640px)').matches ? 5 : 10)
+  const [fullMobileTable, setFullMobileTable] = useState(false)
   const [discovery, setDiscovery] = useState<UnderlyingDiscovery | null>(null)
   const [discoveryError, setDiscoveryError] = useState('')
   const [expiries, setExpiries] = useState<string[]>([])
@@ -320,7 +322,11 @@ export function OptionChain() {
   const visible = range === 0 ? strikes : strikes.slice(Math.max(0, atmIndex - range), Math.min(strikes.length, atmIndex + range + 1))
 
   useEffect(() => {
-    if (atmRef.current) atmRef.current.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    if (window.matchMedia('(max-width: 640px)').matches) {
+      mobileAtmRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    } else {
+      atmRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
   }, [spot, chainSymbol, selectedExpiry, range])
 
   const noDataReason = String(data?.message || expiryError || state?.market?.reason || (marketOpen ? 'Waiting for verified Dhan option-chain rows.' : 'Market closed; no verified broker chain snapshot is available.'))
@@ -343,7 +349,7 @@ export function OptionChain() {
     return <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-surface-2 text-text-muted border border-border" title="Neutral">N</span>
   }
 
-  return <div className="flex flex-col h-full">
+  return <div className={cn('option-chain-root flex flex-col h-full', fullMobileTable && 'chain-mobile-full-table')}>
     <SymbolControls chainSymbol={chainSymbol} setChainSymbol={setChainSymbol} universe={universe} discovery={discovery} discoveryError={discoveryError} />
     <div className="flex flex-wrap items-center gap-3 px-4 py-2 border-b border-border bg-surface-1 flex-shrink-0">
       <span className={cn('pill text-[10px] border', 'bg-amber/10 text-amber border-amber/20')}>{(() => { const counts = requiredChainCounts(chain); return `required_ready ${counts.requiredReady}/${counts.total} · safe_no_trade ${counts.safeNoTrade}/${counts.total} · TRADABLE ${counts.tradableLabel}` })()}</span>
@@ -357,6 +363,12 @@ export function OptionChain() {
       <button onClick={() => setShowGreeks(!showGreeks)} className={cn('px-2.5 py-1 rounded text-xs font-mono font-semibold transition-colors border', showGreeks ? 'bg-accent text-white border-accent' : 'bg-surface-2 text-text-secondary border-border')}>
         {showGreeks ? '📊 GREEKS VIEW' : '📈 STANDARD VIEW'}
       </button>
+      <button
+        type="button"
+        className="chain-mobile-view-toggle soft-btn"
+        aria-pressed={fullMobileTable}
+        onClick={() => setFullMobileTable(value => !value)}
+      >{fullMobileTable ? 'Compact contracts' : 'Full 17-column table'}</button>
       <div className="ml-auto flex items-center gap-2"><span className="text-text-muted text-[10px]">VISIBLE</span><select aria-label="Strike visibility" value={range} onChange={event => setRange(Number(event.target.value))} className="bg-surface-2 border border-border rounded px-2 py-1 text-xs text-text-secondary"><option value={0}>ALL STRIKES ({strikes.length})</option>{[5, 10, 20, 40].map(value => <option key={value} value={value}>+/-{value} ATM</option>)}</select></div>
     </div>
     <div className={cn('px-4 py-2 border-b border-border text-[10px] font-mono', stale || contracts.length === 0 ? 'text-amber bg-amber/5' : 'text-text-muted')}>
@@ -364,8 +376,10 @@ export function OptionChain() {
     </div>
     {mismatch && <div className="px-4 py-2 bg-down/5 text-down text-xs border-b border-border">Backend returned {String(data?.underlying)} while UI selected {chainSymbol}. Wrong-symbol rows are hidden.</div>}
     {Boolean(data?.live_board_conflict) && <div className="px-4 py-2 bg-amber/5 text-amber text-xs border-b border-border">live_board LTP {String(data?.live_board_ltp ?? '--')} disagrees with Dhan chain spot {spot != null ? fmt(spot, 2) : '--'}. Chain ATM is used. Do not treat a FINNIFTY quote as NIFTY.</div>}
-    {contracts.length === 0 ? <div className="flex-1 overflow-auto p-4"><div className="card p-4"><div className="panel-title">Option Chain</div><div className="mt-3 text-amber font-semibold">NO VERIFIED BROKER CHAIN ROWS</div><div className="mt-2 text-xs text-text-muted">{noDataReason}</div><div className="mt-3 text-xs text-text-muted">Safety: ANALYZER / PAPER · LIVE OFF. No synthetic prices, strikes, OI, IV or Greeks are generated.</div></div></div> : <div className="flex-1 overflow-auto">
-      <table className="w-full border-collapse text-[10px]">
+    {contracts.length === 0 ? <div className="flex-1 overflow-auto p-4"><div className="card p-4"><div className="panel-title">Option Chain</div><div className="mt-3 text-amber font-semibold">NO VERIFIED BROKER CHAIN ROWS</div><div className="mt-2 text-xs text-text-muted">{noDataReason}</div><div className="mt-3 text-xs text-text-muted">Safety: ANALYZER / PAPER · LIVE OFF. No synthetic prices, strikes, OI, IV or Greeks are generated.</div></div></div> : <>
+      <div className="chain-full-table-wrap flex-1 overflow-auto">
+      <div className="chain-mobile-scroll-cue">Swipe sideways to compare the full table. Compact contract cards are available above.</div>
+      <table className="chain-wide-table w-full border-collapse text-[10px]">
         <thead className="sticky top-0 z-10 bg-surface-1">
           {showGreeks ? (
             <tr>
@@ -464,7 +478,52 @@ export function OptionChain() {
           )
         })}</tbody>
       </table>
-    </div>}
+      </div>
+      <section className="chain-mobile-cards flex-1 overflow-auto" aria-label="Compact option contracts">
+        {visible.map(strike => {
+          const row = strikeMap.get(strike) || {}
+          const ce = row.CE
+          const pe = row.PE
+          const isAtm = spot != null && strikes.length > 1 && Math.abs(strike - spot) < Math.abs(strikes[1] - strikes[0]) / 2
+          const side = (contract: Contract | undefined, greekKey: 'delta' | 'gamma' | 'theta' | 'vega') => ({
+            ltp: contract && (num(contract.ltp) ?? 0) > 0 ? fmt(Number(contract.ltp), 2) : '--',
+            oi: formatOI(contract?.oi),
+            extraLabel: showGreeks ? greekKey.toUpperCase() : 'IV',
+            extraValue: contract
+              ? showGreeks
+                ? (num(contract[greekKey]) == null ? '--' : Number(contract[greekKey]).toFixed(2))
+                : (num(contract.iv) == null ? '--' : Number(contract.iv).toFixed(2))
+              : '--',
+            change: pct(ltpChangePct(contract)),
+          })
+          const call = side(ce, 'delta')
+          const put = side(pe, 'delta')
+          const sides = [
+            { values: call, label: 'CALL · CE', className: 'chain-mobile-call' },
+            { values: put, label: 'PUT · PE', className: 'chain-mobile-put' },
+          ]
+          return <div key={strike} ref={isAtm ? mobileAtmRef : undefined} className={cn('chain-mobile-strike-card', isAtm && 'atm-row')}>
+            <div className="chain-mobile-strike-heading">
+              <span>STRIKE <strong className="num">{fmt(strike, 2)}</strong></span>
+              {isAtm && <span className="chain-mobile-atm">ATM</span>}
+            </div>
+            <div className="chain-mobile-sides">
+              {sides.map(({ values, label, className }) => (
+                <section key={String(label)} className={`chain-mobile-side ${className}`}>
+                  <div className="chain-mobile-side-title">{label}</div>
+                  <div className="chain-mobile-ltp"><span>LTP</span><strong className="num">{values.ltp}</strong></div>
+                  <div className="chain-mobile-side-metrics">
+                    <span>OI <b className="num">{values.oi}</b></span>
+                    <span>{values.extraLabel} <b className="num">{values.extraValue}</b></span>
+                    <span>CHG <b className="num">{values.change}</b></span>
+                  </div>
+                </section>
+              ))}
+            </div>
+          </div>
+        })}
+      </section>
+    </>}
   </div>
 }
 

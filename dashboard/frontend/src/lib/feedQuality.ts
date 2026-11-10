@@ -19,14 +19,15 @@ function isMockSource(source: unknown): boolean {
 export function resolveFeedQuality(input: {
   marketOpen?: boolean
   wsStatus?: string
-  tickAgeSec?: number | null
+  tickAgeSec?: number | string | null
   dataSource?: string | null
   brokerConnected?: boolean
 }): { label: FeedQuality; tone: FeedTone; detail: string } {
   const marketOpen = Boolean(input.marketOpen)
   const ws = String(input.wsStatus || '').toLowerCase()
-  const tickAge = Number(input.tickAgeSec)
-  const hasTickAge = Number.isFinite(tickAge)
+  const tickAgeRaw = input.tickAgeSec
+  const tickAge = Number(tickAgeRaw)
+  const hasTickAge = tickAgeRaw != null && tickAgeRaw !== '' && Number.isFinite(tickAge)
   const source = input.dataSource || ''
 
   if (isMockSource(source)) {
@@ -62,7 +63,15 @@ export function resolveFeedQuality(input: {
     }
   }
 
-  if (ws === 'live' && (!hasTickAge || tickAge <= STALE_TICK_SEC)) {
+  if (ws === 'live' && !hasTickAge) {
+    return { label: 'Delayed', tone: 'warn', detail: 'WebSocket connected · market tick freshness unavailable' }
+  }
+
+  if (hasTickAge && tickAge < 0) {
+    return { label: 'Delayed', tone: 'warn', detail: 'Market tick timestamp is invalid or in the future' }
+  }
+
+  if (ws === 'live' && tickAge <= STALE_TICK_SEC) {
     return { label: 'Live', tone: 'ok', detail: 'Market hours · stream' }
   }
 

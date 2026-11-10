@@ -126,8 +126,8 @@ class AdvancedCharting:
             ce_match = next((c for c in ce_contracts if c.get("strike") == strike), None)
             pe_match = next((c for c in pe_contracts if c.get("strike") == strike), None)
 
-            ce_value = ce_match.get(greek, 0) if ce_match else 0
-            pe_value = pe_match.get(greek, 0) if pe_match else 0
+            ce_value = ce_match.get(greek) if ce_match else None
+            pe_value = pe_match.get(greek) if pe_match else None
 
             ce_data.append(ce_value)
             pe_data.append(pe_value)
