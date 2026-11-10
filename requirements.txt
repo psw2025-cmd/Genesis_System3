@@ -21,7 +21,7 @@ google-cloud-secret-manager>=2.20.0
 dhanhq==2.2.0
 
 # pyotp: TOTP generation for automated Dhan token refresh (PIN+TOTP strategy)
-pyotp==2.9.0
+pyotp==2.10.0
 
 # scipy: Spearman rank correlation for prediction accuracy validation
 scipy>=1.12.0
