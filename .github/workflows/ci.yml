@@ -202,6 +202,11 @@ jobs:
           python -m pip install --no-cache-dir -r dashboard/backend/requirements.txt --quiet
           echo "deps_install=PASS"
 
+      - name: Prove Cloud Run PAPER env receipt is fail-closed and secret-safe
+        shell: bash
+        timeout-minutes: 5
+        run: python -m unittest tests.test_cloud_run_env_contract
+
       - name: Verify current cloud-only authority and fail-closed trading policy
         shell: bash
         run: |
