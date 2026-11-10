@@ -85,6 +85,38 @@ def test_unexpected_exception_text_does_not_expose_secrets(monkeypatch, tmp_path
     assert "SENSITIVE_TEST_ACCESS_TOKEN" not in path.read_text()
 
 
+@pytest.mark.parametrize(("http_code", "expected_class"), [
+    (401, "AUTH_REJECTED"),
+    (403, "ACCESS_DENIED"),
+    (429, "RATE_LIMITED"),
+    (503, "UPSTREAM_ERROR"),
+])
+def test_http_error_status_is_classified_without_body_or_token_leak(
+    monkeypatch, tmp_path, capsys, http_code, expected_class
+):
+    from urllib.error import HTTPError
+
+    path = _seed_readonly_env(monkeypatch, tmp_path)
+
+    def fail_get(*_args, **_kwargs):
+        raise HTTPError(
+            "https://api.dhan.co/v2/orders?secret=NEVER_EMIT",
+            http_code,
+            "SENSITIVE_TEST_ACCESS_TOKEN",
+            None,
+            None,
+        )
+
+    monkeypatch.setattr(cv, "urlopen", fail_get)
+    assert cv.dhan_orders() is False
+    record = json.loads(path.read_text().strip())
+    assert record["status"] == "NOT_VERIFIED"
+    assert record["http_status"] == http_code
+    assert record["error_class"] == expected_class
+    assert "SENSITIVE_TEST_ACCESS_TOKEN" not in path.read_text()
+    assert "NEVER_EMIT" not in capsys.readouterr().out
+
+
 def test_source_enforces_get_without_real_order_mutations():
     src = (Path(__file__).resolve().parents[1] / "scripts" /
            "cloud_verify_readonly.py").read_text(encoding="utf-8")
