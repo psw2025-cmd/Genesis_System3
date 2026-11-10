@@ -40,6 +40,31 @@ export default function AdvancedCharts() {
     return row
   }).filter((row: any) => ivSeries.some((series: any) => chartNumber(row[series.key]) != null))
 
+  const heatmapRows = (Array.isArray(heatmapData?.heatmap) ? heatmapData.heatmap : [])
+    .map((expiry: any) => {
+      const values = Array.isArray(expiry?.values)
+        ? expiry.values.map(chartNumber).filter((value: number | null): value is number => value != null)
+        : []
+      if (!values.length) return null
+      return {
+        expiry: expiry.expiry,
+        maxValue: Math.max(...values),
+        avgValue: values.reduce((sum: number, value: number) => sum + value, 0) / values.length,
+      }
+    })
+    .filter((row: any) => row != null)
+
+  const rawPcrValues = Array.isArray(pcrData?.pcr_data) && pcrData.pcr_data.length > 0
+    ? pcrData.pcr_data
+    : Array.isArray(pcrData?.pcr_by_strike) ? pcrData.pcr_by_strike : []
+  const pcrRows = (Array.isArray(pcrData?.strikes) ? pcrData.strikes : [])
+    .map((strike: unknown, index: number) => {
+      const pcr = chartNumber(rawPcrValues[index])
+      return pcr == null ? null : { strike: chartNumber(strike) ?? String(strike), pcr }
+    })
+    .filter((row: any) => row != null)
+  const overallPcr = chartNumber(pcrData?.overall_pcr)
+
   const greekHasSideData = Array.isArray(greeksData?.ce_data) || Array.isArray(greeksData?.pe_data)
   const greekStrikes = Array.isArray(greeksData?.strikes) ? greeksData.strikes : []
   const greekRows = greekStrikes.map((strike: unknown, index: number) => ({
@@ -137,35 +162,31 @@ export default function AdvancedCharts() {
                 <div className="text-xl font-bold">₹{heatmapData.spot?.toFixed(2) || '0.00'}</div>
               </div>
             </div>
-            {heatmapData.heatmap && heatmapData.heatmap.length > 0 && (
+            {heatmapRows.length > 0 && (
               <div className="mt-4">
                 <div className="text-sm text-gray-400 mb-2">Heatmap Visualization:</div>
                 <div className="bg-gray-900 p-4 rounded h-64 overflow-auto">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={heatmapData.heatmap.slice(0, 10).map((exp: any, idx: number) => ({
-                      expiry: exp.expiry,
-                      maxOI: Math.max(...(exp.values || [0])),
-                      avgOI: exp.values ? exp.values.reduce((a: number, b: number) => a + b, 0) / exp.values.length : 0
-                    }))}>
+                    <BarChart data={heatmapRows.slice(0, 10)}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="expiry" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
                       <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151' }} />
                       <Legend />
-                      <Bar dataKey="maxOI" fill="#3B82F6" name="Max OI" />
-                      <Bar dataKey="avgOI" fill="#10B981" name="Avg OI" />
+                      <Bar dataKey="maxValue" fill="#3B82F6" name={`Max ${selectedMetric.toUpperCase()}`} />
+                      <Bar dataKey="avgValue" fill="#10B981" name={`Avg ${selectedMetric.toUpperCase()}`} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
                 <div className="text-xs text-gray-500 mt-2">
-                  Showing {Math.min(10, heatmapData.heatmap.length)} of {heatmapData.heatmap.length} expiries
+                  Showing {Math.min(10, heatmapRows.length)} of {heatmapRows.length} expiries with usable data
                 </div>
               </div>
             )}
-            {heatmapData.heatmap?.length ? (
-              <p className="text-sm text-green-400 mt-2">Heatmap observations available.</p>
+            {heatmapRows.length ? (
+              <p className="text-sm text-green-400 mt-2">{selectedMetric.toUpperCase()} observations available.</p>
             ) : (
-              <div data-testid="heatmap-unavailable" className="chart-unavailable">No option-chain rows are available to plot.</div>
+              <div data-testid="heatmap-unavailable" className="chart-unavailable">No usable {selectedMetric.toUpperCase()} observations were returned for this chain.</div>
             )}
           </div>
         ) : chartError ? (
@@ -292,11 +313,12 @@ export default function AdvancedCharts() {
             <div className="grid grid-cols-3 gap-4 mb-4">
               <div>
                 <div className="text-sm text-gray-400">Overall PCR</div>
-                <div className={`text-xl font-bold ${
-                  pcrData.overall_pcr > 1.0 ? 'text-red-400' : 
-                  pcrData.overall_pcr > 0.8 ? 'text-yellow-400' : 'text-green-400'
+                  <div className={`text-xl font-bold ${
+                  overallPcr == null ? 'text-gray-400' :
+                  overallPcr > 1.0 ? 'text-red-400' :
+                  overallPcr > 0.8 ? 'text-yellow-400' : 'text-green-400'
                 }`}>
-                  {pcrData.overall_pcr?.toFixed(2) || '0.00'}
+                  {overallPcr == null ? '--' : overallPcr.toFixed(2)}
                 </div>
               </div>
               <div>
@@ -308,23 +330,19 @@ export default function AdvancedCharts() {
                 <div className="text-xl font-bold">₹{pcrData.spot?.toFixed(2) || '0.00'}</div>
               </div>
             </div>
-            {pcrData.strikes && pcrData.strikes.length > 0 && (
+            {pcrRows.length > 0 && (
               <div className="mt-4">
                 <div className="text-sm text-gray-400 mb-2">PCR by Strike:</div>
                 <div className="bg-gray-900 p-4 rounded h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={pcrData.strikes.slice(0, 20).map((strike: number, idx: number) => ({
-                      strike: strike,
-                      pcr: pcrData.pcr_data?.[idx] ?? pcrData.pcr_by_strike?.[idx] ?? pcrData.overall_pcr ?? 0
-                    }))}>
+                    <BarChart data={pcrRows.slice(0, 20)}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                       <XAxis dataKey="strike" stroke="#9CA3AF" />
                       <YAxis stroke="#9CA3AF" />
                       <Tooltip contentStyle={{ backgroundColor: '#1F2937', border: '1px solid #374151' }} />
                       <Bar dataKey="pcr" fill="#F59E0B" name="PCR">
-                        {pcrData.strikes.slice(0, 20).map((_: any, idx: number) => {
-                          const pcr = pcrData.pcr_data?.[idx] ?? pcrData.pcr_by_strike?.[idx] ?? pcrData.overall_pcr ?? 0
-                          return <Cell key={idx} fill={pcr > 1.0 ? '#EF4444' : pcr > 0.8 ? '#F59E0B' : '#10B981'} />
+                        {pcrRows.slice(0, 20).map((row: any, idx: number) => {
+                          return <Cell key={idx} fill={row.pcr > 1.0 ? '#EF4444' : row.pcr > 0.8 ? '#F59E0B' : '#10B981'} />
                         })}
                       </Bar>
                     </BarChart>
@@ -332,7 +350,7 @@ export default function AdvancedCharts() {
                 </div>
               </div>
             )}
-            {pcrData.strikes?.length ? (
+            {pcrRows.length ? (
               <p className="text-sm text-green-400 mt-2">PCR observations available.</p>
             ) : (
               <div data-testid="pcr-chart-unavailable" className="chart-unavailable">No per-strike PCR observations were returned.</div>

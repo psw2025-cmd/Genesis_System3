@@ -45,13 +45,19 @@ class AdvancedCharting:
                 # Find contracts for this strike and expiry
                 matching = [c for c in contracts if c.get("strike") == strike and c.get("expiry") == expiry]
 
-                if matching:
-                    # Sum CE and PE
-                    value = sum(c.get(metric, 0) for c in matching)
-                else:
-                    value = 0
+                metric_values = []
+                for contract in matching:
+                    try:
+                        value = float(contract[metric])
+                    except (KeyError, TypeError, ValueError):
+                        metric_values = []
+                        break
+                    if not np.isfinite(value):
+                        metric_values = []
+                        break
+                    metric_values.append(value)
 
-                row.append(value)
+                row.append(sum(metric_values) if metric_values else None)
             heatmap_data.append({"expiry": expiry, "values": row})
 
         return {
@@ -158,17 +164,30 @@ class AdvancedCharting:
 
         pcr_data = []
         for strike in strikes:
-            ce_oi = sum(c.get("oi", 0) for c in contracts if c.get("strike") == strike and c.get("option_type") == "CE")
-            pe_oi = sum(c.get("oi", 0) for c in contracts if c.get("strike") == strike and c.get("option_type") == "PE")
+            ce_contracts = [c for c in contracts if c.get("strike") == strike and c.get("option_type") == "CE"]
+            pe_contracts = [c for c in contracts if c.get("strike") == strike and c.get("option_type") == "PE"]
+            try:
+                ce_oi = sum(float(c["oi"]) for c in ce_contracts)
+                pe_oi = sum(float(c["oi"]) for c in pe_contracts)
+            except (KeyError, TypeError, ValueError):
+                ce_oi = pe_oi = None
 
-            pcr = pe_oi / ce_oi if ce_oi > 0 else 0
+            has_valid_oi = (
+                ce_contracts
+                and pe_contracts
+                and ce_oi is not None
+                and pe_oi is not None
+                and np.isfinite(ce_oi)
+                and np.isfinite(pe_oi)
+            )
+            pcr = pe_oi / ce_oi if has_valid_oi and ce_oi > 0 else None
             pcr_data.append(pcr)
 
         return {
             "pcr_data": pcr_data,
             "strikes": strikes,
             "spot": chain_data.get("spot", 0),
-            "overall_pcr": chain_data.get("pcr", 0),
+            "overall_pcr": chain_data.get("pcr"),
         }
 
     def generate_equity_curve_enhanced(self, pnl_history: List[Dict[str, Any]]) -> Dict[str, Any]:
