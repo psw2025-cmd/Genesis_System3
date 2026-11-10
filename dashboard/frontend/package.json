@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality && npm run test:lifecycle-display",
+    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality && npm run test:lifecycle-display && npm run test:tab-routing",
     "test:lifecycle-display": "node scripts/lifecycle_display_contract.mjs",
     "build": "vite build",
     "preview": "vite preview",
@@ -12,7 +12,8 @@
     "test:ui-obs": "node scripts/ui_obs_contract.mjs",
     "test:broker-status": "node scripts/broker_status_freshness_contract.mjs",
     "test:data-integrity": "node scripts/data_integrity_chain_truth_contract.mjs",
-    "test:source-quality": "node scripts/source_quality_arbitration_contract.mjs"
+    "test:source-quality": "node scripts/source_quality_arbitration_contract.mjs",
+    "test:tab-routing": "node scripts/tab_routing_contract.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.4",
