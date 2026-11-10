@@ -29,6 +29,14 @@ class CloudVerifyTargetContract(unittest.TestCase):
         self.assertIn(expected, self.workflow)
         self.assertNotIn("path: |" + chr(92) + "n", self.workflow)
 
+    def test_rotator_metadata_audit_runs_after_cloud_env_failure(self):
+        marker = "      - name: Audit canonical Dhan rotator and production broker without reading token payloads"
+        segment = self.workflow.split(marker, 1)[1].split("      - name:", 1)[0]
+        self.assertIn("if: " + chr(36) + "{{ !cancelled() }}", segment)
+        self.assertIn("run: python -S scripts/dhan_canonical_rotation_readonly.py", segment)
+        self.assertNotIn("continue-on-error:", segment)
+        self.assertIn("PYTHONPATH: ''", segment)
+
     def test_get_only_broker_proof_runs_after_cloud_safety_failure(self):
         # The existing Cloud Run env comparison must remain a blocking FAIL.
         self.assertIn("python -S scripts/cloud_run_env_contract.py", self.workflow)
