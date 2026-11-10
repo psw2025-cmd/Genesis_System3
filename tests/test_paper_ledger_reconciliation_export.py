@@ -98,3 +98,12 @@ def test_broker_api_not_imported_and_manifest_is_provenance_only():
     source = script.read_text()
     for forbidden in ("requests.post", "dhan.place_order", "DhanLogin", "broker_order_count: 0"):
         assert forbidden not in source
+
+def test_untrusted_position_id_cannot_inject_spreadsheet_formula(tmp_path):
+    db = tmp_path / "spreadsheet_safe.db"
+    master = MasterPaperLedger(db)
+    assert master.record_open(position(name="=1+1"), at())
+    receipt, trades, _ = generate_receipt(db)
+    row = list(csv.DictReader(trades.splitlines()))[0]
+    assert row["position_id"] == "'=1+1"
+    assert receipt["real_broker_orders_count_verified"] is False

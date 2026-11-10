@@ -42,10 +42,17 @@ def _timestamp_day(value: Any) -> str:
 
 
 def _csv_text(rows: list[dict], fields: tuple[str, ...]) -> str:
+    # Protect analyst spreadsheets from formula injection in untrusted IDs.
+    # Numeric PnL values remain numeric; only text cells are escaped.
+    def safe(value: Any) -> Any:
+        if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\\t", "\\r", "\\n")):
+            return "'" + value
+        return value
+
     buffer = io.StringIO(newline="")
     writer = csv.DictWriter(buffer, fieldnames=fields, extrasaction="ignore")
     writer.writeheader()
-    writer.writerows(rows)
+    writer.writerows({key: safe(row.get(key)) for key in fields} for row in rows)
     return buffer.getvalue()
 
 
