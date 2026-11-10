@@ -240,7 +240,7 @@ export function useData() {
     // Clear sticky NETWORK_ERROR / CLOUD_DEGRADED once a group recovers,
     // otherwise TopBar stays DHAN DEGRADED forever after one failed poll.
     const remaining = Object.values(failureCountRef.current).some((n) => Number(n) > 0)
-    if (!remaining) setApiStatus(null as any)
+    if (!remaining) setApiStatus(null)
   }, [setApiStatus])
 
   const pollBroker = useCallback(async () => {

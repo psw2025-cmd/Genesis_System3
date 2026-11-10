@@ -410,13 +410,18 @@ def build_snapshot(repo: str, issue_number: int) -> dict[str, Any]:
 
     workflow_inventory = []
     actionable_by_id: dict[int, dict[str, Any]] = {}
+    # Reuse the already fetched global run inventory. A separate API request for
+    # every workflow exhausts the installation rate limit on large repositories.
+    # Workflows absent from this bounded window remain UNKNOWN, never PASS.
+    latest_by_workflow: dict[int, dict[str, Any]] = {}
+    for run in recent_runs:
+        workflow_id = int(run.get("workflow_id") or 0)
+        if workflow_id and workflow_id not in latest_by_workflow:
+            latest_by_workflow[workflow_id] = run
 
     for workflow in workflow_defs:
         wid = int(workflow.get("id") or 0)
-        latest_payload = (
-            api_get(repo, f"actions/workflows/{wid}/runs", params={"per_page": 1}) if wid else {}
-        )
-        latest_raw = (latest_payload.get("workflow_runs") or [None])[0]
+        latest_raw = latest_by_workflow.get(wid)
         latest = _compact_run(latest_raw) if latest_raw else None
         if latest_raw:
             latest["relevant_failure"] = classify_failure_relevance(
@@ -542,7 +547,29 @@ def main() -> int:
     parser.add_argument("--print-json", action="store_true")
     args = parser.parse_args()
 
-    snapshot = build_snapshot(args.repo, args.issue)
+    try:
+        snapshot = build_snapshot(args.repo, args.issue)
+    except RuntimeError as exc:
+        # GitHub installation rate-limit exhaustion must never become a false
+        # PASS or a missing audit artifact. Keep the control plane fail-closed.
+        message = str(exc)
+        if "HTTP 403" not in message or "rate limit" not in message.lower():
+            raise
+        snapshot = {
+            "schema": "SYSTEM3_PREFLIGHT_CONTROL_PLANE_V1",
+            "captured_at_utc": utc_now(),
+            "repository": args.repo,
+            "main_sha": "NOT_VERIFIED",
+            "status": "BLOCKED",
+            "current_step": "GitHub API rate-limit recovery",
+            "next_action": "Wait for API quota reset; rerun the full preflight before deployment",
+            "reason": "GitHub API installation rate limit exhausted; remote evidence NOT VERIFIED",
+        }
+        json_path, md_path = write_snapshot(snapshot, Path(args.out_dir))
+        print(f"STATUS={snapshot['status']}")
+        print(f"SNAPSHOT={json_path}")
+        print(f"NEXT_ACTION_FILE={md_path}")
+        return 2
     json_path, md_path = write_snapshot(snapshot, Path(args.out_dir))
     print(f"STATUS={snapshot['status']}")
     print(f"CURRENT_STEP={snapshot['current_step']}")

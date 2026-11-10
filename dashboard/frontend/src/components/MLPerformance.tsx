@@ -76,23 +76,23 @@ export default function MLPerformance() {
   const [comparison, setComparison] = useState<any>(null)
   const [status, setStatus] = useState<LoadState>('loading')
   const [message, setMessage] = useState('Checking model artifacts...')
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     let cancelled = false
     const fetchOnce = async () => {
       setStatus('loading')
-      try {
-        const stateRes = await axios.get(`${API_BASE}/api/state`, { timeout: 10000, headers: API_HEADERS })
-        if (!cancelled) setState(stateRes.data)
-      } catch {
-        // State is useful but not enough to fail the tab.
-      }
-
-      const [perfRes, compRes] = await Promise.allSettled([
-        axios.get(`${API_BASE}/api/ml/performance`, { timeout: 12000, headers: API_HEADERS }),
+      setMessage('Loading model evidence...')
+      setState(null)
+      setPerfBody(null)
+      setComparison(null)
+      const [stateRes, perfRes, compRes] = await Promise.allSettled([
+        axios.get(`${API_BASE}/api/state`, { timeout: 10000, headers: API_HEADERS }),
+        axios.get<PerfBody>(`${API_BASE}/api/ml/performance`, { timeout: 12000, headers: API_HEADERS }),
         axios.get(`${API_BASE}/api/ml/compare`, { timeout: 12000, headers: API_HEADERS }),
       ])
       if (cancelled) return
+      if (stateRes.status === 'fulfilled') setState(stateRes.value.data)
 
       const body: PerfBody | null = perfRes.status === 'fulfilled' ? perfRes.value.data : null
       const compBody = compRes.status === 'fulfilled' ? compRes.value.data : null
@@ -101,47 +101,53 @@ export default function MLPerformance() {
       setPerfBody(body)
       setComparison(comp)
 
+      if (perfRes.status === 'rejected') {
+        setStatus('error')
+        setMessage('The model performance proof endpoint could not be reached. This is not evidence that training proof is missing.')
+        return
+      }
+
       const models = mergeModels(perf, comp)
       const names = Object.keys(models)
       const apiStatus = String(body?.proof_status || perf?.status || body?.status || '')
       const apiMessage = body?.message || perf?.message || compBody?.message || comp?.message
       const liveReady = body?.ready_for_live === true || perf?.ready_for_live === true
 
-      if (liveReady && apiStatus && apiStatus !== 'BLOCKED') {
+      if (liveReady && apiStatus && apiStatus.toUpperCase() !== 'BLOCKED') {
         setStatus('ready')
-        setMessage(apiMessage || 'Forward validation is ready_for_live.')
+        setMessage(apiMessage || 'Forward-model validation evidence is reported as passed.')
       } else if (body || names.length > 0) {
         setStatus('not_ready')
-        setMessage(apiMessage || 'Model performance is blocked.')
+        setMessage(apiMessage || 'Model performance is blocked or incomplete.')
       } else {
         setStatus('not_ready')
         setMessage(apiMessage || 'No matured ML training/performance artifact is available.')
       }
     }
-    fetchOnce().catch((err) => {
+    void fetchOnce().catch((err) => {
       if (cancelled) return
       setStatus('error')
-      setMessage(`ML proof endpoints pending: ${err?.message || String(err)}`)
+      setMessage(`ML proof request failed: ${err?.message || String(err)}`)
     })
     return () => { cancelled = true }
-  }, [])
+  }, [retryKey])
 
   const model = state?.model || {}
   const perf = perfBody?.performance || null
   const models = mergeModels(perf, comparison)
   const modelNames = Object.keys(models)
-  const liveReady = perfBody?.ready_for_live === true || perf?.ready_for_live === true
-  const apiStatus = String(perfBody?.proof_status || perf?.status || (status === 'loading' ? 'CHECKING' : 'BLOCKED'))
+  const liveReady = status === 'ready' && (perfBody?.ready_for_live === true || perf?.ready_for_live === true)
+  const apiStatus = status === 'loading' ? 'CHECKING' : status === 'error' ? 'REQUEST FAILED' : String(perfBody?.proof_status || perfBody?.status || perf?.status || 'BLOCKED')
   const reason = perfBody?.ready_for_live_reason || perf?.ready_for_live_reason
   const checklist = perfBody?.validations_checklist || perf?.validations_checklist
   const rho = perfBody?.rho ?? perf?.rho
   const hitRate = perfBody?.hit_rate ?? perf?.hit_rate
   const proofPass = perfBody?.proof_pass_count ?? perf?.proof_pass_count
   const generated = perfBody?.generated_at_utc || perf?.generated_at_utc
-  const badgeColor = liveReady ? 'var(--up)' : 'var(--down)'
+  const badgeColor = status === 'loading' ? 'var(--text-sec)' : status === 'error' ? 'var(--amber)' : liveReady ? 'var(--up)' : 'var(--down)'
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
+    <div aria-busy={status === 'loading'} style={{ height: '100%', overflow: 'auto', padding: 18, background: 'var(--surface)' }}>
       <PendingLifecycleBanner />
       <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
@@ -153,9 +159,9 @@ export default function MLPerformance() {
             data-testid="ml-status"
             style={{
               padding: '5px 10px', borderRadius: 999, fontSize: 11, fontWeight: 900,
-              color: apiStatus === 'BLOCKED' || !liveReady ? 'var(--down)' : 'var(--up)',
-              border: '1px solid rgba(239,68,68,.45)',
-              background: 'rgba(239,68,68,.12)',
+              color: status === 'loading' ? 'var(--text-sec)' : status === 'error' ? 'var(--amber)' : apiStatus === 'BLOCKED' || !liveReady ? 'var(--down)' : 'var(--up)',
+              border: `1px solid ${status === 'loading' ? 'var(--border)' : status === 'error' ? 'rgba(245,165,36,.45)' : liveReady ? 'rgba(16,185,129,.45)' : 'rgba(239,68,68,.45)'}`,
+              background: status === 'loading' ? 'var(--surface-2)' : status === 'error' ? 'rgba(245,165,36,.12)' : liveReady ? 'rgba(16,185,129,.12)' : 'rgba(239,68,68,.12)',
             }}
           >{apiStatus}</span>
           <span
@@ -163,16 +169,17 @@ export default function MLPerformance() {
             style={{
               padding: '5px 10px', borderRadius: 999, fontSize: 11, fontWeight: 900,
               color: badgeColor,
-              border: `1px solid ${liveReady ? 'rgba(16,185,129,.45)' : 'rgba(239,68,68,.45)'}`,
-              background: liveReady ? 'rgba(16,185,129,.12)' : 'rgba(239,68,68,.12)',
+              border: `1px solid ${status === 'loading' ? 'var(--border)' : status === 'error' ? 'rgba(245,165,36,.45)' : liveReady ? 'rgba(16,185,129,.45)' : 'rgba(239,68,68,.45)'}`,
+              background: status === 'loading' ? 'var(--surface-2)' : status === 'error' ? 'rgba(245,165,36,.12)' : liveReady ? 'rgba(16,185,129,.12)' : 'rgba(239,68,68,.12)',
             }}
-          >ready_for_live={showField(perfBody?.ready_for_live ?? perf?.ready_for_live)}</span>
+          >{status === 'loading' ? 'FORWARD PROOF: LOADING' : status === 'error' ? 'FORWARD PROOF: NOT VERIFIED' : liveReady ? 'FORWARD PROOF: REPORTED PASS' : 'FORWARD PROOF: NOT PROVEN'}</span>
         </div>
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>
         <div style={{ fontWeight: 900, marginBottom: 6 }}>{message}</div>
-        <div data-testid="ready-for-live-reason" style={{ fontSize: 12, lineHeight: 1.45 }}>{showField(reason)}</div>
+        <div data-testid="ready-for-live-reason" style={{ fontSize: 12, lineHeight: 1.45 }}>{status === 'loading' ? 'Waiting for the model proof response.' : status === 'error' ? 'Current model proof response is unavailable.' : showField(reason)}</div>
+        {status === 'error' && <button type="button" onClick={() => setRetryKey(key => key + 1)} style={{ marginTop: 10, fontSize: 12, fontWeight: 700 }}>Retry proof request</button>}
         <button
           type="button"
           onClick={() => useStore.getState().setActiveTab('system-readiness')}
@@ -182,7 +189,15 @@ export default function MLPerformance() {
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
+      {status === 'loading' ? (
+        <div data-testid="ml-loading" aria-label="Loading model evidence" className="ml-proof-loading">
+          <div>Loading performance, model records and validation checks...</div>
+          <div className="ml-proof-skeleton-grid">{[0, 1, 2, 3].map(item => <div className="ml-proof-skeleton" key={item} />)}</div>
+          <div className="ml-proof-skeleton ml-proof-skeleton-wide" />
+        </div>
+      ) : (
+        <>
+      <div className="ml-proof-metrics-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(140px, 1fr))', gap: 12, marginBottom: 16 }}>
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>rho</div><div style={{ fontWeight: 900 }} data-testid="ml-rho">{showField(rho)}</div></div>
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>hit_rate</div><div style={{ fontWeight: 900 }} data-testid="ml-hit-rate">{showField(hitRate)}</div></div>
         <div className="card"><div style={{ color: 'var(--text-muted)', fontSize: 11 }}>proof_pass_count</div><div style={{ fontWeight: 900 }}>{showField(proofPass)}</div></div>
@@ -202,6 +217,7 @@ export default function MLPerformance() {
       {modelNames.length > 0 ? (
         <div className="card">
           <h3 style={{ marginTop: 0 }}>Model Performance Records</h3>
+          <div className="ml-proof-table-scroll">
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr>
@@ -235,12 +251,20 @@ export default function MLPerformance() {
               )
             })}</tbody>
           </table>
+          </div>
+        </div>
+      ) : status === 'error' ? (
+        <div data-testid="ml-proof-unavailable" className="card" style={{ borderColor: 'rgba(245,165,36,.45)', padding: 14 }}>
+          <b>Proof could not be retrieved.</b>
+          <div style={{ marginTop: 6, color: 'var(--text-muted)', fontSize: 12 }}>A request failure is not evidence that training records are missing.</div>
         </div>
       ) : (
         <div style={{ border: '1px solid rgba(239,68,68,.35)', background: 'rgba(239,68,68,.08)', padding: 14, borderRadius: 10 }}>
           <b>Training proof missing.</b>
           <div style={{ marginTop: 6, color: 'var(--text-muted)', fontSize: 12 }}>No model records were returned by /api/ml/performance.</div>
         </div>
+      )}
+        </>
       )}
     </div>
   )

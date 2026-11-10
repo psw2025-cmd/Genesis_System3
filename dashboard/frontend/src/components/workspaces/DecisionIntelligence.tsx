@@ -129,7 +129,7 @@ export const DecisionIntelligence: React.FC = () => {
         <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
           Live operations
         </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: 12 }}>
+        <div className="operations-metrics-grid">
           <MetricTile label="Exposure" value={formatInr(exposure)} sub="Read-only portfolio" />
           <MetricTile label="Unrealized P&L" value={formatInr(unrealized)} tone={pnlTone} sub="Paper / analyzer" />
           <MetricTile label="VaR 95" value={formatInr(var95)} sub="From /api/state" />

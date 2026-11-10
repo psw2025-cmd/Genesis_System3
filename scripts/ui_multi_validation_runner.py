@@ -1,10 +1,11 @@
 import asyncio
 import json
+import os
 import time
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-OUT_DIR = Path(r"C:\Users\ADMIN\Genesis_System3\Genesis_System3\live-production-ui-proof\multi-validation")
+OUT_DIR = Path(os.environ.get("SYSTEM3_UI_PROOF_DIR", str(Path(__file__).resolve().parents[1] / "reports" / "latest" / "ui_multi_validation")))
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 BASE_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app"

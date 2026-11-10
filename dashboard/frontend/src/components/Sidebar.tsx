@@ -2,7 +2,7 @@ import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
   Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
-  Search, Zap, ListChecks
+  Search, Zap
 } from 'lucide-react'
 import { useStore } from '../store'
 
@@ -28,11 +28,10 @@ export const DASHBOARD_TABS = [
   { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
-  { id: 'system-readiness', label: 'System readiness', Icon: ListChecks,  group: 'system' },
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ] as const
 
-export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map(tab => tab.id))
+export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set([...DASHBOARD_TABS.map(tab => tab.id), 'system-readiness'])
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',

@@ -168,18 +168,23 @@ RESEARCH_UNIVERSE = [
 def get_multibagger_research_data() -> Dict[str, Any]:
     """Return full Multibagger Research Workspace data contract."""
     return {
-        "status": "READY",
+        "status": "STATIC_RESEARCH_ONLY_NOT_VERIFIED",
         "as_of": datetime.now(timezone.utc).isoformat(),
         "total_candidates": len(RESEARCH_UNIVERSE),
+        "dhan_equity_universe_screened": False,
+        "screened_equity_count": 0,
+        "prediction_accuracy_verified": False,
+        "candidate_source": "STATIC_RESEARCH_UNIVERSE_HARDCODED",
+        "live_market_data_verified": False,
         "candidates": RESEARCH_UNIVERSE,
         "sections": {
-            "fundamentals": "VERIFIED",
-            "technicals": "VERIFIED",
-            "valuation": "VERIFIED",
-            "catalysts": "VERIFIED",
-            "risk_governance": "VERIFIED",
+            "fundamentals": "NOT_VERIFIED_STATIC",
+            "technicals": "NOT_VERIFIED_STATIC",
+            "valuation": "NOT_VERIFIED_STATIC",
+            "catalysts": "NOT_VERIFIED_STATIC",
+            "risk_governance": "PAPER_RESEARCH_ONLY",
         },
-        "reason": "Multi-factor quantitative and qualitative screening passed all governance gates.",
+        "reason": "Illustrative hardcoded research shortlist only. No full Dhan equity universe scan, independently verified current fundamentals, or measured multibagger prediction accuracy.",
         "governance": {
             "mode": "RESEARCH_WORKSPACE",
             "live_trading_enabled": False,

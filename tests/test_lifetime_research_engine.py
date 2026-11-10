@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta, timezone
 
 from dashboard.backend.lifetime_research_engine import (
     compute_metrics,
@@ -10,7 +11,7 @@ from dashboard.backend.lifetime_research_engine import (
 
 
 def _row(i, strategy="S1", symbol="NIFTY", side="CE", ret=0.02):
-    return OutcomeRow(ts=f"2026-01-{i:02d}T09:15:00+05:30", symbol=symbol, side=side, strategy=strategy, return_pct=ret, source="test")
+    return OutcomeRow(ts=(datetime(2026, 1, 1, 3, 45, tzinfo=timezone.utc) + timedelta(days=i-1)).isoformat(), symbol=symbol, side=side, strategy=strategy, return_pct=ret, source="test")
 
 
 def test_walk_forward_has_no_future_leakage():

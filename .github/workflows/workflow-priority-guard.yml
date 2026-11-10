@@ -36,8 +36,9 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: workflow-priority-guard-${{ github.event.workflow_run.id || github.event.deployment.id || github.event.pull_request.number || github.sha }}
-  cancel-in-progress: false
+  # Coalesce completion-triggered forensic refreshes; preserve independent PR checks.
+  group: workflow-priority-guard-${{ github.event_name == 'workflow_run' && 'shared-forensic-refresh' || github.event.deployment.id || github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_run' }}
 
 env:
   SYSTEM3_MODE: analyze
@@ -63,7 +64,9 @@ jobs:
         run: python .github/scripts/workflow_priority_guard.py
 
   refresh-canonical-preflight:
-    if: github.event_name == 'workflow_run'
+    if: >-
+      github.event_name == 'workflow_run' &&
+      contains(fromJSON('["failure","cancelled","timed_out","action_required","startup_failure"]'), github.event.workflow_run.conclusion)
     name: FORENSIC - refresh canonical workflow issue artifact snapshot
     runs-on: ubuntu-latest
     timeout-minutes: 10

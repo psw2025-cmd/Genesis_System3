@@ -125,5 +125,47 @@ class StateSyncStalenessTests(unittest.IsolatedAsyncioTestCase):
         )
 
 
+    async def test_explicit_synthetic_pnl_never_reaches_live_shared_state(self):
+        self._seed_stale_runtime_state()
+        (self.outputs / "paper_pnl_summary.json").write_text(json.dumps({
+            "total_trades": 9,
+            "total_unrealized_pnl": 100.0,
+            "total_realized_pnl": -1806.07,
+            "total_pnl": -1706.07,
+            "data_source": "paper_simulation",
+            "note": "Nine synthetic historical fixture trades",
+        }))
+
+        await StateSyncService(self.store, self.outputs).sync_state()
+        pnl = self.store.get_state()["pnl"]
+        self.assertEqual(pnl["total"], 0.0)
+        self.assertEqual(pnl["realized"], 0.0)
+        self.assertEqual(pnl["unrealized"], 0.0)
+        self.assertTrue(pnl["is_synthetic_source_ignored"])
+        self.assertEqual(pnl["verification_status"], "SYNTHETIC_SOURCE_EXCLUDED")
+
+    async def test_fixture_flag_and_replay_source_are_fail_closed(self):
+        for attrs in ({"is_fixture": True}, {"source": "MARKET_CLOSED_REPLAY"}):
+            (self.outputs / "paper_pnl_summary.json").write_text(json.dumps({
+                "total_pnl": 9876.5,
+                "total_realized_pnl": 9876.5,
+                **attrs,
+            }))
+            await StateSyncService(self.store, self.outputs).sync_state()
+            self.assertEqual(self.store.get_state()["pnl"]["total"], 0.0)
+            self.assertTrue(self.store.get_state()["pnl"]["is_synthetic_source_ignored"])
+
+    async def test_broker_labeled_pnl_still_populates_shared_state(self):
+        (self.outputs / "paper_pnl_summary.json").write_text(json.dumps({
+            "total_pnl": 44.5,
+            "total_realized_pnl": 42.5,
+            "total_unrealized_pnl": 2.0,
+            "data_source": "dhan_broker_reconciled",
+        }))
+        await StateSyncService(self.store, self.outputs).sync_state()
+        self.assertEqual(self.store.get_state()["pnl"]["total"], 44.5)
+        self.assertFalse(self.store.get_state()["pnl"].get("is_synthetic_source_ignored", False))
+
+
 if __name__ == "__main__":
     unittest.main()
