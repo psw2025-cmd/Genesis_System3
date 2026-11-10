@@ -87,6 +87,24 @@ def test_scan_equity_top_gainers():
     assert scan["market_top_pe"]["underlying"] == "RELIANCE"
 
 
+def test_rows_from_live_chain_payload():
+    from dashboard.backend.equity_option_scanner import _rows_from_chain_payload
+
+    rows = _rows_from_chain_payload(
+        "RELIANCE",
+        {
+            "expiry_date": "2026-08-28",
+            "contracts": [
+                {"option_type": "CE", "strike": 1300, "ltp": 22.5, "oi": 1000, "oi_change": 50, "volume": 10},
+                {"option_type": "PE", "strike": 1300, "ltp": 18.0, "oi": 800, "oi_change": -20, "volume": 8},
+                {"option_type": "CE", "strike": 0, "ltp": 1, "oi": 1},
+            ],
+        },
+    )
+    assert len(rows) == 2
+    assert {r["option_type"] for r in rows} == {"CE", "PE"}
+
+
 def test_build_equity_report_structure():
     report = build_equity_options_report(top_n=5)
     assert "segments" in report

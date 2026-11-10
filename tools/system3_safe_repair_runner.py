@@ -41,7 +41,6 @@ COMMANDS = [
     [sys.executable, "scripts/system3_friction_expectancy_proof.py"],
     [sys.executable, "scripts/websocket_tick_health_proof.py"],
     [sys.executable, "scripts/system3_blocker_finder.py", "--api-base", API_BASE],
-    [sys.executable, "tools/system3_github_render_failure_tracker.py"],
 ]
 
 
@@ -146,7 +145,7 @@ def main() -> int:
     if visible.get("status") != "PASS":
         payload["blocked_reasons"].append("automated dashboard visual proof is not PASS")
     if gh_render.get("status") != "PASS":
-        payload["blocked_reasons"].append("GitHub plus Render failure tracker is not PASS")
+        payload["blocked_reasons"].append("GitHub failure tracker is not PASS")
     if board.get("status") != "PASS":
         payload["blocked_reasons"].append("autopilot proof board is not PASS")
 

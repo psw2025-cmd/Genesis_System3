@@ -1,0 +1,13 @@
+---
+description: Point-in-time ML, leakage control, no unsafe auto-promotion
+globs: "{core/ml/**,core/engine/**,src/ml/**,models/**,dashboard/backend/**/*ml*,**/multibagger*}"
+alwaysApply: false
+---
+
+# ML and prediction validation
+
+Require provenance, point-in-time availability, versioned features/labels/models, chronological OOS or walk-forward, a simple baseline, and prediction-to-outcome lineage. A pickle is not a valid model. A single accuracy or PnL number cannot promote.
+
+Do not pad, truncate, or reorder features silently. Schema mismatch is CANNOT_SCORE / FAIL closed. No automatic LIVE, capital, or production-code self-mutation.
+
+Multibagger output is equity RESEARCH_CANDIDATE, HIGH_RISK, NOT_INVESTMENT_ADVICE, NOT_PROVEN when unproven. Never display option contracts as equity multibaggers. Never guarantee returns.

@@ -1,0 +1,12 @@
+{
+  "id": 21581518,
+  "contexts": [
+    "BLOCKING - workflow policy and trading safety guard",
+    "BLOCKING - architecture and trading safety gate",
+    "BLOCKING - Python compile proof",
+    "BLOCKING - full proof pack validation",
+    "BLOCKING - frontend production build + browser runtime",
+    "BLOCKING - priority workflows only"
+  ],
+  "updated_at": "2026-08-27T01:08:04.088+05:30"
+}

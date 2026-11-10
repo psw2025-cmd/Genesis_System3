@@ -75,7 +75,8 @@ def py_compile(path: str) -> dict[str, Any]:
 
 
 def safety_scan(files: list[str]) -> dict[str, Any]:
-    render = read_text("render.yaml")
+    render_present = (ROOT / "render.yaml").exists()
+    dockerfile = read_text("dashboard/backend/Dockerfile")
     req = read_text("dashboard/backend/requirements.txt").lower()
     tracked_secret_names = [
         f
@@ -83,11 +84,9 @@ def safety_scan(files: list[str]) -> dict[str, Any]:
         if re.search(r"(^|/)(\.env($|\.)|.*secret.*\.json$|.*credential.*\.json$|.*private.*key.*|.*\.pem$)", f, re.I)
     ]
     return {
-        "render_yaml_exists": (ROOT / "render.yaml").exists(),
-        "live_trading_disabled_in_render": "LIVE_TRADING_ENABLED" in render
-        and re.search(r"LIVE_TRADING_ENABLED[^\n]*(\"0\"|'0'|0|false|False)", render) is not None,
-        "analyze_mode_enabled_in_render": "ANALYZE_MODE" in render
-        and re.search(r"ANALYZE_MODE[^\n]*(\"1\"|'1'|1|true|True)", render) is not None,
+        "render_yaml_exists": render_present,
+        "render_yaml_retired_absent": not render_present,
+        "cloud_run_dockerfile_present": bool(dockerfile.strip()),
         "dhanhq_dependency_present": "dhanhq" in req,
         "tracked_secret_style_file_count": len(tracked_secret_names),
         "tracked_secret_style_files": tracked_secret_names[:50],
@@ -229,8 +228,10 @@ def main() -> int:
 
     blockers = []
     warnings = []
-    if not safety["live_trading_disabled_in_render"]:
-        blockers.append("live_trading_not_proven_disabled_in_render")
+    if safety["render_yaml_exists"]:
+        blockers.append("render_yaml_present_retired_host")
+    if not safety["cloud_run_dockerfile_present"]:
+        blockers.append("cloud_run_dockerfile_missing")
     if safety["tracked_secret_style_file_count"]:
         blockers.append("tracked_secret_style_files_present")
     if not safety["dhanhq_dependency_present"]:

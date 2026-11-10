@@ -1,0 +1,18 @@
+stage,q_ref,status,blocker,next_dependency
+RAW_DATA,Q1,PARTIAL,Dhan 806 / ephemeral Cloud disk,durable GCS history + source labels
+DATA_QUALITY,Q2,PARTIAL,fallback/synthetic mislabel risk,DQ gates in CI + UI
+HISTORY,Q3,PARTIAL,no multi-year OC lake,history pipeline build
+FEATURES,Q4-Q5,PARTIAL,no versioned feature store / leakage suite,feature registry
+LABELS,Q6,PARTIAL,narrow label set,explicit label contracts
+MODELS,Q7-Q9,PARTIAL,heuristic SSOT; ensemble not sole; thin samples,champion metrics
+TOURNAMENT,Q10,MISSING,no fair OOS tournament,tournament harness
+STRATEGY,Q11-Q12,PARTIAL,no robust best-strategy proof,strategy tournament
+BACKTEST,Q13-Q14,NOT_PROVEN,costed WF gate false historically,costed WF engine
+PRED_VS_ACTUAL,Q15,PARTIAL,prediction_id ledger incomplete,immutable prediction store
+SELF_LEARN,Q16-Q18,PARTIAL,no MLflow champion/challenger,registry + promotion API
+PAPER,Q19,PARTIAL,market-day lifecycle gap,paper proof campaign
+PROMOTION,Q20,FAIL_BLOCKED,LIVE correctly off; gates incomplete,all prior PASS
+PROD_API,Q1/Q9,PARTIAL,APIs exist,extend for Q22 fields
+PROD_UI,Q21-Q26,PARTIAL,many UI_OBSERVABILITY_GAP,truth surfaces wave
+MONITORING,Q27,INCOMPLETE_INSTRUCTION,file truncated,complete Q27 text
+BROKER,Part1,PASS,n/a,maintain auto-heal + single secret

@@ -1,0 +1,34 @@
+{
+  "schema": "system3_autonomous_intent_v1",
+  "compiled_at_utc": "2026-08-24T07:01:45Z",
+  "next_id": "RUNBOOK-GOVERNANCE-12",
+  "defect": "",
+  "success_criteria": "",
+  "constraints": [
+    "LIVE=false",
+    "order_placement_allowed=false",
+    "no_secret_mint_except_rotator",
+    "never_weaken_proof_gates",
+    "zero_synthetic_inventions",
+    "gitops_only_no_hot_graph_rewrite"
+  ],
+  "wait_for_user": false,
+  "auto_continue": true,
+  "live_trading_enabled": false,
+  "order_placement_allowed": false,
+  "human_gate_required": null,
+  "rejected_action": null,
+  "strategy_mutation_allowed": "code_via_pr_and_evals_only",
+  "proof_gate_thresholds_locked": true,
+  "synthetic_metrics_allowed": false,
+  "hot_graph_rewrite_allowed": false,
+  "roles": {
+    "schema_drift": "claude_sonnet",
+    "signal_graph": "gemini",
+    "governance_ledger": "copilot",
+    "ast_consistency": "claude_code",
+    "atomic_patches": "codex_cli",
+    "backtests": "gemini_verification",
+    "runtime_truth": "copilot_governance"
+  }
+}

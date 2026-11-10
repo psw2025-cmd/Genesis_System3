@@ -135,6 +135,18 @@ class MarketDataFailoverRouter:
         if isinstance(payload, Mapping):
             if payload.get("ok") is False or payload.get("success") is False:
                 return False
+            # Fail closed on provider-declared errors even when "ok" is omitted.
+            if payload.get("error") or str(payload.get("status") or "").lower() in {
+                "error", "failed", "fail", "unauthorized", "unavailable",
+            }:
+                return False
+            # Broker tier labels alone cannot make mock/replay values real.
+            if payload.get("synthetic") is True or payload.get("simulated") is True:
+                return False
+            if str(payload.get("data_source") or "").lower() in {
+                "synthetic", "simulation", "mock", "fixture", "replay",
+            }:
+                return False
             if "data" in payload and payload.get("data") in (None, {}, []):
                 return False
             return bool(payload)
@@ -151,7 +163,15 @@ class MarketDataFailoverRouter:
     @staticmethod
     def _payload_reason(payload: Any) -> str:
         if isinstance(payload, Mapping):
-            return str(payload.get("reason") or payload.get("error") or payload.get("stale_reason") or "")[:240]
+            # Untrusted provider message strings may include secret-bearing URLs
+            # or headers. Export only fixed classifications, never raw text.
+            for key, code in (
+                ("error", "UPSTREAM_REPORTED_ERROR"),
+                ("stale_reason", "UPSTREAM_REPORTED_STALE"),
+                ("reason", "UPSTREAM_REPORTED_REASON"),
+            ):
+                if payload.get(key):
+                    return code
         return ""
 
     def provider_health(self) -> Dict[str, Dict[str, Any]]:
@@ -213,7 +233,10 @@ class MarketDataFailoverRouter:
                     "latency_ms": round(latency_ms, 3),
                     "stale": stale,
                 })
-                authoritative = provider.tier is ProviderTier.PRIMARY_BROKER and not stale
+                authoritative = (
+                    provider.tier is ProviderTier.PRIMARY_BROKER
+                    and provider.broker_backed and not stale
+                )
                 degraded = fallback_index > 0 or not authoritative or stale
                 return MarketDataResult(
                     ok=True,
@@ -233,7 +256,8 @@ class MarketDataFailoverRouter:
             except Exception as exc:
                 latency_ms = (time.perf_counter() - started) * 1000.0
                 health.consecutive_failures += 1
-                health.last_error = f"{type(exc).__name__}: {exc}"[:240]
+                # Broker exceptions can embed Authorization headers or tokens.
+                health.last_error = "FETCH_FAILED_" + type(exc).__name__
                 if health.consecutive_failures >= self.failure_threshold:
                     health.circuit_open_until = time.monotonic() + self.circuit_open_s
                 attempts.append({

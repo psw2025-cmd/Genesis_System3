@@ -1,0 +1,247 @@
+﻿[
+    {
+        "path":  "/api/deploy_info",
+        "code":  200,
+        "ms":  309,
+        "len":  470,
+        "snippet":  "{\"git_sha\":\"719566d23fd9aeb783a72fcec9493557f783781f\",\"git_branch\":\"\",\"service_name\":\"genesis-system3-web\",\"deploy_target\":\"gcp-cloud-run\",\"cloud_provider\":\"google_cloud\",\"public_b"
+    },
+    {
+        "path":  "/api/health",
+        "code":  200,
+        "ms":  85,
+        "len":  701,
+        "snippet":  "{\"status\":\"ok\",\"mode\":\"PAPER\",\"broker_status\":\"connected\",\"market_status\":\"open\",\"data_source\":\"broker_connected_market_open\",\"live_allowed\":false,\"live_blockers\":[\"Live trading pe"
+    },
+    {
+        "path":  "/api/broker/status",
+        "code":  200,
+        "ms":  363,
+        "len":  2416,
+        "snippet":  "{\"broker\":\"dhan\",\"mode\":\"ANALYZER\",\"live_trading_enabled\":false,\"order_placement_allowed\":false,\"client_id_present\":true,\"access_token_present\":true,\"credentials_present\":true,\"sdk"
+    },
+    {
+        "path":  "/api/auth/status",
+        "code":  200,
+        "ms":  98,
+        "len":  130,
+        "snippet":  "{\"required\":false,\"configured\":false,\"authenticated\":false,\"mode\":\"public_readonly\",\"credential_surface\":\"REMOVED\",\"session\":null}"
+    },
+    {
+        "path":  "/api/auto_gates",
+        "code":  200,
+        "ms":  972,
+        "len":  6413,
+        "snippet":  "{\"generated_utc\":\"2026-08-25T09:59:26.331414Z\",\"status\":\"ok\",\"source\":\"cloud_gate_evaluator\",\"runtime_driven\":true,\"evidence_plane\":\"firestore\",\"market_open\":true,\"market_reason\":\""
+    },
+    {
+        "path":  "/api/ml/performance",
+        "code":  200,
+        "ms":  209,
+        "len":  1012,
+        "snippet":  "{\"status\":\"ok\",\"performance\":{\"models\":{\"model_accuracy_report\":{\"status\":\"BLOCKED\",\"model_proof_ready\":false,\"total_predictions\":0,\"avg_accuracy\":null,\"avg_confidence\":null,\"proof"
+    },
+    {
+        "path":  "/api/paper",
+        "code":  200,
+        "ms":  194,
+        "len":  1098,
+        "snippet":  "{\"status\":\"ok\",\"mode\":\"PAPER\",\"engine\":\"paper_cloud_sim\",\"positions_source\":\"PAPER_CLOUD_SIM\",\"data_source\":\"DHAN_LIVE_MARK_TO_MARKET\",\"live_trading_enabled\":false,\"broker_order_en"
+    },
+    {
+        "path":  "/api/paper/trades",
+        "code":  404,
+        "ms":  44,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/paper/positions",
+        "code":  404,
+        "ms":  32,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/paper/status",
+        "code":  404,
+        "ms":  48,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/paper/pnl",
+        "code":  404,
+        "ms":  26,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/paper/summary",
+        "code":  404,
+        "ms":  51,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/positions",
+        "code":  200,
+        "ms":  852,
+        "len":  68,
+        "snippet":  "{\"positions\":[],\"open_count\":0,\"message\":\"Positions file not found\"}"
+    },
+    {
+        "path":  "/api/signals",
+        "code":  200,
+        "ms":  61,
+        "len":  75,
+        "snippet":  "{\"action\":\"NO_TRADE\",\"reason\":\"Signal file not found\",\"data_source\":\"real\"}"
+    },
+    {
+        "path":  "/api/scanner/equity_options",
+        "code":  200,
+        "ms":  148,
+        "len":  6857,
+        "snippet":  "{\"generated_utc\":\"2026-08-25T09:59:28.622312Z\",\"status\":\"ok\",\"segments\":{\"index_options\":{\"implemented\":true,\"segments\":[\"NIFTY\",\"BANKNIFTY\",\"FINNIFTY\",\"MIDCPNIFTY\"],\"instrument_ty"
+    },
+    {
+        "path":  "/api/holdings",
+        "code":  404,
+        "ms":  24,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/funds",
+        "code":  404,
+        "ms":  22,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/charts/NIFTY",
+        "code":  404,
+        "ms":  27,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/equity/options",
+        "code":  404,
+        "ms":  21,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/multibagger",
+        "code":  404,
+        "ms":  21,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/chain/NIFTY",
+        "code":  200,
+        "ms":  3316,
+        "len":  215279,
+        "snippet":  "{\"underlying\":\"NIFTY\",\"spot\":24334.55,\"pcr\":1.1434051832886543,\"contracts\":[{\"underlying\":\"NIFTY\",\"strike\":17850.0,\"option_type\":\"CE\",\"oi\":0,\"oi_change\":0,\"volume\":0,\"ltp\":0.0,\"iv\""
+    },
+    {
+        "path":  "/api/chain/BANKNIFTY",
+        "code":  200,
+        "ms":  14897,
+        "len":  340905,
+        "snippet":  "{\"underlying\":\"BANKNIFTY\",\"spot\":57514.2,\"pcr\":0.8410026960225612,\"contracts\":[{\"underlying\":\"BANKNIFTY\",\"strike\":31000.0,\"option_type\":\"CE\",\"oi\":0,\"oi_change\":0,\"volume\":0,\"ltp\":0"
+    },
+    {
+        "path":  "/api/chain/FINNIFTY",
+        "code":  200,
+        "ms":  14939,
+        "len":  226219,
+        "snippet":  "{\"underlying\":\"FINNIFTY\",\"spot\":26246.95,\"pcr\":0.9448689138576779,\"contracts\":[{\"underlying\":\"FINNIFTY\",\"strike\":16000.0,\"option_type\":\"CE\",\"oi\":0,\"oi_change\":0,\"volume\":0,\"ltp\":0."
+    },
+    {
+        "path":  "/api/chain/MIDCPNIFTY",
+        "code":  200,
+        "ms":  18106,
+        "len":  247800,
+        "snippet":  "{\"underlying\":\"MIDCPNIFTY\",\"spot\":15000.9,\"pcr\":1.1005518161421382,\"contracts\":[{\"underlying\":\"MIDCPNIFTY\",\"strike\":10000.0,\"option_type\":\"CE\",\"oi\":0,\"oi_change\":0,\"volume\":0,\"ltp\""
+    },
+    {
+        "path":  "/api/chain/SENSEX",
+        "code":  200,
+        "ms":  4162,
+        "len":  182423,
+        "snippet":  "{\"underlying\":\"SENSEX\",\"spot\":77529.94,\"pcr\":1.3054589632966325,\"contracts\":[{\"underlying\":\"SENSEX\",\"strike\":66500.0,\"option_type\":\"CE\",\"oi\":0,\"oi_change\":0,\"volume\":0,\"ltp\":0.0,\"i"
+    },
+    {
+        "path":  "/api/scheduler/health",
+        "code":  200,
+        "ms":  228,
+        "len":  6770,
+        "snippet":  "{\"healthy\":false,\"transport_healthy\":false,\"status\":\"UNHEALTHY\",\"business_readiness\":\"PARTIAL\",\"business_readiness_reasons\":[\"business lane not ready: forecast=PENDING\",\"business a"
+    },
+    {
+        "path":  "/ui/",
+        "code":  200,
+        "ms":  137,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=broker",
+        "code":  200,
+        "ms":  192,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=chain",
+        "code":  200,
+        "ms":  99,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=paper",
+        "code":  200,
+        "ms":  82,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=performance",
+        "code":  200,
+        "ms":  80,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=charts",
+        "code":  200,
+        "ms":  84,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/ui/?tab=signals",
+        "code":  200,
+        "ms":  81,
+        "len":  567,
+        "snippet":  "\u003c!doctype html\u003e \u003chtml lang=\"en\" class=\"dark\"\u003e \u003chead\u003e   \u003cmeta charset=\"UTF-8\" /\u003e   \u003cmeta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /\u003e   \u003ctitle\u003eSystem3 — Genesi"
+    },
+    {
+        "path":  "/api/predictions",
+        "code":  404,
+        "ms":  26,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    },
+    {
+        "path":  "/api/backtest",
+        "code":  404,
+        "ms":  21,
+        "len":  0,
+        "snippet":  "The remote server returned an error: (404) Not Found."
+    }
+]

@@ -1,0 +1,11 @@
+---
+description: Test placement, evidence, and fail-closed reporting
+globs: "{tests/**,scripts/**test**,**/*_test.py,**/*.spec.ts}"
+alwaysApply: false
+---
+
+# Testing and evidence
+
+Put tests in the proper subsystem, not only `tests/evals`. A skipped test is not PASS. Do not change expected outputs to force green. Record command, cwd, UTC, exit code, counts, duration, and whether the test is mocked, local-runtime, or external-read-only.
+
+Current local runtime proof is required for runtime claims. Historical `reports/latest/` is not current.

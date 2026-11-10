@@ -1,0 +1,6 @@
+---
+description: DEPRECATED redirect — not active authority
+alwaysApply: false
+---
+
+HISTORICAL_NON_AUTHORITY. Replaced by `.cursor/rules/00-repository-safety.mdc` and `.cursor/rules/60-git-change-control.mdc`. No Cloud Run GitOps loop.

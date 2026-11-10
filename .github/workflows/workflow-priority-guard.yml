@@ -1,27 +1,30 @@
 name: Workflow Priority Guard
 
 on:
+  # Emit the required check for every PR. Path-filtering a required workflow
+  # leaves unrelated PRs permanently pending and tempts ruleset dilution.
   pull_request:
     branches: [main]
-    paths:
-      - ".github/workflows/**"
-      - ".github/scripts/workflow_priority_guard.py"
-      - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
   push:
     branches: [main]
     paths:
       - ".github/workflows/**"
       - ".github/scripts/workflow_priority_guard.py"
       - "docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md"
+      - "scripts/gcp_full_cloud_audit.py"
+      - "scripts/fetch_exact_security_audit.py"
+      - "scripts/multi_ai_audit_consensus.py"
+      - "scripts/system3_preflight_control_plane.py"
+      - "tests/test_full_cloud_audit_contract.py"
+      - "tests/evals/test_system3_preflight_control_plane.py"
   workflow_dispatch:
   workflow_run:
     workflows:
       - "Genesis System3 Global Safety CI"
-      - "Cloud Run Auto Deploy"
       - "Frontend Browser Runtime Smoke"
-      - "GCP Dhan Token Fix CI"
-      - "GCP Dhan Token Rotation Manual Recovery"
-      - "GCP Stage 2 Safety Checks"
+      - "CodeQL Security Audit"
+      - "Security Audit Evidence"
+      - "SonarQube Audit"
     types: [completed]
   deployment_status:
 
@@ -29,10 +32,13 @@ permissions:
   contents: read
   actions: read
   deployments: read
+  issues: read
+  pull-requests: read
 
 concurrency:
-  group: workflow-priority-guard-${{ github.event.workflow_run.id || github.event.deployment.id || github.event.pull_request.number || github.sha }}
-  cancel-in-progress: false
+  # Coalesce completion-triggered forensic refreshes; preserve independent PR checks.
+  group: workflow-priority-guard-${{ github.event_name == 'workflow_run' && 'shared-forensic-refresh' || github.event.deployment.id || github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_run' }}
 
 env:
   SYSTEM3_MODE: analyze
@@ -49,13 +55,54 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout proposed repository state
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           clean: true
           persist-credentials: false
 
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
+
+  refresh-canonical-preflight:
+    if: >-
+      github.event_name == 'workflow_run' &&
+      contains(fromJSON('["failure","cancelled","timed_out","action_required","startup_failure"]'), github.event.workflow_run.conclusion)
+    name: FORENSIC - refresh canonical workflow issue artifact snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout trusted default branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          clean: true
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Refresh current workflow issue artifact snapshot
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/system3_preflight_control_plane.py --print-json
+
+      - name: Publish operator summary
+        if: always()
+        run: |
+          if [ -f reports/latest/control_plane/NEXT_ACTION.md ]; then
+            cat reports/latest/control_plane/NEXT_ACTION.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload refreshed canonical preflight snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system3-preflight-after-${{ github.event.workflow_run.id }}-${{ github.run_id }}
+          path: reports/latest/control_plane/
+          if-no-files-found: error
+          retention-days: 30
 
   event-forensic-responder:
     if: >-
@@ -77,7 +124,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Checkout trusted default branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           ref: main
           clean: true
@@ -119,7 +166,7 @@ jobs:
               ref = deployment.get("ref")
               evidence_url = deployment_status.get("target_url") or deployment_status.get("log_url")
               deployment_app = str(app.get("slug") or "") or None
-              retired_runtime = deployment_app == "render"
+              retired_runtime = deployment_app == "render"  # Render hosting is forbidden; flag any leftover deploy events
 
           fingerprint = hashlib.sha256(
               "|".join([event_name, source, state, str(deployment_app or "none")]).lower().encode("utf-8")
@@ -164,7 +211,7 @@ jobs:
           PY
 
       - name: Upload forensic event artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: github-event-forensics-${{ github.run_number }}-${{ github.run_attempt }}
           path: reports/latest/github_event_forensics/

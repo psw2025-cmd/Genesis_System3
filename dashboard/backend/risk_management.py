@@ -98,9 +98,14 @@ class RiskManagement:
                 "total_exposure": 0.0,
                 "total_pnl": 0.0,
                 "var": 0.0,
+                "var_95": 0.0,
                 "expected_shortfall": 0.0,
+                "expected_shortfall_95": 0.0,
                 "max_drawdown": 0.0,
                 "concentration_risk": 0.0,
+                "position_count": 0,
+                "greeks_exposure": {"delta": 0.0, "gamma": 0.0, "theta": 0.0, "vega": 0.0},
+                "underlying_exposures": {},
             }
 
         # Calculate exposures

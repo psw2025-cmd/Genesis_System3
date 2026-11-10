@@ -1,0 +1,16 @@
+﻿schema: system3_repo_path_verify_v1
+captured_ist: 2026-08-25T05:09:30.3550961+05:30
+primary_clone: C:\Users\ADMIN\Genesis_System3\Genesis_System3
+branch: fix/p0-188-bankex-paced-cache-20260824
+HEAD: 146eb69b697f86559d50519f8eaee3c8fbb8a82c
+origin_main: 2c0b44a43837c1de5d05721b61329e9269d0a8a0
+live_serving_sha: 719566d23fd9aeb783a72fcec9493557f783781f
+head_equals_origin_main: False
+origin_main_equals_live: False
+disk_free_gb: { C: 5.9, E: 14.44 }
+canonical_rule: .cursor/rules/canonical-laptop-repo-path.mdc
+handoff_doc: docs/handoffs/CANONICAL_LAPTOP_REPO_PATH.md
+broken_old_marker: C:\System3\Genesis_System3\BROKEN_GIT_ARCHIVE_README.md
+stale_parent_marker: C:\Users\ADMIN\Genesis_System3\STALE_PARENT_CHECKOUT_README.md
+overlay_marker: C:\Genesis_System3\NOT_A_GIT_CLONE_README.md
+worktree_prefer: E:\ when C: free < 10GB

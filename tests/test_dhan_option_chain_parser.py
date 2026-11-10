@@ -75,6 +75,8 @@ def test_official_dhan_v2_oc_payload_parsed():
     assert ce["oi"] == 3786445
     assert ce["previous_oi"] == 402220
     assert ce["change_in_oi"] == 3384225
+    assert ce["volume"] == 117567970
+    assert ce["previous_volume"] == 31931705
     assert ce["top_bid_price"] == pytest.approx(133.55)
     assert ce["top_ask_price"] == pytest.approx(134)
 

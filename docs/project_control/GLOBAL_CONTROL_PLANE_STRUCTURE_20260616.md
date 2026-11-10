@@ -12,7 +12,8 @@ Replace scattered ad-hoc scripts and proof workflows with one governed control-p
 | CI safety gate | `.github/scripts/root_architecture_gate.py` | KEEP — blocks unsafe changes |
 | Runtime backend | `dashboard/backend/app.py` | KEEP |
 | Runtime Docker | `dashboard/backend/Dockerfile` | KEEP |
-| Render config | `render.yaml` | KEEP |
+| GCP Cloud Run | `dashboard/backend/Dockerfile` + `.github/workflows/cloud-run-auto-deploy.yml` | KEEP — only production deploy |
+| Render.com | `render.yaml` | FORBIDDEN — file must not exist |
 | Legacy menu | `run_system3.py` | REVIEW — disabled legacy shell, kept because CI still checks it |
 | Ultra menu | `system3_ultra.py` | KEEP — current local panel |
 

@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""
-Multi-agent production coordination — proof-only, no live trading.
+"""Multi-agent production coordination — proof-only, no live trading.
+
+SYSTEM3_TEMPORAL_TRUTH_V1: this coordinator may collect fresh API truth, but stored
+reports remain historical. It must never convert HTTP 200 or reports/latest into a
+current semantic UI/production-readiness PASS.
 """
 
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -14,10 +18,9 @@ from typing import Any, Dict, List
 
 ROOT = Path(__file__).resolve().parents[1]
 REPORTS = ROOT / "reports" / "latest" / "production_grade_readiness"
-import os
-
+DEFAULT_GCP_URL = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 BASE_URL = os.environ.get(
-    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
+    "SYSTEM3_PUBLIC_BACKEND_URL", os.environ.get("BACKEND_URL", DEFAULT_GCP_URL)
 ).rstrip("/")
 
 if str(ROOT) not in sys.path:
@@ -76,11 +79,25 @@ def run_cmd(cmd: List[str]) -> Dict[str, Any]:
         return {"exit_code": -1, "error": str(exc)[:200], "passed": False}
 
 
+def _artifact_metadata(path: Path) -> Dict[str, Any]:
+    if not path.exists():
+        return {"exists": False, "evidence_class": "HISTORICAL_EVIDENCE"}
+    stat = path.stat()
+    return {
+        "exists": True,
+        "evidence_class": "HISTORICAL_EVIDENCE",
+        "mtime_utc": datetime.fromtimestamp(stat.st_mtime, tz=timezone.utc).isoformat(),
+        "temporal_note": "Stored evidence is historical; path/name latest does not make it current.",
+    }
+
+
 def probe_live_endpoints() -> Dict[str, Any]:
     import urllib.request
 
     endpoints = [
         "/api/state",
+        "/api/health",
+        "/api/broker/status",
         "/api/paper",
         "/api/portfolio/unified",
         "/api/broker/holdings",
@@ -91,20 +108,42 @@ def probe_live_endpoints() -> Dict[str, Any]:
         "/api/approval/status",
         "/api/trades/history",
     ]
-    results = {}
+    results: Dict[str, Any] = {}
     for ep in endpoints:
         url = f"{BASE_URL}{ep}"
+        observed = utc_now()
         try:
             with urllib.request.urlopen(url, timeout=60) as resp:
                 body = resp.read(4000).decode("utf-8", errors="replace")
-                results[ep] = {"status": resp.status, "ok": resp.status == 200, "sample": body[:500]}
+                results[ep] = {
+                    "observed_at_utc": observed,
+                    "status": resp.status,
+                    "ok": resp.status == 200,
+                    "sample": body[:500],
+                    "evidence_class": "REQUEST_SCOPED_LIVE_API",
+                }
         except Exception as exc:
-            results[ep] = {"status": 0, "ok": False, "error": str(exc)[:200]}
+            results[ep] = {
+                "observed_at_utc": observed,
+                "status": 0,
+                "ok": False,
+                "error": str(exc)[:200],
+                "evidence_class": "REQUEST_SCOPED_LIVE_API",
+            }
     return results
+
+
+def _json_sample(live: Dict[str, Any], endpoint: str) -> Dict[str, Any]:
+    try:
+        value = json.loads(live.get(endpoint, {}).get("sample", "{}"))
+        return value if isinstance(value, dict) else {}
+    except Exception:
+        return {}
 
 
 def main() -> int:
     REPORTS.mkdir(parents=True, exist_ok=True)
+    capture_started = utc_now()
 
     agent_results = []
     for agent_id, cmd, evidence in AGENT_RUNS:
@@ -114,76 +153,90 @@ def main() -> int:
             {
                 "id": agent_id,
                 "evidence": evidence,
-                "evidence_exists": evidence_path.exists(),
+                "stored_evidence": _artifact_metadata(evidence_path),
                 "run_attempted": True,
                 "run_passed": run["passed"],
                 "run_detail": run,
+                "current_runtime_truth_authority": False,
             }
         )
 
     live = probe_live_endpoints()
-    state_data = {}
-    try:
-        state_data = json.loads(live.get("/api/state", {}).get("sample", "{}"))
-    except Exception:
-        pass
-    broker = state_data.get("broker") or {}
-    broker_connected = bool(broker.get("connected"))
+    state_data = _json_sample(live, "/api/state")
+    broker_data = _json_sample(live, "/api/broker/status")
+    health_data = _json_sample(live, "/api/health")
+    broker_connected = broker_data.get("connected") is True
 
+    # Historical gate files may guide investigation, but never become current runtime truth.
     gates_path = ROOT / "reports" / "latest" / "system3_auto_gates" / "summary.json"
-    blockers = [
-        "LIVE_TRADING_DISABLED_BY_DESIGN",
-        "REAL_PAPER_LIFECYCLE_NOT_PROVEN",
-        "POSITIVE_COSTED_EXPECTANCY_NOT_PROVEN",
-        "MULTI_DAY_STABILITY_NOT_PROVEN",
-        "WEBSOCKET_TICK_HEALTH_NOT_PROVEN",
-    ]
-    next_actions = [
-        "Run tools/system3_auto_coordinator.py for full auto proof cycle",
-        "Accumulate 5+ prediction days with rho>=0.70",
-        "Prove positive net expectancy after all costs",
-    ]
+    historical_gate_advisory: Dict[str, Any] = _artifact_metadata(gates_path)
     if gates_path.exists():
         try:
             gates = json.loads(gates_path.read_text(encoding="utf-8"))
-            blockers = list(gates.get("technical_gates_still_required") or blockers)
-            blockers.append("LIVE_TRADING_DISABLED_BY_DESIGN")
-            blockers = list(dict.fromkeys(blockers))
-            next_actions = list(gates.get("recommended_auto_actions") or next_actions)
-            if gates.get("prediction_accuracy_blocked"):
-                blockers.append("PREDICTION_ACCURACY_BLOCKED")
-            if gates.get("profit_blocked"):
-                blockers.append("PROFIT_EXPECTANCY_BLOCKED")
+            historical_gate_advisory["technical_gates_still_required_at_observation"] = list(
+                gates.get("technical_gates_still_required") or []
+            )
+            historical_gate_advisory["recommended_auto_actions_at_observation"] = list(
+                gates.get("recommended_auto_actions") or []
+            )
         except Exception:
-            pass
-    try:
-        from dashboard.backend.human_approval_service import load_human_approval
+            historical_gate_advisory["parse_error"] = True
 
-        if not load_human_approval().get("approved"):
-            blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
-    except Exception:
-        blockers.append("HUMAN_APPROVAL_REQUIRED_FOR_LIVE")
+    blockers = [
+        "LIVE_TRADING_DISABLED_BY_DESIGN",
+        "FULL_REQUEST_SCOPED_LIVE_UI_LIFECYCLE_NOT_PROVEN_BY_THIS_COORDINATOR",
+        "SEMANTIC_UI_READINESS_NOT_PROVEN_BY_HTTP_200",
+    ]
+    if not broker_connected:
+        blockers.append("BROKER_CONNECTED_NOW_NOT_PROVEN")
+    if not live.get("/api/health", {}).get("ok"):
+        blockers.append("HEALTH_ENDPOINT_NOW_NOT_OK")
 
+    capture_finished = utc_now()
     payload = {
-        "generated_utc": utc_now(),
+        "schema": "system3-multi-agent-coordination-v2",
+        "policy": "SYSTEM3_TEMPORAL_TRUTH_V1",
+        "evidence_class": "REQUEST_SCOPED_LIVE_API",
+        "capture_started_at_utc": capture_started,
+        "capture_finished_at_utc": capture_finished,
+        "captured_at_utc": capture_finished,
+        "max_age_seconds": 300,
         "mode": "ANALYZER_PAPER_ONLY",
         "live_trading_enabled": False,
         "production_ready_for_real_money": False,
         "cloud_url": BASE_URL,
+        "source_authority": "GCP_PRODUCTION_PUBLIC_URL",
         "agents": agent_results,
+        "historical_gate_advisory": historical_gate_advisory,
         "live_endpoint_probe": live,
         "broker_connected": broker_connected,
+        "broker_error": broker_data.get("error"),
+        "health_status": health_data.get("status"),
         "data_source": state_data.get("data_source"),
         "readiness_ladder": {
-            "repo_safe": True,
-            "cloud_deployed": live.get("/api/state", {}).get("ok", False),
-            "dashboard_production_grade": live.get("/api/broker/truth", {}).get("ok", False),
-            "broker_readonly_portfolio_api": live.get("/api/broker/holdings", {}).get("ok", False),
-            "human_approval_recorded": live.get("/api/approval/status", {}).get("ok", False),
+            "api_transport_observed": any(v.get("ok") for v in live.values()),
+            "broker_connected_observed": broker_connected,
+            "semantic_dashboard_production_grade": False,
+            "full_live_ui_lifecycle_current": False,
             "real_money_ready": False,
         },
-        "blockers": blockers,
-        "next_exact_actions": next_actions,
+        "blockers": list(dict.fromkeys(blockers)),
+        "next_exact_actions": [
+            "Run fresh request-scoped scripts/gcp_live_ui_snapshot.py against GCP production",
+            "Inspect semantic_attention plus screenshots/visible text for all 22 live tabs",
+            "Correlate any UI issue with fresh API/log evidence before fixing",
+        ],
+        "safety": {
+            "read_only_capture": True,
+            "mutation_endpoints_called": False,
+            "order_endpoints_called": False,
+            "secret_values_exposed": False,
+        },
+        "interpretation": {
+            "reports_latest_is_current_truth": False,
+            "http_200_is_semantic_ui_pass": False,
+            "stored_artifacts_are_historical": True,
+        },
     }
 
     with open(REPORTS / "summary.json", "w", encoding="utf-8") as f:
@@ -192,22 +245,24 @@ def main() -> int:
     md_lines = [
         "# Production Grade Readiness — Multi-Agent Coordination",
         "",
-        f"Generated UTC: `{payload['generated_utc']}`",
+        f"Captured UTC: `{payload['captured_at_utc']}`",
         "",
-        "**Verdict: ANALYZER READY — REAL MONEY BLOCKED**",
+        "**Verdict: CURRENT API TRUTH PARTIAL — FULL LIVE UI LIFECYCLE REQUIRED**",
+        "",
+        "Stored reports listed below are historical evidence, not current runtime truth.",
         "",
         "## Agents run",
     ]
     for a in agent_results:
-        md_lines.append(f"- **{a['id']}**: {'PASS' if a['run_passed'] else 'FAIL'} — `{a['evidence']}`")
+        md_lines.append(f"- **{a['id']}**: {'PASS' if a['run_passed'] else 'FAIL'} — historical output `{a['evidence']}`")
     md_lines.extend(
         [
             "",
-            "## Cloud probes",
-            *[f"- `{ep}`: {'OK' if v.get('ok') else 'FAIL'}" for ep, v in live.items()],
+            "## Fresh production API probes",
+            *[f"- `{ep}`: {'OK' if v.get('ok') else 'FAIL'} at `{v.get('observed_at_utc')}`" for ep, v in live.items()],
             "",
-            "## Blockers",
-            *[f"- {b}" for b in blockers],
+            "## Current-proof blockers",
+            *[f"- {b}" for b in payload["blockers"]],
             "",
             "## Next actions",
             *[f"- {x}" for x in payload["next_exact_actions"]],

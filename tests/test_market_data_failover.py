@@ -112,6 +112,55 @@ def test_empty_payload_falls_through_to_next_provider():
     assert result.degraded is True
 
 
+def test_upstream_error_without_ok_field_never_becomes_live_quote():
+    router = MarketDataFailoverRouter([
+        _provider("dhan", ProviderTier.PRIMARY_BROKER,
+                  lambda _: {"error": "SECRET_TOKEN_SHOULD_NEVER_LEAK"})
+    ], production=True)
+    with pytest.raises(MarketDataUnavailable) as raised:
+        router.fetch("quote", {"symbol": "NIFTY"})
+    assert "SECRET_TOKEN_SHOULD_NEVER_LEAK" not in str(raised.value)
+    assert "SECRET_TOKEN_SHOULD_NEVER_LEAK" not in str(router.provider_health())
+
+
+def test_broker_exception_text_does_not_leak_in_failover_receipt():
+    def fail(_):
+        raise TimeoutError("authorization=SECRET_PRIVATE_VALUE")
+    router = MarketDataFailoverRouter([
+        _provider("primary", ProviderTier.PRIMARY_BROKER, fail, priority=1),
+        _provider("secondary", ProviderTier.SECONDARY_BROKER,
+                  lambda _: {"ltp": 101}, priority=2),
+    ], production=True)
+    result = router.fetch("quote", {"symbol": "NIFTY"})
+    assert result.degraded is True
+    assert "SECRET_PRIVATE_VALUE" not in str(result.as_dict())
+    assert "SECRET_PRIVATE_VALUE" not in str(router.provider_health())
+
+
+@pytest.mark.parametrize("payload", [
+    {"synthetic": True, "ltp": 100},
+    {"data_source": "mock", "ltp": 100},
+    {"simulated": True, "ltp": 100},
+    {"status": "failed", "ltp": 100},
+])
+def test_broker_tier_cannot_whitewash_unverified_or_failed_data(payload):
+    router = MarketDataFailoverRouter([
+        _provider("broker", ProviderTier.PRIMARY_BROKER, lambda _: payload)
+    ], production=True)
+    with pytest.raises(MarketDataUnavailable):
+        router.fetch("quote", {"symbol": "NIFTY"})
+
+
+def test_nonbroker_primary_provider_never_claims_authoritative():
+    router = MarketDataFailoverRouter([
+        _provider("untrusted", ProviderTier.PRIMARY_BROKER,
+                  lambda _: {"ltp": 101}, broker=False)
+    ], production=True)
+    result = router.fetch("quote", {"symbol": "NIFTY"}, require_broker=False)
+    assert result.authoritative is False
+    assert result.degraded is True
+
+
 def test_capability_filter_routes_to_matching_provider():
     router = MarketDataFailoverRouter([
         _provider("quotes", ProviderTier.PRIMARY_BROKER, lambda req: {"ltp": 100}, supports=frozenset({"quote"})),

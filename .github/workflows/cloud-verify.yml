@@ -1,0 +1,222 @@
+name: Cloud-Only Read-Only Production Verification
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloud-verify.yml'
+      - 'tests/test_cloud_verify_target_contract.py'
+      - 'tests/test_cloud_discover_readonly.py'
+      - 'tests/test_dhan_canonical_rotation_readonly.py'
+      - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/dhan_canonical_rotation_readonly.py'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/cloud-verify.yml'
+      - 'scripts/cloud_verify_readonly.py'
+      - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/dhan_canonical_rotation_readonly.py'
+      - 'dashboard/backend/paper_market_replay.py'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cloud-verify-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  cloud-target-contract:
+    name: OFFLINE - Cloud Run identity and PAPER safety contract
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validate target and safety without GCP credentials
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract
+
+  synthetic-paper-proof:
+    name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      PAPER_MODE: '1'
+      LIVE_ORDER_AUTHORITY: '0'
+      REAL_BROKER_ORDERS: '0'
+      CLOUD_VERIFY_EVIDENCE: cloud-verify-synthetic-evidence.jsonl
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify deterministic synthetic lifecycle without network or broker
+        run: |
+          python - <<'PY'
+          from scripts.cloud_verify_readonly import guard, paper_lifecycle
+          guard()
+          assert paper_lifecycle(), "Synthetic PAPER replay failed"
+          PY
+      - name: Upload synthetic-only evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-paper-only-evidence
+          path: cloud-verify-synthetic-evidence.jsonl
+          if-no-files-found: warn
+          retention-days: 7
+
+  name-discovery:
+    if: github.event_name != 'pull_request'
+    name: NAME-DISCOVERY - read-only GCP project and Cloud Run service inventory
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    outputs:
+      project: ${{ steps.discover.outputs.project }}
+      service: ${{ steps.discover.outputs.service }}
+      auth_mode: ${{ steps.auth-mode.outputs.mode }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Determine configured authentication without exposing values
+        id: auth-mode
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+          GCP_JSON_PRESENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON != '' }}
+        shell: bash
+        run: |
+          if [[ -n "$GCP_WIF_PROVIDER" && -n "$GCP_WIF_SERVICE_ACCOUNT" ]]; then
+            echo 'mode=wif' >> "$GITHUB_OUTPUT"
+            echo 'AUTH_MODE=WIF'
+          elif [[ "$GCP_JSON_PRESENT" == 'true' ]]; then
+            echo 'mode=json' >> "$GITHUB_OUTPUT"
+            echo 'AUTH_MODE=JSON_FALLBACK'
+          else
+            echo 'NOT_VERIFIED: neither complete WIF variables nor JSON fallback is configured'
+            [[ -n "$GCP_WIF_PROVIDER" ]] || echo 'MISSING_VARIABLE=GCP_WIF_PROVIDER'
+            [[ -n "$GCP_WIF_SERVICE_ACCOUNT" ]] || echo 'MISSING_VARIABLE=GCP_WIF_SERVICE_ACCOUNT'
+            echo 'MISSING_OR_UNAVAILABLE_SECRET=GCP_SERVICE_ACCOUNT_JSON'
+            exit 1
+          fi
+      - name: Authenticate using keyless WIF
+        if: steps.auth-mode.outputs.mode == 'wif'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Authenticate using GitHub encrypted JSON fallback
+        if: steps.auth-mode.outputs.mode == 'json'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Discover visible projects and asia-south1 Cloud Run services
+        id: discover
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+        run: python scripts/cloud_discover_readonly.py
+
+  cloud-verify:
+    needs: name-discovery
+    if: github.event_name != 'pull_request'
+    name: READ-ONLY GCP + Dhan GET + synthetic PAPER proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
+      PAPER_MODE: '1'
+      LIVE_ORDER_AUTHORITY: '0'
+      REAL_BROKER_ORDERS: '0'
+      LIVE_TRADING_ENABLED: '0'
+      ORDER_PLACEMENT_ALLOWED: 'false'
+      CLOUD_VERIFY_EVIDENCE: cloud-verify-evidence.jsonl
+      PYTHONPATH: .
+    steps:
+      - name: Checkout immutable commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Verify PR 574 merge is an ancestor
+        shell: bash
+        run: |
+          git fetch --no-tags --unshallow origin main || git fetch --no-tags origin main
+          if git merge-base --is-ancestor 2fd314b8c14aac1f5f2c4c6565007c4fcf3641af HEAD; then
+            echo 'PASS: PR #574 merge commit is an ancestor of this verification run'
+          else
+            echo 'FAIL: PR #574 merge commit not proven as ancestor'
+            exit 1
+          fi
+      - name: Verify Cloud Run target and PAPER safety contracts
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly
+      - name: Authenticate using WIF
+        if: needs.name-discovery.outputs.auth_mode == 'wif'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Authenticate using encrypted JSON fallback
+        if: needs.name-discovery.outputs.auth_mode == 'json'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install gcloud
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Describe discovered Cloud Run service (read only)
+        env:
+          DISCOVERED_PROJECT: ${{ needs.name-discovery.outputs.project }}
+          DISCOVERED_SERVICE: ${{ needs.name-discovery.outputs.service }}
+          PYTHONPATH: '' # prevent repository startup hooks contaminating gcloud JSON stdout
+        run: |
+          test -n "$DISCOVERED_PROJECT" && test -n "$DISCOVERED_SERVICE"
+          gcloud run services describe "$DISCOVERED_SERVICE" --project "$DISCOVERED_PROJECT" --region asia-south1 --format=json > cloud-run-describe-private.json
+          echo "READ_ONLY_TARGET_VERIFIED project=$DISCOVERED_PROJECT service=$DISCOVERED_SERVICE"
+      - name: Compare Cloud Run actual env to CI policy (never print secret values)
+        shell: bash
+        run: python -S scripts/cloud_run_env_contract.py --input cloud-run-describe-private.json --output cloud-run-sanitized-evidence.json
+      - name: Install minimal test dependency
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Audit canonical Dhan rotator and production broker without reading token payloads
+        shell: bash
+        timeout-minutes: 4
+        env:
+          PYTHONPATH: ''
+        run: python -S scripts/dhan_canonical_rotation_readonly.py
+      - name: Verify deterministic PAPER lifecycle and Dhan GET orders
+        env:
+          DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
+          DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}
+        run: python scripts/cloud_verify_readonly.py
+      - name: Emit fail-closed summary even when setup fails
+        if: always()
+        shell: bash
+        run: |
+          if [[ ! -s cloud-verify-evidence.jsonl ]]; then
+            echo '{"check":"cloud_verification","status":"NOT_VERIFIED","reason":"workflow stopped before evidence collection"}' | tee cloud-verify-evidence.jsonl
+          fi
+          echo 'Cloud verification: consult individual step conclusions; no implicit PASS.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload sanitized evidence even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-verify-sanitized-evidence
+          path: |
+            cloud-verify-evidence.jsonl
+            cloud-run-sanitized-evidence.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove private Cloud Run description
+        if: always()
+        shell: bash
+        run: rm -f cloud-run-describe-private.json

@@ -1,0 +1,15 @@
+{
+  "path": "/api/auth/status",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 169,
+  "content_type": "application/json",
+  "data": {
+    "required": false,
+    "configured": false,
+    "authenticated": false,
+    "mode": "public_readonly",
+    "credential_surface": "<REDACTED len=7>",
+    "session": null
+  }
+}

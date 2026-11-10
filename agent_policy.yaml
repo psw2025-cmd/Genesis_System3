@@ -1,0 +1,88 @@
+# agent_policy.yaml — Genesis System3 cloud-only intent; GCP mutation requires separate owner approval
+version: 6
+schema_version: 6
+schema_path: schemas/agent_policy.v6.schema.json
+target_url: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
+coordination_bus: none
+
+execution_authority:
+  effective_date: 2026-10-18
+  authority_doc: docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md
+  sole_controller: none
+  multi_agent: true
+  other_agents_default_role: concurrent_safe_non_overlapping
+  other_agents_may_mutate: true
+  mutation_requires:
+    - dedicated_branch_or_worktree
+    - no_overwrite_of_unrelated_dirty_work
+    - no_live_trading
+    - no_secret_exposure
+  claude_only_ownership: false
+  mandatory_issue_188: false
+
+mandatory_reads:
+  - docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md
+  - AGENTS.md
+  - agent_policy.yaml
+
+runtime:
+  authority: gcp_managed_cloud_target
+  canonical_repository: psw2025-cmd/Genesis_System3
+  upstream: psw2025-cmd/Genesis_System3
+  gcp_runtime_authority: true
+  cloudrun_acceptance_authority: true
+  discover_bound_port: false
+  default_ui: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/
+  local_runtime_required: false
+  cloud_mutation_allowed_without_owner_approval: false
+
+safety:
+  analyze_mode: true
+  live_trading_enabled: false
+  system3_live_trading_allowed: false
+  auto_execute_trades: false
+  mode: PAPER_ANALYZER_ONLY
+  real_order_count_required: 0
+  real_order_placement_modification_cancellation_squareoff: forbidden
+  broker_secret_payload_exposure: forbidden
+  service_account_json_keys: forbidden
+  live_enablement_requires_human_break_glass: true
+
+coordination:
+  github_issue_188_is_live_bus: false
+  github_issue_188_status: HISTORICAL_ONLY
+  parallel_overlapping_mutation: forbidden
+  advisory_agents_may_report_findings: true
+
+completion:
+  stop_at_code_or_pr_or_ci: false
+  require_runtime_proof: true
+  require_repo_runtime_authority_reconciled: true
+  require_paper_zero_order_proof: true
+  require_truthful_ui_proof: true
+  genuine_external_or_user_only_blocker_must_be_explicit: true
+  statuses_allowed:
+    - PASS
+    - FAIL
+    - BLOCKED
+    - UNKNOWN
+    - PARTIAL
+    - NOT_PROVEN
+    - NOT_APPLICABLE
+    - HISTORICAL_ONLY
+
+gcp_exit_billing_control:
+  runtime_authority: cloud_only_target_pending_deployment_proof
+  high_frequency_scheduler_resume_without_reconciled_ssot: forbidden
+  do_not_execute_gcloud: false # read-only inventory permitted
+  do_not_deploy_cloud_run: true # until a separate explicit owner approval
+  owner_approval_before_cloud_mutation: true
+
+evidence:
+  current_evidence_over_historical_claims: true
+  chat_memory_is_not_runtime_proof: true
+  exact_source_sha_required: true
+  local_semantic_proof_required: false
+  cloud_semantic_proof_required: true
+  ui_and_api_parity_required: true
+  broker_source_freshness_truth_required: true

@@ -1,0 +1,1 @@
+MRI_WATCH severity=WARN serving=fb4772f9d52b67a31b55ee85aab8604e525bbad6 gmail_ok=True -> C:\Users\ADMIN\Genesis_System3\Genesis_System3\reports\latest\mri_watch\LATEST.json

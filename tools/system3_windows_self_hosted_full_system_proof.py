@@ -26,7 +26,6 @@ BASE_URL = BASE_URL.rstrip("/")
 PROOF_COMMANDS = [
     [sys.executable, "scripts/system3_gate_evaluator.py", "--sync-gates"],
     [sys.executable, "tools/system3_auto_coordinator.py", "--full"],
-    [sys.executable, "tools/system3_github_render_failure_tracker.py"],
     [sys.executable, "tools/dashboard_visible_issue_tracker.mjs"],
     [sys.executable, "tools/system3_autopilot_proof_board.py"],
 ]
@@ -46,7 +45,6 @@ HTTP_ENDPOINTS = [
 
 REPORTS = {
     "system3_auto_gates": ROOT / "reports/latest/system3_auto_gates/summary.json",
-    "github_render_failure_tracker": ROOT / "reports/latest/github_render_failure_tracker/summary.json",
     "dashboard_visible_issue_tracker": ROOT / "reports/latest/dashboard_visible_issue_tracker/summary.json",
     "autopilot_proof_board": ROOT / "reports/latest/system3_autopilot_proof_board/summary.json",
     "safe_repair_runner": ROOT / "reports/latest/safe_repair_runner/summary.json",

@@ -1,0 +1,46 @@
+{
+  "path": "/api/health",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 158,
+  "content_type": "application/json",
+  "data": {
+    "status": "ok",
+    "mode": "PAPER",
+    "broker_status": "connected",
+    "market_status": "open",
+    "data_source": "broker_connected_market_open",
+    "live_allowed": false,
+    "live_blockers": [
+      "Live trading permanently disabled in analyzer mode"
+    ],
+    "broker": {
+      "connected": true,
+      "name": "dhan",
+      "status": "connected",
+      "error": null
+    },
+    "market": {
+      "is_open": true,
+      "reason": "open"
+    },
+    "cycle_count": 0,
+    "refresh_interval": 5,
+    "last_fetch": "2026-08-26T14:02:31.575840+05:30",
+    "qc_status": "NOT_READY",
+    "qc_failures": [
+      "NO_QC_DATA"
+    ],
+    "trades_executed": 0,
+    "open_positions": 0,
+    "total_pnl": 0.0,
+    "daily_pnl": 0.0,
+    "performance_sla": {
+      "cycle_duration_sec": 0,
+      "fetch_duration_sec": 0,
+      "strategy_duration_sec": 0,
+      "sla_pass": true
+    },
+    "message": "ANALYZER_READY - Broker connected, paper mode active"
+  }
+}

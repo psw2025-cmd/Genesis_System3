@@ -20,13 +20,17 @@ def test_gate_evaluator_runs():
     assert payload["live_trading_enabled"] is False
 
 
-def test_friction_expectancy_from_fixture():
-    from scripts.system3_friction_expectancy_proof import build_report
+def test_friction_expectancy_from_fixture(monkeypatch):
+    from scripts import system3_friction_expectancy_proof as proof
 
-    report = build_report()
+    monkeypatch.setenv("SYSTEM3_ALLOW_FIXTURE_TRADES", "1")
+    monkeypatch.setattr(proof, "_fetch_cloud_trades", lambda: [])
+    report = proof.build_report()
     ev = report["evidence"]
     assert ev["trade_count"] >= 5
     assert ev["net_expectancy_after_costs"] is not None
+    assert report["is_fixture"] is True
+    assert report["pass"] is False
     assert "pass" in report
 
 

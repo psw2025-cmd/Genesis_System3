@@ -2,7 +2,7 @@
 """
 System3 Autopilot Proof Board
 
-Aggregates backend, frontend, visual UI, GitHub/Render failure tracking, workflow, TODO, Render/public-truth, broker/chain/paper/ML proof into one board.
+Aggregates backend, frontend, visual UI, GitHub workflow tracking, Cloud Run/public-truth, broker/chain/paper/ML proof into one board.
 No chat screenshot dependency. No secret printing. No live orders.
 """
 from __future__ import annotations
@@ -122,7 +122,6 @@ def main() -> int:
     sources = [
         report_status("secure_install_credential_audit", read_json("reports/latest/secure_install_credential_audit/summary.json"), "Install/credential audit has not run."),
         report_status("dashboard_visible_issue_tracker", read_json("reports/latest/dashboard_visible_issue_tracker/summary.json"), "Visible UI issue tracker has not run."),
-        report_status("github_render_failure_tracker", read_json("reports/latest/github_render_failure_tracker/summary.json"), "GitHub + Render failure tracker has not run."),
         report_status("parallel_root_cause_audit", read_json("reports/latest/parallel_root_cause_audit/summary.json"), "Parallel root-cause audit has not run."),
         report_status("workflow_failure_tracker", read_json("reports/latest/workflow_failure_tracker/summary.json"), "Workflow failure tracker has not run."),
         report_status("todo_status_update", read_json("reports/latest/todo_status_update/summary.json"), "1000+ TODO status updater has not run."),
@@ -154,7 +153,6 @@ def main() -> int:
 
     core_gates = {
         "render_visual": any(x["gate"] == "dashboard_visible_issue_tracker" and x["gate_status"] == "PASS" for x in gate_rows),
-        "github_render_health": any(x["gate"] == "github_render_failure_tracker" and x["gate_status"] == "PASS" for x in gate_rows),
         "backend_frontend_install": any(x["gate"] == "secure_install_credential_audit" and x["gate_status"] == "PASS" for x in gate_rows),
         "workflow_health": any(x["gate"] == "workflow_failure_tracker" and x["gate_status"] == "PASS" for x in gate_rows),
         "root_cause_zero": any(x["gate"] == "parallel_root_cause_audit" and x["gate_status"] == "PASS" for x in gate_rows),
@@ -184,7 +182,8 @@ def main() -> int:
             "this_summary": "reports/latest/autopilot_proof_board/summary.json",
             "this_markdown": "reports/latest/autopilot_proof_board/summary.md",
             "visible_ui_issues": "reports/latest/dashboard_visible_issue_tracker/summary.md",
-            "github_render_failures": "docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md",
+            "github_workflow_failures": "docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md",
+            "render_hosting_lock": "docs/authority/RENDER_HOSTING_FORBIDDEN.md",
             "workflow_failures": "docs/SYSTEM3_WORKFLOW_FAILURE_TODO.md",
             "todo_status": "reports/latest/todo_status_update/summary.md",
             "public_truth": "reports/latest/system3_public_truth/index.md",
@@ -204,7 +203,7 @@ def main() -> int:
         "## Non-negotiable rules",
         "",
         "- Manual screenshots from user are not required for proof.",
-        "- Backend, frontend, live dashboard UI, GitHub/Render health, workflow health, TODO status, and final truth must be proven by automation.",
+        "- Backend, frontend, live dashboard UI, GitHub/Cloud Run health, workflow health, TODO status, and final truth must be proven by automation.",
         "- Secrets are never printed or committed.",
         "- Live trading remains OFF; no live order routes are called.",
         "- Production-grade claim is allowed only when this board is PASS.",

@@ -1,0 +1,2 @@
+# Deployment architecture — proposed, not deployed
+Owner-approved source SHA -> manual workflow_dispatch (NO push/schedule) -> OIDC/WIF -> Cloud Build canonical dashboard/backend/Dockerfile -> Artifact Registry digest -> zero-traffic Cloud Run candidate -> independent proof -> owner-bounded traffic promotion -> rollback to prior known-good revision. Current deploy implementation: MISSING. No cloud commands authorized.

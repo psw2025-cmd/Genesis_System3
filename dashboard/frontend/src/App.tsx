@@ -4,9 +4,12 @@ import { useData } from './hooks/useData'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
+import { TruthStrip } from './components/TruthStrip'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
+import { AutonomousLoopBanner } from './components/AutonomousLoopBanner'
+import { DeploymentTruthFooter } from './components/DeploymentTruthFooter'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -21,6 +24,7 @@ import { PerformanceTab }  from './components/PerformanceTab'
 import { EndToEndProof }   from './components/EndToEndProof'
 import { SystemTruthControl } from './components/SystemTruthControl'
 import { LiveSimulation } from './components/LiveSimulation'
+import { MobileTradingHub } from './components/MobileTradingHub'
 
 // ── V5 Workspaces ─────────────────────────────────────────────────────
 import { DecisionIntelligence } from './components/workspaces/DecisionIntelligence'
@@ -34,6 +38,7 @@ import { PredictionAudit }      from './components/workspaces/PredictionAudit'
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
+import SystemReadiness from './components/SystemReadiness'
 import { GenesisTab } from './components/GenesisTab'
 
 function Content() {
@@ -54,6 +59,7 @@ function Content() {
     case 'paper':        return <PaperTrading />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
+    case 'system-readiness': return <SystemReadiness />
     case 'genesis':      return <GenesisTab />
     case 'e2e-proof':    return <EndToEndProof />
     case 'broker':       return <BrokerProofPanel />
@@ -95,12 +101,17 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
+  if (mobileTradingRoute) return <MobileTradingHub />
+
   return (
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
                   background: 'var(--surface)', overflow: 'hidden' }}>
       <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
+      <TruthStrip />
+      <AutonomousLoopBanner />
       {/*
         Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden
         on every normal page. Visible API/SHA/ML chips live only under Data Integrity → System health.
@@ -115,6 +126,7 @@ export default function App() {
           </ErrorBoundary>
         </main>
       </div>
+      <DeploymentTruthFooter />
     </div>
   )
 }

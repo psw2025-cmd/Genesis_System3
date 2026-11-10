@@ -15,6 +15,12 @@ export function fmtPct(n: number | null | undefined): string {
   return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'
 }
 
+export function asPct(value: unknown): number | null {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  return Math.abs(n) <= 1 ? n * 100 : n
+}
+
 export function fmtCr(n: number | null | undefined): string {
   if (n == null || isNaN(n)) return '--'
   const abs = Math.abs(n)

@@ -3,13 +3,16 @@ import { Activity, AlertTriangle, Database, Shield, Zap } from 'lucide-react';
 import { useStore } from '../../store';
 import { MetricTile, StatusChip } from './TruthUI';
 import { brokerIsConnected, paperModeActive } from '../../lib/healthTruth';
+import { brokerPermissionLabel } from '../../lib/lifecycleTruth';
 import { formatAgeSec, formatInr, formatIstStamp, shortSha } from '../../lib/formatLive';
+import { PendingLifecycleBanner } from '../PendingLifecycleBanner';
 
 export const DecisionIntelligence: React.FC = () => {
   const {
-    health, state, brokerConnected, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper,
+    health, state, brokerConnected, brokerStatus, marketOpen, wsStatus, apiStatus, deployInfo, pnl, paper, setActiveTab,
   } = useStore();
-  const dhanOk = brokerIsConnected(health, brokerConnected)
+  const dhanOk = brokerIsConnected(health, brokerConnected, brokerStatus)
+  const brokerLabel = brokerPermissionLabel({ brokerConnected, brokerStatus, health, state })
   const apiOk = String(health?.status || apiStatus?.status || '').toLowerCase() === 'ok' || Boolean(health?.mode)
   const predictorRaw = String(health?.predictor?.status || '').toLowerCase()
   const predictorValue = predictorRaw || (paperModeActive(health) ? 'ANALYZER' : 'N/A')
@@ -32,6 +35,7 @@ export const DecisionIntelligence: React.FC = () => {
   const signal = String(state?.signals?.status || state?.signals?.reason || 'No signal generated')
   const sha = shortSha(deployInfo?.git_sha)
   const pnlTone = Number(unrealized) < 0 ? 'error' : Number(unrealized) > 0 ? 'ok' : 'mut'
+  const runtimeBlockers = Array.isArray(health?.blockers) ? health.blockers : []
 
   const sectionStyle: React.CSSProperties = {
     display: 'flex',
@@ -69,6 +73,59 @@ export const DecisionIntelligence: React.FC = () => {
       </header>
 
       <div style={sectionStyle}>
+        <PendingLifecycleBanner />
+        {!marketOpen && (
+          <div
+            data-testid="closed-market-ops-board"
+            style={{
+              padding: 14,
+              borderRadius: 10,
+              border: '1px solid rgba(245,165,36,.4)',
+              background: 'linear-gradient(135deg, rgba(48,28,8,.55), rgba(8,19,33,.9))',
+            }}
+          >
+            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--amber)', marginBottom: 6 }}>
+              AFTER-HOURS OPS BOARD
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--text-sec)', marginBottom: 10, lineHeight: 1.45 }}>
+              Market closed — UI stays read-only/poll. QC may show NOT_READY ({String((state?.qc?.reasons || []).join(', ') || 'NO_VERIFIED_CONTRACTS')})
+              until live contracts re-verify after next open ({String(nextOpen || '09:15 IST')}).
+              Use the tabs below — not only Decision + Chain.
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {[
+                ['chain', 'Option Chain'],
+                ['options-intel', 'Options Intel'],
+                ['broker', 'Broker'],
+                ['data-integrity', 'Data Integrity'],
+                ['truth', 'Truth Control'],
+                ['prediction-audit', 'Prediction Audit'],
+                ['performance', 'Performance'],
+                ['ml', 'ML Model'],
+              ].map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setActiveTab(id)}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    padding: '6px 12px',
+                    borderRadius: 6,
+                    border: '1px solid var(--border-hi)',
+                    background: 'rgba(59,140,255,.14)',
+                    color: 'var(--accent-2)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <h2 style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-mut)', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
           Live operations
         </h2>
@@ -79,7 +136,7 @@ export const DecisionIntelligence: React.FC = () => {
           <MetricTile label="Reconciliation" value={recon || '—'} tone={recon === 'OK' || recon === 'PASS' ? 'ok' : 'warn'} />
           <MetricTile label="Tick age" value={formatAgeSec(tickAge)} sub={marketOpen ? 'Market hours' : 'After hours poll'} />
           <MetricTile label="Cycle" value={cycle != null ? String(cycle) : '—'} sub={formatIstStamp(state?.last_fetch_ts_iso)} />
-          <MetricTile label="Broker latency" value={brokerMs != null ? `${brokerMs} ms` : '—'} tone={Number(brokerMs) < 200 ? 'ok' : 'warn'} />
+          <MetricTile label="Broker latency" value={brokerMs != null ? `${brokerMs} ms` : '—'} tone="warn" sub="Read-only. Fast latency is not trade permission." />
           <MetricTile label="Next open" value={String(nextOpen || '—')} sub={String(marketReason || '')} tone={marketOpen ? 'ok' : 'mut'} />
         </div>
 
@@ -94,7 +151,7 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Truth Control</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="BROKER" value={dhanOk ? 'CONNECTED' : 'DISCONNECTED'} status={dhanOk ? 'ok' : 'error'} />
+              <StatusChip label="BROKER" value={brokerLabel} status={brokerLabel === 'ORDER FLAG REVIEW' ? 'error' : 'warn'} />
               <StatusChip label="WS" value={wsStatus.toUpperCase()} status={wsStatus === 'live' ? 'ok' : wsStatus === 'error' ? 'error' : 'warn'} />
               <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'mut'} />
             </div>
@@ -118,24 +175,27 @@ export const DecisionIntelligence: React.FC = () => {
               <span style={{ fontWeight: 600 }}>Data Sources</span>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <StatusChip label="DHAN" value={dhanOk ? 'AUTH OK' : 'NO AUTH'} status={dhanOk ? 'ok' : 'error'} />
+              <StatusChip label="DHAN" value={dhanOk ? 'READ-ONLY' : brokerLabel} status="warn" />
               <StatusChip label="SOURCE" value={state?.data_source || health?.data_source || 'UNKNOWN'} status={state?.data_source || health?.data_source ? 'ok' : 'mut'} />
-              <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'gcp-cloud-run')} status="ok" />
+              <StatusChip label="DEPLOY" value={String(deployInfo?.deploy_target || 'unknown')} status="ok" />
             </div>
           </div>
 
-          <div className="card" style={{ padding: '16px', background: 'rgba(255, 77, 106, 0.03)' }}>
+          <div className="card" style={{ padding: '16px', background: runtimeBlockers.length ? 'rgba(255, 77, 106, 0.03)' : 'rgba(16,185,129,.03)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <AlertTriangle size={16} color="var(--down)" aria-hidden />
-              <span style={{ fontWeight: 600, color: 'var(--down)' }}>Critical Blockers</span>
+              <AlertTriangle size={16} color={runtimeBlockers.length ? 'var(--down)' : 'var(--up)'} aria-hidden />
+              <span style={{ fontWeight: 600, color: runtimeBlockers.length ? 'var(--down)' : 'var(--up)' }}>Runtime Connectivity Blockers</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--text-sec)' }}>
-              {health?.blockers?.length > 0 ? (
+              {runtimeBlockers.length > 0 ? (
                 <ul style={{ margin: 0, paddingLeft: '16px' }}>
-                  {health.blockers.map((b: any, i: number) => <li key={i}>{b}</li>)}
+                  {runtimeBlockers.map((b: any, i: number) => <li key={i}>{b}</li>)}
                 </ul>
               ) : (
-                <div style={{ color: 'var(--up)', fontWeight: 600 }}>✓ NO SYSTEM BLOCKERS</div>
+                <div>
+                  <div style={{ color: 'var(--up)', fontWeight: 600 }}>✓ NO RUNTIME CONNECTIVITY BLOCKERS</div>
+                  <div style={{ color: 'var(--text-mut)', marginTop: 6, lineHeight: 1.45 }}>This does not mean model maturity, E2E evidence, human approval, or live-money gates are complete. See E2E Proof and Live Gate for those independent blockers.</div>
+                </div>
               )}
             </div>
           </div>
@@ -153,6 +213,7 @@ export const DecisionIntelligence: React.FC = () => {
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('options-intel')}>OPTIONS INTEL</button>
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('risk-scenarios')}>RISK & SCENARIOS</button>
             <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('data-integrity')}>DATA INTEGRITY</button>
+            <button type="button" className="nav-item" style={{ width: 'auto', fontSize: '11px', padding: '4px 10px', border: '1px solid var(--border)' }} onClick={() => useStore.getState().setActiveTab('system-readiness')}>SYSTEM READINESS</button>
           </div>
         </div>
       </div>

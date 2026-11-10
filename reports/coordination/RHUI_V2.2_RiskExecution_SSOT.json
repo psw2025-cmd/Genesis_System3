@@ -1,0 +1,99 @@
+{
+  "RHUI_V2.2_RiskExecution_SSOT": {
+    "metadata": {
+      "version": "2.2.1",
+      "generated_at": "2026-08-26T06:26:14Z",
+      "captured_ist": "2026-08-26T11:53:00+05:30",
+      "author": "cursor-composer",
+      "status": "NOT_ACCEPTED",
+      "revision": "genesis-system3-web-00617-vif",
+      "sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "deploy_run": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32923767070",
+      "evidence_dir": "reports/latest/rhui_v22_verify/",
+      "status_image": "reports/coordination/RHUI_V2.2_Material_Change_Status.png",
+      "human_action_required": false,
+      "note": "Multi-verify after material-change: broker+4/4 improved at market open; scheduler still red; #367 pending 18:45 IST; semantic/stability NOT PROVEN"
+    },
+    "risk_priority": {
+      "critical": [
+        {
+          "gate": "SignalsJob_367",
+          "risk": "NSE BhavCopy 404 / Missing Prediction Evidence",
+          "mitigation": "Bounded retry (#367)",
+          "verification_window": "18:45-19:15 IST",
+          "artifact": "signals_job.log",
+          "status": "PENDING"
+        },
+        {
+          "gate": "SchedulerHealth",
+          "risk": "observability.alert_severity_none",
+          "mitigation": "Attributed to genesis-system3-signals stale cadence; restore successful signals execution",
+          "verification_window": "after signals run",
+          "artifact": "scheduler_health.json",
+          "status": "ATTRIBUTED_FAIL"
+        }
+      ],
+      "high": [
+        {
+          "gate": "OptionChains",
+          "risk": "Chains stale / not fresh",
+          "mitigation": "Market-open recheck",
+          "verification_window": "09:15-09:45 IST",
+          "artifact": "option_chain_snapshot.json",
+          "status": "PASS_API_4_4"
+        }
+      ],
+      "moderate": [
+        {
+          "gate": "BrokerAcceptance",
+          "risk": "Broker not re-proven",
+          "mitigation": "Same-session /api/broker/status",
+          "verification_window": "market open",
+          "artifact": "broker_status.json",
+          "status": "PASS_AUTH_OK"
+        },
+        {
+          "gate": "SemanticParity",
+          "risk": "Visual PASS only",
+          "mitigation": "22-tab semantic vs API",
+          "verification_window": "next continuous session",
+          "artifact": "semantic_diff_report.json",
+          "status": "NOT_PROVEN"
+        }
+      ],
+      "low": [
+        {
+          "gate": "MarketStability",
+          "risk": "Unverified 60-minute session",
+          "mitigation": "After shorter gates green",
+          "verification_window": "next market day",
+          "artifact": "stability_session.log",
+          "status": "NOT_PROVEN"
+        }
+      ]
+    },
+    "fail_closed_logic": {
+      "redeploy_prohibited": true,
+      "preserve_revision": "genesis-system3-web-00617-vif",
+      "iam_token_relaxation": false,
+      "synthetic_runs_allowed": false,
+      "live_orders_enabled": false
+    },
+    "execution_sequence": [
+      "SignalsJob_367",
+      "SchedulerHealth",
+      "SemanticParity",
+      "MarketStability",
+      "FinalAcceptance"
+    ],
+    "final_acceptance": {
+      "criteria": [
+        "All critical gates PASS",
+        "Semantic/API parity",
+        "Stability proof PASS"
+      ],
+      "expected_status": "ACCEPTED",
+      "current_status": "NOT_ACCEPTED"
+    }
+  }
+}

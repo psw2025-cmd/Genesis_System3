@@ -4,7 +4,7 @@
 
 This is the single GitHub-readable proof bridge for System3 dashboard truth.
 
-It exists because some tools may not directly open the Render dashboard/API, but they can read GitHub files. The bridge fetches live public API endpoints, combines them with committed proof files, and writes one report.
+It exists because some tools may not directly open the GCP Cloud Run dashboard/API, but they can read GitHub files. The bridge fetches live public API endpoints, combines them with committed proof files, and writes one report. Render.com is retired.
 
 ## Files
 

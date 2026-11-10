@@ -10,23 +10,31 @@ POLICY_PATH = Path("docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md")
 
 AUTOMATIC = {
     "ci.yml",
-    "workflow-priority-guard.yml",
-    "cloud-run-auto-deploy.yml",
-    "gcp-stage2-ci.yml",
-    "gcp-dhan-token-fix-ci.yml",
+    "cloud-verify.yml",
+    "codeql-security.yml",
+    "command-center-access.yml",
     "frontend-runtime-smoke.yml",
+    "live-proof-center.yml",
+    "repo-clean-forensic-toolkit.yml",
+    "security-audit.yml",
+    "sonarqube-audit.yml",
+    "system3-preflight-control-plane.yml",
+    "system3-runbook-audit.yml",
+    "workflow-priority-guard.yml",
 }
-MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
+MANUAL_ONLY: set[str] = set()
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
+EVENT_TRIGGER_WORKFLOWS = {
+    FORENSIC_WORKFLOW,
+}
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
-    "Cloud Run Auto Deploy",
     "Frontend Browser Runtime Smoke",
-    "GCP Dhan Token Fix CI",
-    "GCP Dhan Token Rotation Manual Recovery",
-    "GCP Stage 2 Safety Checks",
+    "CodeQL Security Audit",
+    "Security Audit Evidence",
+    "SonarQube Audit",
 }
 
 
@@ -95,7 +103,7 @@ def main() -> int:
         if match:
             raise SystemExit(f"WORKFLOW_FORBIDDEN_TRIGGER file={name} match={match.group(1)!r}")
         event_match = event_trigger.search(on_block)
-        if event_match and name != FORENSIC_WORKFLOW:
+        if event_match and name not in EVENT_TRIGGER_WORKFLOWS:
             raise SystemExit(
                 f"WORKFLOW_EVENT_TRIGGER_RESERVED file={name} match={event_match.group(1)!r}"
             )
@@ -105,12 +113,6 @@ def main() -> int:
             raise SystemExit(f"WORKFLOW_RETIRED_RUNTIME_REFERENCE file={name}")
         if live_enable.search(text):
             raise SystemExit(f"WORKFLOW_LIVE_TRADING_FORBIDDEN file={name}")
-
-    manual_on = trigger_blocks["gcp-dhan-token-rotation.yml"]
-    if "workflow_dispatch:" not in manual_on:
-        raise SystemExit("MANUAL_ROTATION_WORKFLOW_DISPATCH_MISSING")
-    if re.search(r"^\s*(push|pull_request)\s*:", manual_on, re.MULTILINE):
-        raise SystemExit(f"MANUAL_ROTATION_HAS_AUTOMATIC_TRIGGER block={manual_on!r}")
 
     ci_on = trigger_blocks["ci.yml"]
     if "pull_request:" not in ci_on or "push:" not in ci_on:
@@ -144,11 +146,37 @@ def main() -> int:
     if not re.search(r"ref:\s*main\s*$", guard_text, re.MULTILINE):
         raise SystemExit("FORENSIC_RESPONDER_DEFAULT_BRANCH_CHECKOUT_MISSING")
 
-    deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
-    if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
-        raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
+    preflight_on = trigger_blocks["system3-preflight-control-plane.yml"]
+    if "push:" not in preflight_on or not re.search(r"branches:\s*\[\s*main\s*\]", preflight_on):
+        raise SystemExit("PREFLIGHT_CONTROL_PLANE_MAIN_TRIGGER_MISSING")
+    if "workflow_dispatch:" not in preflight_on:
+        raise SystemExit("PREFLIGHT_CONTROL_PLANE_MANUAL_TRIGGER_MISSING")
 
-    for name in ("gcp-stage2-ci.yml", "gcp-dhan-token-fix-ci.yml", "frontend-runtime-smoke.yml"):
+    proof_on = trigger_blocks["live-proof-center.yml"]
+    proof_text = workflow_text["live-proof-center.yml"]
+    if re.search(r"^\s*push\s*:", proof_on, re.MULTILINE):
+        raise SystemExit("LIVE_PROOF_CENTER_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN")
+    if "workflow_dispatch:" not in proof_on:
+        raise SystemExit("LIVE_PROOF_CENTER_MANUAL_TRIGGER_MISSING")
+    if re.search(r"^\s*schedule\s*:", proof_on, re.MULTILINE):
+        raise SystemExit("LIVE_PROOF_CENTER_SCHEDULE_FORBIDDEN")
+    if "contents: write" in proof_text or "issues: write" in proof_text or "actions: write" in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_GITHUB_WRITE_FORBIDDEN")
+    if re.search(r"(?m)^\s*git\s+push\b", proof_text) or "gh issue comment" in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_WRITEBACK_FORBIDDEN")
+    if "persist-credentials: false" not in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
+    if "python scripts/system3_live_proof_center.py" not in proof_text:
+        raise SystemExit("LIVE_PROOF_CENTER_CANONICAL_SCRIPT_MISSING")
+
+    for name in (
+        "frontend-runtime-smoke.yml",
+        "codeql-security.yml",
+        "security-audit.yml",
+        "sonarqube-audit.yml",
+        "repo-clean-forensic-toolkit.yml",
+        "command-center-access.yml",
+    ):
         if "pull_request:" not in trigger_blocks[name]:
             raise SystemExit(f"FOCUSED_PRIORITY_PR_TRIGGER_MISSING file={name}")
 

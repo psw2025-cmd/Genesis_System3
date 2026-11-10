@@ -1,140 +1,158 @@
 # System3 Current Blocker Runbook
 
-This runbook is fail-closed. It does not enable broker orders, alter credentials, or permit a production-grade claim.
+**Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
+
+Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
+
+This runbook is fail-closed. It does not enable broker orders, expose credentials, or permit a production-grade claim from stored evidence alone.
 
 ## Safety invariants
 
 - `ANALYZE_MODE=1`
 - `LIVE_TRADING_ENABLED=0`
 - `SYSTEM3_LIVE_TRADING_ALLOWED=0`
-- Never print, commit, or copy API keys, access tokens, cookies, session bodies, or broker credentials into proof artifacts.
+- `AUTO_EXECUTE_TRADES=0`
+- Never print, commit, or copy API keys, access tokens, TOTP/PIN, cookies, or broker secret payloads into proof artifacts.
 - Never mark a blocker resolved from HTTP 200 alone.
-- Never claim DONE unless the current automated Render visual proof is PASS, authenticated, complete, and fresh.
+- Never mark a UI/runtime blocker resolved from a pre-existing screenshot/report.
 
 ## Current evidence precedence
 
-When reports disagree, use the newest timestamped report and keep the older result as historical evidence.
+There is **no “newest stored report wins” rule** for current/live truth.
 
-1. `reports/latest/dashboard_visible_issue_tracker/summary.json` for the newest rendered 16-tab UI state.
-2. `reports/latest/dashboard_visual_production_proof/summary.json` for the strict production visual gate.
-3. `reports/latest/system3_public_truth/index.json` for consolidated public truth.
-4. `reports/latest/github_render_failure_tracker/summary.json` for distinct current workflow and Render failures.
-5. `reports/latest/todo_status_update/summary.json` for the canonical checklist parser state.
+When current state matters, generate new request-scoped observations after the investigation starts:
 
-A newer visible tracker does not convert an older failed production proof into PASS. The strict production proof must be regenerated.
+1. Fresh GCP production browser observation for UI-visible truth.
+2. Fresh same-session production API observation.
+3. Fresh production logs/runtime/deployment metadata for diagnosis.
+4. Current source/config for intended implementation.
+5. Stored reports/artifacts only as historical comparison.
 
-## Active blocker order
+A file in `reports/latest/` has no automatic current-state authority. Its timestamp tells when it was observed, not what is true now.
 
-### P0 — Proof freshness and artifact integrity
+If two stored reports disagree, do not choose the newer one as the live arbiter. Re-observe the authoritative production boundary.
 
-Before every browser proof run, delete the generated source directory:
+## Production authority
 
-```bash
-rm -rf reports/latest/dashboard_live_ui_proof
+- Project: `system3-openalgo-safe`
+- Region: `asia-south1`
+- Service: `genesis-system3-web`
+- UI: `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/`
+- Broker: Dhan
+- Render is retired/non-authoritative.
+
+## P0 — Request-scoped proof freshness
+
+For every current/live investigation:
+
+1. record the current request/investigation UTC start time;
+2. start a new production browser session after that time;
+3. capture the affected tab(s), or all 22 tabs for a full UI audit;
+4. capture same-session broker/health/relevant APIs;
+5. save per-tab capture timestamps;
+6. compare UI-visible state with backend truth;
+7. after any change/recovery/deployment, capture again.
+
+Use:
+
+```text
+scripts/gcp_live_ui_snapshot.py
+scripts/system3_temporal_truth_guard.py
 ```
 
-This prevents screenshots or endpoint files from an earlier successful run from being reused after authentication, navigation, or Render failure.
+A previous successful capture becomes historical immediately for a later `show me now` request.
 
-The production proof must require all of the following from the same run:
+## P1 — Broker read-only truth
 
-- authenticated session PASS;
-- source summary generated in the current run;
-- all required screenshots newly created and larger than the minimum size;
-- no browser/UI exception;
-- no visible red/PEND/BLOCKED issue when evaluating visual PASS;
-- no infrastructure blocker;
-- no required trade-readiness blocker;
-- production claim flag equal to the strict visual-gate result.
+Broker status must be freshly observed. Required safe proof:
 
-### P1 — Dhan read-only session
+- `connected=true` when claiming connected;
+- `error=null` or the exact error reported;
+- dynamic approved token source metadata only;
+- token secret value not exposed;
+- `live_trading_enabled=false`;
+- `order_placement_allowed=false`.
 
-Current UI evidence shows the broker disconnected or token/session invalid. Correct only the Render secret/runtime session; do not write the token to the repository or reports.
+A token expiry timestamp cannot substitute for an actual broker status request.
 
-Proof required:
+## P2 — Required market/option-chain truth
 
-- broker status endpoint HTTP 200;
-- `connected=true` for the read-only Dhan session;
-- `order_allowed=false`;
-- live-trading flags remain OFF;
-- no credential value appears in logs or artifacts.
-
-### P2 — Required option chains
-
-Required symbols:
-
+Required index symbols include:
 - NIFTY
 - BANKNIFTY
 - FINNIFTY
 - MIDCPNIFTY
 
-Each must prove current or explicitly valid Dhan snapshot rows with:
+For a claim that option-chain data is working now, verify fresh production data and visible UI semantics appropriate to market state:
 
-- source exactly Dhan;
-- positive spot;
-- positive contract count;
-- expiry and security-ID provenance;
-- no CSV, synthetic, mock, Yahoo, bhavcopy, or fallback source;
-- stale data rejected.
+- expected symbol/expiry;
+- positive contract/strike rows when the source should provide them;
+- source/provenance;
+- freshness/timestamp;
+- no hidden fallback presented as Dhan truth;
+- UI value agrees with API/backend observation.
 
-`NO_DHAN_DATA` is an acceptable safe no-trade state, but it remains a readiness blocker.
+Market closed/after-hours must be classified separately from genuine missing/stale data.
 
-### P3 — Scanner and CE/PE evidence
+## P3 — Full UI lifecycle
 
-Do not patch the scanner to fabricate candidates. A scanner PASS requires at least one candidate produced from valid required-chain rows with visible provenance, liquidity/spread checks, expiry, strike, lot size, and CE/PE side evidence.
+A full UI audit requires fresh production screenshots + visible text for all 22 canonical tabs listed in the temporal policy.
 
-Zero candidates is truthful but BLOCKED for money readiness.
+Render-only PASS is not semantic PASS. Investigate visible markers such as:
 
-### P4 — Paper lifecycle
+- `—`
+- `UNKNOWN`
+- `WAITING`
+- `LOADING`
+- `POLL`
+- `NO DATA`
+- `DISCONNECTED`
+- `NO AUTH`
+- `ERROR`
+- `FAILED`
+- `DEGRADED`
 
-Paper endpoints returning HTTP 200 with zero rows are transport PASS only. Lifecycle proof requires analyzer-generated entry, update, exit, P&L, timestamps, source/provenance, and confirmation that broker order endpoints were not called.
+Their meaning depends on market/session context; do not silently treat them as healthy.
 
-### P5 — ML proof
+## P4 — Scanner / Signals / CE-PE evidence
 
-ML endpoint/UI visibility is not model proof. Require matured prediction-versus-actual rows, sample size, horizon, accuracy/ranking metrics, and artifact provenance. Keep the model BLOCKED when training or matured evaluation evidence is absent.
+Do not fabricate candidates. A current scanner/signals PASS requires fresh data-backed candidates or a truthful no-candidate state with reason/provenance. If the product requirement is active candidate discovery and none exists, keep readiness blocked.
 
-### P6 — 1000+ TODO source
+## P5 — Paper lifecycle
 
-The updater expects one genuine canonical checklist:
+HTTP 200 or an empty table is transport/render proof only. Full paper lifecycle proof requires durable signal -> entry -> management -> exit -> PnL evidence, timestamps/provenance, and no broker order mutation.
 
-```text
-docs/SYSTEM3_PRODUCTION_GRADE_1000_POINT_QC_TODO.md
-```
+## P6 — ML/prediction evidence
 
-or the legacy root fallback:
+UI visibility is not model proof. Require matured prediction-vs-actual evidence, sample size/horizon, metrics, and artifact provenance. Historical metrics must be labeled with their evaluation window.
 
-```text
-System3_Production_Grade_1000_Point_QC_TODO.md
-```
+## P7 — IAM/automation authority
 
-Do not generate artificial completed items. Until the real checklist is restored, report `total=0`, `status=BLOCKED`, and `production_grade_claim_allowed=false`.
+Current IAM authority must be queried when making a current IAM claim. Stored inventories are historical after capture. Do not call strict scheduler-only authority PASS while temporary/excess project-level job-run authority remains.
 
-## Required rerun sequence
+## Required fix loop
 
-1. Restore the Dhan read-only runtime session without exposing credentials.
-2. Verify the deployed commit matches the repository commit.
-3. Clear the generated live-proof directory.
-4. Run the authenticated live UI proof.
-5. Run the strict production visual proof.
-6. Run shell/visible-issue checks.
-7. Run broker, required-chain, scanner, paper, ML, and gate proof.
-8. Run the distinct latest-workflow failure tracker.
-9. Run the 1000+ TODO updater.
+For any blocker:
+
+1. **Observe current truth** from the authoritative live boundary.
+2. **Classify** evidence as live vs historical.
+3. **Investigate root cause** from logs/code/config.
+4. **Implement** the smallest safe fix.
+5. **Run exact-head tests/CI**.
+6. **Deploy/recover** only through bounded authority.
+7. **Re-observe fresh production truth** after the change.
+8. **Compare before/after**.
+9. Close only if the requested end state is now directly proven.
 
 ## Closure contract
 
-DONE/resolved is allowed only when the current strict Render production proof reports:
+A blocker may be called resolved only when:
 
-```text
-visual_gate_pass=true
-production_grade_claim_allowed=true
-auth_ok=true
-screenshot_gate_pass=true
-infra_blockers=[]
-visual_blockers=[]
-trade_readiness_blockers=[]
-ANALYZE_MODE=1
-LIVE_TRADING_ENABLED=0
-SYSTEM3_LIVE_TRADING_ALLOWED=0
-```
+- the proof was generated after the current request/change;
+- the authoritative production boundary is the source;
+- capture/observation UTC time is recorded;
+- UI and backend/API truth are consistent where applicable;
+- no required semantic blocker remains;
+- safety flags remain PAPER/ANALYZER and LIVE/order execution OFF.
 
-Any remaining item must be reported with its exact endpoint, workflow, symbol, proof file, or missing artifact.
+If proof is stale, absent, or contradictory, status is `NOT_PROVEN`, `BLOCKED`, or `FAIL`—never inferred PASS.

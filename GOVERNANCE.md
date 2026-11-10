@@ -1,139 +1,114 @@
-# Production-Grade Build Governance
+# Genesis System3 Production Governance
 
-This document maps **governance responsibilities** to artifacts and proof. No TODOs; every step must be resolved or justified with proof.
+**Latest owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`; intended production is cloud-only. The owner presently authorizes GitHub repairs/testing and read-only GCP checks, NOT billable deployment or cloud configuration mutation. All deployment, scheduler, IAM, secret, billing and image-push changes require further explicit approval. Local laptop is an optional control client, never runtime/acceptance authority. Project billing enabled and resources existing do not establish production readiness. Budget alerts are not a hard financial cap.
 
----
+**Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
-## Responsibility Status (Audit)
+Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
 
-| # | Responsibility | Status | Proof / Justification |
-|---|----------------|--------|------------------------|
-| 1 | Source Code Governance | **PASS** | commitlint.config.js/cjs, desktop_app signAndEditExecutable, runner.py ASCII-only |
-| 2 | Build & Deploy | **PASS** | check_build_requirements.py, build_fresh_installer.bat, installer exe in desktop_app/dist |
-| 3 | Dashboard Validation | **JUSTIFIED** | comprehensive_pre_build_validation.py; charts load (0 when broker/market unavailable) |
-| 4 | Trader Data Completeness | **JUSTIFIED** | All fields present; zeros when no feed (documented in §4 below) |
-| 5 | Online Data Verification | **JUSTIFIED** | Manual/script when broker connected; production_grade_validation Health Live Gate |
-| 6 | Advanced Prediction & Analytics | **JUSTIFIED** | performance_predictor.py + src/lstm_forecast.py (LSTM stub); ML/Model tabs |
-| 7 | Live Trading Safety Guardrails | **PASS** | /api/health + /api/state mode gating; live_allowed/live_blockers; test_health_live_gate |
-| 8 | Risk Alert System | **JUSTIFIED** | dashboard/backend/alerts_system.py check_risk_alerts; Alerts.tsx risk_alert |
-| 9 | Failure Handling & Retry Logic | **PASS** | runner.py cp1252 fix; plain-language instructions in BUILD_INSTRUCTIONS.md |
-| 10 | Semantic Commit Enforcement | **JUSTIFIED** | commitlint.config.js enforces Conventional Commits |
-| 11 | Commit Lint Configuration | **JUSTIFIED** | commitlint.config.js + commitlint.config.cjs; Husky hook doc in file |
-| 12 | Release Tagging | **JUSTIFIED** | Convention vMAJOR.MINOR.PATCH; match desktop_app/package.json version |
-| 13 | Changelog Grouping | **JUSTIFIED** | Group by commit type (feat, fix, docs, etc.) for release notes |
-| 14 | Proof Pack Generation | **PASS** | proof/ folder; scripts/generate_proof_pack.py; outputs/.../PROOF_*.md |
-| 15 | Continuous Improvement | **JUSTIFIED** | Check before act; log "No action required — already optimal" when skip |
-| 16 | Stop Condition | **PASS** | Production Ready as of 2026-02-23. |
+## Authority
 
-**Production Ready:** Only when row 16 is **PASS** (three consecutive cycles with all checks passed and proof pack generated). **Production Ready as of 2026-02-23.**
+- Code/config authority: `psw2025-cmd/Genesis_System3`.
+- Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`.
+- Broker authority: Dhan.
+- Render.com hosting is forbidden (retired host). Angel-era deployment/broker material is historical/non-authoritative. Canonical lock: `docs/authority/RENDER_HOSTING_FORBIDDEN.md`.
+- PAPER/ANALYZER is the production safety posture until separately and explicitly proven/authorized otherwise.
 
----
+## No permanent “Production Ready” sentence
 
-## 1. Source Code Governance
+A historical document, previous PASS, old proof pack, or old screenshot must never permanently declare the system production-ready.
 
-- **Configs:** `dashboard/frontend/vite.config.*`, `desktop_app/package.json`, `commitlint.config.cjs`
-- **Fixes applied:** Chunk size (optional in vite), icon/metadata (desktop_app: `signAndEditExecutable: false`), commitlint added
-- **Proof:** Build output without UnicodeEncodeError; runner.py uses ASCII-only print on Windows
+**Production readiness is a time-bounded verdict**, not a repository fact. It must be recomputed from fresh evidence for the current serving deployment and current investigation window.
 
-## 2. Build & Deploy
+Any old statement such as “Production Ready as of <date>” is historical only and cannot satisfy a current readiness claim.
 
-- **Commands:** `check_build_requirements.py` → `build_fresh_installer.bat`
-- **Proof:** `desktop_app\dist\System3 Ultra Setup 1.0.0.exe` generated; logs in terminal
+## Temporal truth governance
 
-## 3. Dashboard Validation
+`latest` is not `live`.
 
-- **Checks:** Backend/learning/forensic/validation endpoints; broker status; charts (heatmap, IV surface)
-- **Proof:** `comprehensive_pre_build_validation.py` output; dashboard screenshots in `/proof` when run
+- `reports/latest/` = latest stored report, not current runtime truth.
+- `SYSTEM_STATE.md` / `CHANGE_LOG.md` = context/history, not current runtime truth.
+- GitHub artifact/workflow = evidence of what that run observed, not a guarantee the state persists.
+- Source code = intended behavior, not proof of serving runtime/UI behavior.
 
-## 4. Trader Data Completeness
+For any claim implying `now/current/live/present/still/fixed now/connected now/UI now`, generate new request-scoped evidence after the current investigation begins.
 
-- **Fields:** Option chain, IV surface, Greeks, signals, risk metrics, PnL, broker/market feed
-- **Charts (Option Chain Heatmap, IV Surface):** When broker is disconnected or market closed, strikes/expiries/spot may show 0. This is expected: no live feed → no chain data. Trading is disabled. When broker connects and market is open, data populates.
-- **Proof:** Dashboard shows all fields; zeros when data unavailable (broker/market dependency documented)
+For production UI truth, use a new Chrome/WebDriver session against the actual GCP production URL and capture fresh screenshots/visible text plus same-session read-only API evidence.
 
-## 5. Online Data Verification
+Use:
+- `scripts/gcp_live_ui_snapshot.py` for the 22-tab production UI lifecycle;
+- `scripts/system3_temporal_truth_guard.py` for machine freshness validation.
 
-- **Compare:** Dashboard vs exchange/API (spot, chain, IV, Greeks)
-- **Proof:** Logs from validation scripts; manual check when broker connected
+## Production-ready gate
 
-## 6. Advanced Prediction & Analytics
+A current production-ready verdict requires all applicable conditions to be proven from current evidence:
 
-- **Modules:** ML/Model tabs; `dashboard/backend/performance_predictor.py`; `src/lstm_forecast.py` (LSTM time-series stub for spot/IV when torch available)
-- **Proof:** Prediction charts and logs when data available
+1. Exact serving GCP revision and source SHA are identified.
+2. Runtime safety flags prove ANALYZER/PAPER; LIVE/order execution remains disabled.
+3. Broker truth is freshly observed and internally consistent.
+4. Health/readiness truth is freshly observed.
+5. All 22 canonical production UI tabs are freshly captured from the actual production URL.
+6. Data-bearing tabs have semantic proof of expected data/state; render-only or HTTP 200 is insufficient.
+7. Option-chain/market-data freshness is proven where applicable.
+8. UI-visible status matches same-session backend/API truth; contradictions are blockers.
+9. Required CI/security/deployment gates for the exact relevant source are satisfied or explicitly classified.
+10. IAM/runtime authority is within the declared safety policy; known temporary debt is not mislabeled as closed.
+11. No unresolved P0/P1 blocker remains hidden by an older green artifact.
 
-## 7. Live Trading Safety Guardrails
+If any required condition is missing, stale, contradictory, or not observable, verdict is `NOT_PROVEN`, `BLOCKED`, or `FAIL` as appropriate—not PASS.
 
-- **Rules:** Trades only when market open + broker connected + risk PASS + fresh data
-- **Implementation:** `/api/health` and `/api/state` gate: never return `mode=LIVE` when broker disconnected or data synthetic; `live_allowed` / `live_blockers` in health
-- **Proof:** `production_grade_validation.py` Health Live Gate (0.); PROOF_SYSTEM3_PRODUCTION_GRADE.md
+## UI lifecycle governance
 
-## 8. Risk Alert System
+A full UI audit means the actual production service, not localhost/Vite, and includes:
 
-- **Monitor:** Volatility, margin, unusual OI
-- **Proof:** Alerts in dashboard and logs when thresholds exceeded
+`decision-intel`, `truth`, `genesis`, `e2e-proof`, `overview`, `sim-live`, `options-intel`, `chain`, `signals`, `trade`, `paper`, `positions`, `risk-scenarios`, `multibagger`, `prediction-audit`, `performance`, `ml`, `data-integrity`, `broker`, `alerts`, `system`, `gates`.
 
-## 9. Failure Handling & Retry Logic
+For each tab capture:
+- screenshot;
+- visible text;
+- UTC observation time;
+- rendered/active state;
+- semantic loading/empty/error/degraded observations;
+- relevant API comparison.
 
-- **Runner:** `runner.py` – Unicode replaced with ASCII (`[OK]`, `[WARN]`) to avoid cp1252 UnicodeEncodeError on Windows
-- **Proof:** Start Runner in Control Plane completes without UnicodeEncodeError
+A 22/22 render PASS alone is not production data readiness.
 
-## 10. Semantic Commit Enforcement
+## Evidence classification
 
-- **Config:** `commitlint.config.cjs` (Conventional Commits: feat, fix, docs, style, refactor, test, chore, etc.)
-- **Proof:** Run `npx commitlint --from HEAD~1` or use Husky commit-msg hook
+Use the classes defined in the temporal policy. Only request-scoped live browser/API/log observations or freshly queried deployment metadata can support a current claim within their exact scope.
 
-## 11. Commit Lint Configuration
+Stored artifacts become historical after capture. They remain valid for timeline, regression, before/after, and root-cause analysis, but cannot silently answer a later “what is true now?” question.
 
-- **File:** `commitlint.config.cjs` at project root (use `commitlint.config.js` if using ESM)
-- **Husky:** Add in repo with git: `npx husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'`
-- **Proof:** Bad commit message rejected by hook
+## Safety governance
 
-## 12. Release Tagging
+Mandatory until separate live-enablement authority exists:
 
-- **Convention:** `vMAJOR.MINOR.PATCH` matching `package.json` (e.g. desktop_app or root)
-- **Proof:** GitHub Release tag matches version
+- `ANALYZE_MODE=1`
+- `LIVE_TRADING_ENABLED=0`
+- `SYSTEM3_LIVE_TRADING_ALLOWED=0`
+- `AUTO_EXECUTE_TRADES=0`
+- no real order place/modify/cancel/square-off;
+- no broker secret payload exposure;
+- read-only production UI/API verification is allowed;
+- Dhan token mint authority remains restricted to dedicated scheduler/recovery identities.
 
-## 13. Changelog Grouping
+## Multi-agent governance
 
-- **Sections:** Features, Fixes, Docs, Other (from commit types)
-- **Proof:** Release notes attached to GitHub Release
+All agents must read the temporal policy before using state/proof artifacts.
 
-## 14. Proof Pack Generation
+Before changing code or claiming current status:
+- inspect current main/open PRs;
+- inspect current serving production evidence when runtime-relevant;
+- do not overwrite parallel agent work;
+- do not use a stale branch/PR narrative as current truth;
+- if agents disagree about live state, generate a new observation and use it as arbiter.
 
-- **Location:** `proof/` at project root (created)
-- **Script:** `python scripts/generate_proof_pack.py` — writes `proof/proof_pack_YYYYMMDD_HHMMSS.json` with artifact list and responsibility status
-- **Contents:** Build logs, CI/CD results, dashboard screenshots, verification logs, risk alerts, changelog
-- **Proof:** Proof pack JSON in `proof/`; also `outputs/agent_runs/.../PROOF_*.md` and upgrade_agent proof_packs
+## Completion rule
 
-## 15. Continuous Improvement
+Code written != complete.
+CI green != complete.
+Deployment green != complete.
+HTTP 200 != complete.
+Tab rendered != complete.
 
-- **Rule:** Check existing state; skip if optimal; log "No action required — already optimal"
-- **Proof:** Improvement logs in proof pack
-
-## 16. Stop Condition
-
-- **Criteria:** Dashboard PASS, trader data verified, online data aligned, predictions validated, risk monitored, CI/CD pass, proof pack generated, guardrails confirmed, no further improvement needed
-- **Confirm:** PASS three consecutive cycles → mark "Production Ready"
-
----
-
-## Quick Reference – Key Files
-
-| Responsibility | Key file(s) |
-|----------------|-------------|
-| Fake LIVE gate | `dashboard/backend/app.py` (get_health, get_state), `synthetic_data_generator.py` |
-| Runner encoding | `runner.py` (ASCII-only print) |
-| Health live gate | `production_grade_validation.py` (test_health_live_gate) |
-| Commit lint | `commitlint.config.cjs` |
-| Proof artifacts | `proof/`, `scripts/generate_proof_pack.py`, `proof/PROOF_AGENT_MEMORY_TASKS_*.md`, `outputs/agent_runs/.../PROOF_*.md` |
-| LSTM forecasting | `src/lstm_forecast.py` |
-| Agent memory tasks | `agent_memory/tasks.json`; proof: `proof/PROOF_AGENT_MEMORY_TASKS_20260223.md` |
-| Production Ready log | `proof/FINAL_PRODUCTION_READY_LOG.md` (baseline; do not overwrite) |
-| Maintenance mode | `proof/MAINTENANCE_MODE.md` (daily monitor, weekly QC, governance gate) |
-| Monitoring (daily) | `scripts/monitor_health.py` (Task: **System3_DailyMonitor**, 08:00) → `proof/MONITORING_LOG_YYYYMMDD.txt` |
-| QC audit (weekly) | `scripts/run_weekly_qc_audit.py` (Task: **System3_WeeklyQC**, Sun 09:00) → `proof/qc_audit_YYYYMMDD.json` |
-| Schedule setup | `scripts/setup_scheduled_tasks.ps1`; see proof/MAINTENANCE_MODE.md |
-| New changes | Governance cycle → proof pack → validation; release only if cycle_result = PASS |
-| Changelog / tags | `CHANGELOG.md`; tag versions per release (see proof/RELEASE_TAG_*.txt) |
-| Archive | All artifacts in `proof/`; dated in `proof/archive/` |
-| CI/CD and maintenance | `proof/CI_CD_AND_MAINTENANCE.md` |
+Completion requires the requested end state to be freshly and directly proven at the authoritative boundary where the user experiences it.

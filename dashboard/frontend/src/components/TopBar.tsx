@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, Bell, Menu, Search, Shield } from 'lucide-react'
+import { Activity, Bell, Menu, Search, Shield, Clock as ClockIcon } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
-import { brokerIsConnected } from '../lib/healthTruth'
+import { brokerIsConnected, isNonAuthBrokerRejection } from '../lib/healthTruth'
 import { resolveFeedQuality } from '../lib/feedQuality'
 import { DASHBOARD_TABS } from './Sidebar'
 
@@ -17,20 +17,41 @@ function Clock() {
     const timer = window.setInterval(tick, 1000)
     return () => window.clearInterval(timer)
   }, [])
-  return <span className="num" style={{ color: 'var(--text-sec)', fontSize: 11 }}>{time} IST</span>
+  return (
+    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300 font-mono text-xs font-semibold shrink-0">
+      <ClockIcon size={13} className="text-sky-400" />
+      <span>{time || '00:00:00'} IST</span>
+    </div>
+  )
 }
 
-function MarketTicker({ label, spot, chg, marketOpen }: { label: string; spot?: number; chg?: number | null; marketOpen: boolean }) {
+function MarketTicker({
+  label,
+  spot,
+  chg,
+  marketOpen,
+  missingLabel
+}: {
+  label: string
+  spot?: number
+  chg?: number | null
+  marketOpen: boolean
+  missingLabel?: string
+}) {
   const up = (chg ?? 0) >= 0
-  const missing = !spot
+  const missing = !spot || spot <= 0
+  const missingText = missingLabel || (marketOpen ? 'Warming' : 'After hours')
+
   return (
-    <div className="hide-phone" style={{ minWidth: 88, padding: '0 10px', borderLeft: '1px solid var(--border)' }}>
-      <div style={{ fontSize: 10, color: 'var(--text-mut)', letterSpacing: '0.02em' }}>{label}</div>
-      <div className="num" style={{ marginTop: 2, fontSize: 13, lineHeight: 1.1, fontWeight: 700, color: 'var(--text-pri)' }}>
+    <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[100px] shrink-0" title={missing ? missingText : undefined}>
+      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
+      <div className="font-mono text-sm font-bold text-slate-100 mt-0.5 tabular-nums">
         {missing ? '—' : fmt(spot, 2)}
       </div>
-      <div className="num" style={{ marginTop: 2, fontSize: 10, color: missing ? 'var(--text-mut)' : chg == null ? 'var(--text-mut)' : up ? 'var(--up)' : 'var(--down)' }}>
-        {missing ? (marketOpen ? 'Warming' : 'After hours') : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
+      <div className={`font-mono text-[11px] font-semibold mt-0.5 tabular-nums ${
+        missing ? 'text-amber-400' : chg == null ? 'text-slate-400' : up ? 'text-emerald-400' : 'text-rose-400'
+      }`}>
+        {missing ? missingText : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
       </div>
     </div>
   )
@@ -48,41 +69,63 @@ export function TopBar() {
   const {
     wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
     brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, health,
-    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, state,
+    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, state, liveBoard,
   } = useStore()
   const [searchOpen, setSearchOpen] = useState(false)
 
+  const boardSpot = (symbol: string) => {
+    const row = (liveBoard?.indices || []).find((item: any) => String(item?.symbol || '').toUpperCase() === symbol)
+    if (Number(row?.ltp) > 0) {
+      return { spot: Number(row.ltp), chg: row?.change_pct == null ? null : Number(row.change_pct), rowFound: true }
+    }
+    return { spot: undefined as number | undefined, chg: null as number | null, rowFound: Boolean(row) }
+  }
+
   const getSpot = (symbol: string) => {
+    const fromBoard = boardSpot(symbol)
+    if (fromBoard.spot) return fromBoard
     const row = chain?.[symbol]
     if (Number(row?.spot) > 0) {
       const rawChange = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
-      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange) }
+      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange), rowFound: fromBoard.rowFound }
     }
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
     const match = rankings.find((item: any) => String(item?.underlying ?? '').toUpperCase() === symbol)
     return Number(match?.spot_price) > 0
-      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct) }
-      : { spot: undefined, chg: null }
+      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct), rowFound: fromBoard.rowFound }
+      : { spot: undefined, chg: null, rowFound: fromBoard.rowFound }
   }
 
   const nifty = getSpot('NIFTY')
   const bank = getSpot('BANKNIFTY')
+  const fin = getSpot('FINNIFTY')
+  const vix = getSpot('INDIAVIX')
   const mid = getSpot('MIDCPNIFTY')
-  const apiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
+  const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
+
+  const vixMissingLabel = vix.spot
+    ? undefined
+    : vix.rowFound
+      ? 'Dhan no quote'
+      : liveBoardOk
+        ? 'Dhan unavailable'
+        : marketOpen
+          ? 'Feed warming'
+          : 'After-hours n/a'
+
   const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
     || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
-  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus) || (apiResponded && !hasError)
-  const brokerLabel = (brokerConnected || brokerGood) ? 'Connected' : hasError ? 'Auth issue' : 'Waiting'
-  const brokerTone = brokerConnected || brokerGood ? 'var(--up)' : hasError ? 'var(--down)' : 'var(--amber)'
+  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
+  const requestRejected = isNonAuthBrokerRejection(brokerStatus)
+  const brokerLabel = requestRejected
+    ? 'Request rejected'
+    : (brokerConnected || brokerGood)
+      ? 'Session OK'
+      : hasError
+        ? 'Auth issue'
+        : 'Waiting'
+
   const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
-  const tickAge = state?.last_tick_age_sec ?? state?.tick_health?.last_tick_age_sec
-  const feed = resolveFeedQuality({
-    marketOpen,
-    wsStatus,
-    tickAgeSec: tickAge,
-    dataSource: state?.data_source || health?.data_source,
-    brokerConnected: brokerConnected || brokerGood,
-  })
   const alertCount = Array.isArray(alerts) ? alerts.length : 0
   const matches = useMemo(() => {
     const q = commandQuery.trim().toLowerCase()
@@ -103,87 +146,74 @@ export function TopBar() {
   }, [])
 
   return (
-    <header role="banner" className="app-topbar">
-      <div className="topbar-brand">
-        <div aria-hidden className="topbar-mark">S</div>
-        <div style={{ minWidth: 0 }}>
-          <div className="topbar-title">SYSTEM3</div>
-          <div className="topbar-subtitle">Genesis</div>
-        </div>
+    <header role="banner" className="h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-3 md:px-4 z-40 shrink-0 gap-3">
+      {/* Brand & Nav Toggle */}
+      <div className="flex items-center gap-3 shrink-0">
         <button
           type="button"
-          className="soft-btn"
+          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 active:scale-95 transition-all"
           aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
-          aria-expanded={sidebarOpen}
-          aria-controls="dashboard-sidebar"
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          style={{ marginLeft: 'auto', width: 28, minHeight: 28, padding: 0 }}
         >
-          <Menu size={14} />
+          <Menu size={18} />
         </button>
-      </div>
-
-      <div className="topbar-status-strip" aria-label="Session status">
-        <div className="status-item">
-          <span className={`status-dot-quiet ${marketOpen ? 'tone-ok' : 'tone-warn'}`} aria-hidden />
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-extrabold text-blue-400 text-sm">
+            S3
+          </div>
           <div>
-            <div className="status-label">{marketOpen ? 'Market open' : 'Market closed'}</div>
-            <div className="status-sub">{marketOpen ? 'Session active' : 'Read-only / poll'}</div>
+            <div className="text-sm font-extrabold tracking-wider text-slate-100 leading-none">SYSTEM3</div>
+            <div className="text-[11px] font-semibold text-blue-400/90 leading-none mt-1">GENESIS INSTITUTIONAL</div>
           </div>
         </div>
+      </div>
 
-        <div className="status-item hide-phone" title={feed.detail}>
-          <span className={`feed-badge feed-badge-${feed.tone}`}>{feed.label}</span>
-          <div className="status-sub" style={{ marginLeft: 2 }}>{feed.detail}</div>
-        </div>
-
-        <div className="hide-compact" style={{ display: 'flex', alignItems: 'center' }}>
-          <MarketTicker label="Nifty" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
-          <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
-          <MarketTicker label="Midcap Nifty" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+      {/* Market Tickers (Scrollable with no overlap) */}
+      <div className="hidden lg:flex items-center overflow-x-auto scrollbar-none flex-1 max-w-2xl px-2">
+        <MarketTicker label="Nifty 50" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+        <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={vixMissingLabel} />
+        <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[70px] shrink-0">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Board</div>
+          <div className={`font-mono text-xs font-bold mt-0.5 ${liveBoardOk ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {liveBoardOk ? (marketOpen ? 'Feed OK' : 'Snapshot') : marketOpen ? 'Warming' : 'Idle'}
+          </div>
         </div>
       </div>
 
-      <div className="topbar-actions">
-        <div className="hide-compact" style={{ padding: '0 10px', textAlign: 'right' }}>
-          <Clock />
-        </div>
+      {/* Right Actions & Telemetry */}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <Clock />
 
+        {/* Broker Button */}
         <button
           type="button"
-          aria-label={`Broker ${brokerLabel}`}
           onClick={() => setActiveTab('broker')}
-          className="topbar-broker-btn"
-          title={apiStatus?.message || 'Open broker'}
-          style={{ color: brokerTone }}
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
+            brokerConnected || brokerGood
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
+          }`}
+          title="Open Broker Status"
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 10, color: 'var(--text-mut)' }}>
-            <Shield size={12} aria-hidden /> Broker
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 700, marginTop: 2 }}>Dhan · {brokerLabel}</div>
+          <Shield size={14} />
+          <span>Dhan · {brokerLabel}</span>
         </button>
 
-        <div className="mode-pair" aria-label="Trading mode">
-          <span className="mode-chip mode-paper">Paper</span>
-          <span className={`mode-chip ${liveOn ? 'mode-live-on' : 'mode-live-off'}`}>
-            {liveOn ? 'Live on' : 'Live off'}
+        {/* Paper / Live Mode Pill */}
+        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold">
+          <span className="text-amber-400 font-bold">PAPER</span>
+          <span className="text-slate-600">|</span>
+          <span className={liveOn ? 'text-rose-400 font-bold' : 'text-slate-400'}>
+            {liveOn ? 'LIVE ON' : 'LIVE OFF'}
           </span>
         </div>
 
-        <button
-          type="button"
-          className="soft-btn hide-phone"
-          aria-label="Open system health"
-          title="System health / data integrity"
-          onClick={() => setActiveTab('data-integrity')}
-          style={{ width: 'auto', minHeight: 30, padding: '0 10px', gap: 6, marginRight: 4 }}
-        >
-          <Activity size={13} aria-hidden />
-          <span style={{ fontSize: 11 }}>System health</span>
-        </button>
-
-        <div className="hide-compact" style={{ width: 168, marginRight: 8, position: 'relative' }}>
-          <Search size={13} style={{ position: 'absolute', left: 10, top: 9, color: 'var(--text-mut)' }} aria-hidden />
+        {/* Quick Search */}
+        <div className="hidden xl:block relative w-48">
+          <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
           <input
             id="dashboard-command"
             type="search"
@@ -200,13 +230,18 @@ export function TopBar() {
                 setSearchOpen(false)
               }
             }}
-            className="topbar-search"
+            className="w-full h-8 pl-8 pr-3 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
           {searchOpen && matches.length > 0 && (
-            <ul role="listbox" aria-label="Matching tabs" className="topbar-search-menu">
+            <ul role="listbox" className="absolute top-9 left-0 right-0 bg-slate-900 border border-slate-700 rounded-lg shadow-xl py-1 z-50">
               {matches.map((tab) => (
                 <li key={tab.id}>
-                  <button type="button" className="nav-item" onMouseDown={(e) => e.preventDefault()} onClick={() => { setActiveTab(tab.id); setCommandQuery(''); setSearchOpen(false) }}>
+                  <button
+                    type="button"
+                    className="w-full text-left px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800 hover:text-blue-400 transition-colors"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setActiveTab(tab.id); setCommandQuery(''); setSearchOpen(false) }}
+                  >
                     {tab.label}
                   </button>
                 </li>
@@ -215,13 +250,22 @@ export function TopBar() {
           )}
         </div>
 
-        <button type="button" className="soft-btn" aria-label={alertCount ? `${alertCount} alerts` : 'No active alerts'} onClick={() => setActiveTab('alerts')} style={{ width: 30, minHeight: 30, padding: 0, marginRight: 10, position: 'relative' }}>
-          <Bell size={14} aria-hidden />
+        {/* Alerts Bell */}
+        <button
+          type="button"
+          className="relative p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors"
+          aria-label={alertCount ? `${alertCount} alerts` : 'No active alerts'}
+          onClick={() => setActiveTab('alerts')}
+        >
+          <Bell size={16} />
           {alertCount > 0 && (
-            <span aria-hidden style={{ position: 'absolute', top: -4, right: -3, minWidth: 14, height: 14, display: 'grid', placeItems: 'center', borderRadius: 99, background: 'var(--down)', color: 'white', fontSize: 9, fontWeight: 800 }}>{alertCount}</span>
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+              {alertCount}
+            </span>
           )}
         </button>
       </div>
     </header>
   )
 }
+export default TopBar

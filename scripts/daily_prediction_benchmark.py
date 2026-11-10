@@ -40,6 +40,17 @@ import sys
 from datetime import datetime, date
 from pathlib import Path
 
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    try:
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT_DIR))
 
@@ -240,12 +251,15 @@ def write_benchmark_summary_md(validations: list, dep_ok: bool, dep_reason: str)
     for v in validations[-30:]:
         pred_top = " ".join(v.get("predicted_ranking", [])[:3])
         act_top = " ".join(v.get("actual_ranking", [])[:3])
-        rho = v.get("spearman_correlation")
-        hit = v.get("hit_rate")
+        v_rho = v.get("spearman_rho")
+        v_hit = v.get("hit_rate")
+        rho_str = f"{v_rho:.3f}" if v_rho is not None else "--"
+        hit_str = f"{v_hit:.1%}" if v_hit is not None else "--"
         lines.append(
             f"| {v['date']} | {pred_top} | {act_top} | "
-            f"{rho:.3f} | {hit:.1%} | {v.get('status', '--')} |"
+            f"{rho_str} | {hit_str} | {v.get('status', '--')} |"
         )
+
 
     verdict = "BELOW THRESHOLD — more trading days of data needed, or model retrain required"
     if avg_rho is not None and avg_rho >= 0.70:
@@ -329,14 +343,14 @@ def main():
     print(f"  archived dated copy       — {archive_dest}")
 
     if summary["days"] == 0:
-        print("\n⚠️  No validation data yet. Files written with honest "
+        print("\n[WARN] No validation data yet. Files written with honest "
               "'no data' message.")
     else:
         avg_rho = summary.get("avg_rho")
         if avg_rho is not None:
-            print(f"\n✅ Benchmark complete. Avg Spearman ρ over {summary['days']} days: {avg_rho:.3f}")
+            print(f"\n[OK] Benchmark complete. Avg Spearman rho over {summary['days']} days: {avg_rho:.3f}")
         else:
-            print(f"\n✅ Benchmark complete. {summary['days']} days, ρ: N/A")
+            print(f"\n[OK] Benchmark complete. {summary['days']} days, rho: N/A")
 
     print(f"\nLatest outputs:  {OUT_DIR}")
     print(f"Archived copy:   {archive_dest}")

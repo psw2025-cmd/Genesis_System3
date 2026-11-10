@@ -1,0 +1,15 @@
+{
+  "path": "/api/chain/NIFTY",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 455,
+  "content_type": "application/json",
+  "data": {
+    "underlying": "NIFTY",
+    "status": "MARKET_OPEN",
+    "stale": false,
+    "fetched_at_utc": "2026-08-26T08:32:21.719221+00:00",
+    "n_contracts": 21,
+    "source": null
+  }
+}

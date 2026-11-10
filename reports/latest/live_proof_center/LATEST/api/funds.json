@@ -1,0 +1,45 @@
+{
+  "path": "/api/funds",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 188,
+  "content_type": "application/json",
+  "data": {
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "source": "sdk",
+    "validated": true,
+    "normalized": {
+      "available_balance": 1638.54,
+      "utilized_amount": null,
+      "total_limit": 1638.54,
+      "raw": {
+        "dhanClientId": "1106583741",
+        "availabelBalance": 1638.54,
+        "sodLimit": 1638.54,
+        "collateralAmount": 0.0,
+        "receiveableAmount": 0.0,
+        "utilizedAmount": 0.0,
+        "blockedPayoutAmount": 0.0,
+        "withdrawableBalance": 1638.54
+      }
+    },
+    "success": true,
+    "data": {
+      "dhanClientId": "1106583741",
+      "availabelBalance": 1638.54,
+      "sodLimit": 1638.54,
+      "collateralAmount": 0.0,
+      "receiveableAmount": 0.0,
+      "utilizedAmount": 0.0,
+      "blockedPayoutAmount": 0.0,
+      "withdrawableBalance": 1638.54
+    },
+    "token_reload": "<REDACTED>",
+    "canonical_rotation": {
+      "attempted": false,
+      "success": false,
+      "raw_token_exposed": false
+    }
+  }
+}

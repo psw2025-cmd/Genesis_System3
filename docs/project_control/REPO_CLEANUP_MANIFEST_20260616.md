@@ -29,7 +29,7 @@ This manifest is the authoritative cleanup register for GitHub-side cleanup. It 
 | `.gitignore` | KEEP | Protects env, state, logs, generated outputs | No |
 | `run_system3.py` | REVIEW | Legacy disabled menu but still required by CI gate | No |
 | `system3_ultra.py` | KEEP | Existing System3 Ultra control panel entrypoint | No |
-| `render.yaml` | KEEP | Active Render runtime map | No |
+| `render.yaml` | DELETE/FORBIDDEN | Render.com hosting forbidden; Cloud Run only | Yes, must stay absent |
 | `dashboard/backend/app.py` | KEEP | Backend runtime entrypoint | No |
 | `dashboard/backend/Dockerfile` | KEEP | Backend Docker runtime | No |
 | `state/*.pid` | DELETE | Generated runtime state; safe to regenerate | Yes, when tracked |

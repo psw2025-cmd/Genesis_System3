@@ -1,0 +1,142 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260825134144
+Username: DESKTOP-PQQ1T9K\ADMIN
+RunAs User: DESKTOP-PQQ1T9K\ADMIN
+Configuration Name: 
+Machine: DESKTOP-PQQ1T9K (Microsoft Windows NT 10.0.18362.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -Command Import-Module 'c:\Users\ADMIN\.cursor\extensions\ms-vscode.powershell-2025.4.0-universal\modules\PowerShellEditorServices\PowerShellEditorServices.psd1'; Start-EditorServices -HostName 'Visual Studio Code Host' -HostProfileId 'Microsoft.VSCode' -HostVersion '2025.4.0' -BundledModulesPath 'c:\Users\ADMIN\.cursor\extensions\ms-vscode.powershell-2025.4.0-universal\modules' -EnableConsoleRepl -StartupBanner "PowerShell Extension v2025.4.0
+Copyright (c) Microsoft Corporation.
+
+https://aka.ms/vscode-powershell
+Type 'help' to get help.
+" -LogLevel 'Warning' -LogPath 'c:\Users\ADMIN\AppData\Roaming\Cursor\logs\20260825T125340\window1\exthost\ms-vscode.powershell' -SessionDetailsPath 'c:\Users\ADMIN\AppData\Roaming\Cursor\User\globalStorage\ms-vscode.powershell\sessions\PSES-VSCode-20516-881778.json' -FeatureFlags @() 
+Process ID: 41492
+PSVersion: 5.1.18362.1171
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.18362.1171
+BuildVersion: 10.0.18362.1171
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Users\ADMIN\Genesis_System3\Genesis_System3\reports\latest\access_capability\USER_GRANT_RUN_20260825_134144.log
+]633;D;0]633;A]633;P;Cwd=C:\x5cSystem3\x5cGenesis_System3PS C:\System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cSystem3\x5cGenesis_System3PS C:\System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Set-Location $Primary
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) # 1) Put Google Cloud SDK on PATH for this session
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) $sdk = 'C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin'
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) if (Test-Path $sdk) { $env:Path = "$sdk;$env:Path"; Write-Host "PATH OK: $sdk" } else { Write-Host "ERROR: SDK bin missing: $sdk" }
+PATH OK: C:\Program Files (x86)\Google\Cloud SDK\google-cloud-sdk\bin
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) # 2) Run revised grant (login + project + Cloud Run prove + re-probe)
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) powershell -NoProfile -ExecutionPolicy Bypass -File "$LogDir\ACCESS_GRANT_REVISE.ps1"
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) # 3) Extra proofs Claude/Cursor both need
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host '--- gh ---'
+--- gh ---
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) gh auth status
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host '--- gcloud ---'
+--- gcloud ---
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) gcloud auth list
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) gcloud config get-value project
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) gcloud run services describe genesis-system3-web --project=system3-openalgo-safe --region=asia-south1 --format='value(status.url)'
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host '--- live ---'
+--- live ---
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) curl.exe -sS --max-time 40 "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy_info"
+alse,"deployed_at_known":true,"render_git_commit_legacy":""}
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host ''
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host '--- gmail quick ---'
+--- gmail quick ---
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) & 'C:\Pritam_CV_Tier1_EPC\.venv-pr53\Scripts\python.exe' "$Primary\scripts\system3_access_capability_probe.py"
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) # 4) Claude CLI check
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Write-Host '--- claude ---'
+--- claude ---
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) where.exe claude
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) claude --version
+
+]633;D;0]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+]633;A]633;P;Cwd=C:\x5cUsers\x5cADMIN\x5cGenesis_System3\x5cGenesis_System3PS C:\Users\ADMIN\Genesis_System3\Genesis_System3> ]633;B
+(venv) $global:__psEditorServices_userInput = $args[0]
+(venv) $global:__psEditorServices_userInput = ""
+(venv) Stop-Transcript
+**********************
+Windows PowerShell transcript end
+End time: 20260825134513
+**********************

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+import math
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -135,6 +136,41 @@ def compute_contract_gain_pct(contract: Dict[str, Any]) -> Optional[float]:
     return compute_contract_gain(contract)[3]
 
 
+
+def is_actionable_gainer_row(row: Any) -> bool:
+    """Fail closed on malformed, expired, or unpriced CE/PE gainer rows.
+
+    This is a display/ranking validity filter, not execution authorization:
+    volume, bid/ask spread, and real-time freshness require separate proof.
+    """
+    if not isinstance(row, dict):
+        return False
+    if str(row.get("option_type") or "").upper() not in ("CE", "PE"):
+        return False
+    if not (row.get("trading_symbol") or row.get("symbol") or row.get("contract")):
+        return False
+
+    raw_expiry = row.get("expiry_date") or row.get("expiry")
+    if not raw_expiry:
+        return False
+    try:
+        expiry = datetime.fromisoformat(str(raw_expiry).strip()[:10]).date()
+    except (ValueError, TypeError):
+        return False
+    today_ist = datetime.now(timezone(timedelta(hours=5, minutes=30))).date()
+    if expiry < today_ist:
+        return False
+
+    raw_ltp = row.get("ltp")
+    if raw_ltp is None:
+        raw_ltp = row.get("price")
+    try:
+        ltp = float(raw_ltp)
+    except (TypeError, ValueError):
+        return False
+    return 0.05 < ltp < float("inf")
+
+
 def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, change_rs: Optional[float], ltp: float, prev: Optional[float]) -> Dict[str, Any]:
     opt = str(contract.get("option_type", "")).upper()
     return {
@@ -153,9 +189,9 @@ def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, ch
         "volume": contract.get("volume"),
         "gain_pct": gain_pct,
         "security_id": contract.get("security_id"),
-        "source": contract.get("source") or "dhan",
-        "data_provenance": "DHAN_OPTION_CHAIN_LIVE",
-        "market_match_note": f"LIVE DHAN GAINER (+{gain_pct:.2f}%)",
+        "source": contract.get("source") or "UNKNOWN",
+        "data_provenance": "UNVERIFIED",
+        "market_match_note": f"UNVERIFIED OPTION GAINER (+{gain_pct:.2f}%)",
     }
 
 
@@ -170,18 +206,28 @@ def scan_segment_contracts(
     """Find highest-gain CE and PE contracts for one underlying."""
     scored: List[Dict[str, Any]] = []
     for c in contracts or []:
+        if not isinstance(c, dict):
+            continue
         opt = str(c.get("option_type", "")).upper()
         if opt not in ("CE", "PE"):
             continue
         ltp, prev, change_rs, gain = compute_contract_gain(c)
-        if gain is None or ltp is None or ltp < min_ltp:
+        if (gain is None or ltp is None or not math.isfinite(gain)
+                or not math.isfinite(ltp)
+                or (prev is not None and not math.isfinite(prev))
+                or ltp < min_ltp):
             continue
-        vol = int(c.get("volume") or 0)
-        if vol < min_volume:
+        try:
+            vol = int(c.get("volume") or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if vol < 0 or vol < min_volume:
             continue
         row = _contract_row(c, underlying.upper(), gain, change_rs, ltp, prev)
         if not row.get("expiry_date") and default_expiry:
             row["expiry_date"] = default_expiry
+        if not is_actionable_gainer_row(row):
+            continue
         scored.append(row)
 
     ce_rows = sorted([r for r in scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
@@ -220,10 +266,17 @@ def scan_all_segments_from_chains(
     all_scored: List[Dict[str, Any]] = []
     refreshed_at = _ist_now_str()
 
+    if not isinstance(chains, dict):
+        chains = {}
     underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
+        if not isinstance(chain, dict):
+            chain = {"status": "INVALID_CHAIN_PAYLOAD", "message": "Chain payload is not an object"}
         contracts = chain.get("contracts") or []
+        if not isinstance(contracts, list):
+            chain = {**chain, "status": "INVALID_CONTRACTS_PAYLOAD", "message": "Contracts payload is not a list"}
+            contracts = []
         if not contracts:
             missing.append(underlying)
             segments[underlying] = {
@@ -280,7 +333,39 @@ def scan_all_segments_from_chains(
     }
 
 
-_SHARD_STATE: Dict[str, Any] = {"cursor": 0, "last_syms": []}
+def _new_shard_state() -> Dict[str, Any]:
+    return {
+        "cursor": 0,
+        "last_syms": [],
+        "universe": [],
+        "visited": set(),
+        "cycle": 1,
+        "cycle_complete": False,
+    }
+
+
+_SHARD_STATE: Dict[str, Any] = _new_shard_state()
+
+
+def equity_shard_coverage() -> Dict[str, Any]:
+    """Return bounded, JSON-safe accounting for the current OPTSTK scan cycle."""
+    universe = list(_SHARD_STATE.get("universe") or [])
+    visited = set(_SHARD_STATE.get("visited") or set()) & set(universe)
+    missing = sorted(set(universe) - visited)
+    total = len(universe)
+    return {
+        "schema_version": "system3.equity-option-shard-coverage.v1",
+        "cycle": int(_SHARD_STATE.get("cycle") or 1),
+        "universe_count": total,
+        "visited_count": len(visited),
+        "coverage_pct": round((len(visited) / total) * 100.0, 4) if total else 0.0,
+        "cycle_complete": bool(total and not missing),
+        "missing_symbols": missing,
+        "last_symbols": list(_SHARD_STATE.get("last_syms") or []),
+        "reliance_only": set(universe) == {"RELIANCE"},
+        "read_only": True,
+        "live_trading_enabled": False,
+    }
 
 
 def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
@@ -301,6 +386,9 @@ def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
         if not priority:
             priority = [s for s in (HIGH_MOMENTUM_EQUITY_FO + PRIORITY_EQUITY_FO) if True]
         all_names = list(universe.get("underlyings") or [])
+        if list(_SHARD_STATE.get("universe") or []) != all_names:
+            _SHARD_STATE.update(_new_shard_state())
+            _SHARD_STATE["universe"] = list(all_names)
         limit = max(3, min(int(limit or 12), 40))
 
         selected: List[str] = []
@@ -311,21 +399,22 @@ def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
                 break
 
         if rotate and all_names:
-            cursor = int(_SHARD_STATE.get("cursor") or 0) % max(1, len(all_names))
-            shard = []
-            for i in range(len(all_names)):
-                name = all_names[(cursor + i) % len(all_names)]
-                if name in selected:
-                    continue
-                shard.append(name)
-                if len(selected) + len(shard) >= limit:
-                    break
+            rotating_pool = [name for name in all_names if name not in selected]
+            cursor = int(_SHARD_STATE.get("cursor") or 0) % max(1, len(rotating_pool))
+            capacity = max(0, limit - len(selected))
+            shard = [
+                rotating_pool[(cursor + i) % len(rotating_pool)]
+                for i in range(min(capacity, len(rotating_pool)))
+            ] if rotating_pool else []
             selected.extend(shard)
-            _SHARD_STATE["cursor"] = (cursor + max(1, limit // 2)) % max(1, len(all_names))
+            _SHARD_STATE["cursor"] = (cursor + max(1, len(shard))) % max(1, len(rotating_pool))
         else:
             selected = selected[:limit]
 
         _SHARD_STATE["last_syms"] = selected[:limit]
+        visited = _SHARD_STATE.setdefault("visited", set())
+        visited.update(name for name in selected[:limit] if name in set(all_names))
+        _SHARD_STATE["cycle_complete"] = bool(all_names and set(all_names).issubset(visited))
         return selected[:limit]
     except Exception:
         return ["DIVISLAB", "LTM", "PAYTM", "JUBLFOOD", "RELIANCE", "HDFCBANK", "TCS", "INFY"][: max(3, min(limit, 20))]
@@ -361,11 +450,19 @@ def fetch_chains_for_market(
         index_syms = [u for u in symbols if u in INDEX_SEGMENTS]
         equity_syms = [u for u in symbols if u not in INDEX_SEGMENTS]
 
-        with ThreadPoolExecutor(max_workers=min(4, max(1, len(index_syms)))) as pool:
-            futs = {pool.submit(_fetch_one, u): u for u in index_syms}
-            for fut in as_completed(futs, timeout=max(20.0, overall_timeout_s * 0.55)):
-                underlying, ch = fut.result()
-                chains[underlying] = ch
+        # Dhan option-chain allows one request per three seconds. Parallel
+        # index fan-out previously violated that contract even though equity
+        # requests were spaced. Serialize this scan's index requests too.
+        for underlying in index_syms:
+            if chains:
+                time.sleep(3.15)
+            if (time.monotonic() - started) >= overall_timeout_s - 3.0:
+                chains[underlying] = {
+                    "contracts": [], "underlying": underlying, "status": "SKIPPED_TIMEOUT"
+                }
+                continue
+            underlying2, ch = _fetch_one(underlying)
+            chains[underlying2] = ch
 
         remaining = overall_timeout_s - (time.monotonic() - started)
         if equity_syms and remaining > 12.0:
@@ -407,14 +504,20 @@ def merge_market_top_reports(base: Dict[str, Any], incoming: Dict[str, Any], mar
     by_key: Dict[str, Dict[str, Any]] = {}
     for report in (base, incoming):
         for row in report.get("market_top_table") or []:
-            if not isinstance(row, dict):
+            if not is_actionable_gainer_row(row):
+                continue
+            try:
+                gain = float(row.get("gain_pct"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(gain):
                 continue
             key = (
                 f"{row.get('underlying')}|{row.get('option_type')}|{row.get('strike')}|"
                 f"{row.get('expiry_date') or row.get('expiry')}"
             )
             prev = by_key.get(key)
-            if prev is None or float(row.get("gain_pct") or -1e18) >= float(prev.get("gain_pct") or -1e18):
+            if prev is None or gain >= float(prev.get("gain_pct") or 0):
                 by_key[key] = dict(row)
     combined = sorted(by_key.values(), key=lambda x: float(x.get("gain_pct") or 0), reverse=True)
     refreshed_at = incoming.get("refreshed_at") or base.get("refreshed_at") or _ist_now_str()
@@ -473,6 +576,7 @@ def build_top_contract_gainers_report(
     report["equity_only_board"] = equity_only_board
     report["shard_cursor"] = _SHARD_STATE.get("cursor")
     report["shard_last_syms"] = list(_SHARD_STATE.get("last_syms") or [])
+    report["equity_shard_coverage"] = equity_shard_coverage()
     report["status"] = "ok" if report.get("contracts_scored_total", 0) > 0 else "no_data"
     report["diagnose"] = {
         "why_not_moneycontrol_parity": (
@@ -482,6 +586,7 @@ def build_top_contract_gainers_report(
         ),
         "equity_limit": eq_limit,
         "shard_last_syms": list(_SHARD_STATE.get("last_syms") or []),
+        "equity_shard_coverage": equity_shard_coverage(),
         "live_trading_enabled": False,
     }
     return report

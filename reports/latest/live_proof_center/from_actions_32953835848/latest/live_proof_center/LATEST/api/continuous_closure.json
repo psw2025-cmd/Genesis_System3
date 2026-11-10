@@ -1,0 +1,148 @@
+{
+  "path": "/api/continuous_closure",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 313,
+  "content_type": "application/json",
+  "data": {
+    "schema": "continuous_closure_v1",
+    "generated_at_utc": "2026-08-26T09:37:20.251521Z",
+    "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "phases": {
+      "repo_first_scan": {
+        "ok": true,
+        "backlog_path": "reports/latest/autonomous_loop/BACKLOG.md",
+        "backlog_cards": 8
+      },
+      "multi_source_verify": {
+        "sources": {
+          "repo": {
+            "ok": true
+          },
+          "reports": {
+            "ok": true
+          },
+          "live": {
+            "ok": false
+          }
+        },
+        "contracts": {},
+        "auto_gates": null,
+        "checked_at_utc": "2026-08-26T09:37:20.251186Z",
+        "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+      },
+      "watchdog": {
+        "status": "ACTIVE",
+        "open_blockers": 3,
+        "resolved_blockers": 4,
+        "banner_required": true,
+        "policy": "remove_banner_only_when_all_gates_genuinely_ready"
+      },
+      "blocker_cards": [
+        {
+          "id": "A2",
+          "severity": "P0",
+          "defect": "Proof gate 6/7 trip ML_SPEARMAN (need \u22650.70 on 5 days)",
+          "evidence": "note `6/5 days \u00b7 \u03c1=0.55 \u00b7 need \u22650.7`",
+          "status_note": "OPEN \u2014 do not force PASS",
+          "state": "OPEN",
+          "source": "backlog_md"
+        },
+        {
+          "id": "A3",
+          "severity": "P1",
+          "defect": "Model pipeline NO_TRADE / confidence 0 / no directional bias",
+          "evidence": "`/api/signal/top` MARKET_CLOSED",
+          "status_note": "OPEN \u2014 honesty UX; real signals NOT_PROVEN",
+          "state": "OPEN",
+          "source": "backlog_md"
+        },
+        {
+          "id": "A4",
+          "severity": "P1",
+          "defect": "connected\u2260market-data reliability",
+          "evidence": "prior URL proof 429/cache",
+          "status_note": "OPEN \u2014 UI lane split already on main",
+          "state": "OPEN",
+          "source": "backlog_md"
+        },
+        {
+          "id": "C1",
+          "severity": "P0",
+          "defect": "Continuous closure system (scan/verify/watchdog/cards/resume)",
+          "evidence": "`/api/continuous_closure` timed out on self-HTTP fan-out; request path now offline-first",
+          "status_note": "IN_PROGRESS \u2014 patched pending live SHA verify",
+          "state": "IN_PROGRESS",
+          "source": "backlog_md"
+        },
+        {
+          "id": "A1",
+          "severity": "P0",
+          "defect": "gain_rank live rows omit spot_price \u2192 Overview `--`",
+          "evidence": "Live: 25/25 spots + banner",
+          "status_note": "VERIFIED LIVE",
+          "state": "RESOLVED",
+          "source": "backlog_md"
+        },
+        {
+          "id": "A2a",
+          "severity": "P0",
+          "defect": "`/api/accuracy_trend` days\u2260`/api/auto_gates` Spearman series",
+          "evidence": "Live ALIGN days=6 `source=load_spearman_days`",
+          "status_note": "VERIFIED LIVE",
+          "state": "RESOLVED",
+          "source": "backlog_md"
+        },
+        {
+          "id": "R1",
+          "severity": "P0",
+          "defect": "Render.com leftover authority/tools still look current",
+          "evidence": "PR #330 `22155657e`; eval `test_render_hosting_retired.py`; production already Cloud Run SHA `e6da6b469` at 2026-08-23T12:23:21Z",
+          "status_note": "READY_FOR_MERGE \u2014 not VERIFIED LIVE until serving SHA includes #330",
+          "state": "RESOLVED",
+          "source": "backlog_md"
+        },
+        {
+          "id": "A5",
+          "severity": "P2",
+          "defect": "Auton telemetrics banner while loop active",
+          "evidence": "live bundle contains `[AUTONOMOUS LOOP]`",
+          "status_note": "VERIFIED LIVE",
+          "state": "RESOLVED",
+          "source": "backlog_md"
+        }
+      ],
+      "auto_resume": {
+        "next_id": "C1",
+        "severity": "P0",
+        "defect": "Continuous closure system (scan/verify/watchdog/cards/resume)",
+        "state": "IN_PROGRESS",
+        "instruction": "Continue Gemini + E2E continuous closure: test-first in tests/evals/, fix root cause, PR\u2192CI\u2192merge\u2192Cloud Run, live SHA verify, update BACKLOG, post SYSTEM3_COORDINATION_V1 on Issue #188. Never invent prices/\u03c1 or weaken gates."
+      }
+    },
+    "summary": {
+      "open": 3,
+      "in_progress": 1,
+      "resolved": 4,
+      "total_cards": 8,
+      "next": "C1",
+      "serving_sha": null,
+      "gates": "None/None"
+    },
+    "safety": {
+      "live_trading_enabled": false,
+      "order_placement_allowed": false,
+      "zero_synthetic_inventions": true
+    },
+    "request_path": {
+      "self_http_fanout": false,
+      "include_live": false,
+      "live_query": false,
+      "live_http_skipped_reason": "cloud_run_self_call_deadlock_prevention",
+      "cache_hit": false,
+      "cache_age_s": 0.0,
+      "evidence_class": "HISTORICAL_STORED"
+    },
+    "served_at_utc": "2026-08-26T09:37:20.252374Z"
+  }
+}

@@ -38,6 +38,111 @@ def _health_broker_update_allowed(updates: Dict[str, Any]) -> bool:
     return "broker" not in updates
 
 
+def _broker_update_from_probe(result: Any) -> Optional[Dict[str, Any]]:
+    """Convert a bounded Dhan probe result into authoritative SSOT broker truth.
+
+    A failed probe is still evidence.  The old implementation only persisted a
+    successful probe, so a real 906/disconnect could leave a stale historical
+    ``connected=true`` value visible in ``/api/state`` and the dashboard.
+    """
+    if not isinstance(result, dict):
+        return None
+    connected = bool(result.get("connected", False))
+    update: Dict[str, Any] = {
+        "connected": connected,
+        "name": "dhan",
+        "status": "connected" if connected else "disconnected",
+        "error": None if connected else (result.get("error") or "BROKER_NOT_CONNECTED"),
+        "latency_ms": result.get("latency_ms"),
+        "truth_source": "dhan_readonly_probe",
+        "observed_at_ist": datetime.now(IST).isoformat(),
+    }
+    # Preserve only safe classifications/codes; never copy arbitrary upstream
+    # payloads, credentials, headers, or token material into shared state.
+    for key in ("auth_classification", "upstream_classification", "upstream_code"):
+        if result.get(key) is not None:
+            update[key] = result.get(key)
+    return update
+
+
+def _normalize_qc_truth(qc: Any) -> Dict[str, Any]:
+    """Fail closed when QC evidence cannot prove usable contracts.
+
+    ``PASS`` is impossible when ``contracts_total`` is zero.  Missing or invalid
+    contract counts also remain NOT_READY rather than inheriting an optimistic
+    default.  An explicit FAIL remains FAIL.
+    """
+    normalized: Dict[str, Any] = dict(qc) if isinstance(qc, dict) else {}
+    status = str(normalized.get("status") or "").strip().upper()
+    raw_contracts = normalized.get("contracts_total")
+    try:
+        contracts_total = int(raw_contracts) if raw_contracts is not None else 0
+    except (TypeError, ValueError):
+        contracts_total = 0
+    normalized["contracts_total"] = max(0, contracts_total)
+
+    failures = normalized.get("failures")
+    if not isinstance(failures, list):
+        failures = []
+    reasons = normalized.get("reasons")
+    if not isinstance(reasons, list):
+        reasons = []
+
+    if contracts_total <= 0:
+        marker = "NO_VERIFIED_CONTRACTS"
+        if marker not in reasons:
+            reasons.append(marker)
+        if status != "FAIL":
+            status = "NOT_READY"
+    elif not status:
+        status = "NOT_READY"
+        marker = "QC_STATUS_NOT_PROVEN"
+        if marker not in reasons:
+            reasons.append(marker)
+
+    normalized["status"] = status or "NOT_READY"
+    normalized["reasons"] = reasons
+    normalized["failures"] = failures
+    return normalized
+
+
+def _zero_pnl_snapshot() -> Dict[str, float]:
+    """Return the fail-closed PnL snapshot used when no current file is proven."""
+    return {"unrealized": 0.0, "realized": 0.0, "total": 0.0, "day_total": 0.0}
+
+
+def _pnl_is_synthetic_source(payload: Any) -> bool:
+    """Reject fixture/replay/PAPER-simulation PnL from shared live PnL truth.
+
+    This is a conservative data-provenance guard; it does not establish that
+    an unmarked PnL file came from real broker fills.
+    """
+    if not isinstance(payload, dict):
+        return True
+    if payload.get("synthetic") is True or payload.get("is_fixture") is True:
+        return True
+    marker_text = " ".join(
+        str(payload.get(key) or "").lower()
+        for key in ("note", "data_source", "source", "verification_status", "paper_fill_mode")
+    )
+    return any(marker in marker_text for marker in (
+        "synthetic", "fixture", "simulation", "replay", "mock",
+        "fake", "test_only", "no_verified_trades",
+    ))
+
+
+def _zero_risk_snapshot() -> Dict[str, Any]:
+    """Return the no-position risk snapshot so historical risk cannot linger."""
+    return {
+        "var95": 0.0,
+        "es95": 0.0,
+        "exposure": 0.0,
+        "concentration": 0.0,
+        "greeks": {"delta": 0.0, "gamma": 0.0, "theta": 0.0, "vega": 0.0},
+        "limits": {"status": "PASS", "breaches": []},
+    }
+
+
 class _BrokerAlertLog:
     """Adapter so process_broker_alert can log via print."""
 
@@ -68,8 +173,15 @@ class StateSyncService:
         self._consecutive_failures = 0
 
     async def start(self):
-        """Start the sync service"""
+        """Start the sync service and fail-close the initial QC snapshot."""
         self._running = True
+        # Do not expose a boot-time PASS+0-contracts window before the first
+        # asynchronous file/broker sync gets CPU time.
+        try:
+            current = self.state_store.get_state()
+            self.state_store.update_state({"qc": _normalize_qc_truth(current.get("qc", {}))})
+        except Exception:
+            pass
         asyncio.create_task(self._sync_loop())
 
     async def stop(self):
@@ -90,7 +202,8 @@ class StateSyncService:
         updates = {}
 
         # BOOTSTRAP: On first few syncs, if state_store shows broker not connected,
-        # directly probe Dhan to get real truth (health.json may not exist on cloud)
+        # directly probe Dhan to get real truth (health.json may not exist on cloud).
+        # A negative probe is authoritative too; never keep stale connected truth.
         try:
             current = self.state_store.get_state()
             if not current.get("broker", {}).get("connected", False):
@@ -106,16 +219,9 @@ class StateSyncService:
                     )
 
                     _ds = _probe_dhan()
-                    if _ds.get("connected"):
-                        updates["broker"] = {
-                            "connected": True,
-                            "name": "dhan",
-                            "status": "connected",
-                            "error": None,
-                            "latency_ms": _ds.get("latency_ms"),
-                            "truth_source": "dhan_readonly_probe",
-                            "observed_at_ist": datetime.now(IST).isoformat(),
-                        }
+                    broker_update = _broker_update_from_probe(_ds)
+                    if broker_update is not None:
+                        updates["broker"] = broker_update
                 except Exception:
                     pass
         except Exception:
@@ -182,12 +288,12 @@ class StateSyncService:
                             "observed_at_ist": datetime.now(IST).isoformat(),
                         }
 
-                    # Sync QC
-                    qc_status = health.get("qc_status", "PASS")
+                    # Sync QC. Missing QC evidence must not default to PASS.
+                    qc_status = str(health.get("qc_status", "NOT_READY") or "NOT_READY").upper()
                     qc_failures = health.get("qc_failures", [])
                     updates["qc"] = {
                         "status": qc_status,
-                        "reasons": qc_failures if qc_status == "FAIL" else [],
+                        "reasons": qc_failures if qc_status != "PASS" else [],
                         "failures": qc_failures,
                     }
 
@@ -197,7 +303,9 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing health: {e}")
 
-        # Sync positions
+        # Sync positions. Absence/malformed evidence must clear historical state,
+        # otherwise RuntimeStateStore deep-merge leaves yesterday's positions live.
+        updates["positions"] = []
         try:
             positions_file = self.outputs_dir / "positions_live.json"
             if positions_file.exists():
@@ -208,7 +316,9 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing positions: {e}")
 
-        # Sync PnL
+        # Sync PnL. No current summary is fail-closed to zero rather than keeping
+        # a historical paper-PnL snapshot indefinitely in the SSOT.
+        updates["pnl"] = _zero_pnl_snapshot()
         try:
             pnl_file = self.outputs_dir / "paper_pnl_summary.json"
             if pnl_file.exists():
@@ -225,6 +335,14 @@ class StateSyncService:
                     "total": pnl_data.get("total_pnl", 0.0),
                     "day_total": pnl_data.get("daily_pnl", pnl_data.get("day_total", 0.0)),
                 }
+                if _pnl_is_synthetic_source(pnl_data):
+                    # This shared live PnL display must never silently treat
+                    # simulated PAPER fills/fixture output as verified PnL.
+                    updates["pnl"] = {
+                        **_zero_pnl_snapshot(),
+                        "verification_status": "SYNTHETIC_SOURCE_EXCLUDED",
+                        "is_synthetic_source_ignored": True,
+                    }
         except Exception as e:
             print(f"Error syncing PnL: {e}")
 
@@ -265,10 +383,24 @@ class StateSyncService:
         except Exception as e:
             print(f"Error syncing QC details: {e}")
 
-        # Compute risk metrics if positions exist
+        # Normalize the merged QC snapshot after every cycle.  This also repairs
+        # old persisted Firestore state that says PASS while contracts_total=0.
+        try:
+            current_qc = (self.state_store.get_state().get("qc") or {})
+            merged_qc = dict(current_qc) if isinstance(current_qc, dict) else {}
+            if isinstance(updates.get("qc"), dict):
+                merged_qc.update(updates["qc"])
+            updates["qc"] = _normalize_qc_truth(merged_qc)
+        except Exception:
+            updates["qc"] = _normalize_qc_truth(updates.get("qc", {}))
+
+        # Compute risk metrics if positions exist. When the authoritative position
+        # snapshot is empty, explicitly clear all historical metrics and breaches.
         try:
             positions = updates.get("positions", [])
-            if positions and ADVANCED_FEATURES_AVAILABLE:
+            if not positions:
+                updates["risk"] = _zero_risk_snapshot()
+            elif ADVANCED_FEATURES_AVAILABLE:
                 try:
                     from dashboard.backend.risk_management import get_risk_management
                 except ImportError:
@@ -301,9 +433,14 @@ class StateSyncService:
             merged_broker = updates.get("broker") or current_state.get("broker", {})
             broker_actually_connected = merged_broker.get("connected", False)
 
-            # QC FAIL alert — only when we have fresh QC data saying FAIL
-            if updates.get("qc", {}).get("status") == "FAIL":
-                self.state_store.upsert_alert("WARN", "QC_FAIL", "Quality control check failed")
+            # QC alert — any fail-closed non-PASS QC state is operationally visible.
+            qc_status = str(updates.get("qc", {}).get("status") or "NOT_READY").upper()
+            if qc_status != "PASS":
+                self.state_store.upsert_alert(
+                    "WARN",
+                    "QC_FAIL",
+                    f"Quality control not ready: {qc_status}",
+                )
             else:
                 self.state_store.resolve_alert("QC_FAIL")
 
@@ -337,15 +474,18 @@ class StateSyncService:
         # Tick / refresh health for production viability proofs
         try:
             now_ts = datetime.now(IST).timestamp()
-            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist")
+            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist") or current_state.get("timestamp")
             age_sec = 0.0
             if last_fetch:
                 try:
                     age_sec = max(0.0, now_ts - datetime.fromisoformat(str(last_fetch).replace("Z", "")).timestamp())
                 except Exception:
                     age_sec = float(self._sync_interval)
+            else:
+                age_sec = float(self._sync_interval)
+
             updates["refresh_interval"] = self._sync_interval
-            updates["last_tick_age_sec"] = round(min(age_sec, self._sync_interval * 2), 2)
+            updates["last_tick_age_sec"] = round(min(age_sec, float(self._sync_interval)), 2)
             updates["tick_health"] = {
                 "last_tick_age_sec": updates["last_tick_age_sec"],
                 "refresh_interval_sec": self._sync_interval,

@@ -1,0 +1,218 @@
+{
+  "path": "/api/state",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 165,
+  "content_type": "application/json",
+  "data": {
+    "market": {
+      "current_time_ist": "2026-08-26T14:02:10.923392+05:30",
+      "next_open": "2026-08-26 09:15:00 IST",
+      "reason": "Market open",
+      "is_open": true
+    },
+    "positions_source": "NO_POSITIONS",
+    "alerts": [
+      {
+        "code": "QC_FAIL",
+        "resolved": false,
+        "read": false,
+        "level": "WARN",
+        "ts": "2026-08-26T14:02:10.924302+05:30",
+        "message": "Quality control not ready: NOT_READY"
+      }
+    ],
+    "state_version": 60854,
+    "cycle_count": 60854,
+    "signals": {
+      "last_signal": null,
+      "status": "NO_TRADE",
+      "confidence": 0,
+      "reason": "No signal generated",
+      "underlying": null
+    },
+    "risk": {
+      "greeks": {
+        "vega": 0.0,
+        "delta": 0.0,
+        "theta": 0.0,
+        "gamma": 0.0
+      },
+      "exposure": 0.0,
+      "var95": 0.0,
+      "concentration": 0.0,
+      "es95": 0.0,
+      "limits": {
+        "breaches": [],
+        "status": "PASS"
+      }
+    },
+    "firestore_updated_at_utc": "2026-08-26T08:32:11.092734Z",
+    "refresh_interval": 60,
+    "broker": {
+      "auth_rejection_trace": {
+        "first_rejected_at_utc": null,
+        "auth_classification": null,
+        "rejection_count": 0,
+        "http_status": null,
+        "last_rejected_at_utc": null,
+        "runtime_instance": "genesis-system3-web-00617-vif",
+        "secret_version": null,
+        "client_id_exposed": false,
+        "raw_token_exposed": false,
+        "upstream_code": null
+      },
+      "auth_classification": "AUTH_OK",
+      "probe_header_attempts": [
+        {
+          "public_contract": "access-token-only",
+          "outcome": "AUTH_OK",
+          "upstream_code": null,
+          "http_status": 200,
+          "contract": "docs-access-token-only",
+          "credential_value_exposed": false
+        }
+      ],
+      "token_reload": "<REDACTED>",
+      "probe_header_contract": "access-token-only",
+      "last_ok": null,
+      "observed_at_ist": "2026-08-26T07:02:45.588186+05:30",
+      "probe_strategy": "cloud_rest_profile_bounded",
+      "probe_timeout_s": 5.0,
+      "error": null,
+      "status": "connected",
+      "upstream_classification": null,
+      "broker": "dhan",
+      "name": "dhan",
+      "broker_truth_complete": true,
+      "cache_age_s": 3.9,
+      "probe_contract_cached": true,
+      "client_id_present": true,
+      "profile_source": "rest",
+      "cloud_runtime_patch": true,
+      "latency_ms": 36,
+      "connected": true,
+      "access_token_present": true,
+      "env_source": "core.utils.env_loader",
+      "broker_truth_contract": "profile+funds+holdings+positions",
+      "upstream_code": null,
+      "account_read_proof": {
+        "raw_payload_exposed": false,
+        "holdings": {
+          "item_count": 11,
+          "latency_ms": 47,
+          "ok": true,
+          "error": null
+        },
+        "positions": {
+          "item_count": 0,
+          "latency_ms": 42,
+          "ok": true,
+          "error": null
+        },
+        "profile": {
+          "ok": true,
+          "error": null
+        },
+        "funds": {
+          "item_count": null,
+          "latency_ms": 44,
+          "ok": true,
+          "error": null
+        }
+      },
+      "auto_refresh": {
+        "success": false,
+        "skipped": "AUTO_REFRESH_DISABLED_OR_LIVE_GATE",
+        "attempted": false,
+        "message": "Token generated via PIN + TOTP (fully automated)",
+        "strategy": "generate_token",
+        "token_value_printed": false,
+        "cooldown_remaining_s": 13,
+        "reason": "TOKEN_EXPIRED_OR_INVALID",
+        "cooldown_s": 3600
+      },
+      "credentials_present": true,
+      "order_placement_allowed": false,
+      "token_proof": "<REDACTED>",
+      "truth_source": "dhan_readonly_probe",
+      "cache_hit": false,
+      "canonical_rotation": {
+        "operation_started": true,
+        "success": false,
+        "skipped": "CANONICAL_SELF_HEAL_DISABLED",
+        "order_placement_allowed": false,
+        "error_type": "HTTPError",
+        "attempted": false,
+        "message": "403 Client Error: Forbidden for url: https://run.googleapis.com/v2/projects/system3-openalgo-safe/locations/asia-south1/operations/65a2c16c-19d4-42c0-b7b3-45f5b",
+        "authority": "gcp-cloud-run-job",
+        "job": "genesis-system3-dhan-token-rotate",
+        "live_trading_enabled": false,
+        "cooldown_remaining_s": 254,
+        "raw_token_exposed": false,
+        "reason": "get_status_auth_failure"
+      },
+      "mode": "ANALYZER",
+      "sdk_available": true,
+      "live_trading_enabled": false,
+      "probe_header_variant": "docs-access-token-only",
+      "raw_account_payload_exposed": false
+    },
+    "data_source": "BROKER_LIVE",
+    "tick_health": {
+      "market_open": true,
+      "websocket_endpoint": "/ws/stream",
+      "last_tick_age_sec": 60.26,
+      "refresh_interval_sec": 60,
+      "source": "rest_poll_ssot"
+    },
+    "cloud_job": {
+      "detail": "Analyzer-only bounded worker smoke test",
+      "completed_utc": "2026-08-02T21:08:58.592140Z",
+      "mode": "PAPER",
+      "task_index": 0,
+      "live_trading_enabled": false,
+      "status": "PASS",
+      "kind": "smoke",
+      "task_attempt": 0
+    },
+    "positions": [],
+    "qc": {
+      "failures": [],
+      "reasons": [
+        "NO_VERIFIED_CONTRACTS"
+      ],
+      "status": "NOT_READY",
+      "underlyings": 0,
+      "contracts_total": 0
+    },
+    "timestamp_ist": "2026-08-26T14:02:11.030595+05:30",
+    "last_cycle_ts_iso": "2026-08-26T14:02:11.030595+05:30",
+    "safety": {
+      "live_trading_enabled": false,
+      "execution_mode": "ANALYZER"
+    },
+    "last_fetch_ts_iso": "2026-08-26T14:02:11.030595+05:30",
+    "mode": "PAPER",
+    "last_tick_age_sec": 60.26,
+    "reconciliation": {
+      "mismatches": [],
+      "status": "OK",
+      "timestamp": "2026-08-26T13:38:04.828762+05:30"
+    },
+    "live_trading_enabled": false,
+    "timestamp_utc": "2026-08-26T08:32:11.030595Z",
+    "pnl": {
+      "day_total": 0.0,
+      "total": 0.0,
+      "unrealized": 0.0,
+      "realized": 0.0
+    },
+    "model": {
+      "active": null,
+      "fallback_used": false,
+      "type": null,
+      "metrics": {}
+    }
+  }
+}

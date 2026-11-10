@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
+import { PnlEquityCurveChart } from './LiveInteractiveCharts'
+import { ValidationChecklist, showField, type ChecklistItem } from './ValidationChecklist'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 interface PnlData {
   summary?: {
@@ -35,20 +38,23 @@ export function PerformanceTab() {
   const { gainRank, paper } = useStore()
   const [pnl, setPnl] = useState<PnlData | null>(null)
   const [pnlError, setPnlError] = useState<string | null>(null)
-  const [backtest, setBacktest] = useState<unknown>(null)
+  const [backtest, setBacktest] = useState<any>(null)
+  const [mlPerf, setMlPerf] = useState<any>(null)
   const [lastChecked, setLastChecked] = useState<string>('')
 
   useEffect(() => {
     let mounted = true
     const load = async () => {
       try {
-        const [pnlData, btData] = await Promise.all([
+        const [pnlData, btData, mlData] = await Promise.all([
           fetchJSON('/api/pnl'),
           fetchJSON('/api/backtest/results').catch(() => null),
+          fetchJSON('/api/ml/performance').catch(() => null),
         ])
         if (mounted) {
           setPnl(pnlData)
           setBacktest(btData)
+          setMlPerf(mlData)
           setPnlError(null)
         }
       } catch (e: any) {
@@ -65,6 +71,7 @@ export function PerformanceTab() {
   const summary = pnl?.summary ?? paper?.pnl?.summary ?? {}
   const totalPnl    = summary.total_pnl ?? 0
   const winRate     = summary.win_rate ?? 0
+  const winRatePct  = Number(winRate) <= 1 ? Number(winRate) * 100 : Number(winRate)
   const totalTrades = summary.total_trades ?? 0
   const winning     = summary.winning_trades ?? 0
   const losing      = summary.losing_trades ?? 0
@@ -73,15 +80,26 @@ export function PerformanceTab() {
   // ρ history from gain_rank (file-based, always available)
   const rankHistory: any[] = gainRank?.history ?? []
   const hasData = totalTrades > 0 || Number(openPos) > 0 || rankHistory.length > 0 || backtest?.status === 'ok'
+  const walk = backtest?.costed_walkforward
+  const walkTrades = Number(walk?.trade_count || 0)
+  const walkNetPnl = Number(walk?.total_net_pnl)
+  const walkDays = Array.isArray(walk?.bhavcopy_days_used) ? walk.bhavcopy_days_used.length : 0
+  const walkPipelineProven = walk?.recent_costed_walkforward_proven === true
+    && walk?.costs_slippage_included_proven === true
+    && walkTrades > 0
+  const strategyPerformanceProven = walkPipelineProven && walkNetPnl > 0 && walkTrades >= 30
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
+      <PendingLifecycleBanner />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h2 style={{ color: 'var(--text-pri)', fontWeight: 600, fontSize: '.95rem' }}>Performance</h2>
         <span style={{ fontSize: '.65rem', color: 'var(--text-mut)', fontFamily: 'var(--font-mono)' }}>
           last checked {lastChecked || '--'} IST
         </span>
       </div>
+
+      <MlProofCard payload={mlPerf} />
 
       {pnlError && (
         <div className="card p-4" style={{ borderColor: 'var(--down)' }}>
@@ -106,35 +124,62 @@ export function PerformanceTab() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Total P&L" value={fmtCr(totalPnl)} color={signClass(totalPnl)} sub="Realized + Unrealized" />
-            <StatCard label="Win Rate"  value={`${(winRate ?? 0).toFixed(1)}%`} color={winRate >= 50 ? 'tx-up' : 'tx-down'} />
+            <StatCard label="Win Rate" value={`${winRatePct.toFixed(1)}%`} color={winRatePct >= 50 ? 'tx-up' : 'tx-down'} />
             <StatCard label="Total Trades" value={String(totalTrades)} sub={`${winning}W / ${losing}L`} />
             <StatCard label="Open Paper" value={String(openPos)} sub="Cloud paper engine" />
           </div>
 
+          {/* Interactive PnL Equity Curve Visual Surface */}
+          <PnlEquityCurveChart totalPnl={totalPnl} />
+
           {backtest?.status === 'ok' && (
-            <div className="card p-4">
+            <div className="card p-4" data-testid="costed-walkforward-truth">
               <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '10px' }}>
-                Backtest / Walk-Forward Proof
+                Costed walk-forward truth
               </h3>
-              <pre style={{ fontSize: '.7rem', color: 'var(--text-mut)', whiteSpace: 'pre-wrap', fontFamily: 'var(--font-mono)' }}>
-                {JSON.stringify(
-                  backtest.costed_walkforward
-                    || {
-                      status: backtest.summary?.status,
-                      blockers: backtest.summary?.blockers,
-                      warnings: backtest.summary?.warnings,
-                      evidence: backtest.summary?.evidence
-                        ? {
-                            ...backtest.summary.evidence,
-                            // never show orchestrator file-path scans as trade candidates
-                            candidates_sample: undefined,
-                          }
-                        : undefined,
-                    },
-                  null,
-                  2,
-                ).slice(0, 1200)}
-              </pre>
+              <div style={{
+                display: 'inline-flex',
+                padding: '4px 8px',
+                borderRadius: 999,
+                border: `1px solid ${strategyPerformanceProven ? 'rgba(0,232,122,.3)' : 'rgba(245,158,11,.35)'}`,
+                color: strategyPerformanceProven ? 'var(--up)' : 'var(--amber)',
+                background: strategyPerformanceProven ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.08)',
+                fontSize: 10,
+                fontWeight: 900,
+                marginBottom: 12,
+              }}>
+                {strategyPerformanceProven ? 'STRATEGY_PROVEN' : walkPipelineProven ? 'PIPELINE_PROOF_ONLY' : 'NOT_PROVEN'}
+              </div>
+              {walk ? (
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <StatCard label="OOS sample" value={`${walkTrades} trades`} sub={`${walkDays} source days`} />
+                    <StatCard
+                      label="Net P&L after costs"
+                      value={Number.isFinite(walkNetPnl) ? `₹${walkNetPnl.toLocaleString('en-IN')}` : 'N/A'}
+                      color={Number.isFinite(walkNetPnl) ? signClass(walkNetPnl) : undefined}
+                    />
+                    <StatCard label="Win rate" value={walk?.win_rate_pct == null ? 'N/A' : `${Number(walk.win_rate_pct).toFixed(1)}%`} />
+                    <StatCard
+                      label="Costs + slippage"
+                      value={walk?.costs_slippage_included_proven === true ? 'INCLUDED' : 'NOT PROVEN'}
+                      color={walk?.costs_slippage_included_proven === true ? 'tx-up' : 'tx-down'}
+                    />
+                  </div>
+                  <p style={{ margin: '12px 0 0', color: strategyPerformanceProven ? 'var(--up)' : 'var(--amber)', fontSize: '.75rem', lineHeight: 1.5 }}>
+                    {strategyPerformanceProven
+                      ? 'Current reported sample clears the minimum UI proof rule.'
+                      : 'Promotion remains blocked. This artifact proves the costed walk-forward pipeline ran; it does not prove a profitable or robust strategy. Require a larger common OOS tournament across regimes.'}
+                  </p>
+                  <p style={{ margin: '6px 0 0', color: 'var(--text-mut)', fontSize: '.68rem' }}>
+                    Source: /api/backtest/results · completed {walk.completed || 'timestamp unavailable'}
+                  </p>
+                </>
+              ) : (
+                <p style={{ margin: 0, color: 'var(--text-mut)', fontSize: '.75rem' }}>
+                  Backtest endpoint responded, but no costed walk-forward artifact is available.
+                </p>
+              )}
             </div>
           )}
 
@@ -182,7 +227,11 @@ export function PerformanceTab() {
                     <tr key={i} className="trow">
                       <td className="tcell">{row.date ?? row.timestamp ?? '--'}</td>
                       <td className="tcell">{row.total_trades ?? '--'}</td>
-                      <td className="tcell">{row.win_rate != null ? `${row.win_rate.toFixed(1)}%` : '--'}</td>
+                      <td className="tcell">
+                        {row.win_rate != null
+                          ? `${(Number(row.win_rate) <= 1 ? Number(row.win_rate) * 100 : Number(row.win_rate)).toFixed(1)}%`
+                          : '--'}
+                      </td>
                       <td className={cn('tcell', signClass(row.total_pnl ?? 0))}>{fmtCr(row.total_pnl ?? 0)}</td>
                     </tr>
                   ))}
@@ -192,6 +241,30 @@ export function PerformanceTab() {
           )}
         </>
       )}
+    </div>
+  )
+}
+
+function MlProofCard({ payload }: { payload: any }) {
+  const perf = payload?.performance || payload
+  const checklist: ChecklistItem[] | null | undefined = payload?.validations_checklist || perf?.validations_checklist
+  const ready = payload?.ready_for_live === true || perf?.ready_for_live === true
+  return (
+    <div className="card p-4" data-testid="performance-ml-proof">
+      <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '10px' }}>
+        ML performance
+      </h3>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <span style={{ color: 'var(--down)', fontWeight: 800, fontSize: 12 }}>{showField(payload?.proof_status || perf?.status)}</span>
+        <span style={{ color: ready ? 'var(--up)' : 'var(--down)', fontWeight: 800, fontSize: 12 }}>
+          ready_for_live={showField(payload?.ready_for_live ?? perf?.ready_for_live)}
+        </span>
+      </div>
+      <p style={{ margin: '0 0 8px', fontSize: '.75rem', lineHeight: 1.45 }}>{showField(payload?.ready_for_live_reason || perf?.ready_for_live_reason)}</p>
+      <p style={{ margin: '0 0 8px', fontSize: '.75rem' }}>
+        rho {showField(payload?.rho ?? perf?.rho)} · hit_rate {showField(payload?.hit_rate ?? perf?.hit_rate)} · proof_pass_count {showField(payload?.proof_pass_count ?? perf?.proof_pass_count)} · generated_at_utc {showField(payload?.generated_at_utc || perf?.generated_at_utc)}
+      </p>
+      <ValidationChecklist items={checklist} />
     </div>
   )
 }

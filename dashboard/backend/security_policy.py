@@ -32,6 +32,7 @@ WORKER_PUSH_PATHS = {
     "/api/scheduler/health/push",
     "/api/chain/push",
 }
+AUTHORITY_REQUIRED_MUTATION_PATHS = {"/api/paper/tick"}
 
 
 @dataclass(frozen=True)
@@ -114,6 +115,14 @@ def evaluate_request(
 
     if method in SAFE_METHODS:
         return SecurityDecision(True)
+
+    if path in AUTHORITY_REQUIRED_MUTATION_PATHS:
+        return SecurityDecision(
+            False,
+            503,
+            "Separate mutation authority is required but unavailable",
+            "AUTH_REQUIRED_FOR_MUTATION",
+        )
 
     return SecurityDecision(
         False,

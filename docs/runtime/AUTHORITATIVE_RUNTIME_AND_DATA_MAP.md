@@ -1,120 +1,117 @@
-# PR20 Authoritative Runtime and Data Map
+# Genesis System3 Authoritative Runtime, Data, and Evidence Map
 
-## Purpose
+**Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
-Create the first control-plane boundary after PR19. This file defines how System3 identifies authoritative runtime surfaces, data surfaces, duplicate/stale candidates, and the minimum proof required before future autonomous ML upgrades.
+Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.
 
-## Scope
+## Runtime authority
 
-This PR is architecture and proof-map only.
-
-It does not modify:
-
-- trading logic
-- broker configuration
-- environment or secret files
-- database files
-- model artifacts
-- live runtime mode files
-- deployment workflows
-
-## Decision
-
-System3 must not treat filenames as truth. Every runtime surface must be proven by entrypoint, import, workflow, launcher, or report evidence before it can be called authoritative.
-
-The runtime authority map has four states:
-
-| State | Meaning | Allowed action |
+| Surface | Current authority | Notes |
 |---|---|---|
-| AUTHORITATIVE | Proven wired into runtime, CI, launcher, workflow, or documented control plane | Improve only with proof |
-| CANDIDATE | Looks useful but runtime wiring is not proven | Investigate, do not depend on it |
-| LEGACY_RISK | Duplicate/stale/same-purpose file that can confuse runtime or humans | Quarantine proposal only |
-| REJECTED | Proven unsafe, obsolete, or superseded | Delete only after repeated proof cycles |
+| Repository | `psw2025-cmd/Genesis_System3` / `main` | Source/config authority |
+| Production cloud | GCP project `system3-openalgo-safe` | Render/Azure-era deployment material is historical/non-authoritative |
+| Region | `asia-south1` | Production region |
+| Cloud Run service | `genesis-system3-web` | User-facing production runtime |
+| Public UI | `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/` | Authoritative UI boundary |
+| Broker | Dhan | Legacy Angel paths are retired for current production authority |
+| Cloud auth | GitHub Actions keyless WIF | No long-lived service-account JSON keys |
+| Dhan rotation | `genesis-system3-dhan-token-rotate` | Dedicated bounded authority |
 
-## Current authoritative surfaces
+This document defines authority categories; it does **not** permanently assert that any runtime component is healthy now. Current health/state must be freshly observed.
 
-| Surface | Authoritative path/status | Proof basis | Current risk |
-|---|---|---|---|
-| Repository default branch | `main` | GitHub repo default branch | None |
-| Architecture roadmap | `docs/architecture/MASTER_PR_ROADMAP.md` | PR19 roadmap | Needs execution PRs |
-| Brutal gap analysis | `docs/architecture/SYSTEM3_BRUTAL_GAP_ANALYSIS.md` | PR19 gap matrix | High gaps remain |
-| Autonomous ML blueprint | `docs/architecture/INSTITUTIONAL_AUTONOMOUS_ML_TRADING_BLUEPRINT.md` | PR19 architecture decision | Planning only |
-| Runtime authority inventory | `reports/authority_inventory/ROOT_RUNTIME_AUTHORITY_INVENTORY.md` | PR12 report-only inventory | Needs deeper PR20+ wiring proof |
-| Backend Docker path | `dashboard/backend/Dockerfile` | PR13/PR15/PR16 chain | Build-proof only |
-| Backend app candidate | `dashboard/backend/app.py` | GCP proof path references | Production runtime not proven |
-| GCP backend proof workflow | `.github/workflows/gcp-cloud-run-backend-proof.yml` | PR18 manual workflow | Manual-only, dry-run first |
-| Azure CD workflow | `.github/workflows/cd.yml` | Existing CD path | Azure readiness not proven |
-| Root safety gate | CI governance/root architecture gate | PR10 | Keep blocking |
+## Temporal evidence authority
 
-## Runtime authority proof requirements
+A filename or directory name is never enough to establish current truth.
 
-A file can be marked AUTHORITATIVE only when at least one proof is available:
+| Evidence source | Authority for a new `now/current/live` claim |
+|---|---|
+| New production Chrome/WebDriver session started after current request | Highest for UI-visible state |
+| New same-session production API request | Highest for the API field observed |
+| New current-window Cloud Run/log/runtime query | Authoritative for that runtime/log fact |
+| Fresh serving revision/SHA/traffic query | Authoritative for deployment metadata |
+| Current source/config | Intended implementation only, not runtime proof |
+| `reports/latest/` | Historical stored evidence; not live by path/name |
+| Previous GitHub artifact/workflow | Historical observation; not proof the state persists |
+| `SYSTEM_STATE.md` / `CHANGE_LOG.md` | Historical/contextual only |
 
-1. It is called by a workflow file.
-2. It is imported by an authoritative runtime entrypoint.
-3. It is invoked by a launcher script that is itself authoritative.
-4. It is referenced by the active deployment path.
-5. It is used by CI or a blocking safety gate.
-6. It appears in a runtime report with timestamp and provenance.
+Use `scripts/system3_temporal_truth_guard.py` for machine freshness checks and `scripts/gcp_live_ui_snapshot.py` for request-scoped production UI proof.
 
-## Data authority map
+## Full production UI authority
 
-| Data layer | Target authoritative source | Current status | Required next proof |
-|---|---|---|---|
-| Raw market data | Immutable partitioned files under future `data/raw/` policy | Not proven | Data contract PR |
-| Curated features | Versioned feature tables under future feature-store policy | Not proven | Feature contract PR |
-| Options chain | Full expiry/strike/OI/IV/liquidity snapshots | Not proven | Options schema gate |
-| Lifecycle ledger | Paper/analyzer trade lifecycle truth table/report | Partial/unknown | Runtime lifecycle authority proof |
-| Model registry | Active/candidate model manifest and rollback target | Not proven | MLflow/manifest PR |
-| Dashboard truth | API-backed live state with provenance labels | Not proven | Dashboard data contract PR |
-| Deployment image | Backend image built from proven Dockerfile and runtime endpoint | Build-proof only | FastAPI/uvicorn container PR |
+For a current full-UI claim, the authoritative proof is a new production browser lifecycle capturing all canonical tabs:
 
-## Duplicate and stale-file policy
+`decision-intel`, `truth`, `genesis`, `e2e-proof`, `overview`, `sim-live`, `options-intel`, `chain`, `signals`, `trade`, `paper`, `positions`, `risk-scenarios`, `multibagger`, `prediction-audit`, `performance`, `ml`, `data-integrity`, `broker`, `alerts`, `system`, `gates`.
 
-No deletion is allowed in this phase.
+The same lifecycle must bracket the browser session with fresh broker/health API snapshots and capture per-tab visible text + screenshots + UTC timestamps.
+
+A local Vite/Chrome run is useful for code/render regression testing but cannot establish GCP production data/runtime truth.
+
+## Data authority principles
+
+### Broker and account state
+
+Current Dhan connectivity must come from a fresh read-only production broker observation. Token metadata or a previously successful rotation does not prove connectivity now.
+
+### Option/market data
+
+A current market-data claim requires fresh source/provenance and freshness evidence. UI-facing claims additionally require fresh visible production-browser proof.
+
+HTTP 200 does not prove option-chain completeness. A rendered component does not prove contracts/strikes/expiries are present.
+
+### Prediction and ML data
+
+Model/prediction claims must identify the evaluation window, source, sample size, and observation time. Historical model metrics remain valid for that historical window but are not current market-performance proof.
+
+### Paper lifecycle
+
+Paper state must be reconciled across the current authoritative data store/API/UI. An old proof pack does not prove the current ledger/session state.
+
+## Runtime authority states
+
+| State | Meaning |
+|---|---|
+| `AUTHORITATIVE_PATH` | Correct current source/runtime path, but not necessarily healthy |
+| `CURRENT_LIVE_PROVEN` | Fresh request-scoped/current-window observation proves the stated fact |
+| `HISTORICAL_EVIDENCE` | Valid evidence of a past observation only |
+| `CANDIDATE` | Potentially useful but wiring/authority not proven |
+| `LEGACY_NON_AUTHORITATIVE` | Superseded path that must not drive current conclusions |
+| `NOT_PROVEN` | Required current evidence absent/invalid |
+
+Never convert `AUTHORITATIVE_PATH` into `CURRENT_LIVE_PROVEN` without a fresh observation.
+
+## Duplicate/stale source policy
 
 Safe sequence:
 
 ```text
-search -> classify -> prove runtime authority -> propose quarantine -> run CI/runtime proof -> monitor -> delete later only after repeated evidence
+search -> classify -> identify current authority -> compare history -> observe live -> change -> test -> observe live again
 ```
+
+Do not delete historical evidence merely because it is stale; label it historical. Remove or quarantine obsolete **instructions** when they can cause an agent to act on retired authority.
 
 ## Protected zones
 
-Future PRs must treat these as protected unless the PR explicitly proves safety:
+- LIVE/order execution flags;
+- broker credential payloads;
+- Secret Manager payloads;
+- IAM authority;
+- Dhan token mint path;
+- order/risk code;
+- production deployment/traffic;
+- durable paper/market/model data;
+- UI/API truth contracts.
 
-- live trading enable flags
-- broker credentials or broker adapters
-- `.env`, `.env.*`, secrets, or publish profiles
-- database files and migrations
-- model artifacts and trained binaries
-- order execution and risk-gate code
-- runtime launchers and scheduler tasks
-- dashboard truth API contracts
+Changes require bounded authority, exact-head tests, and post-change fresh proof.
 
-## Immediate blockers after this PR
+## Current-state resolution rule
 
-1. Runtime authority is still not fully machine-proven.
-2. Data lineage contracts are not implemented.
-3. Model registry and promotion gates are not implemented.
-4. Backend container is build-proof oriented, not production runtime proof.
-5. Dashboard is not proven as live truth source.
-6. Old high-risk open PR #1 must not be merged as-is.
+When current state is requested:
 
-## Next required PRs
+1. note request/investigation UTC start;
+2. query current production after that time;
+3. for UI, start new production browser session;
+4. capture same-session API/runtime truth;
+5. report timestamps and contradictions;
+6. do not substitute the newest stored artifact.
 
-| PR | Target | Purpose |
-|---|---|---|
-| PR21 | Data contracts and schema gates | Define raw/curated/lifecycle/options schemas |
-| PR22 | Nightly ingestion orchestrator | Create post-market ingestion workflow skeleton |
-| PR23 | Feature store boundary | Define offline/online feature versioning |
-| PR24 | Daily replay and backtest engine | Build reproducible after-cost replay path |
-| PR36 | Production FastAPI backend container proof | Replace build-proof `http.server` container with runtime proof |
-
-## Final PR20 verdict
-
-PASS for creating the first authoritative runtime and data map.
-
-WARN because this is still a planning/control-plane artifact, not a runtime implementation.
-
-BLOCK real live trading until multi-week analyzer evidence, model promotion gates, and runtime safety proof exist.
+When agents disagree, generate a new authoritative observation. Historical recency alone does not arbitrate.
