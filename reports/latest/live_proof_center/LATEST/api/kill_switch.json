@@ -1,0 +1,13 @@
+{
+  "path": "/api/kill-switch/status",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 402,
+  "content_type": "application/json",
+  "data": {
+    "status": "OK",
+    "kill_active": false,
+    "details": "Kill switch not activated",
+    "kill_switch_path": "/app/storage/live/kill_switch.json"
+  }
+}

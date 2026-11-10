@@ -96,7 +96,7 @@ CLAIMS = [
     {
         "claim": "Backend APIs for orders, portfolio, funds/margins, historical data, option chains",
         "source_ids": ["dhanhq_api_v2_intro", "local_dhan_docs_export"],
-        "system3_current_equivalent": "Render backend exposes broker/status, holdings, funds, positions/live, instruments, underlyings, chain, auto gates, and paper endpoints.",
+        "system3_current_equivalent": "Cloud Run backend exposes broker/status, holdings, funds, positions/live, instruments, underlyings, chain, auto gates, and paper endpoints.",
         "gap": "Official DhanHQ API v2 supports the backend API categories; this branch must keep order writes disabled.",
         "severity": "medium",
         "recommendation": "Continue using official DhanHQ API v2 as System3 authority in Analyzer/Paper mode.",
@@ -104,7 +104,7 @@ CLAIMS = [
     {
         "claim": "Frontend dashboard templates or React/TypeScript templates",
         "source_ids": [],
-        "system3_current_equivalent": "System3 has its own React/TypeScript dashboard snapshot and Render UI proof.",
+        "system3_current_equivalent": "System3 has its own React/TypeScript dashboard snapshot and Cloud Run UI proof.",
         "gap": "Dhan Cloud strategy templates are strategy-code starting templates, not verified React/TypeScript frontend dashboard templates.",
         "severity": "high",
         "recommendation": "Do not claim first-party Dhan React/TypeScript dashboard templates unless official Dhan docs publish them.",
@@ -112,7 +112,7 @@ CLAIMS = [
     {
         "claim": "Dhan Cloud / hosted strategy platform",
         "source_ids": ["dhan_cloud_docs", "local_dhan_docs_export"],
-        "system3_current_equivalent": "System3 is hosted on Render and currently runs custom Analyzer/Paper dashboard proof.",
+        "system3_current_equivalent": "System3 is hosted on GCP Cloud Run and currently runs custom Analyzer/Paper dashboard proof.",
         "gap": "Dhan Cloud is official, but it is a separate future evaluation and not proof for the invalid Dhan Advance Platform name.",
         "severity": "medium",
         "recommendation": "Evaluate Dhan Cloud separately later only after System3 Analyzer/Paper proof is stable.",
@@ -136,7 +136,7 @@ CLAIMS = [
     {
         "claim": "Strategy hosting",
         "source_ids": ["dhan_cloud_docs", "local_dhan_docs_export"],
-        "system3_current_equivalent": "System3 currently has local/Render Analyzer/Paper components, not Dhan Cloud deployment.",
+        "system3_current_equivalent": "System3 currently has local/Cloud Run Analyzer/Paper components, not Dhan Cloud deployment.",
         "gap": "Strategy hosting under Dhan Cloud is official, but separate from System3's current Render deployment.",
         "severity": "medium",
         "recommendation": "Do not enable live trading or order writes in this branch; evaluate Dhan Cloud later.",

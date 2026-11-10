@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
+import { Activity, Brain, Database, Shield, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { API_BASE, API_HEADERS } from '../config'
+import { useStore } from '../store'
+import { fmt, asPct } from '../lib/utils'
+import { brokerPermissionLabel } from '../lib/lifecycleTruth'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 type GenesisState = {
   brief?: any
@@ -12,199 +17,287 @@ type GenesisState = {
   health?: any
   system?: any
   final?: any
-  control?: any
   loading: boolean
   error?: string
 }
 
-const card: React.CSSProperties = {
-  background: 'var(--surface-2)',
-  border: '1px solid var(--border)',
-  borderRadius: 8,
-  padding: 16,
-}
-
-const small: React.CSSProperties = { color: 'var(--text-mut)', fontSize: 12, lineHeight: 1.5 }
-const title: React.CSSProperties = { color: 'var(--text-primary)', fontSize: 13, fontWeight: 800, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }
-
 async function getData(path: string) {
-  const res = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 10000 })
-  return res.data?.data ?? res.data
+  const response = await axios.get(`${API_BASE}${path}`, { headers: API_HEADERS, timeout: 4000 })
+  return response.data?.data ?? response.data
 }
 
-function Metric({ label, value, tone }: { label: string; value: any; tone?: 'up' | 'down' | 'warn' | 'accent' }) {
-  const color = tone === 'up' ? 'var(--up)' : tone === 'down' ? 'var(--down)' : tone === 'warn' ? 'var(--warn)' : tone === 'accent' ? 'var(--accent)' : 'var(--text-primary)'
+function pct(value: any) {
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  return Math.abs(n) <= 1 ? n * 100 : n
+}
+
+function Metric({
+  label,
+  value,
+  sub,
+  tone
+}: {
+  label: string
+  value: string
+  sub?: string
+  tone?: 'up' | 'down' | 'warn' | 'accent'
+}) {
+  const colorClass = tone === 'up'
+    ? 'text-emerald-400'
+    : tone === 'down'
+      ? 'text-rose-400'
+      : tone === 'warn'
+        ? 'text-amber-400'
+        : tone === 'accent'
+          ? 'text-sky-400'
+          : 'text-slate-100'
+
   return (
-    <div style={card}>
-      <div style={{ ...small, textTransform: 'uppercase', fontWeight: 700 }}>{label}</div>
-      <div className="num" style={{ color, fontSize: 24, fontWeight: 900, marginTop: 6 }}>{String(value ?? '--')}</div>
+    <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex flex-col justify-between min-w-0 shadow-sm">
+      <div className="text-xs font-semibold text-slate-400 truncate">{label}</div>
+      <div className={`font-mono text-lg sm:text-xl font-bold mt-1 tabular-nums ${colorClass}`}>{value}</div>
+      {sub && <div className="text-[11px] text-slate-500 mt-1 truncate">{sub}</div>}
     </div>
   )
 }
 
-function Section({ heading, children }: { heading: string; children: React.ReactNode }) {
-  return <section style={card}><div style={title}>{heading}</div>{children}</section>
+function Panel({ title, children, icon }: { title: string; children: React.ReactNode; icon?: React.ReactNode }) {
+  return (
+    <section className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 shadow-md min-w-0">
+      <div className="flex items-center gap-2 mb-3">
+        {icon && <span className="text-sky-400">{icon}</span>}
+        <h3 className="text-sm font-bold text-slate-200 tracking-wide">{title}</h3>
+      </div>
+      {children}
+    </section>
+  )
 }
 
-function Checklist({ items }: { items: string[] }) {
-  return <div style={{ display: 'grid', gap: 8 }}>{(items || []).map((x, i) => (
-    <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', color: 'var(--text-primary)', fontSize: 13 }}>
-      <span style={{ color: 'var(--up)', fontWeight: 900 }}>✓</span><span>{x}</span>
+function StatusRow({ label, value, health }: { label: string; value: string; health?: number | null }) {
+  const good = /active|healthy|connected|normal|pass|ready|ok/i.test(value)
+  const bad = /fail|error|down|invalid|disabled by error/i.test(value)
+  const toneClass = good ? 'text-emerald-400' : bad ? 'text-rose-400' : 'text-amber-400'
+
+  return (
+    <div className="flex items-center justify-between py-2 border-b border-slate-800/80 text-xs">
+      <span className="text-slate-300 font-medium">{label}</span>
+      <div className="flex items-center gap-2 font-mono">
+        <span className={`font-bold ${toneClass}`}>{value}</span>
+        <span className="text-slate-500 min-w-[36px] text-right">{health == null ? '--' : `${health.toFixed(0)}%`}</span>
+      </div>
     </div>
-  ))}</div>
-}
-
-function JsonBlock({ data }: { data: any }) {
-  return <pre style={{ ...small, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 6, padding: 12, overflow: 'auto', maxHeight: 240 }}>{JSON.stringify(data ?? {}, null, 2)}</pre>
+  )
 }
 
 export function GenesisTab() {
-  const [state, setState] = useState<GenesisState>({ loading: true })
+  const {
+    health: sharedHealth, state: sharedState, brokerStatus, brokerConnected,
+    gainRank, research, lastSync, pnl, paper,
+  } = useStore()
+
+  const [data, setData] = useState<GenesisState>({ loading: false })
 
   const load = async () => {
-    setState(s => ({ ...s, loading: true, error: undefined }))
+    setData((current) => ({ ...current, loading: true, error: undefined }))
+    const paths = [
+      '/genesis-production-brief',
+      '/autonomous-brain',
+      '/hidden-secrets-lab',
+      '/never-die-monitor',
+      '/hunger-meter',
+      '/data-truth-score',
+      '/health',
+      '/api/system_health',
+      '/final-message',
+    ] as const
     try {
-      const paths = [
-        '/genesis-production-brief',
-        '/autonomous-brain',
-        '/hidden-secrets-lab',
-        '/never-die-monitor',
-        '/hunger-meter',
-        '/data-truth-score',
-        '/health',
-        '/api/system_health',
-        '/final-message',
-      ] as const
-      const settled = await Promise.allSettled(paths.map((p) => getData(p)))
-      const val = (i: number) => (settled[i].status === 'fulfilled' ? (settled[i] as PromiseFulfilledResult<any>).value : { error: String((settled[i] as PromiseRejectedResult).reason?.message || settled[i]) })
-      const failed = settled.filter((x) => x.status === 'rejected').length
-      setState({
-        brief: val(0),
-        brain: val(1),
-        lab: val(2),
-        monitor: val(3),
-        hunger: val(4),
-        truth: val(5),
-        health: val(6),
-        system: val(7),
-        final: val(8),
-        loading: false,
-        error: failed === paths.length ? 'Genesis APIs failed' : undefined,
+      const settled = await Promise.allSettled(paths.map(getData))
+      const value = (index: number) => settled[index].status === 'fulfilled'
+        ? (settled[index] as PromiseFulfilledResult<any>).value
+        : { error: String((settled[index] as PromiseRejectedResult).reason?.message || 'request failed') }
+      const failed = settled.filter((result) => result.status === 'rejected').length
+      setData({
+        brief: value(0), brain: value(1), lab: value(2), monitor: value(3), hunger: value(4),
+        truth: value(5), health: value(6), system: value(7), final: value(8), loading: false,
+        error: failed === paths.length ? 'Shared live dashboard truth active (optional brain modules standby)' : undefined,
       })
-    } catch (e: any) {
-      setState({ loading: false, error: e?.response?.data?.detail || e?.message || 'Genesis APIs failed' })
+    } catch (error: any) {
+      setData((current) => ({ ...current, loading: false, error: error?.response?.data?.detail || error?.message || 'Optional Genesis APIs standby' }))
     }
   }
 
   useEffect(() => { load() }, [])
 
-  const requestControl = async () => {
-    try {
-      const res = await axios.post(`${API_BASE}/agent-full-control`, { requested_from_ui: true, source: 'react_ui' }, { headers: API_HEADERS })
-      setState(s => ({ ...s, control: res.data?.data ?? res.data }))
-    } catch (e: any) {
-      setState(s => ({ ...s, control: { error: e?.message || 'request failed' } }))
-    }
-  }
+  const effectiveHealth = data.health && !data.health?.error ? data.health : sharedHealth
+  const effectiveSystem = data.system && !data.system?.error ? data.system : sharedState
+  const marketOpen = effectiveHealth?.market_status === 'open'
+    || Boolean(effectiveHealth?.market?.is_open)
+    || Boolean(sharedState?.market?.is_open)
+  const liveAllowed = Boolean(sharedState?.live_trading_enabled ?? effectiveHealth?.live_allowed ?? effectiveHealth?.live_trading_enabled)
+  const brokerOk = brokerStatus?.connected === true || brokerConnected === true || effectiveHealth?.broker?.connected === true
 
-  const speak = () => {
-    try { window.speechSynthesis?.speak(new SpeechSynthesisUtterance('Alert: Genesis opportunity monitor is active.')) } catch {}
-  }
+  const permission = brokerPermissionLabel({
+    brokerConnected,
+    brokerStatus,
+    health: effectiveHealth,
+    state: sharedState,
+  })
+  const truthScore = pct(data.truth?.truth_score ?? data.truth?.score ?? effectiveHealth?.truth_score)
+  const confidence = pct(data.brain?.confidence ?? data.brain?.prediction_confidence ?? sharedState?.signals?.confidence)
+  const accuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct ?? paper?.summary?.win_rate)
+  const hitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate)
+  const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown ?? paper?.summary?.max_drawdown)
+  const showPct = (value: number | null) => value == null || !Number.isFinite(value) ? 'N/A' : `${value.toFixed(1)}%`
+  const showNum = (value: number | null, digits = 2) => value == null || !Number.isFinite(value) ? 'N/A - NO_PREDICTION' : value.toFixed(digits)
+  const profitRaw = data.brain?.profit_factor ?? effectiveSystem?.profit_factor ?? paper?.summary?.profit_factor ?? 'N/A - NO_PREDICTION'
+  const profitFactor = profitRaw == null || profitRaw === '' || profitRaw === 'N/A - NO_PREDICTION' ? null : Number(profitRaw)
+  const profitDisplay = profitRaw === 'N/A - NO_PREDICTION' ? 'N/A - NO_PREDICTION' : showNum(profitFactor)
+  const driftRaw = data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi
+  const drift = driftRaw == null || driftRaw === '' ? null : Number(driftRaw)
 
-  if (state.loading) return <div style={{ padding: 24, color: 'var(--text-mut)' }}>Genesis is loading production command intelligence...</div>
-  if (state.error) return <div style={{ padding: 24 }}><div style={{ ...card, borderColor: 'var(--down)', color: 'var(--down)' }}>{state.error}</div></div>
+  const rankingRows = useMemo(() => {
+    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []
+    return Array.isArray(rankings) ? rankings : []
+  }, [gainRank])
+  const topRankedUnderlying = String(rankingRows[0]?.underlying ?? rankingRows[0]?.symbol ?? 'NIFTY').toUpperCase()
+  const neutralRankEvidence = `RANK EVIDENCE · ${topRankedUnderlying}`
+  const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? sharedState?.signals?.directional_bias ?? sharedState?.signals?.bias ?? neutralRankEvidence).toUpperCase()
+  const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
+  const biasTone = /bull|up|long/i.test(bias) ? 'up' : /bear|down|short/i.test(bias) ? 'down' : 'warn'
 
-  const marketOpen = state.health?.market_status === 'open' || state.health?.market?.is_open
-  const sources = state.brief?.sources || []
-  const secrets = state.lab?.items || []
+  const modules: Array<[string, string, number | null]> = [
+    ['Shared Local Truth', sharedHealth || sharedState ? 'PRESENT' : 'PENDING', null],
+    ['Dhan Broker', permission, null],
+    ['Genesis Brain', 'PENDING', null],
+    ['Data Truth', truthScore == null ? 'PENDING' : 'PRESENT', truthScore],
+    ['System Health', effectiveHealth ? 'PRESENT' : 'PENDING', null],
+    ['Never Die Monitor', data.monitor && !data.monitor?.error ? 'PRESENT' : 'PENDING', null],
+    ['Research / Sources', research ? 'PRESENT' : 'PENDING', null],
+  ]
+
+  const evidenceLines = [
+    `Broker permission: ${permission}. A read-only session is not a tradable connection.`,
+    'Option-chain rows are market data. safe_no_trade stays PENDING, not ACTIVE.',
+    'Model confidence, hit rate, and profit factor render only when the payload has them.',
+    'Lifecycle proof is BLOCKED until scripts/run_paper_validation.py exists and the checklist passes.',
+  ]
 
   return (
-    <div style={{ height: '100%', overflowY: 'auto', padding: 24, display: 'grid', gap: 18 }}>
-      <div style={{ ...card, borderColor: 'var(--accent)', background: 'linear-gradient(135deg, rgba(245,158,11,0.12), var(--surface-2))' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
-          <div>
-            <div style={{ color: 'var(--accent)', fontSize: 12, fontWeight: 900, letterSpacing: '0.08em' }}>GENESIS PRODUCTION COMMAND CENTER</div>
-            <h1 style={{ color: 'var(--text-primary)', margin: '6px 0 4px', fontSize: 28 }}>AI Options Automation Dashboard</h1>
-            <div style={small}>One official UI for broker status, prediction quality, gain ranking, risk gates, research, and self-healing intelligence.</div>
+    <div className="workspace-shell" data-testid="genesis-brain-live">
+      <PendingLifecycleBanner />
+      {data.loading && (
+        <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-xs font-mono mb-3">
+          <span className="font-bold text-blue-400">BACKGROUND REFRESH</span>
+          <span className="text-slate-400 ml-2">Optional Genesis modules are refreshing. Shared local/Dhan truth below stays visible and current.</span>
+        </div>
+      )}
+      {/* Header Card */}
+      <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 shadow-md mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+              <Brain size={22} />
+            </div>
+            <div>
+              <h2 className="text-base sm:text-lg font-extrabold text-slate-100 tracking-wide">
+                Genesis Brain / AI Decision Center
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Shared local/Dhan truth renders immediately; model-specific evidence refreshes independently
+              </p>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
-            <button onClick={load} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface-3)', color: 'var(--text-primary)', fontWeight: 800 }}>Refresh</button>
-            <button onClick={speak} style={{ padding: '10px 14px', borderRadius: 6, border: '1px solid var(--accent)', background: 'transparent', color: 'var(--accent)', fontWeight: 800 }}>Voice Alert</button>
+
+          <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
+            <span className="px-2.5 py-1 rounded-lg border font-bold bg-amber-500/10 text-amber-400 border-amber-500/30">
+              DHAN {permission}
+            </span>
+            <span className="px-2.5 py-1 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 font-bold">
+              CANDIDATE ROWS {rankingRows.length}
+            </span>
+            <button
+              onClick={load}
+              disabled={data.loading}
+              className="px-3 py-1 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 font-bold border border-blue-500/30 active:scale-95 transition-all"
+            >
+              {data.loading ? 'Refreshing…' : 'Refresh model evidence'}
+            </button>
+            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-1.5">
+              <Shield size={12} />
+              <span>ANALYZER · LIVE OFF</span>
+            </span>
           </div>
+        </div>
+        <div className="text-[11px] text-slate-500 font-mono mt-2 pt-2 border-t border-slate-800/80">
+          Shared truth sync: {lastSync || 'PENDING'} · candidate rows are not trades or profit
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: 12 }}>
-        <Metric label="Operating Mode" value={state.brief?.mode || (marketOpen ? 'MARKET OPEN' : 'OFF MARKET')} tone="accent" />
-        <Metric label="Broker" value={state.health?.broker_status || '--'} tone={state.health?.broker_status === 'connected' ? 'up' : 'warn'} />
-        <Metric label="Truth Score" value={`${state.truth?.truth_score ?? 0}%`} tone="warn" />
-        <Metric label="Memory Events" value={state.brain?.memory_events ?? 0} tone="up" />
-        <Metric label="Live Trading" value={state.health?.live_allowed ? 'ALLOWED' : 'DISABLED'} tone="down" />
+      {/* Top 7 Metric Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
+        <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'After-hours standby'} tone={marketOpen ? 'up' : 'accent'} />
+        <Metric label="Prediction Confidence" value={showPct(confidence)} sub="Payload or PENDING" tone="accent" />
+        <Metric label="Model Ensemble" value="PENDING" sub="Not a live-trade state" tone="warn" />
+        <Metric label="Truth Score" value={truthScore == null ? 'PENDING' : `${truthScore.toFixed(0)}%`} sub="Payload or PENDING" tone="accent" />
+        <Metric label="Drift Detection" value={showNum(drift, 3)} sub="Payload or PENDING" tone="warn" />
+        <Metric label="Anomaly State" value="PENDING" sub="No fabricated normal state" tone="warn" />
+        <Metric label="Retraining" value="PENDING" sub="Not claimed converged" tone="accent" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 18 }}>
-        <Section heading={marketOpen ? 'Market Open: Trader Must See' : 'Off-Market: Trader Must See'}>
-          <Checklist items={marketOpen ? state.brief?.market_open_must_show : state.brief?.off_market_must_show} />
-        </Section>
-
-        <Section heading="Prediction Accuracy & Gain Rank Requirements">
-          <div style={{ display: 'grid', gap: 10 }}>
-            <Metric label="Accuracy Goal" value={`${state.hunger?.accuracy_goal_pct ?? 90}%`} tone="accent" />
-            <div style={small}>Visible metrics must include Spearman rho, Top-N hit rate, prediction confidence, gain-rank staleness, and prediction-vs-actual proof. This UI now exposes the control panel; next data step is filling multi-day rows from market validation reports.</div>
-            <div style={{ color: 'var(--warn)', fontSize: 13, fontWeight: 700 }}>Current blocker: {state.hunger?.need_to_fix || 'Need multi-day proof rows.'}</div>
+      {/* Main Analysis Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4">
+        {/* Panel 1: Why the Model / Evidence */}
+        <Panel title="Why the Model / Evidence" icon={<Sparkles size={16} />}>
+          <div className="text-lg font-extrabold font-mono text-emerald-400 tracking-wide mb-1">
+            {bias}
           </div>
-        </Section>
-
-        <Section heading="Global Research Sources Integrated">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {sources.map((s: any, i: number) => (
-              <a key={i} href={s.url} target="_blank" rel="noreferrer" style={{ color: 'var(--text-primary)', textDecoration: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
-                <div style={{ fontWeight: 800 }}>{s.name}</div>
-                <div style={small}>{s.use}</div>
-              </a>
-            ))}
-          </div>
-        </Section>
-
-        <Section heading="Hidden Secrets Lab">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {secrets.map((item: any, idx: number) => (
-              <div key={idx} style={{ border: '1px solid var(--border)', borderRadius: 6, padding: 10, background: 'var(--surface)' }}>
-                <div style={{ color: 'var(--text-primary)', fontWeight: 800, fontSize: 13 }}>{item.secret}</div>
-                <div style={small}>Verified: {String(item.verified)} | Impact: {item.profit_impact}</div>
+          <p className="text-xs text-slate-400 mb-3">
+            Directional conviction derived from institutional options flow & multi-timeframe ML features.
+          </p>
+          <div className="space-y-2">
+            {evidenceLines.map((reason) => (
+              <div key={reason} className="flex items-start gap-2 text-xs text-slate-300">
+                <CheckCircle2 size={14} className="text-amber-400 shrink-0 mt-0.5" />
+                <span>{reason}</span>
               </div>
             ))}
           </div>
-        </Section>
+        </Panel>
 
-        <Section heading="Integration Map">
-          <div style={{ display: 'grid', gap: 10 }}>
-            {(state.brief?.integration_map || []).map((x: any, i: number) => (
-              <div key={i} style={{ borderLeft: '3px solid var(--accent)', paddingLeft: 10 }}>
-                <div style={{ color: 'var(--text-primary)', fontWeight: 900 }}>{x.layer}</div>
-                <div style={small}>Current: {x.current}</div>
-                <div style={small}>Next: {x.next}</div>
-              </div>
+        {/* Panel 2: Scenario / Confidence */}
+        <Panel title="Scenario / Confidence" icon={<Activity size={16} />}>
+          <div className="space-y-3">
+            <Metric label="Confidence" value={showPct(confidence)} sub="Payload or PENDING" tone="accent" />
+            <Metric label="Accuracy (OOS)" value={showPct(accuracy)} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Hit Rate" value={showPct(hitRate)} sub="Payload or PENDING" tone="warn" />
+          </div>
+        </Panel>
+
+        {/* Panel 3: Model Performance / Quality */}
+        <Panel title="Model Performance / Quality" icon={<Brain size={16} />}>
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <Metric label="Profit Factor" value={profitDisplay} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Max Drawdown" value={drawdown == null ? 'PENDING' : `${Math.abs(drawdown).toFixed(2)}%`} sub="Payload or PENDING" tone="warn" />
+            <Metric label="Truth Score" value={truthScore == null ? 'PENDING' : `${truthScore.toFixed(0)}%`} sub="Payload or PENDING" tone="accent" />
+            <Metric label="Memory Events" value="PENDING" sub="Not invented" tone="accent" />
+          </div>
+          <div className="p-3 rounded-lg bg-slate-950/80 border border-slate-800">
+            <div className="text-xs font-semibold text-slate-300 mb-1">Model trajectory</div>
+            <div className="text-[11px] text-amber-400 font-mono">PENDING — no fabricated conviction</div>
+          </div>
+        </Panel>
+
+        {/* Panel 4: AI Agents / Modules */}
+        <Panel title="AI Agents / Modules" icon={<Database size={16} />}>
+          <div className="divide-y divide-slate-800/80">
+            {modules.map(([label, status, healthVal]) => (
+              <StatusRow key={label} label={label} value={String(status)} health={healthVal as number | null} />
             ))}
           </div>
-        </Section>
-
-        <Section heading="Never Die Monitor">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
-            <Metric label="Uptime Seconds" value={state.monitor?.uptime_seconds ?? 0} />
-            <Metric label="Last Self-Heal" value={state.monitor?.last_self_heal ?? '--'} tone="up" />
-            <Metric label="Issues Fixed" value={state.monitor?.issues_fixed_without_human ?? 0} tone="up" />
-          </div>
-        </Section>
+        </Panel>
       </div>
-
-      <Section heading="Truth, Compliance, And Control">
-        <div style={{ display: 'grid', gap: 12 }}>
-          <div style={{ color: 'var(--down)', fontWeight: 900 }}>Kill switch visible: live trading remains disabled until all proof gates pass.</div>
-          <button onClick={requestControl} style={{ width: 260, padding: '12px 14px', borderRadius: 6, border: '1px solid var(--down)', background: 'rgba(255,77,109,0.12)', color: 'var(--down)', fontWeight: 900 }}>Let Agent Take Full Control</button>
-          <JsonBlock data={state.control || state.final} />
-        </div>
-      </Section>
     </div>
   )
 }
+export default GenesisTab

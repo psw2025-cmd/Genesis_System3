@@ -1,13 +1,29 @@
+"""Retired standalone Dhan token-watchdog runner.
+
+Kept only as a compatibility path for old startup references. It never creates,
+renews, or persists a Dhan token.
 """
-Dhan Token Watchdog Runner — standalone process entry point.
-Imports and runs the watchdog loop from core/brokers/dhan/token_watchdog.py.
-"""
+from __future__ import annotations
 
-import sys
-from pathlib import Path
+import json
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from core.brokers.dhan.token_watchdog import run_watchdog_loop
+def main() -> int:
+    print(
+        json.dumps(
+            {
+                "status": "RETIRED",
+                "authority": "gcp-cloud-run-job",
+                "job": "genesis-system3-dhan-token-rotate",
+                "token_generation_attempted": False,
+                "live_trading_enabled": False,
+                "order_placement_allowed": False,
+            },
+            sort_keys=True,
+        )
+    )
+    return 0
 
-run_watchdog_loop()
+
+if __name__ == "__main__":
+    raise SystemExit(main())

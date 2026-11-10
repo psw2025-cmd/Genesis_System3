@@ -1,0 +1,248 @@
+{
+  "schema": "continuous_closure_v1",
+  "generated_at_utc": "2026-10-29T08:11:13.066005Z",
+  "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "phases": {
+    "repo_first_scan": {
+      "ok": true,
+      "backlog_path": "reports\\latest\\autonomous_loop\\BACKLOG.md",
+      "backlog_cards": 8
+    },
+    "multi_source_verify": {
+      "sources": {
+        "repo": {
+          "ok": true
+        },
+        "reports": {
+          "ok": true
+        },
+        "live": {
+          "ok": true
+        }
+      },
+      "contracts": {
+        "gates_passing": 4,
+        "gates_total": 7,
+        "serving_sha": "baa55298b",
+        "broker_connected": true
+      },
+      "auto_gates": {
+        "generated_utc": "2026-10-29T08:11:12.842143Z",
+        "gates": {
+          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
+            "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+            "pass": false,
+            "days_recorded": 1,
+            "days_passing_threshold": 0,
+            "days_required": 5,
+            "threshold": 0.7,
+            "latest_rho": 0.2,
+            "consecutive_pass_days": 0,
+            "blocker_id": "SYS3-BLK-005",
+            "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+            "days": [
+              {
+                "date": "2026-06-12",
+                "rho": 0.2,
+                "hit_rate": 0.6667,
+                "status": "RETRAIN_NEEDED",
+                "pass": false
+              }
+            ]
+          },
+          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
+            "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+            "pass": false,
+            "is_fixture": false,
+            "report_exists": true,
+            "net_expectancy_after_costs": null,
+            "win_rate": null,
+            "trade_count": 0,
+            "source": "none",
+            "blocker_id": "PROFIT_BLOCKER",
+            "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate"
+          },
+          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
+            "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+            "pass": false,
+            "report_exists": true,
+            "full_lifecycle_proven": false,
+            "broker_connected": true,
+            "market_open": false,
+            "blocker_id": "SYS3-BLK-008",
+            "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+          },
+          "WEBSOCKET_TICK_HEALTH_PROVEN": {
+            "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+            "pass": true,
+            "report_exists": true,
+            "last_tick_age_sec": 5.0,
+            "refresh_interval_sec": 5,
+            "blocker_id": null,
+            "auto_action": "REST poll \u226410s counts for analyzer; WebSocket stream for live execution"
+          },
+          "MODEL_ACCURACY_REPORT_PRESENT": {
+            "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+            "pass": true,
+            "report_exists": true,
+            "rows": 1,
+            "validation_days": 1,
+            "spearman_days_passing": 0,
+            "blocker_id": null,
+            "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
+          },
+          "OPTION_STRIKE_VISIBILITY_PROVEN": {
+            "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+            "pass": true,
+            "rows": 3,
+            "paper_trade_allowed_count": 1,
+            "blocker_id": null,
+            "auto_action": "Run scripts/system3_option_visibility_audit.py"
+          },
+          "EQUITY_FO_ELIGIBILITY_PROVEN": {
+            "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+            "pass": true,
+            "underlying_count": 219,
+            "blocker_id": null,
+            "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+          }
+        },
+        "gates_passing": 4,
+        "gates_total": 7,
+        "open_blockers": [
+          "PROFIT_BLOCKER",
+          "SYS3-BLK-005",
+          "SYS3-BLK-008"
+        ],
+        "prediction_accuracy_blocked": true,
+        "profit_blocked": true,
+        "lifecycle_blocked": true,
+        "human_approval": true,
+        "live_trading_enabled": false,
+        "trade_ready": false,
+        "analyzer_ready": true,
+        "technical_gates_still_required": [
+          "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+          "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+          "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF"
+        ],
+        "recommended_auto_actions": [
+          "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+          "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
+          "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+        ],
+        "permanent_safety": [
+          "LIVE_TRADING_DISABLED_BY_DESIGN"
+        ]
+      },
+      "checked_at_utc": "2026-10-29T08:11:13.063008Z",
+      "prod_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+    },
+    "watchdog": {
+      "status": "ACTIVE",
+      "open_blockers": 3,
+      "resolved_blockers": 4,
+      "banner_required": true,
+      "policy": "remove_banner_only_when_all_gates_genuinely_ready"
+    },
+    "blocker_cards": [
+      {
+        "id": "A2",
+        "severity": "P0",
+        "defect": "Proof gate 6/7 trip ML_SPEARMAN (need \u22650.70 on 5 days)",
+        "evidence": "note `6/5 days \u00b7 \u03c1=0.55 \u00b7 need \u22650.7`",
+        "status_note": "OPEN \u2014 do not force PASS",
+        "state": "OPEN",
+        "source": "backlog_md"
+      },
+      {
+        "id": "A3",
+        "severity": "P1",
+        "defect": "Model pipeline NO_TRADE / confidence 0 / no directional bias",
+        "evidence": "`/api/signal/top` MARKET_CLOSED",
+        "status_note": "OPEN \u2014 honesty UX; real signals NOT_PROVEN",
+        "state": "OPEN",
+        "source": "backlog_md"
+      },
+      {
+        "id": "A4",
+        "severity": "P1",
+        "defect": "connected\u2260market-data reliability",
+        "evidence": "prior URL proof 429/cache",
+        "status_note": "OPEN \u2014 UI lane split already on main",
+        "state": "OPEN",
+        "source": "backlog_md"
+      },
+      {
+        "id": "C1",
+        "severity": "P0",
+        "defect": "Continuous closure system (scan/verify/watchdog/cards/resume)",
+        "evidence": "`/api/continuous_closure` timed out on self-HTTP fan-out; request path now offline-first",
+        "status_note": "IN_PROGRESS \u2014 patched pending live SHA verify",
+        "state": "IN_PROGRESS",
+        "source": "backlog_md"
+      },
+      {
+        "id": "A1",
+        "severity": "P0",
+        "defect": "gain_rank live rows omit spot_price \u2192 Overview `--`",
+        "evidence": "Live: 25/25 spots + banner",
+        "status_note": "VERIFIED LIVE",
+        "state": "RESOLVED",
+        "source": "backlog_md"
+      },
+      {
+        "id": "A2a",
+        "severity": "P0",
+        "defect": "`/api/accuracy_trend` days\u2260`/api/auto_gates` Spearman series",
+        "evidence": "Live ALIGN days=6 `source=load_spearman_days`",
+        "status_note": "VERIFIED LIVE",
+        "state": "RESOLVED",
+        "source": "backlog_md"
+      },
+      {
+        "id": "R1",
+        "severity": "P0",
+        "defect": "Render.com leftover authority/tools still look current",
+        "evidence": "PR #330 `22155657e`; eval `test_render_hosting_retired.py`; production already Cloud Run SHA `e6da6b469` at 2026-08-23T12:23:21Z",
+        "status_note": "READY_FOR_MERGE \u2014 not VERIFIED LIVE until serving SHA includes #330",
+        "state": "RESOLVED",
+        "source": "backlog_md"
+      },
+      {
+        "id": "A5",
+        "severity": "P2",
+        "defect": "Auton telemetrics banner while loop active",
+        "evidence": "live bundle contains `[AUTONOMOUS LOOP]`",
+        "status_note": "VERIFIED LIVE",
+        "state": "RESOLVED",
+        "source": "backlog_md"
+      }
+    ],
+    "auto_resume": {
+      "next_id": "C1",
+      "severity": "P0",
+      "defect": "Continuous closure system (scan/verify/watchdog/cards/resume)",
+      "state": "IN_PROGRESS",
+      "instruction": "Continue Gemini + E2E continuous closure: test-first in tests/evals/, fix root cause, PR\u2192CI\u2192merge\u2192Cloud Run, live SHA verify, update BACKLOG, post SYSTEM3_COORDINATION_V1 on Issue #188. Never invent prices/\u03c1 or weaken gates."
+    }
+  },
+  "summary": {
+    "open": 3,
+    "in_progress": 1,
+    "resolved": 4,
+    "total_cards": 8,
+    "next": "C1",
+    "serving_sha": "baa55298b",
+    "gates": "4/7"
+  },
+  "safety": {
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "zero_synthetic_inventions": true
+  },
+  "request_path": {
+    "self_http_fanout": false,
+    "include_live": false
+  }
+}

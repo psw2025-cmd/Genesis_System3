@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Runs automatically when Codespace starts or resumes from sleep.
-# Restarts Dhan token daemons without needing a terminal to be opened.
-# Called by .devcontainer/devcontainer.json → postStartCommand.
+# Genesis System3 Codespace startup.
+#
+# Dhan token minting is intentionally NOT performed here. Google Cloud Run Job
+# `genesis-system3-dhan-token-rotate` is the single token-generation authority.
+# Local/Codespace token daemons previously created a split-brain condition where
+# a newly minted local token invalidated the token stored in Google Secret
+# Manager, leaving the production dashboard disconnected.
 
 set -euo pipefail
 
@@ -10,47 +14,28 @@ PY=$(which python3 2>/dev/null || which python 2>/dev/null || echo "")
 LOG="$PROJ/logs/codespace_startup.log"
 
 mkdir -p "$PROJ/logs"
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Codespace postStartCommand: starting daemons" >> "$LOG"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Codespace postStartCommand: GCP is sole Dhan token authority" >> "$LOG"
 
 if [ -z "$PY" ] || [ ! -d "$PROJ" ]; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: python or project not found" >>"$LOG"
-    exit 0  # non-blocking — don't fail Codespace start
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: python or project not found" >> "$LOG"
+    exit 0
 fi
 
-# Ensure python-dotenv and core deps are installed (survives Codespace resume where
-# postCreateCommand doesn't re-run but packages may be missing after env reset)
-if ! "$PY" -c "import dotenv" 2>/dev/null; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installing requirements (dotenv missing)..." >> "$LOG"
-    "$PY" -m pip install -q -r "$PROJ/requirements.txt" >> "$LOG" 2>&1 || true
-fi
+# Permanently stop legacy local token writers if a resumed Codespace still has
+# processes from an older revision. These processes are not required for
+# analyzer jobs and must never mint/renew the production Dhan token.
+pkill -f "dhan_token_auto_refresh.py" >/dev/null 2>&1 || true
+pkill -f "dhan_watchdog_runner.py" >/dev/null 2>&1 || true
+pkill -f "core.brokers.dhan.token_watchdog" >/dev/null 2>&1 || true
 
-# Layer 0: run full startup check (token refresh + daemon + watchdog)
-"$PY" "$PROJ/scripts/dhan_startup_check.py" >> "$LOG" 2>&1 || true
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Legacy Dhan token daemons stopped; no local token generation allowed" >> "$LOG"
 
-sleep 5  # allow spawned processes to register with the OS before pgrep checks
-
-# Layer 1 fallback: token daemon
-if ! pgrep -f "dhan_token_auto_refresh.py" > /dev/null 2>&1; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting token daemon (fallback)" >> "$LOG"
-    nohup "$PY" -u "$PROJ/scripts/dhan_token_auto_refresh.py" \
-        >> "$PROJ/logs/dhan_token_daemon.log" 2>&1 &
-    disown $!
-fi
-
-# Layer 2 fallback: watchdog
-if ! pgrep -f "dhan_watchdog_runner.py" > /dev/null 2>&1; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting watchdog (fallback)" >> "$LOG"
-    nohup "$PY" -u "$PROJ/scripts/dhan_watchdog_runner.py" \
-        >> "$PROJ/logs/dhan_watchdog.log" 2>&1 &
-    disown $!
-fi
-
-# Layer 3: job scheduler daemon (bhavcopy, gain rank, signal engine, auto-retrain)
+# Keep the unrelated analyzer scheduler available for developer work.
 if ! pgrep -f "system3_phase82_job_scheduler.*--daemon" > /dev/null 2>&1; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting job scheduler daemon" >> "$LOG"
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting analyzer job scheduler daemon" >> "$LOG"
     nohup "$PY" -u "$PROJ/core/engine/system3_phase82_job_scheduler.py" --daemon \
         >> "$PROJ/logs/job_scheduler.log" 2>&1 &
     disown $!
 fi
 
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] postStartCommand complete" >> "$LOG"
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] postStartCommand complete — LIVE remains external/locked" >> "$LOG"

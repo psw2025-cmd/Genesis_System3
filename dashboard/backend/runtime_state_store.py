@@ -67,23 +67,13 @@ class RuntimeStateStore:
         safety["live_trading_enabled"] = False
         safety["execution_mode"] = "ANALYZER"
 
-    def _enforce_safety_invariants(self, state: Dict[str, Any]) -> None:
-        """Cloud persistence must never re-enable live execution."""
-        state["mode"] = "PAPER"
-        state["live_trading_enabled"] = False
-        safety = state.setdefault("safety", {})
-        if not isinstance(safety, dict):
-            safety = {}
-            state["safety"] = safety
-        safety["live_trading_enabled"] = False
-        safety["execution_mode"] = "ANALYZER"
-
     def _check_broker_connectivity(self) -> Dict[str, Any]:
         """Check broker connectivity and return status - uses health.json as source of truth"""
         try:
             from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
+            from core.brokers.dhan.dhan_readonly import sanitize_status_payload
 
-            return _dhan_status()
+            return sanitize_status_payload(_dhan_status())
         except Exception as e:
             return {
                 "connected": False,
@@ -118,7 +108,7 @@ class RuntimeStateStore:
                 "current_time_ist": datetime.now(IST).isoformat(),
             },
             "broker": broker_status,
-            "qc": {"status": "PASS", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
+            "qc": {"status": "NOT_READY", "reasons": [], "contracts_total": 0, "underlyings": 0, "failures": []},
             "signals": {
                 "status": "NO_TRADE",
                 "underlying": None,
@@ -213,29 +203,6 @@ class RuntimeStateStore:
         with open(tmp_path, "w") as f:
             json.dump(data, f, indent=2)
         os.replace(tmp_path, path)
-
-    def _save_local_state(self, include_snapshots: bool = True) -> None:
-        self.outputs_dir.mkdir(parents=True, exist_ok=True)
-        state_file = self.outputs_dir / "runtime_state.json"
-        self._atomic_write_json(state_file, self._state)
-
-        if not include_snapshots:
-            return
-        snapshots_dir = self.outputs_dir / "state_snapshots"
-        snapshots_dir.mkdir(exist_ok=True)
-        snapshot_file = snapshots_dir / f"state_{self._state_version}.json"
-        self._atomic_write_json(snapshot_file, self._state)
-
-        snapshot_files = sorted(
-            snapshots_dir.glob("state_*.json"),
-            key=lambda f: int(f.stem.split("_")[1]) if f.stem.split("_")[1].isdigit() else 0,
-        )
-        if len(snapshot_files) > 1000:
-            for old_file in snapshot_files[:-1000]:
-                try:
-                    old_file.unlink()
-                except Exception:
-                    pass
 
     def _save_local_state(self, include_snapshots: bool = True) -> None:
         self.outputs_dir.mkdir(parents=True, exist_ok=True)
@@ -378,7 +345,7 @@ class RuntimeStateStore:
                 else:
                     updates["data_source"] = health_data_source
                 updates["qc"] = {
-                    "status": health.get("qc_status", "PASS"),
+                    "status": str(health.get("qc_status") or "NOT_READY").upper(),
                     "reasons": health.get("qc_failures", []),
                     "contracts_total": health.get("contracts_total", 0),
                     "underlyings": health.get("underlyings", 0),

@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from '../../store';
 import { StatusChip, PENDINGState } from './TruthUI';
 import { Layers, Activity, TrendingUp, ShieldAlert, BarChart2 } from 'lucide-react';
+import AdvancedCharts from '../AdvancedCharts';
 
 function pickArray(obj: any, ...keys: string[]): any[] {
   if (!obj) return [];
@@ -13,7 +14,7 @@ function pickArray(obj: any, ...keys: string[]): any[] {
 }
 
 export const OptionsIntelligence: React.FC = () => {
-  const { chain, chainSymbol, marketTop, gainRank, brokerPositions } = useStore();
+  const { chain, chainSymbol, setChainSymbol, setActiveTab, marketTop, gainRank, brokerPositions, marketOpen } = useStore();
 
   const currentChain = chain[chainSymbol] || null;
   const rankings: any[] = Array.isArray(gainRank?.rankings) ? gainRank.rankings : [];
@@ -35,11 +36,17 @@ export const OptionsIntelligence: React.FC = () => {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <StatusChip label="SYMBOL" value={chainSymbol} status="ok" />
-          <StatusChip label="MODE" value="ANALYTICS" />
+          <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'warn'} />
         </div>
       </header>
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].map((symbol) => (
+            <button key={symbol} type="button" className={`soft-btn ${chainSymbol === symbol ? 'active' : ''}`} onClick={() => setChainSymbol(symbol)}>{symbol}</button>
+          ))}
+          <button type="button" className="soft-btn" onClick={() => setActiveTab('chain')}>OPEN FULL OPTION CHAIN</button>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
 
           <section className="card" style={{ padding: '16px' }}>
@@ -52,18 +59,23 @@ export const OptionsIntelligence: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (OI)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi || '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi ?? '—'}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (VOL)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol || '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol ?? '—'}</span>
                   </div>
                 </div>
-                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : 'ok'} />
-                <StatusChip label="OI CHANGE" value={currentChain?.oi_change || 'STABLE'} />
+                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile != null ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : currentChain?.iv_percentile != null ? 'ok' : 'mut'} />
+                <StatusChip label="OI CHANGE" value={currentChain?.oi_change ?? 'PENDING'} status={currentChain?.oi_change != null ? 'ok' : 'mut'} />
+                <StatusChip label="SOURCE" value={currentChain?.source ?? currentChain?.data_source ?? 'PENDING'} status={currentChain?.source || currentChain?.data_source ? 'ok' : 'mut'} />
               </div>
             ) : (
-              <PENDINGState reason={`NO CHAIN DATA YET FOR ${chainSymbol}`} />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'CHAIN WARMING' : 'AFTER HOURS'}
+                reason={currentChain?.message || `No Dhan chain snapshot for ${chainSymbol} yet. Analyzer keeps last-good when available.`}
+              />
             )}
           </section>
 
@@ -83,7 +95,11 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <PENDINGState reason="GAIN RANK SERVICE PENDING" />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'RANKING WARMING' : 'AFTER HOURS'}
+                reason="Gain-rank rows appear when the scanner or market-top stream supplies them."
+              />
             )}
           </section>
 
@@ -103,7 +119,11 @@ export const OptionsIntelligence: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <PENDINGState reason="MARKET TOP DATA PENDING" />
+              <PENDINGState
+                tone="mut"
+                title={marketOpen ? 'MARKET TOP WARMING' : 'AFTER HOURS'}
+                reason="Market-wide top contract table is empty until Dhan market-top data arrives."
+              />
             )}
           </section>
 
@@ -112,7 +132,11 @@ export const OptionsIntelligence: React.FC = () => {
               <ShieldAlert size={16} color="var(--text-sec)" />
               <h2 style={{ fontSize: '14px', fontWeight: 700, margin: 0 }}>Abnormal Activity</h2>
             </div>
-            <PENDINGState reason="CATALYST & SENTIMENT DATA PENDING" />
+            <PENDINGState
+              tone="mut"
+              title={marketOpen ? 'NO CATALYST FEED' : 'AFTER HOURS'}
+              reason="No catalyst/sentiment feed is wired. Unusual activity is not invented from empty after-hours chains."
+            />
           </section>
         </div>
 
@@ -153,6 +177,11 @@ export const OptionsIntelligence: React.FC = () => {
           ) : (
             <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-mut)' }}>NO ACTIVE DHAN POSITIONS</div>
           )}
+        </section>
+
+        {/* Real-time Interactive Option Analytics & Visual Charts */}
+        <section className="card" style={{ padding: '20px', background: 'var(--surface-2)' }}>
+          <AdvancedCharts />
         </section>
       </div>
     </div>

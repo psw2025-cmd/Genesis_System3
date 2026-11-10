@@ -1,0 +1,18 @@
+item_id,priority,category,title,status,done_utc,owner,proof_or_link,reason_if_pending,solution_next,user_needed
+XV-001,P0,DEPLOY,Cross-verify main vs serving vs laptop,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/repo_path_audit/cloud_github_vs_laptop.json,DOCS_TEST_CI_ONLY_LAG after #371,No blind redeploy,NO
+XV-002,P0,DEPLOY,main tip not on Cloud Run,CLASSIFIED_OK,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/deploy_info.json,docs/test/CI tip ahead of #367 runtime,Redeploy only on runtime path merge,NO
+LIVE-001,P0,DEPLOY,main vs serving,DOCS_TEST_CI_ONLY_LAG,2026-08-26T19:35:00Z,Auto Deploy,main=0d69559 serving=fb4772f rev=genesis-system3-web-00617-vif,Path filter skip expected,Keep serving pin,NO
+RULE-01,P0,GITHUB,Ruleset 21581518 Priority Guard 6th check,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/ruleset_21581518.json,Was missing after #369 deadlock fix,Monitor PR required contexts,NO
+GMAIL-01,P0,COORD,Gmail System3 intake 14d,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/gmail_system3_threads.json,25 threads; ruleset mail closed by RULE-01,Mirror durable state to #188,NO
+RHUI-V22,P0,RHUI,RHUI V2.2 material change — NOT_ACCEPTED,OPEN,2026-08-26T19:35:00Z,shared,RHUI_V2.2_GATE_BOARD.csv,Semantic+business dates+gates,Market session + ML,NO
+RHUI-V22-G7,P0,SCHEDULER,Scheduler transport HEALTHY,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/scheduler_health.json,,Watch business PARTIAL,NO
+RHUI-V22-G7b,P0,SCHEDULER,Business artifact wrong-date rank/forecast/signals,OPEN,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/scheduler_health.json,PARTIAL readiness,Next weekday jobs,NO
+RHUI-V22-G8,P0,SIGNALS,#367 on serving observed,DONE,2026-08-26T19:35:00Z,cursor,signals-daily 13:15Z + 92lf5,,Continue observe,NO
+RHUI-V22-G4,P0,BROKER,Broker AUTH_OK,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/full_cross_verify_20260826_193000/broker_status.json,,Keep LIVE OFF,NO
+CI-PG,P0,CI,Priority Guard FORENSIC rate-limit fail on main,BLOCKED,2026-08-26T19:35:00Z,github,actions/runs/33005422907,API 403 installation rate limit,Cool-down; not ruleset rollback,NO
+P0-A,P0,ISSUE,#188 Broker/UI parity,OPEN,2026-08-26T19:35:00Z,shared,https://github.com/psw2025-cmd/Genesis_System3/issues/188,Serving lacks local OptionChain WIP,Runtime PR + deploy + re-snap,NO
+P0-B,P0,ISSUE,#179 Render hosting,DONE_HARDENED,2026-08-26T19:35:00Z,shared,PR #365,Render tools deleted on main,Monitor,NO
+P0-C,P0,ISSUE,#228 deploy authority,WATCH,2026-08-26T19:35:00Z,shared,serving lag classified docs/test,Not failed promotion,MRI only on runtime merges,NO
+PEND-001,P0,DEPLOY,Serving lag,CLASSIFIED_OK,2026-08-26T19:35:00Z,cursor,reports/latest/repo_path_audit/cloud_github_vs_laptop.json,Not runtime drift,No redeploy,NO
+ACCESS-PROBE,P0,ACCESS,Access capability probe,DONE,2026-08-26T19:35:00Z,cursor,reports/latest/access_capability/ACCESS_PROBE_RESULT.md,,Re-run if unsure,NO
+TODO-01,P0,COORD,TODO_CHECKLIST_FULL_VERIFY,DONE,2026-08-26T19:35:00Z,cursor,reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md,,Execute remaining PENDING,NO

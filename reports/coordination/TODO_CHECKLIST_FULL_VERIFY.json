@@ -1,0 +1,210 @@
+{
+  "updated_utc": "2026-08-26T19:35:00Z",
+  "counts": {
+    "DONE": 10,
+    "PENDING": 9,
+    "BLOCKED": 1
+  },
+  "items": [
+    {
+      "id": "TV-001",
+      "priority": "P0",
+      "rating": 1,
+      "title": "Truth gate: origin/main vs live deploy_info vs laptop",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/repo_path_audit/cloud_github_vs_laptop.json",
+      "notes": "main=0d6955987115 serving=fb4772f9d52b class=DOCS_TEST_CI_ONLY_LAG primary_clone_ok"
+    },
+    {
+      "id": "TV-002",
+      "priority": "P0",
+      "rating": 1,
+      "title": "Live API dump (deploy/broker/health/state/scheduler/auto_gates)",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/",
+      "notes": "All HTTP 200; broker AUTH_OK; LIVE=false; gates 2/7"
+    },
+    {
+      "id": "TV-003",
+      "priority": "P0",
+      "rating": 1,
+      "title": "ACCESS_PROBE capability",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/access_capability/ACCESS_PROBE_RESULT.md",
+      "notes": "HAVE gmail_api/gh/gcloud/live; MISSING none"
+    },
+    {
+      "id": "TV-004",
+      "priority": "P0",
+      "rating": 1,
+      "title": "Gmail System3 thread intake (14d)",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/gmail_system3_threads.json",
+      "notes": "25 msgs; ChatGPT+human: Priority Guard ruleset missing; Actions fail mails"
+    },
+    {
+      "id": "TV-005",
+      "priority": "P0",
+      "rating": 1,
+      "title": "Restore ruleset 21581518 6th check: BLOCKING - priority workflows only",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/ruleset_21581518.json",
+      "notes": "PUT succeeded 2026-08-27T01:08 IST; was HUMAN_ACTION from Gmail/#188"
+    },
+    {
+      "id": "TV-006",
+      "priority": "P0",
+      "rating": 2,
+      "title": "Refresh coordination CSVs/runbook/RUHI/COMMAND_CENTER/TRACKING",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/coordination/",
+      "notes": "This PR; land on main via docs PR"
+    },
+    {
+      "id": "TV-007",
+      "priority": "P0",
+      "rating": 1,
+      "title": "Post #188 SYSTEM3_COORDINATION_V1 + FULL_VERIFY_REPORT",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/FULL_VERIFY_REPORT.md",
+      "notes": "FULL_VERIFY_REPORT.md written; #188 after PR"
+    },
+    {
+      "id": "TV-008",
+      "priority": "P0",
+      "rating": 1,
+      "title": "RHUI V2.2 overall acceptance",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "reports/coordination/RHUI_V2.2_GATE_BOARD.csv",
+      "notes": "NOT_ACCEPTED: semantic UI + ML gates + business artifact dates"
+    },
+    {
+      "id": "TV-009",
+      "priority": "P0",
+      "rating": 2,
+      "title": "Scheduler HEALTHY + business artifact dates (rank/forecast/signals)",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/scheduler_health.json",
+      "notes": "transport HEALTHY; business_readiness=PARTIAL wrong-date artifacts"
+    },
+    {
+      "id": "TV-010",
+      "priority": "P0",
+      "rating": 2,
+      "title": "Bhavcopy / signals lane hardening observe (#367 on serving)",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "signals-daily last_attempt 2026-08-26T13:15Z; prior 92lf5 SUCCEEDED",
+      "notes": "Code on serving; next weekday runs continue; no redeploy needed"
+    },
+    {
+      "id": "TV-011",
+      "priority": "P0",
+      "rating": 2,
+      "title": "Forecast / rank business artifacts current-date",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/scheduler_health.json",
+      "notes": "forecast-daily last 04:00Z; rank 03:45Z; wrong-date flags"
+    },
+    {
+      "id": "TV-012",
+      "priority": "P0",
+      "rating": 1,
+      "title": "22-tab semantic API\u2194UI proof on exact serving SHA",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "reports/latest/live_proof_center/LATEST/",
+      "notes": "HTTP mounts \u2260 semantic PASS; market closed now"
+    },
+    {
+      "id": "TV-013",
+      "priority": "P0",
+      "rating": 1,
+      "title": "#188 Broker/UI parity (chain columns LTP%/Buildup/OI%/Greeks/ATM)",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "Issue #188 OPEN; local OptionChain dirty not on serving",
+      "notes": "DONE only after runtime merge + serving re-snap"
+    },
+    {
+      "id": "TV-014",
+      "priority": "P0",
+      "rating": 2,
+      "title": "Auto gates 7/7 trade_ready",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "reports/latest/full_cross_verify_20260826_193000/auto_gates.json",
+      "notes": "2/7 pass (MODEL_ACCURACY + EQUITY_FO); LIVE stays OFF"
+    },
+    {
+      "id": "TV-015",
+      "priority": "P0",
+      "rating": 3,
+      "title": "Workflow Priority Guard FORENSIC rate-limit failures on main",
+      "status": "BLOCKED",
+      "owner": "AGENT",
+      "proof": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/33005422907",
+      "notes": "GitHub Actions installation API 403 rate limit \u2014 not code; cool-down"
+    },
+    {
+      "id": "TV-016",
+      "priority": "P1",
+      "rating": 3,
+      "title": "Open P0 issues board (#179,#187,#228,#166,#168,#44\u2026)",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "gh issue list P0 + open issues JSON in session",
+      "notes": "#179 Render hardened via #365; #188 primary active; #44 legacy Render"
+    },
+    {
+      "id": "TV-017",
+      "priority": "P1",
+      "rating": 4,
+      "title": "Do not blind-redeploy for docs tip",
+      "status": "DONE",
+      "owner": "AGENT",
+      "proof": "reports/latest/repo_path_audit/cloud_github_vs_laptop.json",
+      "notes": "Explicitly skipped Auto Deploy; serving stays #367"
+    },
+    {
+      "id": "TV-018",
+      "priority": "P1",
+      "rating": 3,
+      "title": "API 404 honesty: charts/predictions/multibagger/paper/trades",
+      "status": "PENDING",
+      "owner": "AGENT",
+      "proof": "live HTTP 404 snapshot this session",
+      "notes": "holdings/funds 200; charts/predictions/multibagger/paper/trades 404"
+    },
+    {
+      "id": "TV-019",
+      "priority": "P2",
+      "rating": 4,
+      "title": "Stale open docs PRs backlog (#353 governance pack, #335 semantic, \u2026)",
+      "status": "PENDING",
+      "owner": "HUMAN",
+      "proof": "gh pr list open",
+      "notes": "#353 CI mostly green but CodeQL check fail name; triage separately"
+    },
+    {
+      "id": "TV-020",
+      "priority": "P1",
+      "rating": 3,
+      "title": "HUMAN optional: Cursor GitHub App / agent PAT re-auth",
+      "status": "PENDING",
+      "owner": "HUMAN",
+      "proof": "reports/coordination/AGENT_ACCESS_REQUESTS.md (if present)",
+      "notes": "Not blocking this loop; Priority Guard ruleset fixed by agent"
+    }
+  ]
+}

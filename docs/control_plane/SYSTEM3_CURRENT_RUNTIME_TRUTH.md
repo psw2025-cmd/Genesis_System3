@@ -31,6 +31,7 @@ Source: user-provided `/api/state` JSON on 2026-06-15 around 12:53 IST.
 | Contradiction | Evidence | Status |
 |---|---|---|
 | Broker connected but disconnect alerts keep appearing | `broker.connected=true` and latest `BROKER_DISCONNECTED` alert timestamp matches current state timestamp | OPEN |
+| Broker connected but token copy said fully automated while skipped | Live `/api/state` 2026-08-26: `auto_refresh.attempted=false`, `success=false`, `skipped=AUTO_REFRESH_DISABLED_OR_LIVE_GATE`, `message="Token generated via PIN + TOTP (fully automated)"`; stale 403 on `canonical_rotation` while skipped | PATCHED in 0021 (not on origin/main until merge) |
 
 This is not acceptable for live-readiness. It may be safe in PAPER mode, but it breaks dashboard trust and readiness proof.
 
@@ -50,8 +51,9 @@ This is not acceptable for live-readiness. It may be safe in PAPER mode, but it 
 | `reports/latest/system3_blocker_report.json` | Machine-readable blocker summary | MISSING |
 | `reports/latest/option_strike_visibility.md` | PE/CE strike/token proof | MISSING |
 | `reports/latest/option_strike_visibility.json` | Machine-readable strike/token proof | MISSING |
-| `reports/latest/model_accuracy_report.md` | Prediction-vs-actual proof | MISSING |
-| `reports/latest/model_accuracy_report.json` | Machine-readable model accuracy proof | MISSING |
+| `reports/latest/model_accuracy_report.md` | Prediction-vs-actual proof | PRESENT but unproven (`NO_PREDICTION_FOUND`, proof_pass_count 0) |
+| `reports/latest/model_accuracy_report.json` | Machine-readable model accuracy proof | PRESENT but unproven |
+| `reports/coordination/SYSTEM3_PATCH_0021_CURSOR_VERIFICATION.md` | Cursor 0021 live mail/GitHub/cloud verification + 43-test proof | ACTIVE |
 | `reports/latest/markdown_inventory.md` | Documentation inventory and classification | MISSING |
 | `reports/latest/documentation_contradictions.md` | Docs claiming pass/final against current blockers | MISSING |
 

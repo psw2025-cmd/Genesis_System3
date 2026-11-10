@@ -33,6 +33,7 @@ exclude = '''(?x)(
 )'''
 
 [tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
 python_files = ["test_*.py", "*_test.py"]
 testpaths = ["core", "tools", "phases", "dashboard", "tests"]
 addopts = "-q --disable-warnings --ignore=core/engine/test_angelone_api.py --ignore=core/engine/test_angelone_option_chain.py --ignore=scripts"

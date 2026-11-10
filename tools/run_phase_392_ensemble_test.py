@@ -26,9 +26,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-# CRITICAL: Change to project root FIRST, before any imports
-project_root = Path(__file__).resolve().parents[2]
-os.chdir(str(project_root))
+# Resolve the repository containing this tool. Do not change process cwd at
+# pytest collection time because unrelated tests use repo-relative paths.
+project_root = Path(__file__).resolve().parents[1]
 
 # Add project root to path
 if str(project_root) not in sys.path:

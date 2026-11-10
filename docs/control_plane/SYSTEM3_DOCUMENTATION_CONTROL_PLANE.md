@@ -49,6 +49,12 @@ Only these documents can define current truth:
 | `docs/runtime/AUTHORITATIVE_RUNTIME_AND_DATA_MAP.md` | ACTIVE_CONTROL |
 | `docs/architecture/MASTER_PR_ROADMAP.md` | REFERENCE |
 | `docs/architecture/SYSTEM3_BRUTAL_GAP_ANALYSIS.md` | REFERENCE |
+| `docs/control_plane/SYSTEM3_EXTERNAL_SSOT_PROPOSAL_DECISION.md` | REFERENCE |
+| `reports/coordination/SYSTEM3_PATCH_0021_CURSOR_VERIFICATION.md` | ACTIVE_CONTROL (session proof; does not override this tracker) |
+
+The machine-readable discovery index is
+`config/system3_agent_evidence_catalog.v1.json`. It points to these authorities
+and their repeatable runners; it does not duplicate or supersede their content.
 
 ## Contradiction Rules
 

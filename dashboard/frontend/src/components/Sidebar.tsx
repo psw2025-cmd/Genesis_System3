@@ -2,11 +2,11 @@ import {
   LayoutDashboard, TrendingUp, BookOpen, Database,
   FileText, BarChart3, Brain,
   Bell, Activity, Shield, Layers, Sparkles, CheckCircle, FlaskConical,
-  Search, Zap
+  Search, Zap, ListChecks
 } from 'lucide-react'
 import { useStore } from '../store'
 
-const TABS = [
+export const DASHBOARD_TABS = [
   { id: 'decision-intel', label: 'Decision Intel', Icon: Zap, group: 'main' },
   { id: 'truth',          label: 'Truth Control',  Icon: Shield,          group: 'main' },
   { id: 'genesis',        label: 'Genesis Brain',  Icon: Sparkles,        group: 'main' },
@@ -20,7 +20,7 @@ const TABS = [
   { id: 'paper',          label: 'Paper Trades',   Icon: BookOpen,        group: 'trading' },
   { id: 'positions',      label: 'Positions',      Icon: Database,        group: 'trading' },
   { id: 'risk-scenarios', label: 'Risk & Scenarios', Icon: Shield,        group: 'analysis' },
-  { id: 'multibagger',    label: 'Multibagger V4', Icon: Sparkles,        group: 'analysis' },
+  { id: 'multibagger',    label: 'Multibagger', Icon: Sparkles,        group: 'analysis' },
   { id: 'prediction-audit', label: 'Prediction Audit', Icon: Search,       group: 'analysis' },
   { id: 'performance',    label: 'Performance',    Icon: BarChart3,       group: 'analysis' },
   { id: 'ml',             label: 'ML Model',       Icon: Brain,           group: 'analysis' },
@@ -28,26 +28,31 @@ const TABS = [
   { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
+  { id: 'system-readiness', label: 'System readiness', Icon: ListChecks,  group: 'system' },
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
-]
+] as const
+
+export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map(tab => tab.id))
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',
-  market:   'Market Data',
+  market:   'Market data',
   trading:  'Trading',
   analysis: 'Analysis',
   system:   'System',
 }
 
 export function Sidebar() {
-  const { activeTab, setActiveTab, marketOpen, brokerConnected } = useStore()
+  const { activeTab, setActiveTab, marketOpen, brokerConnected, sidebarOpen } = useStore()
 
   const groups = ['main', 'market', 'trading', 'analysis', 'system']
 
   return (
     <nav
+      id="dashboard-sidebar"
       aria-label="Dashboard navigation"
       data-dashboard-navigation="sidebar"
+      className={`dashboard-sidebar${sidebarOpen ? ' is-open' : ''}`}
       style={{
         width: '190px',
         background: 'var(--surface-2)',
@@ -62,7 +67,7 @@ export function Sidebar() {
       }}
     >
       {groups.map(group => {
-        const groupTabs = TABS.filter(t => t.group === group)
+        const groupTabs = DASHBOARD_TABS.filter(t => t.group === group)
         return (
           <div key={group} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             <div style={{
@@ -128,7 +133,7 @@ export function Sidebar() {
                     <span style={{
                       marginLeft: 'auto',
                       width: '7px', height: '7px', borderRadius: '50%',
-                      background: brokerConnected ? 'var(--up)' : 'var(--down)',
+                      background: brokerConnected ? 'var(--amber)' : 'var(--down)',
                     }} />
                   )}
                   {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}

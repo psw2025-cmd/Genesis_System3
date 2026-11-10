@@ -1,4 +1,96 @@
+## 2026-08-18T12:15:00Z [Cursor] W4 LIVE_GATE ALERT LEAK
+
+Alerts tab counted the PAPER-by-design live-trading gate as `1 ACTIVE` and
+told the owner to set `live_trading_approved=true`. That was a classifier leak
+(`type=system_alert` vs `LIVE_GATE`), not a user LIVE-enablement task.
+
+Fix: LIVE_GATE synth uses `type=LIVE_GATE`; Alerts tab filters OPS_LIVE_GATE
+and kill-switch wording into Live Readiness; gate copy no longer instructs a
+kill-switch flip. LIVE and orders remain disabled.
+
+## 2026-08-18T10:02:39Z [Cursor] W1 + PERMANENT 906 CORE FIX
+
+Live broker recurred to `DHAN_REQUEST_REJECTED_906` after rotation-on-906.
+JWT remained valid (secret v269, ~23h remaining). The Profile probe issued two
+GETs and both returned HTTP 400 / 906.
+
+Permanent source fix:
+- `cloud_status_probe.py` no longer falls back to `dhanClientId` on DH-906.
+- Failed second-contract attempts no longer overwrite the canonical docs contract.
+- UI W1: `connected=true` is session-only; 906/805/810 are non-auth and are not
+  token expiry; Broker reliability remains a separate lane.
+
+Docs corrected: `docs/BROKER_RECURRENCE_FORENSIC_CHECKLIST.md` and the 09:24Z
+recovery pack is marked historical, not a 906 closure.
+
+LIVE and order placement remain disabled.
+
+## 2026-08-18T09:24:58Z [Cursor] AUDIT PROBE CORRECTION + BROKER RECOVERY PROOF
+
+- Corrected the production audit/dashboard interpretation to use `/health` and
+  `/api/health` as the canonical app health probes for Cloud Run.
+- Recorded that `/healthz` is platform-intercepted on this deployment and can
+  return a Google 404 before FastAPI handles the request, so it is not
+  authoritative application-health proof.
+- Executed canonical manual Dhan recovery workflow run `32121086079`.
+- Re-verified live production after recovery:
+  - `GET /api/broker/status` -> `connected=true`, `AUTH_OK`
+  - `GET /api/health` -> `status=ok`, `broker_status=connected`
+  - `GET /api/auto_gates` -> `broker_connected=true`
+  - Production Broker tab shows `Broker Connected`, `Equity Holdings (11)`,
+    and `Dhan Live Positions (1)`.
+- Kept LIVE and order placement disabled.
+
+## 2026-08-18T00:40:00Z [Cursor] INFINITE GITOPS PHASE 2 — PROOF LEDGER + INTENT LOOP
+
+Permanent fail-closed infinite GitOps loop (no user wait on routine PAPER work; LIVE stays human-gated):
+- Rule: `.cursor/rules/infinite-gitops-loop.mdc`
+- Policy: `agent_policy.yaml` v3 `infinite_gitops_loop`
+- Prompt: `docs/architecture/INFINITE_GITOPS_AGENT_PROMPT.md`
+- Grounding: `docs/architecture/META_SOVEREIGN_ARCHITECTURE_GROUNDING.md`
+- Ledger: `dashboard/backend/proof_ledger_service.py` + `scripts/system3_proof_ledger.py`
+- API: `GET /api/proof_ledger` (read-only, no secrets)
+- Orchestrator now appends SHA256 ledger + intent tick each closure run
+- Eval: `tests/evals/test_proof_ledger_intent.py`
+
+## 2026-08-17T04:18:00Z [Cursor] PRODUCTION BROKER HEALTH CLOSURE
+
+- Executed canonical bounded Dhan recovery workflow run `31993268520`.
+- Confirmed dynamic Secret Manager v262, broker connected, current Dhan
+  gain-rank/option-chain data, and fresh production UI/API agreement.
+- Cross-verified production SHA `4185162b...` with GitHub `main` and Cloud Run
+  revision `genesis-system3-web-00425-dec` at 100% traffic.
+- Kept LIVE and order execution disabled.
+- Removed TopBar's unrelated-API-success fallback so it cannot falsely infer
+  broker connectivity.
+- Added request-scoped evidence:
+  `reports/latest/broker_health_confirmed/README.md`.
+
+## 2026-08-16T20:00:00Z [Cursor] CONTINUOUS CLOSURE SYSTEM
+
+Built repo-first continuous closure control plane:
+- `scripts/system3_continuous_closure_orchestrator.py`
+- `dashboard/backend/continuous_closure_service.py`
+- `GET /api/continuous_closure`
+- Overview `ContinuousClosureBoard` (blocker cards + auto-resume)
+- Artifacts: `reports/latest/continuous_closure/{summary,resume_state}.json`
+- Docs/rules: `docs/CONTINUOUS_CLOSURE_SYSTEM.md`, `.cursor/rules/continuous-closure.mdc`
+- Eval: `tests/evals/test_continuous_closure.py`
+
+## 2026-08-16T18:00:00Z [Cursor] PERMANENT E2E ISSUES→SOLUTIONS LAW (all agents)
+
+
+User locked flowchart into permanent multi-agent policy:
+- Image: `docs/agent_memory/END_TO_END_ISSUES_SOLUTIONS_FLOWCHART.png`
+- Binding: `docs/END_TO_END_ISSUES_SOLUTIONS_AGENT_POLICY.md`
+- Cursor rule: `.cursor/rules/end-to-end-issues-solutions.mdc` (`alwaysApply: true`)
+- `agent_policy.yaml` → version 2 + `end_to_end_issues_solutions` block
+- `AGENTS.md` read-first list updated
+
+Every agent must run Issue→Solution→Outcome with People/Process/Technology/Policies/KPIs enablers; no painting UI green without the matching solution row; post-ship live SHA verify mandatory.
+
 ## 2026-06-23 (Session 10 — Claude)
+
 
 ### [2026-06-23 12:15 IST] [Claude] DATA APIs ACTIVATED — Full market data unlocked
 
@@ -267,6 +359,8 @@ Phase 1 is now fully implemented. Feedback loop: signal engine → aggregator �
 - **Codex: please verify independently and respond in CHANGE_LOG**
 
 **[2026-06-13 15:45 IST] [Codex]** PROPOSAL: Scheduler daemon + test suite — requesting Gemini cross-verification. File: state/proposals/codex_scheduler_tests_proposal_2026-06-13.md
+
+**[2026-09-03 03:51] [bhavcopy_downloader.py]** DOWNLOAD: 1 bhavcopy files cached, 0 failed. Dates: ['20260824']
 
 <!-- APPEND NEW ENTRIES ABOVE THIS LINE -->
 <!-- Template:
@@ -1233,3 +1327,45 @@ Verification with local `REQUIRE_API_KEY=true`:
 
 
 
+[2026-08-13 21:45 IST] [Codex] DECISION: Repair public Risk & Scenarios UI by removing the anonymous POST to `/api/risk/check-limits` and its five-second retry storm. Consume the existing read-only portfolio-risk GET, retain SSOT state as partial fallback, show explicit unavailable/pending truth, and remove hard-coded factor/scenario claims. Improve Options Intelligence only with existing store/navigation primitives: symbol selection, source/status truth, zero-safe metric rendering, and a path to the full chain. No trading or mutation authority changes.
+[2026-08-13 22:05 IST] [Codex] DECISION: Exclude safe read methods (GET/HEAD/OPTIONS) from the legacy per-process compatibility rate bucket. Production browser proof showed three unrelated GET routes returning 429 together after normal tab navigation because anonymous requests share one request.client.host bucket behind Cloud Run. Mutation policy remains the authority for unsafe methods; write protection is unchanged. Retain throttling for unsafe methods and add Retry-After on its 429 response.
+[2026-08-13 22:45 IST] [Codex] DECISION: Truth-first lifecycle correction for four independently verified UI defects. Remove unconditional CE/PE and paper lifecycle PASS states, stop Signals from defaulting missing QC evidence to PASS, and replace unwired Multibagger/Prediction Audit operational metrics with explicit pending states. No API, trading, model, or navigation behavior changes.
+[2026-08-13 22:28 IST] [Codex] DECISION: Repair the existing /api/portfolio/unified cache contract. Live canonical dashboard verification measured a 12.66-second response. The route checks the existing 30-second cache but never stores successful results, so every caller repeats blocking portfolio aggregation. Cache only completed successful payloads; preserve timeout/error behavior and all paper/live locks.
+[2026-08-13 23:15 IST] [Codex] DECISION: Make public paper/live UI strictly read-only and evidence-driven. Remove denied approval/tick mutations, replace missing source and P&L summaries with pending values, make simulation refresh market-aware, and remove decorative trend direction claims.
+[2026-08-14] [Codex] WAVE 1: Added versioned read-only `/api/research/multibagger` contract on the existing runtime-state/Firestore ownership path. Missing evidence remains PENDING; candidate ranking becomes PARTIAL only after mandatory identity, observed price source/currency/timestamp, and model name/version/generated timestamp validation. Unsupported research sections remain PENDING. Added backend contract tests; Multibagger UI and trading authority unchanged.
+[2026-08-14] [Codex] WAVE 1 REVIEW: Tightened Multibagger evidence admission with approved producer/DHAN source checks, unique positive integer ranks and identities, timezone-aware future/freshness bounds, explicit stale envelopes, projection-only output, and cryptographic artifact/data/code proof requirements. Model metadata without all hashes is labeled UNVERIFIED with `proof_ready=false`.
+[2026-08-14] [Codex] WAVE 1 PROOF CORRECTION: Hash-shaped producer metadata never constitutes server verification. The contract now exposes complete hash manifests only as `producer_asserted_hashes` with `manifest_complete`; model evidence remains UNVERIFIED and `proof_ready=false` until a trusted registry or server-side object rehash is implemented.
+[2026-08-14] [Codex] INTEGRATED SCHEDULER MILESTONE 1: Added a dedicated Firestore scheduler-evidence document contract, separate from runtime state. Writes are transactional, monotonic by trusted observation time, content-hashed, idempotent for exact retries, conflict-rejecting, and protected by a bounded exclusive collector lease. No scheduler health claim or deployment change is made by this storage-only milestone.
+[2026-08-14] [Codex] INTEGRATED SCHEDULER MILESTONE 2: Added a bounded fenced collector for sanitized Google Cloud Scheduler and Cloud Run latest-execution facts. The cloud health GET now reads durable evidence and independently fails closed for missing/stale evidence, 7/4/3 coverage mismatch, missing enabled targets, or failed latest executions; producer-supplied health is never trusted. Live execution remains OFF.
+[2026-08-14] [Codex] INTEGRATED SCHEDULER MILESTONE 3: Added one-shot rank, forecast, and signal lanes with dedicated hashed Firestore artifacts. Rank is the sole producer; forecast reads today's durable rank artifact; signals downloads and consumes the same-session official bhavcopy. Bootstrap owns dedicated keyless collector/business identities and narrow roles; deployment uses explicit Python commands, one task, zero retries, live/order OFF, and a 15-minute rank-to-forecast dependency gap.
+[2026-08-14] [Codex] LIVE FOLLOW-UP: Paused legacy scheduler targets are now explicitly not applicable; only enabled schedulers require exact target URI and delivery facts. Collector prior-execution selection parses completion timestamps and chooses the newest completed run. Deployment proof requires exact collector execution and durable evidence while preserving honest unrelated workload failures instead of demanding an overall green scheduler.
+
+[2026-08-15T12:43:20Z] [Cursor] IMPLEMENT ship-now A'+B-phase1+C': remove deploy rotate execute; web/default-compute job invoker removed; recovery SA gs3-token-recovery WIF; self-heal fail-closed default 0; broker proof DEGRADED/WARN; CI contracts inverted; Rule1 PARTIAL pending project run.jobs.run scrub. Proof: reports/latest/broker_authority_6rules/
+
+
+## [2026-08-16T11:58:43Z] [Cursor] BROKER AUTH SCREENSHOT REPROOF (IST)
+- User screenshot ~17:04 IST showed Auth issue on SHA a48e7b3 **before** v259 remint (17:10 IST).
+- Live now: connected=true, dhan-access-token v259, serving 2d6a9e8 / rev 00388, Dhan profile HTTP 200, UI Broker Connected.
+- Google Storage Insights NHLVNDD marked **UNRELATED** (no broker/GCS Insights code path; asia-south1 web unaffected).
+- Docs: docs/incidents/BROKER_AUTH_20260816_IST.md + BROKER_SETUP.md update; DataIntegrity token chip shows SM version / DH-906 label trap.
+
+## [2026-08-16T12:45:00Z] [Cursor] QUANT LIFECYCLE Q AUDIT PACKAGE
+- Instruction: docs/chatgpt_instruction_for_cursar_2.md
+- Part1 broker tasks re-verified PASS (connected v259 LIVE=false)
+- Q1-Q26 evidence session: docs/audits/system3_quant_lifecycle/sessions/20260816T123000Z/
+- Verdict: broker PASS; quant lifecycle PARTIAL/NOT_PROVEN; promotion BLOCKED
+- Q27 source truncated in instruction file
+
+## [2026-08-16T15:15:00Z] [Cursor] LIVE DOCS CROSS-VERIFY + SSOT PIN REFRESH
+- Compared ChatGPT-required / multi-AI docs against GitHub `main` + open PRs + production URL.
+- Truth: NOT all docs were already live on `main`. Gaps closed in PR (docs-only):
+  - added `18_CURRENT_REMOTE_MAIN_REVALIDATION_ADDENDUM_20260816.md` (was only on PR #251)
+  - added `19_LIVE_DOCS_CROSSVERIFY_MATRIX_20260816.md`
+  - refreshed `SYSTEM_STATE.md` live pins (was stale 2026-06-14 header / Render-era)
+- Still pending on open PRs (not duplicated here to avoid path conflict):
+  - `docs/security/SEC1_NPM_AUDIT_REMEDIATION_20260816.md` → PR #252
+  - UI-OBS-1 code → PR #251
+  - BR-1 code → PR #250
+- Missing older task artifact `reports/latest/broker_secret_dup_audit_20260816/FINAL_REPORT.md` — NOT created under SEC-1 package-only ownership.
+- Live broker at capture: connected=false TOKEN_EXPIRED_OR_INVALID SM v259; serving SHA still 997daef4…; LIVE=false.
+- Bus: Issue #188; NEXT_OWNER for merges remains ChatGPT.

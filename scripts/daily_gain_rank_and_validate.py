@@ -74,6 +74,15 @@ def is_expiry_day(today: date | None = None) -> bool:
 
 
 def load_oi_cache() -> Dict[str, int]:
+    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            remote = FirestoreSchedulerEvidenceBackend().load_oi_cache()
+            if remote:
+                return remote
+        except Exception:
+            pass
     try:
         if OI_CACHE_FILE.exists():
             data = json.loads(OI_CACHE_FILE.read_text(encoding="utf-8"))
@@ -84,9 +93,17 @@ def load_oi_cache() -> Dict[str, int]:
 
 
 def save_oi_cache(snapshot: Dict[str, int]) -> None:
+    clean = {str(k): int(v) for k, v in snapshot.items() if int(v) > 0}
+    if os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("SYSTEM3_STATE_BACKEND", "").lower() == "firestore":
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            FirestoreSchedulerEvidenceBackend().save_oi_cache(clean)
+        except Exception as exc:
+            print(f"  OI cache Firestore write warning: {exc}")
     STATE_DIR.mkdir(parents=True, exist_ok=True)
     tmp = OI_CACHE_FILE.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(snapshot, indent=2, sort_keys=True), encoding="utf-8")
+    tmp.write_text(json.dumps(clean, indent=2, sort_keys=True), encoding="utf-8")
     os.replace(tmp, OI_CACHE_FILE)
 
 
@@ -101,20 +118,35 @@ def _oi_total(df: pd.DataFrame) -> int:
 
 
 def load_live_chain_data() -> Tuple[Dict[str, pd.DataFrame], Dict[str, float]]:
-    """Load official Dhan option-chain rows only."""
+    """Load official Dhan option-chain rows only (no NSE/Yahoo fallbacks that hang on Cloud Run)."""
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeout
+
     dsm = get_datasource_manager()
     all_data: Dict[str, pd.DataFrame] = {}
     spots: Dict[str, float] = {}
     blocked: Dict[str, str] = {}
+    per_symbol_timeout = float(os.environ.get("DHAN_OPTION_CHAIN_TIMEOUT_S", "45"))
     for idx, sym in enumerate(ENABLED_UNDERLYINGS):
         if idx:
             time.sleep(float(os.environ.get("DHAN_OPTION_CHAIN_SPACING_S", "3.25")))
-        df, spot = dsm.fetch_option_chain(sym)
-        if df is None or df.empty or float(spot or 0) <= 0:
-            reason = dsm.last_error or "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
-            blocked[sym] = reason
+        try:
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                fut = pool.submit(dsm._fetch_dhan_real, sym, "")
+                result = fut.result(timeout=per_symbol_timeout)
+        except FuturesTimeout:
+            blocked[sym] = f"DHAN_OPTION_CHAIN_TIMEOUT_{int(per_symbol_timeout)}S"
+            print(f"  {sym}: BLOCKED — {blocked[sym]}")
+            continue
+        except Exception as exc:
+            blocked[sym] = f"DHAN_OPTION_CHAIN_ERROR:{type(exc).__name__}"
+            print(f"  {sym}: BLOCKED — {blocked[sym]}")
+            continue
+        if not result or result[0] is None or getattr(result[0], "empty", True) or float(result[1] or 0) <= 0:
+            reason = getattr(dsm, "last_error", None) or "NO_CURRENT_OR_VERIFIED_DHAN_OPTION_CHAIN_ROWS"
+            blocked[sym] = str(reason)
             print(f"  {sym}: BLOCKED — {reason}")
             continue
+        df, spot = result
         all_data[sym] = df
         spots[sym] = float(spot)
         print(f"  {sym}: Dhan official chain rows={len(df)} spot={float(spot):.2f}")
@@ -152,6 +184,12 @@ def run_ranking(top_n: int = 5) -> None:
         _write_status("BLOCKED", "Rank engine produced no rows from verified Dhan chains")
         print("  BLOCKED: no ranked rows")
         return
+
+    # Persist current OI snapshot for next cloud run (Firestore when configured).
+    try:
+        save_oi_cache({sym: _oi_total(df) for sym, df in all_data.items()})
+    except Exception as exc:
+        print(f"  OI cache save warning: {exc}")
 
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     ranked_df.to_json(REPORT_DIR / "ranked.json", orient="records", indent=2)

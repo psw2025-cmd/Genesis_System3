@@ -1,0 +1,26 @@
+{
+  "schema": "SYSTEM3_AGENT_EVIDENCE_CATALOG_V1",
+  "purpose": "Discovery index only; GitHub main, GCP runtime, Dhan, and fresh browser/API evidence remain authoritative.",
+  "entries": [
+    {"id":"authority","requirement":"required","path":"AGENTS.md","runner":null},
+    {"id":"runbook","requirement":"required","path":"docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md","runner":null},
+    {"id":"policy","requirement":"required","path":"agent_policy.yaml","runner":null},
+    {"id":"policy_schema","requirement":"required","path":"schemas/agent_policy.v4.schema.json","runner":null},
+    {"id":"github_control_plane","requirement":"required","path":"scripts/system3_preflight_control_plane.py","runner":"python scripts/system3_preflight_control_plane.py"},
+    {"id":"temporal_truth_guard","requirement":"required","path":"scripts/system3_temporal_truth_guard.py","runner":"python scripts/system3_temporal_truth_guard.py --help"},
+    {"id":"production_ui_proof","requirement":"required","path":"scripts/gcp_live_ui_snapshot.py","runner":"python scripts/gcp_live_ui_snapshot.py --help"},
+    {"id":"continuous_closure","requirement":"required","path":"scripts/system3_continuous_closure_orchestrator.py","runner":"python scripts/system3_continuous_closure_orchestrator.py --offline"},
+    {"id":"proof_ledger","requirement":"required","path":"scripts/system3_proof_ledger.py","runner":"python scripts/system3_proof_ledger.py --verify-only"},
+    {"id":"issue_ledger","requirement":"required","path":"audit/live_agent_issue_ledger/SYSTEM3_LIVE_UNRESOLVED_ISSUES.csv","runner":null},
+    {"id":"prediction_benchmark","requirement":"required","path":"docs/project_control/PREDICTION_WORLD_CLASS_BENCHMARK_POLICY.md","runner":null},
+    {"id":"runtime_data_map","requirement":"required","path":"docs/runtime/AUTHORITATIVE_RUNTIME_AND_DATA_MAP.md","runner":null},
+    {"id":"external_ssot_proposal_decision","requirement":"required","path":"docs/control_plane/SYSTEM3_EXTERNAL_SSOT_PROPOSAL_DECISION.md","runner":null},
+    {"id":"drive_archive","requirement":"conditional","path":"scripts/system3_drive_archive_control.py","runner":"python scripts/system3_drive_archive_control.py --help"},
+    {"id":"repo_cleanup","requirement":"conditional","path":"scripts/system3_repo_clean_forensic_toolkit.py","runner":"python scripts/system3_repo_clean_forensic_toolkit.py --help"},
+    {"id":"bigquery_audit","requirement":"conditional","path":null,"runner":null,"activation":"Only when a governed BigQuery audit dataset is discovered and authorized."},
+    {"id":"immutable_gcs_audit","requirement":"conditional","path":null,"runner":null,"activation":"Only when a governed versioned/retained Cloud Storage target is discovered and authorized."},
+    {"id":"vertex_training","requirement":"conditional","path":null,"runner":null,"activation":"Only when current architecture and benchmark evidence select Vertex AI; never assumed mandatory."},
+    {"id":"dataflow_pipeline","requirement":"conditional","path":null,"runner":null,"activation":"Only when current workload evidence requires Dataflow; absence is not automatically a defect."},
+    {"id":"kubernetes_chaos","requirement":"conditional","path":null,"runner":null,"activation":"Only if a governed Kubernetes environment exists; Cloud Run does not require Chaos Mesh."}
+  ]
+}

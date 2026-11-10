@@ -5,6 +5,8 @@ import EmptyState from './EmptyState'
 import ErrorBanner from './ErrorBanner'
 import { AuthUnlock } from './AuthUnlock'
 import { MarketTopCePeTable } from './MarketTopCePeTable'
+import { asRecord, gainValue, getErrorMessage, getResponseStatus } from '../lib/strictFlags';
+type ScannerRecord = Record<string, unknown>
 
 type SignalView = {
   action: string
@@ -26,24 +28,28 @@ type SignalView = {
   raw?: any
 }
 
-function firstCandidateFromScanner(scanner: any): any | null {
-  const table = scanner?.market_top_table || scanner?.market_wide?.top_combined_list || []
-  if (Array.isArray(table) && table.length) {
+function firstCandidateFromScanner(scanner: unknown): unknown | null {
+  const s = asRecord(scanner)
+  const marketWide = asRecord(s['market_wide'])
+  const tableRaw = s['market_top_table'] ?? marketWide['top_combined_list'] ?? []
+  const table: unknown[] = Array.isArray(tableRaw) ? tableRaw : []
+  if (table.length) {
     return table[0]
   }
-  const paths = [
-    scanner?.market_wide?.top_ce,
-    scanner?.market_wide?.top_pe,
+  const paths: unknown[] = [
+    marketWide['top_ce'],
+    marketWide['top_pe'],
   ]
-  const bySegment = scanner?.by_segment || {}
-  for (const seg of Object.values(bySegment) as any[]) {
-    paths.push(seg?.top_ce, seg?.top_pe)
-    if (Array.isArray(seg?.top_ce_list)) paths.push(...seg.top_ce_list)
-    if (Array.isArray(seg?.top_pe_list)) paths.push(...seg.top_pe_list)
+  const bySegment = asRecord(s['by_segment'])
+  for (const seg of Object.values(bySegment)) {
+    const sg = asRecord(seg)
+    paths.push(sg['top_ce'], sg['top_pe'])
+    if (Array.isArray(sg['top_ce_list'])) paths.push(...(sg['top_ce_list'] as unknown[]))
+    if (Array.isArray(sg['top_pe_list'])) paths.push(...(sg['top_pe_list'] as unknown[]))
   }
   const rows = paths.filter(Boolean)
   if (!rows.length) return null
-  rows.sort((a: any, b: any) => Number(b?.gain_pct || 0) - Number(a?.gain_pct || 0))
+  rows.sort((a, b) => gainValue(b) - gainValue(a))
   return rows[0]
 }
 
@@ -75,16 +81,14 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
   const isPe = opt.includes('PE') || opt.includes('PUT')
   const isCe = opt.includes('CE') || opt.includes('CALL')
   const gain = Number(candidate.gain_pct ?? candidate.change_percent ?? 0)
-  const confidenceRaw = Number(candidate.confidence ?? candidate.score ?? candidate.display_score ?? Math.max(0, Math.min(100, Math.abs(gain))))
-  const confidence = confidenceRaw > 1 ? confidenceRaw / 100 : confidenceRaw
   const ltp = Number(candidate.ltp ?? candidate.last_price ?? 0)
   return {
     action: 'TRADE_CANDIDATE_ONLY',
     underlying: candidate.underlying || candidate.symbol || candidate.ticker || 'N/A',
-    strategy: `${source}: ${isPe ? 'PE' : isCe ? 'CE' : opt || 'OPTION'} candidate evidence`,
-    confidence: Number.isFinite(confidence) ? confidence : 0,
+    strategy: `${source}: ${isPe ? 'PE' : isCe ? 'CE' : opt || 'OPTION'} scanner observation`,
+    confidence: 0,
     direction: isPe ? 'PE' : isCe ? 'CE' : opt || 'NONE',
-    reason: 'Candidate evidence exists, but broker order remains disabled until risk/paper lifecycle checks pass.',
+    reason: 'Scanner observation only. Not a model confidence and not a broker order. LIVE remains off.',
     source,
     option_type: isPe ? 'PE' : isCe ? 'CE' : opt,
     strike: candidate.strike,
@@ -92,9 +96,6 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
     trading_symbol: candidate.trading_symbol || candidate.symbol,
     ltp: Number.isFinite(ltp) ? ltp : undefined,
     gain_pct: Number.isFinite(gain) ? gain : undefined,
-    entry_mid: Number.isFinite(ltp) && ltp > 0 ? ltp : undefined,
-    stop_loss: Number.isFinite(ltp) && ltp > 0 ? Number((ltp * 0.8).toFixed(2)) : undefined,
-    target: Number.isFinite(ltp) && ltp > 0 ? Number((ltp * 1.3).toFixed(2)) : undefined,
     raw: candidate,
   }
 }
@@ -115,7 +116,7 @@ export default function Signals() {
       ])
 
       if (stateRes.status === 'rejected') {
-        const status = (stateRes.reason as any)?.response?.status || null
+        const status = getResponseStatus(stateRes.reason)
         if (status === 401) {
           setAuthRequired(true)
           setError(null)
@@ -154,12 +155,12 @@ export default function Signals() {
       const scannerTotal = Number(scanner?.segments_total || 0)
       const qcFailures = [
         ...(state.qc?.qc_failures || state.qc?.failures || []),
-        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${(scannerRes.reason as any)?.message || 'unknown'}`] : []),
-        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${(gainRes.reason as any)?.message || 'unknown'}`] : []),
+        ...(scannerRes.status === 'rejected' ? [`scanner endpoint failed: ${getErrorMessage(scannerRes.reason)}`] : []),
+        ...(gainRes.status === 'rejected' ? [`gain_rank endpoint failed: ${getErrorMessage(gainRes.reason)}`] : []),
       ]
 
       const qcData = {
-        status: candidate ? 'PASS' : (state.qc?.status || 'PASS'),
+        status: state.qc?.status || (candidate ? 'SCANNER_ONLY' : 'PENDING'),
         total_contracts: state.qc?.contracts_total || 0,
         underlyings: state.qc?.underlyings || scannerImplemented || 0,
         scanner_segments: `${scannerImplemented}/${scannerTotal || '-'}`,
@@ -190,8 +191,6 @@ export default function Signals() {
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
   }, [])
 
   if (isLoading && !signal && !authRequired) {
@@ -244,12 +243,12 @@ export default function Signals() {
   if (isCandidate) blockingReasons.push('Candidate only: paper/risk/live gates still decide whether trade is allowed')
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       <h2 className="text-3xl font-bold">Signals & Recommendations</h2>
 
       <div className={`p-6 rounded-lg ${isTrade ? 'bg-green-900' : isCandidate ? 'bg-indigo-900' : isManaging ? 'bg-blue-900' : 'bg-gray-800'}`}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-2xl font-bold">{isTrade ? 'TRADE SIGNAL' : isCandidate ? 'REAL CANDIDATE EVIDENCE' : isManaging ? 'MANAGING POSITIONS' : 'NO TRADE'}</h3>
+          <h3 className="text-2xl font-bold">{isTrade ? 'TRADE SIGNAL' : isCandidate ? 'SCANNER OBSERVATION' : isManaging ? 'MANAGING POSITIONS' : 'NO TRADE'}</h3>
           <div className={`px-4 py-2 rounded ${isTrade ? 'bg-green-600' : isCandidate ? 'bg-indigo-600' : isManaging ? 'bg-blue-600' : 'bg-gray-600'}`}>{signal.action}</div>
         </div>
 
@@ -272,7 +271,7 @@ export default function Signals() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div><div className="text-sm text-gray-400">Underlying</div><div className="text-xl font-bold">{signal.underlying || 'N/A'}</div></div>
           <div><div className="text-sm text-gray-400">Strategy</div><div className="text-xl font-bold">{signal.strategy || 'NONE'}</div></div>
-          <div><div className="text-sm text-gray-400">Confidence</div><div className="text-xl font-bold">{signal.confidence ? (signal.confidence * 100).toFixed(1) + '%' : 'N/A'}</div></div>
+          <div><div className="text-sm text-gray-400">{isCandidate ? 'Model confidence' : 'Confidence'}</div><div className="text-xl font-bold">{isCandidate || !signal.confidence ? 'N/A' : (signal.confidence * 100).toFixed(1) + '%'}</div></div>
         </div>
 
         {(isTrade || isCandidate) && (
@@ -284,11 +283,11 @@ export default function Signals() {
           </div>
         )}
 
-        {(isTrade || isCandidate) && (
+        {isTrade && signal.entry_mid != null && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div><div className="text-sm text-gray-400">Entry Mid</div><div className="text-lg">Rs {signal.entry_mid?.toFixed(2) || 'N/A'}</div></div>
-            <div><div className="text-sm text-gray-400">Stop Loss</div><div className="text-lg">Rs {signal.stop_loss?.toFixed(2) || 'N/A'}</div></div>
-            <div><div className="text-sm text-gray-400">Target</div><div className="text-lg">Rs {signal.target?.toFixed(2) || 'N/A'}</div></div>
+            <div><div className="text-sm text-gray-400">Entry Mid</div><div className="text-lg">Rs {signal.entry_mid.toFixed(2)}</div></div>
+            <div><div className="text-sm text-gray-400">Stop Loss</div><div className="text-lg">Rs {signal.stop_loss != null ? signal.stop_loss.toFixed(2) : 'N/A'}</div></div>
+            <div><div className="text-sm text-gray-400">Target</div><div className="text-lg">Rs {signal.target != null ? signal.target.toFixed(2) : 'N/A'}</div></div>
           </div>
         )}
       </div>

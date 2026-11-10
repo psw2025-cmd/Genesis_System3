@@ -10,7 +10,6 @@ History: up to 5 years (Dhan Data APIs plan)
 """
 
 import logging
-import os
 from datetime import date, timedelta
 from pathlib import Path
 from typing import List, Optional
@@ -32,14 +31,14 @@ _DHAN_EXCHANGE = "IDX_I"
 
 
 def _load_dhan():
-    """Load Dhan client from env."""
+    """Load Dhan client from the canonical credential source (local vault / env)."""
     try:
-        import dotenv
         from dhanhq import dhanhq
         from dhanhq.dhan_context import DhanContext
-        dotenv.load_dotenv(ROOT_DIR / ".secrets" / "dhan.env")
-        token = os.environ.get("DHAN_ACCESS_TOKEN", "")
-        client_id = os.environ.get("DHAN_CLIENT_ID", "")
+        from core.utils.env_loader import get_dhan_credentials
+        creds = get_dhan_credentials()
+        client_id = (creds.get("client_id") or "").strip().lstrip("﻿")
+        token = (creds.get("access_token") or "").strip().lstrip("﻿")
         if not token or not client_id:
             return None
         ctx = DhanContext(client_id, token)

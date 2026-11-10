@@ -1,106 +1,42 @@
-# System3 Agent Runbook
+# Genesis System3 autonomous end-to-end runbook
 
-## Purpose
+**Authority marker:** `SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1`.
+**Current owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md` (2026-10-18). The September local-laptop directive and Claude-only override are `HISTORICAL_NON_AUTHORITY`.
 
-This file controls how ChatGPT, Replit Agent, Cursor, Codex, Gemini, or any other agent must work on System3.
+## Mandatory fresh re-read
+Read this runbook, the owner directive, `AGENTS.md`, `agent_policy.yaml`, and `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md` from the exact current checked-out commit immediately before:
+1. every merge decision;
+2. every deployment or production mutation;
+3. every acceptance or rollback decision;
+4. every issue/blocker closure;
+5. every final response claiming completion/current runtime.
 
-No agent should perform random fixes. Every action must improve a named blocker or proof gate.
+Chat memory, an earlier read or `reports/latest/` is not fresh runtime evidence. Record exact main/head SHA, marker and UTC in the active completion ledger.
 
-## Standing Safety Rules
+## Execution authority and owner approval
+Latest explicit owner direction > permanent trading/secret/destructive/cost safety > active cloud directive > `AGENTS.md` / machine policy > scoped rules > historical material. GitHub exact approved main is code authority. Target runtime and acceptance are GCP `system3-openalgo-safe`, `asia-south1`, from independently observed deployed SHA/digest plus same-session cloud API/browser evidence. No laptop checkout, localhost port or Windows scheduled task is routine production authority.
 
-- Do not enable live trading.
-- Do not change Dhan credentials, `.env`, `.secrets`, token files, or broker secrets.
-- Do not change order placement from blocked to allowed.
-- Do not claim live readiness.
-- Do not delete old documentation without classification and approval.
-- Do not patch runtime code before blocker evidence is logged.
+**Current authorization is ONLY** autonomous GitHub edits, branches/PRs, CI/testing and read-only GCP inventory. Before ANY billable GCP build/deploy, artifact push, IAM/secret/token/scheduler/resource or billing/config mutation, obtain separately explicit owner approval for that scope. Do not introduce/enable a push-triggered production deploy as a shortcut. Respect cost exposure; budget alerts are not a hard cap.
 
-## Standard Agent Cycle
-
+## Permanent safety
 ```text
-1. Read SYSTEM3_MASTER_TRACKER.md
-2. Read SYSTEM3_BLOCKER_REGISTER.md
-3. Read current runtime truth/proof if available
-4. Generate blocker report before patching
-5. Patch only the approved blocker
-6. Run proof/test
-7. Update master tracker and blocker register
-8. Return changed files, commands, outputs, remaining blockers
+ANALYZE_MODE=1
+PAPER_MODE=1
+LIVE_TRADING_ENABLED=0
+SYSTEM3_LIVE_TRADING_ALLOWED=0
+AUTO_EXECUTE_TRADES=0
+LIVE_ORDER_AUTHORITY=0
+ORDER_PLACEMENT_ALLOWED=false
 ```
+No real broker order placement/modification/cancellation/square-off; no order-shaped production endpoint tests. Never reveal broker secrets, token payloads, PIN/TOTP or service-account JSON keys. Dhan broker authority remains read-only at this stage.
 
-## Required Agent Output
+## Current safe workflow
+1. Read current main and active PR ownership, then inspect workflow triggers/permissions before any GitHub write. Use a dedicated non-destructive branch.
+2. Make scoped policy/code corrections, run GitHub-hosted tests and review exact-head CI. Investigate failures without weakening gates. Do not merge an old laptop-only or stale cloud PR blindly.
+3. Read-only GCP verification uses explicit project and region; confirm resource ownership, deployment absence/presence, WIF bindings and image provenance without deploying or reading secret values.
+4. Stop at the separate owner approval boundary for cloud configuration/deploy. If not approved, mark `BLOCKED_OWNER_APPROVAL` and continue only safe GitHub/read-only work.
+5. After later authorized deployment, independently prove source/revision/image traceability; startup and service health; exactly one broker worker lease; session-aware broker, symbols/expiry/option-chain completeness; continuous timestamps; persisted PAPER lifecycle; 22-tab same-session semantic UI/API parity; independent zero-real-order proof; signed or SHA-256 anchored evidence.
 
-Every agent response must include:
+`CI green`, `image exists`, `HTTP 200`, `tab rendered` or `connected=true` alone NEVER establish full production PASS. Treat market closure truthfully. Status is `PASS/FAIL/BLOCKED/UNKNOWN/NOT_PROVEN`, each with UTC, project, exact SHA/digest and raw receipt. Historical resources remain historical until newly certified.
 
-| Output | Required |
-|---|---|
-| Goal being improved | Yes |
-| Blocker ID | Yes |
-| Files changed | Yes |
-| Files intentionally not touched | Yes |
-| Commands/tests run | Yes |
-| Before proof | Yes |
-| After proof | Yes |
-| Remaining blockers | Yes |
-| Safety confirmation | Yes |
-
-## First Mandatory Reports
-
-Before broad fixes, the agent must generate:
-
-```text
-reports/latest/markdown_inventory.md
-reports/latest/markdown_inventory.json
-reports/latest/documentation_contradictions.md
-reports/latest/system3_blocker_report.md
-reports/latest/system3_blocker_report.json
-reports/latest/option_strike_visibility.md
-reports/latest/option_strike_visibility.json
-reports/latest/model_accuracy_report.md
-reports/latest/model_accuracy_report.json
-```
-
-## Replit-Specific Rules
-
-Because GitHub workflow may be unavailable due billing, Replit can be used as the active repair/staging workspace.
-
-Replit agent must:
-
-1. Work only on a safe copied project.
-2. Use Replit Secrets for credentials.
-3. Never commit credentials into code.
-4. Generate reports locally before proposing deployment.
-5. Export a safe ZIP after successful proof.
-6. Keep Render/current dashboard unchanged unless user explicitly migrates runtime.
-
-## GitHub-Specific Rules
-
-If GitHub is usable:
-
-1. Documentation-only commits are allowed when explicitly requested.
-2. Runtime code changes should go through branch/PR where possible.
-3. Do not merge old stale PRs without fresh proof.
-4. Do not trust historical `FINAL/COMPLETE` docs over current runtime truth.
-
-## Patch Approval Matrix
-
-| Patch type | Allowed without extra confirmation? | Notes |
-|---|---|---|
-| Add markdown control files | Yes if requested | Safe documentation control |
-| Add report scripts | Yes if no credentials touched | Must be read-only by default |
-| Fix false alert logic | Yes after proof | Must keep PAPER/live blocked |
-| Change dashboard hard-coded proof gates | Yes after report | Must clearly label runtime/static |
-| Change strategy/model logic | No | Needs separate approval |
-| Change broker/order routing | No | High risk |
-| Enable live trading | No | Explicit future approval only |
-| Delete old docs | No | Archive classification first |
-
-## Proof Standard
-
-A fix is accepted only if it includes:
-
-```text
-before state -> patch -> test command -> after state -> blocker update
-```
-
-If proof is missing, the blocker remains open.
+Owner is not the routine technical operator: use connected capabilities directly, and request action only for genuine approval, broker MFA or unavailable authorization.

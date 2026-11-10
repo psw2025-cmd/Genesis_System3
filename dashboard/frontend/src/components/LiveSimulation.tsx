@@ -64,6 +64,11 @@ export function LiveSimulation() {
   const [running, setRunning] = useState(true)
   const [scenario, setScenario] = useState<'trend' | 'range' | 'volatile'>('trend')
   const [tick, setTick] = useState(0)
+  const [replayStep, setReplayStep] = useState(0)
+  const [replay, setReplay] = useState<any>(null)
+  const [lifecycle, setLifecycle] = useState<any>(null)
+  const [lifecycleError, setLifecycleError] = useState<string | null>(null)
+  const [replayError, setReplayError] = useState<string | null>(null)
   const [data, setData] = useState<BackendSimState | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -81,16 +86,37 @@ export function LiveSimulation() {
       }
     }
     load()
-    if (!running) return () => { stop = true }
-    const id = window.setInterval(() => {
-      setTick(v => v + 1)
-      load()
-    }, 2500)
-    return () => { stop = true; window.clearInterval(id) }
-  }, [running, scenario])
+    return () => { stop = true }
+  }, [scenario, tick])
+
+  useEffect(() => {
+    if (!running) return
+    const pollMs = data?.market?.is_open ? 15000 : 60000
+    const id = window.setInterval(() => setTick(v => v + 1), pollMs)
+    return () => window.clearInterval(id)
+  }, [running, data?.market?.is_open])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/simulation/replay/state?scenario=${encodeURIComponent(scenario)}&step=${replayStep}`, { credentials: 'include' })
+      .then(res => { if (!res.ok) throw new Error(`replay API HTTP ${res.status}`); return res.json() })
+      .then(payload => { if (!cancelled) { setReplay(payload?.scenario === scenario && payload?.step === replayStep ? payload : null); setReplayError(payload?.scenario === scenario && payload?.step === replayStep ? null : 'REPLAY_PROVENANCE_MISMATCH') } })
+      .catch(err => { if (!cancelled) { setReplay(null); setReplayError(String(err)) } })
+    return () => { cancelled = true }
+  }, [scenario, replayStep])
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/simulation/replay/lifecycle?scenario=${encodeURIComponent(scenario)}&step=${replayStep}`, { credentials: 'include' })
+      .then(res => { if (!res.ok) throw new Error(`lifecycle API HTTP ${res.status}`); return res.json() })
+      .then(payload => { if (!cancelled) { const valid = payload?.mode === 'SYNTHETIC_PAPER_ONLY' && payload?.source === 'DETERMINISTIC_SYNTHETIC_MARKET' && payload?.broker_orders === false && payload?.scenario === scenario && payload?.step === replayStep; setLifecycle(valid ? payload : null); setLifecycleError(valid ? null : 'LIFECYCLE_PROVENANCE_MISMATCH') } })
+      .catch(err => { if (!cancelled) { setLifecycle(null); setLifecycleError(String(err)) } })
+    return () => { cancelled = true }
+  }, [scenario, replayStep])
 
   const rows = data?.positions || []
-  const totalPnl = Number(data?.paper?.total_pnl || rows.reduce((a, r) => a + Number(r.pnl || 0), 0))
+  const rawPnl = data?.paper?.total_pnl ?? (rows.length ? rows.reduce((a, r) => a + Number(r.pnl ?? 0), 0) : null)
+  const totalPnl = rawPnl == null ? null : Number(rawPnl)
   const gateItems = useMemo(() => Object.entries(data?.gates || {}).filter(([k]) => k !== 'real_live_gate_credit'), [data])
 
   return (
@@ -113,9 +139,72 @@ export function LiveSimulation() {
 
       {error && (
         <div style={{ ...cardStyle('rgba(239,68,68,.35)'), marginBottom: '14px', color: 'var(--down)', fontWeight: 900 }}>
-          Backend simulation API not available yet: {error}. After Render deploy, this should come from /api/simulation/live/state.
+          Backend simulation API unavailable: {error}. Expected local route: /api/simulation/live/state.
         </div>
       )}
+
+      <div data-testid="synthetic-paper-lifecycle" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Synthetic PAPER Lifecycle · Order / Fill / Position / Exit</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>ISOLATED VIRTUAL MARKET — NOT REAL TRADES OR VERIFIED PROFIT</p>
+        <div role="group" aria-label="Synthetic lifecycle stage" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '10px' }}>
+          {([{ step: 0, label: 'Reset / Before BUY' }, { step: 5, label: 'Simulate BUY / Open' }, { step: 30, label: 'Simulate SELL / Closed' }] as const).map(stage => (
+            <button type="button" key={stage.step} data-testid={`synthetic-step-${stage.step}`}
+              aria-pressed={replayStep === stage.step}
+              onClick={() => { setReplayStep(stage.step); setLifecycle(null); setReplay(null); setLifecycleError(null); setReplayError(null) }}
+              style={{ padding: '7px 10px', borderRadius: '8px', cursor: 'pointer',
+                border: replayStep === stage.step ? '2px solid var(--up)' : '1px solid var(--text-mut)',
+                background: 'rgba(15,23,42,.6)', color: 'var(--text-primary)' }}>
+              {stage.label}
+            </button>
+          ))}
+        </div>
+        <p>Virtual market step: {replayStep} · Stage controls change synthetic evidence only, never broker or persistent PAPER ledger.</p>
+
+        {lifecycleError && <p role="alert">Synthetic lifecycle blocked: {lifecycleError}</p>}
+        {!lifecycle ? <p>Lifecycle evidence unavailable</p> : (
+          <>
+            <p>Orders: {lifecycle.order_count} · Simulated fills: {lifecycle.fill_count} · Open positions: {lifecycle.positions?.length ?? 0} · Closed: {lifecycle.closed_positions?.length ?? 0}</p>
+            <p>Capital limit: ₹{lifecycle.capital_limit_inr} · Daily loss limit target: ₹{lifecycle.daily_loss_limit_inr} · Broker orders: NEVER</p>
+            <p>Order Book: {lifecycle.orders?.map((o: any) => `${o.order_id} ${o.side} ${o.status}`).join(' | ') || 'No orders yet'}</p>
+            <p>Trade Book: {lifecycle.fills?.map((f: any) => `${f.fill_id} ${f.side} ${f.qty} @ ₹${f.price}`).join(' | ') || 'No simulated fills yet'}</p>
+            <p>Position Book: {lifecycle.positions?.map((p: any) => `${p.position_id} qty ${p.qty} mark ₹${p.mark_price}`).join(' | ') || 'No open position'}</p>
+            <p>Closed gross P&amp;L (synthetic): {lifecycle.closed_positions?.map((p: any) => `₹${p.gross_pnl}`).join(', ') || 'Pending exit'}</p>
+            <p>Net P&amp;L: NOT VERIFIED · Charges: NOT VERIFIED · Source: {lifecycle.source}</p>
+          </>
+        )}
+      </div>
+
+      <div data-testid="synthetic-trade-outcome-audit" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Trade-wise Prediction vs Outcome Audit</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>SYNTHETIC EXAMPLE ONLY — NOT NSE/BSE PERFORMANCE OR MODEL LEARNING</p>
+        <p>Scenario: {scenario} · Replay step: {replayStep} · Source: {lifecycle?.source ?? 'UNAVAILABLE'}</p>
+        <p>Predicted gain %: NOT AVAILABLE — no immutable entry-time prediction snapshot</p>
+        <p>Actual gross gain % (synthetic): {lifecycle?.closed_positions?.length && lifecycle?.fills?.length === 2 && Number(lifecycle.fills[0]?.price) > 0 && Number(lifecycle.fills[1]?.price) > 0
+          ? `${(((Number(lifecycle.fills[1].price) / Number(lifecycle.fills[0].price)) - 1) * 100).toFixed(2)}%`
+          : 'NOT AVAILABLE — synthetic closing fill required'}</p>
+        <p>Entry timestamp (UTC): {lifecycle?.fills?.[0]?.timestamp_utc ?? 'NOT AVAILABLE'}</p>
+        <p>Exit timestamp (UTC): {lifecycle?.fills?.[1]?.timestamp_utc ?? 'NOT AVAILABLE'}</p>
+        <p>Holding duration: {lifecycle?.fills?.length === 2 && Number.isFinite(Date.parse(lifecycle.fills[0]?.timestamp_utc)) && Number.isFinite(Date.parse(lifecycle.fills[1]?.timestamp_utc))
+          ? `${((Date.parse(lifecycle.fills[1].timestamp_utc) - Date.parse(lifecycle.fills[0].timestamp_utc)) / 1000).toFixed(0)} seconds`
+          : 'NOT AVAILABLE'}</p>
+        <p>Actual NSE/BSE top CE/PE gain: NOT VERIFIED · Ranking/score: NOT AVAILABLE</p>
+        <p>Gross vs market-top gap: NOT VERIFIED · Charges / net gain: NOT VERIFIED</p>
+        <p>Auto-learning: NOT TRAINED · Training examples verified: 0 in this isolated demonstration</p>
+      </div>
+
+      <div data-testid="synthetic-market-replay" style={{ ...cardStyle(), marginBottom: '14px' }}>
+        <h2 style={{ marginTop: 0 }}>Synthetic Market Replay · Existing Sim Live</h2>
+        <p style={{ color: 'var(--amber)', fontWeight: 800 }}>SYNTHETIC TEST DATA — NOT DHAN LIVE — NO REAL BROKER ORDERS</p>
+        {replayError ? <p role="alert">Replay unavailable: {replayError}</p> : !replay ? <p>Loading replay evidence…</p> : (
+          <>
+            <p>IST: {replay.market_timestamp_ist} · Scenario: {replay.scenario} · Tick: {replay.step}</p>
+            <p>NIFTY CE simulated bid ₹{replay.quote?.bid} / ask ₹{replay.quote?.ask} · Available qty {replay.quote?.available_qty}</p>
+            <p>Order: {replay.paper_order?.paper_order_id} · {replay.paper_order?.status} · Simulated filled qty: {replay.filled_qty}</p>
+            <p>Trade fills: {replay.paper_fills?.length ?? 0} · Position/P&amp;L reconciliation: {replay.pnl_verification_status}</p>
+            <p style={{ color: 'var(--text-mut)' }}>{replay.reason}</p>
+          </>
+        )}
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px', marginBottom: '14px' }}>
         <div style={cardStyle('rgba(0,232,122,.28)')}>
@@ -124,7 +213,7 @@ export function LiveSimulation() {
         </div>
         <div style={cardStyle('rgba(59,130,246,.28)')}>
           <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>VIRTUAL P&L</div>
-          <div style={{ fontSize: '22px', fontWeight: 950, color: totalPnl >= 0 ? 'var(--up)' : 'var(--down)' }}>₹{totalPnl.toFixed(2)}</div>
+          <div style={{ fontSize: '22px', fontWeight: 950, color: totalPnl == null ? 'var(--text-mut)' : totalPnl >= 0 ? 'var(--up)' : 'var(--down)' }}>{totalPnl == null ? 'PENDING' : `₹${totalPnl.toFixed(2)}`}</div>
         </div>
         <div style={cardStyle('rgba(245,158,11,.28)')}>
           <div style={{ color: 'var(--text-mut)', fontSize: '11px', fontWeight: 800 }}>REAL LIVE STATUS</div>
@@ -181,7 +270,7 @@ export function LiveSimulation() {
           <div style={{ display: 'grid', gap: '8px' }}>
             {gateItems.map(([item, ok]) => (
               <div key={item} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', border: '1px solid rgba(0,232,122,.20)', borderRadius: '10px', padding: '9px 10px', background: 'rgba(0,232,122,.06)' }}>
-                <span style={{ fontWeight: 800 }}>{item.replaceAll('_', ' ')}</span>
+                <span style={{ fontWeight: 800 }}>{item.replace(/_/g, ' ')}</span>
                 <span style={{ color: ok ? 'var(--up)' : 'var(--amber)', fontWeight: 950 }}>{ok ? '✓ SIM OK' : 'SIM ONLY'}</span>
               </div>
             ))}

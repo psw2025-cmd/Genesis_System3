@@ -1,0 +1,10 @@
+﻿=== SMOKE LOG EXCERPT (first 5 + last 5 lines of console) ===
+SMOKE_START
+  access_policy_schema: PASS
+  excel_sheets_1_to_8: PASS
+  command_center_artifacts_exist: PASS
+  live_deploy_info_http: PASS
+  no_live_trading_flag: PASS
+SMOKE_END
+SMOKE_PASSED=True run_id=local-pr-prep-20260825T132915Z
+audit_entry_id=aud-496c70ff722b

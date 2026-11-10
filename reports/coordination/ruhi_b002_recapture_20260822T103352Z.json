@@ -1,0 +1,85 @@
+{
+  "schema": "ruhi-b002-cursor-recapture-v1",
+  "investigation_start_utc": "2026-08-22T10:33:29Z",
+  "capture_utc": "2026-08-22T10:33:52Z",
+  "market_phase": "CLOSED",
+  "human_action_required": "NO",
+  "github": {
+    "current_main_sha": "f9a0fe6ce4e66ca2012c08a645a6bad0887a60cb",
+    "current_main_class": "docs_only_after_runtime_sha",
+    "runtime_affecting_main_sha": "3661b61b4543a6f45b0ecf48a56cd0f765716881",
+    "merged_prs": [
+      {"number": 318, "sha": "3661b61b4543a6f45b0ecf48a56cd0f765716881", "merged_at": "2026-08-22T10:23:56Z"},
+      {"number": 319, "sha": "f9a0fe6ce4e66ca2012c08a645a6bad0887a60cb", "merged_at": "2026-08-22T10:33:07Z"}
+    ]
+  },
+  "serving": {
+    "git_sha": "3661b61b4543a6f45b0ecf48a56cd0f765716881",
+    "endpoint": "https://genesis-system3-web-doq2wplepa-el.a.run.app/api/deploy/info",
+    "service": "genesis-system3-web",
+    "region": "asia-south1",
+    "project": "system3-openalgo-safe",
+    "live_trading_enabled": false,
+    "matches_runtime_affecting_main": true,
+    "docs_only_main_not_treated_as_runtime_drift": true
+  },
+  "deploy_run": {
+    "id": 32567500703,
+    "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32567500703",
+    "job": 97018169670,
+    "head_sha": "3661b61b4543a6f45b0ecf48a56cd0f765716881",
+    "conclusion": "failure",
+    "step_12_deploy_guarded_public_paper": "success",
+    "step_17_configure_rotator_scheduler": "success",
+    "step_18_configure_bounded_business_lanes": "failure",
+    "step_19_upload_scheduler_health_gate_report": "success",
+    "named_gate_artifact": {
+      "name": "system3-scheduler-health-gate-175",
+      "id": 9474562356,
+      "digest": "sha256:8697d030fbadda4baaea3be0a3af5424716f1f6c4f71666c287fc4f4e84976e0",
+      "url": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32567500703/artifacts/9474562356"
+    }
+  },
+  "named_gate": {
+    "mode": "canary",
+    "transport_class": "OK",
+    "state": "FAIL",
+    "failed_predicates": ["observability.alert_severity_none"],
+    "collector_execution": "genesis-system3-scheduler-collector-47n7j",
+    "collector_evidence_role": "prior_succeeded_execution",
+    "persisted_copy": "reports/coordination/scheduler_health_gate/20260822T103306Z_canary.json"
+  },
+  "blocker": {
+    "file": "dashboard/backend/scheduler_contract.py",
+    "symbol": "EXPECTED_SCHEDULER_CONTRACT['genesis-system3-dhan-token-rotate-daily']",
+    "expected_schedule": "30 * * * *",
+    "expected_timezone": "Asia/Kolkata",
+    "live_schedule": "*/5 * * * *",
+    "live_timezone": "Asia/Kolkata",
+    "compare_function": "dashboard/backend/firestore_state_backend.py:derive_scheduler_health",
+    "gate_predicate": "scripts/scheduler_health_gate.py:_canary_checks['observability.alert_severity_none']",
+    "next_owner": "ChatGPT",
+    "cursor_must_not": "silently change the contract or Cloud Scheduler cadence"
+  },
+  "broker": {
+    "connected": true,
+    "auth_classification": "AUTH_OK",
+    "mode": "ANALYZER",
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "not_full_acceptance": "connected=true and AUTH_OK are not live 4/4 semantic PASS"
+  },
+  "chains": {
+    "market_phase": "CLOSED",
+    "http_200_complete_chain": ["NIFTY", "BANKNIFTY", "FINNIFTY", "SENSEX"],
+    "data_source": "dhan",
+    "source_priority": "dhan_last_verified_snapshot",
+    "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+    "not_ruhi_017_done": true
+  },
+  "overlap": {
+    "do_not_edit": [".cursor/rules/governance-watchdog.mdc"],
+    "do_not_merge": [286, 317, 315, 304, 314],
+    "reason": "ChatGPT/Codex lanes; #286 superseded by merged #318"
+  }
+}

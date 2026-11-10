@@ -3,12 +3,14 @@ import axios from 'axios'
 import { API_BASE, API_HEADERS } from '../config'
 import DataSourceWarning from './DataSourceWarning'
 import ErrorBanner from './ErrorBanner'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 type ApiBundle = {
   state: any
   paper: any
   pnl: any
   tradesToday: any
+  account?: any
 }
 
 /** DhanHQ v2 /positions-aligned paper row (local sim + live LTP). */
@@ -49,8 +51,10 @@ type PaperPos = {
 }
 
 function money(v: any) {
-  const n = Number(v || 0)
-  return `₹${Number.isFinite(n) ? n.toFixed(2) : '0.00'}`
+  if (v == null || v === '') return 'PENDING'
+  const n = Number(v)
+  if (!Number.isFinite(n)) return 'PENDING'
+  return `₹${n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
 function statusBadge(ok: boolean, text: string) {
@@ -76,17 +80,19 @@ export default function PaperTrading() {
   const [bundle, setBundle] = useState<ApiBundle | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [lastRefresh, setLastRefresh] = useState<string>('')
-  const [ticking, setTicking] = useState(false)
+  const [smokeRunning, setSmokeRunning] = useState<boolean>(false)
+  const [smokeOutput, setSmokeOutput] = useState<any>(null)
 
   const fetchData = async () => {
     try {
-      const [stateRes, paperRes, pnlRes, tradesRes] = await Promise.all([
-        axios.get(`${API_BASE}/api/state`, { headers: API_HEADERS, timeout: 15000 }),
+      const [stateRes, paperRes, pnlRes, tradesRes, accRes] = await Promise.all([
+        axios.get(`${API_BASE}/api/state`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
         axios.get(`${API_BASE}/api/paper`, { headers: API_HEADERS, timeout: 20000 }).catch((err) => ({ data: { status: 'ERROR', error: err.message, positions: { positions: [], open_count: 0 }, paper_truth: {} } })),
-        axios.get(`${API_BASE}/api/pnl`, { headers: API_HEADERS, timeout: 15000 }),
+        axios.get(`${API_BASE}/api/pnl`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
         axios.get(`${API_BASE}/api/trades/today`, { headers: API_HEADERS, timeout: 15000 }).catch((err) => ({ data: { status: 'ERROR', error: err.message, entries: [], exits: [], count: 0 } })),
+        axios.get(`${API_BASE}/api/paper/account`, { headers: API_HEADERS, timeout: 15000 }).catch(() => ({ data: null })),
       ])
-      setBundle({ state: stateRes.data, paper: paperRes.data || null, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null })
+      setBundle({ state: stateRes.data, paper: paperRes.data || null, pnl: pnlRes.data || null, tradesToday: tradesRes.data || null, account: accRes.data || null })
       setLastRefresh(new Date().toLocaleString())
       setError(null)
     } catch (err: any) {
@@ -95,22 +101,21 @@ export default function PaperTrading() {
     }
   }
 
-  const forcePaperTick = async () => {
-    setTicking(true)
+  const triggerSmokeLoop = async (symbol: string = 'NIFTY') => {
+    setSmokeRunning(true)
     try {
-      await axios.post(`${API_BASE}/api/paper/tick`, {}, { headers: API_HEADERS, timeout: 90000 })
-      await fetchData()
+      const res = await axios.get(`${API_BASE}/api/paper/run?symbol=${symbol}&loops=5`, { headers: API_HEADERS, timeout: 30000 })
+      setSmokeOutput(res.data)
+      fetchData()
     } catch (err: any) {
-      setError(err.message || 'Paper tick failed')
+      setSmokeOutput({ error: err.message || 'Failed to run smoke loop' })
     } finally {
-      setTicking(false)
+      setSmokeRunning(false)
     }
   }
 
   useEffect(() => {
     fetchData()
-    const interval = setInterval(fetchData, 15000)
-    return () => clearInterval(interval)
   }, [])
 
   if (error && !bundle) {
@@ -135,6 +140,7 @@ export default function PaperTrading() {
   const paper = bundle.paper || {}
   const pnl = bundle.pnl || {}
   const tradesToday = bundle.tradesToday || {}
+  const account = bundle.account || {}
   const posBlock = paper.positions
   const positions: PaperPos[] = Array.isArray(posBlock)
     ? posBlock
@@ -150,7 +156,7 @@ export default function PaperTrading() {
     || paperTruth.source_file
     || state.positions_source
     || 'NO_POSITIONS'
-  const dataSource = paper.data_source || state.data_source || 'DHAN_LIVE_MARK_TO_MARKET'
+  const dataSource = paper.data_source || state.data_source || 'UNKNOWN / PENDING'
   const marketLive = isLiveMarketSource(String(dataSource)) || Boolean(state?.broker?.connected)
   const brokerConnected = Boolean(state?.broker?.connected)
   const mode = state.mode || paper.mode || 'PAPER'
@@ -163,13 +169,17 @@ export default function PaperTrading() {
   const totalRealized = Number(summary?.total_realized_pnl ?? summary?.realized_pnl ?? 0)
   const totalUnrealized = positions.reduce((sum, p) => sum + Number(p.unrealized_pnl ?? p.unrealizedProfit ?? 0), 0)
   const totalPnL = Number(summary?.total_pnl ?? (totalRealized + totalUnrealized))
-  const maxPositions = state?.risk?.limits?.max_positions ?? 3
+  const maxPositions = Number(paper?.max_positions ?? state?.max_positions ?? 3)
+  const initialCapital = account.initial_capital == null ? null : Number(account.initial_capital)
+  const availableMargin = account.available_margin == null ? null : Number(account.available_margin)
+  const usedMargin = account.used_margin == null ? null : Number(account.used_margin)
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-start gap-4 flex-wrap">
         <div>
           <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+          <PendingLifecycleBanner />
           <div className="text-sm text-gray-400 mt-1">
             Aligned to DhanHQ v2 Positions fields · Source: {positionsSource} · Refresh: {lastRefresh || '—'}
           </div>
@@ -179,12 +189,34 @@ export default function PaperTrading() {
         </div>
         <div className="flex gap-2">
           <button onClick={fetchData} className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white font-bold">Refresh</button>
-          <button onClick={forcePaperTick} disabled={ticking} className="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded text-white font-bold disabled:opacity-50">
-            {ticking ? 'Ticking…' : 'Force Paper Tick'}
-          </button>
         </div>
       </div>
 
+      {/* Account Capital & Margin Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-gradient-to-br from-gray-800 to-gray-850 p-4 rounded-lg border border-emerald-500/30">
+          <div className="text-xs uppercase tracking-wider text-emerald-400 font-semibold">Initial Virtual Capital</div>
+          <div className="text-2xl font-black text-white mt-1">{money(initialCapital)}</div>
+          <div className="text-xs text-gray-400 mt-1">100% Guaranteed Virtual Balance</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-blue-400 font-semibold">Available Trading Margin</div>
+          <div className="text-2xl font-black text-white mt-1">{money(availableMargin)}</div>
+          <div className="text-xs text-gray-400 mt-1">Free Collateral for Shadow Orders</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-amber-400 font-semibold">Active Used Margin</div>
+          <div className="text-2xl font-black text-white mt-1">{money(usedMargin)}</div>
+          <div className="text-xs text-gray-400 mt-1">Committed to Open Strategies</div>
+        </div>
+        <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
+          <div className="text-xs uppercase tracking-wider text-purple-400 font-semibold">Total Realized Net P&L</div>
+          <div className={`text-2xl font-black mt-1 ${totalRealized >= 0 ? 'text-green-400' : 'text-red-400'}`}>{money(totalRealized)}</div>
+          <div className="text-xs text-gray-400 mt-1">Cumulative After-Cost Expectancy</div>
+        </div>
+      </div>
+
+      {/* Operational Safety & Session Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Mode Safety</div>
@@ -204,8 +236,66 @@ export default function PaperTrading() {
         <div className="bg-gray-800 p-4 rounded-lg">
           <div className="text-sm text-gray-400">Today Paper Exits</div>
           <div className="text-2xl font-bold mt-1">{todayExits.length}</div>
-          <div className="text-xs text-gray-500 mt-2">Realized: {money(totalRealized)}</div>
+          <div className="text-xs text-gray-500 mt-2">Closed trades: {todayExits.length}</div>
         </div>
+      </div>
+
+      {/* Live Spot vs ML Prediction Smoke Test Runner */}
+      <div className="bg-gray-800 p-5 rounded-lg border border-blue-600/40">
+        <div className="flex justify-between items-center flex-wrap gap-3 mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-blue-400">Live Spot vs ML Prediction Smoke Test Lab</h3>
+            <div className="text-xs text-gray-400">Executes real-time Dhan quotes & ML model prediction comparison with zero hardcoded paths.</div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => triggerSmokeLoop('NIFTY')}
+              disabled={smokeRunning}
+              className={`px-4 py-2 rounded text-sm font-bold text-white ${smokeRunning ? 'bg-blue-800 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-500'}`}
+            >
+              {smokeRunning ? 'Executing NIFTY Loop…' : '▶ Run NIFTY Smoke (5 Loops)'}
+            </button>
+            <button
+              onClick={() => triggerSmokeLoop('BANKNIFTY')}
+              disabled={smokeRunning}
+              className={`px-4 py-2 rounded text-sm font-bold text-white ${smokeRunning ? 'bg-indigo-800 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-500'}`}
+            >
+              {smokeRunning ? 'Executing BANKNIFTY Loop…' : '▶ Run BANKNIFTY Smoke (5 Loops)'}
+            </button>
+          </div>
+        </div>
+
+        {/* Live Comparison Chart Frame */}
+        <div className="bg-gray-900 rounded-lg p-3 border border-gray-700 flex flex-col items-center">
+          <img
+            src={`${API_BASE}/api/paper/chart?t=${Date.now()}`}
+            alt="Genesis System3 Live Spot vs ML Prediction Chart"
+            className="w-full max-h-[320px] object-contain rounded"
+            onError={(e: any) => { e.target.style.display = 'none' }}
+          />
+        </div>
+
+        {smokeOutput && (
+          <div className="mt-4 bg-gray-900/90 p-4 rounded border border-gray-700 text-xs font-mono">
+            <div className="text-green-400 font-bold mb-2">Execution Output (Symbol: {smokeOutput.symbol || 'NIFTY'} | Session: {smokeOutput.market_session}):</div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <div>Iterations: <span className="text-white font-bold">{smokeOutput.iterations_executed}</span></div>
+              <div>Model Active: <span className="text-white font-bold">{smokeOutput.model_active}</span></div>
+              <div>Cumulative PnL: <span className="text-white font-bold">Rs. {Number(smokeOutput.cumulative_net_pnl || 0).toFixed(2)}</span></div>
+              <div>Win Rate: <span className="text-white font-bold">{smokeOutput.win_rate_pct}%</span></div>
+            </div>
+            {Array.isArray(smokeOutput.trades) && (
+              <div className="space-y-1">
+                {smokeOutput.trades.map((t: any, idx: number) => (
+                  <div key={idx} className="flex justify-between border-b border-gray-800 py-1">
+                    <span>Loop #{t.iteration} ({t.signal_action}): Live LTP ₹{t.live_ltp} → Pred ₹{t.predicted_price} ({t.expected_alpha_pct > 0 ? '+' : ''}{t.expected_alpha_pct}%)</span>
+                    <span className={t.signal_action === 'BUY' ? 'text-green-400' : 'text-red-400'}>{t.execution_status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="bg-gray-800 p-5 rounded-lg border border-emerald-800/60">
@@ -286,7 +376,7 @@ export default function PaperTrading() {
                       <td className="p-2 text-xs">{pos.productType || 'INTRADAY'}<br/><span className="text-gray-500">{pos.exchangeSegment || 'NSE_FNO'}</span></td>
                       <td className="p-2 text-xs text-gray-400">
                         {pos.provenance || 'PAPER_CLOUD_SIM'}<br/>
-                        {pos.market_data_source || pos.data_source || 'DHAN_LIVE'}<br/>
+                        {pos.market_data_source || pos.data_source || 'UNKNOWN / PENDING'}<br/>
                         {pos.time_ist || (pos.entry_time ? new Date(pos.entry_time).toLocaleString() : '')}
                       </td>
                     </tr>
@@ -299,7 +389,7 @@ export default function PaperTrading() {
           <div className="bg-gray-900/50 border border-gray-700 p-6 rounded">
             <div className="font-bold text-gray-200">No open paper positions</div>
             <div className="text-sm text-gray-400 mt-2">
-              Use Force Paper Tick during market hours to open a Dhan-chain-backed paper fill, or wait for the cloud paper loop.
+              Public dashboard controls are read-only. Paper fills are created only by the protected cloud paper loop.
             </div>
           </div>
         )}

@@ -3,26 +3,26 @@ import fs from 'fs'
 import path from 'path'
 
 const base = (process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
-const key = String(process.env.DASHBOARD_API_KEY || '').replace(/[^\x20-\x7E]/g, '').trim()
 const outDir = path.join('reports', 'latest', 'dashboard_live_ui_proof')
 fs.mkdirSync(outDir, { recursive: true })
 
-const requiredSymbols = (process.env.SYSTEM3_REQUIRED_UNDERLYINGS || 'NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY').split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
-const optionalSymbols = (process.env.SYSTEM3_OPTIONAL_UNDERLYINGS || 'SENSEX').split(',').map(s => s.trim().toUpperCase()).filter(Boolean).filter(s => !requiredSymbols.includes(s))
+const requiredSymbols = (process.env.SYSTEM3_REQUIRED_UNDERLYINGS || 'NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY')
+  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean)
+const optionalSymbols = (process.env.SYSTEM3_OPTIONAL_UNDERLYINGS || 'SENSEX')
+  .split(',').map(s => s.trim().toUpperCase()).filter(Boolean).filter(s => !requiredSymbols.includes(s))
 const requiredChainEndpoints = requiredSymbols.map(s => `/api/chain/${s}`)
 const optionalChainEndpoints = optionalSymbols.map(s => `/api/chain/${s}`)
 const chainEndpoints = [...requiredChainEndpoints, ...optionalChainEndpoints]
 const apiEndpoints = [
-  '/api/auth/status', '/api/deploy/info', '/api/health', '/api/state',
-  '/api/broker/dhan/status', '/api/broker/funds', '/api/broker/holdings', '/api/broker/positions/live',
-  ...chainEndpoints,
-  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/trades/today', '/api/auto_gates', '/api/ml/performance', '/api/ml/compare', '/api/paper'
+  '/api/auth/status', '/api/deploy/info', '/api/health', '/api/state', '/api/broker/status',
+  '/api/broker/funds', '/api/broker/holdings', '/api/broker/positions/live', ...chainEndpoints,
+  '/api/gain_rank', '/api/scanner/top_contract_gainers?top_n=5', '/api/pnl', '/api/trades/today',
+  '/api/auto_gates', '/api/ml/performance', '/api/ml/compare', '/api/paper'
 ]
 
 function safeName(s) { return s.replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '') }
 function tryJson(text) { try { return JSON.parse(text) } catch { return { raw: String(text || '').slice(0, 2000) } } }
 function wait(ms) { return new Promise(resolve => setTimeout(resolve, ms)) }
-function headers(apiKey) { return apiKey ? { 'X-API-Key': apiKey } : {} }
 function hasUiFailureText(text) { return /Request failed with status code 401|Loading funds|Loading holdings|Loading positions|hardcoded 0|\.\.\.3741|cached read-only/i.test(text || '') }
 function hasOwner(text) { return /PRITAM\s+S\.?\s+WARGHADE/i.test(text || '') && /OWNER/i.test(text || '') }
 function hasSafetyText(text) { return /LIVE\s+OFF/i.test(text || '') && /PAPER/i.test(text || '') }
@@ -30,34 +30,40 @@ function hasMlProofText(text) { return /ML Model Truth/i.test(text || '') && /Tr
 function hasPaperTruthText(text) { return /Paper Truth Provenance/i.test(text || '') && /Fake\/fixture rejected/i.test(text || '') && /Order endpoints/i.test(text || '') && /(NOT CALLED|BLOCKED)/i.test(text || '') }
 function solutionFor(blocker) {
   const b = String(blocker || '')
+  if (b.includes('PUBLIC_READ_CONTRACT')) return 'Restore the permanent anonymous public_readonly /api/auth/status contract before accepting UI proof.'
   if (b.includes('OWNER_BADGE_NOT_VISIBLE')) return 'Ensure TopBar renders OWNER / PRITAM S. WARGHADE in desktop and mobile screenshots, then rerun visual proof.'
   if (b.includes('SAFETY_LABELS_NOT_VISIBLE')) return 'Ensure TopBar shows PAPER and LIVE OFF in every screenshot.'
   if (b.includes('ML_PROOF_TEXT_NOT_VISIBLE')) return 'Ensure ML tab displays Proof records, Training status, model score/accuracy/AUC or a clear BLOCKED reason from /api/ml/performance.'
   if (b.includes('PAPER_TRUTH_NOT_VISIBLE')) return 'Ensure Paper tab displays Paper Truth Provenance, rejected fake/fixture rows, source file, displayed rows, and order endpoints NOT CALLED.'
   if (b.includes('SCREENSHOT_MISSING_OR_EMPTY')) return 'Fix Playwright screenshot capture, route load, or tab selector; screenshot file must exist and be >10KB.'
-  if (b.includes('API_FAIL')) return 'Fix API endpoint/auth/rate-limit/deploy issue before claiming dashboard visual proof.'
+  if (b.includes('API_FAIL')) return 'Fix the read-only endpoint/rate-limit/deploy issue before claiming dashboard visual proof.'
   if (b.includes('CHAIN_NOT_TRADE_READY')) return 'Fix Dhan chain/expiry/security-id data path; optional chains may be safe-blocked, required chains cannot.'
   if (b.includes('UI_FAIL') || b.includes('UI_EXCEPTION')) return 'Fix UI route, tab rendering, loading state, or browser exception; rerun visual proof.'
-  return 'Investigate exact blocker, patch source, redeploy, and regenerate dashboard visual proof before claiming resolved.'
+  return 'Investigate exact blocker, patch source, redeploy if runtime code changed, and regenerate dashboard visual proof before claiming resolved.'
 }
 
 async function pageFetchJson(page, ep, attempts = 5) {
   let last = null
   for (let i = 0; i < attempts; i++) {
-    const result = await page.evaluate(async ({ ep, apiKey }) => {
+    const result = await page.evaluate(async (endpoint) => {
       try {
-        const r = await fetch(ep, { credentials: 'include', headers: apiKey ? { 'X-API-Key': apiKey } : {} })
+        const r = await fetch(endpoint, { credentials: 'omit', cache: 'no-store' })
         const text = await r.text()
-        return { endpoint: ep, ok: r.ok, status: r.status, body: text.slice(0, 200000) }
+        return { endpoint, ok: r.ok, status: r.status, body: text.slice(0, 200000) }
       } catch (err) {
-        return { endpoint: ep, ok: false, status: 0, error: String(err), body: '' }
+        return { endpoint, ok: false, status: 0, error: String(err), body: '' }
       }
-    }, { ep, apiKey: key })
+    }, ep)
     last = result
     if (result.ok || ![0, 429, 502, 503, 504].includes(Number(result.status))) return result
     await wait([8000, 16000, 30000, 45000, 60000][i] || 60000)
   }
   return last
+}
+
+function publicReadContractOk(payload) {
+  return payload && payload.required === false && payload.configured === false && payload.authenticated === false &&
+    payload.mode === 'public_readonly' && payload.credential_surface === 'REMOVED' && payload.session === null
 }
 
 function dhanChainOk(payload) {
@@ -66,11 +72,10 @@ function dhanChainOk(payload) {
   const priority = String(payload.source_priority || '').toLowerCase()
   const status = String(payload.status || '').toUpperCase()
   const combined = `${source} ${priority} ${status}`
-  if (payload.stale === true) return false
-  if (/(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock)/i.test(combined)) return false
+  if (payload.stale === true || /(csv|fallback|synthetic|bhavcopy|yahoo|fake|mock)/i.test(combined)) return false
   const contracts = Array.isArray(payload.contracts) ? payload.contracts.length : Number(payload.total_contracts || 0)
   const spot = Number(payload.spot || 0)
-  const allowedStatus = status === 'OK' || status === 'MARKET_OPEN' || status === 'MARKET_CLOSED_DHAN_SNAPSHOT' || status === 'EOD_SNAPSHOT'
+  const allowedStatus = ['OK', 'MARKET_OPEN', 'MARKET_CLOSED_DHAN_SNAPSHOT', 'EOD_SNAPSHOT'].includes(status)
   return source === 'dhan' && allowedStatus && contracts > 0 && spot > 0
 }
 
@@ -83,10 +88,16 @@ function isSafeDhanBlocked(payload) {
 }
 
 const browser = await chromium.launch({ headless: true })
-const context = await browser.newContext({ viewport: { width: 1366, height: 768 }, extraHTTPHeaders: headers(key) })
+const context = await browser.newContext({ viewport: { width: 1366, height: 768 } })
 const page = await context.newPage()
-
-const summary = { base, generated_at: new Date().toISOString(), required_symbols: requiredSymbols, optional_symbols: optionalSymbols, auth: { ok: false, status: 0 }, api: [], ui: [], visual_requirements: [], chain_truth: [], trader_readiness_panel_visible: false, truth_control_visible: false, owner_badge_visible: false, safety_labels_visible: false, ml_proof_visible: false, paper_truth_visible: false, final_verdict: 'UNKNOWN', infra_blockers: [], trade_readiness_blockers: [], visual_blockers: [], optional_data_blockers: [], blockers: [], solutions: [] }
+const summary = {
+  base, generated_at: new Date().toISOString(), required_symbols: requiredSymbols, optional_symbols: optionalSymbols,
+  auth: { ok: false, status: 0, mode: null, credential_surface: null }, api: [], ui: [], visual_requirements: [],
+  chain_truth: [], trader_readiness_panel_visible: false, truth_control_visible: false, owner_badge_visible: false,
+  safety_labels_visible: false, ml_proof_visible: false, paper_truth_visible: false, final_verdict: 'UNKNOWN',
+  infra_blockers: [], trade_readiness_blockers: [], visual_blockers: [], optional_data_blockers: [], blockers: [], solutions: [],
+  browser_credentials_sent: false, browser_mutations_called: false
+}
 
 function addVisualReq(id, ok, blocker, details = {}) {
   summary.visual_requirements.push({ id, ok, blocker: ok ? null : blocker, ...details })
@@ -95,24 +106,17 @@ function addVisualReq(id, ok, blocker, details = {}) {
 
 try {
   await page.goto(`${base}/api/auth/status`, { waitUntil: 'networkidle', timeout: 90000 })
-
-  if (key) {
-    let auth = null
-    for (let i = 0; i < 5; i++) {
-      auth = await page.evaluate(async (apiKey) => {
-        const r = await fetch('/api/auth/session', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey }, credentials: 'include', body: JSON.stringify({ api_key: apiKey }) })
-        return { ok: r.ok, status: r.status, text: await r.text() }
-      }, key)
-      if (auth.ok || ![429, 502, 503, 504].includes(Number(auth.status))) break
-      await wait([8000, 16000, 30000, 45000, 60000][i] || 60000)
-    }
-    summary.auth = { ok: auth.ok, status: auth.status }
-    if (!auth.ok) summary.infra_blockers.push(`AUTH_FAIL:${auth.status}`)
-  } else {
-    summary.auth = { ok: false, status: 0, note: 'DASHBOARD_API_KEY secret not configured' }
-    summary.infra_blockers.push('DASHBOARD_API_KEY_SECRET_MISSING')
+  const authResult = await pageFetchJson(page, '/api/auth/status', 3)
+  const authPayload = tryJson(authResult.body || '')
+  const authOk = authResult.ok && publicReadContractOk(authPayload)
+  summary.auth = {
+    ok: authOk, status: authResult.status, mode: authPayload?.mode || null,
+    credential_surface: authPayload?.credential_surface || null,
+    required: authPayload?.required, configured: authPayload?.configured, authenticated: authPayload?.authenticated,
+    session_is_null: authPayload?.session === null
   }
-  fs.writeFileSync(path.join(outDir, 'auth_session.json'), JSON.stringify(summary.auth, null, 2))
+  if (!authOk) summary.infra_blockers.push(`PUBLIC_READ_CONTRACT_FAIL:${authResult.status}`)
+  fs.writeFileSync(path.join(outDir, 'auth_status.json'), JSON.stringify(summary.auth, null, 2))
 
   for (const ep of apiEndpoints) {
     await wait(2500)
@@ -121,7 +125,6 @@ try {
     const optional = optionalChainEndpoints.includes(ep)
     summary.api.push({ endpoint: ep, ok: result.ok, status: result.status, optional })
     fs.writeFileSync(path.join(outDir, `${safeName(ep)}.json`), JSON.stringify(payload, null, 2))
-
     if (chainEndpoints.includes(ep)) {
       const ok = result.ok && dhanChainOk(payload)
       const safeBlocked = result.ok && isSafeDhanBlocked(payload)
@@ -134,27 +137,22 @@ try {
         else summary.infra_blockers.push(msg)
       }
     }
-
     if (!result.ok) summary.infra_blockers.push(`API_FAIL:${ep}:${result.status}`)
   }
 
   await page.goto(`${base}/ui/`, { waitUntil: 'networkidle', timeout: 90000 })
   await wait(5000)
-
   const tabs = [
     ['truth', 'Truth Control'], ['genesis', 'Genesis Brain'], ['e2e_proof', 'E2E Proof'], ['overview', 'Overview'],
     ['chain', 'Option Chain'], ['signals', 'Signals'], ['paper', 'Paper Trades'], ['positions', 'Positions'],
     ['broker', 'Broker'], ['performance', 'Performance'], ['ml', 'ML Model'], ['gates', 'Live Gate']
   ]
-
   for (const [id, title] of tabs) {
     try {
       await wait(1500)
-      const btn = page.locator(`button[title="${title}"]`).first()
-      await btn.click({ timeout: 25000 })
+      await page.locator(`button[title="${title}"]`).first().click({ timeout: 25000 })
       await page.waitForTimeout(4500)
       const text = await page.locator('body').innerText({ timeout: 15000 })
-      const bad = hasUiFailureText(text)
       const screenshotPath = path.join(outDir, `${id}.png`)
       await page.screenshot({ path: screenshotPath, fullPage: true })
       const screenshotOk = fs.existsSync(screenshotPath) && fs.statSync(screenshotPath).size > 10000
@@ -170,8 +168,8 @@ try {
       if (id === 'paper' && paperVisible) summary.paper_truth_visible = true
       if (id === 'e2e_proof' && e2eHasProofWords) summary.trader_readiness_panel_visible = true
       if (id === 'truth' && truthHasProofWords) summary.truth_control_visible = true
-      const ok = !bad && screenshotOk && e2eHasProofWords && truthHasProofWords && ownerVisible && safetyVisible && mlVisible && paperVisible
-      summary.ui.push({ id, title, ok, bad_raw_error_or_loading: bad, screenshot_ok: screenshotOk, owner_visible: ownerVisible, safety_labels_visible: safetyVisible, ml_proof_visible: mlVisible, paper_truth_visible: paperVisible, e2e_has_trader_readiness: e2eHasProofWords, truth_control_visible: truthHasProofWords })
+      const ok = !hasUiFailureText(text) && screenshotOk && e2eHasProofWords && truthHasProofWords && ownerVisible && safetyVisible && mlVisible && paperVisible
+      summary.ui.push({ id, title, ok, screenshot_ok: screenshotOk, owner_visible: ownerVisible, safety_labels_visible: safetyVisible, ml_proof_visible: mlVisible, paper_truth_visible: paperVisible, e2e_has_trader_readiness: e2eHasProofWords, truth_control_visible: truthHasProofWords })
       if (!screenshotOk) summary.visual_blockers.push(`SCREENSHOT_MISSING_OR_EMPTY:${title}`)
       if (!ownerVisible) summary.visual_blockers.push(`OWNER_BADGE_NOT_VISIBLE:${title}`)
       if (!safetyVisible) summary.visual_blockers.push(`SAFETY_LABELS_NOT_VISIBLE:${title}`)
@@ -213,11 +211,17 @@ summary.solutions = summary.blockers.map(b => ({ blocker: b, solution: solutionF
 summary.final_verdict = summary.infra_blockers.length || summary.visual_blockers.length ? 'FAIL' : (summary.trade_readiness_blockers.length ? 'BLOCKED_NOT_TRADE_READY' : 'PASS')
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Dashboard Live UI Proof', '', `Generated: ${summary.generated_at}`, `Base: ${summary.base}`, `Required symbols: ${summary.required_symbols.join(', ')}`, `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`, `Final verdict: **${summary.final_verdict}**`, `Owner badge visible: **${summary.owner_badge_visible}**`, `Safety labels visible: **${summary.safety_labels_visible}**`, `ML proof visible: **${summary.ml_proof_visible}**`, `Paper truth visible: **${summary.paper_truth_visible}**`, `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`, `Truth control visible: **${summary.truth_control_visible}**`, '',
+  '# Dashboard Live UI Proof', '', `Generated: ${summary.generated_at}`, `Base: ${summary.base}`,
+  `Public read contract: **${summary.auth.ok ? 'PASS' : 'FAIL'}**`, `Browser credentials sent: **${summary.browser_credentials_sent}**`,
+  `Browser mutations called: **${summary.browser_mutations_called}**`, `Required symbols: ${summary.required_symbols.join(', ')}`,
+  `Optional symbols: ${summary.optional_symbols.join(', ') || '-'}`, `Final verdict: **${summary.final_verdict}**`,
+  `Owner badge visible: **${summary.owner_badge_visible}**`, `Safety labels visible: **${summary.safety_labels_visible}**`,
+  `ML proof visible: **${summary.ml_proof_visible}**`, `Paper truth visible: **${summary.paper_truth_visible}**`,
+  `Trader readiness panel visible: **${summary.trader_readiness_panel_visible}**`, `Truth control visible: **${summary.truth_control_visible}**`, '',
   '## Visual Requirements', ...summary.visual_requirements.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.id}${x.blocker ? ` blocker=${x.blocker}` : ''}`), '',
   '## Chain Truth', ...summary.chain_truth.map(x => `- ${x.ok ? 'PASS' : (x.safe_blocked ? 'BLOCKED' : 'FAIL')} ${x.optional ? '(optional)' : '(required)'} ${x.endpoint} source=${x.source} priority=${x.source_priority} status=${x.status} spot=${x.spot} contracts=${x.total_contracts} blocker=${x.blocker || '-'}`), '',
   '## API', ...summary.api.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.status} ${x.optional ? '(optional)' : ''} ${x.endpoint}`), '',
-  '## UI Screenshots', ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} owner=${x.owner_visible} safety=${x.safety_labels_visible} ml=${x.ml_proof_visible} paper=${x.paper_truth_visible}${x.error ? ` - ${x.error}` : ''}`), '',
+  '## UI Screenshots', ...summary.ui.map(x => `- ${x.ok ? 'PASS' : 'FAIL'} ${x.title} owner=${x.owner_visible} safety=${x.safety_labels_visible} ml=${x.ml_proof_visible} paper=${x.paper_proof_visible}${x.error ? ` - ${x.error}` : ''}`), '',
   '## Infrastructure Blockers', ...(summary.infra_blockers.length ? summary.infra_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Visual Blockers', ...(summary.visual_blockers.length ? summary.visual_blockers.map(x => `- ${x}`) : ['- none']), '',
   '## Trading Readiness Blockers', ...(summary.trade_readiness_blockers.length ? summary.trade_readiness_blockers.map(x => `- ${x}`) : ['- none']), '',
@@ -225,5 +229,10 @@ fs.writeFileSync(path.join(outDir, 'summary.md'), [
   '## Required Solutions', ...(summary.solutions.length ? summary.solutions.map(x => `- ${x.blocker}: ${x.solution}`) : ['- none'])
 ].join('\n'))
 
-if (summary.infra_blockers.length || summary.visual_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length} visual_blockers=${summary.visual_blockers.length}`); console.error([...summary.infra_blockers, ...summary.visual_blockers].join('\n')); process.exit(1) }
-if (summary.trade_readiness_blockers.length) { console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`); console.error(summary.trade_readiness_blockers.join('\n')) }
+if (summary.infra_blockers.length || summary.visual_blockers.length) {
+  console.error(`DASHBOARD_LIVE_UI_PROOF_FAILED infra_blockers=${summary.infra_blockers.length} visual_blockers=${summary.visual_blockers.length}`)
+  process.exit(1)
+}
+if (summary.trade_readiness_blockers.length) {
+  console.error(`DASHBOARD_LIVE_UI_PROOF_BLOCKED_NOT_TRADE_READY trade_blockers=${summary.trade_readiness_blockers.length}`)
+}

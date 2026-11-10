@@ -1,0 +1,50 @@
+{
+  "schema": "system3_live_proof_center_v1",
+  "generated_utc": "2026-08-26T08:32:28Z",
+  "stamp": "20260826T083228Z",
+  "public_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "cross_verify": {
+    "generated_utc": "2026-08-26T08:32:28Z",
+    "github_origin_main": "afd28722e25d3e66c894c2fc6487722c698a1206",
+    "serving_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+    "sha_match": false,
+    "main_class": "DIVERGED_CHECK_PATH_FILTER",
+    "public_base": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "github_run_id": null,
+    "github_run_url": null
+  },
+  "api_ok": 23,
+  "api_total": 23,
+  "tabs_http_ok": 22,
+  "tabs_total": 22,
+  "gcp_available": true,
+  "files": [
+    "INDEX.md",
+    "MANIFEST.json",
+    "System3_LIVE_PROOF_CENTER.xlsx",
+    "CROSS_VERIFY.json",
+    "dashboard_tabs.json",
+    "gcp_inventory.json",
+    "api/"
+  ],
+  "gaps": [
+    {
+      "severity": "INFO",
+      "gap": "main tip != serving SHA",
+      "evidence": "main=afd28722e25d3e66c894c2fc6487722c698a1206 serving=fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "next": "Classify docs-only vs runtime; do not blind redeploy"
+    },
+    {
+      "severity": "CRITICAL",
+      "gap": "Scheduler unhealthy",
+      "evidence": "[\"enabled scheduler execution stale beyond cadence grace: genesis-system3-signals\"]",
+      "next": "Attribute workload; no token mint"
+    },
+    {
+      "severity": "MODERATE",
+      "gap": "22-tab semantic API\u2194UI",
+      "evidence": "HTTP mounts only",
+      "next": "Run semantic continuous session"
+    }
+  ]
+}

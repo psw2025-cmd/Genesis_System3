@@ -275,12 +275,8 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
         blockers.append("forbidden_secret_style_files_tracked")
     if secret_content:
         blockers.append("possible_secret_like_content_in_tracked_text")
-    if not render["render_yaml_exists"]:
-        blockers.append("render_yaml_missing")
-    if not render["mentions_live_trading_enabled"]:
-        warnings.append("render_live_trading_flag_not_found")
-    if render["mentions_live_trading_enabled"] and not render["live_trading_default_zero_or_false"]:
-        blockers.append("render_live_trading_not_proven_disabled")
+    if render["render_yaml_exists"]:
+        blockers.append("render_yaml_present_retired_host")
     if "dhanhq" not in req_text:
         blockers.append("dhanhq_dependency_missing")
     if "logzero" not in req_text:
@@ -310,7 +306,7 @@ def gate_safety_and_secrets(files: list[str]) -> GateResult:
 
 def gate_repo_authority(files: list[str]) -> GateResult:
     categories = {
-        "backend_entrypoints": ["dashboard/backend/app.py", "dashboard/backend/Dockerfile", "render.yaml"],
+        "backend_entrypoints": ["dashboard/backend/app.py", "dashboard/backend/Dockerfile"],
         "frontend_entrypoints": [
             "dashboard/frontend/package.json",
             "dashboard/frontend/src/App.tsx",
@@ -342,8 +338,8 @@ def gate_repo_authority(files: list[str]) -> GateResult:
     warnings: list[str] = []
     if not file_exists("dashboard/backend/app.py"):
         blockers.append("authoritative_backend_app_missing")
-    if not file_exists("render.yaml"):
-        blockers.append("render_config_missing")
+    if file_exists("render.yaml"):
+        blockers.append("render_yaml_present_retired_host")
     if duplicate_candidates:
         warnings.append("duplicate_basename_candidates_need_runtime_classification")
 

@@ -1,0 +1,6 @@
+---
+description: DEPRECATED redirect — not active authority
+alwaysApply: false
+---
+
+HISTORICAL_NON_AUTHORITY. Replaced by `.cursor/rules/00-repository-safety.mdc`. Do not load this file as current policy.

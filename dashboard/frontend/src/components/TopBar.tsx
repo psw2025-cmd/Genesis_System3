@@ -1,231 +1,271 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { Activity, Bell, Menu, Search, Shield, Clock as ClockIcon } from 'lucide-react'
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
-
-function CloudBuildBadge() {
-  const [epoch, setEpoch] = useState<string>('')
-  useEffect(() => {
-    let alive = true
-    fetch(`${window.location.origin}/ui/assets/deploy-provenance.json?t=${Date.now()}`, {
-      cache: 'no-store',
-      headers: { Accept: 'application/json' },
-    })
-      .then((r) => (r.ok ? r.json() : null))
-      .then((j) => {
-        if (!alive || !j) return
-        setEpoch(String(j.build_epoch || j.buildEpoch || ''))
-      })
-      .catch(() => {})
-    return () => { alive = false }
-  }, [])
-  if (!epoch) return null
-  const short = epoch.length > 22 ? epoch.slice(-18) : epoch
-  return (
-    <div
-      data-testid="cloud-build-badge"
-      title={`Cloud frontend build epoch: ${epoch}`}
-      style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: '3px 8px', borderRadius: '8px',
-        background: 'rgba(0,232,122,.08)', border: '1px solid rgba(0,232,122,.30)',
-        flexShrink: 0,
-      }}
-    >
-      <span style={{ fontSize: '.45rem', color: 'var(--text-mut)', letterSpacing: '.14em', fontFamily: 'var(--font-mono)' }}>CLOUD BUILD</span>
-      <span style={{ fontSize: '.58rem', color: 'var(--up)', fontWeight: 800, fontFamily: 'var(--font-mono)', letterSpacing: '.04em' }}>{short}</span>
-    </div>
-  )
-}
+import { brokerIsConnected, isNonAuthBrokerRejection } from '../lib/healthTruth'
+import { resolveFeedQuality } from '../lib/feedQuality'
+import { DASHBOARD_TABS } from './Sidebar'
 
 function Clock() {
   const [time, setTime] = useState('')
   useEffect(() => {
     const tick = () => setTime(new Date().toLocaleTimeString('en-IN', {
       timeZone: 'Asia/Kolkata', hour12: false,
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
     }))
-    tick(); const t = setInterval(tick, 1000); return () => clearInterval(t)
+    tick()
+    const timer = window.setInterval(tick, 1000)
+    return () => window.clearInterval(timer)
   }, [])
-  return <span className="num" style={{ color:'var(--accent)', fontSize:'1rem', fontWeight:600, letterSpacing:'.05em' }}>{time} IST</span>
-}
-
-function IndexChip({ symbol, spot, chg, live }: { symbol:string; spot?:number; chg?:number; live?:boolean }) {
-  const isUp = (chg ?? 0) >= 0
   return (
-    <div style={{ display:'flex', alignItems:'center', gap:'5px', padding:'3px 10px',
-                  background:'var(--surface-2)', borderRadius:'6px',
-                  border: live ? '1px solid rgba(0,232,122,.35)' : '1px solid var(--border)' }}>
-      <span style={{ fontSize:'.6rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)', fontWeight:700 }}>{symbol}</span>
-      <span className="num" style={{ fontSize:'.8rem', fontWeight:700, color:'var(--text-pri)' }}>
-        {spot ? fmt(spot, 0) : '--'}
-      </span>
-      {chg != null && spot ? (
-        <span className="num" style={{ fontSize:'.55rem', color: isUp ? 'var(--up)' : 'var(--down)' }}>
-          {isUp ? '+' : ''}{chg.toFixed(2)}%
-        </span>
-      ) : spot ? (
-        <span style={{ fontSize:'.5rem', color: live ? 'var(--up)' : 'var(--amber)', fontFamily:'var(--font-mono)', fontWeight:700 }}>
-          {live ? 'LIVE' : 'SNAP'}
-        </span>
-      ) : null}
+    <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 text-slate-300 font-mono text-xs font-semibold shrink-0">
+      <ClockIcon size={13} className="text-sky-400" />
+      <span>{time || '00:00:00'} IST</span>
     </div>
   )
 }
 
-function hasBrokerApiError(obj: any): boolean {
+function MarketTicker({
+  label,
+  spot,
+  chg,
+  marketOpen,
+  missingLabel
+}: {
+  label: string
+  spot?: number
+  chg?: number | null
+  marketOpen: boolean
+  missingLabel?: string
+}) {
+  const up = (chg ?? 0) >= 0
+  const missing = !spot || spot <= 0
+  const missingText = missingLabel || (marketOpen ? 'Warming' : 'After hours')
+
+  return (
+    <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[100px] shrink-0" title={missing ? missingText : undefined}>
+      <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{label}</div>
+      <div className="font-mono text-sm font-bold text-slate-100 mt-0.5 tabular-nums">
+        {missing ? '—' : fmt(spot, 2)}
+      </div>
+      <div className={`font-mono text-[11px] font-semibold mt-0.5 tabular-nums ${
+        missing ? 'text-amber-400' : chg == null ? 'text-slate-400' : up ? 'text-emerald-400' : 'text-rose-400'
+      }`}>
+        {missing ? missingText : chg == null ? '—' : `${up ? '+' : ''}${chg.toFixed(2)}%`}
+      </div>
+    </div>
+  )
+}
+
+function brokerError(obj: any) {
   if (!obj) return false
   const raw = obj.raw ?? obj.data ?? obj.normalized?.raw ?? obj.funds?.raw ?? obj
   const status = String(raw?.status ?? obj?.status ?? '').toLowerCase()
-  const details = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
-  return status === 'failure' || details.includes('invalid') || details.includes('token') || details.includes('unauthorized')
+  const detail = JSON.stringify(raw?.remarks ?? raw?.error ?? obj?.error ?? obj?.message ?? '').toLowerCase()
+  return status === 'failure' || detail.includes('invalid') || detail.includes('unauthorized') || detail.includes('token')
 }
 
 export function TopBar() {
   const {
-    wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, state, chain,
-    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, lastSync,
+    wsStatus, brokerConnected, marketOpen, setActiveTab, gainRank, chain,
+    brokerStatus, brokerFunds, brokerHoldings, brokerPositions, apiStatus, health,
+    alerts, sidebarOpen, setSidebarOpen, commandQuery, setCommandQuery, state, liveBoard,
   } = useStore()
-  const rho = state?.signals?.spearman_rho ?? null
-  const streamLive = marketOpen && wsStatus === 'live'
+  const [searchOpen, setSearchOpen] = useState(false)
 
-  const brokerApiResponded = Boolean(brokerStatus || brokerFunds || brokerHoldings || brokerPositions)
-  const transientApi = apiStatus?.status === 'NETWORK_ERROR' || apiStatus?.status === 'CLOUD_DEGRADED' || apiStatus?.status === 'RENDER_DEGRADED'
-  const authLocked = apiStatus?.status === 'API_AUTH_REQUIRED'
-  const brokerHasError = authLocked
-    || hasBrokerApiError(brokerStatus)
-    || hasBrokerApiError(brokerFunds)
-    || hasBrokerApiError(brokerHoldings)
-    || hasBrokerApiError(brokerPositions)
-  const brokerDegraded = Boolean(transientApi && (brokerConnected || brokerApiResponded))
-  const brokerLabel = brokerDegraded ? 'DEGRADED' : brokerConnected ? 'CONNECTED' : brokerHasError ? 'API ERR' : brokerApiResponded ? 'API OK' : 'OFFLINE'
-  const brokerGood = brokerConnected || (brokerApiResponded && !brokerHasError)
-  const brokerColor = brokerDegraded ? 'var(--amber)' : brokerGood ? 'var(--up)' : 'var(--down)'
-  const brokerBg = brokerDegraded ? 'rgba(245,158,11,.1)' : brokerGood ? 'rgba(0,232,122,.1)' : 'rgba(255,77,106,.08)'
-  const brokerBorder = brokerDegraded ? 'rgba(245,158,11,.25)' : brokerGood ? 'rgba(0,232,122,.25)' : 'rgba(255,77,106,.2)'
-  const marketLabel = marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED / DATA POLLING'
-
-  const getSpot = (sym: string) => {
-    const chainData = chain[sym]
-    if (chainData?.spot && chainData.spot > 0) {
-      const chg = chainData.change_pct ?? chainData.pct_change ?? chainData.spot_change_pct ?? null
-      return { spot: chainData.spot, chg: chg == null ? null : Number(chg) }
+  const boardSpot = (symbol: string) => {
+    const row = (liveBoard?.indices || []).find((item: any) => String(item?.symbol || '').toUpperCase() === symbol)
+    if (Number(row?.ltp) > 0) {
+      return { spot: Number(row.ltp), chg: row?.change_pct == null ? null : Number(row.change_pct), rowFound: true }
     }
-    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
-    const entry = rankings.find((r: any) => r.underlying === sym)
-    if (entry?.spot_price) return { spot: entry.spot_price, chg: entry.change_pct ?? null }
-    return null
+    return { spot: undefined as number | undefined, chg: null as number | null, rowFound: Boolean(row) }
   }
 
-  const nifty    = getSpot('NIFTY')
-  const bnfty    = getSpot('BANKNIFTY')
-  const finnifty = getSpot('FINNIFTY')
-  const syncAgeSec = (() => {
-    if (!lastSync || lastSync === '--') return null
-    const t = Date.parse(lastSync)
-    if (!Number.isFinite(t)) return null
-    return Math.max(0, Math.round((Date.now() - t) / 1000))
-  })()
+  const getSpot = (symbol: string) => {
+    const fromBoard = boardSpot(symbol)
+    if (fromBoard.spot) return fromBoard
+    const row = chain?.[symbol]
+    if (Number(row?.spot) > 0) {
+      const rawChange = row?.change_pct ?? row?.pct_change ?? row?.spot_change_pct
+      return { spot: Number(row.spot), chg: rawChange == null ? null : Number(rawChange), rowFound: fromBoard.rowFound }
+    }
+    const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? []
+    const match = rankings.find((item: any) => String(item?.underlying ?? '').toUpperCase() === symbol)
+    return Number(match?.spot_price) > 0
+      ? { spot: Number(match.spot_price), chg: match?.change_pct == null ? null : Number(match.change_pct), rowFound: fromBoard.rowFound }
+      : { spot: undefined, chg: null, rowFound: fromBoard.rowFound }
+  }
+
+  const nifty = getSpot('NIFTY')
+  const bank = getSpot('BANKNIFTY')
+  const fin = getSpot('FINNIFTY')
+  const vix = getSpot('INDIAVIX')
+  const mid = getSpot('MIDCPNIFTY')
+  const liveBoardOk = Boolean(liveBoard?.success || (liveBoard?.live_count ?? 0) > 0)
+
+  const vixMissingLabel = vix.spot
+    ? undefined
+    : vix.rowFound
+      ? 'Dhan no quote'
+      : liveBoardOk
+        ? 'Dhan unavailable'
+        : marketOpen
+          ? 'Feed warming'
+          : 'After-hours n/a'
+
+  const hasError = apiStatus?.status === 'API_AUTH_REQUIRED'
+    || brokerError(brokerStatus) || brokerError(brokerFunds) || brokerError(brokerHoldings) || brokerError(brokerPositions)
+  const brokerGood = brokerIsConnected(health, brokerConnected, brokerStatus)
+  const requestRejected = isNonAuthBrokerRejection(brokerStatus)
+  const brokerLabel = requestRejected
+    ? 'Request rejected'
+    : (brokerConnected || brokerGood)
+      ? 'Session OK'
+      : hasError
+        ? 'Auth issue'
+        : 'Waiting'
+
+  const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
+  const alertCount = Array.isArray(alerts) ? alerts.length : 0
+  const matches = useMemo(() => {
+    const q = commandQuery.trim().toLowerCase()
+    if (!q) return []
+    return DASHBOARD_TABS.filter((tab) => tab.label.toLowerCase().includes(q) || tab.id.includes(q)).slice(0, 8)
+  }, [commandQuery])
+
+  useEffect(() => {
+    const onKey = (ev: KeyboardEvent) => {
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') {
+        ev.preventDefault()
+        setSearchOpen(true)
+        document.getElementById('dashboard-command')?.focus()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [])
 
   return (
-    <header style={{
-      height:'56px', background:'var(--surface-1)', borderBottom:'1px solid var(--border)',
-      display:'flex', alignItems:'center', padding:'0 12px', gap:'10px',
-      flexShrink:0, zIndex:50, overflow:'hidden'
-    }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'8px', flexShrink:0 }}>
-        <div style={{ display:'flex', flexDirection:'column', lineHeight:1 }}>
-          <span style={{ color:'var(--accent)', fontWeight:900, fontSize:'.82rem', letterSpacing:'.14em' }}>SYSTEM3</span>
-          <span style={{ color:'var(--text-mut)', fontSize:'.52rem', letterSpacing:'.16em', fontFamily:'var(--font-mono)' }}>AI OPTIONS CONTROL</span>
-        </div>
-        <div style={{
-          display:'flex', flexDirection:'column', justifyContent:'center', padding:'4px 10px', borderRadius:'10px',
-          background:'linear-gradient(135deg, rgba(59,130,246,.16), rgba(0,232,122,.10))',
-          border:'1px solid rgba(59,130,246,.35)', boxShadow:'0 0 18px rgba(59,130,246,.10)'
-        }} title="System owner / operator identity for visual proof">
-          <span style={{ fontSize:'.5rem', color:'var(--text-mut)', letterSpacing:'.18em', fontFamily:'var(--font-mono)' }}>OWNER</span>
-          <span style={{ fontSize:'.7rem', color:'var(--text-pri)', fontWeight:900, letterSpacing:'.08em' }}>PRITAM S. WARGHADE</span>
-        </div>
-        <CloudBuildBadge />
-      </div>
-      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
-      <Clock />
-      <div style={{ width:'1px', height:'32px', background:'var(--border)' }} />
-
-      <div style={{ display:'flex', gap:'6px', flex:1, overflow:'hidden' }}>
-        <IndexChip symbol="NIFTY"    spot={nifty?.spot}    chg={nifty?.chg ?? undefined} live={streamLive && Boolean(nifty?.spot)} />
-        <IndexChip symbol="BNFTY"    spot={bnfty?.spot}    chg={bnfty?.chg ?? undefined} live={streamLive && Boolean(bnfty?.spot)} />
-        <IndexChip symbol="FINNIFTY" spot={finnifty?.spot} chg={finnifty?.chg ?? undefined} live={streamLive && Boolean(finnifty?.spot)} />
-        {syncAgeSec != null && (
-          <div style={{ display:'flex', alignItems:'center', padding:'3px 8px', borderRadius:'6px',
-                        background:'var(--surface-2)', border:'1px solid var(--border)' }}
-               title="Seconds since last dashboard stream/poll tick">
-            <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)', color: syncAgeSec <= 15 ? 'var(--up)' : 'var(--amber)' }}>
-              TICK {syncAgeSec}s
-            </span>
+    <header role="banner" className="h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-3 md:px-4 z-40 shrink-0 gap-3">
+      {/* Brand & Nav Toggle */}
+      <div className="flex items-center gap-3 shrink-0">
+        <button
+          type="button"
+          className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 active:scale-95 transition-all"
+          aria-label={sidebarOpen ? 'Close navigation' : 'Open navigation'}
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+        >
+          <Menu size={18} />
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/30 flex items-center justify-center font-extrabold text-blue-400 text-sm">
+            S3
           </div>
-        )}
+          <div>
+            <div className="text-sm font-extrabold tracking-wider text-slate-100 leading-none">SYSTEM3</div>
+            <div className="text-[11px] font-semibold text-blue-400/90 leading-none mt-1">GENESIS INSTITUTIONAL</div>
+          </div>
+        </div>
       </div>
 
-      <div style={{ display:'flex', alignItems:'center', gap:'5px', flexShrink:0 }}>
-        <span style={{
-          display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
-          borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)',
-          background: marketOpen ? 'rgba(0,232,122,.1)' : 'rgba(245,158,11,.08)',
-          color: marketOpen ? 'var(--up)' : 'var(--amber)',
-          border:`1px solid ${marketOpen ? 'rgba(0,232,122,.25)' : 'rgba(245,158,11,.2)'}`,
-        }}>
-          <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: marketOpen ? 'var(--up)' : 'var(--amber)',
-                         animation: marketOpen ? 'pulseDot 1.5s infinite' : 'none' }} />
-          {marketLabel}
-        </span>
+      {/* Market Tickers (Scrollable with no overlap) */}
+      <div className="hidden lg:flex items-center overflow-x-auto scrollbar-none flex-1 max-w-2xl px-2">
+        <MarketTicker label="Nifty 50" spot={nifty.spot} chg={nifty.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Bank Nifty" spot={bank.spot} chg={bank.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Fin Nifty" spot={fin.spot} chg={fin.chg} marketOpen={marketOpen} />
+        <MarketTicker label="Midcap" spot={mid.spot} chg={mid.chg} marketOpen={marketOpen} />
+        <MarketTicker label="India VIX" spot={vix.spot} chg={vix.chg} marketOpen={marketOpen} missingLabel={vixMissingLabel} />
+        <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[70px] shrink-0">
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Board</div>
+          <div className={`font-mono text-xs font-bold mt-0.5 ${liveBoardOk ? 'text-emerald-400' : 'text-amber-400'}`}>
+            {liveBoardOk ? (marketOpen ? 'Feed OK' : 'Snapshot') : marketOpen ? 'Warming' : 'Idle'}
+          </div>
+        </div>
+      </div>
 
-        <span onClick={() => setActiveTab('broker')} style={{
-          display:'inline-flex', alignItems:'center', gap:'4px', padding:'3px 8px',
-          borderRadius:'6px', fontSize:'.62rem', fontWeight:700, fontFamily:'var(--font-mono)', cursor:'pointer',
-          background: brokerBg,
-          color: brokerColor,
-          border:`1px solid ${brokerBorder}`,
-        }} title={apiStatus?.message || "Click -> Broker Data"}>
-          <span style={{ width:'6px', height:'6px', borderRadius:'50%',
-                         background: brokerColor }} />
-          DHAN {brokerLabel}
-        </span>
+      {/* Right Actions & Telemetry */}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <Clock />
 
-        <span style={{ padding:'3px 8px', borderRadius:'6px', fontSize:'.62rem', fontWeight:700,
-                       background:'rgba(245,158,11,.1)', color:'var(--amber)',
-                       border:'1px solid rgba(245,158,11,.25)', fontFamily:'var(--font-mono)' }}>PAPER</span>
+        {/* Broker Button */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('broker')}
+          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
+            brokerConnected || brokerGood
+              ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
+              : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
+          }`}
+          title="Open Broker Status"
+        >
+          <Shield size={14} />
+          <span>Dhan · {brokerLabel}</span>
+        </button>
 
-        <span style={{ padding:'3px 8px', borderRadius:'6px', fontSize:'.62rem', fontWeight:700,
-                       background:'rgba(255,77,106,.06)', color:'var(--down)',
-                       border:'1px solid rgba(255,77,106,.18)', fontFamily:'var(--font-mono)' }}>LIVE OFF</span>
-
-        <div style={{ display:'flex', alignItems:'center', gap:'4px', padding:'3px 7px',
-                      background:'var(--surface-2)', borderRadius:'5px', border:'1px solid var(--border)' }}
-             title={`WebSocket: ${wsStatus}`}>
-          <span style={{
-            width:'6px', height:'6px', borderRadius:'50%',
-            background: wsStatus==='live' ? 'var(--up)' : wsStatus==='connecting' ? 'var(--amber)' : 'var(--down)',
-            animation: wsStatus==='live' ? 'pulseDot 1.5s infinite' : 'none'
-          }} />
-          <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)', color:'var(--text-mut)' }}>WS</span>
-          <span style={{ fontSize:'.55rem', fontFamily:'var(--font-mono)',
-                         color: wsStatus==='live' ? 'var(--up)' : 'var(--text-mut)' }}>
-            {wsStatus === 'live' ? 'LIVE' : wsStatus === 'connecting' ? 'CONNECTING' : 'OFF'}
+        {/* Paper / Live Mode Pill */}
+        <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 text-xs font-semibold">
+          <span className="text-amber-400 font-bold">PAPER</span>
+          <span className="text-slate-600">|</span>
+          <span className={liveOn ? 'text-rose-400 font-bold' : 'text-slate-400'}>
+            {liveOn ? 'LIVE ON' : 'LIVE OFF'}
           </span>
         </div>
 
-        {rho != null && (
-          <div style={{ padding:'3px 7px', background:'var(--surface-2)',
-                        borderRadius:'5px', border:'1px solid var(--border)' }}>
-            <span style={{ fontSize:'.55rem', color:'var(--text-mut)', fontFamily:'var(--font-mono)' }}>rho </span>
-            <span className="num" style={{ fontSize:'.75rem', fontWeight:700,
-                                           color: rho>=0.7 ? 'var(--up)' : rho>=0.4 ? 'var(--amber)' : 'var(--down)' }}>
-              {rho.toFixed(2)}
+        {/* Quick Search */}
+        <div className="hidden xl:block relative w-48">
+          <Search size={14} className="absolute left-2.5 top-2.5 text-slate-400" />
+          <input
+            id="dashboard-command"
+            type="search"
+            aria-label="Search dashboard tabs"
+            placeholder="Search (Ctrl+K)"
+            value={commandQuery}
+            onChange={(e) => { setCommandQuery(e.target.value); setSearchOpen(true) }}
+            onFocus={() => setSearchOpen(true)}
+            onBlur={() => window.setTimeout(() => setSearchOpen(false), 150)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && matches[0]) {
+                setActiveTab(matches[0].id)
+                setCommandQuery('')
+                setSearchOpen(false)
+              }
+            }}
+            className="w-full h-8 pl-8 pr-3 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+          />
+          {searchOpen && matches.length > 0 && (
+            <ul role="listbox" className="absolute top-9 left-0 right-0 bg-slate-900 border border-slate-700 rounded-lg shadow-xl py-1 z-50">
+              {matches.map((tab) => (
+                <li key={tab.id}>
+                  <button
+                    type="button"
+                    className="w-full text-left px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800 hover:text-blue-400 transition-colors"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => { setActiveTab(tab.id); setCommandQuery(''); setSearchOpen(false) }}
+                  >
+                    {tab.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Alerts Bell */}
+        <button
+          type="button"
+          className="relative p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 transition-colors"
+          aria-label={alertCount ? `${alertCount} alerts` : 'No active alerts'}
+          onClick={() => setActiveTab('alerts')}
+        >
+          <Bell size={16} />
+          {alertCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full flex items-center justify-center text-[10px] font-bold">
+              {alertCount}
             </span>
-          </div>
-        )}
+          )}
+        </button>
       </div>
     </header>
   )
 }
+export default TopBar

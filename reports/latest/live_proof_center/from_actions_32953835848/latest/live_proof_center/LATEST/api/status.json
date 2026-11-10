@@ -1,0 +1,39 @@
+{
+  "path": "/api/status",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 573,
+  "content_type": "application/json",
+  "data": {
+    "status": "ok",
+    "timestamp": "2026-08-26T15:07:22.294705+05:30",
+    "backend": {
+      "running": true,
+      "port": 8000,
+      "uptime_estimate": "running"
+    },
+    "frontend": {
+      "expected_url": "http://localhost:3000",
+      "status": "should_be_running"
+    },
+    "data": {
+      "source": "real",
+      "market_status": {
+        "is_open": true,
+        "reason": "Market open",
+        "current_time_ist": null
+      },
+      "fresh": false,
+      "last_update": null
+    },
+    "health": false,
+    "endpoints": {
+      "health": "/api/health",
+      "chain": "/api/chain/{underlying}",
+      "signals": "/api/signal/top",
+      "positions": "/api/positions",
+      "pnl": "/api/pnl",
+      "perf": "/api/perf"
+    }
+  }
+}

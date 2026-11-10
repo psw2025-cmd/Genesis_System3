@@ -1,11 +1,15 @@
-import { useAuth } from './hooks/useAuth'
-import { LoginPage } from './components/LoginPage'
+import { useEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
-import { Sidebar }   from './components/Sidebar'
+import { TruthStrip } from './components/TruthStrip'
+import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
+import ErrorBoundary from './components/ErrorBoundary'
+import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
+import { AutonomousLoopBanner } from './components/AutonomousLoopBanner'
+import { DeploymentTruthFooter } from './components/DeploymentTruthFooter'
 
 // ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
 import { Overview }      from './components/Overview'
@@ -20,6 +24,7 @@ import { PerformanceTab }  from './components/PerformanceTab'
 import { EndToEndProof }   from './components/EndToEndProof'
 import { SystemTruthControl } from './components/SystemTruthControl'
 import { LiveSimulation } from './components/LiveSimulation'
+import { MobileTradingHub } from './components/MobileTradingHub'
 
 // ── V5 Workspaces ─────────────────────────────────────────────────────
 import { DecisionIntelligence } from './components/workspaces/DecisionIntelligence'
@@ -33,91 +38,8 @@ import { PredictionAudit }      from './components/workspaces/PredictionAudit'
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
+import SystemReadiness from './components/SystemReadiness'
 import { GenesisTab } from './components/GenesisTab'
-
-function ProductionProofBar() {
-  const { autoGates, brokerConnected, paper, health } = useStore()
-  const gatesObj = (autoGates?.gates && typeof autoGates.gates === 'object') ? autoGates.gates : {}
-  const proofList = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
-  const mlGate = gatesObj.ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS || proofList.find((g: any) => /spearman|ml accuracy/i.test(String(g?.label || g?.gate_id || '')))
-  const profitGate = gatesObj.POSITIVE_NET_EXPECTANCY_AFTER_COSTS || proofList.find((g: any) => /expectancy|profit/i.test(String(g?.label || g?.gate_id || '')))
-  const paperGate = gatesObj.REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF || proofList.find((g: any) => /paper lifecycle|provenance/i.test(String(g?.label || g?.gate_id || '')))
-  const mlOk = Boolean(mlGate?.pass ?? mlGate?.ok)
-  const profitOk = Boolean(profitGate?.pass ?? profitGate?.ok)
-  const paperOk = Boolean(paperGate?.pass ?? paperGate?.ok)
-  const mlLabel = mlOk
-    ? `ρ=${mlGate?.latest_rho ?? 'ok'}`
-    : `ML ${(mlGate?.days_recorded ?? 0)}/${(mlGate?.days_required ?? 5)}d`
-  const paperLabel = paperOk
-    ? 'PAPER OK'
-    : (profitOk ? 'PROVENANCE' : `EXP ${profitGate?.net_expectancy_after_costs ?? paper?.summary?.avg_pnl_per_trade ?? '—'}`)
-  const cloudUiOk = Boolean(brokerConnected || health?.broker_status === 'connected')
-  const proofItems: Array<[string, string, boolean]> = [
-    ['LIVE', 'OFF', true],
-    ['MODE', 'PAPER', true],
-    ['DATA', brokerConnected ? 'DHAN' : 'DHAN REQ', brokerConnected],
-    ['ML', mlLabel, mlOk],
-    ['PAPER', paperLabel, paperOk],
-    ['UI', cloudUiOk ? 'LIVE' : 'CHECK', cloudUiOk],
-  ]
-
-  return (
-    <div
-      data-testid="production-proof-bar"
-      aria-label="Production proof status"
-      title="Proof status from /api/auto_gates + broker health"
-      style={{
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        padding: '6px 12px',
-        minHeight: '36px',
-        background: 'var(--surface-1)',
-        borderBottom: '1px solid var(--border)',
-        overflowX: 'auto',
-      }}
-    >
-      <span style={{
-        color: 'var(--text-mut)',
-        fontSize: '10px',
-        fontFamily: 'var(--font-mono)',
-        fontWeight: 700,
-        letterSpacing: '0.08em',
-        whiteSpace: 'nowrap',
-      }}>PROOF</span>
-      {proofItems.map(([label, value, safe]) => (
-        <div
-          key={label}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '6px',
-            padding: '3px 8px',
-            borderRadius: '6px',
-            background: safe ? 'rgba(0,232,122,.08)' : 'rgba(245,158,11,.10)',
-            border: safe ? '1px solid rgba(0,232,122,.28)' : '1px solid rgba(245,158,11,.28)',
-            whiteSpace: 'nowrap',
-          }}
-        >
-          <span style={{
-            color: 'var(--text-mut)',
-            fontSize: '10px',
-            fontFamily: 'var(--font-mono)',
-            fontWeight: 700,
-            letterSpacing: '0.06em',
-          }}>{label}</span>
-          <span style={{
-            color: safe ? 'var(--up)' : 'var(--amber)',
-            fontSize: '11px',
-            fontFamily: 'var(--font-mono)',
-            fontWeight: 700,
-          }}>{value}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
 
 function Content() {
   const { activeTab } = useStore()
@@ -137,6 +59,7 @@ function Content() {
     case 'paper':        return <PaperTrading />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
+    case 'system-readiness': return <SystemReadiness />
     case 'genesis':      return <GenesisTab />
     case 'e2e-proof':    return <EndToEndProof />
     case 'broker':       return <BrokerProofPanel />
@@ -148,33 +71,75 @@ function Content() {
   }
 }
 
+function DashboardTabUrlSync() {
+  const { activeTab, setActiveTab } = useStore()
+  const initialized = useRef(false)
 
-function AuthGate({ children }: { children: React.ReactNode }) {
-  const { checked, authenticated, login } = useAuth()
-  if (!checked) return (
-    <div style={{minHeight:'100vh',background:'#070b14',display:'flex',alignItems:'center',justifyContent:'center'}}>
-      <div style={{color:'#3b82f6',fontFamily:'monospace',letterSpacing:4,fontSize:13}}>SYSTEM3 LOADING…</div>
-    </div>
-  )
-  if (!authenticated) return <LoginPage onLogin={login} />
-  return <>{children}</>
+  useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true
+      const requested = new URLSearchParams(window.location.search).get('tab')
+      if (requested && DASHBOARD_TAB_IDS.has(requested) && requested !== activeTab) {
+        setActiveTab(requested)
+        return
+      }
+    }
+
+    if (!DASHBOARD_TAB_IDS.has(activeTab)) return
+    const url = new URL(window.location.href)
+    if (url.searchParams.get('tab') !== activeTab) {
+      url.searchParams.set('tab', activeTab)
+      window.history.replaceState(null, '', url)
+    }
+  }, [activeTab, setActiveTab])
+
+  return null
 }
 
 export default function App() {
+  // The deployed dashboard is intentionally public/read-only while System3 is
+  // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
+  // mutation requests; public visibility does not grant execution authority.
   useData()
+  const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
+  if (mobileTradingRoute) return <MobileTradingHub />
+
   return (
-    <AuthGate>
-      <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
-                    background: 'var(--surface)', overflow: 'hidden' }}>
-        <TopBar />
-        <ProductionProofBar />
-        <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
-          <Sidebar />
-          <main style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column',
+                  background: 'var(--surface)', overflow: 'hidden' }}>
+      <a className="skip-link" href="#dashboard-main">Skip to content</a>
+      <DashboardTabUrlSync />
+      <TopBar />
+      <TruthStrip />
+      <AutonomousLoopBanner />
+      {/*
+        Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden
+        on every normal page. Visible API/SHA/ML chips live only under Data Integrity → System health.
+      */}
+      <SystemHealthDiagnostics variant="sr-only" />
+      <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+        <SidebarBackdrop />
+        <Sidebar />
+        <main id="dashboard-main" tabIndex={-1} style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
+          <ErrorBoundary>
             <Content />
-          </main>
-        </div>
+          </ErrorBoundary>
+        </main>
       </div>
-    </AuthGate>
+      <DeploymentTruthFooter />
+    </div>
+  )
+}
+
+function SidebarBackdrop() {
+  const { sidebarOpen, setSidebarOpen } = useStore()
+  if (!sidebarOpen) return null
+  return (
+    <button
+      type="button"
+      className="sidebar-backdrop"
+      aria-label="Close navigation"
+      onClick={() => setSidebarOpen(false)}
+    />
   )
 }

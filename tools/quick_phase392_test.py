@@ -1,38 +1,34 @@
 #!/usr/bin/env python3
-"""Quick test of Phase 392 imports"""
+"""Quick smoke of Phase 392 imports."""
 
-import os
 import sys
 from pathlib import Path
 
-# Setup path
-project_root = Path(__file__).resolve().parents[2]
-print(f"Project root: {project_root}")
-print(f"Current dir: {os.getcwd()}")
 
-os.chdir(str(project_root))
-print(f"Changed to: {os.getcwd()}")
+project_root = Path(__file__).resolve().parents[1]
+if str(project_root) not in sys.path:
+    sys.path.insert(0, str(project_root))
 
-sys.path.insert(0, str(project_root))
-print(f"sys.path[0]: {sys.path[0]}")
 
-# Try import
-print("\nAttempting import...")
-try:
-    from core.engine.system3_phase392_ensemble_integration import run_phase_392
+def main() -> int:
+    """Run the legacy smoke only when invoked directly."""
+    print(f"Project root: {project_root}")
+    print("Attempting import...")
+    try:
+        from core.engine.system3_phase392_ensemble_integration import run_phase_392
 
-    print("✓ Import successful")
+        print("Import successful")
+        result = run_phase_392()
+        print(f"Status: {result.get('status')}")
+        print(f"Scores computed: {result.get('scores_computed')}")
+        return 0
+    except Exception as exc:
+        print(f"Error: {exc}")
+        import traceback
 
-    # Run Phase 392
-    print("\nRunning Phase 392...")
-    result = run_phase_392()
+        traceback.print_exc()
+        return 1
 
-    print("\nPhase 392 Result:")
-    print(f"Status: {result.get('status')}")
-    print(f"Scores computed: {result.get('scores_computed')}")
 
-except Exception as e:
-    print(f"✗ Error: {e}")
-    import traceback
-
-    traceback.print_exc()
+if __name__ == "__main__":
+    raise SystemExit(main())

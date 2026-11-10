@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""End-to-end Cloud proof for Genesis System3 web dashboard.
+"""End-to-end Cloud proof for Genesis System3 public/read-only dashboard.
 
 Writes reports/latest/cloud_e2e_proof/{summary.json,README.md}.
 Exit 0 only when required UI/API/stream markers pass.
+
+Dashboard reads are anonymous by architecture. This proof must never load or
+send the retired dashboard API key/session credential surface.
 """
 from __future__ import annotations
 
@@ -21,21 +24,9 @@ BASE = os.environ.get("SYSTEM3_CLOUD_BASE", "https://genesis-system3-web-doq2wpl
 EXPECTED_EPOCH = os.environ.get("SYSTEM3_EXPECTED_EPOCH", "20260803_e2e_full_cloud_40")
 
 
-def _load_api_key() -> str:
-    env_path = ROOT / ".secrets" / "dashboard_api_key.env"
-    if not env_path.exists():
-        return os.environ.get("DASHBOARD_API_KEY", "").strip()
-    for line in env_path.read_text(encoding="utf-8").splitlines():
-        if line.startswith("API_KEY=") or line.startswith("DASHBOARD_API_KEY="):
-            return line.split("=", 1)[1].strip()
-    return ""
-
-
-def _get(path: str, key: str = "", timeout: float = 60.0):
+def _get(path: str, timeout: float = 60.0):
     url = f"{BASE}{path}"
     req = urllib.request.Request(url, headers={"Accept": "application/json"})
-    if key:
-        req.add_header("X-API-Key", key)
     started = time.time()
     try:
         with urllib.request.urlopen(req, timeout=timeout) as resp:
@@ -57,7 +48,6 @@ def _get(path: str, key: str = "", timeout: float = 60.0):
 
 
 def main() -> int:
-    key = _load_api_key()
     checks = []
 
     prov = _get("/ui/assets/deploy-provenance.json")
@@ -95,7 +85,7 @@ def main() -> int:
         }
     )
 
-    health = _get("/api/health", key)
+    health = _get("/api/health")
     h = health.get("data") if isinstance(health.get("data"), dict) else {}
     checks.append(
         {
@@ -111,7 +101,7 @@ def main() -> int:
     )
 
     for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"):
-        ch = _get(f"/api/chain/{sym}", key, timeout=90)
+        ch = _get(f"/api/chain/{sym}", timeout=90)
         d = ch.get("data") if isinstance(ch.get("data"), dict) else {}
         n = len(d.get("contracts") or [])
         spot = float(d.get("spot") or 0)
@@ -130,7 +120,7 @@ def main() -> int:
             }
         )
 
-    top = _get("/api/scanner/top_contract_gainers?top_n=3&market_top_n=10&include_equity=1", key, timeout=120)
+    top = _get("/api/scanner/top_contract_gainers?top_n=3&market_top_n=10&include_equity=1", timeout=120)
     td = top.get("data") if isinstance(top.get("data"), dict) else {}
     rows = td.get("market_top_table") or []
     checks.append(
@@ -151,19 +141,30 @@ def main() -> int:
         }
     )
 
-    auth = _get("/api/auth/status", key)
+    auth = _get("/api/auth/status")
+    auth_data = auth.get("data") if isinstance(auth.get("data"), dict) else {}
     checks.append(
         {
             "id": "auth_status",
-            "pass": auth.get("ok") and isinstance(auth.get("data"), dict),
-            "detail": auth.get("data") if isinstance(auth.get("data"), dict) else auth,
+            "pass": auth.get("ok")
+            and auth_data.get("required") is False
+            and auth_data.get("configured") is False
+            and auth_data.get("authenticated") is False
+            and auth_data.get("mode") == "public_readonly",
+            "detail": {
+                "http": auth.get("status"),
+                "required": auth_data.get("required"),
+                "configured": auth_data.get("configured"),
+                "authenticated": auth_data.get("authenticated"),
+                "mode": auth_data.get("mode"),
+            },
         }
     )
 
     passed = sum(1 for c in checks if c["pass"])
     failed = [c["id"] for c in checks if not c["pass"]]
     summary = {
-        "schema": 1,
+        "schema": 2,
         "generated_at_ist": datetime.now().isoformat(timespec="seconds"),
         "base": BASE,
         "expected_epoch": EXPECTED_EPOCH,
@@ -172,6 +173,9 @@ def main() -> int:
         "fail_count": len(failed),
         "failed": failed,
         "overall_pass": len(failed) == 0,
+        "dashboard_access": "public_readonly_anonymous",
+        "dashboard_credentials_loaded": False,
+        "dashboard_credentials_sent": False,
         "live_trading_enabled": False,
         "checks": checks,
     }
@@ -185,7 +189,9 @@ def main() -> int:
         f"- Expected epoch: `{EXPECTED_EPOCH}`",
         f"- Observed epoch: `{epoch}`",
         f"- Overall: **{'PASS' if summary['overall_pass'] else 'FAIL'}** ({passed}/{len(checks)})",
-        f"- Live trading: OFF",
+        "- Dashboard access: anonymous public/read-only",
+        "- Dashboard credentials loaded/sent: false/false",
+        "- Live trading: OFF",
         "",
         "## Checks",
         "",

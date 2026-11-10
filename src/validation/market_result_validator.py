@@ -143,6 +143,11 @@ class MarketResultValidator:
     # ------------------------------------------------------------------ #
 
     def _fetch_actual_top_movers(self) -> List[Dict]:
+        # Production is Dhan-only on Cloud Run. Prefer Dhan actuals; NSE is local fallback only.
+        dhan_data = self._fetch_dhan_index_movers()
+        if dhan_data:
+            return dhan_data
+        logger.warning("Dhan actuals unavailable — trying NSE fallback (often blocked on Cloud Run)")
         nse_data = self._fetch_nse_most_active_options()
         if nse_data:
             return nse_data
@@ -155,6 +160,65 @@ class MarketResultValidator:
         results.sort(key=lambda x: x.get("composite_score", 0), reverse=True)
         for i, r in enumerate(results):
             r["market_rank"] = i + 1
+        return results
+
+    def _fetch_dhan_index_movers(self) -> List[Dict]:
+        """Rank tracked underlyings from verified Dhan option-chain OI / spot activity."""
+        try:
+            from core.data.datasource_manager import get_datasource_manager
+        except Exception as exc:
+            logger.warning(f"Dhan datasource unavailable for validation actuals: {exc}")
+            return []
+        dsm = get_datasource_manager()
+        results: List[Dict] = []
+        for symbol in TRACKED_UNDERLYINGS:
+            try:
+                df, spot = dsm.fetch_option_chain(symbol)
+            except Exception as exc:
+                logger.warning(f"Dhan chain fetch failed for {symbol}: {exc}")
+                continue
+            if df is None or getattr(df, "empty", True) or float(spot or 0) <= 0:
+                continue
+            oi_col = next(
+                (
+                    c
+                    for c in df.columns
+                    if str(c).lower() == "oi"
+                    or ("oi" in str(c).lower() and "change" not in str(c).lower() and "prev" not in str(c).lower())
+                ),
+                None,
+            )
+            chg_col = next(
+                (
+                    c
+                    for c in df.columns
+                    if "changeinopeninterest" in str(c).lower()
+                    or str(c).lower() in {"oi_change", "change_oi", "oichange"}
+                ),
+                None,
+            )
+            try:
+                total_oi = float(df[oi_col].sum()) if oi_col else 0.0
+            except Exception:
+                total_oi = 0.0
+            try:
+                total_oi_change = float(df[chg_col].abs().sum()) if chg_col else 0.0
+            except Exception:
+                total_oi_change = 0.0
+            oi_change_pct = (total_oi_change / total_oi * 100.0) if total_oi > 0 else 0.0
+            results.append(
+                {
+                    "symbol": symbol,
+                    "oi_change_pct": round(oi_change_pct, 2),
+                    "price_change_pct": 0.0,
+                    "composite_score": oi_change_pct,
+                    "spot": float(spot),
+                    "source": "dhan",
+                }
+            )
+        results.sort(key=lambda x: x.get("composite_score", 0), reverse=True)
+        for i, row in enumerate(results):
+            row["market_rank"] = i + 1
         return results
 
     def _fetch_nse_most_active_options(self) -> List[Dict]:

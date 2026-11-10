@@ -60,26 +60,50 @@ def _spearman_from_validation(data: Dict[str, Any]) -> Optional[float]:
 
 
 def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[float]]:
-    mv_dir = root / "state" / "market_validations"
-    days: List[Dict[str, Any]] = []
-    if not mv_dir.exists():
-        return days, 0, None
-    for path in sorted(mv_dir.glob("*.json")):
-        data = _read_json(path)
-        if not data:
-            continue
+    by_date: Dict[str, Dict[str, Any]] = {}
+
+    def _ingest(data: Dict[str, Any], fallback_date: str = "") -> None:
+        if data.get("error") and _spearman_from_validation(data) in (None, 0.0):
+            return
         rho = _spearman_from_validation(data)
         if rho is None:
-            continue
-        days.append(
-            {
-                "date": data.get("date") or path.stem.replace("market_validation_", ""),
-                "rho": round(rho, 4),
-                "hit_rate": data.get("hit_rate"),
-                "status": data.get("status"),
-                "pass": rho >= SPEARMAN_THRESHOLD,
-            }
-        )
+            return
+        day = str(data.get("date") or fallback_date or "").strip()
+        if not day:
+            return
+        by_date[day] = {
+            "date": day,
+            "rho": round(rho, 4),
+            "hit_rate": data.get("hit_rate", data.get("match_rate_top3")),
+            "status": data.get("status") or data.get("grade"),
+            "pass": rho >= SPEARMAN_THRESHOLD,
+        }
+
+    mv_dir = root / "state" / "market_validations"
+    cloud_backend = os.environ.get("SYSTEM3_STATE_BACKEND", "").strip().lower() == "firestore" or bool(
+        os.environ.get("SYSTEM3_FIRESTORE_PROJECT") or os.environ.get("CLOUD_MODE")
+    )
+    # Cloud Run has no durable local state/; prefer Firestore and skip empty laptop paths.
+    if not cloud_backend and mv_dir.exists():
+        for path in sorted(mv_dir.glob("*.json")):
+            data = _read_json(path)
+            if not data:
+                continue
+            _ingest(data, fallback_date=path.stem.replace("market_validation_", ""))
+
+    # Durable production path is authoritative in cloud mode. Avoid contacting
+    # Firestore from explicitly local/offline runs, where state/ is scratch.
+    if cloud_backend:
+        try:
+            from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend
+
+            for row in FirestoreSchedulerEvidenceBackend().list_validation_days():
+                if isinstance(row, dict):
+                    _ingest(row)
+        except Exception:
+            pass
+
+    days = [by_date[k] for k in sorted(by_date)]
     passing = sum(1 for d in days if d["pass"])
     latest_rho = days[-1]["rho"] if days else None
     return days, passing, latest_rho
@@ -118,15 +142,29 @@ def eval_expectancy_gate(root: Path) -> Dict[str, Any]:
         net_f = float(net) if net is not None else None
     except (TypeError, ValueError):
         net_f = None
-    ok = data.get("pass") is True and net_f is not None and net_f > 0
+    source = str(data.get("source") or "").replace("\\", "/")
+    is_fixture = (
+        data.get("is_fixture") is True
+        or "tests/fixtures" in source
+        or "paper_closed_trades_feb2026" in source
+    )
+    ok = (
+        (not is_fixture)
+        and data.get("pass") is True
+        and net_f is not None
+        and net_f > 0
+    )
+    blocker = None if ok else ("INSUFFICIENT_REAL_TRADES" if is_fixture else "PROFIT_BLOCKER")
     return {
         "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
         "pass": ok,
+        "is_fixture": is_fixture,
         "report_exists": path.exists(),
         "net_expectancy_after_costs": net_f,
         "win_rate": ev.get("win_rate"),
         "trade_count": ev.get("trade_count"),
-        "blocker_id": None if ok else "PROFIT_BLOCKER",
+        "source": source or None,
+        "blocker_id": blocker,
         "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate",
     }
 

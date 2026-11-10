@@ -19,9 +19,15 @@ from __future__ import annotations
 import csv
 import json
 import os
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+try:
+    from dashboard.backend.trade_logger import log_trade_event
+except ImportError:
+    from trade_logger import log_trade_event
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
@@ -101,6 +107,7 @@ class CloudPaperEngine:
         self.trades_csv = outputs_dir / "paper_trades_live.csv"
         self.state_file = outputs_dir / "paper_engine_state.json"
         self._load_state()
+        self._lock = threading.Lock()
 
     def _load_state(self):
         if self.state_file.exists():
@@ -138,10 +145,10 @@ class CloudPaperEngine:
     def _reset_if_new_day(self):
         today = _now_ist().strftime("%Y-%m-%d")
         if self.session_date != today:
+            # Never erase unsettled paper positions or the audit trail at midnight.
+            # A new session changes the date, not the lifetime trade ledger.
+            # Keep seq monotonic to avoid reusing position IDs after restart.
             self.session_date = today
-            self.open_positions = []
-            self.closed_positions = []
-            self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Pick one tradeable contract by pure Dhan LTP % gain (highest first).
@@ -281,6 +288,69 @@ class CloudPaperEngine:
         max_open: int = 3,
         market_top: Optional[List[Dict[str, Any]]] = None,
     ):
+        """One engine tick: update open positions, maybe open a new one.
+
+        Serialized via self._lock so a concurrent manual close
+        (close_position_by_id) cannot race this background tick.
+        """
+        with self._lock:
+            return self._step_locked(chains, max_open=max_open, market_top=market_top)
+
+    def close_position_by_id(self, position_id: str) -> Optional[Dict[str, Any]]:
+        """Manually close one open position through the engine's own authority.
+
+        Single lifecycle path for manual close: mutates self.open_positions /
+        self.closed_positions (the same state paper_engine_state.json and all
+        projection files are derived from) instead of editing
+        positions_live.json directly. Fixes PAPER-017/PAPER-018: removes the
+        dual-authority split between engine state and dashboard file.
+        """
+        with self._lock:
+            for i, pos in enumerate(self.open_positions):
+                if str(pos.get("position_id", "")) == str(position_id):
+                    entry = pos.get("entry_price", 0)
+                    cur = pos.get("current_price", entry)
+                    net = _compute_net_pnl(entry, cur, pos.get("underlying"))
+                    chg_pct = (cur - entry) / entry * 100.0 if entry else 0.0
+                    closed = {
+                        **pos,
+                        "action": "CLOSE",
+                        "status": "CLOSED",
+                        "exit_price": round(cur, 2),
+                        "exit_reason": "MANUAL_CLOSE",
+                        "realized_pnl": net,
+                        "realized_pnl_pct": round(chg_pct, 2),
+                        "time_ist": _ist_str(),
+                    }
+                    del self.open_positions[i]
+                    self.closed_positions.append(closed)
+                    self._append_trade_csv(closed, "CLOSE")
+                    log_trade_event(
+                        event_type="POSITION_CLOSED",
+                        position_id=closed.get("position_id"),
+                        underlying=closed.get("underlying"),
+                        symbol=closed.get("trading_symbol"),
+                        strike=closed.get("strike"),
+                        option_type=closed.get("option_type"),
+                        action="CLOSE",
+                        entry_price=closed.get("entry_price"),
+                        exit_price=closed.get("exit_price"),
+                        qty=closed.get("qty"),
+                        pnl=closed.get("realized_pnl"),
+                        strategy=closed.get("strategy"),
+                        exit_reason=closed.get("exit_reason"),
+                    )
+                    self._save_state()
+                    self._write_outputs()
+                    return closed
+            return None
+
+    def _step_locked(
+        self,
+        chains: List[Dict[str, Any]],
+        max_open: int = 3,
+        market_top: Optional[List[Dict[str, Any]]] = None,
+    ):
         """One engine tick: update open positions, maybe open a new one."""
         self._reset_if_new_day()
         now = _now_ist()
@@ -343,6 +413,22 @@ class CloudPaperEngine:
                 }
                 self.closed_positions.append(closed)
                 self._append_trade_csv(closed, "CLOSE")
+                log_trade_event(
+                    event_type="POSITION_CLOSED",
+                    position_id=closed.get("position_id"),
+                    underlying=closed.get("underlying"),
+                    symbol=closed.get("trading_symbol"),
+                    strike=closed.get("strike"),
+                    option_type=closed.get("option_type"),
+                    action="CLOSE",
+                    entry_price=closed.get("entry_price"),
+                    exit_price=closed.get("exit_price"),
+                    qty=closed.get("qty"),
+                    pnl=closed.get("realized_pnl"),
+                    strategy=closed.get("strategy"),
+                    exit_reason=closed.get("exit_reason"),
+                    timestamp=closed.get("timestamp"),
+                )
             else:
                 pos["current_price"] = round(cur, 2)
                 pos["ltp"] = round(cur, 2)
@@ -424,6 +510,19 @@ class CloudPaperEngine:
                 }
                 self.open_positions.append(pos)
                 self._append_trade_csv(pos, "OPEN")
+                log_trade_event(
+                    event_type="POSITION_OPENED",
+                    position_id=pos["position_id"],
+                    underlying=pos["underlying"],
+                    symbol=pos["trading_symbol"],
+                    strike=pos["strike"],
+                    option_type=pos["option_type"],
+                    action="OPEN",
+                    entry_price=pos["entry_price"],
+                    qty=pos["qty"],
+                    strategy=pos["strategy"],
+                    timestamp=pos["timestamp"],
+                )
 
         self._write_outputs()
         self._save_state()

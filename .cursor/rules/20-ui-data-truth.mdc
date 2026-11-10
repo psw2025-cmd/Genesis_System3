@@ -1,0 +1,13 @@
+---
+description: Dashboard UI/API truth, dynamic tab discovery, semantic parity
+globs: dashboard/**/*.{py,ts,tsx,js,jsx,css,html}
+alwaysApply: false
+---
+
+# UI / data truth
+
+Discover tabs/routes/widgets from App.tsx, registries, sidebar, query params, and the live DOM. Do not assume a fixed 22-tab count.
+
+For data-bearing UI: HTTP 200 and a screenshot are not PASS. Compare visible fields to the same-session API. Disclose fallbacks (source, reason, age). Empty authentic data is empty, not success.
+
+Local current UI: `http://127.0.0.1:8000/ui/` after proving the bound port. GCP `run.app` URLs are historical.

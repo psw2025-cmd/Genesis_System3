@@ -11,10 +11,10 @@ This guide is for a non-coder, a junior coder, or an automation agent. Follow it
 | Rule | Meaning |
 |---|---|
 | Live trading stays OFF | System3 is analyzer/paper-only until all proof is green. |
-| Never share secrets | Do not paste Dhan token, Render secrets, GitHub tokens, or worker push token in chat. |
+| Never share secrets | Do not paste Dhan token, GCP secrets, GitHub tokens, or worker push token in chat. |
 | GitHub repo is source of truth | Code changes should end in `psw2025-cmd/Genesis_System3`. |
-| Windows self-hosted runner is proof machine | Use the laptop runner for proof while Render minutes/backend are unstable. |
-| Render is not final truth when 502/deploy blocked | If Render is 502, prove locally first. |
+| Windows self-hosted runner is proof machine | Use the laptop runner for local proof. Production truth is GCP Cloud Run. |
+| Render.com is forbidden | Do not deploy to Render. Production URL is Cloud Run only. |
 | No green claim without proof | Final status is PASS only when reports and dashboard visual proof are PASS. |
 
 ---
@@ -28,7 +28,7 @@ Use these paths exactly.
 | Active GitHub self-hosted runner repo | `C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3` |
 | Old/local OpenAlgo repo | `C:\openalgo-main` |
 | Local dashboard URL | `http://127.0.0.1:8010/ui` or `http://127.0.0.1:5000/ui` depending which server is running |
-| Render dashboard URL | `http://127.0.0.1:8000/ui` |
+| Production Cloud Run UI | `https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/` |
 | GitHub repo | `psw2025-cmd/Genesis_System3` |
 | Proof reports | `reports\latest\...` |
 
@@ -45,7 +45,7 @@ Use these paths exactly.
 | Dhan read-only broker | Real holdings, positions, funds, option data | Connected or clearly degraded, no hidden orders |
 | Worker | Background scheduler/scanner/pusher | Running, no token mismatch |
 | GitHub workflows | Automated proof/checks | Self-hosted runner PASS |
-| Render | Cloud hosting | Used only after backend/deploy is healthy |
+| Cloud Run | GCP production host | Serving SHA must match expected commit |
 | Playwright | Browser proof tool | `PLAYWRIGHT_OK` |
 
 ---
@@ -206,7 +206,7 @@ Check the report. There should be no unknown process occupying the port you want
 
 ## 6. Start local backend safely
 
-Use local backend first when Render is 502, billing-limited, or unstable.
+Use local backend first when Cloud Run is 502 or otherwise unproven.
 
 ```powershell
 cd C:\actions-runner-genesis\_work\Genesis_System3\Genesis_System3
@@ -405,14 +405,14 @@ broker/order safety true
 
 ---
 
-## 12. Render/cloud check
+## 12. Cloud Run / local API check
 
-Use Render only after local and self-hosted proof are clean.
+Production host is GCP Cloud Run. Local `127.0.0.1` is not production truth.
 
 Check these routes:
 
 ```powershell
-$base="http://127.0.0.1:8000"
+$base="https://genesis-system3-web-doq2wplepa-el.a.run.app"
 $routes=@(
 "/api/health",
 "/api/state",
@@ -442,8 +442,8 @@ Interpretation:
 |---|---|---|
 | 200 | Route reachable | Continue proof |
 | 401 | Auth/session missing | Check dashboard API key/session, do not change token blindly |
-| 502 | Render backend down | Fix Render backend/redeploy/restart |
-| Timeout | Render sleeping/down/network issue | Retry after service wakes or inspect logs |
+| 502 | Cloud Run backend down | Inspect Cloud Run revision/logs; do not recreate Render |
+| Timeout | Cloud Run / network issue | Retry and inspect Cloud Run logs |
 | `ERR_NAME_NOT_RESOLVED` in browser | Frontend URL/WS config broken | Fix frontend API/WS base URL |
 
 ---
@@ -489,7 +489,7 @@ Positions unavailable
 Action:
 
 1. Do not paste token in chat.
-2. Update token only inside Render/local `.env` or secret manager.
+2. Update token only through the canonical Dhan Cloud Run / Secret Manager rotation Job or local `.env`.
 3. Restart backend/worker after update.
 4. Recheck `/api/broker/dhan/status`, `/api/broker/holdings`, `/api/broker/positions/live`.
 
@@ -618,7 +618,7 @@ Do not confuse old scanner path with active GitHub runner repo.
 | `PLAYWRIGHT_OK` missing | Node package missing | Run npm install after removing stale lock/node_modules |
 | `dhanhq-javascript` 404 | Bad old npm dependency | Pull latest repo, verify package.json no longer contains it |
 | `Select-String -Recurse` error | Wrong PowerShell syntax | Use `Get-ChildItem ... | Select-String ...` |
-| Render 502 | Cloud backend down | Prove locally, then restart/redeploy Render when available |
+| Cloud Run 502 | Cloud backend down | Prove locally, then inspect/redeploy the Cloud Run service |
 | 401 Missing dashboard session | API auth missing | Check dashboard/API key/session setup |
 | DH-906 Invalid Token | Dhan token invalid/expired | Refresh token in secret manager only, restart backend/worker |
 | Holdings visible but `/api/state` disconnected | SSOT mismatch | Patch read-only broker observation into state store |
@@ -734,7 +734,7 @@ Final PASS requires all of this:
 ```text
 GitHub self-hosted workflow PASS
 Local backend smoke PASS
-Render backend smoke PASS if using Render
+Cloud Run `/api/health` + `/api/deploy/info` smoke PASS
 Dashboard visual tracker PASS
 Autopilot proof board PASS
 Dhan broker connected/degraded with clear reason

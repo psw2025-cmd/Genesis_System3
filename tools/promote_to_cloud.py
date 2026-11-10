@@ -90,7 +90,6 @@ def main() -> int:
             "tools/fetch_nse_option_chain.py",
             "tools/promote_to_cloud.py",
             "tools/local_ci_runner.py",
-            "tools/sync_render_secrets.py",
             "tools/verify_local_env.py",
             "tools/run_all_tests.py",
             "scripts/dashboard_production_audit.py",

@@ -11,6 +11,8 @@ from html.parser import HTMLParser
 from typing import Any, Dict, List, Optional, Tuple
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
+import logging
+logger = logging.getLogger(__name__)
 
 MC_URL = (
     "https://www.moneycontrol.com/stocks/fno/marketstats/options/gainers/homebody.php"

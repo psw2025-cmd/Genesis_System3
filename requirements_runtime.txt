@@ -40,6 +40,9 @@ openpyxl==3.1.2
 xlrd==2.0.1
 pyarrow==14.0.2
 
+# Market-data lake object storage (issue #376)
+google-cloud-storage==2.18.2
+
 # Data ingestion / APIs
 requests==2.31.0
 aiohttp==3.9.3

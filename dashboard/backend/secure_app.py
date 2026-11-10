@@ -1,0 +1,269 @@
+"""Permanent public-readonly security boundary for Genesis System3.
+
+Cloud Run launches this module. Dashboard viewing has no browser credential,
+login-session, or dashboard-secret authority. Retired dashboard-auth environment
+variables are scrubbed BEFORE importing the legacy application, so configuration
+drift cannot reactivate that old code path.
+
+Public visibility never becomes mutation authority. MutationPolicy owns every
+write; UNKNOWN writes and all live mutation/approval capabilities fail closed.
+Dedicated worker ingestion remains bound to its separate worker token.
+"""
+from __future__ import annotations
+
+from collections import Counter
+import hashlib
+import json
+import os
+
+from fastapi import HTTPException, Request
+
+# Permanent architecture invariant: these retired dashboard-auth knobs have no
+# runtime meaning. Scrub them before importing the legacy backend so even a
+# manually drifted Cloud Run revision cannot activate its old compatibility
+# middleware. The canonical deployer also removes them from revision metadata.
+_RETIRED_DASHBOARD_ENV = (
+    "REQUIRE_" + "API_KEY",
+    "API_" + "KEY",
+    "DASHBOARD_" + "API_KEY",
+    "ENABLE_DASHBOARD_" + "AUTH",
+    "DASHBOARD_SESSION_" + "MAX_AGE",
+)
+for _name in _RETIRED_DASHBOARD_ENV:
+    os.environ.pop(_name, None)
+
+from dashboard.backend import app as legacy  # noqa: E402
+from dashboard.backend.mutation_policy import (  # noqa: E402
+    Capability,
+    assert_runtime_manifest,
+    duplicate_write_routes,
+    evaluate_runtime_mutation,
+    inventory_write_routes,
+    unclassified_write_routes,
+)
+from dashboard.backend.security_policy import SecurityDecision, evaluate_request  # noqa: E402
+
+
+app = legacy.app
+
+# Belt-and-suspenders protection for the already-imported legacy compatibility
+# globals. They are not authority and can never be changed by request input.
+if hasattr(legacy, "_REQUIRE_API_KEY"):
+    legacy._REQUIRE_API_KEY = False
+if hasattr(legacy, "_API_KEY"):
+    legacy._API_KEY = ""
+if hasattr(legacy, "_has_dashboard_api_access"):
+    legacy._has_dashboard_api_access = lambda _request: False
+
+# Only the informational status route survives. Login/logout/session endpoints
+# are deliberately absent from the serving route table.
+_RETIRED_AUTH_PATHS = {
+    "/api/auth/" + "session",
+    "/api/auth/" + "logout",
+    "/api/auth/" + "status",
+}
+app.router.routes = [
+    route for route in app.router.routes
+    if getattr(route, "path", None) not in _RETIRED_AUTH_PATHS
+]
+
+
+def _capability_aware_request_policy(**kwargs) -> SecurityDecision:
+    """Apply MutationPolicy before the public-readonly request policy."""
+    mutation = evaluate_runtime_mutation(
+        kwargs.get("method", ""),
+        kwargs.get("path", ""),
+        worker_token_configured=bool(kwargs.get("worker_token_configured")),
+        worker_token_valid=bool(kwargs.get("worker_token_valid")),
+        control_authorized=False,
+    )
+    if mutation is None:
+        return evaluate_request(**kwargs)
+
+    if not mutation.allowed:
+        return SecurityDecision(
+            False,
+            mutation.status_code,
+            mutation.reason,
+            mutation.code,
+        )
+
+    if mutation.capability is Capability.WORKER_INGEST:
+        return SecurityDecision(True)
+
+    return SecurityDecision(
+        False,
+        403,
+        "Public dashboard is read-only; mutation authority is separate",
+        "PUBLIC_DASHBOARD_READ_ONLY",
+    )
+
+
+# Existing legacy middleware resolves this symbol at request time. Replacing it
+# keeps one middleware stack while removing the retired dashboard-auth model.
+legacy.evaluate_request = _capability_aware_request_policy
+
+
+@app.middleware("http")
+async def strip_retired_dashboard_credentials(request: Request, call_next):
+    """Make retired dashboard credential input inert before inner middleware.
+
+    This middleware is registered last and therefore wraps the legacy stack.
+    It removes only the retired dashboard credential header/cookie; unrelated
+    cookies and worker/control headers are preserved.
+    """
+    headers = []
+    retired_header = b"x-" + b"api-key"
+    retired_cookie_name = "system3_dashboard_" + "session"
+
+    for key, value in request.scope.get("headers", []):
+        lower = key.lower()
+        if lower == retired_header:
+            continue
+        if lower == b"cookie":
+            try:
+                parts = []
+                for part in value.decode("latin-1").split(";"):
+                    item = part.strip()
+                    if not item:
+                        continue
+                    name = item.split("=", 1)[0].strip()
+                    if name == retired_cookie_name:
+                        continue
+                    parts.append(item)
+                if parts:
+                    headers.append((key, "; ".join(parts).encode("latin-1")))
+            except Exception:
+                headers.append((key, value))
+            continue
+        headers.append((key, value))
+
+    request.scope["headers"] = headers
+    return await call_next(request)
+
+
+@app.get("/api/auth/status")
+async def dashboard_auth_status():
+    """Stable non-secret proof that dashboard credential authority is absent."""
+    return {
+        "required": False,
+        "configured": False,
+        "authenticated": False,
+        "mode": "public_readonly",
+        "credential_surface": "REMOVED",
+        "session": None,
+    }
+
+
+@app.get("/api/market-status")
+async def market_status_readonly():
+    """Read-only session CLOCK evidence, never a broker-live trading gate.
+
+    Weekday/clock heuristics cannot certify exchange holidays or feed health.
+    Downstream PAPER execution must use an independently verified session gate.
+    """
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    now = datetime.now(ZoneInfo("Asia/Kolkata"))
+    response = {
+        "status": "NOT_VERIFIED",
+        "market_open": None,
+        "is_open": None,
+        "market_status": "NOT_VERIFIED",
+        "source": "INDIA_SESSION_CLOCK_ONLY",
+        "calendar_verified": False,
+        "live_market_data_verified": False,
+        "real": False,
+        "live_trading_enabled": False,
+        "timestamp_ist": now.isoformat(),
+    }
+    detector = None
+    if getattr(legacy, "MARKET_DETECTION_AVAILABLE", False):
+        detector = getattr(legacy, "get_market_status", None)
+    if detector is None:
+        # Canonical repository location; the historical utils.market_hours
+        # import in legacy may not exist in a clean Cloud Run image.
+        try:
+            from src.utils.market_hours import get_market_status as detector
+        except ImportError:
+            response["reason"] = "MARKET_SESSION_DETECTOR_UNAVAILABLE"
+            return response
+    try:
+        details = detector(now_ist=now)
+    except Exception:
+        response["reason"] = "MARKET_SESSION_DETECTOR_FAILED"
+        return response
+    if not isinstance(details, dict) or type(details.get("is_open")) is not bool:
+        response["reason"] = "INVALID_SESSION_DETECTOR_RESPONSE"
+        return response
+    clock_open = details["is_open"]
+    response.update({
+        "status": "CLOCK_WINDOW_OPEN" if clock_open else "CLOCK_WINDOW_CLOSED",
+        "market_open": clock_open,
+        "is_open": clock_open,
+        "market_status": "open" if clock_open else "closed",
+        "reason": str(details.get("reason") or "CLOCK_WINDOW_ONLY")[:120],
+        "next_open": details.get("next_open"),
+        "verification_status": "CLOCK_WINDOW_ONLY_NOT_EXCHANGE_VERIFIED",
+    })
+    return response
+
+
+def _sentinel_reached(capability: str) -> None:
+    raise HTTPException(
+        status_code=500,
+        detail=f"MUTATION_POLICY_BYPASSED_{capability}",
+    )
+
+
+@app.post("/api/security/mutation-policy/probe/paper", include_in_schema=False)
+async def mutation_policy_probe_paper():
+    _sentinel_reached("PAPER_MUTATION")
+
+
+@app.post("/api/security/mutation-policy/probe/live", include_in_schema=False)
+async def mutation_policy_probe_live():
+    _sentinel_reached("LIVE_MUTATION")
+
+
+@app.post("/api/security/mutation-policy/probe/worker", include_in_schema=False)
+async def mutation_policy_probe_worker():
+    _sentinel_reached("WORKER_INGEST")
+
+
+@app.get("/api/security/mutation-policy")
+async def mutation_policy_status():
+    """Non-secret runtime evidence for the active mutation boundary."""
+    rows = inventory_write_routes(app)
+    unknown = unclassified_write_routes(app)
+    duplicates = duplicate_write_routes(app)
+    counts = Counter(row.capability.value for row in rows)
+    manifest_rows = [
+        {"method": row.method, "path": row.path, "capability": row.capability.value}
+        for row in rows
+    ]
+    manifest_hash = hashlib.sha256(
+        json.dumps(manifest_rows, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return {
+        "state": "ENFORCED" if not unknown and not duplicates else "INVALID",
+        "runtime_mode": "ANALYZER_PAPER",
+        "public_dashboard_read_only": True,
+        "dashboard_credential_authority": "REMOVED",
+        "control_authority_configured": False,
+        "live_mutation": "HARD_DENY",
+        "live_approval": "HARD_DENY",
+        "worker_authority": "DEDICATED_WORKER_TOKEN",
+        "write_route_count": len(rows),
+        "unknown_count": len(unknown),
+        "duplicate_count": len(duplicates),
+        "capability_counts": dict(sorted(counts.items())),
+        "manifest_sha256": manifest_hash,
+        "secret_values_exposed": False,
+    }
+
+
+# Startup/import fails if any newly added write route bypasses classification or
+# duplicates an existing method/path owner.
+assert_runtime_manifest(app)

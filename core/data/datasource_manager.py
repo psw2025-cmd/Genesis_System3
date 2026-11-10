@@ -5,6 +5,7 @@ NSE scraping, Yahoo Finance, bhavcopy removed to save RAM.
 fetch_option_chain() preserved for chain_adapter.py compatibility.
 """
 from __future__ import annotations
+import csv
 import json
 import logging
 import os
@@ -24,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[2]
 _DHAN_OC_LOCK = threading.Lock()
 _DHAN_OC_LAST_TS = 0.0
 _DHAN_OC_MIN_GAP_S = float(os.environ.get("DHAN_OC_MIN_GAP_S", "3.4"))
+_DHAN_OC_TERMINAL_CODES = {429, 805, 808, 906}
 
 
 def _pace_dhan_option_chain_call() -> None:
@@ -33,6 +35,66 @@ def _pace_dhan_option_chain_call() -> None:
     if wait > 0:
         time.sleep(wait)
     _DHAN_OC_LAST_TS = time.time()
+
+
+def _dhan_non_success_codes(resp: Any) -> set[int]:
+    """Extract only known Dhan/HTTP failure codes from a non-success response.
+
+    SDK versions have emitted codes under several nested key names (for example
+    ``errorCode``, ``error_code``, ``code`` and HTTP status fields).  Keep this
+    intentionally narrow so arbitrary numeric market values cannot suppress the
+    existing bounded retry for unknown transient failures.
+    """
+    codes: set[int] = set()
+    code_keys = {
+        "code",
+        "errorcode",
+        "error_code",
+        "error-code",
+        "httpstatus",
+        "http_status",
+        "statuscode",
+        "status_code",
+    }
+
+    def _walk(value: Any, key: str = "") -> None:
+        if isinstance(value, dict):
+            for child_key, child_value in value.items():
+                _walk(child_value, str(child_key).strip().lower())
+            return
+        if isinstance(value, (list, tuple)):
+            for child in value:
+                _walk(child, key)
+            return
+        if key not in code_keys:
+            return
+        text = str(value or "").strip().upper()
+        for prefix in ("DH-", "DH_", "HTTP_", "HTTP-", "HTTP "):
+            if text.startswith(prefix):
+                text = text[len(prefix):]
+                break
+        try:
+            code = int(text)
+        except (TypeError, ValueError):
+            return
+        if code in _DHAN_OC_TERMINAL_CODES:
+            codes.add(code)
+
+    _walk(resp)
+    # Some SDKs place only prose in remarks for rate limiting.  Recognize this
+    # one provider-defined condition without treating arbitrary numbers as codes.
+    try:
+        rendered = json.dumps(resp, sort_keys=True, default=str).lower()
+    except Exception:
+        rendered = str(resp).lower()
+    if "too many requests" in rendered or "http_429" in rendered or "http 429" in rendered:
+        codes.update({429, 805})
+    return codes
+
+
+def _is_terminal_dhan_non_success(resp: Any) -> bool:
+    """True when retrying this Dhan response would amplify auth/rate-limit failure."""
+    return bool(_dhan_non_success_codes(resp))
 
 
 class DataSourceManager:
@@ -49,6 +111,7 @@ class DataSourceManager:
         "FINNIFTY": 27,
         "MIDCPNIFTY": 442,
         "SENSEX": 51,
+        "BANKEX": 12,
     }
 
     # Dhan option-chain UnderlyingSeg for index underlyings (NSE + BSE Sensex)
@@ -60,6 +123,7 @@ class DataSourceManager:
         "FINNIFTY": "IDX_I",
         "MIDCPNIFTY": "IDX_I",
         "SENSEX": "IDX_I",
+        "BANKEX": "BSE_FNO",
     }
 
     def __init__(self):
@@ -68,16 +132,19 @@ class DataSourceManager:
         self._equity_sec_ids: Dict[str, int] = {}
 
     def _get_client(self):
-        if self._client is None:
+        from core.utils.env_loader import get_dhan_credentials
+        creds = get_dhan_credentials()
+        client_id = creds.get("client_id", "").strip().lstrip("\ufeff")
+        token = creds.get("access_token", "").strip().lstrip("\ufeff")
+        if hasattr(self, "_cached_token") and self._cached_token != token:
+            self._client = None
+        self._cached_token = token
+        if self._client is None and client_id and token:
             try:
                 from dhanhq import dhanhq
                 from dhanhq.dhan_context import DhanContext
-
-                client_id = os.environ.get("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff")
-                token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
-                if client_id and token:
-                    ctx = DhanContext(client_id, token)
-                    self._client = dhanhq(ctx)
+                ctx = DhanContext(client_id, token)
+                self._client = dhanhq(ctx)
             except Exception as e:
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client
@@ -107,6 +174,32 @@ class DataSourceManager:
 
         if sym_u in self._equity_sec_ids:
             return self._equity_sec_ids[sym_u], env_seg or "NSE_EQ"
+
+        # Institutional Indian Equity Security IDs
+        INSTITUTIONAL_EQUITY_IDS = {
+            "RELIANCE": 2885,
+            "TCS": 11536,
+            "INFY": 1594,
+            "HDFCBANK": 1333,
+            "ICICIBANK": 4963,
+            "SBIN": 3045,
+            "TATAMOTORS": 3456,
+            "BHARTIARTL": 10604,
+            "ITC": 1660,
+            "LT": 11483,
+        }
+        if sym_u in INSTITUTIONAL_EQUITY_IDS:
+            return INSTITUTIONAL_EQUITY_IDS[sym_u], env_seg or "NSE_EQ"
+
+        # In-memory SQLite Master Cache lookup (zero CSV dependency)
+        try:
+            from core.data.dhan_master_cache import get_master_cache
+
+            sec_id, seg, exch = get_master_cache().resolve_underlying_security(sym_u)
+            if sec_id:
+                return sec_id, env_seg or seg
+        except Exception:
+            pass
 
         # Resolve NSE equity underlying id from security master (OPTSTK parents).
         try:
@@ -190,6 +283,34 @@ class DataSourceManager:
             break
         return []
 
+    @staticmethod
+    def _nearest_master_expiry(sym: str) -> str:
+        """Return the nearest non-expired option expiry from Dhan's master."""
+        master = ROOT / "security_id_list.csv"
+        if not master.exists():
+            return ""
+        wanted = sym.strip().upper()
+        aliases = {"BSXOPT": "SENSEX", "BKXOPT": "BANKEX"}
+        today = date.today().isoformat()
+        found = set()
+        try:
+            with master.open(encoding="utf-8", errors="replace") as handle:
+                for row in csv.DictReader(handle):
+                    inst = str(row.get("SEM_INSTRUMENT_NAME") or row.get("INSTRUMENT") or "").upper()
+                    if inst not in {"OPTIDX", "OPTSTK"}:
+                        continue
+                    trading = str(row.get("SEM_TRADING_SYMBOL") or "").strip().upper()
+                    name = trading.split("-", 1)[0] if "-" in trading else str(
+                        row.get("SM_SYMBOL_NAME") or row.get("SYMBOL_NAME") or ""
+                    ).strip().upper()
+                    name = aliases.get(name, name)
+                    expiry_value = str(row.get("SEM_EXPIRY_DATE") or row.get("EXPIRY_DATE") or "").strip()[:10]
+                    if name == wanted and len(expiry_value) == 10 and expiry_value >= today:
+                        found.add(expiry_value)
+        except (OSError, csv.Error):
+            return ""
+        return min(found) if found else ""
+
     def _option_chain_expiry(self, dhan: Any, sec_id: int, segment: str, sym: str, expiry: str = "") -> str:
         """Resolve expiry via env override, then Dhan expiry_list, then calendar fallback."""
         explicit = (
@@ -210,6 +331,9 @@ class DataSourceManager:
                     return dates[0]
         except Exception as exc:
             logger.warning(f"[DSM] expiry_list failed for {sym}: {exc}")
+        master_expiry = self._nearest_master_expiry(sym)
+        if master_expiry:
+            return master_expiry
         return self._nearest_expiry()
 
     def fetch_option_chain(self, symbol: str, expiry: str = "") -> Optional[Tuple[Any, float]]:
@@ -219,11 +343,12 @@ class DataSourceManager:
         """
         import time
         sym = symbol.upper()
+        cache_key = (sym, expiry or "")
 
         # Cache TTL check (e.g. 5 seconds)
         cache_ttl = 5
-        if hasattr(self, "_cache") and sym in self._cache:
-            cache_time, cached_df, cached_spot = self._cache[sym]
+        if hasattr(self, "_cache") and cache_key in self._cache:
+            cache_time, cached_df, cached_spot = self._cache[cache_key]
             if time.time() - cache_time < cache_ttl:
                 return cached_df, cached_spot
 
@@ -239,26 +364,13 @@ class DataSourceManager:
 
         for source_name, source_fn in sources:
             try:
-                if source_name == "dhan":
-                    res = source_fn()
-                    if res == (None, None):
-                        dhan_res = self._fetch_dhan_real(sym, expiry)
-                        if dhan_res is not None and dhan_res[0] is not None and not dhan_res[0].empty:
-                            self._cache[sym] = (time.time(), dhan_res[0], dhan_res[1])
-                            return dhan_res
-                    elif res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
-                            self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
-                else:
-                    res = source_fn()
-                    if res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
-                            if source_name != "synthetic":
-                                self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
+                res = source_fn()
+                if res is not None and isinstance(res, tuple) and len(res) >= 2 and res[0] is not None:
+                    df, spot = res[0], res[1]
+                    if hasattr(df, "empty") and not df.empty:
+                        if source_name != "synthetic":
+                            self._cache[cache_key] = (time.time(), df, spot)
+                        return df, float(spot or 0.0)
             except AssertionError as e:
                 raise e
             except Exception as e:
@@ -338,7 +450,14 @@ class DataSourceManager:
                     if isinstance(resp, dict):
                         remarks = str(resp.get("remarks") or resp.get("error_message") or resp)[:180]
                     logger.warning(f"[DSM] Dhan option_chain non-success for {sym}: {remarks or resp}")
-                    # One bounded retry still respects the global OC gap.
+                    terminal_codes = _dhan_non_success_codes(resp)
+                    if terminal_codes:
+                        logger.warning(
+                            f"[DSM] Dhan option_chain terminal non-success for {sym}; "
+                            f"codes={sorted(terminal_codes)} immediate_retry=false"
+                        )
+                        return None
+                    # Preserve one bounded retry only for unclassified transient failures.
                     _pace_dhan_option_chain_call()
                     if hasattr(dhan, "option_chain"):
                         resp = dhan.option_chain(
@@ -501,9 +620,9 @@ class DataSourceManager:
 
         return pd.DataFrame(rows), spot
 
-    # ── Backward compatible shims for unit testing ──
     def _try_dhan(self, symbol: str, expiry: str = "") -> Tuple[Optional[Any], Optional[float]]:
-        return None, None
+        res = self._fetch_dhan_real(symbol, expiry)
+        return res if res is not None else (None, None)
 
     def _try_nse(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
         return None, None
@@ -542,4 +661,3 @@ def get_datasource_manager() -> DataSourceManager:
 
 def get_manager() -> DataSourceManager:
     return get_datasource_manager()
-

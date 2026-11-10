@@ -3,7 +3,6 @@ import fs from 'fs'
 import path from 'path'
 
 const base = (process.env.DASHBOARD_BASE_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
-const key = process.env.DASHBOARD_API_KEY || ''
 const outDir = path.join('reports', 'latest', 'dashboard_shell_diagnostic')
 fs.mkdirSync(outDir, { recursive: true })
 
@@ -26,6 +25,8 @@ function sourceExpectedTabs() {
 
 const expectedTabs = sourceExpectedTabs()
 const safeText = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 240)
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+
 const summary = {
   generated_at: new Date().toISOString(),
   base,
@@ -33,16 +34,20 @@ const summary = {
   analyzer_mode: true,
   live_trading_enabled: false,
   order_routes_called: false,
+  browser_credentials_sent: false,
+  browser_mutations_called: false,
   secrets_persisted: false,
-  auth: { ok: false, status: 0 },
+  public_readonly: { ok: false, status: 0 },
+  health: { ok: false, status: 0 },
+  broker: { ok: false, status: 0 },
   ui_response_status: 0,
   render_ui_available: false,
-  authenticated_dashboard_rendered: false,
+  public_dashboard_rendered: false,
   tab_coverage_evaluated: false,
   availability_attempts: [],
-  post_auth_render_attempts: [],
+  render_attempts: [],
   recovered_after_transient_failure: false,
-  recovered_after_post_auth_failure: false,
+  recovered_after_render_failure: false,
   final_url: '',
   page_title: '',
   body_text_length: 0,
@@ -62,13 +67,36 @@ const summary = {
   production_grade_claim_allowed: false,
 }
 
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
+async function getJson(page, endpoint) {
+  return page.evaluate(async pathName => {
+    const response = await fetch(pathName, { method: 'GET', credentials: 'omit', cache: 'no-store' })
+    let payload = null
+    try { payload = await response.json() } catch {}
+    return { ok: response.ok, status: response.status, payload }
+  }, endpoint)
+}
+
+async function provePublicReadonly(page) {
+  const auth = await getJson(page, '/api/auth/status')
+  const payload = auth.payload || {}
+  return {
+    ok: auth.ok && auth.status === 200 && payload.required === false && payload.configured === false &&
+      payload.authenticated === false && payload.mode === 'public_readonly' &&
+      payload.credential_surface === 'REMOVED' && payload.session === null,
+    status: auth.status,
+    mode: payload.mode || null,
+    required: payload.required,
+    configured: payload.configured,
+    authenticated: payload.authenticated,
+    credential_surface: payload.credential_surface || null,
+    session_is_null: payload.session === null,
+  }
+}
 
 async function gotoWithRecovery(page, url) {
   const maxAttempts = Math.max(1, Math.min(4, Number(process.env.DASHBOARD_UI_MAX_ATTEMPTS || 3)))
   const retryDelayMs = Math.max(1000, Math.min(30000, Number(process.env.DASHBOARD_UI_RETRY_DELAY_MS || 12000)))
   let response = null
-
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     let status = 0
     let errorType = ''
@@ -78,7 +106,6 @@ async function gotoWithRecovery(page, url) {
     } catch (err) {
       errorType = err?.name || 'NavigationError'
     }
-
     summary.availability_attempts.push({ attempt, status, error_type: errorType })
     if (status >= 200 && status < 400) {
       summary.recovered_after_transient_failure = attempt > 1
@@ -114,11 +141,10 @@ async function inspectShell(page) {
   }, expectedTabs)
 }
 
-async function renderAuthenticatedShellWithRecovery(page) {
-  const maxAttempts = Math.max(1, Math.min(4, Number(process.env.DASHBOARD_POST_AUTH_MAX_ATTEMPTS || 3)))
-  const retryDelayMs = Math.max(1000, Math.min(30000, Number(process.env.DASHBOARD_POST_AUTH_RETRY_DELAY_MS || 8000)))
+async function renderPublicShellWithRecovery(page) {
+  const maxAttempts = Math.max(1, Math.min(4, Number(process.env.DASHBOARD_RENDER_MAX_ATTEMPTS || 3)))
+  const retryDelayMs = Math.max(1000, Math.min(30000, Number(process.env.DASHBOARD_RENDER_RETRY_DELAY_MS || 8000)))
   let latestShell = null
-
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     let status = 0
     let errorType = ''
@@ -130,23 +156,13 @@ async function renderAuthenticatedShellWithRecovery(page) {
       await page.waitForTimeout(5000)
       latestShell = await inspectShell(page)
     } catch (err) {
-      errorType = err?.name || 'PostAuthRenderError'
+      errorType = err?.name || 'PublicRenderError'
       latestShell = await inspectShell(page).catch(() => null)
     }
-
-    const rendered = Boolean(
-      status >= 200 && status < 400 && latestShell && latestShell.rootChildCount > 0 && latestShell.bodyLength > 0
-    )
-    summary.post_auth_render_attempts.push({
-      attempt,
-      status,
-      error_type: errorType,
-      root_child_count: latestShell?.rootChildCount || 0,
-      body_text_length: latestShell?.bodyLength || 0,
-      rendered,
-    })
+    const rendered = Boolean(status >= 200 && status < 400 && latestShell && latestShell.rootChildCount > 0 && latestShell.bodyLength > 0)
+    summary.render_attempts.push({ attempt, status, error_type: errorType, root_child_count: latestShell?.rootChildCount || 0, body_text_length: latestShell?.bodyLength || 0, rendered })
     if (rendered) {
-      summary.recovered_after_post_auth_failure = attempt > 1
+      summary.recovered_after_render_failure = attempt > 1
       return latestShell
     }
     if (attempt < maxAttempts) await sleep(retryDelayMs)
@@ -157,36 +173,23 @@ async function renderAuthenticatedShellWithRecovery(page) {
 let browser
 try {
   browser = await chromium.launch({ headless: true })
-  const context = await browser.newContext({
-    viewport: { width: 1366, height: 768 },
-    extraHTTPHeaders: key ? { 'X-API-Key': key } : {},
-  })
+  const context = await browser.newContext({ viewport: { width: 1366, height: 768 } })
   const page = await context.newPage()
-  page.on('console', msg => {
-    if (msg.type() === 'error') summary.console_error_types.push('console.error')
-  })
-  page.on('pageerror', err => {
-    summary.page_error_types.push(err?.name || 'PageError')
-  })
+  page.on('console', msg => { if (msg.type() === 'error') summary.console_error_types.push('console.error') })
+  page.on('pageerror', err => { summary.page_error_types.push(err?.name || 'PageError') })
 
   const first = await gotoWithRecovery(page, `${base}/ui/`)
   summary.ui_response_status = first?.status() || summary.availability_attempts.at(-1)?.status || 0
   summary.render_ui_available = summary.ui_response_status >= 200 && summary.ui_response_status < 400
 
-  if (key && summary.render_ui_available) {
-    summary.auth = await page.evaluate(async apiKey => {
-      const response = await fetch('/api/auth/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-Key': apiKey },
-        credentials: 'include',
-        body: JSON.stringify({ api_key: apiKey }),
-      })
-      return { ok: response.ok, status: response.status }
-    }, key).catch(() => ({ ok: false, status: 0 }))
+  if (summary.render_ui_available) {
+    summary.public_readonly = await provePublicReadonly(page)
+    summary.health = await getJson(page, '/api/health')
+    summary.broker = await getJson(page, '/api/broker/status')
   }
 
-  const shell = summary.render_ui_available && summary.auth.ok
-    ? await renderAuthenticatedShellWithRecovery(page)
+  const shell = summary.render_ui_available && summary.public_readonly.ok
+    ? await renderPublicShellWithRecovery(page)
     : await inspectShell(page)
 
   summary.final_url = safeText(shell.finalUrl)
@@ -196,22 +199,20 @@ try {
   summary.visible_button_count = shell.buttonCount
   summary.visible_link_count = shell.linkCount
   summary.safe_visible_controls = shell.controls.map(safeText)
-  summary.authenticated_dashboard_rendered = Boolean(
-    summary.render_ui_available && summary.auth.ok && shell.rootChildCount > 0 && shell.bodyLength > 0
-  )
-  summary.tab_coverage_evaluated = summary.authenticated_dashboard_rendered
+  summary.public_dashboard_rendered = Boolean(summary.render_ui_available && summary.public_readonly.ok && shell.rootChildCount > 0 && shell.bodyLength > 0)
+  summary.tab_coverage_evaluated = summary.public_dashboard_rendered
   summary.matched_tabs = summary.tab_coverage_evaluated ? shell.matched : []
   summary.matched_tab_count = summary.matched_tabs.length
-  summary.missing_tabs = summary.tab_coverage_evaluated
-    ? expectedTabs.filter(title => !summary.matched_tabs.includes(title))
-    : []
+  summary.missing_tabs = summary.tab_coverage_evaluated ? expectedTabs.filter(title => !summary.matched_tabs.includes(title)) : []
   summary.deployed_asset_drift_detected = summary.tab_coverage_evaluated && summary.missing_tabs.length > 0
   summary.console_error_types = [...new Set(summary.console_error_types)]
   summary.page_error_types = [...new Set(summary.page_error_types)]
 
-  if (!summary.render_ui_available) summary.blocker = 'RENDER_UI_UNAVAILABLE_AFTER_RETRIES'
-  else if (!summary.auth.ok) summary.blocker = 'DASHBOARD_AUTH_NOT_PROVEN'
-  else if (!summary.authenticated_dashboard_rendered) summary.blocker = 'AUTHENTICATED_FRONTEND_UNAVAILABLE_AFTER_RETRIES'
+  if (!summary.render_ui_available) summary.blocker = 'PUBLIC_UI_UNAVAILABLE_AFTER_RETRIES'
+  else if (!summary.public_readonly.ok) summary.blocker = 'PUBLIC_READONLY_CONTRACT_NOT_PROVEN'
+  else if (!summary.health.ok) summary.blocker = 'HEALTH_SENTINEL_NOT_PROVEN'
+  else if (!summary.broker.ok) summary.blocker = 'BROKER_SENTINEL_NOT_PROVEN'
+  else if (!summary.public_dashboard_rendered) summary.blocker = 'PUBLIC_FRONTEND_UNAVAILABLE_AFTER_RETRIES'
   else if (summary.missing_tabs.length) summary.blocker = 'DEPLOYED_FRONTEND_ASSET_DRIFT'
   else if (summary.page_error_types.length || summary.console_error_types.length) summary.blocker = 'FRONTEND_RUNTIME_ERRORS_PRESENT'
   else {
@@ -228,48 +229,35 @@ try {
 summary.production_grade_claim_allowed = false
 fs.writeFileSync(path.join(outDir, 'summary.json'), JSON.stringify(summary, null, 2))
 fs.writeFileSync(path.join(outDir, 'summary.md'), [
-  '# Dashboard Shell Diagnostic',
-  '',
-  `Generated: ${summary.generated_at}`,
-  `Status: **${summary.status}**`,
-  `Blocker: **${summary.blocker}**`,
+  '# Dashboard Shell Diagnostic', '', `Generated: ${summary.generated_at}`, `Status: **${summary.status}**`, `Blocker: **${summary.blocker}**`,
   `Render UI available: \`${summary.render_ui_available}\``,
+  `Public-readonly contract: \`${summary.public_readonly.ok}\` (HTTP ${summary.public_readonly.status})`,
+  `Health HTTP: \`${summary.health.status}\``, `Broker HTTP: \`${summary.broker.status}\``,
   `Availability attempts: \`${summary.availability_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}`).join(', ') || 'none'}\``,
   `Recovered after transient failure: \`${summary.recovered_after_transient_failure}\``,
-  `Auth OK: \`${summary.auth.ok}\` (HTTP ${summary.auth.status})`,
-  `Post-auth render attempts: \`${summary.post_auth_render_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}:${item.rendered ? 'rendered' : 'empty'}`).join(', ') || 'none'}\``,
-  `Recovered after post-auth failure: \`${summary.recovered_after_post_auth_failure}\``,
-  `UI HTTP: \`${summary.ui_response_status}\``,
-  `Authenticated dashboard rendered: \`${summary.authenticated_dashboard_rendered}\``,
-  `Tab coverage evaluated: \`${summary.tab_coverage_evaluated}\``,
-  `Root children: \`${summary.root_child_count}\``,
-  `Body text length: \`${summary.body_text_length}\``,
+  `Render attempts: \`${summary.render_attempts.map(item => `${item.attempt}:${item.status || item.error_type || 'error'}:${item.rendered ? 'rendered' : 'empty'}`).join(', ') || 'none'}\``,
+  `Recovered after render failure: \`${summary.recovered_after_render_failure}\``, `UI HTTP: \`${summary.ui_response_status}\``,
+  `Public dashboard rendered: \`${summary.public_dashboard_rendered}\``, `Tab coverage evaluated: \`${summary.tab_coverage_evaluated}\``,
+  `Root children: \`${summary.root_child_count}\``, `Body text length: \`${summary.body_text_length}\``,
   `Matched tabs: \`${summary.matched_tab_count}/${summary.expected_tab_count}\``,
   `Missing source-defined tabs: \`${summary.missing_tabs.join(', ') || 'not evaluated / none'}\``,
   `Deployed asset drift: \`${summary.deployed_asset_drift_detected}\``,
-  `Visible buttons: \`${summary.visible_button_count}\``,
-  `Visible links: \`${summary.visible_link_count}\``,
-  `Console error categories: \`${summary.console_error_types.join(', ') || 'none'}\``,
-  `Page error categories: \`${summary.page_error_types.join(', ') || 'none'}\``,
-  '',
-  'This report is analyzer-only. It never calls order routes, never persists credentials, and never permits a production-grade claim.',
+  `Console error categories: \`${summary.console_error_types.join(', ') || 'none'}\``, `Page error categories: \`${summary.page_error_types.join(', ') || 'none'}\``,
+  '', 'This diagnostic is anonymous/read-only. It never sends dashboard credentials, never calls mutation/order routes, and never permits a production-grade claim.',
 ].join('\n'))
 
 console.log(JSON.stringify({
   status: summary.status,
   blocker: summary.blocker,
   render_ui_available: summary.render_ui_available,
-  availability_attempts: summary.availability_attempts,
-  recovered_after_transient_failure: summary.recovered_after_transient_failure,
-  auth_ok: summary.auth.ok,
-  post_auth_render_attempts: summary.post_auth_render_attempts,
-  recovered_after_post_auth_failure: summary.recovered_after_post_auth_failure,
-  ui_http: summary.ui_response_status,
-  authenticated_dashboard_rendered: summary.authenticated_dashboard_rendered,
-  tab_coverage_evaluated: summary.tab_coverage_evaluated,
+  public_readonly: summary.public_readonly.ok,
+  health_http: summary.health.status,
+  broker_http: summary.broker.status,
   matched_tabs: `${summary.matched_tab_count}/${summary.expected_tab_count}`,
   missing_tabs: summary.missing_tabs,
   deployed_asset_drift_detected: summary.deployed_asset_drift_detected,
   live_trading_enabled: false,
   order_routes_called: false,
+  browser_credentials_sent: false,
+  browser_mutations_called: false,
 }))

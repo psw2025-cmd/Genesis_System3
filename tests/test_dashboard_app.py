@@ -11,6 +11,7 @@ import asyncio
 import importlib.util
 import json
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -94,6 +95,155 @@ def test_health_endpoint_returns_200(app):
     assert "broker_status" in data
 
 
+def test_dependency_free_liveness_aliases(app):
+    for path in ("/healthz", "/api/healthz"):
+        status, _, body = call(app, "GET", path)
+        assert status == 200
+        assert json.loads(body) == {"status": "ok"}
+
+
+def test_multibagger_contract_is_truthful_pending_without_evidence(app):
+    status, _, body = call(app, "GET", "/api/research/multibagger")
+    assert status == 200
+    data = json.loads(body)
+    assert data["schema_version"] == "1.0.0"
+    assert data["status"] == "pending"
+    assert data["candidates"] == []
+    assert data["sections"]["candidate_ranking"] == "pending"
+    assert data["safety"] == {"read_only": True, "orders_enabled": False}
+
+
+def test_multibagger_contract_requires_price_and_model_provenance(app):
+    endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    now = datetime.now(timezone.utc).isoformat()
+    result = endpoint.__globals__["_build_multibagger_contract"]({
+        "as_of": now, "source": "GENESIS_FORECAST_EVALUATOR",
+        "candidates": [{"candidate_id": "c-1", "symbol": "RELIANCE", "rank": 1, "price": {"value": 100}}]
+    })
+    assert result["status"] == "pending"
+    assert result["validation"]["accepted"] == 0
+    assert "PRICE_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+    assert "MODEL_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+
+
+def test_multibagger_contract_exposes_only_validated_partial_evidence(app):
+    endpoint = route_endpoint(app, "GET", "/api/research/multibagger")
+    now = datetime.now(timezone.utc).isoformat()
+    result = endpoint.__globals__["_build_multibagger_contract"]({
+        "as_of": now,
+        "source": "GENESIS_FORECAST_EVALUATOR",
+        "candidates": [{
+            "candidate_id": "c-1", "symbol": "reliance", "rank": 1,
+            "price": {"value": 1500.5, "currency": "inr", "source": "DHAN", "observed_at": now, "secret": "drop"},
+            "model": {"name": "gain-rank", "version": "2026.08", "scoring_method": "rank_score", "generated_at": now, "internal": "drop"},
+            "extra": "drop",
+        }],
+    })
+    assert result["status"] == "partial"
+    assert result["sections"]["candidate_ranking"] == "partial"
+    assert result["sections"]["probability_ladder"] == "pending"
+    assert result["candidates"][0]["symbol"] == "RELIANCE"
+    assert result["candidates"][0]["price"]["source"] == "DHAN"
+    assert result["candidates"][0]["model"]["proof_ready"] is False
+    assert result["candidates"][0]["model"]["evidence_status"] == "unverified"
+    assert "extra" not in result["candidates"][0]
+    assert "secret" not in result["candidates"][0]["price"]
+    assert "internal" not in result["candidates"][0]["model"]
+    assert result["validation"] == {"accepted": 1, "rejected": 0, "rejections": []}
+
+
+def test_multibagger_contract_rejects_bad_rank_duplicates_and_unapproved_price_source(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc).isoformat()
+    def row(candidate_id, symbol, rank, source="DHAN"):
+        return {"candidate_id": candidate_id, "symbol": symbol, "rank": rank,
+                "price": {"value": 10, "currency": "INR", "source": source, "observed_at": now},
+                "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": now}}
+    result = build({"as_of": now, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [
+        row("a", "AAA", 1), row("a", "BBB", 2), row("c", "AAA", 3),
+        row("d", "DDD", 1), row("e", "EEE", 1.5), row("f", "FFF", 6, "CSV"),
+    ]})
+    reasons = "|".join(item["reason"] for item in result["validation"]["rejections"])
+    assert result["validation"]["accepted"] == 1
+    assert "DUPLICATE_CANDIDATE_OR_SYMBOL" in reasons
+    assert "DUPLICATE_RANK" in reasons
+    assert "POSITIVE_INTEGRAL_RANK_REQUIRED" in reasons
+    assert "PRICE_PROVENANCE_REQUIRED" in reasons
+
+
+def test_multibagger_contract_requires_approved_producer_and_fresh_aware_timestamps(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    assert build({"as_of": datetime.now(timezone.utc).isoformat(), "source": "UNKNOWN", "candidates": []})["reason"] == "PRODUCER_SOURCE_UNVERIFIED"
+    assert build({"as_of": "2026-08-14T10:00:00", "source": "GENESIS_FORECAST_EVALUATOR", "candidates": []})["reason"] == "INVALID_OR_FUTURE_AS_OF"
+    future = (datetime.now(timezone.utc) + timedelta(minutes=10)).isoformat()
+    assert build({"as_of": future, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": []})["reason"] == "INVALID_OR_FUTURE_AS_OF"
+
+
+def test_multibagger_contract_marks_old_envelope_stale_and_rejects_stale_candidate_evidence(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc)
+    old = (now - timedelta(hours=2)).isoformat()
+    fresh = now.isoformat()
+    valid = {"candidate_id": "a", "symbol": "AAA", "rank": 1,
+             "price": {"value": 10, "currency": "INR", "source": "DHAN", "observed_at": fresh},
+             "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": fresh}}
+    result = build({"as_of": old, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert result["status"] == "stale" and result["stale"] is True
+    valid["price"]["observed_at"] = old
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert result["status"] == "pending"
+    assert "PRICE_EVIDENCE_STALE" in result["validation"]["rejections"][0]["reason"]
+    valid["price"]["observed_at"] = fresh
+    valid["model"]["generated_at"] = old
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert "MODEL_EVIDENCE_STALE" in result["validation"]["rejections"][0]["reason"]
+    valid["model"]["generated_at"] = (now + timedelta(minutes=10)).isoformat()
+    result = build({"as_of": fresh, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [valid]})
+    assert "MODEL_PROVENANCE_REQUIRED" in result["validation"]["rejections"][0]["reason"]
+
+
+def test_multibagger_model_proof_requires_all_hashes(app):
+    build = route_endpoint(app, "GET", "/api/research/multibagger").__globals__["_build_multibagger_contract"]
+    now = datetime.now(timezone.utc).isoformat()
+    row = {"candidate_id": "a", "symbol": "AAA", "rank": 1,
+           "price": {"value": 10, "currency": "INR", "source": "DHAN", "observed_at": now},
+           "model": {"name": "m", "version": "1", "scoring_method": "score", "generated_at": now,
+                     "proof": {"artifact_sha256": "a" * 64, "data_sha256": "b" * 64, "code_sha": "c" * 40}}}
+    result = build({"as_of": now, "source": "GENESIS_FORECAST_EVALUATOR", "candidates": [row]})
+    model = result["candidates"][0]["model"]
+    assert model["proof_ready"] is False
+    assert model["evidence_status"] == "unverified"
+    assert model["manifest_complete"] is True
+    assert model["producer_asserted_hashes"]["artifact_sha256"] == "a" * 64
+    assert "proof" not in model
+
+
+def test_root_advertises_local_urls(app, monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
+    monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
+    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+    monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
+    status, _, body = call(app, "GET", "/")
+    assert status == 200
+    data = json.loads(body)
+    assert data["backend_url"] == "http://127.0.0.1:8000"
+    assert data["dashboard_url"] == "http://127.0.0.1:8000/ui"
+    assert data["health"] == "http://127.0.0.1:8000/api/health"
+    assert data["relative_paths"]["dashboard"] == "/ui"
+
+
+def test_root_ignores_stale_cloud_env_in_local_runtime(app, monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
+    monkeypatch.setenv("CLOUD_MODE", "1")
+    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", "https://genesis-system3-web-doq2wplepa-el.a.run.app")
+    status, _, body = call(app, "GET", "/")
+    assert status == 200
+    data = json.loads(body)
+    assert data["backend_url"] == "http://127.0.0.1:8000"
+    assert data["dashboard_url"] == "http://127.0.0.1:8000/ui"
+
+
 def test_state_endpoint_returns_200(app):
     status, _, body = call(app, "GET", "/api/state")
     assert status == 200
@@ -123,6 +273,49 @@ def test_request_id_header_present_on_every_response(app):
     status, headers, _ = call(app, "GET", "/api/health")
     assert status == 200
     assert b"x-request-id" in headers
+
+
+def test_safe_dashboard_reads_do_not_trip_compat_rate_bucket(app):
+    # Regression: Cloud Run proxy clients can share request.client.host. A
+    # normal dashboard burst must not make unrelated read endpoints return 429.
+    for _ in range(181):
+        status, _, _ = call(app, "GET", "/api/state")
+        assert status == 200
+
+
+def test_mutation_policy_probes_do_not_trip_compat_rate_bucket(app):
+    for _ in range(181):
+        status, _, _ = call(
+            app,
+            "POST",
+            "/api/security/mutation-policy/probe/paper",
+            json_body={"proof": "deny-only"},
+        )
+        assert status != 429
+        status, _, _ = call(
+            app,
+            "POST",
+            "/__system3_unknown_mutation_probe__",
+            json_body={"proof": "deny-only"},
+        )
+        assert status != 429
+
+
+def test_unified_portfolio_caches_successful_result(app, monkeypatch):
+    endpoint = route_endpoint(app, "GET", "/api/portfolio/unified")
+    endpoint.__globals__["_API_CACHE"].pop("portfolio", None)
+    calls = {"count": 0}
+
+    async def fake_run_blocking(*args, **kwargs):
+        calls["count"] += 1
+        return {"status": "ok", "live_trading_enabled": False}
+
+    monkeypatch.setitem(endpoint.__globals__, "_run_blocking", fake_run_blocking)
+    first = asyncio.run(endpoint())
+    second = asyncio.run(endpoint())
+    assert first == second
+    assert calls["count"] == 1
+    assert first["live_trading_enabled"] is False
 
 
 def test_order_create_rejected_when_approval_not_signed_off(app, monkeypatch):
@@ -177,3 +370,18 @@ def test_order_create_rejected_when_kill_switch_active(app, monkeypatch, tmp_pat
     )
     assert data["status"] == "ERROR"
     assert "kill switch" in data["message"].lower()
+
+
+def test_actual_backtest_route_never_certifies_unverified_report_files(app):
+    """The real /api/backtest/results route must fail closed, not just a helper."""
+    status, _, body = call(app, "GET", "/api/backtest/results")
+    assert status == 200
+    result = json.loads(body)
+    assert result.get("status") in ("NOT_VERIFIED", "no_data")
+    assert result.get("passed") is not True
+    assert result.get("live_trading_enabled") is False or result.get("status") == "no_data"
+    if result.get("status") == "NOT_VERIFIED":
+        assert result["verification_status"] == "NOT_VERIFIED"
+        assert result["summary"]["net_pnl"] is None
+        assert result["summary"]["win_rate"] is None
+        assert result["costed_walkforward"] is None

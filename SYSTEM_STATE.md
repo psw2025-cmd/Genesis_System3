@@ -1,6 +1,8 @@
 # SYSTEM_STATE.md — Single Source of Truth
 > **ALL AGENTS MUST READ THIS FILE FIRST before making any changes.**
-> Last updated: 2026-06-14 20:30 IST | Updated by: Claude (controller)
+> Last updated: 2026-08-17 09:48 IST | Updated by: Cursor (broker health closure)
+> Coordination bus: GitHub Issue #188 | Final consolidator: ChatGPT
+> Production URL: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
 
 ---
 
@@ -13,14 +15,28 @@
 
 ---
 
+## CURRENT LIVE PINS (request-scoped — re-read before acting)
+| Pin | Value (2026-08-17 04:18Z capture) |
+|-----|-------------------------------------|
+| Remote `main` | `4185162b2b6dd69beb034c4cf84aec4dda95900b` |
+| Production serving SHA | `4185162b2b6dd69beb034c4cf84aec4dda95900b` (matches `main`; revision `genesis-system3-web-00425-dec`, 100% traffic) |
+| Broker | `connected=true` · `error=null` · canonical SM version **262** |
+| Safety | LIVE=false · order_placement_allowed=false |
+| Canonical SM secret | `dhan-access-token` (see `docs/BROKER_SETUP.md`) |
+| Broker proof | `reports/latest/broker_health_confirmed/README.md` |
+
+**Do not treat Render/Codespace paragraphs below as current production authority.** Prefer GCP Cloud Run `genesis-system3-web` @ `asia-south1` + Issue #188.
+
+---
+
 ## BROKER
 - **ACTIVE:** DhanHQ ONLY
 - **Client ID:** ...3741
 - **SDK:** dhanhq 2.2.0
-- **Status (Codespace):** Token expired — TOTP strategy giving "Invalid TOTP" (2026-06-14). User must complete OAuth flow.
-- **Status (Render cloud):** TOKEN_EXPIRED_OR_INVALID — user must set fresh `DHAN_ACCESS_TOKEN` in Render dashboard.
-- **Balance:** ₹17.53 (last verified 2026-06-12)
-- **ACTION REQUIRED:** Visit `https://auth.dhan.co/login/consentApp-login?consentAppId=8f9ce6a8-af69-41a5-99c9-2d433f386e88`, copy tokenId from redirect, run `python scripts/dhan_token_auto_refresh.py --consume <tokenId>`, then set in Render dashboard.
+- **Production (GCP Cloud Run, request-scoped 2026-08-17 04:18Z):** `connected=true`, error=`null`, canonical Secret Manager version=`262`, live Dhan gain-rank and option-chain data populated, LIVE=false.
+- **Canonical secret:** `dhan-access-token` only. Banned/quarantined aliases: `system3-dhan-access-token`, `DHAN_BROKER_TOKEN` (policy in `docs/BROKER_SETUP.md`).
+- **Recovery proof:** bounded GitHub run `31993268520` invoked the sole Cloud Run mint authority; fresh API and browser evidence passed afterward.
+- **Historical note (Codespace/Render, 2026-06):** older TOTP/OAuth notes below are retained for archaeology only — not current deploy authority.
 
 ### Dhan API Subscription Status (CRITICAL — read before implementing data features)
 | API Category | Status | Notes |

@@ -6,12 +6,12 @@ import { API_BASE } from '../config'
 declare global {
   interface Window {
     electronAPI?: {
-      getAgentMemory: () => Promise<any>
-      saveAgentMemory: (tasks: any) => Promise<any>
-      showNotification: (options: { title: string; body: string }) => Promise<any>
-      downloadProofPack: () => Promise<any>
-      getBackendStatus: () => Promise<any>
-      controlBackend: (action: string) => Promise<any>
+      getAgentMemory: () => Promise<unknown>
+      saveAgentMemory: (tasks: any) => Promise<unknown>
+      showNotification: (options: { title: string; body: string }) => Promise<unknown>
+      downloadProofPack: () => Promise<unknown>
+      getBackendStatus: () => Promise<unknown>
+      controlBackend: (action: string) => Promise<unknown>
     }
   }
 }
@@ -152,7 +152,7 @@ export default function AgentConsole() {
     try {
       if (window.electronAPI) {
         const result = await window.electronAPI.downloadProofPack()
-        if (result?.success) {
+        if ((result as any)?.success) {
           window.open(`${API_BASE}/api/proof-pack`, '_blank')
         }
       } else {

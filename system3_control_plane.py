@@ -62,7 +62,6 @@ KEEP_EXACT = {
     ".github/workflows/ci.yml",
     ".github/scripts/root_architecture_gate.py",
     ".gitignore",
-    "render.yaml",
     "dashboard/backend/app.py",
     "dashboard/backend/Dockerfile",
     "system3_ultra.py",

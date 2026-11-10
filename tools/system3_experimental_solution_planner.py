@@ -47,15 +47,15 @@ LANE_RULES = [
 
 LANE_FIXES = {
     "GITHUB_RENDER_FAILURE": [
-        "Open docs/SYSTEM3_GITHUB_RENDER_FAILURE_TODO.md first.",
+        "Render.com hosting is forbidden. Do not recreate render.yaml or deploy to Render. See docs/authority/RENDER_HOSTING_FORBIDDEN.md.",
         "Fix failed GitHub workflows from latest run/job evidence.",
-        "Fix failing Render endpoints or deploy freshness issues.",
-        "Keep item open until a later GitHub + Render failure tracker run is PASS.",
+        "Treat any Render deployment event as a P0 owner dashboard-delete action (Issue #179).",
+        "Keep item open until a later GitHub workflow-failure tracker run is PASS.",
     ],
     "RENDER_DEPLOY": [
-        "Verify /api/deploy/info exposes latest commit.",
-        "Force Render redeploy if commit mismatch or missing.",
-        "Run live dashboard screenshot proof after deploy.",
+        "Render.com is forbidden. Production is GCP Cloud Run only.",
+        "Verify /api/deploy/info on Cloud Run exposes latest commit.",
+        "Do not force a Render redeploy. Run live dashboard screenshot proof after Cloud Run deploy.",
     ],
     "UI_RED_VISUAL": [
         "Use dashboard_visible_issue_tracker output as source of truth.",

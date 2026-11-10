@@ -42,6 +42,37 @@ def _extract_payload(resp: Dict[str, Any], key: str) -> list | dict:
     return []
 
 
+def _state_broker_truth(status: Dict[str, Any]) -> Dict[str, Any]:
+    """Allow-list the current broker status before persisting it into SSOT."""
+    connected = bool(status.get("connected", False))
+    truth: Dict[str, Any] = {
+        "connected": connected,
+        "broker": "dhan",
+        "name": "dhan",
+        "status": "connected" if connected else "disconnected",
+        "error": None if connected else (status.get("error") or "BROKER_NOT_CONNECTED"),
+        "latency_ms": status.get("latency_ms"),
+        "truth_source": "dhan_readonly_probe",
+        "observed_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    for key in ("auth_classification", "upstream_classification", "upstream_code"):
+        if status.get(key) is not None:
+            truth[key] = status.get(key)
+    return truth
+
+
+def _persist_broker_truth(status: Dict[str, Any]) -> None:
+    """Persist both success and failure so `/api/state` cannot stay stale green."""
+    if _state_store is None or not hasattr(_state_store, "update_state"):
+        return
+    try:
+        _state_store.update_state({"broker": _state_broker_truth(status)})
+    except Exception:
+        # Status reads must stay available even if the optional SSOT persistence
+        # layer is temporarily unavailable.  The response itself remains current.
+        return
+
+
 @router.get("/dhan/status")
 async def get_dhan_status():
     """Dhan broker connection status — analyzer/read-only."""
@@ -49,26 +80,34 @@ async def get_dhan_status():
         from core.brokers.dhan.dhan_readonly import get_status
 
         status = get_status()
-        return {
+        result = {
             "connected": bool(status.get("connected", False)),
             "broker": status.get("broker", "dhan"),
             "mode": status.get("mode", "ANALYZER"),
             "status": "connected" if status.get("connected") else "disconnected",
             "error": status.get("error"),
             "latency_ms": status.get("latency_ms"),
+            "auth_classification": status.get("auth_classification"),
+            "upstream_classification": status.get("upstream_classification"),
+            "upstream_code": status.get("upstream_code"),
             "live_trading_enabled": False,
             "order_placement_allowed": False,
             "source": status.get("source", "dhan_readonly"),
         }
+        _persist_broker_truth(result)
+        return result
     except Exception as e:
-        return {
+        result = {
             "connected": False,
             "broker": "dhan",
             "mode": "ANALYZER",
+            "status": "disconnected",
             "error": _safe_error(e),
             "live_trading_enabled": False,
             "order_placement_allowed": False,
         }
+        _persist_broker_truth(result)
+        return result
 
 
 @router.get("/status")

@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
 import { OptionChain } from './OptionChain'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 import { MarketTopCePeTable } from './MarketTopCePeTable'
 import { useStore } from '../store'
-import { API_BASE, API_HEADERS } from '../config'
 import { fmt, cn } from '../lib/utils'
-
-const BASE = API_BASE || (typeof window !== 'undefined' ? window.location.origin : '')
 
 function ScannerRow({ row }: { row: any }) {
   const isUp = row.direction === 'UP'
@@ -56,45 +53,23 @@ function EquityRow({ row }: { row: any }) {
 }
 
 export function TradeTab() {
-  const { gainRank, apiStatus, setChainSymbol } = useStore()
+  const { gainRank, apiStatus, setChainSymbol, marketTop } = useStore()
   const rankings: any[] = gainRank?.rankings ?? []
-  const [equity, setEquity] = useState<any>(null)
-  const [equityErr, setEquityErr] = useState('')
-
-  useEffect(() => {
-    let alive = true
-    const load = async () => {
-      try {
-        const r = await fetch(`${BASE}/api/scanner/equity_options?top_n=8`, {
-          credentials: 'include',
-          headers: { Accept: 'application/json', ...API_HEADERS },
-        })
-        if (!r.ok) throw new Error(String(r.status))
-        const data = await r.json()
-        if (alive) {
-          setEquity(data)
-          setEquityErr('')
-        }
-      } catch (e: any) {
-        if (alive) setEquityErr(String(e?.message || e))
-      }
-    }
-    load()
-    const t = setInterval(load, 180000)
-    return () => {
-      alive = false
-      clearInterval(t)
-    }
-  }, [])
-
-  const equityRows: any[] = [
-    ...(equity?.scanner?.top_ce_list || []),
-    ...(equity?.scanner?.top_pe_list || []),
-  ].slice(0, 12)
-  const liveOk = Number(equity?.segments?.equity_options?.live_chains_ok || 0)
+  const equityErr = ''
+  const scannerRows: any[] = []
+  const seedRows: any[] = []
+  const marketEquity = Array.isArray(marketTop?.market_top_table)
+    ? marketTop.market_top_table.filter((row: any) => {
+        const u = String(row?.underlying || row?.symbol || '').toUpperCase()
+        return u && !['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX', 'BANKEX'].includes(u)
+      })
+    : []
+  const equityRows: any[] = (scannerRows.length ? scannerRows : (seedRows.length ? seedRows : marketEquity)).slice(0, 12)
+  const liveOk = equityRows.length
 
   return (
     <div className="flex flex-col h-full min-h-0 overflow-hidden">
+      <PendingLifecycleBanner />
       <div className="h-[46%] min-h-[240px] border-b border-border flex-shrink-0 overflow-hidden">
         <MarketTopCePeTable onSelectUnderlying={(sym) => setChainSymbol(sym)} />
       </div>
@@ -132,7 +107,7 @@ export function TradeTab() {
             {equityRows.length === 0 ? (
               <div className="p-4 text-center text-text-muted text-xs space-y-2">
                 <div className="font-semibold text-text-primary">No equity option rows</div>
-                <div>{equityErr || equity?.scanner?.gain_metric_note || equity?.message || 'Waiting for Dhan equity option chain snapshot.'}</div>
+                <div>{equityErr || 'Waiting for Dhan equity option chain snapshot.'}</div>
               </div>
             ) : (
               equityRows.map((row, i) => (
