@@ -194,6 +194,9 @@ jobs:
           PYTHONPATH: ''
         run: python -S scripts/dhan_canonical_rotation_readonly.py
       - name: Verify deterministic PAPER lifecycle and Dhan GET orders
+        # Independent GET-only broker evidence must still run after a Cloud Run
+        # env failure. This does NOT turn a failed safety step into PASS.
+        if: ${{ !cancelled() }}
         env:
           DHAN_ACCESS_TOKEN: ${{ secrets.DHAN_ACCESS_TOKEN }}
           DHAN_CLIENT_ID: ${{ secrets.DHAN_CLIENT_ID }}

@@ -86,7 +86,8 @@ def main():
         paper_ok = paper_lifecycle()
         dhan_ok = dhan_orders()
     except Exception as exc:
-        emit("cloud_verify_python", "FAIL", error_type=type(exc).__name__, message=str(exc)[:120])
+        # Exception strings may contain token-bearing broker URLs/headers.
+        emit("cloud_verify_python", "FAIL", error_type=type(exc).__name__)
         return 1
     return 0 if paper_ok and dhan_ok else 1
 
