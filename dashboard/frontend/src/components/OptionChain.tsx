@@ -323,11 +323,12 @@ export function OptionChain() {
 
   useEffect(() => {
     if (window.matchMedia('(max-width: 640px)').matches) {
-      mobileAtmRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+      const atmTarget = fullMobileTable ? atmRef.current : mobileAtmRef.current
+      atmTarget?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     } else {
       atmRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
-  }, [spot, chainSymbol, selectedExpiry, range])
+  }, [spot, chainSymbol, selectedExpiry, range, fullMobileTable])
 
   const noDataReason = String(data?.message || expiryError || state?.market?.reason || (marketOpen ? 'Waiting for verified Dhan option-chain rows.' : 'Market closed; no verified broker chain snapshot is available.'))
 
