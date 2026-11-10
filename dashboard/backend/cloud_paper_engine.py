@@ -145,10 +145,10 @@ class CloudPaperEngine:
     def _reset_if_new_day(self):
         today = _now_ist().strftime("%Y-%m-%d")
         if self.session_date != today:
+            # Never erase unsettled paper positions or the audit trail at midnight.
+            # A new session changes the date, not the lifetime trade ledger.
+            # Keep seq monotonic to avoid reusing position IDs after restart.
             self.session_date = today
-            self.open_positions = []
-            self.closed_positions = []
-            self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Pick one tradeable contract by pure Dhan LTP % gain (highest first).
