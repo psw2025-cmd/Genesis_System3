@@ -211,7 +211,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cloud-verify-sanitized-evidence
-          path: |\n            cloud-verify-evidence.jsonl\n            cloud-run-sanitized-evidence.json
+          path: |
+            cloud-verify-evidence.jsonl
+            cloud-run-sanitized-evidence.json
           if-no-files-found: warn
           retention-days: 7
       - name: Remove private Cloud Run description

@@ -20,6 +20,15 @@ class CloudVerifyTargetContract(unittest.TestCase):
         self.assertNotIn("project_id: system3-openalgo-safe", self.workflow)
         self.assertNotIn("services describe genesis-system3-web --project", self.workflow)
 
+    def test_cloud_verify_artifact_path_is_multiline_yaml_not_literal_escape(self):
+        # A literal backslash-n under path: makes GitHub reject the workflow.
+        expected = "          path: |" + chr(10) + (
+            "            cloud-verify-evidence.jsonl" + chr(10) +
+            "            cloud-run-sanitized-evidence.json"
+        )
+        self.assertIn(expected, self.workflow)
+        self.assertNotIn("path: |" + chr(92) + "n", self.workflow)
+
     def test_read_only_wif_and_paper_safety_preserved(self):
         for marker in (
             "id-token: write",
