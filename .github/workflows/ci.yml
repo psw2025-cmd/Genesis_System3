@@ -205,7 +205,7 @@ jobs:
       - name: Prove Cloud Run PAPER env receipt is fail-closed and secret-safe
         shell: bash
         timeout-minutes: 5
-        run: python -m unittest tests.test_cloud_run_env_contract tests.test_cloud_verify_target_contract
+        run: python -m unittest tests.test_cloud_run_env_contract tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly
 
       - name: Verify current cloud-only authority and fail-closed trading policy
         shell: bash
