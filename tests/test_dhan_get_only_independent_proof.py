@@ -22,7 +22,7 @@ class Response:
         return self.body
 
 
-def setup(monkeypatch, tmp_path):
+def _seed_readonly_env(monkeypatch, tmp_path):
     path = tmp_path / "broker-get-evidence.jsonl"
     monkeypatch.setenv("CLOUD_VERIFY_EVIDENCE", str(path))
     monkeypatch.setenv("PAPER_MODE", "1")
@@ -34,7 +34,7 @@ def setup(monkeypatch, tmp_path):
 
 
 def test_get_only_zero_count_and_hash_without_secret_output(monkeypatch, tmp_path, capsys):
-    path = setup(monkeypatch, tmp_path)
+    path = _seed_readonly_env(monkeypatch, tmp_path)
 
     def fake_get(request, timeout):
         assert request.get_method() == "GET"
@@ -54,7 +54,7 @@ def test_get_only_zero_count_and_hash_without_secret_output(monkeypatch, tmp_pat
 
 
 def test_get_nonempty_is_fail_not_zero(monkeypatch, tmp_path):
-    path = setup(monkeypatch, tmp_path)
+    path = _seed_readonly_env(monkeypatch, tmp_path)
     monkeypatch.setattr(cv, "urlopen", lambda *_args, **_kw: Response([
         {"orderId": "TEST_ONLY_UNSENT_ORDER"}
     ]))
@@ -65,7 +65,7 @@ def test_get_nonempty_is_fail_not_zero(monkeypatch, tmp_path):
 
 
 def test_error_object_is_not_zero_orders(monkeypatch, tmp_path):
-    path = setup(monkeypatch, tmp_path)
+    path = _seed_readonly_env(monkeypatch, tmp_path)
     monkeypatch.setattr(cv, "urlopen", lambda *_args, **_kw: Response({
         "errorMessage": "SENSITIVE_TEST_ACCESS_TOKEN", "errorCode": "DH-906"
     }))
@@ -76,7 +76,7 @@ def test_error_object_is_not_zero_orders(monkeypatch, tmp_path):
 
 
 def test_unexpected_exception_text_does_not_expose_secrets(monkeypatch, tmp_path, capsys):
-    path = setup(monkeypatch, tmp_path)
+    path = _seed_readonly_env(monkeypatch, tmp_path)
     monkeypatch.setattr(cv, "guard", lambda: (_ for _ in ()).throw(
         RuntimeError("SENSITIVE_TEST_ACCESS_TOKEN")
     ))
