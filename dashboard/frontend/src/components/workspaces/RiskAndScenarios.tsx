@@ -7,6 +7,13 @@ import RiskDashboard from '../RiskDashboard';
 export const RiskAndScenarios: React.FC = () => {
   const { autoGates, state } = useStore();
 
+  // Unknown is not the same as CLOSED or safety-LOCKED.
+  const gateActive = autoGates?.active === true;
+  const gateKnown = typeof autoGates?.active === 'boolean';
+  const gateLabel = gateActive ? 'ARMED' : gateKnown ? 'LOCKED' : 'UNVERIFIED';
+  const marketStatus = state?.market?.is_open === true ? 'OPEN' : state?.market?.is_open === false ? 'CLOSED' : 'UNKNOWN';
+  const liveOrdersStatus = state?.live_trading_enabled === true ? 'ENABLED' : state?.live_trading_enabled === false ? 'LOCKED' : 'UNVERIFIED';
+
   return (
     <div data-testid="risk-scenarios-root" style={{ height: '100%', overflowY: 'auto', background: 'var(--surface)' }}>
       <header style={{
@@ -21,7 +28,7 @@ export const RiskAndScenarios: React.FC = () => {
           <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Risk & Scenarios</h1>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <StatusChip label="GATE" value={autoGates?.active ? 'ARMED' : 'LOCKED'} status={autoGates?.active ? 'warn' : 'ok'} />
+          <StatusChip label="GATE" value={gateLabel} status={gateActive || !gateKnown ? 'warn' : 'ok'} />
         </div>
       </header>
 
@@ -42,7 +49,7 @@ export const RiskAndScenarios: React.FC = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ fontSize: '11px', color: 'var(--text-mut)', marginBottom: '4px' }}>State reported by the system proof gates</div>
-              <StatusChip label="GATE STATE" value={autoGates?.active ? 'ACTIVE' : 'INHIBITED'} status={autoGates?.active ? 'warn' : 'ok'} />
+              <StatusChip label="GATE STATE" value={gateActive ? 'ACTIVE' : gateKnown ? 'INHIBITED' : 'UNVERIFIED'} status={gateActive || !gateKnown ? 'warn' : 'ok'} />
               <div style={{ fontSize: '10px', color: 'var(--text-sec)', padding: '8px', background: 'var(--surface-2)', borderRadius: '4px' }}>
                 Live order execution remains locked unless every server-side proof gate passes.
               </div>
@@ -56,11 +63,11 @@ export const RiskAndScenarios: React.FC = () => {
             </div>
             {state?.market || state?.risk ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <StatusChip label="MARKET" value={state?.market?.is_open ? 'OPEN' : 'CLOSED'} status={state?.market?.is_open ? 'ok' : 'mut'} />
+                <StatusChip label="MARKET" value={marketStatus} status={marketStatus === 'OPEN' ? 'ok' : marketStatus === 'CLOSED' ? 'mut' : 'warn'} />
                 <StatusChip label="LIMITS" value={String(state?.risk?.limits?.status || '—')} status={String(state?.risk?.limits?.status).toUpperCase() === 'PASS' ? 'ok' : 'warn'} />
-                <StatusChip label="LIVE ORDERS" value={state?.live_trading_enabled ? 'ENABLED' : 'LOCKED'} status={state?.live_trading_enabled ? 'error' : 'ok'} />
+                <StatusChip label="LIVE ORDERS" value={liveOrdersStatus} status={liveOrdersStatus === 'ENABLED' ? 'error' : liveOrdersStatus === 'LOCKED' ? 'ok' : 'warn'} />
                 <div style={{ fontSize: '11px', color: 'var(--text-sec)', padding: '8px', background: 'var(--surface-2)', borderRadius: '4px', lineHeight: 1.45 }}>
-                  {state?.market?.reason || 'Using live /api/state as the base scenario. Monte-Carlo shock models are not enabled in PAPER analyzer.'}
+                  {state?.market?.reason || 'No verified scenario model output. Displayed fields originate from the current state snapshot only.'}
                 </div>
               </div>
             ) : (

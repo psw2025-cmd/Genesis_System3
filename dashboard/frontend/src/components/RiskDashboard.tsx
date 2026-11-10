@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 import { useStore } from '../store'
+import { numberOrUndefined } from '../lib/riskNumericTruth'
 import { PENDINGState, StatusChip } from './workspaces/TruthUI'
 
 type NumericMap = Record<string, number>
@@ -19,11 +20,6 @@ interface RiskMetrics {
 }
 
 type LoadState = 'loading' | 'ready' | 'degraded' | 'no-data' | 'error'
-
-const numberOrUndefined = (value: unknown): number | undefined => {
-  const parsed = Number(value)
-  return Number.isFinite(parsed) ? parsed : undefined
-}
 
 const money = (value: unknown): string => {
   const parsed = numberOrUndefined(value)
