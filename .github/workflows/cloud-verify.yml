@@ -40,7 +40,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate target and safety without GCP credentials
-        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract
 
   synthetic-paper-proof:
     name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
@@ -184,24 +184,7 @@ jobs:
           echo "READ_ONLY_TARGET_VERIFIED project=$DISCOVERED_PROJECT service=$DISCOVERED_SERVICE"
       - name: Compare Cloud Run actual env to CI policy (never print secret values)
         shell: bash
-        run: |
-          python -S - <<'PY'
-          import json, os, sys
-          doc=json.load(open("cloud-run-describe-private.json", encoding="utf-8"))
-          containers=(doc.get("spec",{}).get("template",{}).get("spec",{}).get("containers") or
-                      doc.get("template",{}).get("containers") or [])
-          expected={"PAPER_MODE":"1","LIVE_ORDER_AUTHORITY":"0","REAL_BROKER_ORDERS":"0"}
-          if len(containers)!=1:
-              print("FAIL: cannot prove exactly one Cloud Run container"); sys.exit(1)
-          entries=containers[0].get("env",[])
-          for key,value in expected.items():
-              matched=[e for e in entries if e.get("name")==key]
-              if len(matched)!=1 or matched[0].get("value")!=value or os.getenv(key)!=value:
-                  print("FAIL: Cloud Run/CI safety mismatch for "+key)
-                  sys.exit(1)
-              print("PASS: Cloud Run and CI agree for "+key)
-          print("PASS: actual Cloud Run safety env verified (read-only)")
-          PY
+        run: python -S scripts/cloud_run_env_contract.py --input cloud-run-describe-private.json --output cloud-run-sanitized-evidence.json
       - name: Install minimal test dependency
         run: python -m pip install --disable-pip-version-check pytest
       - name: Audit canonical Dhan rotator and production broker without reading token payloads
@@ -228,7 +211,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cloud-verify-sanitized-evidence
-          path: cloud-verify-evidence.jsonl
+          path: |\n            cloud-verify-evidence.jsonl\n            cloud-run-sanitized-evidence.json
           if-no-files-found: warn
           retention-days: 7
       - name: Remove private Cloud Run description
