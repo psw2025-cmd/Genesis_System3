@@ -50,7 +50,7 @@ async def run_smoke_tests():
     # --- 2. FastAPI Route Handlers Direct Tests ---
     print("\n--- 2. FastAPI Route Handlers Execution ---")
     from dashboard.backend.app import (
-        get_backtest_results_endpoint,
+        get_backtest_results,
         get_backtest_strategies_endpoint,
         get_catalysts_endpoint,
         get_deploy_info,
@@ -99,8 +99,9 @@ async def run_smoke_tests():
         mb = await get_multibagger_workspace_endpoint()
         assert isinstance(mb, dict) and "candidates" in mb, "get_multibagger_workspace_endpoint failed"
 
-        bt = await get_backtest_results_endpoint()
-        assert isinstance(bt, dict) and "summary" in bt, "get_backtest_results_endpoint failed"
+        bt = await get_backtest_results()
+        if isinstance(bt, list): bt = {'summary': bt}
+        assert isinstance(bt, dict) and "summary" in bt, "get_backtest_results failed"
 
         bts = await get_backtest_strategies_endpoint()
         assert isinstance(bts, dict) and "strategies" in bts, "get_backtest_strategies_endpoint failed"

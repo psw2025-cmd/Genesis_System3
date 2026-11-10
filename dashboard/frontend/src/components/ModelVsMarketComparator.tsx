@@ -9,7 +9,7 @@ export function ModelVsMarketComparator() {
 
   // Dynamic Spot Resolution
   const boardRow = (liveBoard?.indices || []).find((item: any) => String(item?.symbol || '').toUpperCase() === selectedSymbol)
-  const currentSpot = Number(boardRow?.ltp || chain?.[selectedSymbol]?.spot || (selectedSymbol === 'NIFTY' ? 24350 : selectedSymbol === 'BANKNIFTY' ? 51200 : 23180))
+  const currentSpot = Number(boardRow?.ltp || chain?.[selectedSymbol]?.spot || 0)
 
   const timeline = ['09:15', '09:45', '10:15', '10:45', '11:15', '11:45', '12:15', '12:45', '13:15', '13:45', '14:15', '14:45', '15:15', '15:30']
   
@@ -136,9 +136,9 @@ export function ModelVsMarketComparator() {
 
         {/* Dynamic Metric Badges */}
         <div className="flex items-center gap-3 font-mono">
-          <span className="text-slate-400">Spearman Rank: <strong className="text-emerald-400 font-bold">ρ = 0.74</strong></span>
-          <span className="text-slate-400">Net Alpha: <strong className="text-sky-400 font-bold">+0.12%</strong></span>
-          <span className="text-slate-400">Tracking Error: <strong className="text-slate-200 font-bold">0.08%</strong></span>
+          <span className="text-amber-300">Spearman Rank: PENDING</span>
+          <span className="text-amber-300">Net Alpha: PENDING</span>
+          <span className="text-slate-300">Tracking Error: PENDING</span>
         </div>
       </div>
     </div>

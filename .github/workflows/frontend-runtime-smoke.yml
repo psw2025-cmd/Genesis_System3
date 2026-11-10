@@ -53,21 +53,27 @@ jobs:
         shell: bash
         run: npm run build
 
+      - name: Typecheck all frontend TypeScript before browser smoke
+        working-directory: dashboard/frontend
+        shell: bash
+        run: npm run typecheck
+
       - name: Compile browser and temporal-truth harnesses
         shell: bash
         run: |
           python -m py_compile scripts/frontend_local_runtime_smoke.py
-          python -m py_compile scripts/gcp_live_ui_snapshot.py
-          python -m py_compile scripts/gcp_live_ui_semantic_proof.py
           python -m py_compile scripts/system3_temporal_truth_guard.py
           python -m py_compile scripts/system3_resolve_runtime_deploy_sha.py
+          python -m py_compile scripts/system3_release_proof_gate.py
+          python -m py_compile scripts/gcp_live_ui_snapshot.py
 
       - name: Enforce temporal truth and live UI remediation contracts
         shell: bash
         run: |
           python -m unittest \
             tests.test_temporal_truth_contract \
-            tests.test_live_ui_truth_remediation_contract
+            tests.test_live_ui_truth_remediation_contract \
+            tests.test_phase02_live_ui_recovery
 
       - name: Prove all canonical tabs render in local Chrome
         shell: bash
@@ -102,7 +108,7 @@ jobs:
       - name: Resolve expected runtime-affecting serving SHA
         if: github.ref == 'refs/heads/main'
         shell: bash
-        run: python scripts/system3_resolve_runtime_deploy_sha.py --write-github-env
+        run: python scripts/system3_release_proof_gate.py --write-github-env
 
       - name: Capture exact-SHA request-scoped read-only live production UI lifecycle proof
         if: github.ref == 'refs/heads/main'

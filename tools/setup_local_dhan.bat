@@ -21,7 +21,11 @@ if errorlevel 1 (
 )
 
 echo [4/5] Restart backend on port 8000...
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":8000.*LISTENING" 2^>nul') do taskkill /F /PID %%a >nul 2>&1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0port8000_guard.ps1" -Mode restart-own
+if errorlevel 20 (
+    echo   Port 8000 belongs to another process. Not stopping it and not starting a second server.
+    goto :eof
+)
 timeout /t 2 /nobreak >nul
 start "System3 Backend" /MIN cmd /c "cd /d ""%CD%"" && venv\Scripts\python.exe -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000"
 

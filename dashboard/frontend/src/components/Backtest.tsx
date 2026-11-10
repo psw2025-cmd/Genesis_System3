@@ -12,6 +12,8 @@ type BacktestSummary = {
   max_drawdown?: number
   generated_at?: string
   message?: string
+  verification_status?: string
+  reason_if_unverified?: string
   [key: string]: unknown
 }
 
@@ -27,6 +29,7 @@ const formatNumber = (value: unknown): string => {
 
 export default function Backtest() {
   const [summary, setSummary] = useState<BacktestSummary | null>(null)
+  const [reason, setReason] = useState('No independently verified historical backtest')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -36,7 +39,10 @@ export default function Backtest() {
       setError(null)
       try {
         const response = await axios.get(`${API_BASE}/api/backtest/results`, { timeout: 12000 })
-        setSummary(response.data?.summary || response.data)
+        const payload = response.data || {}
+        const isVerified = payload.passed === true && payload.status === 'PASS' && payload.verification_status === 'VERIFIED'
+        setReason(payload.reason_if_unverified || 'No independently verified historical backtest')
+        setSummary({ ...(isVerified ? payload.summary || {} : {}), status: isVerified ? 'PASS' : 'NOT VERIFIED', passed: isVerified })
       } catch (err: any) {
         setSummary(null)
         setError(err?.message || 'Backtest data pending')
@@ -78,7 +84,7 @@ export default function Backtest() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Simulation Status</div>
-              <div className="text-2xl font-bold text-green-400">{summary.status || (summary.passed ? 'PASS' : 'UNKNOWN')}</div>
+              <div className="text-2xl font-bold text-yellow-400">{summary.status || (summary.passed ? 'PASS' : 'UNKNOWN')}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Total Trades</div>
@@ -86,15 +92,15 @@ export default function Backtest() {
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Win Rate</div>
-              <div className="text-2xl font-bold text-green-400">{formatPercent(summary.win_rate)}</div>
+              <div className="text-2xl font-bold text-gray-200">{summary.passed ? formatPercent(summary.win_rate) : "PENDING"}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Profit Factor</div>
-              <div className="text-2xl font-bold text-green-400">{formatNumber(summary.profit_factor)}</div>
+              <div className="text-2xl font-bold text-gray-200">{summary.passed ? formatNumber(summary.profit_factor) : "PENDING"}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Net Realized P&amp;L</div>
-              <div className="text-2xl font-bold text-green-400">₹{formatNumber(summary.net_pnl)}</div>
+              <div className="text-2xl font-bold text-gray-200">{summary.passed ? `₹${formatNumber(summary.net_pnl)}` : "PENDING"}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Max Drawdown</div>
@@ -102,33 +108,21 @@ export default function Backtest() {
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Sharpe Ratio</div>
-              <div className="text-2xl font-bold">{summary.sharpe_ratio ?? 1.88}</div>
+              <div className="text-2xl font-bold">{summary.sharpe_ratio == null ? 'PENDING' : String(summary.sharpe_ratio)}</div>
             </div>
             <div className="bg-gray-800 p-5 rounded-lg">
               <div className="text-sm text-gray-400">Avg Trade Expectancy</div>
-              <div className="text-2xl font-bold text-green-400">₹{formatNumber(summary.avg_trade_expectancy ?? 1892.66)}</div>
+              <div className="text-2xl font-bold text-green-400">{summary.avg_trade_expectancy == null ? 'PENDING' : `₹${formatNumber(summary.avg_trade_expectancy)}`}</div>
             </div>
           </div>
 
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <h3 className="text-xl font-bold mb-3">Event-Driven Simulation Assumptions</h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div><span className="text-gray-400">Slippage Model:</span> 0.05% per execution</div>
-              <div><span className="text-gray-400">Transaction Costs:</span> SEBI / STT / Exchange fees</div>
-              <div><span className="text-gray-400">Latency Buffer:</span> 250 ms</div>
-              <div><span className="text-gray-400">Fill Rate:</span> 98.0% (conservative)</div>
+          {!summary.passed && (
+            <div className="bg-yellow-900/40 border border-yellow-700 p-6 rounded-lg" role="status">
+              <h3 className="font-bold text-yellow-200">Historical backtest NOT VERIFIED</h3>
+              <p className="text-yellow-100 mt-2">{reason}</p>
+              <p className="text-yellow-100 mt-2">No certified paper P&L, execution assumptions, trade history, chart curve, or cloud artifacts.</p>
             </div>
-          </div>
-
-          <div className="bg-gray-800 p-6 rounded-lg">
-            <h3 className="text-xl font-bold mb-3">Cloud Storage Artifacts</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between p-3 bg-gray-900 rounded">
-                <span className="text-gray-300 font-mono">gs://system3-openalgo-safe-artifacts/backtests/SYS3-STRAT-MOMENTUM-V1/run_manifest.parquet</span>
-                <span className="text-green-400 font-semibold text-xs bg-green-900/40 px-2 py-1 rounded">VERIFIED_GCS</span>
-              </div>
-            </div>
-          </div>
+          )}
         </>
       )}
 

@@ -158,6 +158,13 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         strike = float(row.get("strike", row.get("strike_price", 0)) or 0)
         oi = int(row.get("oi", 0) or 0)
         volume = int(row.get("volume", 0) or 0)
+        previous_volume = int(row.get("previous_volume", 0) or 0)
+        volume_change = volume - previous_volume if previous_volume > 0 else None
+        volume_change_percent = (
+            volume_change / previous_volume * 100.0
+            if volume_change is not None
+            else None
+        )
         ltp_val = float(row.get("ltp", row.get("last_price", 0)) or 0)
         prev_close = float(row.get("previous_close_price", row.get("close", ltp_val)) or ltp_val)
         change_rs = ltp_val - prev_close
@@ -235,6 +242,13 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             "bid_ask_spread": round(spread, 2),
             "bid_ask_spread_pct": round(spread_pct, 2),
             "volume": volume,
+            "previous_volume": previous_volume,
+            "volume_change": volume_change,
+            "volume_change_percent": (
+                round(volume_change_percent, 2)
+                if volume_change_percent is not None
+                else None
+            ),
             "oi": oi,
             "oi_change": oi_change,
             "oi_change_pct": round(oi_change_pct, 2),

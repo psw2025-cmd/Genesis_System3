@@ -1,13 +1,18 @@
 name: Live Proof Center (GCP + Dashboard MRI)
 
+# HISTORICAL_NON_AUTHORITY for local-laptop runtime (2026-09-16 Batch 1).
+# Manual GCP forensic pack only. Local acceptance is http://127.0.0.1:8000.
+# Do not treat this workflow as current runtime, token, or UI proof authority.
+
 # Read-only continuous forensic pack for agents without laptop/gcloud access.
 # Policy: no GitHub Actions schedule (GCP / manual workflow_dispatch for recurrence).
 # Least-privilege commit-status publication only; no repository write-back, no order/LIVE mutation.
 # Publishes Actions artifacts only (agents download LATEST pack from the run).
 
 on:
-  push:
-    branches: [main]
+  # GCP-EXIT NOTE (2026-09-01): automatic push trigger removed — this pack
+  # calls live GCP on every push; a normal main push must not invoke GCP.
+  # Manual only now. See Issue #188 / A-GCP-KILL.
   workflow_dispatch:
 
 concurrency:

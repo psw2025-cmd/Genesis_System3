@@ -27,6 +27,7 @@ DEPLOY_TRIGGER_PATTERNS = (
     "scripts/start_cloud_run.py",
     "scripts/gcp_dhan_token_rotation_job.py",
     "scripts/gcp_cloud_run_auto_deploy.py",
+    "scripts/gcp_cloud_run_auto_deploy_impl.py",
     "scripts/gcp_runtime_iam_preflight.py",
     "scripts/gcp_failed_revision_forensic.py",
     "scripts/gcp_runtime_evidence.py",

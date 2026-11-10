@@ -106,6 +106,7 @@ export const DataIntegrity: React.FC = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <StatusChip label="Dhan login" value={connected ? 'Authenticated' : 'Not connected'} status={connected ? 'ok' : 'error'} />
+              <StatusChip label="Mode" value={String(state?.mode || health?.mode || 'PAPER LOCKED')} status="ok" />
               <StatusChip
                 label="Token"
                 value={

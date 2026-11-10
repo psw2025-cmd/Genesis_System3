@@ -1,0 +1,27 @@
+{
+  "schema_version": "2.0",
+  "updated_at": "2026-11-07T02:28:00+05:30",
+  "repository": "https://github.com/psw2025-cmd/Genesis_System3",
+  "branch": "recovery/actionable-gainer-import-20261106",
+  "pr_516_merge_commit": "a21dd8d5a1551aff67cd79d69af617b6a387e828",
+  "sim_replay_commit": "f1a4858d5188a8ecfb6ed774476186ac611f975b",
+  "issues": [
+    {
+      "id": "ISSUE-514-CLOSE-CONTRACT",
+      "status": "CLOSED",
+      "merged_pr": 516,
+      "merge_sha": "a21dd8d5a1551aff67cd79d69af617b6a387e828"
+    },
+    {
+      "id": "ISSUE-516-SIM-REPLAY",
+      "title": "Off-Market Deterministic Market Replay & E2E Sandbox Engine",
+      "status": "CLOSED",
+      "commit_sha": "f1a4858d5188a8ecfb6ed774476186ac611f975b",
+      "files": [
+        "backend/simulation/market_replay_engine.py",
+        "tests/test_deterministic_market_replay.py"
+      ],
+      "market_closed_dual_truth": "VERIFIED (Market Closed banner + Authentic LTP without fake values)"
+    }
+  ]
+}

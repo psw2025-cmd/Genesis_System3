@@ -1,0 +1,14 @@
+---
+description: Universal safety, path, secrets, dirty-worktree, and instruction precedence
+alwaysApply: true
+---
+
+# Repository safety (always)
+
+Canonical checkout: `C:\Genesis_System3_Clean`. Upstream: GitHub `psw2025-cmd/Genesis_System3`. Runtime: local Windows, default `http://127.0.0.1:8000`. Discover the actual bound port.
+
+Precedence: latest user instruction → trading/secret/destructive safety → `AGENTS.md` → scoped `.cursor/rules` → control-plane docs → source/tests/fresh local evidence → history.
+
+Never: LIVE trading; real broker orders; print secrets; `git reset --hard`; `git clean`; restore-all; stash; force-push; overwrite unrelated dirty work; treat GCP/Cloud Run as current authority; treat Issue #188 as a mandatory bus; treat any named AI as sole controller.
+
+Statuses: PASS/FAIL/BLOCKED/UNKNOWN/PARTIAL/NOT_PROVEN/NOT_APPLICABLE/HISTORICAL_ONLY. Missing evidence is NOT_PROVEN.

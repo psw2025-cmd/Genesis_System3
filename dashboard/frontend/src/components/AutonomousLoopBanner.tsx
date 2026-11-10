@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useStore } from '../store'
 import { shortSha } from '../lib/formatLive'
-import { Info, CheckCircle2, ShieldAlert } from 'lucide-react'
+import { pickFutureNextOpen } from '../lib/nextMarketOpen'
+import { brokerConnectedFromPayloads, gatesDisplay } from '../lib/sourceQuality'
+import { brokerPermissionLabel } from '../lib/lifecycleTruth'
 
 const IST_FMT = new Intl.DateTimeFormat('en-CA', {
   timeZone: 'Asia/Kolkata',
@@ -18,7 +20,7 @@ export const AUTONOMOUS_LOOP_BANNER_ENABLED = true
 
 export function AutonomousLoopBanner() {
   const {
-    deployInfo, brokerStatus, gainRank, chain, state, autoGates, marketOpen, health, setActiveTab,
+    deployInfo, brokerStatus, brokerConnected, gainRank, chain, state, autoGates, marketOpen, health, setActiveTab,
   } = useStore()
   const [ist, setIst] = useState(() => `${IST_FMT.format(new Date()).replace(', ', ' ')} IST`)
 
@@ -29,11 +31,18 @@ export function AutonomousLoopBanner() {
     return () => window.clearInterval(t)
   }, [])
 
-  const proof = Array.isArray(autoGates?.proof_gates) ? autoGates.proof_gates : []
-  const passCount = proof.filter((g: any) => g?.pass === true || String(g?.status).toUpperCase() === 'PASS').length
-  const brokerOk = brokerStatus?.connected === true
-  const serving = shortSha(deployInfo?.git_sha || '7b26b87')
-  const nextOpen = String(state?.market?.next_open || health?.market?.next_open || '2026-08-31 09:15:00 IST')
+  const gates = gatesDisplay(autoGates)
+  const passCount = gates.passCount
+  const brokerOk = brokerConnectedFromPayloads(health, brokerStatus, brokerConnected).value
+  const brokerLabel = brokerPermissionLabel({ brokerConnected: brokerOk, brokerStatus, health, state })
+  const serving = deployInfo?.git_sha ? shortSha(deployInfo.git_sha) : deployInfo?.version ? String(deployInfo.version).slice(0, 7) : '—'
+  const marketReason = String(state?.market?.reason || health?.market?.reason || '')
+  const isWeekendClosed = /weekend/i.test(marketReason)
+  const isHolidayClosed = /holiday/i.test(marketReason)
+  const nextOpen = useMemo(
+    () => pickFutureNextOpen([state?.market?.next_open, health?.market?.next_open]),
+    [state?.market?.next_open, health?.market?.next_open, ist],
+  )
 
   if (!AUTONOMOUS_LOOP_BANNER_ENABLED) return null
 
@@ -51,10 +60,10 @@ export function AutonomousLoopBanner() {
             : 'bg-slate-800 text-slate-300 border border-slate-700'
         }`}>
           <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
-          <span>{marketOpen ? 'MARKET SESSION OPEN' : 'MARKET CLOSED (WEEKEND STANDBY)'}</span>
+          <span>{marketOpen ? 'MARKET SESSION OPEN' : `MARKET CLOSED${isHolidayClosed ? ' (HOLIDAY)' : isWeekendClosed ? ' (WEEKEND STANDBY)' : ' (AFTER HOURS)'}`}</span>
         </div>
 
-        {!marketOpen && (
+        {!marketOpen && nextOpen !== '—' && (
           <div className="flex items-center gap-1.5 text-slate-300">
             <span>Next Live Market Open:</span>
             <span className="font-mono text-sky-400 font-bold">{nextOpen}</span>
@@ -65,13 +74,13 @@ export function AutonomousLoopBanner() {
       {/* System State Chips */}
       <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-          BROKER: <strong className={brokerOk ? 'text-emerald-400' : 'text-slate-300'}>{brokerOk ? 'OK' : 'CONNECTED'}</strong>
+          BROKER: <strong className="text-amber-400">{brokerLabel}</strong>
         </div>
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
           SERVING: <strong className="text-sky-400">{serving}</strong>
         </div>
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
-          GATES: <strong className="text-emerald-400">{passCount}/{proof.length || 7}</strong>
+          GATES: <strong className={gates.stale ? 'text-amber-400' : 'text-emerald-400'}>{passCount}/{gates.total}{gates.stale ? ' STALE' : ''}</strong>
         </div>
         <div className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300">
           SAFETY: <strong className="text-emerald-400">PAPER LOCKED</strong>

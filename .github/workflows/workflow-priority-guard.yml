@@ -21,15 +21,10 @@ on:
   workflow_run:
     workflows:
       - "Genesis System3 Global Safety CI"
-      - "Cloud Run Auto Deploy"
       - "Frontend Browser Runtime Smoke"
-      - "GCP Dhan Token Fix CI"
-      - "GCP Dhan Token Rotation Manual Recovery"
-      - "GCP Stage 2 Safety Checks"
       - "CodeQL Security Audit"
       - "Security Audit Evidence"
       - "SonarQube Audit"
-      - "Full Cloud Audit and Forensic Consensus"
     types: [completed]
   deployment_status:
 
@@ -41,8 +36,9 @@ permissions:
   pull-requests: read
 
 concurrency:
-  group: workflow-priority-guard-${{ github.event.workflow_run.id || github.event.deployment.id || github.event.pull_request.number || github.sha }}
-  cancel-in-progress: false
+  # Coalesce completion-triggered forensic refreshes; preserve independent PR checks.
+  group: workflow-priority-guard-${{ github.event_name == 'workflow_run' && 'shared-forensic-refresh' || github.event.deployment.id || github.event.pull_request.number || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'workflow_run' }}
 
 env:
   SYSTEM3_MODE: analyze
@@ -67,11 +63,10 @@ jobs:
       - name: Enforce permanent workflow allow-list
         run: python .github/scripts/workflow_priority_guard.py
 
-      - name: Execute full cloud audit adversarial contract tests
-        run: python -m unittest tests.test_full_cloud_audit_contract -v
-
   refresh-canonical-preflight:
-    if: github.event_name == 'workflow_run'
+    if: >-
+      github.event_name == 'workflow_run' &&
+      contains(fromJSON('["failure","cancelled","timed_out","action_required","startup_failure"]'), github.event.workflow_run.conclusion)
     name: FORENSIC - refresh canonical workflow issue artifact snapshot
     runs-on: ubuntu-latest
     timeout-minutes: 10

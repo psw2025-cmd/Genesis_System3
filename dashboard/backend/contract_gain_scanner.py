@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta, timezone
+import math
 import os
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -135,6 +136,41 @@ def compute_contract_gain_pct(contract: Dict[str, Any]) -> Optional[float]:
     return compute_contract_gain(contract)[3]
 
 
+
+def is_actionable_gainer_row(row: Any) -> bool:
+    """Fail closed on malformed, expired, or unpriced CE/PE gainer rows.
+
+    This is a display/ranking validity filter, not execution authorization:
+    volume, bid/ask spread, and real-time freshness require separate proof.
+    """
+    if not isinstance(row, dict):
+        return False
+    if str(row.get("option_type") or "").upper() not in ("CE", "PE"):
+        return False
+    if not (row.get("trading_symbol") or row.get("symbol") or row.get("contract")):
+        return False
+
+    raw_expiry = row.get("expiry_date") or row.get("expiry")
+    if not raw_expiry:
+        return False
+    try:
+        expiry = datetime.fromisoformat(str(raw_expiry).strip()[:10]).date()
+    except (ValueError, TypeError):
+        return False
+    today_ist = datetime.now(timezone(timedelta(hours=5, minutes=30))).date()
+    if expiry < today_ist:
+        return False
+
+    raw_ltp = row.get("ltp")
+    if raw_ltp is None:
+        raw_ltp = row.get("price")
+    try:
+        ltp = float(raw_ltp)
+    except (TypeError, ValueError):
+        return False
+    return 0.05 < ltp < float("inf")
+
+
 def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, change_rs: Optional[float], ltp: float, prev: Optional[float]) -> Dict[str, Any]:
     opt = str(contract.get("option_type", "")).upper()
     return {
@@ -153,9 +189,9 @@ def _contract_row(contract: Dict[str, Any], underlying: str, gain_pct: float, ch
         "volume": contract.get("volume"),
         "gain_pct": gain_pct,
         "security_id": contract.get("security_id"),
-        "source": contract.get("source") or "dhan",
-        "data_provenance": "DHAN_OPTION_CHAIN_LIVE",
-        "market_match_note": f"LIVE DHAN GAINER (+{gain_pct:.2f}%)",
+        "source": contract.get("source") or "UNKNOWN",
+        "data_provenance": "UNVERIFIED",
+        "market_match_note": f"UNVERIFIED OPTION GAINER (+{gain_pct:.2f}%)",
     }
 
 
@@ -170,18 +206,28 @@ def scan_segment_contracts(
     """Find highest-gain CE and PE contracts for one underlying."""
     scored: List[Dict[str, Any]] = []
     for c in contracts or []:
+        if not isinstance(c, dict):
+            continue
         opt = str(c.get("option_type", "")).upper()
         if opt not in ("CE", "PE"):
             continue
         ltp, prev, change_rs, gain = compute_contract_gain(c)
-        if gain is None or ltp is None or ltp < min_ltp:
+        if (gain is None or ltp is None or not math.isfinite(gain)
+                or not math.isfinite(ltp)
+                or (prev is not None and not math.isfinite(prev))
+                or ltp < min_ltp):
             continue
-        vol = int(c.get("volume") or 0)
-        if vol < min_volume:
+        try:
+            vol = int(c.get("volume") or 0)
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if vol < 0 or vol < min_volume:
             continue
         row = _contract_row(c, underlying.upper(), gain, change_rs, ltp, prev)
         if not row.get("expiry_date") and default_expiry:
             row["expiry_date"] = default_expiry
+        if not is_actionable_gainer_row(row):
+            continue
         scored.append(row)
 
     ce_rows = sorted([r for r in scored if r["option_type"] == "CE"], key=lambda x: x["gain_pct"], reverse=True)
@@ -220,10 +266,17 @@ def scan_all_segments_from_chains(
     all_scored: List[Dict[str, Any]] = []
     refreshed_at = _ist_now_str()
 
+    if not isinstance(chains, dict):
+        chains = {}
     underlyings = list(chains.keys()) or list(INDEX_SEGMENTS)
     for underlying in underlyings:
         chain = chains.get(underlying) or {}
+        if not isinstance(chain, dict):
+            chain = {"status": "INVALID_CHAIN_PAYLOAD", "message": "Chain payload is not an object"}
         contracts = chain.get("contracts") or []
+        if not isinstance(contracts, list):
+            chain = {**chain, "status": "INVALID_CONTRACTS_PAYLOAD", "message": "Contracts payload is not a list"}
+            contracts = []
         if not contracts:
             missing.append(underlying)
             segments[underlying] = {
@@ -397,11 +450,19 @@ def fetch_chains_for_market(
         index_syms = [u for u in symbols if u in INDEX_SEGMENTS]
         equity_syms = [u for u in symbols if u not in INDEX_SEGMENTS]
 
-        with ThreadPoolExecutor(max_workers=min(4, max(1, len(index_syms)))) as pool:
-            futs = {pool.submit(_fetch_one, u): u for u in index_syms}
-            for fut in as_completed(futs, timeout=max(20.0, overall_timeout_s * 0.55)):
-                underlying, ch = fut.result()
-                chains[underlying] = ch
+        # Dhan option-chain allows one request per three seconds. Parallel
+        # index fan-out previously violated that contract even though equity
+        # requests were spaced. Serialize this scan's index requests too.
+        for underlying in index_syms:
+            if chains:
+                time.sleep(3.15)
+            if (time.monotonic() - started) >= overall_timeout_s - 3.0:
+                chains[underlying] = {
+                    "contracts": [], "underlying": underlying, "status": "SKIPPED_TIMEOUT"
+                }
+                continue
+            underlying2, ch = _fetch_one(underlying)
+            chains[underlying2] = ch
 
         remaining = overall_timeout_s - (time.monotonic() - started)
         if equity_syms and remaining > 12.0:
@@ -443,14 +504,20 @@ def merge_market_top_reports(base: Dict[str, Any], incoming: Dict[str, Any], mar
     by_key: Dict[str, Dict[str, Any]] = {}
     for report in (base, incoming):
         for row in report.get("market_top_table") or []:
-            if not isinstance(row, dict):
+            if not is_actionable_gainer_row(row):
+                continue
+            try:
+                gain = float(row.get("gain_pct"))
+            except (TypeError, ValueError, OverflowError):
+                continue
+            if not math.isfinite(gain):
                 continue
             key = (
                 f"{row.get('underlying')}|{row.get('option_type')}|{row.get('strike')}|"
                 f"{row.get('expiry_date') or row.get('expiry')}"
             )
             prev = by_key.get(key)
-            if prev is None or float(row.get("gain_pct") or -1e18) >= float(prev.get("gain_pct") or -1e18):
+            if prev is None or gain >= float(prev.get("gain_pct") or 0):
                 by_key[key] = dict(row)
     combined = sorted(by_key.values(), key=lambda x: float(x.get("gain_pct") or 0), reverse=True)
     refreshed_at = incoming.get("refreshed_at") or base.get("refreshed_at") or _ist_now_str()

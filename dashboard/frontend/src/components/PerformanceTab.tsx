@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useStore } from '../store'
 import { fmt, fmtCr, signClass, cn } from '../lib/utils'
 import { PnlEquityCurveChart } from './LiveInteractiveCharts'
+import { ValidationChecklist, showField, type ChecklistItem } from './ValidationChecklist'
+import { PendingLifecycleBanner } from './PendingLifecycleBanner'
 
 interface PnlData {
   summary?: {
@@ -37,19 +39,22 @@ export function PerformanceTab() {
   const [pnl, setPnl] = useState<PnlData | null>(null)
   const [pnlError, setPnlError] = useState<string | null>(null)
   const [backtest, setBacktest] = useState<any>(null)
+  const [mlPerf, setMlPerf] = useState<any>(null)
   const [lastChecked, setLastChecked] = useState<string>('')
 
   useEffect(() => {
     let mounted = true
     const load = async () => {
       try {
-        const [pnlData, btData] = await Promise.all([
+        const [pnlData, btData, mlData] = await Promise.all([
           fetchJSON('/api/pnl'),
           fetchJSON('/api/backtest/results').catch(() => null),
+          fetchJSON('/api/ml/performance').catch(() => null),
         ])
         if (mounted) {
           setPnl(pnlData)
           setBacktest(btData)
+          setMlPerf(mlData)
           setPnlError(null)
         }
       } catch (e: any) {
@@ -86,12 +91,15 @@ export function PerformanceTab() {
 
   return (
     <div className="p-6 space-y-6 overflow-y-auto h-full">
+      <PendingLifecycleBanner />
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h2 style={{ color: 'var(--text-pri)', fontWeight: 600, fontSize: '.95rem' }}>Performance</h2>
         <span style={{ fontSize: '.65rem', color: 'var(--text-mut)', fontFamily: 'var(--font-mono)' }}>
           last checked {lastChecked || '--'} IST
         </span>
       </div>
+
+      <MlProofCard payload={mlPerf} />
 
       {pnlError && (
         <div className="card p-4" style={{ borderColor: 'var(--down)' }}>
@@ -233,6 +241,30 @@ export function PerformanceTab() {
           )}
         </>
       )}
+    </div>
+  )
+}
+
+function MlProofCard({ payload }: { payload: any }) {
+  const perf = payload?.performance || payload
+  const checklist: ChecklistItem[] | null | undefined = payload?.validations_checklist || perf?.validations_checklist
+  const ready = payload?.ready_for_live === true || perf?.ready_for_live === true
+  return (
+    <div className="card p-4" data-testid="performance-ml-proof">
+      <h3 style={{ fontSize: '.75rem', fontWeight: 700, color: 'var(--text-pri)', textTransform: 'uppercase', letterSpacing: '.05em', marginBottom: '10px' }}>
+        ML performance
+      </h3>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 8 }}>
+        <span style={{ color: 'var(--down)', fontWeight: 800, fontSize: 12 }}>{showField(payload?.proof_status || perf?.status)}</span>
+        <span style={{ color: ready ? 'var(--up)' : 'var(--down)', fontWeight: 800, fontSize: 12 }}>
+          ready_for_live={showField(payload?.ready_for_live ?? perf?.ready_for_live)}
+        </span>
+      </div>
+      <p style={{ margin: '0 0 8px', fontSize: '.75rem', lineHeight: 1.45 }}>{showField(payload?.ready_for_live_reason || perf?.ready_for_live_reason)}</p>
+      <p style={{ margin: '0 0 8px', fontSize: '.75rem' }}>
+        rho {showField(payload?.rho ?? perf?.rho)} · hit_rate {showField(payload?.hit_rate ?? perf?.hit_rate)} · proof_pass_count {showField(payload?.proof_pass_count ?? perf?.proof_pass_count)} · generated_at_utc {showField(payload?.generated_at_utc || perf?.generated_at_utc)}
+      </p>
+      <ValidationChecklist items={checklist} />
     </div>
   )
 }

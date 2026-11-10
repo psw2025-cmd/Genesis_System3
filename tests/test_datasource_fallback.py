@@ -141,8 +141,32 @@ def test_empty_df_from_nse_falls_through(dsm):
 # TC-FB-7: Cache hit within TTL — source functions not called
 def test_cache_hit_bypasses_sources(dsm):
     cached_df = _make_df("cached")
-    dsm._cache["NIFTY"] = (time.time(), cached_df, 23000.0)
+    dsm._cache[("NIFTY", "")] = (time.time(), cached_df, 23000.0)
     with patch.object(dsm, "_try_nse", side_effect=AssertionError("should not call nse")):
         chain_df, spot = dsm.fetch_option_chain("NIFTY")
     assert chain_df is not None
     assert len(chain_df) == 5
+
+
+# Regression: cache key must include expiry, or a second expiry requested
+# within the TTL window silently returns the first expiry's rows/symbols.
+def test_cache_does_not_leak_across_different_expiries(dsm):
+    calls = []
+
+    def fake_try_dhan(symbol, expiry=""):
+        calls.append(expiry)
+        df = _make_df(symbol)
+        df["expiry"] = expiry
+        df["trading_symbol"] = f"NIFTY_{expiry}_CE"
+        return df, 24000.0
+
+    with patch.object(dsm, "_try_dhan", side_effect=fake_try_dhan):
+        df1, _ = dsm.fetch_option_chain("NIFTY", expiry="2026-09-08")
+        df2, _ = dsm.fetch_option_chain("NIFTY", expiry="2026-09-15")
+        df3, _ = dsm.fetch_option_chain("NIFTY", expiry="2026-09-08")
+
+    assert df1["trading_symbol"].iloc[0] == "NIFTY_2026-09-08_CE"
+    assert df2["trading_symbol"].iloc[0] == "NIFTY_2026-09-15_CE"
+    # Same (symbol, expiry) as call 1 -> served from cache, no 3rd fetch.
+    assert df3["trading_symbol"].iloc[0] == "NIFTY_2026-09-08_CE"
+    assert calls == ["2026-09-08", "2026-09-15"]

@@ -1,3 +1,9 @@
+# SYSTEM3_ROOT_DOCKERFILE_NONPRODUCTION: legacy/developer image ONLY.
+# DO NOT use this file for GCP System3 Cloud Run production. It uses the
+# legacy backend app and a fixed port, unlike the audited Cloud Run launcher.
+# Canonical candidate image path: dashboard/backend/Dockerfile (repo-root context).
+# Cloud build/deploy still requires separate explicit owner authorization.
+# PERMANENT FIX: Exclude baked moneycontrol JSON — live data fetched via services/moneycontrol_live.py (Path B).
 FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \

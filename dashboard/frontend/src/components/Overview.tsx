@@ -135,7 +135,7 @@ export function Overview() {
         <Metric label="Win Rate" value={winRate == null ? '--' : `${winRate.toFixed(1)}%`} sub="From paper evidence" tone={winRate == null ? undefined : winRate >= 50 ? 'up' : 'warn'} icon={<Activity size={14} />} />
         <Metric label="Model Confidence" value={modelConfidence == null ? '--' : `${modelConfidence.toFixed(0)}%`} sub={hasModelEvidence ? 'Bound to current System3 model state' : 'No model evidence · not invented'} tone={modelConfidence == null ? undefined : 'accent'} icon={<Brain size={14} />} />
         <Metric label="System Health" value={systemHealth} sub={`${passCount}/${proofGates.length || 0} proof gates${failingGate ? ` · trip: ${failingGate.gate_id}` : ''}`} tone={gatesReady && (systemHealth.includes('PASS') || systemHealth.includes('HEALTH')) ? 'up' : 'warn'} icon={<Shield size={14} />} />
-        <Metric label="Latency" value={latency > 0 ? `${latency.toFixed(0)}ms` : '--'} sub={brokerConnected ? 'Broker read-only' : brokerResponded ? 'API responded' : 'Waiting'} tone={latency > 0 && latency < 500 ? 'up' : latency > 0 ? 'warn' : undefined} icon={<Activity size={14} />} />
+        <Metric label="Latency" value={latency > 0 ? `${latency.toFixed(0)}ms` : '--'} sub="Read-only. Not a tradable speed." tone="warn" icon={<Activity size={14} />} />
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(0, 3fr) minmax(275px, 1fr)', marginTop: 10 }}>
@@ -168,7 +168,7 @@ export function Overview() {
               <div className="metric-label">Evidence & Safety</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginTop: 10 }}>
                 {[
-                  ['Broker', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+                  ['Broker', brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
                   ['Market', marketOpen ? 'OPEN' : 'CLOSED / POLL'],
                   ['Alerts', String(alertCount)],
                   ['Proof Gates', `${passCount}/${proofGates.length || 0}`],
@@ -186,7 +186,7 @@ export function Overview() {
         <div className="card" style={{ padding: 13 }}>
           <div className="panel-title">Broker & Account</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
-            <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'CONNECTED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone={brokerConnected ? 'up' : 'warn'} />
+            <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone="warn" />
             <Metric label="Mode" value="READ-ONLY" sub="No order authority from dashboard" tone="accent" />
             <Metric label="Available" value={brokerFunds?.normalized?.available_balance != null ? fmtCr(brokerFunds.normalized.available_balance) : brokerFunds?.available_balance != null ? fmtCr(brokerFunds.available_balance) : '--'} sub="From broker API only" />
             <Metric label="Paper P&L" value={totalPnl == null ? '--' : fmtCr(totalPnl)} sub={totalPnl == null ? 'Waiting for evidence' : 'Simulation evidence'} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'up' : 'down'} />
@@ -203,7 +203,7 @@ export function Overview() {
           <div style={{ marginTop: 9 }}>
             {[
               ['Data engine', health ? 'RESPONDED' : 'WAITING'],
-              ['Broker monitor', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+              ['Broker monitor', brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
               ['Model state', state ? 'RESPONDED' : 'WAITING'],
               ['Execution authority', liveAllowed ? 'LIVE FLAG' : 'LOCKED'],
             ].map(([label, value]) => (

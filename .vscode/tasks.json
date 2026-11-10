@@ -2,84 +2,44 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Open Streamlit Dashboard (in default browser)",
+      "label": "Open System3 Dashboard (local)",
       "type": "shell",
       "command": "start",
-      "args": [
-        "http://127.0.0.1:8501"
-      ],
+      "args": ["http://127.0.0.1:8000/ui/"],
       "windows": {
         "command": "start",
-        "args": [
-          "http://127.0.0.1:8501"
-        ]
+        "args": ["http://127.0.0.1:8000/ui/"]
       },
-      "osx": {
-        "command": "open",
-        "args": [
-          "http://127.0.0.1:8501"
-        ]
-      },
-      "linux": {
-        "command": "xdg-open",
-        "args": [
-          "http://127.0.0.1:8501"
-        ]
-      },
-      "presentation": {
-        "reveal": "silent",
-        "panel": "shared"
-      },
+      "presentation": { "reveal": "silent", "panel": "shared" },
       "problemMatcher": []
     },
     {
-      "label": "Open Backend API Docs (in default browser)",
+      "label": "Open Backend API Docs (local)",
       "type": "shell",
       "command": "start",
-      "args": [
-        "http://127.0.0.1:8000/docs"
-      ],
+      "args": ["http://127.0.0.1:8000/docs"],
       "windows": {
         "command": "start",
-        "args": [
-          "http://127.0.0.1:8000/docs"
-        ]
+        "args": ["http://127.0.0.1:8000/docs"]
       },
-      "osx": {
-        "command": "open",
-        "args": [
-          "http://127.0.0.1:8000/docs"
-        ]
-      },
-      "linux": {
-        "command": "xdg-open",
-        "args": [
-          "http://127.0.0.1:8000/docs"
-        ]
-      },
-      "presentation": {
-        "reveal": "silent",
-        "panel": "shared"
-      },
+      "presentation": { "reveal": "silent", "panel": "shared" },
       "problemMatcher": []
     },
     {
-      "label": "Open all live URLs (Streamlit + API docs)",
-      "dependsOn": [
-        "Open Streamlit Dashboard (in default browser)",
-        "Open Backend API Docs (in default browser)"
+      "label": "Start Dashboard Backend (FastAPI)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "uvicorn",
+        "dashboard.backend.app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
       ],
-      "dependsOrder": "parallel",
+      "isBackground": true,
       "problemMatcher": []
-    },
-    {
-      "type": "npm",
-      "script": "build",
-      "path": ".worktrees/cloud_first_mri_20260828/desktop_app",
-      "group": "build",
-      "problemMatcher": [],
-      "label": "npm: build - .worktrees/cloud_first_mri_20260828/desktop_app",
-      "detail": "electron-builder"
     }
   ]
 }
