@@ -148,13 +148,13 @@ export function GenesisTab() {
   const accuracy = pct(data.brain?.accuracy ?? data.brain?.accuracy_pct ?? data.hunger?.accuracy_pct ?? paper?.summary?.win_rate)
   const hitRate = pct(data.brain?.hit_rate ?? data.brain?.top_n_hit_rate)
   const drawdown = pct(data.brain?.max_drawdown ?? effectiveSystem?.max_drawdown ?? paper?.summary?.max_drawdown)
+  const showPct = (value: number | null) => value == null || !Number.isFinite(value) ? 'N/A' : `${value.toFixed(1)}%`
+  const showNum = (value: number | null, digits = 2) => value == null || !Number.isFinite(value) ? 'N/A - NO_PREDICTION' : value.toFixed(digits)
   const profitRaw = data.brain?.profit_factor ?? effectiveSystem?.profit_factor ?? paper?.summary?.profit_factor ?? 'N/A - NO_PREDICTION'
   const profitFactor = profitRaw == null || profitRaw === '' || profitRaw === 'N/A - NO_PREDICTION' ? null : Number(profitRaw)
   const profitDisplay = profitRaw === 'N/A - NO_PREDICTION' ? 'N/A - NO_PREDICTION' : showNum(profitFactor)
   const driftRaw = data.brain?.drift_psi ?? data.brain?.psi ?? data.truth?.drift_psi
   const drift = driftRaw == null || driftRaw === '' ? null : Number(driftRaw)
-  const showPct = (value: number | null) => value == null || !Number.isFinite(value) ? 'N/A' : `${value.toFixed(1)}%`
-  const showNum = (value: number | null, digits = 2) => value == null || !Number.isFinite(value) ? 'N/A - NO_PREDICTION' : value.toFixed(digits)
 
   const rankingRows = useMemo(() => {
     const rankings = gainRank?.latest?.rankings ?? gainRank?.rankings ?? gainRank?.latest?.predictions ?? []

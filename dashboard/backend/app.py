@@ -5105,21 +5105,41 @@ def _equity_gainer_rotation_symbols() -> List[str]:
     return equity_gainer_seed_symbols(mc_rows, limit=12)
 
 
+def _cached_equity_fo_underlyings() -> List[str]:
+    """Bound the 200k+ instrument-master scan: read-only TTL, not per Dhan tick."""
+    cache_key = "equity_fo_universe_rotation_v1"
+    cached = _cache_get(cache_key, 300.0)
+    if isinstance(cached, list):
+        return cached
+    names: List[str] = []
+    try:
+        from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe
+
+        source = load_equity_fo_universe()
+        if source.get("implemented") is True:
+            names = [str(s).strip().upper()
+                     for s in (source.get("underlyings") or []) if s]
+    except Exception:
+        # No invented 219-symbol coverage if the official master is unavailable.
+        names = []
+    return _cache_set(cache_key, list(dict.fromkeys(names)))
+
+
 def _next_equity_gainer_symbol() -> Optional[str]:
+    """Round-robin verified F&O underlyings; one missing chain cannot starve all.
+
+    Called only by the EXISTING paced 3.5s market micro-loop. No new Dhan
+    requests, extra worker, scheduler or trade authority are introduced here.
+    """
     global _EQUITY_GAINER_CURSOR
-    names = _equity_gainer_rotation_symbols()
-    if not names:
-        return None
-    # Warm missing Moneycontrol/momentum names first so LUPIN is not re-fetched forever.
-    for name in names:
-        sym = str(name or "").upper()
-        if not sym:
-            continue
-        if not _usable_chain_snapshot(_chain_from_push_cache(sym)):
-            return sym
-    sym = str(names[_EQUITY_GAINER_CURSOR % len(names)] or "").upper()
-    _EQUITY_GAINER_CURSOR += 1
-    return sym or None
+    from dashboard.backend.equity_rotation_policy import choose_equity_gainer_symbol
+
+    universe = _cached_equity_fo_underlyings()
+    priority = _equity_gainer_rotation_symbols()
+    symbol = choose_equity_gainer_symbol(_EQUITY_GAINER_CURSOR, universe, priority)
+    if symbol:
+        _EQUITY_GAINER_CURSOR += 1
+    return symbol
 
 
 def _build_market_top_from_chain_cache(
@@ -5133,8 +5153,11 @@ def _build_market_top_from_chain_cache(
         extra = _equity_gainer_rotation_symbols()
     except Exception:
         extra = []
+    # Include all broker-backed symbols already warmed by the paced worker.
+    # This is cache-only; it cannot amplify Dhan option-chain API calls.
+    warmed_symbols = list(_PUSHED_CHAIN_CACHE)
     seen = set()
-    for sym in list(_INDEX_STREAM_SYMBOLS) + extra:
+    for sym in list(_INDEX_STREAM_SYMBOLS) + extra + warmed_symbols:
         if not sym or sym in seen:
             continue
         seen.add(sym)
@@ -5143,7 +5166,7 @@ def _build_market_top_from_chain_cache(
             ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
             if isinstance(ttl_hit, dict):
                 chain = dict(ttl_hit)
-        if isinstance(chain, dict) and (chain.get("contracts") or []):
+        if _usable_chain_snapshot(chain) and (chain.get("contracts") or []):
             chains[sym] = chain
     if not chains:
         return None
@@ -6464,6 +6487,13 @@ async def paper_engine_tick(background_tasks: BackgroundTasks, max_open: int = 3
     except ImportError:
         from cloud_paper_engine import get_paper_engine
 
+    try:
+        from dashboard.backend.paper_feed_admission import (
+            admit_paper_chains, missing_open_position_quotes,
+        )
+    except ImportError:
+        from paper_feed_admission import admit_paper_chains, missing_open_position_quotes
+
     engine = get_paper_engine(OUTPUTS_DIR)
     open_before = len(engine.open_positions)
 
@@ -6495,7 +6525,14 @@ async def paper_engine_tick(background_tasks: BackgroundTasks, max_open: int = 3
                         market_top_rows = list(mw.get("top_combined_list") or [])
             except Exception as mt_exc:
                 print(f"[paper-tick] market top fetch skipped: {mt_exc}")
-        engine.step(chains, max_open=min(max(max_open, 1), 5), market_top=market_top_rows)
+        fresh_chains, rejects = admit_paper_chains(chains)
+        uncovered = missing_open_position_quotes(engine.open_positions, fresh_chains)
+        if not fresh_chains or uncovered:
+            print(f"[paper-tick] BLOCKED_FRESH_QUOTES admitted={len(fresh_chains)} "
+                  f"rejected={len(rejects)} unquoted_positions={len(uncovered)}")
+            return
+        engine.step(fresh_chains, max_open=min(max(max_open, 1), 5),
+                    market_top=market_top_rows)
         _API_CACHE.pop("paper", None)
         print(
             f"[paper-tick] done open={len(engine.open_positions)} "
@@ -6978,6 +7015,67 @@ async def get_simulation_live_state(scenario: str = "paper_analyzer"):
         "gates": gate_flags,
         "safety_banner": "SIMULATION ONLY — no broker order APIs, live trading remains OFF",
     }
+
+
+@app.get("/api/simulation/replay/state")
+async def get_synthetic_market_replay_state(scenario: str = "trend", step: int = 0):
+    """Isolated deterministic market-like PAPER evidence for existing Sim Live UI.
+
+    No broker access, no writes, no production quote or trade authority.
+    """
+    from datetime import timedelta
+    try:
+        from dashboard.backend.paper_market_replay import MarketTick, replay_paper_buy
+    except ImportError:
+        from paper_market_replay import MarketTick, replay_paper_buy
+
+    if scenario not in {"trend", "range", "volatile"}:
+        raise HTTPException(status_code=400, detail="INVALID_REPLAY_SCENARIO")
+    if step < 0 or step > 3600:
+        raise HTTPException(status_code=400, detail="INVALID_REPLAY_STEP")
+    anchor = datetime(2026, 11, 9, 3, 45, tzinfo=timezone.utc)
+    drift = {"trend": 0.4, "range": 0.0, "volatile": -0.2}[scenario]
+    wiggle = ((step % 11) - 5) * {"trend": 0.2, "range": 0.8, "volatile": 2.0}[scenario]
+    ask = round(max(1.0, 100 + drift * step + wiggle), 2)
+    bid = round(max(0.01, ask - 0.5), 2)
+    stamp = (anchor + timedelta(seconds=step)).isoformat()
+    tick = MarketTick(timestamp=stamp, bid=bid, ask=ask, available_qty=25)
+    result = replay_paper_buy([tick], qty=25)
+    return {
+        "status": "SYNTHETIC_REPLAY",
+        "mode": "PAPER_SIMULATION_ONLY",
+        "scenario": scenario,
+        "step": step,
+        "generated_utc": datetime.now(timezone.utc).isoformat(),
+        "market_timestamp_utc": stamp,
+        "market_timestamp_ist": (anchor + timedelta(seconds=step)).astimezone(IST).isoformat(),
+        "source": "DHAN_REPLAY_SYNTHETIC",
+        "broker_connected": False,
+        "real_broker_routes_called": False,
+        "order_placement_allowed": False,
+        "quote": {"underlying": "NIFTY", "option_side": "CE", "bid": bid, "ask": ask,
+                  "available_qty": tick.available_qty, "source": tick.source},
+        "paper_order": {"paper_order_id": f"SYNTHETIC-{scenario}-{step}", "qty": 25,
+                        "status": result["status"], "source": "SYNTHETIC_REPLAY"},
+        "paper_fills": result["fills"],
+        "filled_qty": result["filled_qty"],
+        "remaining_qty": result.get("remaining_qty", 0),
+        "pnl_verification_status": "NOT_VERIFIED",
+        "reason": "Synthetic scenario only; no independently reconciled closing fills or charges",
+    }
+
+
+@app.get("/api/simulation/replay/lifecycle")
+async def get_synthetic_paper_lifecycle(scenario: str = "trend", step: int = 0):
+    """Isolated synthetic lifecycle for existing Sim Live UI; no broker or real ledger writes."""
+    try:
+        from dashboard.backend.synthetic_paper_lifecycle import virtual_paper_lifecycle
+    except ImportError:
+        from synthetic_paper_lifecycle import virtual_paper_lifecycle
+    try:
+        return virtual_paper_lifecycle(scenario, step)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 @app.post("/api/positions/{position_id}/close")
@@ -7596,6 +7694,14 @@ async def cloud_paper_trading_loop():
                     from cloud_paper_engine import get_paper_engine
 
                 engine = get_paper_engine(OUTPUTS_DIR)
+                try:
+                    from dashboard.backend.paper_feed_admission import (
+                        admit_paper_chains, missing_open_position_quotes,
+                    )
+                except ImportError:
+                    from paper_feed_admission import (
+                        admit_paper_chains, missing_open_position_quotes,
+                    )
 
                 # Prefer warmed chain cache so this loop cannot starve /ui.
                 chains = []
@@ -7625,8 +7731,19 @@ async def cloud_paper_trading_loop():
                 except Exception as seed_exc:
                     print(f"[paper-loop] high-rise seed skipped: {seed_exc}")
 
-                if chains:
-                    engine.step(chains, max_open=3, market_top=market_top_rows)
+                fresh_chains, rejects = admit_paper_chains(chains)
+                uncovered = missing_open_position_quotes(
+                    engine.open_positions, fresh_chains)
+                if not fresh_chains or uncovered:
+                    # The dashboard can still show historical quotes. Automated
+                    # PAPER entry/mark/exit must never consume those quotes.
+                    print(
+                        f"[paper-loop] BLOCKED_FRESH_QUOTES "
+                        f"admitted={len(fresh_chains)} rejected={len(rejects)} "
+                        f"unquoted_positions={len(uncovered)}"
+                    )
+                else:
+                    engine.step(fresh_chains, max_open=3, market_top=market_top_rows)
                     print(
                         f"[paper-loop] tick: {len(engine.open_positions)} open, "
                         f"{len(engine.closed_positions)} closed, "
@@ -9266,12 +9383,29 @@ async def get_backtest_results():
             costed = json.loads(costed_path.read_text(encoding="utf-8"))
     except Exception as exc:
         costed = {"error": str(exc)[:160]}
-    # Operator view: never dump repo file-path "candidates_sample" as trade evidence.
+    # Repository report files are not independent proof of actual backtesting.
+    # Never present their contents as verified trades, returns or P&L.
     summary = _sanitize_backtest_operator_summary(summary)
     return {
-        "status": "ok",
-        "summary": summary,
-        "costed_walkforward": costed,
+        "status": "NOT_VERIFIED",
+        "passed": False,
+        "verification_status": "NOT_VERIFIED",
+        "reason_if_unverified": (
+            "Local report artifacts exist, but historical market provenance, "
+            "fill reconciliation, cost model and walk-forward results have not "
+            "been independently verified."
+        ),
+        "summary": {
+            "total_trades": None,
+            "win_rate": None,
+            "profit_factor": None,
+            "net_pnl": None,
+            "max_drawdown_pct": None,
+            "sharpe_ratio": None,
+            "avg_trade_expectancy": None,
+            "passed": False,
+        },
+        "costed_walkforward": None,
         "source_dir": str(base),
         "live_trading_enabled": False,
     }
@@ -11601,13 +11735,27 @@ async def get_broker_positions():
 
 @app.get("/api/market/top-gainers")
 async def get_market_top_gainers():
+    """Read the scanner's actual ranked board, never a nonexistent 'data' field."""
     try:
-        result = await get_top_contract_gainers() if asyncio.iscoroutinefunction(get_top_contract_gainers) else get_top_contract_gainers()
-        if isinstance(result, dict) and "data" in result:
-            gainers = sorted(result["data"], key=lambda x: x.get("ce_gain_percent", 0), reverse=True)[:10]
-            return {"gainers": gainers, "status": "ok"}
-        return {"gainers": [], "status": "no_data"}
-    except: return {"gainers": [], "status": "error"}
+        result = await get_top_contract_gainers()
+        if not isinstance(result, dict):
+            return {"gainers": [], "status": "not_verified", "source": "scanner"}
+        rows = result.get("market_top_table") or []
+        return {
+            "gainers": rows[:10],
+            "status": result.get("status", "not_verified") if rows else "no_data",
+            "source": "scanner.market_top_table",
+            "market_open": result.get("market_open"),
+            "generated_utc": result.get("generated_utc"),
+        }
+    except Exception:
+        return {"gainers": [], "status": "error", "source": "scanner"}
+
+
+@app.get("/api/options/gainers")
+async def get_option_gainers():
+    """Compatibility route; retain scanner provenance and market-closed labels."""
+    return await get_top_contract_gainers()
 
 @app.get("/api/market/top-losers")
 async def get_market_top_losers():

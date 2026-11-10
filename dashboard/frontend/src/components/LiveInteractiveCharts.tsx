@@ -138,7 +138,7 @@ export function PnlEquityCurveChart({
   totalPnl?: number
 }) {
   const data = pnlHistory.length > 0 ? pnlHistory : []
-  const lastVal = data.length ? (data[data.length - 1]?.cumulative ?? totalPnl) : null
+  const lastVal = data.length ? ((data[data.length - 1] as any)?.cumulative ?? totalPnl) : null
   const isUp = typeof lastVal === 'number' && lastVal > 0
 
   return (

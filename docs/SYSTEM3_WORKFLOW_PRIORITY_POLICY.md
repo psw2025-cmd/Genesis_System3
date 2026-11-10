@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following eleven GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following twelve GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -17,10 +17,11 @@ Only the following eleven GitHub Actions workflows are allowed in `.github/workf
 9. `command-center-access.yml` — validates `ACCESS_POLICY.yaml`, runs Command Center smoke, appends audit log.
 10. `live-proof-center.yml` — read-only public dashboard/API forensic MRI for multi-agent access.
 11. `system3-runbook-audit.yml` — persistent autonomous runbook validation.
+12. `cloud-verify.yml` — GitHub-hosted, read-only WIF Cloud Run environment inspection, Dhan GET orders, and clearly labeled synthetic PAPER replay evidence; no deploy or broker POST.
 
 ### Retired workflows (GCP Exit Complete)
 
-All Google Cloud Platform workflows (`cloud-run-auto-deploy.yml`, `gcp-authority-repair.yml`, `gcp-live-ui-semantic-proof.yml`, `gcp-stage2-ci.yml`, `gcp-dhan-token-fix-ci.yml`, `full-cloud-audit.yml`, `gcp-dhan-token-rotation.yml`) are permanently retired under RUHI_RULE_V2.3.
+All previously retired Google Cloud Platform deployment and mutation workflows (`cloud-run-auto-deploy.yml`, `gcp-authority-repair.yml`, `gcp-live-ui-semantic-proof.yml`, `gcp-stage2-ci.yml`, `gcp-dhan-token-fix-ci.yml`, `full-cloud-audit.yml`, `gcp-dhan-token-rotation.yml`) remain retired under RUHI_RULE_V2.3. The new `cloud-verify.yml` is a narrowly scoped, read-only verification exception requested by the owner; it has no deploy or infrastructure mutation steps.
 
 ## Event workflow rules
 
@@ -35,8 +36,8 @@ GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to the
 - Run the smallest required priority workflow first.
 - Never start duplicate or overlapping workflow runs.
 - Use GitHub-hosted cloud runners only.
-- Local Self-Hosted Laptop is the sole runtime/deployment authority (`http://127.0.0.1:8000`).
-- Google Cloud Platform and Render remain retired and prohibited.
+- The owner requests GitHub-hosted cloud-only verification; the offline laptop is not required for `cloud-verify.yml`. This does not authorize a production deployment.
+- Google Cloud deployment/mutation and Render remain prohibited by this workflow policy; read-only GCP inspection through `cloud-verify.yml` is explicitly allowed.
 - `LIVE_TRADING_ENABLED=0`.
 - `SYSTEM3_LIVE_TRADING_ALLOWED=0`.
 - `AUTO_EXECUTE_TRADES=0`.
