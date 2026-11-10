@@ -29,6 +29,15 @@ class CloudVerifyTargetContract(unittest.TestCase):
         self.assertIn(expected, self.workflow)
         self.assertNotIn("path: |" + chr(92) + "n", self.workflow)
 
+    def test_get_only_broker_proof_runs_after_cloud_safety_failure(self):
+        # The existing Cloud Run env comparison must remain a blocking FAIL.
+        self.assertIn("python -S scripts/cloud_run_env_contract.py", self.workflow)
+        marker = "      - name: Verify deterministic PAPER lifecycle and Dhan GET orders"
+        segment = self.workflow.split(marker, 1)[1].split("      - name:", 1)[0]
+        self.assertIn("if: " + chr(36) + "{{ !cancelled() }}", segment)
+        self.assertIn("run: python scripts/cloud_verify_readonly.py", segment)
+        self.assertNotIn("continue-on-error:", segment)
+
     def test_read_only_wif_and_paper_safety_preserved(self):
         for marker in (
             "id-token: write",
