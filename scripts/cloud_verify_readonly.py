@@ -46,7 +46,24 @@ def dhan_orders():
             if len(body) > 2_000_000:
                 raise ValueError("oversized response")
             payload = json.loads(body)
-    except (HTTPError, URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
+    except HTTPError as exc:
+        # HTTPError may carry a credential-containing URL/response body.
+        # Emit ONLY a validated integer code and fixed classification.
+        code = exc.code if type(exc.code) is int and 100 <= exc.code <= 599 else None
+        if code == 401:
+            category = "AUTH_REJECTED"
+        elif code == 403:
+            category = "ACCESS_DENIED"
+        elif code == 429:
+            category = "RATE_LIMITED"
+        elif code is not None and 500 <= code <= 599:
+            category = "UPSTREAM_ERROR"
+        else:
+            category = "REQUEST_REJECTED_OR_UNKNOWN"
+        emit("dhan_orders_get", "NOT_VERIFIED", error_type="HTTPError",
+             http_status=code, error_class=category)
+        return False
+    except (URLError, TimeoutError, ValueError, json.JSONDecodeError) as exc:
         emit("dhan_orders_get", "NOT_VERIFIED", error_type=type(exc).__name__)
         return False
     # Dhan may return an error object instead of a list. Never treat that as zero orders.
