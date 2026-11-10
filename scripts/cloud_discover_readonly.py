@@ -65,6 +65,21 @@ def select_production_target(matches):
     return PRODUCTION_TARGET if PRODUCTION_TARGET in set(matches) else None
 
 
+def select_readonly_inspection_target(projects, services_by_project):
+    """Select only the exact canonical identity for READ-ONLY diagnostics.
+
+    This function does NOT classify the target as safe or production-ready.
+    The subsequent independent per-variable check must fail closed on a
+    missing, duplicate, referenced, or mismatched PAPER safety value.
+    """
+    identities = {
+        (project_id(p), service_name(svc))
+        for p in projects
+        for svc in services_by_project.get(project_id(p), [])
+    }
+    return PRODUCTION_TARGET if PRODUCTION_TARGET in identities else None
+
+
 def main():
     try:
         projects = gcloud("projects", "list")
@@ -99,13 +114,20 @@ def main():
             print("NOT_VERIFIED: inventory incomplete for " + str(len(set(incomplete_projects))) + " project(s); refusing to select a potentially ambiguous target")
             return 2
         matches = discover(projects, services)
-        selected = select_production_target(matches)
+        selected = select_readonly_inspection_target(projects, services)
         if selected is None:
-            print("NOT_VERIFIED: canonical production target absent or PAPER safety unverified; safe candidates=" + str(len(matches)))
+            print("NOT_VERIFIED: canonical production service identity not available for read-only inspection")
             return 2
         pid, name = selected
+        safety_match = select_production_target(matches) == selected
         print("DISCOVERED_PRODUCTION_TARGET project=" + pid + " service=" + name + " region=" + REGION)
         print("CANONICAL_TARGET_EXACT_MATCH=PASS")
+        print("PAPER_ENV_PREFLIGHT=" + ("MATCH" if safety_match else "NOT_VERIFIED"))
+        if not safety_match:
+            print("READ_ONLY_INSPECTION_ONLY=1 PRODUCTION_READINESS=BLOCKED_PAPER_ENV")
+        # A mismatched environment must NOT suppress forensic inspection.
+        # The downstream contract independently fails closed; this step
+        # certifies only target identity, never readiness.
         output = os.getenv("GITHUB_OUTPUT", "")
         if not output:
             print("NOT_VERIFIED: GITHUB_OUTPUT missing")

@@ -1,6 +1,6 @@
 """Offline safety and ambiguity checks for read-only GCP discovery."""
 import unittest
-from scripts.cloud_discover_readonly import discover, service_name, select_production_target
+from scripts.cloud_discover_readonly import (discover, service_name, select_production_target, select_readonly_inspection_target)
 
 
 def service(name, env):
@@ -57,6 +57,29 @@ class DiscoveryTests(unittest.TestCase):
             service("genesis-system3", SAFE),
         ]})
         self.assertIsNone(select_production_target(matches))
+
+    def test_readonly_inspection_may_select_exact_unsafe_canonical_without_claiming_safe(self):
+        project = "system3-openalgo-safe"
+        unsafe = {**SAFE, "PAPER_MODE": "0"}
+        projects = [{"projectId": project}]
+        services = {project: [
+            service("genesis-system3-web", unsafe),
+            service("genesis-system3-web-staging", SAFE),
+        ]}
+        matches = discover(projects, services)
+        self.assertIsNone(select_production_target(matches))
+        self.assertEqual(select_readonly_inspection_target(projects, services),
+                         (project, "genesis-system3-web"))
+
+    def test_readonly_inspection_rejects_unknown_identity(self):
+        projects = [{"projectId": "other-project"}]
+        self.assertIsNone(select_readonly_inspection_target(projects, {
+            "other-project": [service("genesis-system3-web", SAFE)]
+        }))
+        self.assertIsNone(select_readonly_inspection_target(
+            [{"projectId": "system3-openalgo-safe"}],
+            {"system3-openalgo-safe": [service("genesis-system3-web-staging", SAFE)]},
+        ))
 
     def test_other_services_not_selected(self):
         self.assertEqual(discover([{"projectId": "p"}], {"p": [service("other-app", SAFE)]}), [])
