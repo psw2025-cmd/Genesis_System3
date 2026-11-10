@@ -357,6 +357,11 @@ jobs:
           test -f reports/latest/proof_pack_closure_gate/summary.json
           echo "proof_pack_closure_gate=PASS"
 
+      - name: Assert public market-session route is CLOCK ONLY and read-only
+        shell: bash
+        timeout-minutes: 3
+        run: python -m unittest tests.test_secure_app_contract
+
       - name: Enforce canonical Cloud Run healthz source contract
         shell: bash
         run: |
@@ -479,10 +484,20 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_synthetic_sell_bid_truth.py -o addopts="" --tb=short
 
+      - name: Synthetic live PnL exclusion and stale-state regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_state_sync_staleness.py -o addopts="" --tb=short
+
       - name: Existing Positions paper PnL provenance
         shell: bash
         timeout-minutes: 5
         run: python -m pytest -q tests/test_positions_pnl_provenance_label.py -o addopts="" --tb=short
+
+      - name: Root PAPER PnL fallback provenance and session persistence regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_paper_pnl_root_truth_contract.py tests/test_cloud_paper_session_rollover.py -o addopts="" --tb=short
 
       - name: Instant virtual market lifecycle stage proof
         shell: bash
@@ -509,6 +524,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_paper_buy_quote_age_guard.py -o addopts="" --tb=short
 
+      - name: Autonomous market-to-paper fresh-source admission gate
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_autonomous_paper_feed_admission.py -o addopts="" --tb=short
+
       - name: PAPER replay cumulative capital regression
         shell: bash
         timeout-minutes: 5
@@ -532,7 +552,7 @@ jobs:
       - name: Autonomous PAPER master ledger and shadow learning regressions
         shell: bash
         timeout-minutes: 5
-        run: python -m pytest -q tests/test_autonomous_paper_core.py -o addopts="" --tb=short
+        run: python -m pytest -q tests/test_autonomous_paper_core.py tests/test_virtual_market_lifecycle.py tests/test_cloud_paper_session_rollover.py -o addopts="" --tb=short
 
       - name: ML walk-forward chronology and leakage regression
         shell: bash

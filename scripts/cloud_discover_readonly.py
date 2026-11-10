@@ -8,7 +8,7 @@ import sys
 
 REGION = "asia-south1"
 EXPECTED = {"PAPER_MODE": "1", "LIVE_ORDER_AUTHORITY": "0", "REAL_BROKER_ORDERS": "0"}
-HINTS = (("genesis-system3", "genesis"), ("system3-openalgo-safe", "genesis-system3-web"))
+PRODUCTION_TARGET = ("system3-openalgo-safe", "genesis-system3-web")
 
 
 def gcloud(*args, expect_list=True):
@@ -55,6 +55,16 @@ def discover(projects, services_by_project):
     return sorted(set(matches))
 
 
+def select_production_target(matches):
+    """Require the exact canonical production identity AND explicit PAPER locks.
+
+    Having multiple PAPER-locked services (e.g. staging and older revisions)
+    cannot make us target a different service. Missing/unsafe canonical target
+    remains a hard block, even if another Genesis service is safe.
+    """
+    return PRODUCTION_TARGET if PRODUCTION_TARGET in set(matches) else None
+
+
 def main():
     try:
         projects = gcloud("projects", "list")
@@ -89,12 +99,13 @@ def main():
             print("NOT_VERIFIED: inventory incomplete for " + str(len(set(incomplete_projects))) + " project(s); refusing to select a potentially ambiguous target")
             return 2
         matches = discover(projects, services)
-        if len(matches) != 1:
-            print("NOT_VERIFIED: expected exactly one Genesis service with explicit PAPER safety; found " + str(len(matches)))
+        selected = select_production_target(matches)
+        if selected is None:
+            print("NOT_VERIFIED: canonical production target absent or PAPER safety unverified; safe candidates=" + str(len(matches)))
             return 2
-        pid, name = matches[0]
+        pid, name = selected
         print("DISCOVERED_PRODUCTION_TARGET project=" + pid + " service=" + name + " region=" + REGION)
-        print("USER_PROVIDED_HINT genesis-system3/genesis; ACTUAL_DISCOVERED=" + pid + "/" + name)
+        print("CANONICAL_TARGET_EXACT_MATCH=PASS")
         output = os.getenv("GITHUB_OUTPUT", "")
         if not output:
             print("NOT_VERIFIED: GITHUB_OUTPUT missing")
