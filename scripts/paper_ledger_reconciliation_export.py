@@ -45,7 +45,7 @@ def _csv_text(rows: list[dict], fields: tuple[str, ...]) -> str:
     # Protect analyst spreadsheets from formula injection in untrusted IDs.
     # Numeric PnL values remain numeric; only text cells are escaped.
     def safe(value: Any) -> Any:
-        if isinstance(value, str) and value.startswith(("=", "+", "-", "@", "\\t", "\\r", "\\n")):
+        if isinstance(value, str) and value and (value[0] in "=+-@" or ord(value[0]) in (9, 10, 13)):
             return "'" + value
         return value
 
