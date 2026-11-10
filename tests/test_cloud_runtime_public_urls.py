@@ -1,62 +1,88 @@
-"""Public Cloud Run URL helpers must never advertise localhost in cloud mode."""
-import os
-
 from core.config.cloud_runtime import (
+    deploy_target,
+    is_cloud_runtime,
     public_base_url,
     public_cors_origins,
     public_dashboard_url,
     public_ui_path,
 )
 
-CLOUD = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
+LOCAL = "http://127.0.0.1:8000"
+GCP = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 
 
 def test_public_base_url_prefers_system3_env(monkeypatch):
-    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", CLOUD)
+    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", LOCAL)
     monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
-    assert public_base_url() == CLOUD
-    assert public_dashboard_url() == f"{CLOUD}/ui"
+    monkeypatch.delenv("K_SERVICE", raising=False)
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
     assert public_ui_path() == "/ui"
 
 
-def test_public_base_url_reads_legacy_public_backend_url(monkeypatch):
-    monkeypatch.delenv("CLOUD_MODE", raising=False)
-    monkeypatch.delenv("SYSTEM3_DEPLOY_TARGET", raising=False)
+def test_local_runtime_ignores_stale_remote_public_backend_url(monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
     monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)
-    monkeypatch.setenv("PUBLIC_BACKEND_URL", "https://example.invalid")
-    assert public_base_url() == "https://example.invalid"
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", GCP)
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
+    assert deploy_target() == "local-laptop"
 
 
-def test_cloud_mode_rejects_localhost_override(monkeypatch):
+def test_local_runtime_ignores_stale_gcp_mode_and_deploy_target(monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.setenv("CLOUD_MODE", "1")
     monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "gcp-cloud-run")
-    monkeypatch.setenv("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000")
-    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", "http://localhost:3000")
-    assert public_base_url() == CLOUD
-    assert public_dashboard_url() == f"{CLOUD}/ui"
-    assert "127.0.0.1" not in public_base_url()
-    assert "localhost" not in public_dashboard_url()
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", GCP)
+    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", GCP)
+    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", f"{GCP}/ui")
+    assert is_cloud_runtime() is False
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
+    assert deploy_target() == "local-laptop"
 
 
-def test_public_cors_origins_include_canonical_and_regional_alias(monkeypatch):
+def test_local_defaults_use_loopback(monkeypatch):
+    monkeypatch.delenv("K_SERVICE", raising=False)
     monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
     monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)
+    monkeypatch.delenv("SYSTEM3_DEPLOY_TARGET", raising=False)
+    monkeypatch.delenv("PUBLIC_DASHBOARD_URL", raising=False)
+    assert public_base_url() == LOCAL
+    assert public_dashboard_url() == f"{LOCAL}/ui"
+    assert deploy_target() == "local-laptop"
+    assert is_cloud_runtime() is False
+
+
+def test_cloud_run_is_detected_only_from_runtime_service_env(monkeypatch):
+    cloud = "https://example.invalid"
+    monkeypatch.setenv("K_SERVICE", "genesis-system3-web")
+    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", cloud)
+    monkeypatch.setenv("PUBLIC_DASHBOARD_URL", f"{cloud}/ui")
+    assert is_cloud_runtime() is True
+    assert public_base_url() == cloud
+    assert public_dashboard_url() == f"{cloud}/ui"
+
+
+def test_public_cors_origins_skip_loopback_defaults(monkeypatch):
+    monkeypatch.delenv("PUBLIC_BACKEND_URL", raising=False)
+    monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
+    monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
+    monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)
+    monkeypatch.delenv("K_SERVICE", raising=False)
     origins = public_cors_origins()
-    assert CLOUD in origins
-    assert "https://genesis-system3-web-802404398783.asia-south1.run.app" in origins
-    assert all("127.0.0.1" not in origin and "localhost" not in origin for origin in origins)
+    assert origins == []
 
 
 def test_local_dev_still_allows_loopback_without_cloud_mode(monkeypatch):
     monkeypatch.setenv("PUBLIC_BACKEND_URL", "http://127.0.0.1:8000")
     monkeypatch.setenv("PUBLIC_DASHBOARD_URL", "http://127.0.0.1:8000/ui")
-    monkeypatch.delenv("CLOUD_MODE", raising=False)
     monkeypatch.delenv("K_SERVICE", raising=False)
-    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "local")
+    monkeypatch.setenv("SYSTEM3_DEPLOY_TARGET", "local-laptop")
     monkeypatch.delenv("SYSTEM3_PUBLIC_BACKEND_URL", raising=False)
     monkeypatch.delenv("SYSTEM3_API_BASE", raising=False)
     monkeypatch.delenv("DASHBOARD_BASE_URL", raising=False)

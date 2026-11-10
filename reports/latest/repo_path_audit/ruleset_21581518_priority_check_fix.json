@@ -1,0 +1,38 @@
+﻿{
+    "marker":  "RULESET_21581518_PATH_FILTER_FIX_20260826",
+    "timestamp_utc":  "2026-08-26T18:24:03.6549107Z",
+    "option":  1,
+    "action":  "Removed path-filtered required check BLOCKING - priority workflows only from ruleset main-protection-fail-closed (21581518)",
+    "ruleset_id":  21581518,
+    "ruleset_name":  "main-protection-fail-closed",
+    "required_status_checks_before":  [
+                                          "BLOCKING - workflow policy and trading safety guard",
+                                          "BLOCKING - architecture and trading safety gate",
+                                          "BLOCKING - Python compile proof",
+                                          "BLOCKING - full proof pack validation",
+                                          "BLOCKING - frontend production build + browser runtime",
+                                          "BLOCKING - priority workflows only"
+                                      ],
+    "required_status_checks_after":  [
+                                         "BLOCKING - workflow policy and trading safety guard",
+                                         "BLOCKING - architecture and trading safety gate",
+                                         "BLOCKING - Python compile proof",
+                                         "BLOCKING - full proof pack validation",
+                                         "BLOCKING - frontend production build + browser runtime"
+                                     ],
+    "kept_protections":  [
+                             "pull_request",
+                             "deletion",
+                             "non_fast_forward",
+                             "strict_required_status_checks_policy"
+                         ],
+    "pr_369":  {
+                   "url":  "https://github.com/psw2025-cmd/Genesis_System3/pull/369",
+                   "mergeStateStatus_before":  "BLOCKED",
+                   "mergeStateStatus_after":  "CLEAN",
+                   "note":  "Did not merge; gate unstick only",
+                   "mergeable":  "MERGEABLE"
+               },
+    "primary_clone":  "C:\\Users\\ADMIN\\Genesis_System3\\Genesis_System3",
+    "github_origin_main_sha":  "5e2b43f644f831e672ae297d3745a909d6ced32d"
+}

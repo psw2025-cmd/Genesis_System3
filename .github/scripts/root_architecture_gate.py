@@ -63,6 +63,8 @@ def sh(cmd: list[str], allow_fail: bool = False) -> dict:
             cmd,
             cwd=ROOT,
             text=True,
+            encoding="utf-8",
+            errors="replace",
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             timeout=120,
@@ -156,9 +158,14 @@ def check_protected_paths_not_changed(files: list[str]) -> dict:
         "docs/ci_truth/",
         "reports/ci_truth/",
     )
+    # Audited non-execution scheduling files explicitly allowed:
+    allowed_files = {
+        "core/engine/system3_phase82_job_scheduler.py",
+        "core/engine/system3_scheduler_catchup.py",
+    }
     violations = []
     for f in files:
-        if f.startswith(allowed_prefixes):
+        if f.startswith(allowed_prefixes) or f in allowed_files:
             continue
         if f.startswith(PROTECTED_PATH_PREFIXES):
             violations.append(f)

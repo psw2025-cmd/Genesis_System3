@@ -132,16 +132,19 @@ class DataSourceManager:
         self._equity_sec_ids: Dict[str, int] = {}
 
     def _get_client(self):
-        if self._client is None:
+        from core.utils.env_loader import get_dhan_credentials
+        creds = get_dhan_credentials()
+        client_id = creds.get("client_id", "").strip().lstrip("\ufeff")
+        token = creds.get("access_token", "").strip().lstrip("\ufeff")
+        if hasattr(self, "_cached_token") and self._cached_token != token:
+            self._client = None
+        self._cached_token = token
+        if self._client is None and client_id and token:
             try:
                 from dhanhq import dhanhq
                 from dhanhq.dhan_context import DhanContext
-
-                client_id = os.environ.get("DHAN_CLIENT_ID", "").strip().lstrip("\ufeff")
-                token = os.environ.get("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
-                if client_id and token:
-                    ctx = DhanContext(client_id, token)
-                    self._client = dhanhq(ctx)
+                ctx = DhanContext(client_id, token)
+                self._client = dhanhq(ctx)
             except Exception as e:
                 logger.warning(f"[DSM] Dhan client init failed: {e}")
         return self._client
@@ -171,6 +174,32 @@ class DataSourceManager:
 
         if sym_u in self._equity_sec_ids:
             return self._equity_sec_ids[sym_u], env_seg or "NSE_EQ"
+
+        # Institutional Indian Equity Security IDs
+        INSTITUTIONAL_EQUITY_IDS = {
+            "RELIANCE": 2885,
+            "TCS": 11536,
+            "INFY": 1594,
+            "HDFCBANK": 1333,
+            "ICICIBANK": 4963,
+            "SBIN": 3045,
+            "TATAMOTORS": 3456,
+            "BHARTIARTL": 10604,
+            "ITC": 1660,
+            "LT": 11483,
+        }
+        if sym_u in INSTITUTIONAL_EQUITY_IDS:
+            return INSTITUTIONAL_EQUITY_IDS[sym_u], env_seg or "NSE_EQ"
+
+        # In-memory SQLite Master Cache lookup (zero CSV dependency)
+        try:
+            from core.data.dhan_master_cache import get_master_cache
+
+            sec_id, seg, exch = get_master_cache().resolve_underlying_security(sym_u)
+            if sec_id:
+                return sec_id, env_seg or seg
+        except Exception:
+            pass
 
         # Resolve NSE equity underlying id from security master (OPTSTK parents).
         try:
@@ -314,11 +343,12 @@ class DataSourceManager:
         """
         import time
         sym = symbol.upper()
+        cache_key = (sym, expiry or "")
 
         # Cache TTL check (e.g. 5 seconds)
         cache_ttl = 5
-        if hasattr(self, "_cache") and sym in self._cache:
-            cache_time, cached_df, cached_spot = self._cache[sym]
+        if hasattr(self, "_cache") and cache_key in self._cache:
+            cache_time, cached_df, cached_spot = self._cache[cache_key]
             if time.time() - cache_time < cache_ttl:
                 return cached_df, cached_spot
 
@@ -334,26 +364,13 @@ class DataSourceManager:
 
         for source_name, source_fn in sources:
             try:
-                if source_name == "dhan":
-                    res = source_fn()
-                    if res == (None, None):
-                        dhan_res = self._fetch_dhan_real(sym, expiry)
-                        if dhan_res is not None and dhan_res[0] is not None and not dhan_res[0].empty:
-                            self._cache[sym] = (time.time(), dhan_res[0], dhan_res[1])
-                            return dhan_res
-                    elif res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
-                            self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
-                else:
-                    res = source_fn()
-                    if res is not None:
-                        df, spot = res
-                        if df is not None and not df.empty:
-                            if source_name != "synthetic":
-                                self._cache[sym] = (time.time(), df, spot)
-                            return df, spot
+                res = source_fn()
+                if res is not None and isinstance(res, tuple) and len(res) >= 2 and res[0] is not None:
+                    df, spot = res[0], res[1]
+                    if hasattr(df, "empty") and not df.empty:
+                        if source_name != "synthetic":
+                            self._cache[cache_key] = (time.time(), df, spot)
+                        return df, float(spot or 0.0)
             except AssertionError as e:
                 raise e
             except Exception as e:
@@ -603,9 +620,9 @@ class DataSourceManager:
 
         return pd.DataFrame(rows), spot
 
-    # ── Backward compatible shims for unit testing ──
     def _try_dhan(self, symbol: str, expiry: str = "") -> Tuple[Optional[Any], Optional[float]]:
-        return None, None
+        res = self._fetch_dhan_real(symbol, expiry)
+        return res if res is not None else (None, None)
 
     def _try_nse(self, symbol: str) -> Tuple[Optional[Any], Optional[float]]:
         return None, None

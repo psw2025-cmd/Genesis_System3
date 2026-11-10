@@ -102,14 +102,32 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
         _URL_OLD.format(yyyy=yyyy, mon_upper=mon, dd=dd),
     ]
 
+    max_retries = 5
     for url in urls:
-        try:
-            print(f"  {date_str}: fetching {url.split('/')[-1]} ...", end=" ", flush=True)
-            resp = session.get(url, timeout=30)
-            if resp.status_code != 200:
-                print(f"HTTP {resp.status_code}")
-                continue
+        resp = None
+        for attempt in range(1, max_retries + 1):
+            try:
+                print(f"  {date_str}: fetching {url.split('/')[-1]} (attempt {attempt}/{max_retries}) ...", end=" ", flush=True)
+                resp = session.get(url, timeout=30)
+            except Exception as e:
+                print(f"ERROR: {e}")
+                resp = None
 
+            if resp is not None and resp.status_code == 200:
+                break
+            if resp is not None and resp.status_code == 429 and attempt < max_retries:
+                backoff = 1.0 * (2 ** (attempt - 1))  # 1s, 2s, 4s, 8s, ...
+                print(f"HTTP 429, backing off {backoff:.0f}s")
+                time.sleep(backoff)
+                continue
+            if resp is not None:
+                print(f"HTTP {resp.status_code}")
+            break
+
+        if resp is None or resp.status_code != 200:
+            continue
+
+        try:
             # Extract CSV from zip archive
             with zipfile.ZipFile(io.BytesIO(resp.content)) as zf:
                 csv_files = [n for n in zf.namelist() if n.lower().endswith(".csv")]
@@ -124,12 +142,14 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
                 print("empty CSV")
                 continue
 
-            # Quick validation: check for option rows
+            # Quick validation: check for option rows.
+            # Old NSE format: INSTRUMENT in {OPTIDX, OPTSTK}.
+            # New NSE format (since ~2026): FinInstrmTp in {IDO (index options), STO (stock options)}.
             has_opt = False
-            for col in df.columns:
-                if col in ("INSTRUMENT", "FinInstrmTp"):
-                    has_opt = "OPTIDX" in df[col].astype(str).values
-                    break
+            if "INSTRUMENT" in df.columns:
+                has_opt = df["INSTRUMENT"].astype(str).isin(["OPTIDX", "OPTSTK"]).any()
+            elif "FinInstrmTp" in df.columns:
+                has_opt = df["FinInstrmTp"].astype(str).isin(["IDO", "STO"]).any()
 
             # Save regardless (even futures data is useful for future extension)
             BHAVCOPY_DIR.mkdir(parents=True, exist_ok=True)
@@ -194,12 +214,12 @@ def _write_change_log(today: str, n_downloaded: int, n_failed: int) -> None:
         f"DOWNLOAD: {n_downloaded} bhavcopy files cached, {n_failed} failed. "
         f"Dates: {_downloaded}\n"
     )
-    content = log_file.read_text()
+    content = log_file.read_text(encoding="utf-8", errors="replace")
     # Insert before the sentinel line
     sentinel = "<!-- APPEND NEW ENTRIES ABOVE THIS LINE -->"
     if sentinel in content:
         content = content.replace(sentinel, f"{entry}\n{sentinel}", 1)
-        log_file.write_text(content)
+        log_file.write_text(content, encoding="utf-8")
 
 
 def main() -> None:

@@ -5,6 +5,9 @@ trading system. It is not authorized for real orders.
 
 ## Authority
 
+**Owner directive (2026-10-18):** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`. Cloud-only is the intended architecture; presently approved actions are GitHub repairs/testing and read-only GCP verification. Any billable deployment or GCP configuration change needs a separate approval. A listed URL is not evidence of a currently running deployment. The laptop is a browser/control device only, not production hosting.
+
+
 - Code/configuration: GitHub `psw2025-cmd/Genesis_System3` current `main`.
 - Production/runtime: GCP project `system3-openalgo-safe`, region `asia-south1`.
 - Cloud Run service: `genesis-system3-web`.
@@ -16,12 +19,13 @@ trading system. It is not authorized for real orders.
 
 Every agent must read, in order:
 
-1. `AGENTS.md`
-2. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md`
-3. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
-4. `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`
-5. `docs/RUHI_RULE_V2.md`
-6. Current remote `main`, active PR ownership, and latest Issue #188 status
+1. `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`
+2. `AGENTS.md`
+3. `docs/control_plane/SYSTEM3_AGENT_RUNBOOK.md`
+4. `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`
+5. `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`
+6. `docs/RUHI_RULE_V2.md` (historical only; do not execute its laptop-only/GCP-exit instructions)
+7. Current remote `main`, active PR ownership, and latest Issue #188 status
 
 ## Owner blocker and acceleration rule
 
@@ -47,7 +51,7 @@ are in `docs/authority/USER_ACTION_AUTONOMY_SPEED_POLICY.md`.
 
 ## Local development
 
-Local execution is for development/testing only and is never production truth.
+Local execution below is optional developer-only context, never production truth or a required user action. No routine local System3 process is allowed.
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn dashboard.backend.app:app --host 127.0.0.1 --port 8000

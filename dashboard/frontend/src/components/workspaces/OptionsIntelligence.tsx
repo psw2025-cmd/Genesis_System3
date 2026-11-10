@@ -2,6 +2,7 @@ import React from 'react';
 import { useStore } from '../../store';
 import { StatusChip, PENDINGState } from './TruthUI';
 import { Layers, Activity, TrendingUp, ShieldAlert, BarChart2 } from 'lucide-react';
+import AdvancedCharts from '../AdvancedCharts';
 
 function pickArray(obj: any, ...keys: string[]): any[] {
   if (!obj) return [];
@@ -176,6 +177,11 @@ export const OptionsIntelligence: React.FC = () => {
           ) : (
             <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text-mut)' }}>NO ACTIVE DHAN POSITIONS</div>
           )}
+        </section>
+
+        {/* Real-time Interactive Option Analytics & Visual Charts */}
+        <section className="card" style={{ padding: '20px', background: 'var(--surface-2)' }}>
+          <AdvancedCharts />
         </section>
       </div>
     </div>

@@ -10,46 +10,31 @@ POLICY_PATH = Path("docs/SYSTEM3_WORKFLOW_PRIORITY_POLICY.md")
 
 AUTOMATIC = {
     "ci.yml",
-    "workflow-priority-guard.yml",
-    "cloud-run-auto-deploy.yml",
-    "gcp-authority-repair.yml",
-    "gcp-live-ui-semantic-proof.yml",
-    "gcp-stage2-ci.yml",
-    "gcp-dhan-token-fix-ci.yml",
-    "frontend-runtime-smoke.yml",
+    "cloud-verify.yml",
     "codeql-security.yml",
+    "command-center-access.yml",
+    "frontend-runtime-smoke.yml",
+    "live-proof-center.yml",
+    "repo-clean-forensic-toolkit.yml",
     "security-audit.yml",
     "sonarqube-audit.yml",
-    "full-cloud-audit.yml",
     "system3-preflight-control-plane.yml",
-    "repo-clean-forensic-toolkit.yml",
-    "command-center-access.yml",
-    "live-proof-center.yml",
+    "system3-runbook-audit.yml",
+    "workflow-priority-guard.yml",
 }
-MANUAL_ONLY = {"gcp-dhan-token-rotation.yml"}
+MANUAL_ONLY: set[str] = set()
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
-IAM_REPAIR_WORKFLOW = "gcp-authority-repair.yml"
-LIVE_UI_PROOF_WORKFLOW = "gcp-live-ui-semantic-proof.yml"
-DHAN_VERIFY_WORKFLOW = "gcp-dhan-token-fix-ci.yml"
 EVENT_TRIGGER_WORKFLOWS = {
     FORENSIC_WORKFLOW,
-    IAM_REPAIR_WORKFLOW,
-    LIVE_UI_PROOF_WORKFLOW,
-    DHAN_VERIFY_WORKFLOW,
 }
 FORENSIC_MONITORED_WORKFLOWS = {
     "Genesis System3 Global Safety CI",
-    "Cloud Run Auto Deploy",
     "Frontend Browser Runtime Smoke",
-    "GCP Dhan Token Fix CI",
-    "GCP Dhan Token Rotation Manual Recovery",
-    "GCP Stage 2 Safety Checks",
     "CodeQL Security Audit",
     "Security Audit Evidence",
     "SonarQube Audit",
-    "Full Cloud Audit and Forensic Consensus",
 }
 
 
@@ -129,12 +114,6 @@ def main() -> int:
         if live_enable.search(text):
             raise SystemExit(f"WORKFLOW_LIVE_TRADING_FORBIDDEN file={name}")
 
-    manual_on = trigger_blocks["gcp-dhan-token-rotation.yml"]
-    if "workflow_dispatch:" not in manual_on:
-        raise SystemExit("MANUAL_ROTATION_WORKFLOW_DISPATCH_MISSING")
-    if re.search(r"^\s*(push|pull_request)\s*:", manual_on, re.MULTILINE):
-        raise SystemExit(f"MANUAL_ROTATION_HAS_AUTOMATIC_TRIGGER block={manual_on!r}")
-
     ci_on = trigger_blocks["ci.yml"]
     if "pull_request:" not in ci_on or "push:" not in ci_on:
         raise SystemExit("GLOBAL_SAFETY_PRIORITY_TRIGGERS_MISSING")
@@ -167,93 +146,6 @@ def main() -> int:
     if not re.search(r"ref:\s*main\s*$", guard_text, re.MULTILINE):
         raise SystemExit("FORENSIC_RESPONDER_DEFAULT_BRANCH_CHECKOUT_MISSING")
 
-    repair_on = trigger_blocks[IAM_REPAIR_WORKFLOW]
-    repair_text = workflow_text[IAM_REPAIR_WORKFLOW]
-    if "workflow_run:" not in repair_on or "workflow_dispatch:" not in repair_on:
-        raise SystemExit("IAM_REPAIR_REQUIRED_TRIGGERS_MISSING")
-    if "deployment_status:" in repair_on:
-        raise SystemExit("IAM_REPAIR_DEPLOYMENT_STATUS_TRIGGER_FORBIDDEN")
-    if re.search(r"^\s*(push|pull_request)\s*:", repair_on, re.MULTILINE):
-        raise SystemExit("IAM_REPAIR_DIRECT_CODE_EVENT_TRIGGER_FORBIDDEN")
-    if 'workflows: ["Cloud Run Auto Deploy"]' not in repair_on:
-        raise SystemExit("IAM_REPAIR_WORKFLOW_RUN_SOURCE_NOT_EXACT")
-    if "head_branch == 'main'" not in repair_text:
-        raise SystemExit("IAM_REPAIR_MAIN_BRANCH_GUARD_MISSING")
-    if "actions: write" in repair_text or "contents: write" in repair_text:
-        raise SystemExit("IAM_REPAIR_GITHUB_WRITE_PERMISSION_FORBIDDEN")
-    if "gs3-iam-repair@system3-openalgo-safe.iam.gserviceaccount.com" not in repair_text:
-        raise SystemExit("IAM_REPAIR_PRIMARY_IDENTITY_MISSING")
-    if "gs3-iam-repair-b@system3-openalgo-safe.iam.gserviceaccount.com" not in repair_text:
-        raise SystemExit("IAM_REPAIR_FALLBACK_IDENTITY_MISSING")
-    if repair_text.count("uses: ./.github/workflows/cloud-run-auto-deploy.yml") != 1:
-        raise SystemExit("IAM_REPAIR_BOUNDED_DEPLOY_REUSE_INVALID")
-    if "gcloud run jobs execute" in repair_text:
-        raise SystemExit("IAM_REPAIR_DHAN_OR_JOB_EXECUTION_FORBIDDEN")
-
-    semantic_on = trigger_blocks[LIVE_UI_PROOF_WORKFLOW]
-    semantic_text = workflow_text[LIVE_UI_PROOF_WORKFLOW]
-    if "workflow_run:" not in semantic_on or "workflow_dispatch:" not in semantic_on:
-        raise SystemExit("LIVE_UI_PROOF_REQUIRED_TRIGGERS_MISSING")
-    if 'workflows: ["Cloud Run Auto Deploy"]' not in semantic_on:
-        raise SystemExit("LIVE_UI_PROOF_WORKFLOW_RUN_SOURCE_NOT_EXACT")
-    if "head_branch == 'main'" not in semantic_text:
-        raise SystemExit("LIVE_UI_PROOF_MAIN_BRANCH_GUARD_MISSING")
-    if re.search(r"^\s*(push|pull_request|deployment_status)\s*:", semantic_on, re.MULTILINE):
-        raise SystemExit("LIVE_UI_PROOF_DIRECT_CODE_OR_DEPLOYMENT_TRIGGER_FORBIDDEN")
-    if "contents: read" not in semantic_text or "statuses: write" not in semantic_text:
-        raise SystemExit("LIVE_UI_PROOF_MINIMAL_GITHUB_PERMISSIONS_MISSING")
-    for forbidden_permission in ("actions: write", "contents: write", "deployments: write", "issues: write", "pull-requests: write"):
-        if forbidden_permission in semantic_text:
-            raise SystemExit(f"LIVE_UI_PROOF_WRITE_PERMISSION_FORBIDDEN permission={forbidden_permission}")
-    if "persist-credentials: false" not in semantic_text:
-        raise SystemExit("LIVE_UI_PROOF_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
-    if "gcloud " in semantic_text or "gcloud\t" in semantic_text:
-        raise SystemExit("LIVE_UI_PROOF_GCP_MUTATION_SURFACE_FORBIDDEN")
-    if "python scripts/gcp_live_ui_semantic_proof.py" not in semantic_text:
-        raise SystemExit("LIVE_UI_PROOF_CANONICAL_SCRIPT_MISSING")
-
-    dhan_verify_on = trigger_blocks[DHAN_VERIFY_WORKFLOW]
-    dhan_verify_text = workflow_text[DHAN_VERIFY_WORKFLOW]
-    if "workflow_run:" not in dhan_verify_on:
-        raise SystemExit("DHAN_VERIFY_WORKFLOW_RUN_TRIGGER_MISSING")
-    if "Cloud Run Auto Deploy" not in dhan_verify_on:
-        raise SystemExit("DHAN_VERIFY_WORKFLOW_RUN_SOURCE_NOT_EXACT")
-    if not re.search(r"branches:\s*\n\s*-\s*main\s*$", dhan_verify_on, re.MULTILINE):
-        raise SystemExit("DHAN_VERIFY_MAIN_BRANCH_FILTER_MISSING")
-    if "github.event.workflow_run.conclusion == 'success'" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_SUCCESS_GUARD_MISSING")
-    if "EXPECTED_RUNTIME_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_EXACT_RUNTIME_SHA_INPUT_MISSING")
-    if "ref: ${{ env.EXPECTED_RUNTIME_SHA }}" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_EXACT_SHA_CHECKOUT_MISSING")
-    if "contents: read" not in dhan_verify_text or "id-token: write" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_MINIMAL_PERMISSIONS_MISSING")
-    for forbidden_permission in ("actions: write", "contents: write", "deployments: write", "issues: write", "pull-requests: write", "checks: write", "statuses: write"):
-        if forbidden_permission in dhan_verify_text:
-            raise SystemExit(f"DHAN_VERIFY_FORBIDDEN_GITHUB_PERMISSION permission={forbidden_permission}")
-    if "persist-credentials: false" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_CHECKOUT_CREDENTIAL_PERSISTENCE_NOT_DISABLED")
-    if "gcloud run jobs execute" in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_ROTATOR_EXECUTION_FORBIDDEN")
-    if "gcloud secrets versions access" in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_SECRET_PAYLOAD_ACCESS_FORBIDDEN")
-    if "SCHEDULER_ONLY_ROTATION_AUTHORITY_PASS" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_SCHEDULER_AUTHORITY_PROOF_MISSING")
-    if "STRICT_BROKER_RUNTIME_TRUTH=PASS" not in dhan_verify_text:
-        raise SystemExit("DHAN_VERIFY_STRICT_BROKER_PROOF_MISSING")
-
-    deploy_on = trigger_blocks["cloud-run-auto-deploy.yml"]
-    if "push:" not in deploy_on or not re.search(r"branches:\s*\[\s*main\s*\]", deploy_on):
-        raise SystemExit("CLOUD_RUN_MAIN_TRIGGER_MISSING")
-    if "workflow_call:" not in deploy_on:
-        raise SystemExit("CLOUD_RUN_REUSABLE_TRIGGER_MISSING")
-
-    full_audit_on = trigger_blocks["full-cloud-audit.yml"]
-    if "push:" not in full_audit_on or not re.search(r"branches:\s*\[\s*main\s*\]", full_audit_on):
-        raise SystemExit("FULL_CLOUD_AUDIT_MAIN_TRIGGER_MISSING")
-    if "workflow_dispatch:" not in full_audit_on:
-        raise SystemExit("FULL_CLOUD_AUDIT_MANUAL_TRIGGER_MISSING")
-
     preflight_on = trigger_blocks["system3-preflight-control-plane.yml"]
     if "push:" not in preflight_on or not re.search(r"branches:\s*\[\s*main\s*\]", preflight_on):
         raise SystemExit("PREFLIGHT_CONTROL_PLANE_MAIN_TRIGGER_MISSING")
@@ -262,8 +154,10 @@ def main() -> int:
 
     proof_on = trigger_blocks["live-proof-center.yml"]
     proof_text = workflow_text["live-proof-center.yml"]
-    if "push:" not in proof_on or "workflow_dispatch:" not in proof_on:
-        raise SystemExit("LIVE_PROOF_CENTER_REQUIRED_TRIGGERS_MISSING")
+    if re.search(r"^\s*push\s*:", proof_on, re.MULTILINE):
+        raise SystemExit("LIVE_PROOF_CENTER_AUTOMATIC_PUSH_TRIGGER_FORBIDDEN")
+    if "workflow_dispatch:" not in proof_on:
+        raise SystemExit("LIVE_PROOF_CENTER_MANUAL_TRIGGER_MISSING")
     if re.search(r"^\s*schedule\s*:", proof_on, re.MULTILINE):
         raise SystemExit("LIVE_PROOF_CENTER_SCHEDULE_FORBIDDEN")
     if "contents: write" in proof_text or "issues: write" in proof_text or "actions: write" in proof_text:
@@ -276,8 +170,6 @@ def main() -> int:
         raise SystemExit("LIVE_PROOF_CENTER_CANONICAL_SCRIPT_MISSING")
 
     for name in (
-        "gcp-stage2-ci.yml",
-        "gcp-dhan-token-fix-ci.yml",
         "frontend-runtime-smoke.yml",
         "codeql-security.yml",
         "security-audit.yml",
@@ -299,14 +191,8 @@ def main() -> int:
             "retired_runtime_workflows": False,
             "scheduled_github_workflows": False,
             "event_forensic_responder": FORENSIC_WORKFLOW,
-            "event_iam_repair": IAM_REPAIR_WORKFLOW,
-            "event_live_ui_semantic_proof": LIVE_UI_PROOF_WORKFLOW,
-            "event_dhan_post_deploy_verify": DHAN_VERIFY_WORKFLOW,
             "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
             "event_responder_write_permissions": False,
-            "iam_repair_github_write_permissions": False,
-            "live_ui_proof_runtime_mutation_permissions": False,
-            "dhan_verify_runtime_mutation_permissions": False,
             "live_trading": False,
         },
     )

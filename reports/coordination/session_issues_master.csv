@@ -1,33 +1,33 @@
 issue_id,priority,category,title,status,live_proof,need_from_user,recommendation,verify,serving_sha,updated_utc
-PEND-001,P0,deploy,Serving SHA lag behind GitHub main,CLASSIFIED_OK,main=0d69559 serving=fb4772f DOCS_TEST_CI_ONLY_LAG,None,Do not redeploy,deploy_info classified,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-002,P0,scheduler,Scheduler health UNHEALTHY,DONE,healthy=True business=PARTIAL,None,Watch business dates,scheduler/health healthy=true,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-003,P1,broker,Broker AUTH_OK keep fresh,WATCH,connected=True auth=AUTH_OK v=319,None,Watch rotate,broker connected AUTH_OK,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-004,P0,chain_ui,Stale chain badge false-green,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain badge STALE when age>60s,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-005,P0,chain_ui,Default chain not ATM-centered,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,default VISIBLE +/-10 ATM,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-006,P0,chain_ui,Missing LTP Chg %,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain header LTP%,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-007,P0,chain_ui,Missing Buildup,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain header Buildup,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-008,P0,chain_ui,Missing OI%/Vol%,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain headers OI% Vol%,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-009,P0,chain_ui,Missing Greeks columns,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain headers Delta..Vega,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-010,P1,equity,Equity options security_id map,OPEN,awaiting implementation/proof,Priority underlyings optional,Scrip master map,equity chain load,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-011,P1,api_404,/api/holdings /api/funds 404,OPEN,holdings=404 funds=404,None,Deploy alias routes,HTTP 200 holdings+funds,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-012,P1,api_404,/api/charts 404,OPEN,charts=404,None,Implement or mark MISSING,charts 200 or MISSING label,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-013,P1,api_404,multibagger/predictions/backtest 404,OPEN,predictions=404 multibagger=404,None,Wire or honest MISSING,routes or MISSING,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-014,P0,paper,Paper positions file missing,OPEN,Positions file not found,LIVE stays OFF,Cloud persistence,paper open_count or honest empty,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-015,P0,paper,Paper P&L synthetic/stale,OPEN,awaiting implementation/proof,None,Paper lifecycle,same-day paper proof,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-016,P0,paper,/api/paper/* subroutes 404,OPEN,paper/trades=404,None,Implement or document,subroutes or UI aggregate,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-017,P0,paper,Paper lifecycle gate FAIL,OPEN,pass=False,None,Market-hours proof,REAL_PAPER_LIFECYCLE pass,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-018,P0,paper,Expectancy negative,OPEN,pass=False,Do not weaken gate,Better signals,POSITIVE_NET_EXPECTANCY pass,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-019,P0,ml,Spearman rho below 0.70,OPEN,pass=False,Do not lower threshold,Retrain/validate,ML_SPEARMAN pass,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-020,P0,ml,ML predictions = 0,OPEN,total_predictions=0,None,Prediction writer,predictions>0 or BLOCKED honest,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-021,P0,signals,Signal file missing / 429,OPEN,action=NO_TRADE http=200,None,Persist + rate limit,signals actionable,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-022,P1,positions,/api/positions empty file,OPEN,awaiting implementation/proof,None,Align paths,positions truth,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-023,P0,freshness,Tick health gate FAIL,OPEN,pass=False,None,Refresh/WS proof,WEBSOCKET_TICK_HEALTH pass,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-024,P0,visibility,Option visibility gate FAIL,OPEN,pass=False,None,ATM audit,OPTION_STRIKE_VISIBILITY pass,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-025,P1,auth,API key public_readonly,WATCH,public_readonly until user decides,Enforce or document,User decision,policy decided,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-026,P1,governance,No RUHI board on UI,OPEN,awaiting implementation/proof,Confirm want board,UI board,progress board visible,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-027,P2,memory,Claude memory stale,OPEN,user action required,Update Claude memory,User,memory refreshed,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-028,P1,gates,Gates not 7/7,OPEN,gates=2/7 trade_ready=False,LIVE OFF until 7/7,Close blockers,gates_passing==7,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-029,P1,dhan_parity,Full Dhan parity FAIL,OPEN,awaiting implementation/proof,Keep Dhan open,Close chain gaps,same-session Dhan match,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-030,P2,path,Wrong Cursor path,DONE,primary_clone_ok=true,None,Keep primary path,toplevel primary,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-031,P0,multibagger,Multibagger 0 candidates,OPEN,awaiting implementation/proof,None,Research pipeline,candidates>0 or Delayed honest,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
-PEND-032,P1,paper,Manual Dhan book vs paper separate,OPEN,awaiting implementation/proof,None,Keep separate truth,broker vs paper snaps,fb4772f9d52b67a31b55ee85aab8604e525bbad6,2026-08-26T19:35:00Z
+PEND-001,P0,deploy,Serving SHA lag behind GitHub main,OPEN,serving=01a4592 (compare origin/main in session),None,MRI Auto Deploy,deploy_info==main,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-002,P0,scheduler,Scheduler health UNHEALTHY,DONE,healthy=True http=200,None,MRI Scheduler IAM,scheduler/health healthy=true,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-003,P1,broker,Broker AUTH_OK keep fresh,WATCH,connected=True auth=AUTH_OK v=323,None,Watch rotate,broker connected AUTH_OK,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-004,P0,chain_ui,Stale chain badge false-green,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain badge STALE when age>60s,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-005,P0,chain_ui,Default chain not ATM-centered,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,default VISIBLE +/-10 ATM,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-006,P0,chain_ui,Missing LTP Chg %,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain header LTP%,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-007,P0,chain_ui,Missing Buildup,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain header Buildup,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-008,P0,chain_ui,Missing OI%/Vol%,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain headers OI% Vol%,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-009,P0,chain_ui,Missing Greeks columns,IN_PROGRESS,UI fix landed locally; DONE only after serving SHA re-snap,None,Deploy OptionChain fix,chain headers Delta..Vega,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-010,P1,equity,Equity options security_id map,OPEN,awaiting implementation/proof,Priority underlyings optional,Scrip master map,equity chain load,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-011,P1,api_404,/api/holdings /api/funds 404,DONE,holdings=200 funds=200,None,Deploy alias routes,HTTP 200 holdings+funds,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-012,P1,api_404,/api/charts 404,OPEN,charts=404,None,Implement or mark MISSING,charts 200 or MISSING label,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-013,P1,api_404,multibagger/predictions/backtest 404,OPEN,predictions=404 multibagger=404,None,Wire or honest MISSING,routes or MISSING,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-014,P0,paper,Paper positions file missing,OPEN,Positions file not found,LIVE stays OFF,Cloud persistence,paper open_count or honest empty,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-015,P0,paper,Paper P&L synthetic/stale,OPEN,awaiting implementation/proof,None,Paper lifecycle,same-day paper proof,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-016,P0,paper,/api/paper/* subroutes 404,OPEN,paper/trades=404,None,Implement or document,subroutes or UI aggregate,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-017,P0,paper,Paper lifecycle gate FAIL,OPEN,pass=False,None,Market-hours proof,REAL_PAPER_LIFECYCLE pass,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-018,P0,paper,Expectancy negative,OPEN,pass=False,Do not weaken gate,Better signals,POSITIVE_NET_EXPECTANCY pass,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-019,P0,ml,Spearman rho below 0.70,DONE,pass=True,Do not lower threshold,Retrain/validate,ML_SPEARMAN pass,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-020,P0,ml,ML predictions = 0,OPEN,total_predictions=0,None,Prediction writer,predictions>0 or BLOCKED honest,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-021,P0,signals,Signal file missing / 429,OPEN,action=NO_TRADE http=200,None,Persist + rate limit,signals actionable,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-022,P1,positions,/api/positions empty file,OPEN,awaiting implementation/proof,None,Align paths,positions truth,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-023,P0,freshness,Tick health gate FAIL,OPEN,pass=False,None,Refresh/WS proof,WEBSOCKET_TICK_HEALTH pass,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-024,P0,visibility,Option visibility gate FAIL,OPEN,pass=False,None,ATM audit,OPTION_STRIKE_VISIBILITY pass,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-025,P1,auth,API key public_readonly,WATCH,public_readonly until user decides,Enforce or document,User decision,policy decided,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-026,P1,governance,No RUHI board on UI,OPEN,awaiting implementation/proof,Confirm want board,UI board,progress board visible,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-027,P2,memory,Claude memory stale,OPEN,user action required,Update Claude memory,User,memory refreshed,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-028,P1,gates,Gates not 7/7,OPEN,gates=3/7 trade_ready=False,LIVE OFF until 7/7,Close blockers,gates_passing==7,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-029,P1,dhan_parity,Full Dhan parity FAIL,OPEN,awaiting implementation/proof,Keep Dhan open,Close chain gaps,same-session Dhan match,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-030,P2,laptop,Wrong Cursor path,OPEN,user action required,Open primary path,User,primary clone open,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-031,P0,multibagger,Multibagger 0 candidates,OPEN,awaiting implementation/proof,None,Research pipeline,candidates>0 or Delayed honest,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00
+PEND-032,P1,paper,Manual Dhan book vs paper separate,OPEN,awaiting implementation/proof,None,Keep separate truth,broker vs paper snaps,01a4592f4c68c120a26b4fd955d1aff655b82e33,2026-08-29T11:10:58.823255+00:00

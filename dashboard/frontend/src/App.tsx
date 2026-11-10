@@ -1,9 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
 // ── Layout ────────────────────────────────────────────────────────────
 import { TopBar }    from './components/TopBar'
+import { TruthStrip } from './components/TruthStrip'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
@@ -37,6 +38,7 @@ import { PredictionAudit }      from './components/workspaces/PredictionAudit'
 import Signals       from './components/Signals'
 import PaperTrading  from './components/PaperTrading'
 import MLPerformance from './components/MLPerformance'
+import SystemReadiness from './components/SystemReadiness'
 import { GenesisTab } from './components/GenesisTab'
 
 function Content() {
@@ -57,6 +59,7 @@ function Content() {
     case 'paper':        return <PaperTrading />
     case 'performance':  return <PerformanceTab />
     case 'ml':           return <MLPerformance />
+    case 'system-readiness': return <SystemReadiness />
     case 'genesis':      return <GenesisTab />
     case 'e2e-proof':    return <EndToEndProof />
     case 'broker':       return <BrokerProofPanel />
@@ -98,6 +101,17 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const activeTab = useStore((s) => s.activeTab)
+  useLayoutEffect(() => {
+    const main = document.getElementById('dashboard-main')
+    if (!main) return
+    for (const element of main.querySelectorAll<HTMLElement>('*')) {
+      if (element.scrollTop > 0 || element.scrollLeft > 0) {
+        element.scrollTop = 0
+        element.scrollLeft = 0
+      }
+    }
+  }, [activeTab])
   const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
   if (mobileTradingRoute) return <MobileTradingHub />
 
@@ -107,6 +121,7 @@ export default function App() {
       <a className="skip-link" href="#dashboard-main">Skip to content</a>
       <DashboardTabUrlSync />
       <TopBar />
+      <TruthStrip />
       <AutonomousLoopBanner />
       {/*
         Deploy proofs still need production-proof-bar in the DOM, but it must stay visually hidden

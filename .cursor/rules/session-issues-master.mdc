@@ -1,0 +1,6 @@
+---
+description: DEPRECATED redirect — not active authority
+alwaysApply: false
+---
+
+HISTORICAL_NON_AUTHORITY. Replaced by `.cursor/rules/10-autonomous-verification.mdc`. Command-center GCP MRI is retired.

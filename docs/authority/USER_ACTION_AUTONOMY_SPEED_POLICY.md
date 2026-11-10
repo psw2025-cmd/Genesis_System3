@@ -91,7 +91,7 @@ The agent must provide the smallest exact runnable artifact available:
 6. After the user returns the output, the agent must independently cross-check every relevant capability/settings item it can verify from GitHub/GCP/current remote evidence.
 7. If anything remains missing, ambiguous, or misconfigured, report **only the smallest remaining correction** the user must make, using `WHY / WHERE / CLICK or RUN / SET / DO NOT / RESULT / PROOF / URGENCY`.
 8. Repeat this verify-correct-reverify loop until the required capability is proven or a genuine external blocker is reached.
-9. Do not make the user rerun already-PASS checks unless fresh evidence shows they may have changed.
+9. Agents do not make the user rerun already-PASS checks unless fresh evidence shows they may have changed.
 10. Once the required access/capability is proven, immediately continue the agent-owned implementation work; do not stop at the access audit.
 
 Required output fields for this loop:

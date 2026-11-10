@@ -1,0 +1,394 @@
+[
+  {
+    "tab_id": "decision-intel",
+    "label": "Decision Intel",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=decision-intel",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 565,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state",
+      "/api/auto_gates"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "truth",
+    "label": "Truth Control",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=truth",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 565,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/broker/status",
+      "/api/deploy_info",
+      "/api/health"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "genesis",
+    "label": "Genesis Brain",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=genesis",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 307,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state",
+      "/api/signal/top"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "e2e-proof",
+    "label": "E2E Proof",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=e2e-proof",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 570,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/proof_ledger",
+      "/api/continuous_closure"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "overview",
+    "label": "Overview",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=overview",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 568,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state",
+      "/api/health"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "sim-live",
+    "label": "Sim Live",
+    "group": "main",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=sim-live",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 568,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "options-intel",
+    "label": "Options Intel",
+    "group": "market",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=options-intel",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 567,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/batch/chains",
+      "/api/chain/NIFTY"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "chain",
+    "label": "Option Chain",
+    "group": "market",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=chain",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 569,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/batch/chains",
+      "/api/chain/NIFTY"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "signals",
+    "label": "Signals",
+    "group": "market",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=signals",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 567,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/signal/top"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "trade",
+    "label": "Trade",
+    "group": "trading",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=trade",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 565,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "paper",
+    "label": "Paper Trades",
+    "group": "trading",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=paper",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 312,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/positions"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "positions",
+    "label": "Positions",
+    "group": "trading",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=positions",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 572,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/positions",
+      "/api/broker/positions/live"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "risk-scenarios",
+    "label": "Risk & Scenarios",
+    "group": "analysis",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=risk-scenarios",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 307,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "multibagger",
+    "label": "Multibagger",
+    "group": "analysis",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=multibagger",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 307,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/research/multibagger"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "prediction-audit",
+    "label": "Prediction Audit",
+    "group": "analysis",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=prediction-audit",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 565,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/accuracy_trend",
+      "/api/auto_gates"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "performance",
+    "label": "Performance",
+    "group": "analysis",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=performance",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 569,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/perf",
+      "/api/pnl"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "ml",
+    "label": "ML Model",
+    "group": "analysis",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=ml",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 572,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/auto_gates"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "data-integrity",
+    "label": "Data Integrity",
+    "group": "system",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=data-integrity",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 307,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/instruments/health",
+      "/api/scheduler/health"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "broker",
+    "label": "Broker",
+    "group": "system",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=broker",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 567,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/broker/status",
+      "/api/broker/truth",
+      "/api/holdings",
+      "/api/funds"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "alerts",
+    "label": "Alerts",
+    "group": "system",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=alerts",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 574,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/state"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "system",
+    "label": "System",
+    "group": "system",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=system",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 566,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/system_health",
+      "/api/deploy_info",
+      "/api/memory"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  },
+  {
+    "tab_id": "gates",
+    "label": "Live Gate",
+    "group": "system",
+    "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app/ui/?tab=gates",
+    "http_ok": true,
+    "http_status": 200,
+    "elapsed_ms": 304,
+    "bytes": 571,
+    "has_root": true,
+    "title_hint": "System3 \u2014 Genesis AI Trading",
+    "primary_apis": [
+      "/api/auto_gates",
+      "/api/live-trading/gate"
+    ],
+    "error": null,
+    "semantic_proof": "NOT_PROVEN"
+  }
+]

@@ -1,5 +1,7 @@
 # Genesis System3 Production Governance
 
+**Latest owner directive:** `docs/authority/CLOUD_ONLY_OWNER_DIRECTIVE_20261018.md`; intended production is cloud-only. The owner presently authorizes GitHub repairs/testing and read-only GCP checks, NOT billable deployment or cloud configuration mutation. All deployment, scheduler, IAM, secret, billing and image-push changes require further explicit approval. Local laptop is an optional control client, never runtime/acceptance authority. Project billing enabled and resources existing do not establish production readiness. Budget alerts are not a hard financial cap.
+
 **Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 
 Canonical temporal policy: `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md`.

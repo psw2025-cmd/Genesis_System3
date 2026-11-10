@@ -1,0 +1,246 @@
+﻿{
+    "healthy":  false,
+    "transport_healthy":  false,
+    "status":  "UNHEALTHY",
+    "business_readiness":  "PARTIAL",
+    "business_readiness_reasons":  [
+                                       "business lane not ready: forecast=PENDING",
+                                       "business artifact missing: signals"
+                                   ],
+    "unhealthy_reasons":  [
+                              "enabled scheduler execution stale beyond cadence grace: genesis-system3-signals"
+                          ],
+    "observed_at_utc":  "2026-08-26T06:20:21.925725Z",
+    "evidence_version":  17717,
+    "evidence_sha256":  "e66fe4c5479278144c6ae8bd71d5b3174522e604b7f9003528aa96505e04e2e4",
+    "resources":  [
+                      {
+                          "schedule":  "0 4 * * MON-FRI",
+                          "target_job":  "genesis-system3-forecast",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-26T04:00:00.185288Z",
+                          "name":  "genesis-system3-forecast-daily",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  true
+                      },
+                      {
+                          "schedule":  "0 10 * * 1-5",
+                          "target_job":  null,
+                          "delivery_status_code":  -1,
+                          "target_type":  "http",
+                          "last_attempt_time":  null,
+                          "name":  "genesis-system3-signals-schedule",
+                          "delivery_status_message":  "",
+                          "state":  "PAUSED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  false
+                      },
+                      {
+                          "schedule":  "5 10 * * MON-FRI",
+                          "target_job":  "genesis-system3-validate",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-25T10:05:00.175774Z",
+                          "name":  "genesis-system3-validate-daily",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  true
+                      },
+                      {
+                          "schedule":  "*/5 * * * *",
+                          "target_job":  "genesis-system3-dhan-token-rotate",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-26T06:20:04.622657Z",
+                          "name":  "genesis-system3-dhan-token-rotate-daily",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "Asia/Kolkata",
+                          "target_uri_valid":  true
+                      },
+                      {
+                          "schedule":  "45 3 * * MON-FRI",
+                          "target_job":  "genesis-system3-rank",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-26T03:45:00.172616Z",
+                          "name":  "genesis-system3-rank-daily",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  true
+                      },
+                      {
+                          "schedule":  "50 3 * * 1-5",
+                          "target_job":  null,
+                          "delivery_status_code":  -1,
+                          "target_type":  "http",
+                          "last_attempt_time":  null,
+                          "name":  "genesis-system3-rank-schedule",
+                          "delivery_status_message":  "",
+                          "state":  "PAUSED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  false
+                      },
+                      {
+                          "schedule":  "0 4,5,6,7,8,9 * * 1-5",
+                          "target_job":  null,
+                          "delivery_status_code":  -1,
+                          "target_type":  "http",
+                          "last_attempt_time":  null,
+                          "name":  "genesis-system3-forecast-schedule",
+                          "delivery_status_message":  "",
+                          "state":  "PAUSED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  false
+                      },
+                      {
+                          "schedule":  "15 13 * * MON-FRI",
+                          "target_job":  "genesis-system3-signals",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-25T13:15:00.179189Z",
+                          "name":  "genesis-system3-signals-daily",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  true
+                      },
+                      {
+                          "schedule":  "* * * * *",
+                          "target_job":  "genesis-system3-scheduler-collector",
+                          "delivery_status_code":  0,
+                          "target_type":  "http",
+                          "last_attempt_time":  "2026-08-26T06:20:00.592829Z",
+                          "name":  "genesis-system3-scheduler-collector-every-minute",
+                          "delivery_status_message":  "",
+                          "state":  "ENABLED",
+                          "time_zone":  "UTC",
+                          "target_uri_valid":  true
+                      }
+                  ],
+    "jobs":  [
+                 {
+                     "name":  "genesis-system3-dhan-token-rotate",
+                     "execution":  "genesis-system3-dhan-token-rotate-ptd9v",
+                     "completion_time":  "2026-08-26T06:15:20.771517Z",
+                     "create_time":  "2026-08-26T06:15:04.718617Z",
+                     "evidence_role":  "last_succeeded_within_history",
+                     "latest_completion_status":  "EXECUTION_RUNNING",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 },
+                 {
+                     "name":  "genesis-system3-forecast",
+                     "execution":  "genesis-system3-forecast-xlfdg",
+                     "completion_time":  "2026-08-26T04:00:18.290838Z",
+                     "create_time":  "2026-08-26T04:00:00.239965Z",
+                     "evidence_role":  "latest_created_execution",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 },
+                 {
+                     "name":  "genesis-system3-rank",
+                     "execution":  "genesis-system3-rank-hxr7s",
+                     "completion_time":  "2026-08-26T03:45:46.117464Z",
+                     "create_time":  "2026-08-26T03:45:00.232903Z",
+                     "evidence_role":  "latest_created_execution",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 },
+                 {
+                     "name":  "genesis-system3-scheduler-collector",
+                     "execution":  "genesis-system3-scheduler-collector-k8f8f",
+                     "completion_time":  "2026-08-26T06:19:19.193754Z",
+                     "create_time":  "2026-08-26T06:19:00.671179Z",
+                     "evidence_role":  "prior_succeeded_execution",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 },
+                 {
+                     "name":  "genesis-system3-signals",
+                     "execution":  "genesis-system3-signals-xq8km",
+                     "completion_time":  "2026-08-20T13:15:17.368570Z",
+                     "create_time":  "2026-08-20T13:15:00.204445Z",
+                     "evidence_role":  "last_succeeded_within_history",
+                     "latest_completion_status":  "EXECUTION_FAILED",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 },
+                 {
+                     "name":  "genesis-system3-validate",
+                     "execution":  "genesis-system3-validate-xl7w9",
+                     "completion_time":  "2026-08-25T10:05:49.766958Z",
+                     "create_time":  "2026-08-25T10:05:00.300815Z",
+                     "evidence_role":  "latest_created_execution",
+                     "completion_status":  "EXECUTION_SUCCEEDED"
+                 }
+             ],
+    "artifacts":  [
+                      {
+                          "source_sha256":  "29d7ad0dc9ec34ff302a701ca8314a2a37512513cd1751159b9f21155cb354c1",
+                          "produced_at_utc":  "2026-08-26T03:45:42.865833Z",
+                          "business_date":  "2026-08-26",
+                          "output_sha256":  "29d7ad0dc9ec34ff302a701ca8314a2a37512513cd1751159b9f21155cb354c1",
+                          "artifact_version":  23,
+                          "reason_code":  null,
+                          "lane":  "rank",
+                          "run_id":  "genesis-system3-rank-hxr7s",
+                          "code_sha256":  "576578ca67480f4a051e3df4a1ea3e4e234ed1417db2bb7728027cd87c090c77",
+                          "status":  "PASS",
+                          "verified":  true
+                      },
+                      {
+                          "source_sha256":  "29d7ad0dc9ec34ff302a701ca8314a2a37512513cd1751159b9f21155cb354c1",
+                          "produced_at_utc":  "2026-08-26T04:00:15.086457Z",
+                          "business_date":  "2026-08-26",
+                          "output_sha256":  "e858af08cde07305416edf801422ef2e147e6d923af7438b5eda9626f94f19f8",
+                          "artifact_version":  17,
+                          "reason_code":  "VALIDATED_FORECAST_MODEL_NOT_CONFIGURED",
+                          "lane":  "forecast",
+                          "run_id":  "genesis-system3-forecast-xlfdg",
+                          "code_sha256":  "e8eb389b495f80dea68fa65c10003c400fea53d4d7dea5d545e6e1d522ede5b1",
+                          "status":  "PENDING",
+                          "verified":  true
+                      },
+                      {
+                          "source_sha256":  "a18f686ac4862b062a932bb76df4bd6254d77a214510057319e24881edf8dd7b",
+                          "produced_at_utc":  "2026-08-25T10:05:46.172597Z",
+                          "business_date":  "2026-08-25",
+                          "output_sha256":  "2cf175f5dcb62671cf352317fcc51347f358e9fc236fbb6ff5dde9c0a9b67ecf",
+                          "artifact_version":  13,
+                          "reason_code":  null,
+                          "lane":  "validate",
+                          "run_id":  "genesis-system3-validate-xl7w9",
+                          "code_sha256":  "3b07fd1bd7005de8bce2feeb44d97bfa1772db2e3ef2cb87b8d9bf5e3edf6d26",
+                          "status":  "PASS",
+                          "verified":  true
+                      }
+                  ],
+    "coverage":  {
+                     "workload":  8,
+                     "control":  1,
+                     "total":  9,
+                     "enabled":  6,
+                     "paused":  3,
+                     "expected_total":  9,
+                     "expected_workload":  8,
+                     "expected_control":  1,
+                     "expected_enabled":  6,
+                     "expected_paused":  3,
+                     "contract_matched":  true
+                 },
+    "observability":  {
+                          "alert_signals":  [
+                                                "enabled scheduler execution stale beyond cadence grace: genesis-system3-signals"
+                                            ],
+                          "miss_or_stale_signal_count":  1,
+                          "contract_matched":  true,
+                          "collector_control_ok":  true,
+                          "practice":  "cadence_grace_not_raw_consecutive_count",
+                          "alert_severity":  "warning"
+                      },
+    "live_trading_enabled":  false,
+    "cache_hit":  true,
+    "cache_ttl_s":  30,
+    "deploy_git_sha":  "fb4772f9d52b67a31b55ee85aab8604e525bbad6"
+}

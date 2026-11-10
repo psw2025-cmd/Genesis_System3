@@ -1,0 +1,13 @@
+---
+description: Branch, exact-head, commit/push/PR/merge, worktree protection
+globs: "{**/.github/**,**/AGENTS.md,**/.cursorrules,**/agent_policy.yaml}"
+alwaysApply: false
+---
+
+# Git change control
+
+Protect pre-existing dirty work. Use a dedicated branch/worktree from fetched `origin/main` for authority or shared edits. Stage only intended files. Reject secrets, databases, model binaries, and unrelated dirty paths.
+
+Merge only the exact reviewed head when required checks pass and policy allows. Never merge an older green head. Never force-push. After merge, fetch `origin/main` and reconcile accepted files into `C:\Genesis_System3_Clean` without reset.
+
+Local HEAD may differ from `origin/main`; report both.

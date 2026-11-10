@@ -4,8 +4,9 @@ import { shortSha, formatIstStamp } from '../lib/formatLive'
 export function DeploymentTruthFooter() {
   const { deployInfo, health, marketOpen, lastSync } = useStore()
   const sha = String(deployInfo?.git_sha || '')
-  const target = String(deployInfo?.deploy_target || 'gcp-cloud-run')
-  const region = String(deployInfo?.region || 'asia-south1')
+  const target = String(deployInfo?.deploy_target || 'unknown')
+  const region = String(deployInfo?.region || '')
+  const targetLabel = target.toLowerCase().includes('local') ? 'Local Laptop' : target
 
   return (
     <footer
@@ -26,7 +27,7 @@ export function DeploymentTruthFooter() {
       }}
     >
       <span>
-        Deploy truth · {target} · {region} · SHA{' '}
+        Deploy truth · {targetLabel}{region ? ` · ${region}` : ''} · SHA{' '}
         <strong style={{ color: 'var(--accent-2)' }}>{shortSha(sha)}</strong>
         {sha.length > 8 ? ` (${sha})` : ''}
       </span>

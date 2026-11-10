@@ -9,6 +9,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -26,6 +27,16 @@ BLOCK_STALE_FORECAST = "STALE_OR_MISSING_FORECAST"
 # ---------------------------------------------------------------------------
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _ist_event_time(utc_timestamp: str) -> str:
+    """Convert an immutable UTC event time to timezone-aware India time."""
+    from zoneinfo import ZoneInfo
+
+    parsed = datetime.fromisoformat(utc_timestamp.replace("Z", "+00:00"))
+    if parsed.tzinfo is None:
+        raise ValueError("PAPER_EVENT_TIMESTAMP_MISSING_TIMEZONE")
+    return parsed.astimezone(ZoneInfo("Asia/Kolkata")).isoformat()
 
 
 def _today_ist() -> str:
@@ -52,34 +63,42 @@ def _write_json(path: Path, data: Any) -> None:
 
 
 def _append_jsonl_once(path: Path, row: Dict[str, Any], key: str) -> bool:
+    """Fail closed on corrupt ledgers, never silently append to unreadable history."""
     path.parent.mkdir(parents=True, exist_ok=True)
+    if key not in row or row[key] is None or str(row[key]) == "":
+        raise ValueError("PAPER_LEDGER_MISSING_ID")
     existing = set()
     if path.exists():
-        try:
-            for line in path.read_text(encoding="utf-8").splitlines():
-                if line.strip():
-                    item = json.loads(line)
-                    if key in item:
-                        existing.add(str(item[key]))
-        except Exception:
-            pass
-    if str(row.get(key)) in existing:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            item = json.loads(line)  # Corrupt history must stop paper writes.
+            if not isinstance(item, dict) or key not in item:
+                raise ValueError("PAPER_LEDGER_INVALID_HISTORY")
+            existing.add(str(item[key]))
+    if str(row[key]) in existing:
         return False
+    serialized = json.dumps(row, default=str, allow_nan=False)
     with path.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(row, default=str) + "\n")
+        f.write(serialized + "\n")
     return True
 
 
 def _read_jsonl(path: Path, limit: Optional[int] = None) -> List[Dict[str, Any]]:
-    rows: List[Dict[str, Any]] = []
+    """Never turn corrupt paper-trade evidence into a misleading empty ledger."""
     if not path.exists():
-        return rows
-    try:
-        for line in path.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                rows.append(json.loads(line))
-    except Exception:
-        return rows
+        return []
+    rows: List[Dict[str, Any]] = []
+    for line_number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+        if not line.strip():
+            continue
+        try:
+            item = json.loads(line)
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"PAPER_LEDGER_CORRUPT:{path.name}:line_{line_number}") from exc
+        if not isinstance(item, dict):
+            raise ValueError(f"PAPER_LEDGER_INVALID_ROW:{path.name}:line_{line_number}")
+        rows.append(item)
     return rows[-limit:] if limit else rows
 
 
@@ -232,12 +251,16 @@ def _is_real_dhan_chain_payload(data: Dict[str, Any]) -> bool:
     combined = f"{data_source} {source_priority}"
     if any(bad in combined for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse")):
         return False
-    return data_source == "dhan"
+    if data_source != "dhan":
+        return False
+    if status in ("MARKET_CLOSED", "CLOSED", "NO_DATA", "ERROR", "NOT_VERIFIED"):
+        return False
+    return True
 
 
 def _contract_has_dhan_source(contract: Dict[str, Any]) -> bool:
-    source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "dhan").lower()
-    return not any(bad in source for bad in ("csv", "fallback", "synthetic", "bhavcopy", "yahoo", "nse"))
+    source = str(contract.get("source") or contract.get("data_source") or contract.get("quote_source") or "").lower()
+    return source == "dhan"
 
 
 def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[float]) -> Tuple[Optional[Dict[str, Any]], str]:
@@ -265,13 +288,15 @@ def _load_chain_quote(root: Path, underlying: str, side: str, spot: Optional[flo
                 ltp_f = float(ltp)
             except Exception:
                 continue
-            if ltp_f <= 0:
+            if not math.isfinite(ltp_f) or ltp_f <= 0:
                 continue
             strike = c.get("strike") or c.get("strike_price")
             try:
                 strike_f = float(strike) if strike is not None else None
             except Exception:
                 strike_f = None
+            if strike_f is not None and not math.isfinite(strike_f):
+                continue
             rows.append((abs((strike_f or (spot or 0)) - (spot or (strike_f or 0))), c, ltp_f))
         if rows:
             rows.sort(key=lambda x: x[0])
@@ -312,8 +337,19 @@ def _paper_qty(contract: Dict[str, Any]) -> int:
 def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
     paths = _pipeline_paths(root)
     pos_file = paths["positions"]
-    current = _read_json(pos_file, {"positions": [], "open_count": 0})
-    positions = current.get("positions", []) if isinstance(current, dict) else []
+    # Existing position evidence must never silently become an empty book.
+    if pos_file.exists():
+        try:
+            current = json.loads(pos_file.read_text(encoding="utf-8"))
+        except (ValueError, UnicodeError, OSError) as exc:
+            raise ValueError("PAPER_POSITIONS_CORRUPT") from exc
+        if not isinstance(current, dict) or not isinstance(current.get("positions"), list):
+            raise ValueError("PAPER_POSITIONS_INVALID_SCHEMA")
+        positions = current["positions"]
+        if any(not isinstance(p, dict) or not p.get("position_id") for p in positions):
+            raise ValueError("PAPER_POSITIONS_INVALID_ENTRY")
+    else:
+        positions = []
     if not any(p.get("position_id") == order["position_id"] for p in positions):
         positions.append({
             "position_id": order["position_id"],
@@ -326,11 +362,26 @@ def _update_positions_and_pnl(root: Path, order: Dict[str, Any]) -> None:
             "unrealized_pnl": 0.0,
             "status": "PAPER_OPEN",
             "entry_time": order["created_utc"],
+            "entry_time_ist": _ist_event_time(order["created_utc"]),
             "signal_source": "core_pipeline_v8",
             "provenance": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER_REAL_DHAN_QUOTE",
         })
     _write_json(pos_file, {"positions": positions, "open_count": len(positions), "timestamp": _utc_now(), "source": "core_pipeline_v8"})
-    summary = {"total_trades": 0, "winning_trades": 0, "losing_trades": 0, "win_rate": 0.0, "total_realized_pnl": 0.0, "total_unrealized_pnl": 0.0, "total_pnl": 0.0, "open_positions": len(positions), "source": "core_pipeline_v8"}
+    # Opening a PAPER position must not erase previously realized trade history.
+    # When no independent close ledger exists, unknown results stay unknown.
+    prior = _read_json(paths["pnl_summary"], {})
+    prior = prior if isinstance(prior, dict) else {}
+    realized_keys = ("total_trades", "winning_trades", "losing_trades",
+                     "win_rate", "total_realized_pnl")
+    summary = {key: prior.get(key) for key in realized_keys}
+    summary.update({
+        "total_unrealized_pnl": None,
+        "total_pnl": None,
+        "open_positions": sum(1 for p in positions if p.get("status") == "PAPER_OPEN"),
+        "source": "core_pipeline_v8",
+        "verification_status": "NOT_VERIFIED",
+        "reason_if_unverified": "No independently reconciled closing fills or mark-to-market prices",
+    })
     _write_json(paths["pnl_summary"], summary)
     paths["pnl_csv"].parent.mkdir(parents=True, exist_ok=True)
     if not paths["pnl_csv"].exists():
@@ -395,8 +446,26 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "source": prediction_source,
             "raw": pred.get("raw"),
         }
+        forecast["created_ist"] = _ist_event_time(forecast["created_utc"])
         if _append_jsonl_once(paths["forecast"], forecast, "forecast_id"):
             result["forecasts_written"] += 1
+
+        # A forecast is still auditable outside trading hours, but must never
+        # create a PAPER fill from yesterday's prediction or a closed market.
+        if not fresh or not market_open:
+            reason = BLOCK_STALE_FORECAST if not fresh else "MARKET_CLOSED_PAPER_ENTRY"
+            blocked = {
+                "block_id": _row_id(forecast_id, reason),
+                "created_utc": _utc_now(),
+                "forecast_id": forecast_id,
+                "underlying": underlying,
+                "reason": reason,
+                "scope": "forecast_only_no_paper_entry",
+            }
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
 
         contract, contract_status = _select_option_contract(df, underlying, pred.get("option_side") or "CE", pred.get("spot"))
         if not contract:
@@ -420,6 +489,62 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
         entry_price = float(quote.get("ltp") or 0)
         if entry_price <= 0:
             continue
+        # Enforce capital on the ACTUAL paper pipeline, not only the toy simulator.
+        # Fail closed on malformed configuration or invalid lot size.
+        qty = _paper_qty(contract)
+        try:
+            capital_limit = float(os.environ.get("TRADING_CAPITAL_LIMIT_INR", "50000"))
+        except (ValueError, TypeError):
+            capital_limit = float("nan")
+        order_value = entry_price * qty
+        # A new order must fit alongside all existing open PAPER positions.
+        # Corrupt position evidence must never be interpreted as zero exposure.
+        try:
+            if paths["positions"].exists():
+                saved_positions = json.loads(paths["positions"].read_text(encoding="utf-8"))
+                if not isinstance(saved_positions, dict) or not isinstance(saved_positions.get("positions"), list):
+                    raise ValueError("PAPER_POSITIONS_INVALID")
+                existing_positions = saved_positions["positions"]
+            else:
+                existing_positions = []
+            open_exposure = 0.0
+            for position in existing_positions:
+                if not isinstance(position, dict):
+                    raise ValueError("PAPER_POSITION_INVALID_ROW")
+                if position.get("status") != "PAPER_OPEN":
+                    continue
+                held_qty = float(position["qty"])
+                held_price = float(position["entry_price"])
+                held_value = held_qty * held_price
+                if (not math.isfinite(held_value) or held_qty <= 0
+                        or held_price <= 0):
+                    raise ValueError("PAPER_POSITION_INVALID_VALUE")
+                open_exposure += held_value
+            if not math.isfinite(open_exposure):
+                raise ValueError("PAPER_EXPOSURE_INVALID")
+        except (OSError, ValueError, TypeError, KeyError, OverflowError) as exc:
+            reason = "PAPER_EXPOSURE_UNVERIFIED"
+            blocked = {"block_id": _row_id(forecast_id, reason),
+                       "created_utc": _utc_now(), "forecast_id": forecast_id,
+                       "underlying": underlying, "reason": reason,
+                       "scope": "trade_only_forecast_kept"}
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
+        if (not math.isfinite(capital_limit) or capital_limit <= 0
+                or not isinstance(qty, (int, float))
+                or not math.isfinite(float(qty)) or qty <= 0
+                or not math.isfinite(order_value) or order_value + open_exposure > capital_limit):
+            reason = "PAPER_CAPITAL_LIMIT_BLOCK"
+            blocked = {"block_id": _row_id(forecast_id, reason),
+                       "created_utc": _utc_now(), "forecast_id": forecast_id,
+                       "underlying": underlying, "reason": reason,
+                       "scope": "trade_only_forecast_kept"}
+            if _append_jsonl_once(paths["blocked"], blocked, "block_id"):
+                result["blocked_written"] += 1
+            result["blockers"].append(blocked)
+            continue
         paper_order_id = _row_id("PAPER", today, underlying, pred.get("option_side"), contract.get("symbol"), entry_price)
         order = {
             "paper_order_id": paper_order_id,
@@ -433,7 +558,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "token": contract.get("token"),
             "expiry": contract.get("expiry"),
             "strike": contract.get("strike"),
-            "qty": _paper_qty(contract),
+            "qty": qty,
             "entry_price": entry_price,
             "status": "PAPER_OPEN",
             "order_mode": "ANALYZER_PAPER_ONLY_NO_BROKER_ORDER",
@@ -442,6 +567,7 @@ def run_pipeline_once(root: Path | str, outputs_dir: Optional[Path | str] = None
             "quote_source_priority": quote.get("chain_source_priority"),
             "source": "core_pipeline_v8",
         }
+        order["created_ist"] = _ist_event_time(order["created_utc"])
         if _append_jsonl_once(paths["orders"], order, "paper_order_id"):
             result["paper_orders_written"] += 1
             result["paper_orders"].append(order)
@@ -459,9 +585,28 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
     root = Path(root)
     paths = _pipeline_paths(root)
     status = _read_json(paths["status"], {})
-    forecasts = _read_jsonl(paths["forecast"], limit=20)
-    orders = _read_jsonl(paths["orders"], limit=20)
-    blocked = _read_jsonl(paths["blocked"], limit=20)
+    try:
+        forecasts_all = _read_jsonl(paths["forecast"])
+        orders_all = _read_jsonl(paths["orders"])
+        blocked_all = _read_jsonl(paths["blocked"])
+    except ValueError as exc:
+        return {
+            "status": "NOT_VERIFIED",
+            "pipeline": "core_pipeline_v8",
+            "generated_utc": _utc_now(),
+            "verification_status": "NOT_VERIFIED",
+            "ledger_integrity": "FAIL",
+            "reason_if_unverified": str(exc),
+            "ledger_counts": None,
+            "recent_forecasts": [],
+            "recent_paper_orders": [],
+            "recent_blockers": [],
+            "safety": {"broker_real_order_path": "not_used_by_core_pipeline_v8"},
+            "next_action": "Quarantine and repair the corrupt paper ledger with audit evidence before resuming writes.",
+        }
+    forecasts = forecasts_all[-20:]
+    orders = orders_all[-20:]
+    blocked = blocked_all[-20:]
     validation_dir = root / "state" / "market_validations"
     validation_files = sorted(validation_dir.glob("market_validation_*.json")) if validation_dir.exists() else []
     return {
@@ -475,7 +620,7 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
             "broker_real_order_path": "not_used_by_core_pipeline_v8",
         },
         "latest_run": status,
-        "ledger_counts": {"forecasts": len(_read_jsonl(paths["forecast"])), "paper_orders": len(_read_jsonl(paths["orders"])), "blocked_trades": len(_read_jsonl(paths["blocked"])), "validation_days": len(validation_files)},
+        "ledger_counts": {"forecasts": len(forecasts_all), "paper_orders": len(orders_all), "blocked_trades": len(blocked_all), "validation_days": len(validation_files)},
         "recent_forecasts": forecasts,
         "recent_paper_orders": orders,
         "recent_blockers": blocked,
@@ -484,17 +629,69 @@ def build_pipeline_status(root: Path | str, outputs_dir: Optional[Path | str] = 
 
 
 def run_self_test(proof_dir: Path | str) -> Dict[str, Any]:
+    """Execute isolated PAPER safety probes, not pre-filled PASS assertions.
+
+    This is a structural/offline self-test, NOT 30-day historical replay proof.
+    """
+    import tempfile
+
     proof_dir = Path(proof_dir)
     proof_dir.mkdir(parents=True, exist_ok=True)
-    checks = [
-        {"name": "cash_equity_forecast_not_trade", "passed": True, "detail": "Cash-only equity remains in forecast ledger and is blocked from trade with FORECAST_ONLY_CASH_EQUITY."},
-        {"name": "option_requires_real_dhan_quote", "passed": True, "detail": "Option paper order requires a non-stale Dhan chain quote; non-Dhan files are blocked with NO_LIVE_OPTION_QUOTE."},
-        {"name": "paper_only_no_broker_order", "passed": True, "detail": "Core Pipeline V8 writes JSON/CSV paper ledgers only and never calls broker order endpoints."},
-        {"name": "live_flags_safe", "passed": os.environ.get("LIVE_TRADING_ENABLED", "0") in ("0", "", "false", "False"), "detail": f"LIVE_TRADING_ENABLED={os.environ.get('LIVE_TRADING_ENABLED', '0')}"},
-    ]
-    result = {"status": "PASS" if all(c["passed"] for c in checks) else "FAIL", "checks": checks, "generated_utc": _utc_now()}
+    checks = []
+    with tempfile.TemporaryDirectory(prefix="system3_paper_selftest_") as temp:
+        root = Path(temp)
+        try:
+            contract, reason = _select_option_contract(None, "CASH_ONLY", "CE", 100)
+            checks.append({"name": "missing_instrument_blocks_trade",
+                           "passed": contract is None and reason == "INSTRUMENT_MASTER_MISSING",
+                           "detail": reason})
+        except Exception as exc:
+            checks.append({"name": "missing_instrument_blocks_trade", "passed": False,
+                           "detail": type(exc).__name__})
+        try:
+            quote, reason = _load_chain_quote(root, "NIFTY", "CE", 25000)
+            checks.append({"name": "missing_dhan_quote_blocks_trade",
+                           "passed": quote is None and reason == BLOCK_NO_LIVE_QUOTE,
+                           "detail": reason})
+        except Exception as exc:
+            checks.append({"name": "missing_dhan_quote_blocks_trade", "passed": False,
+                           "detail": type(exc).__name__})
+        try:
+            ledger = root / "paper_orders.jsonl"
+            first = _append_jsonl_once(ledger, {"paper_order_id": "probe-1"}, "paper_order_id")
+            duplicate = _append_jsonl_once(ledger, {"paper_order_id": "probe-1"}, "paper_order_id")
+            checks.append({"name": "paper_ledger_idempotent",
+                           "passed": first is True and duplicate is False and len(_read_jsonl(ledger)) == 1,
+                           "detail": "Isolated temporary ledger; no production writes"})
+        except Exception as exc:
+            checks.append({"name": "paper_ledger_idempotent", "passed": False,
+                           "detail": type(exc).__name__})
+
+    gates = ("LIVE_TRADING_ENABLED", "SYSTEM3_LIVE_TRADING_ALLOWED",
+             "LIVE_ORDER_AUTHORITY", "REAL_BROKER_ORDERS",
+             "AUTO_EXECUTE_TRADES", "USE_LIVE_EXECUTION_ENGINE")
+    unsafe = [name for name in gates if os.environ.get(name, "0").lower() not in ("0", "false", "")]
+    checks.append({"name": "live_execution_environment_disabled",
+                   "passed": not unsafe,
+                   "detail": "All inspected execution flags disabled" if not unsafe else
+                   "Unsafe environment flags: " + ",".join(unsafe)})
+
+    passed = all(c["passed"] for c in checks)
+    result = {
+        "status": "PASS" if passed else "FAIL",
+        "scope": "ISOLATED_OFFLINE_STRUCTURAL_ONLY",
+        "full_market_replay_verified": False,
+        "production_ui_verified": False,
+        "model_training_verified": False,
+        "real_broker_orders": 0,
+        "checks": checks,
+        "generated_utc": _utc_now(),
+    }
     _write_json(proof_dir / "selftest.json", result)
-    md = ["# Core Pipeline V8 Self-Test", "", f"Status: **{result['status']}**", "", "| Check | Result | Detail |", "|---|---:|---|"]
+    md = ["# Core Pipeline V8 Isolated Self-Test", "",
+          f"Status: **{result['status']}** (offline checks only)", "",
+          "Not proof of a 30-day historical replay, browser UI, or live market feed.",
+          "", "| Check | Result | Detail |", "|---|---:|---|"]
     for c in checks:
         md.append(f"| {c['name']} | {'PASS' if c['passed'] else 'FAIL'} | {c['detail']} |")
     (proof_dir / "summary.md").write_text("\n".join(md) + "\n", encoding="utf-8")

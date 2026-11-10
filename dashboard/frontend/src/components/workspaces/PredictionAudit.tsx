@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Search } from 'lucide-react'
+import { Search, CheckCircle, AlertTriangle, XCircle, ShieldCheck } from 'lucide-react'
 import { useStore } from '../../store'
 import { MetricTile, PENDINGState, StatusChip } from './TruthUI'
 import { formatIstStamp } from '../../lib/formatLive'
 import { API_BASE, API_HEADERS } from '../../config'
+import { SpearmanAccuracyTrendChart } from '../LiveInteractiveCharts'
 
 type AccuracyTrend = {
   status?: string
@@ -216,6 +217,8 @@ export const PredictionAudit: React.FC = () => {
                   Predicted: {(latest.predicted || []).join(', ') || 'N/A'} · Actual: {(latest.actual || []).join(', ') || 'N/A'}
                 </div>
               )}
+              {/* Rolling Spearman Rank Correlation Trend Chart */}
+              <SpearmanAccuracyTrendChart trend={accuracy?.trend || []} />
             </>
           ) : (
             <PENDINGState

@@ -1,7 +1,7 @@
 from scripts.system3_gate_evaluator import load_spearman_days
 
 
-def test_load_spearman_days_merges_firestore_and_local(tmp_path, monkeypatch):
+def test_load_spearman_days_uses_firestore_only_in_cloud_mode(tmp_path, monkeypatch):
     root = tmp_path
     mv = root / "state" / "market_validations"
     mv.mkdir(parents=True)
@@ -31,9 +31,10 @@ def test_load_spearman_days_merges_firestore_and_local(tmp_path, monkeypatch):
         "dashboard.backend.firestore_state_backend.FirestoreSchedulerEvidenceBackend",
         FakeBackend,
     )
+    monkeypatch.setenv("SYSTEM3_STATE_BACKEND", "firestore")
     days, passing, latest = load_spearman_days(root)
     assert [d["date"] for d in days] == ["2026-06-12", "2026-08-11"]
-    # Firestore wins on same date
+    # Firestore is the single cloud authority, including duplicate dates.
     assert days[0]["rho"] == 0.55
     assert days[1]["rho"] == 0.75
     assert passing == 1
