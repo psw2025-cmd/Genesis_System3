@@ -489,6 +489,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_positions_pnl_provenance_label.py -o addopts="" --tb=short
 
+      - name: Root PAPER PnL fallback provenance and session persistence regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_paper_pnl_root_truth_contract.py tests/test_cloud_paper_session_rollover.py -o addopts="" --tb=short
+
       - name: Instant virtual market lifecycle stage proof
         shell: bash
         timeout-minutes: 5
