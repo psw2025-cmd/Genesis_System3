@@ -111,6 +111,9 @@ for (const state of ['loading', 'ready', 'degraded', 'no-data', 'error']) {
   assert.match(riskDashboard, new RegExp(`'${state}'`), `Risk dashboard must support finite ${state} state`)
 }
 assert.match(riskDashboard, /timeout: 15000/, 'Risk read must be bounded by a timeout')
+assert.match(riskDashboard, /numberOrUndefined \} from '\.\.\/lib\/riskNumericTruth'/, 'Risk number coercion must use fail-closed parser')
+assert.match(riskWorkspace, /marketStatus/, 'Unknown market status must not display CLOSED')
+assert.match(riskWorkspace, /liveOrdersStatus/, 'Unknown broker-order state must not display LOCKED')
 assert.match(riskDashboard, /error\?\.name === 'NO_DATA'/, 'Successful empty risk payloads must become explicit no-data truth')
 assert.match(riskDashboard, /loadState !== 'ready' && fallback/, 'Late state snapshot must recover a failed or empty API read')
 assert.match(riskDashboard, /raw\.var_95 \?\? raw\.var/, 'Empty-book VaR aliases must normalize')
