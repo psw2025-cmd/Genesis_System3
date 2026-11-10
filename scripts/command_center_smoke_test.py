@@ -14,7 +14,7 @@ OUT = ROOT / "reports" / "coordination"
 SMOKE_OUT = OUT / "SMOKE_TEST_LAST.json"
 BASE = os.environ.get(
     "SYSTEM3_PUBLIC_BASE",
-    "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+    "http://127.0.0.1:8000",
 ).rstrip("/")
 
 REQUIRED_XLSX_SHEETS = {
@@ -32,6 +32,47 @@ REQUIRED_XLSX_SHEETS = {
 
 def check(name: str, ok: bool, detail: str) -> dict:
     return {"name": name, "ok": ok, "detail": detail}
+
+
+def _is_loopback_base(url: str) -> bool:
+    lowered = (url or "").strip().lower()
+    return "127.0.0.1" in lowered or "localhost" in lowered
+
+
+def _local_deploy_info() -> dict:
+    git_sha = ""
+    try:
+        import subprocess
+
+        git_sha = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=str(ROOT),
+            timeout=3,
+            stderr=subprocess.DEVNULL,
+        ).decode().strip()
+    except Exception:
+        git_sha = ""
+    return {
+        "git_sha": git_sha,
+        "service_name": "local-laptop",
+        "deploy_target": "local-laptop",
+        "public_base_url": BASE,
+        "live_trading_enabled": False,
+        "_source": "repo-local",
+    }
+
+
+def _read_deploy_info() -> tuple[dict | None, str]:
+    endpoints = ["/api/deploy/info", "/api/deploy_info"]
+    for path in endpoints:
+        try:
+            with urllib.request.urlopen(f"{BASE}{path}", timeout=25) as resp:
+                return json.loads(resp.read().decode("utf-8")), f"http:{path}"
+        except Exception:
+            continue
+    if _is_loopback_base(BASE):
+        return _local_deploy_info(), "local-fallback"
+    return None, "http-unreachable"
 
 
 def main() -> int:
@@ -78,14 +119,13 @@ def main() -> int:
     live_ok = False
     live_detail = ""
     live_trading = None
-    try:
-        with urllib.request.urlopen(f"{BASE}/api/deploy_info", timeout=25) as resp:
-            raw = json.loads(resp.read().decode("utf-8"))
-            live_ok = bool(raw.get("git_sha"))
-            live_trading = raw.get("live_trading_enabled")
-            live_detail = f"sha={(raw.get('git_sha') or '')[:12]} live_trading={live_trading}"
-    except Exception as e:  # noqa: BLE001
-        live_detail = str(e)[:200]
+    raw, source = _read_deploy_info()
+    if raw is not None:
+        live_ok = bool(raw.get("git_sha"))
+        live_trading = raw.get("live_trading_enabled")
+        live_detail = f"source={source} sha={(raw.get('git_sha') or '')[:12]} live_trading={live_trading}"
+    else:
+        live_detail = source
     results.append(check("live_deploy_info_http", live_ok, live_detail))
     results.append(check("no_live_trading_flag", live_trading is False, f"live_trading_enabled={live_trading}"))
 

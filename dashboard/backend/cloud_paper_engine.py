@@ -24,6 +24,22 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+try:
+    from dashboard.backend.trade_logger import log_trade_event
+except ImportError:
+    from trade_logger import log_trade_event
+
+try:
+    from dashboard.backend.autonomous_paper_core import (
+        MasterPaperLedger, PaperEvidenceError, detect_opening_gap,
+        estimate_costed_paper_pnl, FILL_MODE,
+    )
+except ImportError:
+    from autonomous_paper_core import (
+        MasterPaperLedger, PaperEvidenceError, detect_opening_gap,
+        estimate_costed_paper_pnl, FILL_MODE,
+    )
+
 IST = timezone(timedelta(hours=5, minutes=30))
 
 LOT_SIZES = {
@@ -71,16 +87,11 @@ def _is_phantom(ltp: float, strike: float, spot: float, opt_type: str) -> bool:
     return extrinsic > cap
 
 
-def _compute_net_pnl(entry: float, exit_p: float, symbol: str) -> float:
-    lot = LOT_SIZES.get(symbol, 50)
-    gross = (exit_p - entry) * lot
-    ev, xv = entry * lot, exit_p * lot
-    brokerage = BROKERAGE_PER_SIDE * 2
-    stt = xv * STT_RATE
-    exc = (ev + xv) * EXCHANGE_TXN_CHARGE
-    gst = (brokerage + exc) * GST_ON_BROKERAGE
-    slip = (ev + xv) * SLIPPAGE_PCT
-    return round(gross - (brokerage + stt + exc + gst + slip), 2)
+def _compute_net_pnl(entry: float, exit_p: float, symbol: str,
+                     qty: Optional[int] = None) -> float:
+    # Use the recorded position quantity, not an inferred symbol lot size.
+    size = qty if qty is not None else LOT_SIZES.get(symbol, 50)
+    return estimate_costed_paper_pnl(entry, exit_p, size)
 
 
 def _atomic_write_text(path: Path, text: str) -> None:
@@ -101,7 +112,29 @@ class CloudPaperEngine:
         self.pnl_file = outputs_dir / "pnl_live.json"
         self.trades_csv = outputs_dir / "paper_trades_live.csv"
         self.state_file = outputs_dir / "paper_engine_state.json"
+        self.master_ledger = MasterPaperLedger(outputs_dir / "paper_master_ledger.sqlite3")
+        # Only a separately implemented trusted source verifier may enable
+        # market-outcome attestation. Never infer trust from inbound JSON.
+        self.independent_outcome_verifier = None
         self._load_state()
+        historical = self.master_ledger.snapshot()
+        if historical["event_count"]:
+            # The verified hash-chain, not the JSON dashboard cache, is authority.
+            self.open_positions = historical["open_positions"]
+            self.closed_positions = historical["closed_positions"]
+        elif self.open_positions or self.closed_positions:
+            self.master_ledger.import_legacy_once(
+                self.open_positions, self.closed_positions, _now_ist().isoformat())
+            historical = self.master_ledger.snapshot()
+            self.open_positions = historical["open_positions"]
+            self.closed_positions = historical["closed_positions"]
+        self.seq = max(
+            [self.seq] + [
+                int(str(p.get("position_id") or "").rsplit("_", 1)[-1])
+                for p in self.open_positions + self.closed_positions
+                if str(p.get("position_id") or "").rsplit("_", 1)[-1].isdigit()
+            ]
+        )
         self._lock = threading.Lock()
 
     def _load_state(self):
@@ -140,10 +173,9 @@ class CloudPaperEngine:
     def _reset_if_new_day(self):
         today = _now_ist().strftime("%Y-%m-%d")
         if self.session_date != today:
+            # Never erase an unclosed trade or yesterday's evidence.
+            # Reconciliation and EOD closures must be explicit ledger events.
             self.session_date = today
-            self.open_positions = []
-            self.closed_positions = []
-            self.seq = 0
 
     def _pick_signal(self, chain: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Pick one tradeable contract by pure Dhan LTP % gain (highest first).
@@ -305,7 +337,8 @@ class CloudPaperEngine:
                 if str(pos.get("position_id", "")) == str(position_id):
                     entry = pos.get("entry_price", 0)
                     cur = pos.get("current_price", entry)
-                    net = _compute_net_pnl(entry, cur, pos.get("underlying"))
+                    net = _compute_net_pnl(entry, cur, pos.get("underlying"),
+                                           pos.get("qty"))
                     chg_pct = (cur - entry) / entry * 100.0 if entry else 0.0
                     closed = {
                         **pos,
@@ -313,13 +346,32 @@ class CloudPaperEngine:
                         "status": "CLOSED",
                         "exit_price": round(cur, 2),
                         "exit_reason": "MANUAL_CLOSE",
+                        "pnl_verification_status": "COSTED_SIMULATION_NOT_BROKER_VERIFIED",
+                        "paper_fill_mode": FILL_MODE,
+                        "exit_timestamp_utc": _now_ist().astimezone(timezone.utc).isoformat(),
                         "realized_pnl": net,
                         "realized_pnl_pct": round(chg_pct, 2),
                         "time_ist": _ist_str(),
                     }
+                    self.master_ledger.record_close(closed, _now_ist().isoformat())
                     del self.open_positions[i]
                     self.closed_positions.append(closed)
                     self._append_trade_csv(closed, "CLOSE")
+                    log_trade_event(
+                        event_type="POSITION_CLOSED",
+                        position_id=closed.get("position_id"),
+                        underlying=closed.get("underlying"),
+                        symbol=closed.get("trading_symbol"),
+                        strike=closed.get("strike"),
+                        option_type=closed.get("option_type"),
+                        action="CLOSE",
+                        entry_price=closed.get("entry_price"),
+                        exit_price=closed.get("exit_price"),
+                        qty=closed.get("qty"),
+                        pnl=closed.get("realized_pnl"),
+                        strategy=closed.get("strategy"),
+                        exit_reason=closed.get("exit_reason"),
+                    )
                     self._save_state()
                     self._write_outputs()
                     return closed
@@ -335,6 +387,22 @@ class CloudPaperEngine:
         self._reset_if_new_day()
         now = _now_ist()
         market_top = market_top or []
+
+        # Observed opening gaps require the actual session open, never a late LTP.
+        opening_gaps = {}
+        for chain in chains:
+            if all(k in chain for k in
+                   ("session_open_price", "previous_session_close", "session_open_timestamp_ist")):
+                symbol = str(chain.get("underlying") or "").upper()
+                gap = detect_opening_gap(
+                    session=now.strftime("%Y-%m-%d"),
+                    previous_close=chain["previous_session_close"],
+                    opening_price=chain["session_open_price"],
+                    opened_at=chain["session_open_timestamp_ist"],
+                    source=str(chain.get("opening_price_source") or ""),
+                )
+                self.master_ledger.record_gap(symbol, gap)
+                opening_gaps[symbol] = gap
 
         # 1. Update open positions — check SL/TP using current chain LTP
         chain_by_key = {}
@@ -355,9 +423,11 @@ class CloudPaperEngine:
                     preferred = sig
 
         still_open = []
+        just_closed: set[tuple] = set()
         for pos in self.open_positions:
             key = (pos["underlying"], pos["strike"], pos["option_type"])
-            cur = chain_by_key.get(key, pos["entry_price"])
+            has_fresh_quote = key in chain_by_key
+            cur = chain_by_key.get(key, pos.get("current_price", pos["entry_price"]))
             entry = pos["entry_price"]
             chg_pct = (cur - entry) / entry * 100.0 if entry > 0 else 0.0
             exit_reason = None
@@ -380,23 +450,52 @@ class CloudPaperEngine:
             ):
                 # Exit wrong OI-flow pick so next tick can open the true Dhan gainer.
                 exit_reason = "ROTATE_TO_MARKET_TOP_GAINER"
+            if exit_reason and not has_fresh_quote:
+                # No market quote => no invented exit fill, even near session end.
+                self.master_ledger.record_exit_blocked(
+                    pos["position_id"], now.isoformat(), "BLOCKED_NO_CURRENT_QUOTE")
+                pos["paper_quote_status"] = "BLOCKED_NO_CURRENT_QUOTE"
+                still_open.append(pos)
+                continue
             if exit_reason:
-                net = _compute_net_pnl(entry, cur, pos["underlying"])
+                net = _compute_net_pnl(entry, cur, pos["underlying"], pos.get("qty"))
                 closed = {
                     **pos,
                     "action": "CLOSE",
+                    "status": "CLOSED",
                     "exit_price": round(cur, 2),
                     "exit_reason": exit_reason,
+                    "pnl_verification_status": "COSTED_SIMULATION_NOT_BROKER_VERIFIED",
+                    "paper_fill_mode": FILL_MODE,
+                    "exit_timestamp_utc": now.astimezone(timezone.utc).isoformat(),
                     "realized_pnl": net,
                     "realized_pnl_pct": round(chg_pct, 2),
                     "time_ist": _ist_str(now),
                 }
+                self.master_ledger.record_close(closed, now.isoformat())
+                just_closed.add(key)
                 self.closed_positions.append(closed)
                 self._append_trade_csv(closed, "CLOSE")
+                log_trade_event(
+                    event_type="POSITION_CLOSED",
+                    position_id=closed.get("position_id"),
+                    underlying=closed.get("underlying"),
+                    symbol=closed.get("trading_symbol"),
+                    strike=closed.get("strike"),
+                    option_type=closed.get("option_type"),
+                    action="CLOSE",
+                    entry_price=closed.get("entry_price"),
+                    exit_price=closed.get("exit_price"),
+                    qty=closed.get("qty"),
+                    pnl=closed.get("realized_pnl"),
+                    strategy=closed.get("strategy"),
+                    exit_reason=closed.get("exit_reason"),
+                    timestamp=closed.get("timestamp"),
+                )
             else:
                 pos["current_price"] = round(cur, 2)
                 pos["ltp"] = round(cur, 2)
-                unreal = _compute_net_pnl(entry, cur, pos["underlying"])
+                unreal = _compute_net_pnl(entry, cur, pos["underlying"], pos.get("qty"))
                 pos["unrealized_pnl"] = unreal
                 pos["unrealizedProfit"] = unreal
                 pos["buyAvg"] = entry
@@ -408,11 +507,16 @@ class CloudPaperEngine:
                     pos["target"] = round(entry * (1.0 + TARGET_PCT / 100.0), 2)
                 pos["provenance"] = pos.get("provenance") or "PAPER_CLOUD_SIM"
                 pos["broker_order_endpoints_called"] = False
+                if has_fresh_quote:
+                    self.master_ledger.record_mark(pos, now.isoformat())
                 still_open.append(pos)
         self.open_positions = still_open
 
         # 2. Maybe open a new position (one per tick, respect max_open)
-        if len(self.open_positions) < max_open and preferred:
+        if (len(self.open_positions) < max_open and preferred
+                and (preferred["underlying"], preferred["strike"],
+                     preferred["option_type"]) not in just_closed):
+            # Never close and immediately reopen the same contract in one tick.
             best = preferred
             dup = any(
                 p["underlying"] == best["underlying"]
@@ -429,7 +533,7 @@ class CloudPaperEngine:
                     f"{int(best['strike'])}{best['option_type']}"
                 )
                 pos = {
-                    "position_id": f"POS_{self.seq:04d}",
+                    "position_id": f"POS_{now:%Y%m%d}_{self.seq:06d}",
                     "action": "OPEN",
                     "status": "OPEN",
                     "underlying": best["underlying"],
@@ -456,6 +560,10 @@ class CloudPaperEngine:
                     "sellQty": 0,
                     "strategy": best.get("strategy") or "MARKET_TOP_GAIN_PCT",
                     "selection_reason": best.get("selection_reason"),
+                    "opening_gap": opening_gaps.get(best["underlying"]),
+                    "opening_gap_status": (
+                        opening_gaps[best["underlying"]]["direction"]
+                        if best["underlying"] in opening_gaps else "UNAVAILABLE"),
                     "gain_pct_at_entry": best.get("gain_pct"),
                     "market_match_note": best.get("market_match_note"),
                     "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
@@ -472,9 +580,42 @@ class CloudPaperEngine:
                     "entry_time": now.isoformat(),
                     "time_ist": _ist_str(now),
                 }
+                self.master_ledger.record_open(pos, now.isoformat())
                 self.open_positions.append(pos)
                 self._append_trade_csv(pos, "OPEN")
+                log_trade_event(
+                    event_type="POSITION_OPENED",
+                    position_id=pos["position_id"],
+                    underlying=pos["underlying"],
+                    symbol=pos["trading_symbol"],
+                    strike=pos["strike"],
+                    option_type=pos["option_type"],
+                    action="OPEN",
+                    entry_price=pos["entry_price"],
+                    qty=pos["qty"],
+                    strategy=pos["strategy"],
+                    timestamp=pos["timestamp"],
+                )
 
+        # Optional generic independent-outcome records can arrive with market
+        # frames. The ledger validates provenance and triggers learning
+        # automatically only for source-attested, post-exit observations.
+        for frame in chains:
+            for outcome in frame.get("independent_market_outcomes") or []:
+                if not isinstance(outcome, dict):
+                    raise PaperEvidenceError("INVALID_INDEPENDENT_OUTCOME_SCHEMA")
+                self.master_ledger.record_outcome(
+                    str(outcome["position_id"]),
+                    reference_price=outcome["reference_price"],
+                    at=str(outcome["timestamp_utc"]),
+                    source=str(outcome.get("source") or "UNVERIFIED"),
+                    reference_id=outcome.get("evidence_id"),
+                    independent_verifier=self.independent_outcome_verifier,
+                )
+        reconciliation = self.master_ledger.reconcile(
+            self.open_positions, self.closed_positions)
+        if not reconciliation["projection_matches"]:
+            raise PaperEvidenceError("PAPER_MASTER_LEDGER_RECONCILIATION_FAILED")
         self._write_outputs()
         self._save_state()
 

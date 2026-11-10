@@ -155,6 +155,61 @@ async def dashboard_auth_status():
     }
 
 
+@app.get("/api/market-status")
+async def market_status_readonly():
+    """Read-only session CLOCK evidence, never a broker-live trading gate.
+
+    Weekday/clock heuristics cannot certify exchange holidays or feed health.
+    Downstream PAPER execution must use an independently verified session gate.
+    """
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+
+    now = datetime.now(ZoneInfo("Asia/Kolkata"))
+    response = {
+        "status": "NOT_VERIFIED",
+        "market_open": None,
+        "is_open": None,
+        "market_status": "NOT_VERIFIED",
+        "source": "INDIA_SESSION_CLOCK_ONLY",
+        "calendar_verified": False,
+        "live_market_data_verified": False,
+        "real": False,
+        "live_trading_enabled": False,
+        "timestamp_ist": now.isoformat(),
+    }
+    detector = None
+    if getattr(legacy, "MARKET_DETECTION_AVAILABLE", False):
+        detector = getattr(legacy, "get_market_status", None)
+    if detector is None:
+        # Canonical repository location; the historical utils.market_hours
+        # import in legacy may not exist in a clean Cloud Run image.
+        try:
+            from src.utils.market_hours import get_market_status as detector
+        except ImportError:
+            response["reason"] = "MARKET_SESSION_DETECTOR_UNAVAILABLE"
+            return response
+    try:
+        details = detector(now_ist=now)
+    except Exception:
+        response["reason"] = "MARKET_SESSION_DETECTOR_FAILED"
+        return response
+    if not isinstance(details, dict) or type(details.get("is_open")) is not bool:
+        response["reason"] = "INVALID_SESSION_DETECTOR_RESPONSE"
+        return response
+    clock_open = details["is_open"]
+    response.update({
+        "status": "CLOCK_WINDOW_OPEN" if clock_open else "CLOCK_WINDOW_CLOSED",
+        "market_open": clock_open,
+        "is_open": clock_open,
+        "market_status": "open" if clock_open else "closed",
+        "reason": str(details.get("reason") or "CLOCK_WINDOW_ONLY")[:120],
+        "next_open": details.get("next_open"),
+        "verification_status": "CLOCK_WINDOW_ONLY_NOT_EXCHANGE_VERIFIED",
+    })
+    return response
+
+
 def _sentinel_reached(capability: str) -> None:
     raise HTTPException(
         status_code=500,

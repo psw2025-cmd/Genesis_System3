@@ -1,0 +1,8 @@
+{
+  "path": "/api/deploy_info",
+  "ok": false,
+  "http_status": 429,
+  "elapsed_ms": 10681,
+  "error": "HTTPError 429",
+  "body_preview": "Rate exceeded."
+}

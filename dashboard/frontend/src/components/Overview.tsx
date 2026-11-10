@@ -4,6 +4,9 @@ import { asPct, cn, fmt, fmtCr, signClass } from '../lib/utils'
 import { statusToneCss } from '../lib/statusTone'
 import { AuthUnlock } from './AuthUnlock'
 import { ContinuousClosureBoard } from './ContinuousClosureBoard'
+import { HolographicIndexCards } from './HolographicIndexCards'
+import { ModelVsMarketComparator } from './ModelVsMarketComparator'
+import { NiftyIntradayChart, VolatilitySmileChart, PnlEquityCurveChart } from './LiveInteractiveCharts'
 
 function Metric({ label, value, sub, tone, icon }: {
   label: string; value: string; sub?: string; tone?: 'up' | 'down' | 'warn' | 'accent'; icon?: React.ReactNode
@@ -22,11 +25,14 @@ function Metric({ label, value, sub, tone, icon }: {
 }
 
 function ChartPlaceholder({ title, value }: { title: string; value?: string; tone?: 'accent' | 'up' | 'down' }) {
+  const hasSnapshot = Boolean(value && value !== '--')
   return (
     <div className="chart-shell" style={{ minHeight: 145, padding: 12 }}>
       <div className="panel-title">{title}</div>
       {value && <div className="num" style={{ marginTop: 6, color: 'var(--text-pri)', fontSize: '1rem', fontWeight: 750 }}>{value}</div>}
-      <div style={{ marginTop: 28, color: 'var(--text-mut)', fontSize: '.64rem', borderTop: '1px dashed var(--border)', paddingTop: 12 }}>NO TIME-SERIES DATA · SNAPSHOT ONLY</div>
+      <div style={{ marginTop: 28, color: 'var(--text-mut)', fontSize: '.64rem', borderTop: '1px dashed var(--border)', paddingTop: 12 }}>
+        {hasSnapshot ? 'CURRENT SNAPSHOT AVAILABLE · INTRADAY HISTORY NOT WIRED' : 'SNAPSHOT UNAVAILABLE · INTRADAY HISTORY NOT WIRED'}
+      </div>
     </div>
   )
 }
@@ -104,12 +110,20 @@ export function Overview() {
   const indexCard = (label: string, symbol: string) => {
     const p = spot(symbol)
     const c = change(symbol)
-    return <Metric label={label} value={p > 0 ? fmt(p, 2) : '--'} sub={c == null ? 'Waiting for market data' : `${c >= 0 ? '+' : ''}${c.toFixed(2)}%`} tone={c == null ? undefined : c >= 0 ? 'up' : 'down'} icon={<TrendingUp size={14} />} />
+    const sub = c != null
+      ? `${c >= 0 ? '+' : ''}${c.toFixed(2)}%`
+      : p > 0
+        ? 'Spot snapshot available · change unavailable'
+        : 'Market snapshot unavailable'
+    return <Metric label={label} value={p > 0 ? fmt(p, 2) : '--'} sub={sub} tone={c == null ? undefined : c >= 0 ? 'up' : 'down'} icon={<TrendingUp size={14} />} />
   }
 
   return (
     <div className="workspace-shell">
       {apiAuthNeeded && <div style={{ marginBottom: 10 }}><AuthUnlock /></div>}
+
+      <HolographicIndexCards />
+      <ModelVsMarketComparator />
 
       <ContinuousClosureBoard />
 
@@ -121,7 +135,7 @@ export function Overview() {
         <Metric label="Win Rate" value={winRate == null ? '--' : `${winRate.toFixed(1)}%`} sub="From paper evidence" tone={winRate == null ? undefined : winRate >= 50 ? 'up' : 'warn'} icon={<Activity size={14} />} />
         <Metric label="Model Confidence" value={modelConfidence == null ? '--' : `${modelConfidence.toFixed(0)}%`} sub={hasModelEvidence ? 'Bound to current System3 model state' : 'No model evidence · not invented'} tone={modelConfidence == null ? undefined : 'accent'} icon={<Brain size={14} />} />
         <Metric label="System Health" value={systemHealth} sub={`${passCount}/${proofGates.length || 0} proof gates${failingGate ? ` · trip: ${failingGate.gate_id}` : ''}`} tone={gatesReady && (systemHealth.includes('PASS') || systemHealth.includes('HEALTH')) ? 'up' : 'warn'} icon={<Shield size={14} />} />
-        <Metric label="Latency" value={latency > 0 ? `${latency.toFixed(0)}ms` : '--'} sub={brokerConnected ? 'Broker read-only' : brokerResponded ? 'API responded' : 'Waiting'} tone={latency > 0 && latency < 500 ? 'up' : latency > 0 ? 'warn' : undefined} icon={<Activity size={14} />} />
+        <Metric label="Latency" value={latency > 0 ? `${latency.toFixed(0)}ms` : '--'} sub="Read-only. Not a tradable speed." tone="warn" icon={<Activity size={14} />} />
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: 'minmax(0, 3fr) minmax(275px, 1fr)', marginTop: 10 }}>
@@ -154,7 +168,7 @@ export function Overview() {
               <div className="metric-label">Evidence & Safety</div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginTop: 10 }}>
                 {[
-                  ['Broker', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+                  ['Broker', brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
                   ['Market', marketOpen ? 'OPEN' : 'CLOSED / POLL'],
                   ['Alerts', String(alertCount)],
                   ['Proof Gates', `${passCount}/${proofGates.length || 0}`],
@@ -172,7 +186,7 @@ export function Overview() {
         <div className="card" style={{ padding: 13 }}>
           <div className="panel-title">Broker & Account</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
-            <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'CONNECTED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone={brokerConnected ? 'up' : 'warn'} />
+            <Metric label="Broker" value="DHAN" sub={brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'API RESPONDED' : 'WAITING'} tone="warn" />
             <Metric label="Mode" value="READ-ONLY" sub="No order authority from dashboard" tone="accent" />
             <Metric label="Available" value={brokerFunds?.normalized?.available_balance != null ? fmtCr(brokerFunds.normalized.available_balance) : brokerFunds?.available_balance != null ? fmtCr(brokerFunds.available_balance) : '--'} sub="From broker API only" />
             <Metric label="Paper P&L" value={totalPnl == null ? '--' : fmtCr(totalPnl)} sub={totalPnl == null ? 'Waiting for evidence' : 'Simulation evidence'} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'up' : 'down'} />
@@ -181,15 +195,15 @@ export function Overview() {
       </div>
 
       <div className="workspace-grid" style={{ gridTemplateColumns: '1fr 1fr 1fr minmax(270px, .95fr)', marginTop: 10 }}>
-        <ChartPlaceholder title="NIFTY Snapshot" value={spot('NIFTY') > 0 ? fmt(spot('NIFTY'), 2) : '--'} />
-        <ChartPlaceholder title="Market / Volatility Monitor" value={marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'} tone="down" />
-        <ChartPlaceholder title="Paper P&L Snapshot" value={totalPnl == null ? '--' : fmtCr(totalPnl)} tone={totalPnl == null ? undefined : totalPnl >= 0 ? 'accent' : 'down'} />
+        <NiftyIntradayChart spot={spot('NIFTY')} changePct={change('NIFTY')} title="NIFTY 50 Intraday Dynamics" />
+        <VolatilitySmileChart spot={spot('NIFTY')} />
+        <PnlEquityCurveChart totalPnl={totalPnl ?? 0} />
         <div className="card" style={{ padding: 12 }}>
           <div className="panel-title">Automation Status</div>
           <div style={{ marginTop: 9 }}>
             {[
               ['Data engine', health ? 'RESPONDED' : 'WAITING'],
-              ['Broker monitor', brokerConnected ? 'CONNECTED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
+              ['Broker monitor', brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
               ['Model state', state ? 'RESPONDED' : 'WAITING'],
               ['Execution authority', liveAllowed ? 'LIVE FLAG' : 'LOCKED'],
             ].map(([label, value]) => (

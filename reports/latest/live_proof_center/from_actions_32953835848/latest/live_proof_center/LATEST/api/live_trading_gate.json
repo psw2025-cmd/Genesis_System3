@@ -1,0 +1,46 @@
+{
+  "path": "/api/live-trading/gate",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 303,
+  "content_type": "application/json",
+  "data": {
+    "gate_open": false,
+    "gates": [
+      {
+        "gate": "env_live_disabled",
+        "passed": true,
+        "detail": "LIVE_TRADING_ENABLED=0 (must be 0 for paper, 1 for live)"
+      },
+      {
+        "gate": "kill_switch_off",
+        "passed": true,
+        "detail": "Kill switch not activated"
+      },
+      {
+        "gate": "human_approved",
+        "passed": false,
+        "detail": "live_trading_approved remains false by design; PAPER/ANALYZER does not require LIVE approval"
+      },
+      {
+        "gate": "validation_days",
+        "passed": false,
+        "detail": "1 validation days (need \u226510)"
+      },
+      {
+        "gate": "ml_accuracy_rho",
+        "passed": false,
+        "detail": "Avg Spearman \u03c1=0.200 (need \u22650.70)"
+      },
+      {
+        "gate": "max_loss_configured",
+        "passed": true,
+        "detail": "Max daily loss = \u20b95000 hardcoded in kill_switch.json"
+      }
+    ],
+    "summary": "3/6 gates passed",
+    "verdict": "LIVE_TRADING_BLOCKED",
+    "message": "Live trading blocked \u2014 see failed gates above",
+    "live_trading_status": "OFF \u2014 remains off until all gates pass"
+  }
+}

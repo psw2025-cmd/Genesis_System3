@@ -1,0 +1,129 @@
+{
+  "RHUI_V2.2_Verification_Checklist": {
+    "metadata": {
+      "version": "2.2.1",
+      "generated_at": "2026-08-26T06:26:14Z",
+      "captured_ist": "2026-08-26T11:53:00+05:30",
+      "author": "cursor-composer",
+      "status": "NOT_ACCEPTED",
+      "revision": "genesis-system3-web-00617-vif",
+      "sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "deploy_run": "https://github.com/psw2025-cmd/Genesis_System3/actions/runs/32923767070",
+      "evidence_dir": "reports/latest/rhui_v22_verify/",
+      "status_image": "reports/coordination/RHUI_V2.2_Material_Change_Status.png",
+      "human_action_required": false,
+      "note": "Multi-verify after material-change: broker+4/4 improved at market open; scheduler still red; #367 pending 18:45 IST; semantic/stability NOT PROVEN"
+    },
+    "cross_verify": {
+      "github_origin_main": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "gcp_serving_sha": "fb4772f9d52b67a31b55ee85aab8604e525bbad6",
+      "sha_match": true,
+      "revision": "genesis-system3-web-00617-vif",
+      "traffic_percent": 100,
+      "laptop_head": "146eb69b697f86559d50519f8eaee3c8fbb8a82c",
+      "laptop_branch": "fix/p0-188-bankex-paced-cache-20260824",
+      "laptop_authoritative": false,
+      "workspace_ban_path": "C:\\System3\\Genesis_System3"
+    },
+    "Phase1_DeploymentIdentity": {
+      "Capture_api_health_state": "PASS",
+      "Record_SHA_revision_traffic": "PASS",
+      "Verify_source_matches_deployment": "PASS",
+      "health_qc_status": "NOT_READY",
+      "state_qc_status": "NOT_READY",
+      "health_state_qc_convergence": "PASS_BOTH_NOT_READY",
+      "ExpectedResult": "PASS",
+      "ActualResult": "PASS"
+    },
+    "Phase2_BrokerOptionChains": {
+      "Capture_api_broker_status": "PASS",
+      "Record_token_metadata_sanitized": "PASS",
+      "broker_connected": true,
+      "auth_classification": "AUTH_OK",
+      "secret_version": 320,
+      "live_trading_enabled": false,
+      "order_placement_allowed": false,
+      "Prove_NIFTY_BANKNIFTY_FINNIFTY_MIDCPNIFTY_fresh_populated": "PASS",
+      "required_symbols_ready": true,
+      "chain_counts": {
+        "NIFTY": 462,
+        "BANKNIFTY": 714,
+        "FINNIFTY": 470,
+        "MIDCPNIFTY": 506
+      },
+      "Compare_API_UI_timestamps": "NOT_PROVEN",
+      "ExpectedResult": "PASS",
+      "ActualResult": "PARTIAL",
+      "note": "API 4/4 ready at market open; UI semantic parity still NOT_PROVEN"
+    },
+    "Phase3_SchedulerHealth": {
+      "Inspect_scheduler_health_artifact": "PASS",
+      "Attribute_failing_predicate": "PASS",
+      "attribution": "observability.alert_severity=warning because genesis-system3-signals execution stale beyond cadence grace",
+      "Confirm_collector_transport_OK": "PASS",
+      "healthy": false,
+      "alert_severity": "warning",
+      "ExpectedResult": "PASS",
+      "ActualResult": "FAIL"
+    },
+    "Phase4_SignalsJob367": {
+      "Observe_postfix_execution_18_45IST": "pending",
+      "Confirm_BhavCopy_retries": "pending",
+      "Verify_successful_termination": "pending",
+      "Generate_new_prediction_evidence": "pending",
+      "code_deployed_on_serving": true,
+      "ExpectedResult": "PASS",
+      "ActualResult": "PENDING"
+    },
+    "Phase5_SemanticAcceptanceStability": {
+      "Inspect_all_22_tabs_semantically": "NOT_PROVEN",
+      "visual_22_22_only": "PASS_HISTORICAL_00617",
+      "Compare_tab_values_with_API_payloads": "NOT_PROVEN",
+      "Run_60min_market_session_stability": "NOT_PROVEN",
+      "ExpectedResult": "PASS",
+      "ActualResult": "NOT_PROVEN"
+    },
+    "Phase6_FinalAcceptance": {
+      "Reevaluate_all_prior_phases": "DONE",
+      "Confirm_broker_scheduler_signals_semantics_complete": "FAIL",
+      "Record_RHUI_V2.2_status": "NOT_ACCEPTED"
+    },
+    "root_causes": [
+      {
+        "id": "RC1_BHAVCOPY",
+        "domain": "signals/ML",
+        "status": "FIX_DEPLOYED_EFFECTIVENESS_PENDING",
+        "fix": "PR #367 bounded retries 5x/90s",
+        "verify_at": "18:45 IST signals schedule"
+      },
+      {
+        "id": "RC2_SCHEDULER_SEVERITY",
+        "domain": "observability",
+        "status": "ATTRIBUTED_STILL_FAILING",
+        "cause": "genesis-system3-signals stale beyond cadence grace \u2192 alert_severity=warning \u2192 observability.alert_severity_none fails",
+        "next": "Clear signals cadence / post-#367 successful run then re-check scheduler health"
+      },
+      {
+        "id": "RC3_CHAINS_PREMARKET",
+        "domain": "broker/chains",
+        "status": "CLEARED_ON_MARKET_OPEN_RECHECK",
+        "note": "Earlier pre-market NOT READY correctly fail-closed; market-open multi-verify required_symbols_ready=true"
+      }
+    ],
+    "missing_required_implementations": [
+      "Semantic 22-tab API\u2194UI parity harness on exact serving SHA (not visual-only)",
+      "Post-#367 genuine signals run proof + new prediction evidence",
+      "Scheduler-health green after signals cadence restored",
+      "Same-session Option Chain UI vs /api/batch/chains timestamp parity",
+      "60-minute uninterrupted market stability proof",
+      "Verified contracts path so QC can leave NOT_READY when truthful"
+    ],
+    "fail_closed_logic": {
+      "redeploy_prohibited": true,
+      "preserve_revision": "genesis-system3-web-00617-vif",
+      "iam_token_relaxation": false,
+      "synthetic_runs_allowed": false,
+      "live_orders_enabled": false
+    }
+  }
+}

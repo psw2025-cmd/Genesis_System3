@@ -1,0 +1,34 @@
+{
+  "timestamp_utc": "2026-08-29T19:25:29.917857+00:00",
+  "base_url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "layer1_api_schema": {
+    "status": "PASS",
+    "git_sha": "1e11fdf8e049c8366a642ac9b51395ef8ab0c27d",
+    "revision": "genesis-system3-web-00665-wuf",
+    "broker_connected": true,
+    "http_deploy": 200,
+    "http_health": 200
+  },
+  "layer2_browser_dom": {
+    "status": "PASS",
+    "tabs_passing": 22,
+    "total_tabs": 22,
+    "interactive_charts_mounted": true
+  },
+  "layer3_broker_universe": {
+    "status": "PASS",
+    "total_scrips": 136670,
+    "missing_scrips": 0,
+    "fno_underlyings": 216,
+    "nifty_contracts": 154
+  },
+  "layer4_quant_lineage": {
+    "status": "PASS",
+    "avg_spearman_rho": 0.7252,
+    "validation_sample_days": 5,
+    "auto_gates_passed": 5,
+    "model_champion": "CatBoost-Challenger-v4",
+    "feature_count": 129
+  },
+  "all_layers_pass": true
+}

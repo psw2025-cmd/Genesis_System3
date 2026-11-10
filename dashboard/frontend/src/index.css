@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -127,7 +126,7 @@
   .workspace-shell {
     height: 100%;
     overflow-y: auto;
-    padding: 12px;
+    padding: 12px 12px 6rem 12px;
     background:
       linear-gradient(rgba(28, 59, 91, .035) 1px, transparent 1px),
       linear-gradient(90deg, rgba(28, 59, 91, .025) 1px, transparent 1px);
@@ -401,6 +400,48 @@
 
 .sidebar-backdrop {
   display: none;
+}
+
+.dashboard-topbar {
+  height: 56px;
+  min-height: 56px;
+  flex: 0 0 auto;
+}
+
+.truth-strip {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+.truth-strip-brand,
+.truth-strip-telemetry,
+.truth-strip-market {
+  min-width: 0;
+}
+
+.truth-strip-telemetry {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.truth-strip-market {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.truth-strip-chains { display: flex !important; }
+
+.operations-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 12px;
 }
 
 /* Keep deploy-proof DOM for tests, but never paint the engineering strip on trading pages. */
@@ -821,11 +862,25 @@
   html, body { font-size: 13px; }
   .workspace-shell { padding: 8px; }
   .hide-phone { display: none !important; }
-  .app-topbar {
+  .dashboard-topbar {
     height: auto;
     min-height: 56px;
     flex-wrap: wrap;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    row-gap: 6px;
   }
+  .dashboard-topbar-brand { flex: 1 1 auto; min-width: 0; }
+  .dashboard-topbar-actions { flex: 0 1 auto; justify-content: flex-end; gap: 6px; }
+  .dashboard-broker-button { min-width: 0; }
+  .truth-strip {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 10px;
+  }
+  .truth-strip-telemetry { gap: 6px; }
+  .truth-strip-market { justify-content: flex-start; }
+  .truth-strip-chains { display: none !important; }
   .topbar-brand {
     border-right: 0;
     width: auto;
@@ -1181,4 +1236,119 @@
 
 @media (min-width: 821px) {
   .mobile-hub-shell { display: none; }
+}
+
+@media (max-width: 600px) {
+  .dashboard-topbar { padding-left: 10px; padding-right: 10px; }
+  .dashboard-topbar-actions { flex: 1 1 100%; justify-content: space-between; }
+  .truth-strip-brand { flex-wrap: wrap; }
+  .truth-strip-telemetry > div,
+  .truth-strip-market > div { min-height: 30px; }
+}
+
+.option-chain-root { min-width: 0; }
+.chain-full-table-wrap { min-width: 0; }
+.chain-wide-table { width: max-content; min-width: 100%; }
+.chain-mobile-view-toggle,
+.chain-mobile-cards,
+.chain-mobile-scroll-cue { display: none; }
+
+.chain-mobile-strike-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(16, 37, 59, .52), rgba(7, 18, 31, .88));
+}
+
+.chain-mobile-strike-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: var(--text-mut);
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+
+.chain-mobile-strike-heading strong { margin-left: 6px; color: var(--text-pri); font-size: .82rem; }
+.chain-mobile-atm { color: var(--amber); }
+.chain-mobile-sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.chain-mobile-side { min-width: 0; padding: 8px; border-radius: 8px; background: rgba(4, 12, 22, .72); }
+.chain-mobile-call { border-top: 2px solid rgba(24, 215, 130, .55); }
+.chain-mobile-put { border-top: 2px solid rgba(168, 85, 247, .55); }
+.chain-mobile-side-title { font-size: .58rem; font-weight: 850; letter-spacing: .05em; color: var(--text-sec); }
+.chain-mobile-ltp { display: flex; justify-content: space-between; gap: 6px; margin-top: 6px; color: var(--text-mut); font-size: .62rem; }
+.chain-mobile-ltp strong { color: var(--text-pri); font-size: .76rem; }
+.chain-mobile-side-metrics { display: grid; gap: 4px; margin-top: 7px; color: var(--text-mut); font-size: .56rem; }
+.chain-mobile-side-metrics span { display: flex; justify-content: space-between; gap: 5px; }
+.chain-mobile-side-metrics b { color: var(--text-sec); font-weight: 650; }
+
+.lifecycle-status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 6px 14px;
+}
+
+.ml-proof-loading {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-sec);
+  background: var(--surface-1);
+}
+
+.ml-proof-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.ml-proof-skeleton {
+  height: 58px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--surface-2), var(--surface-3), var(--surface-2));
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+.ml-proof-skeleton-wide { height: 150px; margin-top: 12px; }
+.ml-proof-table-scroll { overflow-x: auto; }
+.chart-unavailable { margin-top: 12px; padding: 12px; border: 1px dashed var(--border-hi); border-radius: 8px; color: var(--text-sec); font-size: 12px; }
+
+@media (max-width: 1180px) {
+  .truth-strip { grid-template-columns: minmax(0, 1fr); }
+  .truth-strip-market { justify-content: flex-start; }
+  .truth-strip-chains { display: none !important; }
+}
+
+@media (max-width: 700px) {
+  .ml-proof-skeleton-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ml-proof-metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+
+@media (max-width: 640px) {
+  .truth-strip-chains { display: none !important; }
+  .chain-mobile-view-toggle { display: inline-flex; min-height: 30px; padding: 4px 8px; font-size: .62rem; }
+  .chain-full-table-wrap { display: none; }
+  .chain-mobile-cards { display: grid; align-content: start; gap: 7px; padding: 8px; }
+  .chain-mobile-scroll-cue { display: none; }
+  .chain-mobile-full-table .chain-full-table-wrap { display: block; overflow-x: auto; }
+  .chain-mobile-full-table .chain-mobile-scroll-cue {
+    display: block;
+    position: sticky;
+    left: 0;
+    z-index: 11;
+    padding: 7px 9px;
+    color: var(--text-sec);
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--border);
+    font-size: .6rem;
+  }
+  .chain-mobile-full-table .chain-mobile-cards { display: none; }
+  .chain-wide-table { min-width: 1038px; }
 }

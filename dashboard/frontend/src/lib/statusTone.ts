@@ -16,7 +16,7 @@ export function statusTone(value: string): StatusTone {
   ) {
     return 'down'
   }
-  if (s === 'WAITING' || s === 'LOCKED' || s === 'RESPONDED') return 'warn'
+  if (s === 'WAITING' || s === 'LOCKED' || s === 'RESPONDED' || s.includes('PAPER LOCKED') || s.includes('PENDING')) return 'warn'
   if (s === 'CONNECTED' || s === 'PASS' || s === 'HEALTHY' || s === 'OPEN') return 'up'
   if (s.includes('LIVE FLAG')) return 'down'
   return 'neutral'

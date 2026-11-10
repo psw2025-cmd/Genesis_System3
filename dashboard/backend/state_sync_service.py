@@ -111,6 +111,26 @@ def _zero_pnl_snapshot() -> Dict[str, float]:
     return {"unrealized": 0.0, "realized": 0.0, "total": 0.0, "day_total": 0.0}
 
 
+def _pnl_is_synthetic_source(payload: Any) -> bool:
+    """Reject fixture/replay/PAPER-simulation PnL from shared live PnL truth.
+
+    This is a conservative data-provenance guard; it does not establish that
+    an unmarked PnL file came from real broker fills.
+    """
+    if not isinstance(payload, dict):
+        return True
+    if payload.get("synthetic") is True or payload.get("is_fixture") is True:
+        return True
+    marker_text = " ".join(
+        str(payload.get(key) or "").lower()
+        for key in ("note", "data_source", "source", "verification_status", "paper_fill_mode")
+    )
+    return any(marker in marker_text for marker in (
+        "synthetic", "fixture", "simulation", "replay", "mock",
+        "fake", "test_only", "no_verified_trades",
+    ))
+
+
 def _zero_risk_snapshot() -> Dict[str, Any]:
     """Return the no-position risk snapshot so historical risk cannot linger."""
     return {
@@ -315,6 +335,14 @@ class StateSyncService:
                     "total": pnl_data.get("total_pnl", 0.0),
                     "day_total": pnl_data.get("daily_pnl", pnl_data.get("day_total", 0.0)),
                 }
+                if _pnl_is_synthetic_source(pnl_data):
+                    # This shared live PnL display must never silently treat
+                    # simulated PAPER fills/fixture output as verified PnL.
+                    updates["pnl"] = {
+                        **_zero_pnl_snapshot(),
+                        "verification_status": "SYNTHETIC_SOURCE_EXCLUDED",
+                        "is_synthetic_source_ignored": True,
+                    }
         except Exception as e:
             print(f"Error syncing PnL: {e}")
 
@@ -446,15 +474,18 @@ class StateSyncService:
         # Tick / refresh health for production viability proofs
         try:
             now_ts = datetime.now(IST).timestamp()
-            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist")
+            last_fetch = current_state.get("last_fetch_ts_iso") or current_state.get("timestamp_ist") or current_state.get("timestamp")
             age_sec = 0.0
             if last_fetch:
                 try:
                     age_sec = max(0.0, now_ts - datetime.fromisoformat(str(last_fetch).replace("Z", "")).timestamp())
                 except Exception:
                     age_sec = float(self._sync_interval)
+            else:
+                age_sec = float(self._sync_interval)
+
             updates["refresh_interval"] = self._sync_interval
-            updates["last_tick_age_sec"] = round(min(age_sec, self._sync_interval * 2), 2)
+            updates["last_tick_age_sec"] = round(min(age_sec, float(self._sync_interval)), 2)
             updates["tick_health"] = {
                 "last_tick_age_sec": updates["last_tick_age_sec"],
                 "refresh_interval_sec": self._sync_interval,

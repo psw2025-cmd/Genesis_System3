@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GenesisSystem3RunbookAudit",
+  "type": "object",
+  "required": ["audit_id", "checked_at_utc", "results", "overall_verdict", "missing_or_mismatched_items", "recommended_actions"],
+  "properties": {
+    "audit_id": {
+      "type": "string"
+    },
+    "checked_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["check_id", "status", "evidence"],
+        "properties": {
+          "check_id": {
+            "type": "string",
+            "enum": ["LIVE_ENDPOINT", "GCS_ARTIFACT", "SECRETS", "SCHEDULER_PUBSUB", "IAM_WIF", "UI_ALIGNMENT"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["PASS", "FAIL", "PARTIAL", "UNVERIFIED"]
+          },
+          "evidence": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "overall_verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL"]
+    },
+    "missing_or_mismatched_items": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommended_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,2 @@
+# Phase 0.3 architecture discovery
+Observed: dashboard/backend/Dockerfile candidate, scripts/start_cloud_run.py, secure_app, Firestore state backend and tests. Removed auto-deploy workflow/impl and gcp_live_ui_snapshot in #462. Root Dockerfile marked nonproduction in #481. Canonical build, owner-gated manual deploy, rollback and production runtime integration still require tests. Runtime topology remains UNKNOWN/NOT DEPLOYED, not PASS.

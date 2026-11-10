@@ -247,12 +247,24 @@ def group_rows(rows: Sequence[OutcomeRow]) -> Dict[str, List[OutcomeRow]]:
 def walk_forward_windows(rows: Sequence[OutcomeRow], train_size: int, test_size: int) -> List[Tuple[List[OutcomeRow], List[OutcomeRow]]]:
     windows: List[Tuple[List[OutcomeRow], List[OutcomeRow]]] = []
     i = 0
-    ordered = list(rows)
+    if type(train_size) is not int or type(test_size) is not int or train_size <= 0 or test_size <= 0:
+        raise ValueError("INVALID_WALK_FORWARD_WINDOW_SIZES")
+    # Fail closed on missing/naive timestamps. Lexical order and input row order
+    # are not evidence of chronological separation.
+    def aware_utc(row: OutcomeRow) -> datetime:
+        try:
+            ts = datetime.fromisoformat(row.ts.replace("Z", "+00:00"))
+        except (AttributeError, TypeError, ValueError) as exc:
+            raise ValueError("INVALID_WALK_FORWARD_TIMESTAMP") from exc
+        if ts.tzinfo is None or ts.utcoffset() is None:
+            raise ValueError("WALK_FORWARD_TIMESTAMP_REQUIRES_TIMEZONE")
+        return ts.astimezone(timezone.utc)
+    ordered = sorted(rows, key=aware_utc)
     while i + train_size + test_size <= len(ordered):
         train = ordered[i : i + train_size]
         test = ordered[i + train_size : i + train_size + test_size]
-        if train and test:
-            # Leakage guard: every test row must be after train row in the sorted sequence.
+        if train and test and aware_utc(train[-1]) < aware_utc(test[0]):
+            # Never let a shared timestamp appear in both training and test.
             windows.append((train, test))
         i += test_size
     return windows

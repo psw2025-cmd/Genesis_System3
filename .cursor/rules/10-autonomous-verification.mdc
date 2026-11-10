@@ -1,0 +1,12 @@
+---
+description: Reproduce issues, find root cause, test, prove locally, complete honestly
+alwaysApply: false
+---
+
+# Autonomous verification
+
+For each defect: reproduce from current checkout/runtime; name root cause with file evidence; add or run tests; do not lower thresholds; prove locally (API + browser when UI-visible); status must match evidence.
+
+Completion fields: STATUS, IN_PROGRESS, CURRENT_STEP, NEXT_ACTION, MANDATORY_USER_ACTION, OPTIONAL_ACCELERATION_ACTION.
+
+Do not stop at unit tests if the claim is about local runtime behavior.

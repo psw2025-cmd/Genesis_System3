@@ -1,7 +1,8 @@
 # System3 Master Goal Lock
 
 Repository: `psw2025-cmd/Genesis_System3`
-Production authority: GCP project `system3-openalgo-safe`, region `asia-south1`, Cloud Run service `genesis-system3-web`
+Runtime authority: local Windows laptop (`C:\Genesis_System3_Clean`, `http://127.0.0.1:8000`)
+GCP Cloud Run (`system3-openalgo-safe` / `genesis-system3-web`) is HISTORICAL_NON_AUTHORITY.
 
 **Temporal authority marker:** `SYSTEM3_TEMPORAL_TRUTH_V1`
 

@@ -31,7 +31,7 @@ export const DASHBOARD_TABS = [
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ] as const
 
-export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set(DASHBOARD_TABS.map(tab => tab.id))
+export const DASHBOARD_TAB_IDS: ReadonlySet<string> = new Set([...DASHBOARD_TABS.map(tab => tab.id), 'system-readiness'])
 
 const GROUP_LABELS: Record<string, string> = {
   main:     'Command',
@@ -132,7 +132,7 @@ export function Sidebar() {
                     <span style={{
                       marginLeft: 'auto',
                       width: '7px', height: '7px', borderRadius: '50%',
-                      background: brokerConnected ? 'var(--up)' : 'var(--down)',
+                      background: brokerConnected ? 'var(--amber)' : 'var(--down)',
                     }} />
                   )}
                   {id === 'truth' && <span style={{ marginLeft: 'auto', fontSize: '9px', color: 'var(--text-mut)' }}>TRUTH</span>}

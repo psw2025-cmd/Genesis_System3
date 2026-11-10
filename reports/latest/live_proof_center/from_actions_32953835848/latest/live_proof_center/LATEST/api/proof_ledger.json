@@ -1,0 +1,21 @@
+{
+  "path": "/api/proof_ledger",
+  "ok": true,
+  "http_status": 200,
+  "elapsed_ms": 572,
+  "content_type": "application/json",
+  "data": {
+    "schema": "system3_proof_ledger_status_v1",
+    "chain": {
+      "ok": true,
+      "entries": 0,
+      "tip_hash": "GENESIS"
+    },
+    "tip": null,
+    "intent_tick": null,
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "secret_payloads_present": false,
+    "wait_for_user_routine": false
+  }
+}
