@@ -484,6 +484,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_synthetic_sell_bid_truth.py -o addopts="" --tb=short
 
+      - name: Synthetic live PnL exclusion and stale-state regression
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_state_sync_staleness.py -o addopts="" --tb=short
+
       - name: Existing Positions paper PnL provenance
         shell: bash
         timeout-minutes: 5
