@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
@@ -101,6 +101,17 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  const activeTab = useStore((s) => s.activeTab)
+  useLayoutEffect(() => {
+    const main = document.getElementById('dashboard-main')
+    if (!main) return
+    for (const element of main.querySelectorAll<HTMLElement>('*')) {
+      if (element.scrollTop > 0 || element.scrollLeft > 0) {
+        element.scrollTop = 0
+        element.scrollLeft = 0
+      }
+    }
+  }, [activeTab])
   const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
   if (mobileTradingRoute) return <MobileTradingHub />
 

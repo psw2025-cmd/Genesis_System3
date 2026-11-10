@@ -3,7 +3,7 @@ import { Activity, Bell, Menu, Search, Shield, Clock as ClockIcon } from 'lucide
 import { useStore } from '../store'
 import { fmt } from '../lib/utils'
 import { brokerIsConnected, isNonAuthBrokerRejection } from '../lib/healthTruth'
-import { resolveFeedQuality } from '../lib/feedQuality'
+import { liveTradingOn } from '../lib/lifecycleTruth'
 import { DASHBOARD_TABS } from './Sidebar'
 
 function Clock() {
@@ -125,7 +125,7 @@ export function TopBar() {
         ? 'Auth issue'
         : 'Waiting'
 
-  const liveOn = Boolean(state?.live_trading_enabled ?? health?.live_allowed)
+  const liveOn = liveTradingOn(state, brokerStatus, health)
   const alertCount = Array.isArray(alerts) ? alerts.length : 0
   const matches = useMemo(() => {
     const q = commandQuery.trim().toLowerCase()
@@ -146,9 +146,9 @@ export function TopBar() {
   }, [])
 
   return (
-    <header role="banner" className="h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-3 md:px-4 z-40 shrink-0 gap-3">
+    <header role="banner" className="dashboard-topbar bg-slate-950 border-b border-slate-800 flex items-center justify-between px-3 md:px-4 z-40 shrink-0 gap-3">
       {/* Brand & Nav Toggle */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="dashboard-topbar-brand flex items-center gap-3 shrink-0">
         <button
           type="button"
           className="p-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 active:scale-95 transition-all"
@@ -184,14 +184,14 @@ export function TopBar() {
       </div>
 
       {/* Right Actions & Telemetry */}
-      <div className="flex items-center gap-2.5 shrink-0">
+      <div className="dashboard-topbar-actions flex items-center gap-2.5 shrink-0">
         <Clock />
 
         {/* Broker Button */}
         <button
           type="button"
           onClick={() => setActiveTab('broker')}
-          className={`flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
+          className={`dashboard-broker-button flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
             brokerConnected || brokerGood
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
               : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
