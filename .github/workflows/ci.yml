@@ -559,6 +559,11 @@ jobs:
         timeout-minutes: 5
         run: python -m pytest -q tests/test_market_data_failover.py -o addopts="" --tb=short
 
+      - name: Paced 219-equity F&O rotation and cached market-top truth
+        shell: bash
+        timeout-minutes: 5
+        run: python -m pytest -q tests/test_equity_rotation_policy.py -o addopts="" --tb=short
+
       - name: Autonomous PAPER master ledger and shadow learning regressions
         shell: bash
         timeout-minutes: 5

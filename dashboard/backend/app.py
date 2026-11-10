@@ -5105,21 +5105,41 @@ def _equity_gainer_rotation_symbols() -> List[str]:
     return equity_gainer_seed_symbols(mc_rows, limit=12)
 
 
+def _cached_equity_fo_underlyings() -> List[str]:
+    """Bound the 200k+ instrument-master scan: read-only TTL, not per Dhan tick."""
+    cache_key = "equity_fo_universe_rotation_v1"
+    cached = _cache_get(cache_key, 300.0)
+    if isinstance(cached, list):
+        return cached
+    names: List[str] = []
+    try:
+        from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe
+
+        source = load_equity_fo_universe()
+        if source.get("implemented") is True:
+            names = [str(s).strip().upper()
+                     for s in (source.get("underlyings") or []) if s]
+    except Exception:
+        # No invented 219-symbol coverage if the official master is unavailable.
+        names = []
+    return _cache_set(cache_key, list(dict.fromkeys(names)))
+
+
 def _next_equity_gainer_symbol() -> Optional[str]:
+    """Round-robin verified F&O underlyings; one missing chain cannot starve all.
+
+    Called only by the EXISTING paced 3.5s market micro-loop. No new Dhan
+    requests, extra worker, scheduler or trade authority are introduced here.
+    """
     global _EQUITY_GAINER_CURSOR
-    names = _equity_gainer_rotation_symbols()
-    if not names:
-        return None
-    # Warm missing Moneycontrol/momentum names first so LUPIN is not re-fetched forever.
-    for name in names:
-        sym = str(name or "").upper()
-        if not sym:
-            continue
-        if not _usable_chain_snapshot(_chain_from_push_cache(sym)):
-            return sym
-    sym = str(names[_EQUITY_GAINER_CURSOR % len(names)] or "").upper()
-    _EQUITY_GAINER_CURSOR += 1
-    return sym or None
+    from dashboard.backend.equity_rotation_policy import choose_equity_gainer_symbol
+
+    universe = _cached_equity_fo_underlyings()
+    priority = _equity_gainer_rotation_symbols()
+    symbol = choose_equity_gainer_symbol(_EQUITY_GAINER_CURSOR, universe, priority)
+    if symbol:
+        _EQUITY_GAINER_CURSOR += 1
+    return symbol
 
 
 def _build_market_top_from_chain_cache(
@@ -5133,8 +5153,11 @@ def _build_market_top_from_chain_cache(
         extra = _equity_gainer_rotation_symbols()
     except Exception:
         extra = []
+    # Include all broker-backed symbols already warmed by the paced worker.
+    # This is cache-only; it cannot amplify Dhan option-chain API calls.
+    warmed_symbols = list(_PUSHED_CHAIN_CACHE)
     seen = set()
-    for sym in list(_INDEX_STREAM_SYMBOLS) + extra:
+    for sym in list(_INDEX_STREAM_SYMBOLS) + extra + warmed_symbols:
         if not sym or sym in seen:
             continue
         seen.add(sym)
@@ -5143,7 +5166,7 @@ def _build_market_top_from_chain_cache(
             ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
             if isinstance(ttl_hit, dict):
                 chain = dict(ttl_hit)
-        if isinstance(chain, dict) and (chain.get("contracts") or []):
+        if _usable_chain_snapshot(chain) and (chain.get("contracts") or []):
             chains[sym] = chain
     if not chains:
         return None
