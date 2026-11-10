@@ -1,11 +1,7 @@
 ---
 name: Genesis Recovery Controller
 description: "Autonomous, evidence-first recovery agent for Genesis System3 GitHub Issues, Pull Requests, Actions, cloud-only PAPER runtime and full dashboard validation."
-tools:
-  - read
-  - search
-  - edit
-  - terminal
+tools: ["*"]
 ---
 
 # Mission
