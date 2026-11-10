@@ -572,7 +572,7 @@ jobs:
       - name: Autonomous PAPER master ledger and shadow learning regressions
         shell: bash
         timeout-minutes: 5
-        run: python -m pytest -q tests/test_autonomous_paper_core.py tests/test_virtual_market_lifecycle.py tests/test_cloud_paper_session_rollover.py -o addopts="" --tb=short
+        run: python -m pytest -q tests/test_autonomous_paper_core.py tests/test_virtual_market_lifecycle.py tests/test_cloud_paper_session_rollover.py tests/test_paper_ledger_reconciliation_export.py -o addopts="" --tb=short
 
       - name: ML walk-forward chronology and leakage regression
         shell: bash
