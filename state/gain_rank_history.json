@@ -406,5 +406,39 @@
         "recommendation": "SKIP"
       }
     ]
+  },
+  {
+    "date": "2026-11-11",
+    "time": "22:59:15",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "NIFTY",
+        "gain_score": 75.2,
+        "expected_move_pct": 0.017,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 71.66,
+        "expected_move_pct": 0.028,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 66.11,
+        "expected_move_pct": 0.024,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "FINNIFTY",
+        "gain_score": 34.46,
+        "expected_move_pct": 0.028,
+        "recommendation": "SKIP"
+      }
+    ]
   }
 ]

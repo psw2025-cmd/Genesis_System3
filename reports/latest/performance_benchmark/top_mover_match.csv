@@ -1,0 +1,7 @@
+date,top_n,predicted_top,actual_top,matched_symbols,missed_symbols,match_count,match_rate_pct
+2026-06-12,3,NIFTY | MIDCPNIFTY | FINNIFTY,NIFTY | BANKNIFTY | FINNIFTY,FINNIFTY | NIFTY,BANKNIFTY,2,66.7
+2026-11-03,3,,,NONE,NONE,0,0.0
+2026-11-04,3,,,NONE,NONE,0,0.0
+2026-11-05,3,,,NONE,NONE,0,0.0
+2026-11-06,3,,,NONE,NONE,0,0.0
+2026-11-09,3,,,NONE,NONE,0,0.0

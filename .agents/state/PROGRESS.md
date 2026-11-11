@@ -1,10 +1,10 @@
 # Genesis System3 — Independent Continuity Record
-**Updated:** 2026-11-11 17:15 UTC (22:45 IST)
+**Updated:** 2026-11-11 17:42 UTC (23:12 IST)
 **Workspace:** C:\Genesis_System3_clean
-**Branch:** feature/consolidation-sync-fix | **SHA:** 49820e6b4
+**Branch:** feature/consolidation-sync-fix | **SHA:** b409663d0
 **GCP Target:** `system3-openalgo-safe` / `asia-south1`
-**Active Deployed Revision:** `genesis-system3-web-00122-klk` (Image: `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:49820e6b4`)
-**Serving Traffic:** 100% to latest revision `00122-klk` at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
+**Active Deployed Revision:** `genesis-system3-web-00124-46q` (Image: `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:b409663d0`)
+**Serving Traffic:** 100% to latest revision `00124-46q` at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
 **Constitutional Safety Posture:** PAPER_MODE=1 | ANALYZE_MODE=1 | LIVE_TRADING_ENABLED=0 | LIVE_ORDER_AUTHORITY=0 | ORDER_PLACEMENT_ALLOWED=false
 
 ---
@@ -75,11 +75,38 @@
 
 ---
 
+### [FIX-05] Paper Trade Lifecycle & Backtesting Verification Deployed
+- **Problem**:
+  1. Paper trades displayed static February 2026 fixture data from `tests/fixtures/paper_closed_trades_feb2026.json` because `_WEEKLY_SYMBOL_RE` in `core/brokers/dhan/nse_option_symbol.py` misparsed 8-digit date symbols (e.g. `BANKEX2026112662500PE`), raising `ValueError: day is out of range for month` and triggering an unhandled fallback in `portfolio_truth_service.py`.
+  2. Prediction backtesting needed multi-day execution benchmarks and verification.
+- **Root Cause & Fix**:
+  1. Added dedicated 8-digit date regex and `try...except ValueError` guard in `core/brokers/dhan/nse_option_symbol.py`. Made `enrich_option_rows` fail-safe per item.
+  2. Executed end-to-end paper trading lifecycle smoke test via `scripts/paper_lifecycle_proof.py --force`, proving:
+     - Real Dhan options chains fetched (520 NIFTY, 776 BANKNIFTY, 588 FINNIFTY, 614 MIDCPNIFTY).
+     - Signal generation via GainRankEngine (`GRE_105479FD`, confidence=0.752).
+     - Paper entry simulated fill (`order_id=PAPER_8AC158312F76`, fill=100.0).
+     - Simulated hold and paper exit (exit=105.0, net PnL realized).
+     - Full audit logging in `outputs/trade_execution_log.jsonl` (41 lines total).
+  3. Executed model prediction backtest benchmark (`scripts/daily_prediction_benchmark.py --skip-dependency-check`) across 6 trading sessions:
+     - Average directional hit rate: 70.6% (latest date 75.0%).
+     - Average Spearman rho: 0.660.
+- **Cloud Run Deployment**:
+  - Built image `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:b409663d0`.
+  - Deployed Cloud Run revision `genesis-system3-web-00124-46q` serving 100% traffic.
+  - Probed live `/api/paper/trades` on Cloud Run:
+    - HTTP 200, 41 trades returned.
+    - `is_fixture: false` verified.
+    - Trade dates verified from October 30 to November 11, 2026.
+  - Probed `/health`, `/api/paper/account`, `/api/paper/positions`, `/api/trades/today`, `/api/pnl`, `/api/accuracy_trend`: all returning HTTP 200.
+  - Evidence integrity gate verified with 100% PASS in `.agy-proof/receipt.json`.
+
+---
+
 ## 2. Evidence Integrity Contract Verification
 - Runner: `evidence_gate.py`
 - Contract: `.agy-proof/contract.json`
 - Session: `466270f2-eadd-453e-ac62-5e4f9ea2a85d`
-- Turn: `8a9e98c5d2594f93adc1b4402e57cda0`
+- Turn: `8e60b3cbf34241f480d0b6d1c5f363cb`
 - Results:
   - `R1`: Auto-recovery from expired or missing token -> **PASS**
   - `R2`: Proactive pre-emptive renewal before expiry -> **PASS**
