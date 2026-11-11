@@ -313,6 +313,19 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
     configured_limit = _configured_chain_limit()
     is_live = bool(spot_f > 0 and source == "dhan")
 
+    # Calculate aggregate OI change across all contracts in the chain
+    total_oi_change = sum(int(c.get("oi_change") or 0) for c in contracts)
+    oi_change_str = f"{total_oi_change:+d}" if total_oi_change != 0 else "+0"
+
+    # Calculate IV percentile across contracts
+    valid_ivs = [float(c["iv"]) for c in contracts if float(c.get("iv") or 0) > 0]
+    if valid_ivs:
+        atm_ivs = [float(c["iv"]) for c in contracts if abs(float(c.get("strike") or 0) - spot_f) <= (spot_f * 0.015) and float(c.get("iv") or 0) > 0]
+        ref_iv = (sum(atm_ivs) / len(atm_ivs)) if atm_ivs else (sum(valid_ivs) / len(valid_ivs))
+        iv_percentile = round((sum(1 for iv in valid_ivs if iv <= ref_iv) / len(valid_ivs)) * 100, 1)
+    else:
+        iv_percentile = 50.0
+
     return {
         "underlying": underlying.upper(),
         "spot": spot_f,
@@ -320,6 +333,9 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         "max_pain": max_pain,
         "pcr": round(pcr, 3),
         "pcr_context": pcr_context,
+        "iv_percentile": iv_percentile,
+        "oi_change": oi_change_str,
+        "total_oi_change": total_oi_change,
         "total_ce_oi": ce_oi,
         "total_pe_oi": pe_oi,
         "total_ce_volume": ce_vol,

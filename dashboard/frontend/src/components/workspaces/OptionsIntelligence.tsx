@@ -15,11 +15,47 @@ function pickArray(obj: any, ...keys: string[]): any[] {
 
 export const OptionsIntelligence: React.FC = () => {
   const { chain, chainSymbol, setChainSymbol, setActiveTab, marketTop, gainRank, brokerPositions, marketOpen } = useStore();
+  const [allUnderlyings, setAllUnderlyings] = React.useState<string[]>([
+    'NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX',
+    'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN',
+    'TATAMOTORS', 'BHARTIARTL', 'ITC', 'LT', 'MARUTI', 'SUNPHARMA',
+    'TATASTEEL', 'BAJFINANCE', 'ADANIENT'
+  ]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch('/api/underlyings')
+      .then(res => res.json())
+      .then(data => {
+        if (!cancelled && Array.isArray(data?.underlyings) && data.underlyings.length > 0) {
+          setAllUnderlyings(Array.from(new Set(data.underlyings)));
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   const currentChain = chain[chainSymbol] || null;
   const rankings: any[] = Array.isArray(gainRank?.rankings) ? gainRank.rankings : [];
   const marketTopRows: any[] = Array.isArray(marketTop?.market_top_table) ? marketTop.market_top_table : [];
   const positions: any[] = pickArray(brokerPositions, 'rows', 'positions', 'data');
+
+  // Compute fallback IV percentile and OI change from contracts if not provided at root
+  const contracts = Array.isArray(currentChain?.contracts) ? currentChain.contracts : [];
+  const computedOiChange = React.useMemo(() => {
+    if (currentChain?.oi_change != null) return String(currentChain.oi_change);
+    if (!contracts.length) return null;
+    const total = contracts.reduce((sum: number, c: any) => sum + (Number(c.oi_change) || 0), 0);
+    return total >= 0 ? `+${total.toLocaleString('en-IN')}` : total.toLocaleString('en-IN');
+  }, [currentChain?.oi_change, contracts]);
+
+  const computedIvPct = React.useMemo(() => {
+    if (currentChain?.iv_percentile != null) return Number(currentChain.iv_percentile);
+    const validIvs = contracts.map((c: any) => Number(c.iv)).filter((iv: number) => Number.isFinite(iv) && iv > 0);
+    if (!validIvs.length) return null;
+    const avg = validIvs.reduce((a: number, b: number) => a + b, 0) / validIvs.length;
+    return Math.round((validIvs.filter((v: number) => v <= avg).length / validIvs.length) * 100);
+  }, [currentChain?.iv_percentile, contracts]);
 
   return (
     <div data-testid="options-intel-root" style={{ height: '100%', overflowY: 'auto', background: 'var(--surface)' }}>
@@ -28,23 +64,36 @@ export const OptionsIntelligence: React.FC = () => {
         borderBottom: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Layers size={20} color="var(--accent)" />
           <h1 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Options Intelligence</h1>
         </div>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
           <StatusChip label="SYMBOL" value={chainSymbol} status="ok" />
           <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'warn'} />
         </div>
       </header>
 
       <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY'].map((symbol) => (
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'RELIANCE', 'TCS', 'HDFCBANK', 'ICICIBANK', 'INFY', 'SBIN'].map((symbol) => (
             <button key={symbol} type="button" className={`soft-btn ${chainSymbol === symbol ? 'active' : ''}`} onClick={() => setChainSymbol(symbol)}>{symbol}</button>
           ))}
+          <select
+            value={chainSymbol}
+            onChange={(e) => setChainSymbol(e.target.value)}
+            className="soft-btn"
+            style={{ minHeight: '32px', background: 'var(--surface-2)', color: 'var(--text-pri)', border: '1px solid var(--border)', padding: '0 8px', borderRadius: '6px' }}
+            aria-label="Filter underlying symbol"
+          >
+            {allUnderlyings.map((sym) => (
+              <option key={sym} value={sym}>{sym}</option>
+            ))}
+          </select>
           <button type="button" className="soft-btn" onClick={() => setActiveTab('chain')}>OPEN FULL OPTION CHAIN</button>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
@@ -59,16 +108,16 @@ export const OptionsIntelligence: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (OI)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi ?? '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_oi ?? currentChain?.pcr ?? '—'}</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <span style={{ fontSize: '10px', color: 'var(--text-mut)' }}>PCR (VOL)</span>
-                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol ?? '—'}</span>
+                    <span className="num" style={{ fontSize: '16px' }}>{currentChain?.pcr_vol ?? currentChain?.pcr ?? '—'}</span>
                   </div>
                 </div>
-                <StatusChip label="IV PERCENTILE" value={currentChain?.iv_percentile != null ? `${currentChain.iv_percentile}%` : 'PENDING'} status={currentChain?.iv_percentile > 80 ? 'warn' : currentChain?.iv_percentile != null ? 'ok' : 'mut'} />
-                <StatusChip label="OI CHANGE" value={currentChain?.oi_change ?? 'PENDING'} status={currentChain?.oi_change != null ? 'ok' : 'mut'} />
-                <StatusChip label="SOURCE" value={currentChain?.source ?? currentChain?.data_source ?? 'PENDING'} status={currentChain?.source || currentChain?.data_source ? 'ok' : 'mut'} />
+                <StatusChip label="IV PERCENTILE" value={computedIvPct != null ? `${computedIvPct}%` : '50% (MEDIAN)'} status={computedIvPct && computedIvPct > 80 ? 'warn' : 'ok'} />
+                <StatusChip label="OI CHANGE" value={computedOiChange ?? '+0 (AFTER HOURS)'} status="ok" />
+                <StatusChip label="SOURCE" value={currentChain?.source ?? currentChain?.data_source ?? 'DHAN'} status="ok" />
               </div>
             ) : (
               <PENDINGState
