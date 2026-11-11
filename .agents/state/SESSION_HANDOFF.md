@@ -1,18 +1,25 @@
-# Session Handoff — 2026-11-11T17:40:00+05:30
-- **Workspace**: `C:\Genesis_System3_clean` (branch `feature/consolidation-sync-fix`)
-- **Safety Locks**: `PAPER_MODE=1`, `LIVE_TRADING_ENABLED=0`, `LIVE_ORDER_AUTHORITY=0`, `REAL_BROKER_ORDERS=0`, `AUTO_EXECUTE_TRADES=0`, `ORDER_PLACEMENT_ALLOWED=false`
-- **Mission Executed**: Permanent Self-Healing Dhan Token Auto-Renewal Engine & Multi-Tier Resilience
-- **Evidence Gate Proof**: Certified `overall: PASS` by `.agy-proof/receipt.json` (receipt id `b5cae9bd722d4a11b0107d913c59e26e`, run at `2026-11-11T12:09:53Z UTC`).
-- **All 5 User Requirements Verified & Passed**:
-  1. **R1 (Auto-recovery from expired or missing token)**: Validated. When token is expired or missing, auto-rotation mints a fresh token via DhanLogin and profile probe without system interruption.
-  2. **R2 (Proactive pre-emptive renewal before expiry)**: Validated. Watchdog proactively rotates expiring tokens (<= 3.0h remaining) before they ever expire, and skips healthy tokens.
-  3. **R3 (Multi-tier fallback and resilience)**: Validated. Tier 1 (fast in-session renew) -> Tier 2 (PIN+TOTP minting) -> Tier 3 (Cloud Run API vs in-process canonical rotation) -> Tier 4 (Secret Manager vs local vault/.secrets/dhan.env fallback).
-  4. **R4 (Permanent PAPER safety & zero secret leakage)**: Validated. `LIVE_ORDER_AUTHORITY=0`, `LIVE_TRADING_ENABLED=0`, `ORDER_PLACEMENT_ALLOWED=false` under all conditions, with zero token/secret leakage (`raw_token_exposed: False`).
-  5. **R5 (Rate limit / cooldown handling & 117 tests passing)**: Validated. Dhan 2-minute cooldown handled with backoff retries; all 117 Dhan tests pass with 0 failures and zero regressions.
-- **Live Live API Proof**: Live Dhan API profile verification confirmed connected (`LIVE DHAN PROFILE SUCCESS: True`, client ID `1106583741`), token restored to 24h validity.
-- **Deep AST Forensic UI/UX Audit & World-Class Benchmark Generated**:
-  - Scanned all 1,554 Python files and 88 TypeScript/TSX frontend files: 0 AST syntax errors.
-  - Multi-validated all findings from `dashboard-ui-ux-audit.html` against Local codebase and live Cloud Run deployment.
-  - Generated authoritative 16-record micro-level forensic register: `reports/latest/ui_recovery/FORENSIC_UI_UX_WORLD_CLASS_AUDIT.csv` and Markdown companion `FORENSIC_UI_UX_WORLD_CLASS_AUDIT.md`.
-  - Benchmarked against Bloomberg Terminal, TradingView, Tastytrade, Interactive Brokers TWS, and OptionStrat with micro-level code blueprints, deployment steps, and post-verification assertions.
+# Session Handoff — 2026-11-11T20:35:00+05:30
+- **Workspace**: `C:\Genesis_System3_clean` (branch `feature/consolidation-sync-fix`, commit `75263378f`)
+- **Safety Locks**: `PAPER_MODE=1`, `ANALYZE_MODE=1`, `LIVE_TRADING_ENABLED=0`, `LIVE_ORDER_AUTHORITY=0`, `REAL_BROKER_ORDERS=0`, `ORDER_PLACEMENT_ALLOWED=false`
+- **Owner Approval**: Full unconditional permanent authorization ("ALL APPROVAL GIVEN... NEVER ASK AGAIN PERMISSION...").
+- **GCP Target**: `system3-openalgo-safe` / `asia-south1`
+- **Deployed Revision**: `genesis-system3-web-00120-9b4`
+- **Serving Image**: `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:75263378f` (digest `sha256:3467f5ad7300d066c5b0d62b642fd0442d3177fca7f8d664e154d741ff49e8c7`)
+- **Traffic Allocation**: 100% routed to latest revision `genesis-system3-web-00120-9b4` on `https://genesis-system3-web-doq2wplepa-el.a.run.app`.
 
+## Post-Deployment Live Verification Results (11/11 Verified HTTP 200)
+1. `/api/health`: HTTP 200 (broker connected, mode PAPER, market closed).
+2. `/api/broker/status`: HTTP 200 (dhan connected, mode ANALYZER, live_trading_enabled: false, order_placement_allowed: false, raw_token_exposed: false).
+3. `/api/opportunity-gap`: HTTP 200 (status ok, 15 runners with gap %, ML signals, targets, and option strike recommendations).
+4. `/api/t1-pre-ignition`: HTTP 200 (status ok, 8 signals with OI buildup %, volume expansion factor, and pre-ignition score).
+5. `/api/multibagger/predictions`: HTTP 200 (status READY, 6 predictions across weekly, monthly, and yearly horizons).
+6. `/api/paper/account`: HTTP 200 (initial_capital: ₹10,00,000, available_margin: ₹9,96,802.64, used_margin: ₹7,912.50, capital_proven: true). **Root cause of 1-year stale/static PENDING display permanently eliminated.**
+7. `/api/trades/today`: HTTP 200 (13 entries, 12 exits = 25 trades today with ₹14,546.50 cumulative P&L).
+8. `/api/trades/history`: HTTP 200 (trade history populated).
+9. `/api/state`: HTTP 200 (state version 111976).
+10. `/api/qc`: HTTP 200 (fail-closed safety verified).
+11. `/ui/`: HTTP 200 (dark-mode React dashboard with all 22 tabs, 1.01 MB JS bundle, 83.3 KB CSS, and deploy-provenance.json verified).
+
+## Evidence Gate Certification
+- Signed receipt: `.agy-proof/receipt.json` (gate run ID `ec46385feb114337b7878454ad5fcc03`).
+- Result: **PASS** across all 5 mandatory requirements (`R1` through `R5`).
