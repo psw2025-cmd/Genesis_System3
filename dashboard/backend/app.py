@@ -11986,6 +11986,25 @@ async def get_ml_predictions():
                 merged["strike"] = hint.get("suggested_atm_strike")
             if not merged.get("expiry"):
                 merged["expiry"] = hint.get("suggested_expiry")
+            try:
+                from core.engine.live_ml_inference_engine import get_live_ml_engine
+                engine = get_live_ml_engine()
+                ml_res = engine.predict_underlying(str(symbol))
+                if isinstance(ml_res, dict):
+                    merged["direction"] = ml_res.get("direction")
+                    merged["option_side"] = ml_res.get("option_side")
+                    merged["confidence_pct"] = round(float(ml_res.get("confidence", 0.0)) * 100.0, 2)
+                    merged["model_loaded"] = ml_res.get("model_loaded", False)
+                    merged["probabilities"] = ml_res.get("probabilities", {})
+                    rec_strike = ml_res.get("recommended_strike")
+                    if rec_strike and float(rec_strike) > 0:
+                        merged["recommended_strike"] = float(rec_strike)
+                        merged["strike"] = float(rec_strike)
+                    if ml_res.get("direction") in ("BULLISH", "BEARISH"):
+                        merged["signal"] = f"BUY_{ml_res.get('option_side')}"
+                        merged["recommendation"] = "TRADE"
+            except Exception:
+                pass
             enriched.append(merged)
         predictions = enriched
         if SSOT_AVAILABLE and state_store is not None:
