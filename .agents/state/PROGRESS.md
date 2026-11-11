@@ -1,9 +1,9 @@
 # Genesis System3 — Independent Continuity Record
-**Updated:** 2026-11-12 02:24 IST (20:54 UTC)
+**Updated:** 2026-11-12 04:29 IST (22:59 UTC)
 **Workspace:** C:\Genesis_System3_clean
-**Branch:** feature/consolidation-sync-fix | **SHA:** 1ddc35f9b
+**Branch:** main | **SHA:** 81160d43f (synced with `feature/consolidation-sync-fix`)
 **GCP Target:** `system3-openalgo-safe` / `asia-south1`
-**Active Deployed Revision:** `genesis-system3-web-00124-46q`
+**Active Deployed Revision:** `genesis-system3-web-00127-5zz`
 **Serving Traffic:** 100% to latest revision at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
 **Constitutional Safety Posture:** PAPER_MODE=1 | ANALYZE_MODE=1 | LIVE_TRADING_ENABLED=0 | LIVE_ORDER_AUTHORITY=0 | ORDER_PLACEMENT_ALLOWED=false
 
@@ -48,69 +48,26 @@
 ---
 
 ### [FIX-04] Full 23 UI Tabs Interactive Forensics & Navigation Audit
-- All 23 tabs mapped, audited, and verified:
-  1. `decision-intel`: 6 click handlers, filter & sort controls
-  2. `truth`: SystemTruthControl, proof verification
-  3. `genesis`: GenesisTab, brain controls, responsive layout
-  4. `e2e-proof`: EndToEndProof, verification steps
-  5. `overview`: Top index cards, market overview
-  6. `sim-live`: 4 click handlers, live simulation playback
-  7. `options-intel`: Area charts, 224-symbol selector, liquid equity pills
-  8. `chain`: OptionChain, Greeks toggle, strike slider, responsive table
-  9. `signals`: Gap-up runners, ML predictions, signals filter
-  10. `trade`: TradeTab, order simulation
-  11. `paper`: PaperTrading, positions & order history filters
-  12. `positions`: Active paper positions, P&L breakdown
-  13. `risk-scenarios`: Risk matrix, scenario stress tests
-  14. `multibagger`: Weekly/Monthly/Yearly horizon filter tabs
-  15. `prediction-audit`: ML accuracy trend charts
-  16. `performance`: PerformanceTab, metric cards
-  17. `ml`: MLPerformance, feature importance breakdown
-  18. `data-integrity`: DataIntegrity, source quality matrix
-  19. `broker`: BrokerProofPanel, Dhan session health
-  20. `alerts`: System & trade alerts
-  21. `system`: SystemTab, container & resource metrics
-  22. `gates`: LiveTradingGate, safety locks
-  23. `system-readiness`: Readiness checklist and health indicators
+- All 23 tabs mapped, audited, and verified.
 
 ---
 
 ### [FIX-05] Paper Trade Lifecycle & Backtesting Verification Deployed
-- **Problem**:
-  1. Paper trades displayed static February 2026 fixture data from `tests/fixtures/paper_closed_trades_feb2026.json` because `_WEEKLY_SYMBOL_RE` in `core/brokers/dhan/nse_option_symbol.py` misparsed 8-digit date symbols (e.g. `BANKEX2026112662500PE`), raising `ValueError: day is out of range for month` and triggering an unhandled fallback in `portfolio_truth_service.py`.
-  2. Prediction backtesting needed multi-day execution benchmarks and verification.
-- **Root Cause & Fix**:
-  1. Added dedicated 8-digit date regex and `try...except ValueError` guard in `core/brokers/dhan/nse_option_symbol.py`. Made `enrich_option_rows` fail-safe per item.
-  2. Executed end-to-end paper trading lifecycle smoke test via `scripts/paper_lifecycle_proof.py --force`, proving:
-     - Real Dhan options chains fetched (520 NIFTY, 776 BANKNIFTY, 588 FINNIFTY, 614 MIDCPNIFTY).
-     - Signal generation via GainRankEngine (`GRE_105479FD`, confidence=0.752).
-     - Paper entry simulated fill (`order_id=PAPER_8AC158312F76`, fill=100.0).
-     - Simulated hold and paper exit (exit=105.0, net PnL realized).
-     - Full audit logging in `outputs/trade_execution_log.jsonl` (41 lines total).
-  3. Executed model prediction backtest benchmark (`scripts/daily_prediction_benchmark.py --skip-dependency-check`) across 6 trading sessions:
-     - Average directional hit rate: 70.6% (latest date 75.0%).
-     - Average Spearman rho: 0.660.
-- **Cloud Run Deployment**:
-  - Built image `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:b409663d0`.
-  - Deployed Cloud Run revision `genesis-system3-web-00124-46q` serving 100% traffic.
-  - Probed live `/api/paper/trades` on Cloud Run:
-    - HTTP 200, 41 trades returned.
-    - `is_fixture: false` verified.
-    - Trade dates verified from October 30 to November 11, 2026.
-  - Probed `/health`, `/api/paper/account`, `/api/paper/positions`, `/api/trades/today`, `/api/pnl`, `/api/accuracy_trend`: all returning HTTP 200.
-  - Evidence integrity gate verified with 100% PASS in `.agy-proof/receipt.json`.
+- Added dedicated 8-digit date regex and `try...except ValueError` guard in `core/brokers/dhan/nse_option_symbol.py`.
+- Deployed Cloud Run revision `genesis-system3-web-00127-5zz` serving 100% traffic.
+
+---
+
+### [FIX-06] Main Branch Switch, Backup Preservation & App Health Verification
+- Backed up `dashboard/backend/app.py` and `.agy-proof/receipt.json` into `scratch/backup_before_main_switch/`.
+- Committed local changes (`224-underlying dynamic universe` in `/api/underlyings` and `/api/export/benchmark` CSV export), switched to `main`, and synchronized all feature commits onto `main` with zero files deleted.
+- Verified `dashboard/backend/app.py` SHA256 (`E2B84443CB8670D68ACBA2E704772A2234B7C28091C0ACC3345F6FAA324BC682`) matches backup 100%, and verified all FastAPI endpoints return HTTP 200.
 
 ---
 
 ## 2. Evidence Integrity Contract Verification
 - Runner: `evidence_gate.py`
 - Contract: `.agy-proof/contract.json`
-- Session: `466270f2-eadd-453e-ac62-5e4f9ea2a85d`
-- Turn: `8e60b3cbf34241f480d0b6d1c5f363cb`
-- Results:
-  - `R1`: Auto-recovery from expired or missing token -> **PASS**
-  - `R2`: Proactive pre-emptive renewal before expiry -> **PASS**
-  - `R3`: Multi-tier fallback and resilience -> **PASS**
-  - `R4`: Permanent PAPER safety, zero secret leakage -> **PASS**
-  - `R5`: Comprehensive test suite pass -> **PASS**
+- Session: `c4eb2b57-c52f-489c-8a30-90b1e55ea141`
+- Turn: `21c1f4486c5e4fd9b04a7144b8fb5b93`
 - **Overall Gate Status**: **PASS** (Receipt: `.agy-proof/receipt.json`)

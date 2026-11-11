@@ -1,41 +1,39 @@
 {
-  "scope": "Permanent self-healing Dhan token auto-renewal engine and multi-tier resilience: auto-recovery from expired tokens, proactive pre-emptive renewal before expiry, multi-tier fallback ladder, permanent PAPER mode safety, zero token leakage, rate-limit cooldown handling, and prevention of future BLOCKED states.",
+  "scope": "Resolve git checkout conflict on .agy-proof/receipt.json and dashboard/backend/app.py: preserve backups, commit local work without loss, switch to main branch with fast-forward sync of all feature commits, verify zero files deleted, and verify local FastAPI app endpoints return HTTP 200 with zero errors under PAPER mode.",
   "limitations": [
-    "Read-only/analyzer-only Dhan credential rotation; live trading locked to OFF; no real broker orders; PAPER mode enforced."
+    "Read-only/analyzer-only verification; live trading locked to OFF (LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false); PAPER mode enforced."
   ],
   "subject_files": [
-    "core/brokers/dhan/cloud_runtime_patch.py",
-    "core/brokers/dhan/token_watchdog.py",
-    "core/utils/env_loader.py",
-    "scripts/dhan_token_auto_refresh.py",
-    "scripts/gcp_dhan_token_rotation_job.py",
-    "tests/test_dhan_token_auto_renewal.py",
-    "tools/dhan-rotator/main.py"
+    "dashboard/backend/app.py",
+    "scratch/verify_main_branch_and_app_health.py",
+    ".agents/state/BLOCKERS.md",
+    ".agents/state/PROGRESS.md",
+    ".agents/state/SESSION_HANDOFF.md"
   ],
   "requirements": [
     {
       "id": "R1",
-      "description": "Auto-recovery from expired or missing token: when old token is expired or missing, auto-rotation mints and validates a fresh token via DhanLogin and profile probe without system interruption.",
+      "description": "Backups of dashboard/backend/app.py and .agy-proof/receipt.json created and SHA256 verified before branch switch.",
       "mandatory": true
     },
     {
       "id": "R2",
-      "description": "Proactive pre-emptive renewal before expiry: watchdog proactively rotates expiring tokens (<= 3.0h remaining) before they ever expire, and skips healthy tokens.",
+      "description": "Local changes committed cleanly without loss and repository switched to main branch.",
       "mandatory": true
     },
     {
       "id": "R3",
-      "description": "Multi-tier fallback and resilience: fast in-session renew fallback to PIN+TOTP minting; Cloud Run API failure fallback to in-process canonical rotation; Secret Manager failure fallback to local vault/.secrets/dhan.env.",
+      "description": "All user work and commits restored on main branch with exact SHA256 match on dashboard/backend/app.py and zero files deleted.",
       "mandatory": true
     },
     {
       "id": "R4",
-      "description": "Permanent PAPER safety, zero secret leakage, and order authority lockout: LIVE_ORDER_AUTHORITY=0, LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false under all conditions, with zero token/secret leakage.",
+      "description": "FastAPI application (dashboard/backend/app.py) loads cleanly and returns HTTP 200 across health, 224-underlying universe, benchmark CSV export, and paper trading account endpoints with zero errors.",
       "mandatory": true
     },
     {
       "id": "R5",
-      "description": "Comprehensive test suite pass: all Dhan tests pass with zero regressions, and rate-limit/cooldown handling prevents future deadlocks.",
+      "description": "Permanent PAPER mode safety enforced (PAPER_MODE=1, LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false).",
       "mandatory": true
     }
   ],
@@ -49,65 +47,18 @@
         "R4",
         "R5"
       ],
-      "kind": "unit_test",
+      "kind": "integration_test",
       "argv": [
         "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
-        "-m",
-        "pytest",
-        "tests/test_dhan_token_auto_renewal.py",
-        "-v"
+        "scratch/verify_main_branch_and_app_health.py"
       ],
       "cwd": ".",
-      "timeout": 60,
+      "timeout": 90,
       "expected_exit": 0,
       "assertion": {
-        "type": "exit_only"
-      }
-    },
-    {
-      "id": "C2",
-      "requirement_ids": [
-        "R3",
-        "R4",
-        "R5"
-      ],
-      "kind": "unit_test",
-      "argv": [
-        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
-        "-m",
-        "pytest",
-        "tests/test_dhan_single_token_authority.py",
-        "-v"
-      ],
-      "cwd": ".",
-      "timeout": 60,
-      "expected_exit": 0,
-      "assertion": {
-        "type": "exit_only"
-      }
-    },
-    {
-      "id": "C3",
-      "requirement_ids": [
-        "R1",
-        "R4",
-        "R5"
-      ],
-      "kind": "unit_test",
-      "argv": [
-        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
-        "-m",
-        "pytest",
-        "tests/test_dhan_canonical_rotation_readonly.py",
-        "tests/test_br1_dhan_auth_reliability.py",
-        "tests/test_br2_dhan_terminal_no_retry.py",
-        "-v"
-      ],
-      "cwd": ".",
-      "timeout": 60,
-      "expected_exit": 0,
-      "assertion": {
-        "type": "exit_only"
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
       }
     }
   ]
