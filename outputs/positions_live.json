@@ -1,0 +1,35 @@
+{
+  "timestamp_ist": "2026-11-12 04:55:05 IST",
+  "as_of": "2026-11-11T23:25:05.552082+00:00",
+  "positions": [
+    {
+      "position_id": "POS_0013",
+      "action": "OPEN",
+      "status": "OPEN",
+      "underlying": "NIFTY",
+      "symbol": "NIFTY",
+      "trading_symbol": "NIFTY2026111225100CE",
+      "security_id": 1115501,
+      "exchange_segment": "NSE_FNO",
+      "product_type": "MARGIN",
+      "position_type": "LONG",
+      "option_type": "CE",
+      "strike": 25100.0,
+      "expiry_date": "2026-11-12",
+      "qty": 75,
+      "entry_price": 105.5,
+      "current_price": 118.2,
+      "ltp": 118.2,
+      "unrealized_pnl": 952.5,
+      "unrealized_pnl_pct": 12.04,
+      "stop_loss": 84.4,
+      "target": 147.7,
+      "entry_time": "2026-11-12 04:55:05 IST",
+      "time_ist": "2026-11-12 04:55:05 IST",
+      "data_source": "DHAN_OPTION_CHAIN_LTP",
+      "provenance": "PAPER_CLOUD_SIM"
+    }
+  ],
+  "open_count": 1,
+  "source_file": "C:\\Genesis_System3_clean\\outputs\\positions_live.json"
+}

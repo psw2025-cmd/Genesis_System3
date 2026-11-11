@@ -1,12 +1,8 @@
 # Missed Opportunities — Daily Top-Mover Misses
 
-_Generated 2026-11-12T03:02:06.737174_
+_Generated 2026-11-12T04:57:19.029394_
 
 Symbols that were actual top movers on a given day but were NOT in System3's predicted top-N ranking for that day.
 
 
-## 2026-06-12
-- Predicted top-3: NIFTY, MIDCPNIFTY, FINNIFTY
-- Actual top-3: NIFTY, BANKNIFTY, FINNIFTY
-- **Missed**: BANKNIFTY
-- ρ for day: 0.2
+No missed top movers in the analyzed window.

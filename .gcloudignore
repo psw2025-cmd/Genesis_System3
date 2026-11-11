@@ -67,3 +67,5 @@ content/
 master_config_audit_report.txt
 security_id_list.csv
 
+outputs/state_snapshots/
+outputs/state_snapshots/**

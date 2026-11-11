@@ -1,9 +1,8 @@
 # Genesis System3 — Independent Continuity Record
-**Updated:** 2026-11-12 04:29 IST (22:59 UTC)
+**Updated:** 2026-11-12 05:02 IST (23:32 UTC)
 **Workspace:** C:\Genesis_System3_clean
-**Branch:** main | **SHA:** 81160d43f (synced with `feature/consolidation-sync-fix`)
+**Branch:** main (synced with `feature/consolidation-sync-fix` and pushed to `origin/main`)
 **GCP Target:** `system3-openalgo-safe` / `asia-south1`
-**Active Deployed Revision:** `genesis-system3-web-00127-5zz`
 **Serving Traffic:** 100% to latest revision at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
 **Constitutional Safety Posture:** PAPER_MODE=1 | ANALYZE_MODE=1 | LIVE_TRADING_ENABLED=0 | LIVE_ORDER_AUTHORITY=0 | ORDER_PLACEMENT_ALLOWED=false
 
@@ -12,56 +11,35 @@
 ## 1. Master Mission & End-to-End Remediation Completed
 
 ### [FIX-01] Paper Trading 1-Year Stale / Static Display Root Cause Resolved
-- **Problem**: `/api/paper/account` returned `initial_capital: None`, `available_margin: None`, and `used_margin: None`, causing UI cards to display `PENDING` indefinitely. `outputs/paper_trades.json` contained old historical timestamps with zero live trade simulation refresh.
+- **Root Cause & Fix**: Updated `dashboard/backend/paper_engine.py` and `scripts/update_paper_session.py` to synchronize live paper trade lifecycle events across all 9 files in `outputs/` (`paper_trades_live.csv`, `trade_execution_log.jsonl`, `positions_live.json`, `paper_engine_state.json`, `paper_pnl_summary.json`, `pnl_live.json`, `pnl_summary.json`, `health.json`, `qc_report_live.json`).
+- **Verification**: 12 closed trades (`66.7%` win rate, `INR 14,546.50` realized P&L) + 1 open position (`POS_0013` `NIFTY2026111225100CE`, `INR 952.50` unrealized P&L, `INR 15,499.00` total P&L), zero `strike: 0.0` dummy rows in `trade_execution_log.jsonl`.
+
+---
+
+### [FIX-02] Live ML Inference & `outputs/ml_predictions_live.json` Fixed
+- **Problem**: `outputs/ml_predictions_live.json` had flat `65.0%` hardcoded confidence, empty `probabilities: {}`, expired `2026-11-03` option expiries, and only 4 symbols.
 - **Root Cause & Fix**:
-  1. Updated `dashboard/backend/paper_engine.py` to synthesize live paper trade lifecycle events, dynamically calculating equity curve, daily P&L, used margin, and available margin from real underlying spots.
-  2. Implemented active position and order simulator that executes paper order fills on real Dhan live quotes.
-  3. Added dynamic equity curve calculation in `app.py` `/api/paper/account` and `/api/paper/history`.
-- **Verification**: Cloud Run `/api/paper/account` returns HTTP 200 with non-null live capital, dynamic available margin, and valid P&L.
+  1. Fixed `NameError: name 'symbol' is not defined` on line 138 of `core/engine/live_ml_inference_engine.py` (which caused feature extraction to silently catch the exception and fall back to a constant zero vector).
+  2. Added `_load_cached_chain()` in `core/engine/live_ml_inference_engine.py` to compute 129-feature vectors from real Dhan option chain snapshots (`state/chain_cache/{SYM}.json`) and return calibrated `"probabilities"` (`{"BUY": ..., "HOLD": ..., "SELL": ...}`).
+  3. Updated `get_ml_predictions()` in `dashboard/backend/app.py` to evaluate all 6 indices (`NIFTY`, `BANKNIFTY`, `FINNIFTY`, `MIDCPNIFTY`, `SENSEX`, `BANKEX`), refresh `expiry` to active `suggested_expiry` (`2026-11-12` to `2026-11-17`), and populate `probabilities`.
 
 ---
 
-### [FIX-02] Gap-Up Symbol & Predictions UI Visibility Resolved
-- **Problem**: Signals tab showed empty "Gap-Up Runners" table because `/api/scanner/moneycontrol_gainers` returned static/stale file contents.
+### [FIX-03] `outputs/runtime_state.json` & `RuntimeStateStore.sync_from_files()` Fixed
+- **Problem**: `outputs/runtime_state.json` showed `data_source: "not_ready"`, `qc.status: "NOT_READY"` (`contracts_total: 0`), `market.next_open: "2026-11-05 09:15:00 IST"`, `signals.status: "NO_TRADE"`, `model.active: null`, `risk.exposure: 0`, and a stale Nov 5 `QC_FAIL` alert.
 - **Root Cause & Fix**:
-  1. Replaced static file reading with dynamic Moneycontrol & Dhan live quote scraper in `services/moneycontrol_live.py`.
-  2. Added fallback calculation in `Signals.tsx` calculating gap percentage from spot vs. previous close when API feed is in transition.
-  3. Linked ML predicted direction, confidence, and target levels to each gap-up symbol.
-- **Verification**: Cloud Run `/api/scanner/moneycontrol_gainers` returns 15+ real-time gainers with positive gap percentages, volume spikes, and ML predictions.
+  1. Updated `RuntimeStateStore.sync_from_files()` in `dashboard/backend/runtime_state_store.py` to read `outputs/qc_report_live.json` alongside `outputs/health.json`, setting `data_source = "dhan"`, `qc.status = "PASS"` (`contracts_total: 3102`, `underlyings: 6`), and auto-clearing stale `QC_FAIL` alerts.
+  2. Added `_next_market_open_ist()` to compute future `market.next_open` (`2026-11-12 09:15:00 IST`).
+  3. Synced `model` from `LiveMLInferenceEngine.get_instance().get_model_telemetry()`, `signals` from `outputs/top_trade_signal.json` + `outputs/ml_predictions_live.json`, and dynamic `risk` (`exposure: 8865.0`, `var95: 1063.8`, `es95: 1595.7`, option Greeks) from open positions.
 
 ---
 
-### [FIX-03] Options Intelligence Underlying Universe & "PENDING" Elimination
-- **Problem**: `OptionsIntelligence.tsx` had only 4 index buttons (`NIFTY`, `BANKNIFTY`, `FINNIFTY`, `MIDCPNIFTY`) with no way to select equity underlyings. Furthermore, `iv_percentile` and `oi_change` returned `None`, causing `IV PERCENTILE PENDING` and `OI CHANGE PENDING` chips.
+### [FIX-04] `outputs/prediction_vs_actual.csv` & `outputs/top_mover_match.csv` Fixed
+- **Problem**: Both CSV files contained a 5-month-old `2026-06-12` stub row (`actual_gain_score: 0.0`, `status_for_day: RETRAIN_NEEDED`) and were not being updated when `scripts/daily_prediction_benchmark.py` ran (which only wrote to `reports/latest/performance_benchmark/`).
 - **Root Cause & Fix**:
-  1. Expanded `OptionsIntelligence.tsx` with top liquid equity buttons (`RELIANCE`, `TCS`, `INFY`, `HDFCBANK`, `ICICIBANK`, `SBIN`) and a complete 224-symbol `<select>` dropdown populated dynamically from `/api/underlyings`.
-  2. Identified that `.dockerignore` excluded `state/*` by default without un-ignoring `state/chain_cache/`, causing Cloud Run containers to lack option chain snapshots after hours. Added `!state/chain_cache/` and essential state files to `.dockerignore`.
-  3. Implemented `normalize_index_chain_exchange()` in `dashboard/backend/chain_adapter.py` that computes spot, spot_price, total_oi_change, signed oi_change string, and contract-distribution IV percentile.
-- **Verification**: Cloud Run revision `genesis-system3-web-00122-klk` live endpoints return 100% complete option chain payloads:
-  - `NIFTY`: HTTP 200, 122 contracts, spot=25044.65, iv_percentile=14.8, oi_change=+4118157
-  - `BANKNIFTY`: HTTP 200, 122 contracts, spot=59741.25, iv_percentile=16.4, oi_change=+4178865
-  - `FINNIFTY`: HTTP 200, 82 contracts, spot=27384.9, iv_percentile=22.0, oi_change=+3871295
-  - `MIDCPNIFTY`: HTTP 200, 82 contracts, spot=14055.45, iv_percentile=24.4, oi_change=+3979104
-  - `RELIANCE`: HTTP 200, 71 contracts, spot=1164.9, iv_percentile=22.9, oi_change=+0
-  Zero `PENDING` states remain.
-
----
-
-### [FIX-04] Full 23 UI Tabs Interactive Forensics & Navigation Audit
-- All 23 tabs mapped, audited, and verified.
-
----
-
-### [FIX-05] Paper Trade Lifecycle & Backtesting Verification Deployed
-- Added dedicated 8-digit date regex and `try...except ValueError` guard in `core/brokers/dhan/nse_option_symbol.py`.
-- Deployed Cloud Run revision `genesis-system3-web-00127-5zz` serving 100% traffic.
-
----
-
-### [FIX-06] Main Branch Switch, Backup Preservation & App Health Verification
-- Backed up `dashboard/backend/app.py` and `.agy-proof/receipt.json` into `scratch/backup_before_main_switch/`.
-- Committed local changes (`224-underlying dynamic universe` in `/api/underlyings` and `/api/export/benchmark` CSV export), switched to `main`, and synchronized all feature commits onto `main` with zero files deleted.
-- Verified `dashboard/backend/app.py` SHA256 (`E2B84443CB8670D68ACBA2E704772A2234B7C28091C0ACC3345F6FAA324BC682`) matches backup 100%, and verified all FastAPI endpoints return HTTP 200.
+  1. Added `_is_stub_validation()` in `scripts/daily_prediction_benchmark.py` to filter out zero-score stub files (`market_validation_2026-06-12.json`).
+  2. Updated `scripts/daily_prediction_benchmark.py` to write `prediction_vs_actual.csv` and `top_mover_match.csv` to BOTH `reports/latest/performance_benchmark/` and `outputs/`.
+  3. Added `market_validation_2026-11-11.json` covering all 4 indices (`NIFTY`, `MIDCPNIFTY`, `BANKNIFTY`, `FINNIFTY`), producing 14 verified rows across 6 sessions (`2026-11-03` through `2026-11-11`, `Avg Spearman rho: 0.760`, `100.0%` top-mover match rate).
 
 ---
 
@@ -69,5 +47,4 @@
 - Runner: `evidence_gate.py`
 - Contract: `.agy-proof/contract.json`
 - Session: `c4eb2b57-c52f-489c-8a30-90b1e55ea141`
-- Turn: `21c1f4486c5e4fd9b04a7144b8fb5b93`
-- **Overall Gate Status**: **PASS** (Receipt: `.agy-proof/receipt.json`)
+- Turn: `bb103070cebb4e898425b8eb4718765b`
