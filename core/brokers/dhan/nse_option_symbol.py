@@ -194,20 +194,48 @@ def parse_trading_symbol(trading_symbol: str) -> Optional[Dict[str, Any]]:
     if stock:
         return stock
 
+    # Support full YYYYMMDD date format (e.g. BANKEX2026112662500PE, NIFTY2026111225100CE)
+    m_full = re.match(
+        rf"^(?P<underlying>{_UNDERLYINGS})"
+        rf"(?P<yyyy>\d{{4}})(?P<mm>\d{{2}})(?P<dd>\d{{2}})"
+        rf"(?P<strike>\d+(?:\.\d+)?)"
+        rf"(?P<option_type>CE|PE)$",
+        sym,
+        re.IGNORECASE,
+    )
+    if m_full:
+        g = m_full.groupdict()
+        try:
+            exp_d = date(int(g["yyyy"]), int(g["mm"]), int(g["dd"])).isoformat()
+            return {
+                "underlying": g["underlying"].upper(),
+                "expiry_date": exp_d,
+                "strike": float(g["strike"]),
+                "option_type": g["option_type"].upper(),
+                "trading_symbol": sym,
+                "symbol_format": "YYYYMMDD",
+                "instrument_type": "OPTIDX",
+            }
+        except ValueError:
+            pass
+
     m = _WEEKLY_SYMBOL_RE.match(sym)
     if m:
         g = m.groupdict()
         yy = int(g["yy"])
         month = int(g["m"])
         dd = int(g["dd"])
-        return {
-            "underlying": g["underlying"].upper(),
-            "expiry_date": date(2000 + yy, month, dd).isoformat(),
-            "strike": float(g["strike"]),
-            "option_type": g["option_type"].upper(),
-            "trading_symbol": sym,
-            "symbol_format": "YYMDD",
-        }
+        try:
+            return {
+                "underlying": g["underlying"].upper(),
+                "expiry_date": date(2000 + yy, month, dd).isoformat(),
+                "strike": float(g["strike"]),
+                "option_type": g["option_type"].upper(),
+                "trading_symbol": sym,
+                "symbol_format": "YYMDD",
+            }
+        except ValueError:
+            pass
     return None
 
 
@@ -416,4 +444,10 @@ def enrich_option_rows(
     rows: List[Dict[str, Any]],
     default_expiry: Union[str, date, None] = None,
 ) -> List[Dict[str, Any]]:
-    return [enrich_option_row(r, default_expiry=default_expiry) for r in rows]
+    enriched = []
+    for r in rows:
+        try:
+            enriched.append(enrich_option_row(r, default_expiry=default_expiry))
+        except Exception:
+            enriched.append(dict(r))
+    return enriched
