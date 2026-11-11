@@ -1,3 +1,5 @@
+substitutions:
+  _COMMIT_SHA: 'latest'
 steps:
   # Reject source-based mini-app uploads and missing production routes before build.
   - name: 'python:3.11-slim'
@@ -11,10 +13,10 @@ steps:
       - '-t'
       - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
       - '-t'
-      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:$COMMIT_SHA'
+      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:${_COMMIT_SHA}'
       - '.'
 images:
   - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
-  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:$COMMIT_SHA'
+  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:${_COMMIT_SHA}'
 options:
   logging: CLOUD_LOGGING_ONLY

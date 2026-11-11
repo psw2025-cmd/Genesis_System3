@@ -6759,7 +6759,13 @@ async def get_multibagger_backtest():
 async def get_opportunity_gap_endpoint():
     """Opportunity Gap & Real Market Comparison endpoint."""
     try:
-        from src.analytics.opportunity_gap_engine import get_opportunity_gap_engine
+        try:
+            from src.analytics.opportunity_gap_engine import get_opportunity_gap_engine
+        except Exception:
+            try:
+                from dashboard.backend.opportunity_gap_engine import get_opportunity_gap_engine
+            except Exception:
+                from opportunity_gap_engine import get_opportunity_gap_engine
         engine = get_opportunity_gap_engine()
         return engine.analyze_curated_runners()
     except Exception as e:
