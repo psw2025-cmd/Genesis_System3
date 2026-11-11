@@ -137,3 +137,8 @@ untracked_list.txt
 forensic_bundle.txt
 scratch/cloud_inspect/*.tgz
 
+
+# Ignore large audit bundles
+forensic_bundle.txt
+scratch/cloud_inspect/*.tgz
+
