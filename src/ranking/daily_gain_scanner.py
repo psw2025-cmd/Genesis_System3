@@ -90,14 +90,28 @@ def run_prediction() -> dict:
         return {"status": "skipped", "reason": "ranking_empty"}
 
     top3 = engine.get_top_n(all_data, spots)
+    ranking_cols = [
+        c
+        for c in [
+            "rank",
+            "underlying",
+            "direction",
+            "option_side",
+            "recommended_strike",
+            "confidence",
+            "gain_score",
+            "expected_move_pct",
+            "recommendation",
+            "model_loaded",
+        ]
+        if c in ranked.columns
+    ]
     result = {
         "status": "ok",
         "date": datetime.now().strftime("%Y-%m-%d"),
         "time": datetime.now().strftime("%H:%M:%S"),
         "top_predictions": top3,
-        "full_ranking": ranked[["rank", "underlying", "gain_score", "expected_move_pct", "recommendation"]].to_dict(
-            orient="records"
-        ),
+        "full_ranking": ranked[ranking_cols].to_dict(orient="records"),
     }
 
     os.makedirs(REPORT_DIR, exist_ok=True)

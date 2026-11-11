@@ -844,6 +844,68 @@ def process_snapshot(df_snap: pd.DataFrame) -> pd.DataFrame:
         signal_counts = df["signal"].value_counts() if "signal" in df.columns else {}
         logger.info(f"  After signal generation: {len(df)} rows | Signal distribution: {dict(signal_counts)}")
         logger.info("✓ Signals generated")
+
+        # -------------------------------------------------------------
+        # LIVE ML MODEL INFERENCE & DIRECTIONAL SYNC (Phase 391 XGBoost)
+        # Bridges ML Predictions directly into Signal Engine to eliminate desync
+        # -------------------------------------------------------------
+        try:
+            from core.engine.live_ml_inference_engine import get_ml_engine
+            ml_engine = get_ml_engine()
+
+            ml_predictions: Dict[str, Dict[str, Any]] = {}
+            for underlying in df.get("underlying", pd.Series()).unique():
+                if pd.isna(underlying):
+                    continue
+                und_str = str(underlying).upper()
+                und_df = df[df["underlying"] == underlying]
+                spot_val = float(und_df["spot"].iloc[0]) if "spot" in und_df.columns and not und_df.empty else 0.0
+                ml_predictions[und_str] = ml_engine.predict_underlying(und_str, spot=spot_val, df=und_df)
+
+            ml_directions = []
+            ml_option_sides = []
+            ml_confidences = []
+            ml_model_loaded = []
+
+            for idx, row in df.iterrows():
+                und_str = str(row.get("underlying") or "").upper()
+                side = str(row.get("side") or "").upper()
+                pred = ml_predictions.get(und_str, {})
+                direction = pred.get("direction", "NEUTRAL")
+                target_side = pred.get("option_side", "NONE")
+                conf = pred.get("confidence", 0.5)
+                rec_strike = float(pred.get("recommended_strike") or 0.0)
+                strike = float(row.get("strike") or 0.0)
+
+                ml_directions.append(direction)
+                ml_option_sides.append(target_side)
+                ml_confidences.append(conf)
+                ml_model_loaded.append(pred.get("model_loaded", False))
+
+                # Align signal with ML Direction
+                if direction == "BULLISH" and target_side == "CE":
+                    if side == "CE":
+                        if abs(strike - rec_strike) <= (rec_strike * 0.02) and row.get("final_score", 0.0) >= -0.2:
+                            df.at[idx, "signal"] = "BUY"
+                    elif side == "PE":
+                        if df.at[idx, "signal"] == "BUY":
+                            df.at[idx, "signal"] = "HOLD"
+
+                elif direction == "BEARISH" and target_side == "PE":
+                    if side == "PE":
+                        if abs(strike - rec_strike) <= (rec_strike * 0.02) and row.get("final_score", 0.0) >= -0.2:
+                            df.at[idx, "signal"] = "BUY"
+                    elif side == "CE":
+                        if df.at[idx, "signal"] == "BUY":
+                            df.at[idx, "signal"] = "HOLD"
+
+            df["direction"] = ml_directions
+            df["option_side"] = ml_option_sides
+            df["ml_confidence"] = ml_confidences
+            df["model_loaded"] = ml_model_loaded
+            logger.info("✓ Live ML Model Direction and Option Side synchronized into Signal Engine")
+        except Exception as ml_err:
+            logger.warning(f"Live ML directional sync skipped: {ml_err}")
     except Exception as e:
         logger.error(f"Error generating signals: {e}")
         df["signal"] = "HOLD"

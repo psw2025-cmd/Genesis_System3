@@ -1,6 +1,6 @@
 # Prediction Benchmark Summary — Issue #26 Proof
 
-_Generated 2026-11-12T02:19:13.252263_
+_Generated 2026-11-12T03:02:06.738184_
 
 - Dependency gate (today's validate run): ⚠️ daily_gain_validate has never run (no scheduler state found)
 - Trading days with validation data: **6**

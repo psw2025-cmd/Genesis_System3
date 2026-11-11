@@ -122,15 +122,37 @@ class GainRankEngine:
             if iv_proxy is not None:
                 iv_proxies_today[underlying] = iv_proxy
 
+            # Run live inference via trained ML models (XGBoost Phase 391)
+            try:
+                from core.engine.live_ml_inference_engine import get_ml_engine
+                ml_pred = get_ml_engine().predict_underlying(underlying, spot=spot, df=chain_df)
+            except Exception as ml_err:
+                logger.warning(f"Live ML inference fallback for {underlying}: {ml_err}")
+                ml_pred = {}
+
+            effective_ml_conf = (
+                float(ml_pred.get("confidence", 0.0) * 100.0)
+                if ml_pred.get("model_loaded")
+                else (ml_confidence.get(underlying, 0.0) if ml_confidence else 0.0)
+            )
+
             row = self._score_underlying(
                 underlying=underlying,
                 chain_df=chain_df,
                 spot=spot,
                 oi_hist=oi_history.get(underlying) if oi_history else None,
                 avg_vol=vol_history.get(underlying) if vol_history else None,
-                ml_conf=ml_confidence.get(underlying, 0.0) if ml_confidence else 0.0,
+                ml_conf=effective_ml_conf,
                 iv_proxy=iv_proxy,
             )
+
+            # Enrich row with explicit ML Direction, Option Side, Strike, and Model Metadata
+            row["direction"] = ml_pred.get("direction", "NEUTRAL")
+            row["option_side"] = ml_pred.get("option_side", "NONE")
+            row["recommended_strike"] = ml_pred.get("recommended_strike", spot)
+            row["confidence"] = ml_pred.get("confidence", 0.5)
+            row["model_loaded"] = ml_pred.get("model_loaded", False)
+            row["model_type"] = ml_pred.get("model_type", "Rule-based")
             rows.append(row)
 
         if not rows:

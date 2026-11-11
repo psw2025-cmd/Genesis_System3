@@ -191,6 +191,20 @@ class CloudPaperEngine:
         if spot <= 0 or not contracts:
             return None
         cands: List[Dict[str, Any]] = []
+
+        # Query Live ML Inference Engine for Direction, Option Side & Confidence
+        ml_pred: Dict[str, Any] = {}
+        try:
+            from core.engine.live_ml_inference_engine import get_ml_engine
+
+            ml_pred = get_ml_engine().predict_underlying(underlying, chain=chain, spot=spot)
+        except Exception:
+            ml_pred = {}
+
+        target_side = ml_pred.get("option_side") if ml_pred.get("direction") in ("BULLISH", "BEARISH") else None
+        target_strike = float(ml_pred.get("recommended_strike") or 0.0)
+        ml_conf = float(ml_pred.get("confidence") or 0.5)
+
         for c in contracts:
             strike = float(c.get("strike", 0) or 0)
             ot = str(c.get("option_type", "") or "").strip().upper()
@@ -211,12 +225,22 @@ class CloudPaperEngine:
                 or 0
             )
             gain_pct = ((ltp - prev) / prev * 100.0) if prev > 0 else float(c.get("gain_pct") or 0)
-            if gain_pct < MIN_GAIN_PCT_TO_OPEN:
+            if gain_pct < MIN_GAIN_PCT_TO_OPEN and target_side is None:
                 continue
             oi_chg = abs(float(c.get("dOI", c.get("oi_change", c.get("change_in_oi", 0))) or 0))
             vol = abs(float(c.get("volume", 0) or 0))
-            # Pure gain first; volume/OI only break ties.
-            score = gain_pct * 10000.0 + vol * 0.01 + oi_chg * 0.001
+
+            # Prioritize ML Directional Recommendation when present
+            if target_side and ot == target_side:
+                dist_penalty = abs(strike - target_strike) / max(1.0, target_strike) * 100.0
+                score = (100000.0 * ml_conf) - (dist_penalty * 100.0) + (gain_pct * 10.0) + (vol * 0.01)
+                strategy = "ML_DIRECTIONAL_PREDICTION"
+                selection_reason = f"ML_{ml_pred.get('direction')}_{target_side}_CONF_{ml_conf:.2f}_STRIKE_{strike}"
+            else:
+                score = gain_pct * 10000.0 + vol * 0.01 + oi_chg * 0.001
+                strategy = "MARKET_TOP_GAIN_PCT"
+                selection_reason = "highest_dhan_gain_pct_near_atm"
+
             cands.append(
                 {
                     "underlying": underlying,
@@ -230,8 +254,12 @@ class CloudPaperEngine:
                     "moneyness_pct": round(mny, 4),
                     "expiry_date": c.get("expiry_date") or c.get("expiry") or chain.get("expiry_date"),
                     "security_id": c.get("security_id"),
-                    "strategy": "MARKET_TOP_GAIN_PCT",
-                    "selection_reason": "highest_dhan_gain_pct_near_atm",
+                    "strategy": strategy,
+                    "selection_reason": selection_reason,
+                    "direction": ml_pred.get("direction", "NEUTRAL"),
+                    "option_side": target_side or ot,
+                    "ml_confidence": ml_conf,
+                    "model_loaded": ml_pred.get("model_loaded", False),
                 }
             )
         if not cands:
@@ -566,6 +594,10 @@ class CloudPaperEngine:
                         if best["underlying"] in opening_gaps else "UNAVAILABLE"),
                     "gain_pct_at_entry": best.get("gain_pct"),
                     "market_match_note": best.get("market_match_note"),
+                    "direction": best.get("direction", "NEUTRAL"),
+                    "option_side": best.get("option_side", best["option_type"]),
+                    "ml_confidence": best.get("ml_confidence", 0.5),
+                    "model_loaded": best.get("model_loaded", False),
                     "stop_loss": round(entry * (1.0 - SL_PCT / 100.0), 2),
                     "target": round(entry * (1.0 + TARGET_PCT / 100.0), 2),
                     "unrealized_pnl": 0.0,
