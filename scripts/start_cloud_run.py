@@ -60,9 +60,8 @@ def main() -> None:
         host="0.0.0.0",
         port=port,
         workers=1,
-        timeout_keep_alive=20,
-        limit_max_requests=1000,
-        limit_concurrency=50,
+        timeout_keep_alive=75,
+        limit_concurrency=100,
         log_level=os.getenv("UVICORN_LOG_LEVEL", "info"),
     )
 

@@ -105,3 +105,8 @@ state/*
 !state/alerts.json
 !state/iv_history.json
 !state/last_verified_dhan_quotes.json
+!outputs/qc_report_live.json
+!outputs/trade_execution_log.jsonl
+!outputs/paper_trades.json
+!storage/instruments/OpenAPIScripMaster.json
+!storage/instruments/master_meta.json

@@ -164,6 +164,10 @@ def write_top_mover_match_csv(validations: list) -> int:
     for v in validations:
         predicted_top = v.get("predicted_ranking", [])
         actual_top = v.get("actual_ranking", [])
+        if not predicted_top and "actual_details" in v and isinstance(v["actual_details"], list):
+            predicted_top = [r["underlying"] for r in v["actual_details"] if isinstance(r, dict) and "underlying" in r]
+        if not actual_top and "actual_details" in v and isinstance(v["actual_details"], list):
+            actual_top = [r["underlying"] for r in v["actual_details"] if isinstance(r, dict) and "underlying" in r]
         top_n = v.get("top_n_evaluated", 3)
         predicted_set = set(predicted_top[:top_n])
         actual_set = set(actual_top[:top_n])
@@ -179,12 +183,25 @@ def write_top_mover_match_csv(validations: list) -> int:
             "match_count": len(matched),
             "match_rate_pct": round(100 * len(matched) / top_n, 1) if top_n else 0,
         })
-    with out_path.open("w", newline="", encoding="utf-8") as f:
-        cols = ["date", "top_n", "predicted_top", "actual_top",
-                "matched_symbols", "missed_symbols", "match_count", "match_rate_pct"]
-        w = csv.DictWriter(f, fieldnames=cols)
-        w.writeheader()
-        w.writerows(rows)
+    try:
+        with out_path.open("w", newline="", encoding="utf-8") as f:
+            cols = ["date", "top_n", "predicted_top", "actual_top",
+                    "matched_symbols", "missed_symbols", "match_count", "match_rate_pct"]
+            w = csv.DictWriter(f, fieldnames=cols)
+            w.writeheader()
+            w.writerows(rows)
+    except (PermissionError, OSError) as exc:
+        print(f"Warning: could not write {out_path} ({exc}); attempting fallback file")
+        fallback = OUT_DIR / "top_mover_match_new.csv"
+        try:
+            with fallback.open("w", newline="", encoding="utf-8") as f:
+                cols = ["date", "top_n", "predicted_top", "actual_top",
+                        "matched_symbols", "missed_symbols", "match_count", "match_rate_pct"]
+                w = csv.DictWriter(f, fieldnames=cols)
+                w.writeheader()
+                w.writerows(rows)
+        except Exception:
+            pass
     return len(rows)
 
 

@@ -310,7 +310,10 @@ from option_strike_visibility_audit import OptionVisibilityAuditor, generate_sam
 from gain_rank_spot_enrichment import enrich_gain_rank_rows_with_authenticated_spots
 
 # ── Memory guard middleware ────────────────────────────────────────────────
-from middleware.memory_guard import memory_guard_middleware, get_memory_stats
+try:
+    from dashboard.backend.middleware.memory_guard import memory_guard_middleware, get_memory_stats
+except ImportError:
+    from middleware.memory_guard import memory_guard_middleware, get_memory_stats
 from starlette.middleware.base import BaseHTTPMiddleware
 
 app = FastAPI(title="System3 Genesis API")
@@ -5166,6 +5169,13 @@ def _build_market_top_from_chain_cache(
             ttl_hit = _cache_get(f"chain_{sym}", max(_TTL_CHAIN, 120.0))
             if isinstance(ttl_hit, dict):
                 chain = dict(ttl_hit)
+        if chain is None:
+            snap_file = ROOT_DIR / "state" / "chain_cache" / f"{sym.upper()}.json"
+            if snap_file.exists():
+                try:
+                    chain = json.loads(snap_file.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
         if _usable_chain_snapshot(chain) and (chain.get("contracts") or []):
             chains[sym] = chain
     if not chains:
@@ -7612,7 +7622,7 @@ async def market_top_micro_loop():
     Rebuilds the ranked table from the last good paced chain snapshots so the
     index_chain_micro_loop remains the sole Dhan OC owner. /ws/stream reads cache only.
     """
-    await asyncio.sleep(8)
+    await asyncio.sleep(1)
     while True:
         started = time.monotonic()
         rows = 0

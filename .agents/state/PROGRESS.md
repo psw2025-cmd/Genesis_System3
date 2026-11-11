@@ -1,10 +1,10 @@
 # Genesis System3 — Independent Continuity Record
-**Updated:** 2026-11-11 17:42 UTC (23:12 IST)
+**Updated:** 2026-11-12 02:24 IST (20:54 UTC)
 **Workspace:** C:\Genesis_System3_clean
-**Branch:** feature/consolidation-sync-fix | **SHA:** b409663d0
+**Branch:** feature/consolidation-sync-fix | **SHA:** 1ddc35f9b
 **GCP Target:** `system3-openalgo-safe` / `asia-south1`
-**Active Deployed Revision:** `genesis-system3-web-00124-46q` (Image: `asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:b409663d0`)
-**Serving Traffic:** 100% to latest revision `00124-46q` at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
+**Active Deployed Revision:** `genesis-system3-web-00124-46q`
+**Serving Traffic:** 100% to latest revision at `https://genesis-system3-web-doq2wplepa-el.a.run.app` (`https://genesis-system3-web-802404398783.asia-south1.run.app`)
 **Constitutional Safety Posture:** PAPER_MODE=1 | ANALYZE_MODE=1 | LIVE_TRADING_ENABLED=0 | LIVE_ORDER_AUTHORITY=0 | ORDER_PLACEMENT_ALLOWED=false
 
 ---

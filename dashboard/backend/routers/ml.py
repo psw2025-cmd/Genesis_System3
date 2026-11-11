@@ -259,9 +259,9 @@ def _is_stub_validation(data: Dict[str, Any]) -> bool:
 def _validation_json_files() -> List[Path]:
     files: List[Path] = []
     if PAPER_VAL_DIR.is_dir():
-        files.extend(sorted(path for path in PAPER_VAL_DIR.glob("*.json") if path.is_file()))
+        files.extend(sorted(path for path in PAPER_VAL_DIR.glob("paper_validation_*.json") if path.is_file()))
     if VAL_DIR.is_dir():
-        files.extend(sorted(path for path in VAL_DIR.glob("*.json") if path.is_file()))
+        files.extend(sorted(path for path in VAL_DIR.glob("market_validation_*.json") if path.is_file()))
     return files
 
 

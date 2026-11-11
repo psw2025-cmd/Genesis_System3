@@ -1,4 +1,4 @@
-"﻿""ID""",Priority,Module,Test Type,Historical Claimed Verdict,Historical Claim Evidence URI,Independent Verdict,Independent Raw Evidence URI,Independent Reviewer,Verified UTC,Expected vs Observed,Blocker / Next Action
+"ID","Priority","Module","Test Type","Historical Claimed Verdict","Historical Claim Evidence URI","Independent Verdict","Independent Raw Evidence URI","Independent Reviewer","Verified UTC","Expected vs Observed","Blocker / Next Action"
 S3-01-01-1,P0,Mission and owner success contract,FUNCTION,PASS,evidence/mission_and_owner_success_contract/S3-01-01-1.json,UNVERIFIED,,,,,Reproduce check with authentic raw artifacts and external/independent verification.
 S3-01-01-2,P0,Mission and owner success contract,FAILURE,PASS,evidence/mission_and_owner_success_contract/S3-01-01-2.json,UNVERIFIED,,,,,Reproduce check with authentic raw artifacts and external/independent verification.
 S3-01-01-3,P0,Mission and owner success contract,INDEPENDENT,PASS,evidence/mission_and_owner_success_contract/S3-01-01-3.json,UNVERIFIED,,,,,Reproduce check with authentic raw artifacts and external/independent verification.
