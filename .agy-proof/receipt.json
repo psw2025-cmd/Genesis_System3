@@ -2,9 +2,9 @@
   "schema": 1,
   "policy": "AGY-EVIDENCE-INTEGRITY-v1",
   "session": "466270f2-eadd-453e-ac62-5e4f9ea2a85d",
-  "turn": "5baf281509a14cfa870288a6c182ef05",
-  "run_id": "0c6a4914332745a294f274dc2af29723",
-  "observed_utc": "2026-11-11T15:05:53Z",
+  "turn": "8a9e98c5d2594f93adc1b4402e57cda0",
+  "run_id": "13c92694c1734e368094717c2b37cac9",
+  "observed_utc": "2026-11-11T17:10:57Z",
   "workspace": "C:\\Genesis_System3_clean",
   "scope": "Permanent self-healing Dhan token auto-renewal engine and multi-tier resilience: auto-recovery from expired tokens, proactive pre-emptive renewal before expiry, multi-tier fallback ladder, permanent PAPER mode safety, zero token leakage, rate-limit cooldown handling, and prevention of future BLOCKED states.",
   "limitations": [
@@ -49,27 +49,27 @@
   "subjects_unchanged_during_checks": true,
   "artifacts": [
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\0.stdout.txt",
-      "sha256": "0a57dae7bda0e5ae92825ca1a927eb46459e64768206de055541f212e4af98a3"
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\0.stdout.txt",
+      "sha256": "9d8f25cbe752a9c5ac0f943418a9360512e2088d6323b11b9fac214d3a23a591"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\0.stderr.txt",
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\0.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\1.stdout.txt",
-      "sha256": "bbf2428aa56c7e651b544775666cd7b8e3fb7fc9459cd11ebcf511de4595bc0d"
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\1.stdout.txt",
+      "sha256": "b20ada91f9eed3d024d4915128d87de210e8b31cc15b1a8d6934cd5179a964e2"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\1.stderr.txt",
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\1.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\2.stdout.txt",
-      "sha256": "f523bd2fe2d25da8b467b325e7404a93f70857435343482d8caf258e2b5df97c"
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\2.stdout.txt",
+      "sha256": "f6f9670fce1f8f9ad8c7817105f986a005f5df8761e3959285713826ad0fef8d"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T150545Z-b1cc6a5ddc4e47d3a711ac918ae71d45\\2.stderr.txt",
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T171047Z-02beb72446774b5dafc88b9bd0b61905\\2.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
@@ -124,8 +124,8 @@
         "-v"
       ],
       "cwd": "C:\\Genesis_System3_clean",
-      "started_utc": "2026-11-11T15:05:45Z",
-      "elapsed_seconds": 1.984,
+      "started_utc": "2026-11-11T17:10:47Z",
+      "elapsed_seconds": 2.641,
       "exit_code": 0,
       "assertion": {
         "type": "exit_only"
@@ -151,8 +151,8 @@
         "-v"
       ],
       "cwd": "C:\\Genesis_System3_clean",
-      "started_utc": "2026-11-11T15:05:47Z",
-      "elapsed_seconds": 2.469,
+      "started_utc": "2026-11-11T17:10:50Z",
+      "elapsed_seconds": 2.687,
       "exit_code": 0,
       "assertion": {
         "type": "exit_only"
@@ -180,8 +180,8 @@
         "-v"
       ],
       "cwd": "C:\\Genesis_System3_clean",
-      "started_utc": "2026-11-11T15:05:50Z",
-      "elapsed_seconds": 3.687,
+      "started_utc": "2026-11-11T17:10:53Z",
+      "elapsed_seconds": 4.36,
       "exit_code": 0,
       "assertion": {
         "type": "exit_only"
@@ -193,5 +193,5 @@
     }
   ],
   "overall": "PASS",
-  "integrity_signature": "c8af6f8f42a96a5a7adb0fd234dc348aa7cf8b77a94d1ad15f9bf14808faec8b"
+  "integrity_signature": "8f742910a8c4ba8fb440b5868feea950f2d89850568468db5e0bae0c12b16409"
 }
