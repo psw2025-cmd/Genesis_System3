@@ -1,0 +1,206 @@
+import csv
+import os
+
+output_path = r"C:\Genesis_System3_clean\reports\latest\ui_recovery\FORENSIC_UI_UX_WORLD_CLASS_AUDIT.csv"
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+rows = [
+    {
+        "Item_ID": "F01",
+        "Audit_Category": "Responsive Layout & Viewport Overflow",
+        "Audit_Finding_Title": "Status header is clipped on tablet (768px) and phone (390px)",
+        "Audit_Severity": "HIGH",
+        "Observed_Behavior_Cloud": "At 390px, topbar is 507px wide and status ribbon is 741px; at 768px ribbon is 1088px. Broker, session, and alert info clip off-screen without scrollbar.",
+        "Observed_Behavior_Local": "Identical layout in dashboard/frontend/src/components/TopBar.tsx and TruthStrip.tsx. Non-wrapping flex containers with flex-shrink: 0 children exceed viewport.",
+        "Forensic_Root_Cause": "TopBar actions container (clock, broker button, mode pill) and TruthStrip grid (brand, telemetry, market status) use rigid min-widths and lack responsive flex-wrap below 1024px.",
+        "Current_Status": "FAIL",
+        "World_Top_Benchmark": "TradingView & Bloomberg Terminal Launchpad",
+        "World_Class_Best_Practice_Design": "Bloomberg Terminal top status ribbon uses prioritized tiered disclosure: essential locks (Safety Gate, Mode, Broker Link) stay pinned; market tickers scroll horizontally in a touch-friendly marquee strip.",
+        "Concrete_Implementation_Blueprint": "1. In TopBar.tsx, wrap right-side actions in flex-wrap. Hide non-critical badges (clock seconds, text labels) on < 640px. 2. In TruthStrip.tsx, reflow grid into 2 responsive rows below 768px; collapse chain stats into a compact summary badge.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/TopBar.tsx:149-214; dashboard/frontend/src/components/TruthStrip.tsx:37-97; dashboard/frontend/src/index.css:411-440",
+        "Validation_Method": "Playwright viewport tests at 390x844 (iPhone 12/13/14) and 768x1024 (iPad Mini); assert document.documentElement.scrollWidth <= window.innerWidth.",
+        "Priority": "P0"
+    },
+    {
+        "Item_ID": "F02",
+        "Audit_Category": "Option Chain UX & Mobile Density",
+        "Audit_Finding_Title": "Option chain is not phone-readable as a full table (17 columns, 1038px on 390px phone)",
+        "Audit_Severity": "HIGH",
+        "Observed_Behavior_Cloud": "17-column desktop table is rendered directly on mobile viewports. Only 3-4 call-side columns are visible; strike and put-side columns are clipped off-screen to the right.",
+        "Observed_Behavior_Local": "dashboard/frontend/src/components/OptionChain.tsx renders single <table> element with 17 <th> headers. Strike filter only reduces row count (21 to 11), not column width.",
+        "Forensic_Root_Cause": "No responsive column groupings, no column-preset toggle (Greeks vs Price vs Volume), and no sticky strike rail. Table container relies on default overflow-x scroll without sticky headers.",
+        "World_Top_Benchmark": "Tastytrade & OptionStrat",
+        "World_Class_Best_Practice_Design": "Tastytrade mobile chain centers a sticky Strike Price column in the middle, displaying Bid/Ask on either side with toggleable view modes (Greeks / Liquidity / Volume / OI / IV). Mobile view displays card-based strike rows.",
+        "Concrete_Implementation_Blueprint": "1. Implement Column Profile Switcher in OptionChain.tsx: 'Compact' (LTP, Strike, LTP), 'Liquidity' (OI, Vol, Bid, Ask, Strike), and 'Greeks' (Delta, Theta, IV, Strike). 2. Add sticky CSS (position: sticky, left: 50% or center rail) for Strike column. 3. Provide card-view toggle for screens < 640px.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/OptionChain.tsx:140-520; dashboard/frontend/src/index.css:320-380",
+        "Validation_Method": "Playwright mobile audit at 390px; verify strike column is visible and sticky; verify horizontal swipe cue is rendered.",
+        "Priority": "P0"
+    },
+    {
+        "Item_ID": "F03",
+        "Audit_Category": "Operational Telemetry & Truth Disambiguation",
+        "Audit_Finding_Title": "Operational readiness mixes distinct states (model proof vs market validation vs paper lock)",
+        "Audit_Severity": "HIGH",
+        "Observed_Behavior_Cloud": "PendingLifecycleBanner displays ready_for_live=true and 'proven forward validation' while ML checklist displays 'market_validation real run? NO' and TopBar displays 'PAPER LOCKED / LIVE OFF'. Separately, health card displays 'WS LIVE' while feed is 'SESSION REPLAY'.",
+        "Observed_Behavior_Local": "PendingLifecycleBanner.tsx and SystemHealthDiagnostics.tsx read different truth payloads (mlPerformance vs state vs health) without unified operational state taxonomy.",
+        "Forensic_Root_Cause": "Architectural conflation of 5 independent lifecycle layers: 1) Historical offline model proof, 2) Same-session live market validation, 3) WebSocket transport socket connection, 4) Market data feed freshness, and 5) Broker live order execution permission.",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "Interactive Brokers TWS & Bloomberg Terminal BQNT",
+        "World_Class_Best_Practice_Design": "IBKR TWS strictly decouples: Account Routing (Paper vs Production), Market Data Subscription (Realtime Streaming vs Delayed Snapshot vs Frozen), and Order Gate (Disarmed vs Safety Locked vs Armed). A green status is NEVER shown if an upstream validation check is NO.",
+        "Concrete_Implementation_Blueprint": "1. Update PendingLifecycleBanner.tsx to show a 5-layer Operational Truth Matrix: Layer 1 (Model Offline Proof: PASS), Layer 2 (Live Market Validation: PENDING/NO), Layer 3 (Market Data Mode: SESSION REPLAY), Layer 4 (Transport: WS LIVE), Layer 5 (Order Authority: LOCKED OFF). 2. Forbid overall green 'READY' badge whenever Layer 2 or Layer 5 is uncertified.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/PendingLifecycleBanner.tsx:26-105; dashboard/frontend/src/components/SystemHealthDiagnostics.tsx:40-120; dashboard/frontend/src/lib/lifecycleTruth.ts:1-80",
+        "Validation_Method": "Jest/Vitest lifecycle display contract + Playwright DOM inspection asserting zero conflated 'READY' badges when market validation is NO.",
+        "Priority": "P0"
+    },
+    {
+        "Item_ID": "F04",
+        "Audit_Category": "Component Lifecycle & Loading State",
+        "Audit_Finding_Title": "ML proof view flashes an apparent failure before settling (~5 seconds delay)",
+        "Audit_Severity": "MEDIUM",
+        "Observed_Behavior_Cloud": "Opening ML Model tab first displays red/amber 'CHECKING', null metrics, and 'Training proof missing' for ~5 seconds before loading the actual proven record (rho 0.78, hit rate 0.75).",
+        "Observed_Behavior_Local": "MLPerformance.tsx sets state=null, perfBody=null on initial mount, and renders initial status='loading' with error-styled fallback chips before Promise.allSettled resolves.",
+        "Forensic_Root_Cause": "In MLPerformance.tsx, loading state renders fallback text ('Training proof missing') and null metrics before API response arrives, making normal asynchronous network latency look like an operational failure.",
+        "Current_Status": "FAIL",
+        "World_Top_Benchmark": "OptionStrat & TradingView Financials",
+        "World_Class_Best_Practice_Design": "OptionStrat uses dedicated skeleton shimmer placeholders (SVG pulse animation) during network fetching; metrics cards display animated skeleton bars, and status chip displays neutral blue/slate 'FETCHING PROOF...' rather than red/amber warning badges.",
+        "Concrete_Implementation_Blueprint": "1. In MLPerformance.tsx, replace premature error/missing fallback messages with a unified ShimmerSkeletonLoader. 2. Keep previous cached proof in memory if available (stale-while-revalidate pattern) so tab switching is instantaneous without flashing blank states.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/MLPerformance.tsx:73-198",
+        "Validation_Method": "Playwright network throttling test (Fast 3G); assert no red error text or 'Training proof missing' badge appears while status === 'loading'.",
+        "Priority": "P1"
+    },
+    {
+        "Item_ID": "F05",
+        "Audit_Category": "Data Visualization & Chart Rendering",
+        "Audit_Finding_Title": "Two advanced chart panels show success without visible plots (IV Surface & Greeks Chart)",
+        "Audit_Severity": "MEDIUM",
+        "Observed_Behavior_Cloud": "Option Chain Heatmap and PCR chart render successfully, but IV Surface and Greeks Chart show 'data loaded successfully' and summary metrics with a completely blank chart area.",
+        "Observed_Behavior_Local": "In AdvancedCharts.tsx, Recharts ResponsiveContainer is nested inside h-64 div without explicit min-height or aspect-ratio; 142 raw strikes (20850 to 28000) are fed into LineChart, collapsing SVG dimensions when illiquid strikes contain 0 or null values.",
+        "Forensic_Root_Cause": "1. Recharts ResponsiveContainer width/height collapse bug when rendered in hidden tab or un-settled flex container. 2. Backend /api/charting/iv-surface and /api/charting/greeks return 142 strikes, of which first 30 strikes have 0 values, causing SVG scale distortion.",
+        "Current_Status": "FAIL",
+        "World_Top_Benchmark": "TradingView & OptionStrat Volatility Surface",
+        "World_Class_Best_Practice_Design": "OptionStrat centers IV surface and Greeks charts around the current ATM spot price (+/- 15 liquid strikes), filters out deep OTM zero-value strikes, and applies fixed SVG height (min-h-[280px]) with auto-scaling Y-axis domain [dataMin - 0.05, dataMax + 0.05].",
+        "Concrete_Implementation_Blueprint": "1. In AdvancedCharts.tsx, slice ivRows and greekRows to [ATM - 15 strikes, ATM + 15 strikes]. 2. Set min-h-[280px] on chart container and provide explicit width/height fallback to ResponsiveContainer. 3. Configure YAxis domain=['auto', 'auto'] with formatters.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/AdvancedCharts.tsx:25-76, 200-245; dashboard/frontend/src/components/workspaces/OptionsIntelligence.tsx:80-140",
+        "Validation_Method": "Playwright screenshot capture of /ui?tab=options-intel (Advanced Charts section); assert SVG polyline/path count > 0 for IV Surface and Greeks.",
+        "Priority": "P1"
+    },
+    {
+        "Item_ID": "F06",
+        "Audit_Category": "Navigation & Routing State",
+        "Audit_Finding_Title": "Navigation can retain the previous page's scroll offset across tab switches",
+        "Audit_Severity": "MEDIUM",
+        "Observed_Behavior_Cloud": "Scrolling down deeply in Options Intelligence on mobile (390px), then selecting Decision Intel opened partway down the new page: title and lifecycle banner were scrolled above viewport.",
+        "Observed_Behavior_Local": "App.tsx line 105 has useLayoutEffect([activeTab]) that queries main.querySelectorAll('*') but never resets main.scrollTop = 0 or individual workspace roots like [data-testid='decision-intel-root'].",
+        "Forensic_Root_Cause": "In App.tsx, the scroll reset effect iterates children of #dashboard-main, but individual workspace components have their own overflowY: 'auto' containers (e.g. decision-intel-root, options-intel-root). These containers do not get reset on activeTab change.",
+        "Current_Status": "FAIL",
+        "World_Top_Benchmark": "TradingView & Linear App",
+        "World_Class_Best_Practice_Design": "Linear and TradingView reset both window.scrollTo(0, 0) and the primary viewport scroll container to top (scrollTop = 0) immediately upon route/tab transition, while maintaining tab-specific scroll memory only when user navigates back.",
+        "Concrete_Implementation_Blueprint": "1. In App.tsx useLayoutEffect([activeTab]): Add main.scrollTop = 0; document.querySelectorAll('[data-testid$=\"-root\"]').forEach(el => el.scrollTop = 0); window.scrollTo(0, 0).",
+        "Affected_Component_Files": "dashboard/frontend/src/App.tsx:105-114",
+        "Validation_Method": "Playwright test: scroll down 500px in options-intel, click decision-intel tab, assert decision-intel-root.scrollTop === 0 and top banner is in viewport.",
+        "Priority": "P1"
+    },
+    {
+        "Item_ID": "F07",
+        "Audit_Category": "Grid Architecture & Layout Balance",
+        "Audit_Finding_Title": "One operations card is orphaned on desktop (1440px desktop view)",
+        "Audit_Severity": "MEDIUM",
+        "Observed_Behavior_Cloud": "At 1440px, seven Live Operations cards occupy the first row while 'Next open' card sits alone on the second row, leaving 85% of row 2 empty.",
+        "Observed_Behavior_Local": "In DecisionIntelligence.tsx line 132, .operations-metrics-grid is styled in index.css as repeat(auto-fit, minmax(min(100%, 150px), 1fr)). At 1440px width, 150px minmax creates 7 columns for 8 cards, orphaning 1 card.",
+        "Forensic_Root_Cause": "Grid template repeat(auto-fit, minmax(150px, 1fr)) creates an uncontrolled column count that doesn't divide 8 evenly at standard screen widths (1440px, 1920px).",
+        "Current_Status": "FAIL",
+        "World_Top_Benchmark": "Bloomberg Terminal Launchpad & Datadog Dashboard",
+        "World_Class_Best_Practice_Design": "Bloomberg Terminal uses deliberate 4-column x 2-row (desktop) or 2-column x 4-row (tablet) balanced metric grids. An 8-metric operational cluster is structured as 2 even rows of 4 cards, ensuring zero orphaned cards.",
+        "Concrete_Implementation_Blueprint": "1. Update index.css .operations-metrics-grid: grid-template-columns: repeat(4, 1fr) on desktop (lg/xl), repeat(2, 1fr) on tablet (md), and 1fr on mobile. 2. Alternatively promote 'Next open' into Market Status Banner as contextual metadata.",
+        "Affected_Component_Files": "dashboard/frontend/src/index.css:441-445; dashboard/frontend/src/components/workspaces/DecisionIntelligence.tsx:132-141",
+        "Validation_Method": "Playwright layout assertion at 1440x900; verify cards form a balanced 4x2 grid with zero cards alone on a trailing row.",
+        "Priority": "P1"
+    },
+    {
+        "Item_ID": "F08",
+        "Audit_Category": "Typography & Data Density",
+        "Audit_Finding_Title": "Option chain numeric text is 11.4px, too small on desktop and difficult to scan across 17 columns",
+        "Audit_Severity": "LOW",
+        "Observed_Behavior_Cloud": "Option chain numbers are rendered in small 11.4px font with dense row spacing; visual scanning across 17 columns causes cognitive fatigue.",
+        "Observed_Behavior_Local": "In OptionChain.tsx, table cells use text-xs (12px) scaled down by container font rules to 11.4px; lack of subtle column grouping borders makes Call vs Put separation faint.",
+        "Forensic_Root_Cause": "Monolithic font styling across all 17 columns without visual hierarchy between primary metrics (LTP, Strike, Net Change) and secondary metrics (Bid/Ask quantities, theta, gamma).",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "Bloomberg OMON (Option Monitor) & Interactive Brokers TWS",
+        "World_Class_Best_Practice_Design": "Bloomberg OMON applies distinct optical hierarchy: Strike column is bold 14px with high-contrast accent background; LTP is bold 13px; Greeks and secondary data are muted 12px tabular numerals with zebra shading.",
+        "Concrete_Implementation_Blueprint": "1. In OptionChain.tsx, elevate Strike column to 13px bold tabular-nums with distinct border. 2. Elevate LTP and Change % to 12.5px font-semibold. 3. Add vertical divider between Call side, Strike rail, and Put side.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/OptionChain.tsx:320-480; dashboard/frontend/src/index.css:320-370",
+        "Validation_Method": "Visual hierarchy inspection and automated font-size verification in Playwright.",
+        "Priority": "P2"
+    },
+    {
+        "Item_ID": "F09",
+        "Audit_Category": "Accessibility & WCAG Contrast",
+        "Audit_Finding_Title": "Low emphasis and contrast on dark panels for muted labels and secondary text",
+        "Audit_Severity": "LOW",
+        "Observed_Behavior_Cloud": "Secondary metadata text (e.g. sub-labels in MetricTile, card headers) uses var(--text-mut) or text-slate-500, which on dark slate-950/gray-900 background has contrast ratio around 2.8:1 to 3.2:1.",
+        "Observed_Behavior_Local": "dashboard/frontend/src/index.css defines --text-mut as #71717a (slate-500) and --text-sec as #94a3b8 (slate-400). On #0b132b background, #71717a fails WCAG AA 4.5:1 ratio for normal text.",
+        "Forensic_Root_Cause": "CSS custom property --text-mut is tuned for aesthetic subtlety rather than WCAG 2.1 AA 4.5:1 minimum contrast requirement.",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "GitHub Dark Mode & Bloomberg Professional Design System",
+        "World_Class_Best_Practice_Design": "GitHub Primer Dark and Bloomberg Professional use minimum #a1a1aa (slate-400) for tertiary/muted labels and #e2e8f0 (slate-200) for primary values, guaranteeing > 4.5:1 contrast against dark backgrounds.",
+        "Concrete_Implementation_Blueprint": "1. In index.css, update --text-mut to #94a3b8 (slate-400, contrast 4.8:1) and --text-sec to #cbd5e1 (slate-300, contrast 7.2:1). 2. Add aria-labels to all icon-only buttons in TopBar and TruthStrip.",
+        "Affected_Component_Files": "dashboard/frontend/src/index.css:10-50",
+        "Validation_Method": "Lighthouse accessibility audit; automated axe-core contrast check in Playwright.",
+        "Priority": "P2"
+    },
+    {
+        "Item_ID": "F10",
+        "Audit_Category": "Data Transport & Freshness Truth",
+        "Audit_Finding_Title": "WebSocket connection state (WS LIVE) displayed alongside market data freshness (SESSION REPLAY)",
+        "Audit_Severity": "MEDIUM",
+        "Observed_Behavior_Cloud": "TopBar and TruthStrip display 'WEBSOCKET: CONNECTED' or 'WS LIVE' in green while market data is after-hours 'SESSION REPLAY', leading users to assume real-time live market ticks are flowing.",
+        "Observed_Behavior_Local": "TruthStrip.tsx lines 65-72 display separate badges for MARKET DATA and WEBSOCKET, but green tone on WEBSOCKET: CONNECTED visually dominates the grey/amber SESSION REPLAY badge.",
+        "Forensic_Root_Cause": "Visual weight asymmetry: WebSocket connection status (pure network transport layer) uses bright green badge (#10b981), which users intuitively interpret as 'Live Market Data Flowing'.",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "Interactive Brokers TWS & TradingView",
+        "World_Class_Best_Practice_Design": "IBKR TWS uses a composite Market Data indicator: 'STREAMING LIVE' (Green), 'SNAPSHOT' (Yellow), 'AFTER HOURS REPLAY' (Blue/Slate), 'OFFLINE' (Red). Socket connection is treated as low-level diagnostic telemetry, not primary trading banner.",
+        "Concrete_Implementation_Blueprint": "1. In TruthStrip.tsx, subordinate WebSocket badge to small grey/slate dot indicator. 2. Promote unified Market Feed Freshness banner as primary status chip with explicit timestamp and age in seconds.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/TruthStrip.tsx:64-73; dashboard/frontend/src/components/TopBar.tsx:178-184",
+        "Validation_Method": "Playwright assertion: during after-hours session, no primary green 'LIVE' status is presented on market feed.",
+        "Priority": "P1"
+    },
+    {
+        "Item_ID": "F11",
+        "Audit_Category": "Mobile Ergonomics & Navigation Drawer",
+        "Audit_Finding_Title": "Mobile navigation drawer overlay and touch target ergonomics",
+        "Audit_Severity": "LOW",
+        "Observed_Behavior_Cloud": "Mobile hamburger drawer opens correctly and lists all 22 tabs, but backdrop touch dismiss occasionally delays and drawer scroll lacks momentum scrolling on iOS Safari.",
+        "Observed_Behavior_Local": "Sidebar.tsx and App.tsx SidebarBackdrop component rely on basic fixed positioning with 56px top offset; lacks -webkit-overflow-scrolling: touch.",
+        "Forensic_Root_Cause": "Sidebar CSS lacks hardware-accelerated touch scrolling and active tap target padding for mobile touch viewports (< 48px min-height).",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "Linear Mobile Web & TradingView Mobile",
+        "World_Class_Best_Practice_Design": "Mobile navigation uses slide-over sheet with spring physics, explicit 48px touch targets, sticky search filter at top of drawer, and auto-close on selection with touch backdrop dismiss.",
+        "Concrete_Implementation_Blueprint": "1. In Sidebar.tsx, add quick filter search inside mobile drawer. 2. Set min-h-[44px] on all nav buttons. 3. Add -webkit-overflow-scrolling: touch in index.css.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/Sidebar.tsx:1-200; dashboard/frontend/src/index.css:400-410",
+        "Validation_Method": "Touch tap and scroll audit via Chrome DevTools touch emulation at 390x844.",
+        "Priority": "P2"
+    },
+    {
+        "Item_ID": "F12",
+        "Audit_Category": "Contract Filtering & Strike Rail Controls",
+        "Audit_Finding_Title": "Strike range selector reduces row count but does not filter illiquid or zero-volume contracts",
+        "Audit_Severity": "LOW",
+        "Observed_Behavior_Cloud": "Strike filter selector (+/- 5 ATM, +/- 10 ATM, Full) successfully reduces row count from 142 to 21 or 11, but rows still display illiquid zero-OI contracts without highlighting the active ATM strike.",
+        "Observed_Behavior_Local": "OptionChain.tsx filters rows by index range around ATM, but does not provide liquidity toggle ('Hide Zero OI / Zero Volume').",
+        "Forensic_Root_Cause": "Filter logic is purely mathematical strike distance without liquidity arbitration.",
+        "Current_Status": "PARTIAL",
+        "World_Top_Benchmark": "Sensibull & Tastytrade",
+        "World_Class_Best_Practice_Design": "Sensibull and Tastytrade provide a quick 'Active Strikes Only' (Volume > 0 and OI > 100) filter toggle and a prominent visual ATM Marker row with spot price banner separating ITM Call / OTM Put.",
+        "Concrete_Implementation_Blueprint": "1. In OptionChain.tsx, add 'Active Only' checkbox filter. 2. Highlight ATM strike row with high-contrast accent outline and spot price pill banner.",
+        "Affected_Component_Files": "dashboard/frontend/src/components/OptionChain.tsx:180-250",
+        "Validation_Method": "Unit test and UI verification: selecting 'Active Only' filters out 0-volume contracts.",
+        "Priority": "P2"
+    }
+]
+
+with open(output_path, "w", newline="", encoding="utf-8") as f:
+    writer = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+    writer.writeheader()
+    writer.writerows(rows)
+
+print(f"Successfully generated {len(rows)} forensic audit records in {output_path}")

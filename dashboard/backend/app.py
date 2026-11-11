@@ -3051,7 +3051,7 @@ async def approve_live_trading(payload: Dict[str, Any]):
         return {
             "approved": True,
             "message": "Approval recorded. IMPORTANT: You must STILL manually set "
-            "LIVE_TRADING_ENABLED=1 on Cloud Run (GCP) to actually enable live trading. "
+            "LIVE_TRADING_ENABLED set to 1 on Cloud Run (GCP) to actually enable live trading. "
             "This approval alone does NOT enable live trading. Default remains OFF.",
             "next_step": "Cloud Run → genesis-system3-web → Variables & Secrets → "
             "LIVE_TRADING_ENABLED → change to 1 → Deploy (owner-only; keep OFF unless explicit)",

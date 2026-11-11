@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quantitative Options Dashboard - UI/UX Audit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--subtle:#fafafa;--muted:#f4f4f5;--line:#e4e4e7;--faint:#a1a1aa;--soft:#71717a;--text2:#52525b;--text:#18181b;--good:#15803d;--warn:#b45309;--bad:#b91c1c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+main{max-width:1080px;margin:0 auto;padding:44px 24px 72px}
+h1{font-size:32px;line-height:1.2;letter-spacing:-.02em;margin:0 0 12px;font-weight:700}
+h2{font-size:19px;letter-spacing:-.01em;margin:38px 0 12px;font-weight:600}
+h3{font-size:15px;line-height:1.4;margin:0 0 8px;font-weight:650}
+p{margin:0 0 12px;color:var(--text2)}
+a{color:var(--text);text-decoration:underline;text-decoration-color:var(--faint);text-underline-offset:2px;overflow-wrap:anywhere}
+a:hover{text-decoration-color:var(--text)}
+.meta{font-size:13px;color:var(--soft);margin-bottom:22px}
+.lead{font-size:17px;color:var(--text);max-width:850px}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:20px 0}
+.box,.finding{border:1px solid var(--line);border-radius:12px;padding:16px;background:var(--bg)}
+.box .label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--soft)}
+.box p{font-size:14px;margin:6px 0 0}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:1px 8px;border-radius:999px;background:var(--muted);color:var(--text2);white-space:nowrap}
+.tag.high{background:#fef2f2;color:var(--bad)}
+.tag.medium{background:#fffbeb;color:var(--warn)}
+.tag.good{background:#f0fdf4;color:var(--good)}
+.findings{display:grid;gap:10px}
+.finding{padding:16px 18px}
+.finding p{font-size:14px;margin:6px 0}
+.finding .fix{color:var(--text);margin-bottom:0}
+.finding .tag{margin-right:7px}
+.gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+figure{margin:0;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--subtle);min-width:0}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px;background:#111827}
+figcaption{font-size:13px;color:var(--text2);padding:8px 2px 1px}
+.note{border-left:3px solid var(--line);padding:2px 0 2px 12px;font-size:14px;color:var(--text2)}
+ul{margin:0;padding-left:20px;color:var(--text2)}
+li{margin:5px 0}
+.sources{font-size:13px}
+.sources li{word-break:break-word}
+footer{margin-top:40px;font-size:12px;color:var(--faint)}
+@media(max-width:700px){main{padding:28px 16px 48px}h1{font-size:26px}.lead{font-size:16px}.gallery{grid-template-columns:1fr}.finding{padding:14px}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Quantitative Options Dashboard: UI/UX Audit</h1>
+  <div class="meta">Audited 10 Nov 2026, approximately 19:01-19:06 IST · 1440x900 desktop, 768x1024 tablet, 390x844 phone · read-only inspection</div>
+  <p class="lead">The desktop dashboard is information-rich and its core navigation and chain filters work. The main risks are clipped status information on narrow screens, an over-wide option chain, and readiness labels that combine several different operational states; clarify these before relying on the interface during live operations.</p>
+
+  <div class="summary">
+    <div class="box"><div class="label">Overall</div><strong>Strong desktop foundation</strong><p>Clear dark theme, useful market context, grouped panels, and monospaced financial values.</p></div>
+    <div class="box"><div class="label">Highest priority</div><strong>Responsive and status clarity</strong><p>Critical header chips disappear off-screen at 390px and 768px; trading readiness wording is easy to misread.</p></div>
+    <div class="box"><div class="label">Controls checked</div><strong>Navigation and filters respond</strong><p>Navigation drawer opened; the strike-range selector changed the chain from 21 rows to 11 at +/-5 ATM.</p></div>
+  </div>
+
+  <h2>Priority Findings</h2>
+  <div class="findings">
+    <article class="finding">
+      <h3><span class="tag high">High</span>Status header is clipped on tablet and phone</h3>
+      <p>At 390px, the top header measures 507px wide and the status ribbon 741px; at 768px the ribbon is 1088px. The document itself remains viewport-width, so the overflow is clipped rather than exposed as a clear page-level scroll. Broker/session and alert information at the right edge is partly or wholly out of view.</p>
+      <p class="fix"><strong>Recommendation:</strong> Reflow or wrap status chips below tablet width. Keep the safety gate, market/feed mode, and connection state visible; move lower-priority ticker items into a deliberate horizontal ticker with an obvious affordance.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag high">High</span>Option chain is not phone-readable as a full table</h3>
+      <p>The chain has 17 columns. At 390px its table is 1038px wide inside a 382px viewport region, so only a few call-side columns appear initially and the central strike/put-side fields require horizontal scrolling. At desktop, numeric text is about 11.4px. The strike-range filter works, but it only reduces rows, not columns.</p>
+      <p class="fix"><strong>Recommendation:</strong> Use a phone-specific contract view or let users choose compact column groups. Pin the strike and column headers, add a visible swipe/scroll cue, and retain a desktop full-chain mode.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag high">High</span>Operational readiness mixes distinct states</h3>
+      <p>The lifecycle banner says <code>ready_for_live=true</code> and proven forward validation. The settled ML checklist also shows “market_validation real run? NO” because <code>state/market_validations</code> is missing, while the shell says PAPER LOCKED / LIVE OFF. Separately, the health panel says WS LIVE while the feed is SESSION REPLAY and live trading is off. These may describe different layers, but the UI does not explain the distinction at a glance.</p>
+      <p class="fix"><strong>Recommendation:</strong> Display separate, plainly named states for historical model proof, current-session market validation, WebSocket transport, market-data mode/freshness, broker permission, and order gate. Avoid a single green “ready” signal when an independent live-market check is NO.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag medium">Medium</span>ML proof view flashes an apparent failure before settling</h3>
+      <p>On opening ML Model, the page first showed CHECKING, null metrics, and “Training proof missing.” After roughly five seconds, it loaded one proven performance record (rho 0.78, hit rate 0.75, 204 proof passes) and a populated checklist. The initial screen looks like a data error, not an in-progress request.</p>
+      <p class="fix"><strong>Recommendation:</strong> Keep a stable loading skeleton until the request completes; distinguish “loading,” “no record,” and “request failed.” Do not display null values as final status.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag medium">Medium</span>Two advanced chart panels show success without visible plots</h3>
+      <p>The Option Chain Heatmap and Put-Call Ratio visibly render charts. IV Surface and Greeks Chart show summary metrics and a green “data loaded successfully” message, but no plot is visible in the captured panels.</p>
+      <p class="fix"><strong>Recommendation:</strong> Render the plot or replace the success state with a clear “visualization unavailable / no usable data” explanation. A success label should not imply a chart is present when the panel is blank.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag medium">Medium</span>Navigation can retain the previous page's scroll offset</h3>
+      <p>After scrolling deeply in Options Intelligence on a phone, selecting Decision Intel opened partway down the new page: the title and lifecycle banner were above the viewport. This makes a successful tab change look like a missing or partial page.</p>
+      <p class="fix"><strong>Recommendation:</strong> Reset the main content scroller to the top on section changes, or intentionally restore a per-section scroll position and make that behavior predictable.</p>
+    </article>
+    <article class="finding">
+      <h3><span class="tag medium">Medium</span>One operations card is orphaned on desktop</h3>
+      <p>At 1440px, seven Live Operations cards occupy the first row while “Next open” sits alone on a second row, leaving a large unused area and weakening comparison across the metrics.</p>
+      <p class="fix"><strong>Recommendation:</strong> Use a deliberate 4-by-2 or 8-column responsive grid, or promote “Next open” into the market-status banner.</p>
+    </article>
+  </div>
+
+  <h2>What Works Well</h2>
+  <ul>
+    <li>The dark visual system groups market context, operational metrics, truth/status panels, and model evidence consistently.</li>
+    <li>Core navigation buttons, the mobile navigation drawer, and the option-chain strike selector responded. The selector changed the visible strike rows from 21 to 11 for +/-5 ATM.</li>
+    <li>The page includes a skip-to-content link, named navigation controls, an active-page state, and labels on the option-chain selects.</li>
+    <li>Financial values use monospaced, tabular numerals. Negative moves are red and positive moves are commonly green; signs and text labels also carry meaning, so color is not the only cue.</li>
+    <li>The interface repeatedly states that the inspected session is read-only, market-closed, paper-locked, or live-off. No trade or broker-changing action was taken.</li>
+  </ul>
+
+  <h2>Accessibility and Performance Notes</h2>
+  <p>Numerical typography is consistent, but the option-chain cells are small on desktop and too wide to scan on mobile. Muted labels and status text are much lower emphasis than the bright data colors. A visual check suggests the red/green values are prominent on the dark panels, but no automated WCAG contrast audit was run; verify contrast for all secondary labels and color states, and never rely on red/green alone.</p>
+  <p>The main observed delay was the ML tab's approximately five-second transition from CHECKING/null to loaded proof. Navigation and the strike filter otherwise responded during inspection. This was not a formal performance profile. The market was closed and the account was in paper/live-off state, so live-feed recovery and order flows could not be verified.</p>
+
+  <h2>Screenshot Evidence</h2>
+  <div class="gallery">
+    <figure><img src="[BASE64_IMAGE]" alt="Decision Intelligence desktop overview showing live operations and start of system health"><figcaption>Decision Intelligence and Live Operations, desktop 1440x900.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="System health truth cards and live decision brief on desktop"><figcaption>System Health &amp; Truth, desktop 1440x900. WS LIVE appears alongside SESSION REPLAY and LIVE OFF elsewhere in the shell.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Desktop option chain with 17 columns and strike values"><figcaption>Option Chain, desktop 1440x900. Dense but scannable full-width chain.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Option chain at 768 pixel tablet width with header chips clipped and table partly cut off"><figcaption>Option Chain, tablet 768x1024. The status ribbon and 17-column table exceed the viewport.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Option chain on phone, showing underlying controls and first columns of wide table"><figcaption>Option Chain, phone 390x844. Strike and put-side values are off to the right until the table is horizontally scrolled.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Options Intelligence top cards on desktop"><figcaption>Options Intelligence summary cards, desktop 1440x900.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Options Intelligence cards on phone with clipped top status chips"><figcaption>Options Intelligence, phone 390x844. Main cards stack, while top status information is clipped.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Advanced Charts with visible option chain heatmap and start of IV Surface"><figcaption>Advanced Charts, desktop 1440x900. Heatmap is visible; the IV Surface panel begins below.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="IV Surface and Greeks cards show loaded labels but no visible chart plots; PCR chart below"><figcaption>Chart detail, desktop 1440x900. IV Surface and Greeks show loaded status without a visible plot; PCR renders.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Genesis Brain AI Decision Center with seven scorecards and evidence panels"><figcaption>Genesis Brain / AI Decision Center, desktop 1440x900.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="ML Model Truth with loaded metrics and validation checklist"><figcaption>ML Model Truth after loading, desktop 1440x900. The validation checklist includes a NO for real market validation.</figcaption></figure>
+    <figure><img src="[BASE64_IMAGE]" alt="Decision Intelligence mobile view opened partway down after navigating from a scrolled section"><figcaption>Decision Intelligence, phone 390x844. Navigation retained a mid-page scroll position, hiding the page title and lifecycle banner.</figcaption></figure>
+  </div>
+
+  <h2>Recommended Fix Order</h2>
+  <ol>
+    <li>Make mobile/tablet status and safety information visible, and redesign the chain for narrow screens.</li>
+    <li>Disambiguate model proof, live-market validation, WebSocket connection, feed mode, and broker/order permission.</li>
+    <li>Fix loading-state transitions and either render or honestly label unavailable IV/Greeks visualizations.</li>
+    <li>Reset section scroll on navigation, then polish the Live Operations grid and run a formal WCAG contrast check.</li>
+  </ol>
+
+  <h2>Scope and Source</h2>
+  <p class="note">Read-only visual and interaction audit of the supplied dashboard. Viewports tested: 1440x900, 768x1024, and 390x844. The page showed market closed, Dhan paper locked, and live off during inspection. No trade flow was submitted. Screenshot state is time-sensitive; live data and statuses may change.</p>
+  <ol class="sources">
+    <li><a href="https://genesis-system3-web-802404398783.asia-south1.run.app/ui">Genesis System3 quantitative options dashboard</a> - directly opened and inspected, including Decision Intelligence, Option Chain, Options Intelligence/Charts, Genesis Brain, ML Model, and System Health.</li>
+  </ol>
+  <footer>Audit evidence captured 10 Nov 2026. Contrast notes are visual observations, not a certified WCAG conformance result.</footer>
+</main>
+</body>
+</html>
