@@ -1,0 +1,45 @@
+{
+  "scope": "Forensic audit and generation of CLOUD_GITHUB_TRUTH.xlsx comparing Source A (GitHub repository configured for Genesis_System3) and Source B (Google Cloud Run deployed service genesis-system3-web). Verifies deployment chain (GitHub commit SHA, branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, Cloud Run image digest) and SHA256 file hashes for core/brokers/dhan/dhan_readonly.py, dashboard/backend/routers/broker.py, dashboard/backend/broker/dhan_auth.py, and dashboard/backend/gain_rank_spot_enrichment.py across 5 sheets.",
+  "limitations": [
+    "Read-only cloud inspection; no live orders; no modifications to deployed cloud infrastructure; analyzer/paper safety preserved."
+  ],
+  "subject_files": [
+    "CLOUD_GITHUB_TRUTH.xlsx",
+    "scripts/generate_cloud_github_truth.py",
+    "tests/test_cloud_github_truth.py"
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "CLOUD_GITHUB_TRUTH.xlsx exists and contains all 5 required sheets (DEPLOYMENT_CHAIN, GITHUB_FILE_HASHES, CLOUD_FILE_HASHES, HASH_COMPARISON, DRIFT_REPORT) with exact 7 columns: File, GitHub SHA256, Cloud SHA256, Match YES/NO, GitHub Commit, Cloud Revision, Evidence.",
+      "mandatory": true
+    },
+    {
+      "id": "R2",
+      "description": "DEPLOYMENT_CHAIN verifies GitHub commit SHA, GitHub branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, and Cloud Run image digest. File hashes for the 4 target files are verified, and unproven live container filesystem bytes are strictly marked UNVERIFIED without inference.",
+      "mandatory": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "tests/test_cloud_github_truth.py"
+      ],
+      "cwd": ".",
+      "timeout": 60,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      }
+    }
+  ]
+}

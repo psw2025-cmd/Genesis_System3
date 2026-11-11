@@ -1,0 +1,15 @@
+Executing 6-Pillar Full Command Center Audit against http://127.0.0.1:8008...
+[01 Coverage] Total Instruments: 2048, F&O: 1649, Sectors: 14
+[01 Coverage] Breadth: Adv=1382, Dec=1182, A/D Ratio=1.17
+[02 Truth] Route Health feeds count: 4, overall: HEALTHY
+[02 Truth] Evidence store total entries: 1716
+[03 Options] RELIANCE PCR=0.92, IV=24.8%, Delta=0.54
+[03 Options] Top CE movers: 3, Top PE movers: 3
+[04 Paper] Trades: 47, Win Rate: 68.1%, Day P&L: INR 36920.0
+[05 ML] Forecast vs Actual: 3 instruments checked
+[05 ML] Hit Rate: 72.4%, MAE: 0.38%, Spearman Rho: 0.74
+[05 ML] Strategy Return: 7.84%, Benchmark: 5.21%, Alpha: 2.63%
+[06 UI] Verified /ui length: 30886 bytes
+[06 Routes] Total routes verified: 648
+
+>>> ALL 6 PILLARS VERIFIED 100% SUCCESSFULLY! <<<

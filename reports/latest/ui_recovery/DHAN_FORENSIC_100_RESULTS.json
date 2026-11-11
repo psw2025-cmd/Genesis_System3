@@ -1,0 +1,902 @@
+﻿[
+    {
+        "id":  "FC-001",
+        "group":  "broker",
+        "path":  "core/brokers/dhan/dhan_readonly.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=29034",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-002",
+        "group":  "broker",
+        "path":  "core/brokers/dhan/cloud_token_provider.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=9033",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-003",
+        "group":  "broker",
+        "path":  "core/brokers/dhan/token_manager.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=3591",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-004",
+        "group":  "broker",
+        "path":  "core/brokers/dhan/token_watchdog.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=918",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-005",
+        "group":  "broker",
+        "path":  "core/brokers/dhan",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "16 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-006",
+        "group":  "market",
+        "path":  "core/data/datasource_manager.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=27399",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-007",
+        "group":  "market",
+        "path":  "core/data/dhan_option_chain_parser.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8291",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-008",
+        "group":  "market",
+        "path":  "core/data/dhan_master_cache.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8372",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-009",
+        "group":  "market",
+        "path":  "core/data/live_fetcher.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=258",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-010",
+        "group":  "market",
+        "path":  "core/data",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "15 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-011",
+        "group":  "feed",
+        "path":  "core/brokers/dhan/market_ltp.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=20233",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-012",
+        "group":  "feed",
+        "path":  "core/brokers/dhan/instruments.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4168",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-013",
+        "group":  "feed",
+        "path":  "core/brokers/dhan/equity_fo_universe.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=11577",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-014",
+        "group":  "feed",
+        "path":  "core/brokers/dhan/dhan_payload_normalizer.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4903",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-015",
+        "group":  "feed",
+        "path":  "core/brokers/dhan",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "16 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-016",
+        "group":  "backend",
+        "path":  "dashboard/backend/app.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=503880",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-017",
+        "group":  "backend",
+        "path":  "dashboard/backend/chain_adapter.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=14883",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-018",
+        "group":  "backend",
+        "path":  "dashboard/backend/contract_gain_scanner.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=24610",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-019",
+        "group":  "backend",
+        "path":  "dashboard/backend/equity_option_scanner.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=13198",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-020",
+        "group":  "backend",
+        "path":  "dashboard/backend",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "76 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-021",
+        "group":  "orders",
+        "path":  "dashboard/backend/order_gateway.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=9284",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-022",
+        "group":  "orders",
+        "path":  "dashboard/backend/order_management.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5117",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-023",
+        "group":  "orders",
+        "path":  "dashboard/backend/paper_pipeline_v8.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=22760",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-024",
+        "group":  "orders",
+        "path":  "dashboard/backend/trade_journal.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4224",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-025",
+        "group":  "orders",
+        "path":  "dashboard/backend",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "76 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-026",
+        "group":  "ui",
+        "path":  "dashboard/frontend/src/config.ts",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1599",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-027",
+        "group":  "ui",
+        "path":  "dashboard/frontend/src/hooks/useData.ts",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=38243",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-028",
+        "group":  "ui",
+        "path":  "dashboard/frontend/src/hooks/useWebSocket.ts",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=7799",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-029",
+        "group":  "ui",
+        "path":  "dashboard/frontend/src/hooks/useWebSocketProd.ts",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8214",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-030",
+        "group":  "ui",
+        "path":  "dashboard/frontend/src",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "9 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-031",
+        "group":  "docs",
+        "path":  "docs/DHAN_BROKER_API_ANALYSIS.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=20885",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-032",
+        "group":  "docs",
+        "path":  "docs/SYSTEM3_DHAN_TOKEN_UPDATE_NOTE.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1913",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-033",
+        "group":  "docs",
+        "path":  "docs/BROKER_RECURRENCE_FORENSIC_CHECKLIST.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=11844",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-034",
+        "group":  "docs",
+        "path":  "docs/OPTION_CHAIN_MISSING_DATA_REPORT.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=12952",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-035",
+        "group":  "docs",
+        "path":  "docs",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "510 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-036",
+        "group":  "scripts",
+        "path":  "scripts/verify_dhan_readonly.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=7397",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-037",
+        "group":  "scripts",
+        "path":  "scripts/dhan_startup_check.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1167",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-038",
+        "group":  "scripts",
+        "path":  "scripts/system3_dhan_token_issuer_forensics.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=7880",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-039",
+        "group":  "scripts",
+        "path":  "scripts/gcp_dhan_token_rotation_job.py",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "bytes=3702",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-040",
+        "group":  "scripts",
+        "path":  "scripts",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "421 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-041",
+        "group":  "tests",
+        "path":  "tests/test_dhan_only_chain_guard.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=2195",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-042",
+        "group":  "tests",
+        "path":  "tests/test_dhan_option_chain_parser.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5384",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-043",
+        "group":  "tests",
+        "path":  "tests/test_dhan_single_token_authority.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=10149",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-044",
+        "group":  "tests",
+        "path":  "tests/test_dhan_readonly_request_contract.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=9351",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-045",
+        "group":  "tests",
+        "path":  "tests",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "124 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-046",
+        "group":  "reports",
+        "path":  "reports/latest/dhan_parity/DHAN_LIVE_PARITY_ISSUES.md",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-047",
+        "group":  "reports",
+        "path":  "reports/latest/dhan_token_issuer_forensics/summary.json",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-048",
+        "group":  "reports",
+        "path":  "reports/latest/dhan_option_chain_schema_audit/summary.md",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-049",
+        "group":  "reports",
+        "path":  "reports/latest/dhan_advance_platform_verification/summary.md",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-050",
+        "group":  "reports",
+        "path":  "reports/latest",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "2 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-051",
+        "group":  "engine",
+        "path":  "core/engine/dhan_real_data_extractor.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5319",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-052",
+        "group":  "engine",
+        "path":  "core/engine/dhan_real_outcome_logger.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5183",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-053",
+        "group":  "engine",
+        "path":  "core/engine/dhan_trade_executor.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5220",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-054",
+        "group":  "engine",
+        "path":  "core/engine/dhan_synthetic_backtester.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=23356",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-055",
+        "group":  "engine",
+        "path":  "core/engine",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "444 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-056",
+        "group":  "config",
+        "path":  "config/dhan_automation_config.json",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=170",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-057",
+        "group":  "config",
+        "path":  "config/system3_broker_config.yml",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=608",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-058",
+        "group":  "config",
+        "path":  "config/runtime_flags.json",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=533",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-059",
+        "group":  "config",
+        "path":  "config/kill_switch.json",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=568",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-060",
+        "group":  "config",
+        "path":  "config",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "24 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-061",
+        "group":  "safety",
+        "path":  "core/brokers/dhan/broker_legacy.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1012",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-062",
+        "group":  "safety",
+        "path":  "core/brokers/dhan/preflight.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1328",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-063",
+        "group":  "safety",
+        "path":  "core/brokers/dhan/cloud_status_probe.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=18256",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-064",
+        "group":  "safety",
+        "path":  "core/brokers/dhan/first_rejection_trace.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=2852",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-065",
+        "group":  "safety",
+        "path":  "core/brokers/dhan",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "16 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-066",
+        "group":  "history",
+        "path":  "core/data/history_fetcher.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5962",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-067",
+        "group":  "history",
+        "path":  "core/data/nse_provider.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=6742",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-068",
+        "group":  "history",
+        "path":  "core/data/nse_session.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=587",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-069",
+        "group":  "history",
+        "path":  "core/data/dhan_option_chain_parser.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8291",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-070",
+        "group":  "history",
+        "path":  "core/data",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "15 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-071",
+        "group":  "rest",
+        "path":  "src/dhan/expiry_selector.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8808",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-072",
+        "group":  "rest",
+        "path":  "src/dhan/live_chain_rest.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5513",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-073",
+        "group":  "rest",
+        "path":  "src/dhan/live_chain_ws.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1235",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-074",
+        "group":  "rest",
+        "path":  "src/dhan/missing.py",
+        "exists":  false,
+        "tracked":  false,
+        "detail":  "",
+        "status":  "NOT_FOUND"
+    },
+    {
+        "id":  "FC-075",
+        "group":  "rest",
+        "path":  "src/dhan",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "3 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-076",
+        "group":  "frontend",
+        "path":  "dashboard/frontend/src/components/MarketTopCePeTable.tsx",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=13248",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-077",
+        "group":  "frontend",
+        "path":  "dashboard/frontend/src/components/PaperTrading.tsx",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=24879",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-078",
+        "group":  "frontend",
+        "path":  "dashboard/frontend/src/components/ChainAnalytics.tsx",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=9722",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-079",
+        "group":  "frontend",
+        "path":  "dashboard/frontend/src/components/Alerts.tsx",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4271",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-080",
+        "group":  "frontend",
+        "path":  "dashboard/frontend/src/components",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "54 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-081",
+        "group":  "audit",
+        "path":  "docs/OPTION_CHAIN_TEST_CHECKLIST.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5823",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-082",
+        "group":  "audit",
+        "path":  "docs/OPTION_CHAIN_VERIFICATION_REPORT.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=5964",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-083",
+        "group":  "audit",
+        "path":  "docs/BROKER_SETUP.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=2127",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-084",
+        "group":  "audit",
+        "path":  "docs/ALL_INDICES_OPTION_CHAIN_FETCH.md",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=7648",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-085",
+        "group":  "audit",
+        "path":  "docs",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "510 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-086",
+        "group":  "pipeline",
+        "path":  "core/engine/dhan_blended_model_trainer.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4309",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-087",
+        "group":  "pipeline",
+        "path":  "core/engine/dhan_pnl_simulator.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=6349",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-088",
+        "group":  "pipeline",
+        "path":  "core/engine/dhan_signal_outcome_analyzer.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=8303",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-089",
+        "group":  "pipeline",
+        "path":  "core/engine/dhan_execution_guardrail.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4222",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-090",
+        "group":  "pipeline",
+        "path":  "core/engine",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "444 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-091",
+        "group":  "jobs",
+        "path":  "scripts/dhan_token_auto_refresh.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=1191",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-092",
+        "group":  "jobs",
+        "path":  "scripts/dhan_watchdog_runner.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=739",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-093",
+        "group":  "jobs",
+        "path":  "scripts/sync_dhan_instruments_master.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=4456",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-094",
+        "group":  "jobs",
+        "path":  "scripts/dhan_full_api_test.py",
+        "exists":  true,
+        "tracked":  true,
+        "detail":  "bytes=13760",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-095",
+        "group":  "jobs",
+        "path":  "scripts",
+        "exists":  true,
+        "tracked":  false,
+        "detail":  "421 direct files",
+        "status":  "PRESENT"
+    },
+    {
+        "id":  "FC-096",
+        "group":  "evidence",
+        "path":  "reports/latest/dhan_parity/api_chain_NIFTY.json",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-097",
+        "group":  "evidence",
+        "path":  "reports/latest/dhan_parity/api_broker_status.json",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-098",
+        "group":  "evidence",
+        "path":  "reports/latest/dhan_parity/api_health.json",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-099",
+        "group":  "evidence",
+        "path":  "reports/latest/dhan_parity/DHAN_PARITY_LIVE_COMPARE.json",
+        "exists":  false,
+        "tracked":  true,
+        "detail":  "",
+        "status":  "TRACKED_MISSING"
+    },
+    {
+        "id":  "FC-100",
+        "group":  "evidence",
+        "path":  "reports/latest/dhan_parity",
+        "exists":  false,
+        "tracked":  false,
+        "detail":  "",
+        "status":  "NOT_FOUND"
+    }
+]

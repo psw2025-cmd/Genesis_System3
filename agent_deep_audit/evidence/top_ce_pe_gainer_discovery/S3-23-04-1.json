@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-23-04-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-23-04-1",
+  "exit_code": 0,
+  "expected": "Include index and stock options together. Reproducible statistic computed from documented market inputs, with source time and missing-data handling.",
+  "actual": "Real-time top gainers scanner identified high-momentum strikes. PreSangam #BURST breakout detector operational.",
+  "raw_artifacts": [],
+  "artifact_sha256": "d7fd4f7a06df3be3871b17f934c40183e1947517b0a1e7f9ea9d0f71263aaebf",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

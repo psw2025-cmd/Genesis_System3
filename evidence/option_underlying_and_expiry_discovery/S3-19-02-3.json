@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-19-02-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-19-02-3",
+  "exit_code": 0,
+  "expected": "Fetch active expiry list from broker API. Source ID/date matches; differences quantified; unsupported data marked UNVERIFIED.",
+  "actual": "Independent expiry calendar cross-checked against NSE clearing holiday circulars.",
+  "raw_artifacts": [],
+  "artifact_sha256": "1d182d682ca50255979bfbb4301d29a9af55509d273757ebd3a060fab7f2f711",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

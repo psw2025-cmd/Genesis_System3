@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/psw2025-cmd/Genesis_System3/schemas/agent_policy.v4.schema.json",
+  "title": "Genesis System3 Agent Policy v4",
+  "type": "object",
+  "required": ["version", "schema_version", "schema_path", "autonomous_end_to_end_runbook", "invariants"],
+  "properties": {
+    "version": {"const": 4},
+    "schema_version": {"const": 4},
+    "schema_path": {"const": "schemas/agent_policy.v4.schema.json"},
+    "autonomous_end_to_end_runbook": {
+      "type": "object",
+      "required": ["authority", "production_sentinel", "deployment_supply_chain", "recommendation_ledger", "data_integrity_audit", "dhan_rotation_governance", "iam_recovery", "policy_schema_lifecycle", "paper_lifecycle_reconciliation", "paper_telemetry", "dag_resilience_testing", "mri_autonomous_scan"],
+      "properties": {
+        "authority": {"const": "SYSTEM3_AUTONOMOUS_E2E_RUNBOOK_V1"},
+        "production_sentinel": {
+          "type": "object",
+          "required": ["read_only_observer", "may_redeploy_or_repair_iam", "on_iam_drift"],
+          "properties": {
+            "read_only_observer": {"const": true},
+            "may_redeploy_or_repair_iam": {"const": false},
+            "on_iam_drift": {"const": "freeze_evidence_and_open_or_update_blocker"}
+          }
+        },
+        "deployment_supply_chain": {
+          "type": "object",
+          "required": ["github_to_gcp_auth", "service_account_json_keys", "require_artifact_digest_revision_sha_mapping", "self_reported_serving_sha_alone_sufficient", "web_runtime_may_invoke_dhan_rotator", "split_brain_sentinel", "require_single_production_writer", "workflow_actions_must_use_reviewed_full_sha"],
+          "properties": {
+            "github_to_gcp_auth": {"const": "oidc_workload_identity_federation"},
+            "service_account_json_keys": {"const": "forbidden"},
+            "require_artifact_digest_revision_sha_mapping": {"const": true},
+            "self_reported_serving_sha_alone_sufficient": {"const": false},
+            "web_runtime_may_invoke_dhan_rotator": {"const": false},
+            "split_brain_sentinel": {"const": "SPLIT_BRAIN_DEPLOYMENT_RISK"},
+            "require_single_production_writer": {"const": true},
+            "workflow_actions_must_use_reviewed_full_sha": {"const": true}
+          }
+        },
+        "recommendation_ledger": {
+          "type": "object",
+          "required": ["schema_version", "ids", "statuses", "required_fields"],
+          "properties": {
+            "schema_version": {"const": 1},
+            "ids": {"const": ["R01", "R02", "R03", "R04", "R05", "R06", "R07", "R08", "R09", "R10", "R11", "R12"]},
+            "statuses": {"const": ["PASS", "FAIL", "PARTIAL", "BLOCKED"]}
+          }
+        },
+        "data_integrity_audit": {"type": "object", "required": ["schema_version", "mode", "preferred_store", "alternative_store"], "properties": {"mode": {"const": "read_only"}}},
+        "dhan_rotation_governance": {"type": "object", "required": ["authority", "web_runtime_invocation", "refresh_token_mechanism_may_be_invented", "audit_payload"], "properties": {"web_runtime_invocation": {"const": "forbidden"}, "refresh_token_mechanism_may_be_invented": {"const": false}, "audit_payload": {"const": "metadata_only"}}},
+        "iam_recovery": {"type": "object", "required": ["sentinel_can_repair", "audit_log_function_can_grant_roles", "audit_log_function_role", "remediation_identity", "required_controls", "human_gates"], "properties": {"sentinel_can_repair": {"const": false}, "audit_log_function_can_grant_roles": {"const": false}, "audit_log_function_role": {"const": "detect_and_queue_only"}}},
+        "policy_schema_lifecycle": {"type": "object", "required": ["canonical_schema", "validate_before_merge", "breaking_change_requires_new_major_schema", "migration_and_backward_compatibility_tests", "unknown_future_major", "silently_drop_unknown_safety_fields"], "properties": {"canonical_schema": {"const": "schemas/agent_policy.v4.schema.json"}, "validate_before_merge": {"const": true}, "silently_drop_unknown_safety_fields": {"const": false}}},
+        "paper_lifecycle_reconciliation": {"type": "object", "required": ["mode", "timestamps", "paper_equals_real_execution", "infer_missing_fills_or_rewrite_records", "material_mismatch_gate"], "properties": {"mode": {"const": "read_only"}, "paper_equals_real_execution": {"const": false}}},
+        "paper_telemetry": {"type": "object", "required": ["latency_metrics", "reliability_metrics"]},
+        "dag_resilience_testing": {"type": "object", "required": ["fail_closed", "primary", "locust_role", "chaos_mesh"], "properties": {"fail_closed": {"const": true}, "chaos_mesh": {"const": "only_if_governed_kubernetes_environment_exists"}}},
+        "mri_autonomous_scan": {
+          "type": "object",
+          "required": ["concern_list_markdown", "concern_list_json", "market_data_authority", "compute", "paper_latency", "continuous_concern_reporting", "catalyst_intelligence", "paid_ai_connector_control_plane"],
+          "properties": {
+            "concern_list_markdown": {"const": "reports/latest/mri/Concern_List.md"},
+            "concern_list_json": {"const": "reports/latest/mri/Concern_List.json"},
+            "market_data_authority": {
+              "type": "object",
+              "required": ["primary_live_indian_broker", "alternative_sources_never_masquerade_as_dhan"],
+              "properties": {
+                "primary_live_indian_broker": {"const": "dhan"},
+                "alternative_sources_never_masquerade_as_dhan": {"const": true}
+              }
+            },
+            "compute": {
+              "type": "object",
+              "required": ["primary_execution", "fallback_order", "laptop_production_or_paper_serving", "immutable_artifact_sync_only"],
+              "properties": {
+                "primary_execution": {"const": "google_cloud"},
+                "fallback_order": {"const": ["alternate_cloud_node", "smaller_cloud_cpu", "bounded_laptop_cpu_last_resort"]},
+                "laptop_production_or_paper_serving": {"const": false},
+                "immutable_artifact_sync_only": {"const": true}
+              }
+            },
+            "paper_latency": {
+              "type": "object",
+              "required": ["websocket_tick_to_observation_p95_target_ms", "target_is_slo_not_guarantee", "option_chain_rest_is_separate_cadence", "live_or_hft_authority_granted"],
+              "properties": {
+                "websocket_tick_to_observation_p95_target_ms": {"const": 1000},
+                "target_is_slo_not_guarantee": {"const": true},
+                "option_chain_rest_is_separate_cadence": {"const": true},
+                "live_or_hft_authority_granted": {"const": false}
+              }
+            },
+            "continuous_concern_reporting": {
+              "type": "object",
+              "required": ["scan_each_stage_before_and_after", "immediate_new_or_changed_concern_report", "unresolved_visible_at_transitions_and_final", "repeat_identical_unchanged_messages"],
+              "properties": {
+                "scan_each_stage_before_and_after": {"const": true},
+                "immediate_new_or_changed_concern_report": {"const": true},
+                "unresolved_visible_at_transitions_and_final": {"const": true},
+                "repeat_identical_unchanged_messages": {"const": false}
+              }
+            },
+            "catalyst_intelligence": {
+              "type": "object",
+              "required": ["market_and_broker_truth", "official_event_sources", "point_in_time_and_revision_lineage_required", "price_only_vs_catalyst_ablation_required"],
+              "properties": {
+                "market_and_broker_truth": {"const": "dhan_only"},
+                "official_event_sources": {"const": ["nse", "bse", "sebi", "rbi", "government_releases"]},
+                "point_in_time_and_revision_lineage_required": {"const": true},
+                "price_only_vs_catalyst_ablation_required": {"const": true}
+              }
+            },
+            "paid_ai_connector_control_plane": {
+              "type": "object",
+              "required": ["public_dashboard_raw_secret_input", "public_dashboard_mode", "secret_store", "browser_may_read_secret_payload", "connector_not_proven_when_official_api_missing", "api_key_provider_setup", "activation_can_enable_live_or_orders", "hot_patch_serving_app_during_market_hours"],
+              "properties": {
+                "public_dashboard_raw_secret_input": {"const": "forbidden"},
+                "public_dashboard_mode": {"const": "read_only_connector_status"},
+                "secret_store": {"const": "google_secret_manager"},
+                "browser_may_read_secret_payload": {"const": false},
+                "connector_not_proven_when_official_api_missing": {"const": true},
+                "api_key_provider_setup": {"const": "authenticated_admin_to_secret_manager_only"},
+                "activation_can_enable_live_or_orders": {"const": false},
+                "hot_patch_serving_app_during_market_hours": {"const": "forbidden"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "invariants": {"type": "object"}
+  },
+  "additionalProperties": true
+}

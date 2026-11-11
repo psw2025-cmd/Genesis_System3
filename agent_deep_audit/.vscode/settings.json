@@ -1,0 +1,7 @@
+{
+  "python.defaultInterpreterPath": "/home/codespace/.python/current/bin/python3",
+  "python.terminal.activateEnvironment": true,
+  "terminal.integrated.shellIntegration.environmentReporting": true,
+  "terminal.integrated.suggest.enabled": true,
+  "git.ignoreLimitWarning": true
+}

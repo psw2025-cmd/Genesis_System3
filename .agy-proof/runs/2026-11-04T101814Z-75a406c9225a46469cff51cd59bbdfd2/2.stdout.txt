@@ -1,0 +1,24 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Genesis_System3_clean
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 97 items
+
+tests\test_order_zero_calls.py ...                                       [  3%]
+tests\test_dhan_only_chain_guard.py ....                                 [  7%]
+tests\test_dhan_option_chain_parser.py ........                          [ 15%]
+tests\test_dhan_payload_normalizer.py ...                                [ 18%]
+tests\test_dhan_profile_header_reconcile.py .........                    [ 27%]
+tests\test_dhan_readonly_request_contract.py ........................    [ 52%]
+tests\test_dhan_bankex_underlying.py ..                                  [ 54%]
+tests\test_dhan_cloud_status_probe_error_taxonomy.py ........            [ 62%]
+tests\test_dhan_first_rejection_trace.py ..                              [ 64%]
+tests\test_dhan_issuer_mri_bundle_contract.py ...                        [ 68%]
+tests\test_dhan_market_ltp.py ...........                                [ 79%]
+tests\test_br2_dhan_terminal_no_retry.py .....                           [ 84%]
+tests\test_paper_pipeline_v8_dhan_only.py ...                            [ 87%]
+tests\test_qc_validator_dhan_aliases.py ........                         [ 95%]
+tests\test_system3_dhan_token_issuer_forensics.py ....                   [100%]
+
+======================= 97 passed, 9 warnings in 25.13s =======================

@@ -1,0 +1,15 @@
+
+=================================== ERRORS ====================================
+_______ ERROR collecting tests/test_dhan_rotator_forensic_redaction.py ________
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\test_dhan_rotator_forensic_redaction.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_dhan_rotator_forensic_redaction.py:4: in <module>
+    from scripts.gcp_dhan_rotator_forensic import _redact
+E   ModuleNotFoundError: No module named 'scripts.gcp_dhan_rotator_forensic'
+=========================== short test summary info ===========================
+ERROR tests/test_dhan_rotator_forensic_redaction.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!

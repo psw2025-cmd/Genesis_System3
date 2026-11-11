@@ -1,0 +1,2 @@
+signal,risk,fill,exit,P&L,source_IDs
+SIG-FORENSIC-CANARY-01,PAPER_MODE=1 | LIVE_TRADING_ENABLED=0,order_id=PAPER-01 symbol=NIFTY 05NOV2026 23450 CE qty=75,OPEN_PAPER_POSITION,0.0 (PAPER_SIMULATED_ONLY),execution_mode=PAPER | broker_order_sent=False

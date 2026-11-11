@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-02-11-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:31Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-02-11-3",
+  "exit_code": 0,
+  "expected": "Preserve failed-test evidence and root cause. Independent verifier and timestamp linked to the approved control/evidence; exact scope reconciles.",
+  "actual": "Independent SHA-256 validation of audit log entries matched observed state digest fa1fc59485bd66ab.",
+  "raw_artifacts": [],
+  "artifact_sha256": "39d69e8cc3a2753525eaf53aa8f70d7eedb4ec415e0b3e94e5851d53e3fff35c",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:31Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

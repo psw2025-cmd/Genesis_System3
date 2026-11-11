@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\verify_consolidation_plan.py", line 1, in <module>
+    import openpyxl
+ModuleNotFoundError: No module named 'openpyxl'

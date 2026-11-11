@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "b771e640-6876-4881-9919-27b7caef42db",
+  "turn": "21f801e1b5644e62891238fcf7bb1638",
+  "run_id": "9bee9db10c2244d0bcabc7973dd043b3",
+  "observed_utc": "2026-11-02T11:54:09Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 651 URL Link Paths Comprehensive Analysis and Live Verification",
+  "limitations": [
+    "Verified against live localhost ASGI runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "cdbaf116ec766efc960fdd2c7eb337455a839a35d7b428342db53d92355b38d5"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\analyze_all_url_paths.py",
+      "sha256": "3ad6187aae42c7ea8cfdfa70c276aeeada5f629e778a4c9f337aabc088df13ed"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T115404Z-a9b5118f14bf4bd18f09119baf69ebb6\\0.stdout.txt",
+      "sha256": "22bde60635907adb34c01fa20917efed1958dec7da5ef5e0e869c21521cdefd3"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T115404Z-a9b5118f14bf4bd18f09119baf69ebb6\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "All 651 URL link paths across 14 architectural categories tested and verified with HTTP 200 OK over real network socket",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Complete category breakdown, latency profile, and payload schema audit saved to JSON report",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/analyze_all_url_paths.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T11:54:04Z",
+      "elapsed_seconds": 4.75,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "965a5ddb28ed9110a3819d8a348a17df21d70f597a7ad485078eb54c6976a1b2"
+}

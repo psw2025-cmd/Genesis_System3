@@ -1,0 +1,12 @@
+from pathlib import Path
+
+app_py = Path(r"c:\Genesis_System3_clean\dashboard\backend\app.py")
+txt = app_py.read_text(encoding="utf-8", errors="ignore")
+
+lines = txt.splitlines()
+for i, l in enumerate(lines):
+    if '@app.get("/api/accuracy_trend")' in l:
+        print(f"Line {i+1}: {l}")
+        for j in range(i, min(len(lines), i + 40)):
+            print(f"  {j+1}: {lines[j]}")
+        break

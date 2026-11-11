@@ -1,0 +1,6 @@
+
+dhanhq==2.3.0
+numpy==2.5.4
+pandas==3.1.0
+uvicorn==0.54.0
+

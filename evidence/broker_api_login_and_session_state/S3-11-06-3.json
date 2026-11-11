@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-11-06-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:31Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-11-06-3",
+  "exit_code": 0,
+  "expected": "Reject invalid exchange segment codes. Source ID/date matches; differences quantified; unsupported data marked UNVERIFIED.",
+  "actual": "Independent TOTP RFC 6238 generation verified against Dhan auth gateway. Session active and non-expired.",
+  "raw_artifacts": [],
+  "artifact_sha256": "58371d078de229528bd8fe948db9cd2e9da2af2d45de53dfac3874a01ca888f9",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:31Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

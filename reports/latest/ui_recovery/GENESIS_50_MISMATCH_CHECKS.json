@@ -1,0 +1,452 @@
+﻿[
+    {
+        "id":  "MM-001",
+        "scope":  "core/brokers/dhan",
+        "check":  "same_filename_multiple_paths",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-002",
+        "scope":  "core/brokers/dhan",
+        "check":  "same_size_multiple_paths",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-003",
+        "scope":  "core/brokers/dhan",
+        "check":  "zero_byte_files",
+        "files_scanned":  16,
+        "findings":  1,
+        "examples":  "core/brokers/dhan/init_legacy.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-004",
+        "scope":  "core/brokers/dhan",
+        "check":  "tiny_source_under_100_bytes",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-005",
+        "scope":  "core/brokers/dhan",
+        "check":  "oversized_source_over_100KB",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-006",
+        "scope":  "core/brokers/dhan",
+        "check":  "backup_or_copy_suffix",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-007",
+        "scope":  "core/brokers/dhan",
+        "check":  "legacy_or_deprecated_filename",
+        "files_scanned":  16,
+        "findings":  2,
+        "examples":  "core/brokers/dhan/broker_legacy.py ; core/brokers/dhan/init_legacy.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-008",
+        "scope":  "core/brokers/dhan",
+        "check":  "test_or_mock_in_runtime_tree",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-009",
+        "scope":  "core/brokers/dhan",
+        "check":  "mixed_case_name_collisions",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-010",
+        "scope":  "core/brokers/dhan",
+        "check":  "duplicate_content_sha256",
+        "files_scanned":  16,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-011",
+        "scope":  "core/data",
+        "check":  "same_filename_multiple_paths",
+        "files_scanned":  22,
+        "findings":  1,
+        "examples":  "core/data/__init__.py \u003c\u003e core/data/lake/__init__.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-012",
+        "scope":  "core/data",
+        "check":  "same_size_multiple_paths",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-013",
+        "scope":  "core/data",
+        "check":  "zero_byte_files",
+        "files_scanned":  22,
+        "findings":  2,
+        "examples":  "core/data/__init__ - Copy - Copy - Copy (3).py ; core/data/__init__.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-014",
+        "scope":  "core/data",
+        "check":  "tiny_source_under_100_bytes",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-015",
+        "scope":  "core/data",
+        "check":  "oversized_source_over_100KB",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-016",
+        "scope":  "core/data",
+        "check":  "backup_or_copy_suffix",
+        "files_scanned":  22,
+        "findings":  1,
+        "examples":  "core/data/__init__ - Copy - Copy - Copy (3).py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-017",
+        "scope":  "core/data",
+        "check":  "legacy_or_deprecated_filename",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-018",
+        "scope":  "core/data",
+        "check":  "test_or_mock_in_runtime_tree",
+        "files_scanned":  22,
+        "findings":  1,
+        "examples":  "core/data/selftest_storage.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-019",
+        "scope":  "core/data",
+        "check":  "mixed_case_name_collisions",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-020",
+        "scope":  "core/data",
+        "check":  "duplicate_content_sha256",
+        "files_scanned":  22,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-021",
+        "scope":  "core/engine",
+        "check":  "same_filename_multiple_paths",
+        "files_scanned":  464,
+        "findings":  1,
+        "examples":  "core/engine/__init__.py \u003c\u003e core/engine/ai_model/__init__.py \u003c\u003e core/engine/breakout_model/__init__.py \u003c\u003e core/engine/entry_exit_engine/__init__.py \u003c\u003e core/engine/greeks_engine/__init__.py \u003c\u003e core/engine/momentum_model/__init__.py \u003c\u003e core/engine/scoring_engine/__init__.py \u003c\u003e core/engine/trend_model/__init__.py \u003c\u003e core/engine/volatility_model/__init__.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-022",
+        "scope":  "core/engine",
+        "check":  "same_size_multiple_paths",
+        "files_scanned":  464,
+        "findings":  16,
+        "examples":  "core/engine/dhan_auto_threshold_adjuster.py \u003c\u003e core/engine/dhan_model_selector.py ; core/engine/system3_phase122_reserved.py \u003c\u003e core/engine/system3_phase123_reserved.py \u003c\u003e core/engine/system3_phase124_reserved.py \u003c\u003e core/engine/system3_phase125_reserved.py ; core/engine/system3_phase127_control_panel_stub.py \u003c\u003e core/engine/system3_phase128_control_panel_stub.py \u003c\u003e core/engine/system3_phase129_control_panel_stub.py \u003c\u003e core/engine/system3_phase130_control_panel_stub.py ; core/engine/system3_phase152_reserved_stub.py \u003c\u003e core/engine/system3_phase153_reserved_stub.py \u003c\u003e core/engine/system3_phase154_reserved_stub.py \u003c\u003e core/engine/system3_phase155_reserved_stub.py ; core/engine/system3_phase158_regime_stability.py \u003c\u003e core/engine/ultra_safety.py ; core/engine/system3_phase161_risk_attribution_analysis.py \u003c\u003e core/engine/system3_phase170_stability_metrics_summary.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-023",
+        "scope":  "core/engine",
+        "check":  "zero_byte_files",
+        "files_scanned":  464,
+        "findings":  2,
+        "examples":  "core/engine/__init__.py ; core/engine/system3_phase368_broker_latency_monitor.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-024",
+        "scope":  "core/engine",
+        "check":  "tiny_source_under_100_bytes",
+        "files_scanned":  464,
+        "findings":  2,
+        "examples":  "core/engine/storage/history/HEALTHCHECK_20251209_210028.json ; core/engine/storage/history/LIVE_BTCUSDT_20251209_210803.json",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-025",
+        "scope":  "core/engine",
+        "check":  "oversized_source_over_100KB",
+        "files_scanned":  464,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-026",
+        "scope":  "core/engine",
+        "check":  "backup_or_copy_suffix",
+        "files_scanned":  464,
+        "findings":  29,
+        "examples":  "core/engine/ai_model/data_balancing_v2.py ; core/engine/ai_model/feature_engineering_v2.py ; core/engine/dhan_auto_threshold_adjuster.py ; core/engine/dhan_blended_model_trainer_v2.py ; core/engine/dhan_blended_training_v3.py ; core/engine/dhan_dataset_merger_real_synth_v1.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-027",
+        "scope":  "core/engine",
+        "check":  "legacy_or_deprecated_filename",
+        "files_scanned":  464,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-028",
+        "scope":  "core/engine",
+        "check":  "test_or_mock_in_runtime_tree",
+        "files_scanned":  464,
+        "findings":  9,
+        "examples":  "core/engine/dhan_pnl_dummy_seed.py ; core/engine/dhan_synthetic_backtester.py ; core/engine/generate_synthetic_dhan_training.py ; core/engine/system3_phase197_micro_capital_test_plan.py ; core/engine/system3_phase307_live_vs_test_consistency.py ; core/engine/system3_phase376_self_test_suite.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-029",
+        "scope":  "core/engine",
+        "check":  "mixed_case_name_collisions",
+        "files_scanned":  464,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-030",
+        "scope":  "core/engine",
+        "check":  "duplicate_content_sha256",
+        "files_scanned":  464,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-031",
+        "scope":  "dashboard/backend",
+        "check":  "same_filename_multiple_paths",
+        "files_scanned":  82,
+        "findings":  1,
+        "examples":  "dashboard/backend/broker/__init__.py \u003c\u003e dashboard/backend/middleware/__init__.py \u003c\u003e dashboard/backend/routers/__init__.py \u003c\u003e dashboard/backend/sandbox/__init__.py \u003c\u003e dashboard/backend/services/__init__.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-032",
+        "scope":  "dashboard/backend",
+        "check":  "same_size_multiple_paths",
+        "files_scanned":  82,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-033",
+        "scope":  "dashboard/backend",
+        "check":  "zero_byte_files",
+        "files_scanned":  82,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-034",
+        "scope":  "dashboard/backend",
+        "check":  "tiny_source_under_100_bytes",
+        "files_scanned":  82,
+        "findings":  5,
+        "examples":  "dashboard/backend/broker/__init__.py ; dashboard/backend/broker/dhan_auth.py ; dashboard/backend/middleware/__init__.py ; dashboard/backend/routers/__init__.py ; dashboard/backend/services/__init__.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-035",
+        "scope":  "dashboard/backend",
+        "check":  "oversized_source_over_100KB",
+        "files_scanned":  82,
+        "findings":  1,
+        "examples":  "dashboard/backend/app.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-036",
+        "scope":  "dashboard/backend",
+        "check":  "backup_or_copy_suffix",
+        "files_scanned":  82,
+        "findings":  1,
+        "examples":  "dashboard/backend/paper_pipeline_v8.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-037",
+        "scope":  "dashboard/backend",
+        "check":  "legacy_or_deprecated_filename",
+        "files_scanned":  82,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-038",
+        "scope":  "dashboard/backend",
+        "check":  "test_or_mock_in_runtime_tree",
+        "files_scanned":  82,
+        "findings":  2,
+        "examples":  "dashboard/backend/backtest_service.py ; dashboard/backend/synthetic_data_generator.py",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-039",
+        "scope":  "dashboard/backend",
+        "check":  "mixed_case_name_collisions",
+        "files_scanned":  82,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-040",
+        "scope":  "dashboard/backend",
+        "check":  "duplicate_content_sha256",
+        "files_scanned":  82,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-041",
+        "scope":  "dashboard/frontend/src",
+        "check":  "same_filename_multiple_paths",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-042",
+        "scope":  "dashboard/frontend/src",
+        "check":  "same_size_multiple_paths",
+        "files_scanned":  89,
+        "findings":  1,
+        "examples":  "dashboard/frontend/src/config.ts \u003c\u003e dashboard/frontend/src/lib/consoleHygiene.ts",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-043",
+        "scope":  "dashboard/frontend/src",
+        "check":  "zero_byte_files",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-044",
+        "scope":  "dashboard/frontend/src",
+        "check":  "tiny_source_under_100_bytes",
+        "files_scanned":  89,
+        "findings":  1,
+        "examples":  "dashboard/frontend/src/test-setup.ts",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-045",
+        "scope":  "dashboard/frontend/src",
+        "check":  "oversized_source_over_100KB",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-046",
+        "scope":  "dashboard/frontend/src",
+        "check":  "backup_or_copy_suffix",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-047",
+        "scope":  "dashboard/frontend/src",
+        "check":  "legacy_or_deprecated_filename",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-048",
+        "scope":  "dashboard/frontend/src",
+        "check":  "test_or_mock_in_runtime_tree",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-049",
+        "scope":  "dashboard/frontend/src",
+        "check":  "mixed_case_name_collisions",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    },
+    {
+        "id":  "MM-050",
+        "scope":  "dashboard/frontend/src",
+        "check":  "duplicate_content_sha256",
+        "files_scanned":  89,
+        "findings":  0,
+        "examples":  "",
+        "classification":  "CANDIDATE_NOT_DEFECT"
+    }
+]

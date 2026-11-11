@@ -1,0 +1,340 @@
+{
+  "entries": [
+    {
+      "url": "http://127.0.0.1:8008/ui",
+      "status": 200,
+      "method": "GET",
+      "content_type": "text/html; charset=utf-8",
+      "ts": "2026-11-04T16:35:45.659944+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/dhan/summary",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.593788+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/dhan/holdings",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.596790+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.597798+05:30"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/chart.js",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/javascript; charset=utf-8",
+      "ts": "2026-11-04T16:35:46.598791+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/health",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.926831+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/pnl",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.946612+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market/sectors",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:46.948615+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/routes",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.024231+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.153803+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/history?symbol=NIFTY&points=60",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.157495+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.307361+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/history?symbol=RELIANCE&points=60",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.309360+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.310358+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.311361+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/positions",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.313358+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/orders",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.594833+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.691349+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.693563+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/risk",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.706571+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/drawdown",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.923468+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/broker/status",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:47.938418+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/health",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:48.100956+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:50.192617+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:50.208414+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:50.292870+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:50.306697+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:52.465470+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:52.469472+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:52.641199+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:52.642400+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/pnl",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.442632+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/positions",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.444160+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/orders",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.445161+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/risk",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.450159+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/drawdown",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.457003+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/broker/status",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.469571+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/health",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.699191+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/v1/placeorder",
+      "status": 403,
+      "method": "POST",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:53.798936+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:54.169200+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:54.173201+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:54.264474+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:54.273788+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:56.202454+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/verified-market",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:56.225824+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/routes",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:56.292126+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/options/gainers",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:56.442090+05:30"
+    },
+    {
+      "url": "http://127.0.0.1:8008/api/depth?symbol=RELIANCE",
+      "status": 200,
+      "method": "GET",
+      "content_type": "application/json",
+      "ts": "2026-11-04T16:35:56.444090+05:30"
+    }
+  ]
+}

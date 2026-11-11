@@ -1,0 +1,84 @@
+Content/app total routes: 62
+Dashboard/backend total routes: 268
+Overlap: 13
+Content only: 44
+Dashboard only: 239
+
+--- SAMPLE OVERLAP ---
+/api/broker/status
+/api/health
+/api/market/top-gainers
+/api/options/gainers
+/api/orders
+/api/pnl
+/api/positions
+/api/risk
+/emergency-exit
+/funds
+/holdings
+/positions
+/ui
+
+--- SAMPLE CONTENT ONLY ---
+/
+/api/audit
+/api/chain/{symbol}
+/api/data/provenance
+/api/decision
+/api/depth
+/api/dhan/discovery/chain-subscriptions
+/api/dhan/discovery/full-market
+/api/dhan/live-connectivity
+/api/drawdown
+/api/evidence
+/api/hash-chain
+/api/history
+/api/kill-switch
+/api/logs
+/api/market
+/api/market/breadth
+/api/market/inventory
+/api/market/missing-symbols
+/api/market/sectors
+/api/metrics
+/api/ml/benchmark
+/api/ml/forecast-vs-actual
+/api/ml/prediction-audit
+/api/options/greeks
+/api/options/intelligence
+/api/options/oi-buildup
+/api/paper/ledger
+/api/paper/lifecycle
+/api/route-health
+
+--- SAMPLE DASHBOARD ONLY ---
+/adapt-market
+/agent-full-control
+/api/accuracy_trend
+/api/agent-status
+/api/agent/apply-upgrade
+/api/agent/create-plan
+/api/agent/issues
+/api/agent/memory
+/api/agent/pause
+/api/agent/rollback
+/api/agent/status
+/api/agent/test-results/{plan_id}
+/api/agent/upgrade-plan
+/api/alerts
+/api/alerts/recent
+/api/alerts/unread
+/api/alerts/{alert_id}/read
+/api/approval/status
+/api/audit/comprehensive
+/api/audit/option-visibility
+/api/audit/secrets
+/api/audit/validate/pnl/{position_id}
+/api/audit/validate/spot/{underlying}
+/api/auth/logout
+/api/auth/session
+/api/auth/status
+/api/auto_gates
+/api/backtest/results
+/api/backtest/run
+/api/backtest/strategies

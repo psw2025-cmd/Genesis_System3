@@ -1,0 +1,14 @@
+# Command: c:\Genesis_System3_clean\.venv\Scripts\python.exe tests/test_ui_p0_recovery_mission.py
+# Timestamp UTC: 2026-11-04T10:10:51.301146+00:00
+# Exit Code: 0
+# Duration Sec: 81.38
+
+--- STDOUT ---
+
+--- STDERR ---
+...............
+----------------------------------------------------------------------
+Ran 15 tests in 78.190s
+
+OK
+

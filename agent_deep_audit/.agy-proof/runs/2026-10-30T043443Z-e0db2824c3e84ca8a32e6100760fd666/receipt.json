@@ -1,0 +1,129 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "bc55d0b1-e78e-4b10-abac-63bf51819d55",
+  "turn": "89c654ed42d14473bbe5ba31e328d99e",
+  "run_id": "de5c8b9315d24c87a7c6df5074bed323",
+  "observed_utc": "2026-10-30T04:34:49Z",
+  "workspace": "C:\\Genesis_System3",
+  "scope": "System3 Genesis Recovery Progress and Audit Verification",
+  "limitations": [
+    "Production Cloud Run read-only audit; live trading permanently disabled; Dhan broker Data API requires external subscription"
+  ],
+  "gate_sha256": "b27c10c10947dfd816bd1a6f28adf72034aeb90b978a7d8b8aa2de2049bda944",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3\\.agy-proof\\contract.json",
+    "sha256": "85f72dff10ee063e5a93f0f51e79c68b5502f0d77b2e306673ad61a0dc0ece67"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\backend\\app.py",
+      "sha256": "3fcc68bc34d12b7a5f08a3d44abee6d4a32904eec8b60fd0c62832f31a016c19"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\App.tsx",
+      "sha256": "6d083a413ef457826f5d7f9476a3aa3336b9675fd1a483564d6891dbc5dc0d2e"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\Sidebar.tsx",
+      "sha256": "8be3322a8a05fac2a6b1231f4e2effd370bb1e1aee74301003bb8678619eb61b"
+    },
+    {
+      "path": "C:\\Genesis_System3\\dashboard\\frontend\\src\\components\\RecoveryProgressTab.tsx",
+      "sha256": "fd260fe4ed6c38bba7ec402654cb6bb532f430ba7cc67bcf9a563cd80cf34f24"
+    },
+    {
+      "path": "C:\\Genesis_System3\\scripts\\get_token_official.py",
+      "sha256": "440da89b8efa65dc16585cb9c96c51ba76eb0af8c97df5554cf27a5c8109dd3a"
+    },
+    {
+      "path": "C:\\Genesis_System3\\tests\\test_recovery_audit_and_progress.py",
+      "sha256": "547be6e40c57e83f14ac4c2f46bf8697eaf80c24fc74f485cb0a3b2eeb0794de"
+    },
+    {
+      "path": "C:\\Genesis_System3\\reports\\latest\\recovery_progress.json",
+      "sha256": "59b87ccc397dc9d7158b4ef26344ade466026419d1432804c3b461ae42247bdd"
+    },
+    {
+      "path": "C:\\Genesis_System3\\reports\\latest\\MASTER_RECOVERY_CLOSURE.md",
+      "sha256": "4c5863031a0f2063b0b09f7e2b33d755b3ba39b911ed74cb1fed9902504f38b0"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-30T043443Z-e0db2824c3e84ca8a32e6100760fd666\\0.stdout.txt",
+      "sha256": "0f73c2ae6f0d2e2a8fcb05f1aa3f730e74f28b81e622ea107d31ff60a0fe0a28"
+    },
+    {
+      "path": "C:\\Genesis_System3\\.agy-proof\\runs\\2026-10-30T043443Z-e0db2824c3e84ca8a32e6100760fd666\\0.stderr.txt",
+      "sha256": "4a57ec82cc6a293b50a817078a4a146c9989ff6c575b60b1469187b6e4b008c0"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "23-tab Excel audit register with 121 micro-checks has valid structure, evidence and closure statuses",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Production Cloud Run runtime enforces PAPER mode, live_allowed=false, and order_placement_allowed=false",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Backend exposes /api/recovery/progress serving durable verified recovery progress JSON with 121 checks",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Frontend wires RecoveryProgressTab in Sidebar, App and builds clean production bundle",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Master Recovery Closure report documents root causes, Dhan Data API Error 806, token generation fix, and deployment matrix",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3\\.venv\\Scripts\\python.exe",
+        "tests/test_recovery_audit_and_progress.py"
+      ],
+      "cwd": "C:\\Genesis_System3",
+      "started_utc": "2026-10-30T04:34:43Z",
+      "elapsed_seconds": 6.172,
+      "exit_code": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "actual": true,
+        "expected": true
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "8970c96981164613c13d92f3d7dc61820a1d795dfad9513a1794bd0d49bea08c"
+}

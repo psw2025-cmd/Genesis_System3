@@ -1,0 +1,296 @@
+Path,Classification,Confidence,Reason,Importing_or_Referencing_Files,Line_Numbers,Test_References,Workflow_References,Risk_or_Validation_Details
+.agents/,GITIGNORE,98%,Local agent memory and dynamic session state files,scripts/update_continuity_state.py,Lines 8-15,None,None,Contains mutable session state (PROGRESS.md BLOCKERS.md) changing every turn; local only
+.agy-proof/,GITIGNORE,100%,Generated verification proof receipts,C:/Users/ADMIN/.gemini/config/evidence-integrity/evidence_gate.py,Lines 53-59,evidence_gate.py,None,Contains contract.json and receipt.json emitted by evidence gate tool
+.gcloudignore,DEPLOY,99%,Prevents local secrets and sensitive directories from uploading to Cloud Build,Cloud Build trigger / gcloud CLI,Lines 1-65,cloud_run_source_integrity_gate.py,cloudbuild.yaml / cloud-run-auto-deploy.yml,Critical risk: If omitted local secrets .env and credentials upload to Cloud Build context
+.github/workflows/cloud-run-auto-deploy.yml,MANUAL_REVIEW,85%,Direct conflict with Owner Directive 2026-10-18 forbidding unapproved automatic deployment on push,AGENTS.md,Lines 1-564,None,GitHub Actions push:main,High Risk: Committing enables automatic deployment on push violating constitutional owner consent
+AGENTS.md.bak_forensic,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Temporary backup file from prior editing session
+AGENTS.md.bak_master,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Temporary backup file from prior editing session
+AGY_WRITE_TEST.txt,DELETE,99%,Temporary probe text file with zero repository references,None,N/A,None,None,No imports runtime references workflows or tests found; safe to delete
+DATASOURCE_TRUTH_CLASSIFICATION.csv,GITIGNORE,95%,Generated audit classification report for data sources,None,N/A,None,None,Generated documentation artifact from past audit
+DATASOURCE_TRUTH_CLASSIFICATION.md,GITIGNORE,95%,Generated audit classification report for data sources,None,N/A,None,None,Generated documentation artifact from past audit
+GEMINI.md.bak_forensic,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Temporary backup file from prior editing session
+GEMINI.md.bak_master,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Temporary backup file from prior editing session
+GENESIS_1872_MASTER_CHECKLIST.csv,GITIGNORE,98%,Historical unverified claim register from Nov 2 2026,scripts/run_1872_acceptance_pipeline.py,Lines 1-40,scripts/verify_1872_acceptance_mission.py,None,Generated claim register; designated non-authoritative in AGENTS.md
+Genesis_Diagnose_Output.txt,GITIGNORE,100%,Diagnostic console output report,None,N/A,None,None,Local diagnostic text output from past session
+RUN_SUMMARY.json,GITIGNORE,100%,Generated test run execution summary artifact,None,N/A,None,None,JSON test run artifact generated during previous test execution
+System3_Autonomous_Trading_Roadmap.csv,GITIGNORE,95%,Generated audit roadmap report,None,N/A,None,None,Historical audit report artifact
+System3_Component_Truth_Matrix.csv,GITIGNORE,95%,Generated component truth matrix report,None,N/A,None,None,Historical component truth audit report
+add_broker_status.py,DELETE,98%,One-off patch script appending /api/broker/status to content/app/app.py,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+agent_control_audit/,GITIGNORE,100%,Generated agent control audit report directory,None,N/A,None,None,Contains generated markdown and json audit reports from prior runs
+agent_deep_audit/,GITIGNORE,100%,Generated agent deep audit report directory,None,N/A,None,None,Contains generated markdown and json audit reports from prior runs
+agent_memory/proof_packs/,GITIGNORE,100%,Generated proof pack directory,None,N/A,None,None,Local proof artifacts and execution traces
+antigravity_write_test.txt,DELETE,99%,Temporary probe text file with zero repository references,None,N/A,None,None,No imports runtime references workflows or tests found; safe to delete
+app.py,MANUAL_REVIEW,85%,Root entrypoint loading .secrets/dhan.env and importing content.app.app,None,Lines 1-20,None,None,Conflicting architecture: imports content.app instead of canonical dashboard.backend.app; needs architectural decision
+audit/__init__.py,MANUAL_REVIEW,85%,Audit microservice package initialization,tests/test_middleware_failures.py,Line 3,tests/test_middleware_failures.py,None,Used by content/app/app.py and audit unit tests but not integrated into canonical dashboard/backend/app.py
+audit/database.py,MANUAL_REVIEW,85%,Database connection module for audit service,audit/service.py,Lines 1-41,None,None,Hardcodes local sqlite:///C:/Genesis_System3_clean/audit/genesis_audit.db; requires architectural review
+audit/genesis_audit.db,GITIGNORE,100%,Runtime SQLite database file,audit/database.py,Line 10,None,None,Runtime SQLite database; strictly prohibited from deployment by .db rule
+audit/main.py,MANUAL_REVIEW,85%,Standalone FastAPI audit service application,tests/test_kill_switch.py,Line 2,tests/test_kill_switch.py,None,Stand-alone audit app; tested by kill switch tests but not mounted in canonical Cloud Run container
+audit/middleware.py,MANUAL_REVIEW,85%,AuditMiddleware for request logging and exception handling,tests/test_middleware_failures.py,Line 3,tests/test_middleware_failures.py,None,Tested by unit tests; architectural review needed for canonical integration
+audit/models.py,MANUAL_REVIEW,85%,SQLAlchemy models for audit log records,audit/service.py,Lines 1-50,None,None,Part of audit microservice data model
+audit/router.py,MANUAL_REVIEW,85%,FastAPI router exposing /api/audit endpoints,scripts/patch_app_audit.py,Line 18,tests/test_router_failures.py,None,Audit router mounted into content/app; pending canonical dashboard integration
+audit/schemas.py,MANUAL_REVIEW,85%,Pydantic schemas for audit endpoints,audit/router.py,Lines 1-40,None,None,Validation schemas for audit endpoints
+audit/service.py,MANUAL_REVIEW,85%,CRUD business logic for audit records,audit/router.py,Lines 1-50,None,None,Data access service for audit records
+capture_all_tabs.py,DELETE,95%,Ad-hoc local playwright script for tab capture,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+check_alerts_dom.py,DELETE,95%,Ad-hoc local DOM verification probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_auto_gates.py,DELETE,95%,Ad-hoc local auto-gates verification probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_db.py,DELETE,95%,Ad-hoc local database verification probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_engine_state.py,DELETE,95%,Ad-hoc local engine state verification probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_mv_keys.py,DELETE,95%,Ad-hoc local validation keys probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_paper_pnl.py,DELETE,95%,Ad-hoc local paper PnL probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_pnl_live.py,DELETE,95%,Ad-hoc local live PnL probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_prediction_audit_dom.py,DELETE,95%,Ad-hoc local prediction DOM probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+check_system_dom.py,DELETE,95%,Ad-hoc local system DOM probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+cloudbuild_recovery.yaml,MANUAL_REVIEW,85%,Cloud Build recovery pipeline bypassing source preflight gate,None,Lines 1-13,None,None,Bypasses scripts/cloud_run_source_integrity_gate.py; billable cloud deployment risk
+content/,MANUAL_REVIEW,80%,Alternative 7463-line backend application and UI templates,app.py / scripts/start_port_8008_clean.py,Lines 1-50,tests/test_ui_p0_recovery_mission.py,None,Massive alternative app structure; tested by local P0 tests but rejected by canonical Cloud Run preflight gate
+core/data_lake/columnar_store.py,DEPLOY,98%,Core in-memory columnar store and analytical lake (DuckDB and PyArrow),core/engine/option_chain_pipeline.py,Line 7,tests/test_columnar_truth_architecture.py,dashboard/backend/Dockerfile:31,Active production code: replaces runtime CSV dependencies with high-performance In-Memory PyArrow caching
+core/engine/anti_fake_guard.py,DEPLOY,95%,Anti-fake verification and market-hours guard for live quotes,core/engine/option_chain_pipeline.py,Line 5,tests/test_truth_certification.py,dashboard/backend/Dockerfile:31,Enforces truth classification preventing emission of stale or synthetic quotes as live
+core/engine/dhan_full_market_scanner.py,DEPLOY,96%,Dhan dynamic full-market symbol discovery and multiplexing subscriptions,tests/test_dhan_full_market_daemon.py,Line 7,tests/test_dhan_full_market_daemon.py,dashboard/backend/Dockerfile:47,Core production engine discovering 180+ F&O underlyings and computing proximity option strikes
+core/engine/option_chain_pipeline.py,DEPLOY,96%,End-to-end option chain truth pipeline and evidence emitter,tests/test_columnar_truth_architecture.py,Line 12,tests/test_columnar_truth_architecture.py,dashboard/backend/Dockerfile:31,Executes raw chain parsing validation columnar storage and ML inference
+core/engine/system3_self_healing_watchdog.py,DEPLOY,95%,Autonomous reliability watchdog ensuring 24/7 service self-healing,tests/test_autonomous_watchdog.py,Line 5,tests/test_autonomous_watchdog.py,AGENTS.md,Monitors broker token validity ASGI server ports and recovers services automatically
+core/engine/telegram_notifier.py,DEPLOY,95%,Institutional Telegram alert and downstream notification engine,tests/test_telegram_downstream.py,Line 7,tests/test_telegram_downstream.py,dashboard/backend/Dockerfile:31,Dispatches market signals risk alerts and paper execution receipts to Telegram outbox
+dashboard/backend/app.py.bak_20261101_065834,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Historical backend backup file
+dashboard/backend/app.py.bak_market_top_route,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Historical backend backup file
+dashboard/backend/app.py.bak_perma_del_20261101_074025,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Historical backend backup file
+dashboard/backend/app.py.bak_perma_del_20261101_074148,GITIGNORE,100%,Backup file covered by .gitignore *.bak rule,None,N/A,None,None,Historical backend backup file
+dashboard/backend/autonomous_market_daemon.py,DEPLOY,94%,Autonomous market sync daemon recalculating ATM strikes and healing cache,scripts/test_autonomous_market_sync.py,Line 6,scripts/test_autonomous_market_sync.py,dashboard/backend/Dockerfile:31,Maintains fresh index baselines and option strikes during broker rate limits or closures
+dashboard/backend/sandbox/,GITIGNORE,100%,Local experimental backend sandbox directory,None,N/A,None,None,Local-only developer sandbox
+dashboard/backend/state_manager.py,DEPLOY,95%,Initializes state directory and index baselines for 7 core indices,dashboard/backend/index_history_service.py,Line 1,tests/test_local_full_dashboard_fallback.py,dashboard/backend/Dockerfile:31,Prevents startup 404/500 errors by seeding valid chain structures
+debug_totp.py,SECRET,100%,TOTP RFC 6238 MFA secret debugging script,None,Lines 1-35,None,None,Handles TOTP secret seed; must never be committed to prevent broker account compromise
+evidence/,GITIGNORE,100%,Generated evidence run artifacts directory,None,N/A,None,None,Local proof artifacts and run evidence
+find_23053.py,DELETE,95%,One-off grep script for stale spot price 23053,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+find_4828.py,DELETE,95%,One-off grep script for PID 4828,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+find_paper_cloud_sim.py,DELETE,95%,One-off search script for paper cloud simulation,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+find_pnl_files.py,DELETE,95%,One-off search script for PnL files,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+find_pnl_route.py,DELETE,95%,One-off search script for PnL route,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+find_pnl_writers.py,DELETE,95%,One-off search script for PnL writers,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+forensic_bundle.txt,GITIGNORE,100%,Generated forensic report bundle text file,None,N/A,None,None,Local forensic output artifact
+generate_pnl_sessions.py,DELETE,95%,One-off script generating synthetic PnL session data,None,N/A,None,None,Dead developer script; violates REAL_ONLY invariant; safe to delete
+inspect_all_validations.py,DELETE,95%,One-off inspector for validation files,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+inspect_cloud.py,DELETE,95%,One-off inspector for cloud deployment state,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+inspect_dom.py,DELETE,95%,One-off inspector for DOM tree,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+master_config_audit_report.txt,GITIGNORE,100%,Generated master configuration audit report text file,None,N/A,None,None,Local audit report artifact
+mockups/,GITIGNORE,100%,Design mockups directory,None,N/A,None,None,Static design mockups; not part of production runtime
+models/phantom_family_weights.json,GITIGNORE,95%,Generated model family weights JSON artifact,None,N/A,None,None,Generated model evaluation artifact
+prototypes/,GITIGNORE,100%,Experimental prototypes directory,None,N/A,None,None,Local prototype code; not part of production runtime
+reports/latest/analyzer_paper_lifecycle_proof/LIFECYCLE_20261109_222031.json,GITIGNORE,100%,Generated paper lifecycle proof JSON report,None,N/A,None,None,Proof artifact from past paper execution run
+reports/latest/live_cloud_probe_summary.json,GITIGNORE,100%,Generated live cloud probe summary JSON report,None,N/A,None,None,Proof artifact from past cloud probe
+reports/latest/live_verified/,GITIGNORE,100%,Generated live verification artifacts directory,None,N/A,None,None,Local verification receipts and outputs
+reports/latest/proof_ui_options_greeks.png,GITIGNORE,100%,Screenshot proof artifact for options Greeks UI,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/proof_ui_tab1_candlestick_ema_vwap.png,GITIGNORE,100%,Screenshot proof artifact for Tab 1 candlestick chart,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/proof_ui_tab3_quant_feature_chart.png,GITIGNORE,100%,Screenshot proof artifact for Tab 3 quant feature chart,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/proof_ui_tab4_agent_logs.png,GITIGNORE,100%,Screenshot proof artifact for Tab 4 agent logs,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/staging_ui_after_fix.png,GITIGNORE,100%,Screenshot proof artifact for staging UI,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/staging_ui_system_tab_after_fix.png,GITIGNORE,100%,Screenshot proof artifact for system tab,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/ui_ml_paper_snap.png,GITIGNORE,100%,Screenshot proof artifact for ML paper trading,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/ui_recovery/,GITIGNORE,100%,Generated UI recovery receipts directory,None,N/A,None,None,Local recovery artifacts and snapshots
+reports/latest/ui_tab2_holdings_snap.png,GITIGNORE,100%,Screenshot proof artifact for broker holdings,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/ui_ticker_snap.png,GITIGNORE,100%,Screenshot proof artifact for ticker header,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/ui_trading_operations_snap.png,GITIGNORE,100%,Screenshot proof artifact for trading operations,None,N/A,None,None,UI screenshot proof artifact
+reports/latest/ui_verified_snap.png,GITIGNORE,100%,Screenshot proof artifact for verified UI,None,N/A,None,None,UI screenshot proof artifact
+scratch/,GITIGNORE,100%,Temporary scratch directory,None,N/A,None,None,Local temporary scratch folder
+scripts/add_wipro_gainer.py,DELETE,95%,One-off patch adding mock Wipro gainer to state,None,N/A,None,None,Dead developer script; violates REAL_ONLY invariant; safe to delete
+scripts/append_p0_14.py,DELETE,95%,One-off script appending tests to suite,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/append_p0_tests.py,DELETE,95%,One-off script appending tests to suite,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/append_telegram_routes.py,DELETE,95%,One-off patch script appending routes to content/app/app.py,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/audit_pending_items.py,DELETE,95%,One-off audit script for pending checklist items,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/audit_ui_interactivity.py,DELETE,95%,One-off UI interactivity verification script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/build_master_env.py,SECRET,98%,Script assembling master .env from credential files,None,Lines 1-45,None,None,Handles environment secret aggregation; must never be committed
+scripts/capture_live_revision_103.py,DELETE,95%,One-off screenshot capture script for rev 103,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/capture_rev101_snaps.py,DELETE,95%,One-off screenshot capture script for rev 101,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/capture_rev108_evidence.py,DELETE,95%,One-off screenshot capture script for rev 108,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/capture_scrolled_perf.py,DELETE,95%,One-off performance screenshot script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/capture_scrolled_perf2.py,DELETE,95%,One-off performance screenshot script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/categorize_env_vars.py,SECRET,98%,Script categorizing and inspecting environment credentials,None,Lines 1-50,None,None,Scans sensitive API keys and environment variables; must never be committed
+scripts/check_backtest_reports.py,DELETE,95%,One-off checker for backtest report files,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/check_keys_gainers.py,DELETE,95%,One-off checker for gainer dictionary keys,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/check_live_cloud_state.py,DELETE,95%,One-off checker for cloud deployment state,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/check_pending_updates.py,DELETE,95%,One-off checker for pending state updates,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/clean_premium_html.py,DELETE,95%,One-off patch cleaning HTML template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/clean_telegram_test.py,DELETE,95%,One-off script cleaning telegram test fixtures,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/debug_dhan_quote.py,DELETE,95%,One-off debug script for Dhan quote response,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/deep_inspect_html.py,DELETE,95%,One-off HTML template tag inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/dump_search.py,DELETE,95%,One-off grep dump script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/dump_tabs.py,DELETE,95%,One-off UI tab dumper script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/dump_trajectory.py,DELETE,95%,One-off agent trajectory dump script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/fast_env_scanner.py,SECRET,98%,High-speed environment secret scanner,None,Lines 1-40,None,None,Reads and parses plain-text API secrets; must never be committed
+scripts/find_accuracy_trend_line.py,DELETE,95%,One-off search for accuracy trend line in frontend,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_api_health.py,DELETE,95%,One-off search for health API endpoints,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_frontend_issues.py,DELETE,95%,One-off search for frontend issues,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_html_in_py.py,DELETE,95%,One-off search for embedded HTML in Python files,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_mismatch_subject.py,DELETE,95%,One-off search for subject manifest mismatches,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_options_gainers.py,DELETE,95%,One-off search for options gainers routes,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_synthesize_alerts.py,DELETE,95%,One-off search for alert synthesizer functions,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/find_tickers.py,DELETE,95%,One-off search for ticker references,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/fix_button.py,DELETE,95%,One-off patch fixing UI button handler,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/fix_cache_and_eod.py,DELETE,95%,One-off patch fixing cache and EOD calculations,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/fix_performance_tab_clean.py,DELETE,95%,One-off patch cleaning performance tab HTML,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/fix_script_tag.py,DELETE,95%,One-off patch fixing script tag in template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/forensic_env_analyzer.py,SECRET,98%,Forensic analyzer inspecting environment secrets,None,Lines 1-50,None,None,Parses secret environment variables; must never be committed
+scripts/gcp_cloud_run_auto_deploy.py,DEPLOY,98%,Canonical Cloud Run deployment entrypoint with immutable digest proof,.github/workflows/cloud-run-auto-deploy.yml,Line 16,scripts/cloud_run_source_integrity_gate.py,.github/workflows/cloud-run-auto-deploy.yml,Core deployment entrypoint applying PAPER runtime contract and deploying Cloud Run image
+scripts/gcp_cloud_run_auto_deploy_impl.py,DEPLOY,99%,Implementation engine for Cloud Run deployment state machine,scripts/gcp_cloud_run_auto_deploy.py,Line 18,scripts/cloud_run_source_integrity_gate.py,.github/workflows/cloud-run-auto-deploy.yml,Required by gcp_cloud_run_auto_deploy.py; omission crashes deployment automation
+scripts/gcp_dhan_rotator_forensic.py,SECRET,98%,Forensic inspection script for GCP Dhan token rotator,None,Lines 1-60,None,None,Inspects token rotation secrets in GCP Secret Manager; must never be committed
+scripts/gcp_dhan_token_rotation_job.py,SECRET,98%,Token rotation Cloud Run job implementation,None,Lines 1-80,None,None,Handles Dhan broker API keys TOTP and JWT token issuance; must never be committed
+scripts/generate_authentic_eod_chains.py,GITIGNORE,95%,Artifact generator script synthesizing authentic EOD chains,None,N/A,None,None,Local artifact generator script for test data
+scripts/generate_costed_walkforward_artifacts.py,GITIGNORE,95%,Artifact generator script for walkforward backtest reports,None,N/A,None,None,Local artifact generator script for backtest data
+scripts/generate_credentials_audit_csv.py,SECRET,98%,Script auditing credentials and generating CSV report,None,Lines 1-45,None,None,Scans for plain-text credentials and private keys; must never be committed
+scripts/inspect_alerts_endpoint.py,DELETE,95%,One-off endpoint inspector for alerts,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_auto_gates_endpoint.py,DELETE,95%,One-off endpoint inspector for auto gates,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_backtest_endpoint.py,DELETE,95%,One-off endpoint inspector for backtest,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_bhavcopy_dir.py,DELETE,95%,One-off directory inspector for bhavcopy,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_by_und.py,DELETE,95%,One-off underlying contracts inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_contract_subjects.py,DELETE,95%,One-off contract subject inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_data_integrity.py,DELETE,95%,One-off data integrity probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_equity_and_accuracy_trend.py,DELETE,95%,One-off trend inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_gainers_json.py,DELETE,95%,One-off JSON payload inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_gate_failure.py,DELETE,95%,One-off failure analysis script,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_gates.py,DELETE,95%,One-off gate configuration inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_health_endpoint.py,DELETE,95%,One-off endpoint inspector for /api/health,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_interactive_elements.py,DELETE,95%,One-off DOM inspector for interactive UI elements,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_lines_250_320.py,DELETE,95%,One-off script dumping lines 250-320 of app.py,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/inspect_lines_330_385.py,DELETE,95%,One-off script dumping lines 330-385 of app.py,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/inspect_local_secrets_and_tools.py,SECRET,98%,Script inspecting local .secrets directory,None,Lines 1-40,None,None,Directly audits .secrets/ directory; must never be committed
+scripts/inspect_market_validations.py,DELETE,95%,One-off inspector for market validations,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_nifty_bytes.py,DELETE,95%,One-off byte-level inspector for NIFTY state,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_performance_component.py,DELETE,95%,One-off inspector for performance component,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_pid_cwd.py,DELETE,95%,One-off process inspector checking PID and CWD,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_process_and_folders.py,DELETE,95%,One-off inspector checking processes and folders,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_runtime_endpoints.py,DELETE,95%,One-off endpoint probe for localhost runtime,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_state_files.py,DELETE,95%,One-off inspector for state directory files,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_storage_backtests.py,DELETE,95%,One-off storage inspector for backtest results,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_store_auto_gates.py,DELETE,95%,One-off inspector for auto-gates state,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_tail.py,DELETE,95%,One-off log tail inspector,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_telegram_test.py,DELETE,95%,One-off inspector for telegram test fixtures,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/inspect_validations.py,DELETE,95%,One-off inspector for validation records,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/monitor_all_23_tabs.py,DELETE,95%,Ad-hoc monitoring probe for all 23 UI tabs,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+scripts/orchestra_self_heal.py,DELETE,95%,Ad-hoc self heal script for local uvicorn process,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/parse_audit_summary.py,DELETE,95%,One-off summary parser for audit log files,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/patch_all_gates.py,DELETE,95%,One-off patch updating all safety gate values,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_app_audit.py,DELETE,95%,One-off patch adding AuditMiddleware to content/app/app.py,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_app_chain.py,DELETE,95%,One-off patch updating option chain handler in app,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_app_endpoints.py,DELETE,95%,One-off patch adding endpoints to app,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_app_forensics.py,DELETE,95%,One-off patch adding forensic routes to app,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_app_top_gainers.py,DELETE,95%,One-off patch updating top gainers handler,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_daily_gain_scanner.py,DELETE,95%,One-off patch for daily gain scanner module,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_discovery_and_untested_badge.py,DELETE,95%,One-off patch for UI untested badges,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_dynamic_bind_get.py,DELETE,95%,One-off patch adding GET handler for dynamic bind,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_full_ui_solution.py,DELETE,95%,One-off patch applying multi-tab UI solution,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_institutional_console_ui.py,DELETE,95%,One-off patch for institutional console template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_notifier_secrets.py,SECRET,98%,Script patching notification secrets and environment credentials,None,Lines 1-45,None,None,Directly manipulates notification secrets and bot credentials; must never be committed
+scripts/patch_premium_badges.py,DELETE,95%,One-off patch updating status badges in premium template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_premium_ui_final.py,DELETE,95%,One-off patch applying final styling to premium template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_provenance_and_routes.py,DELETE,95%,One-off patch adding provenance headers to routes,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_routes_api.py,DELETE,95%,One-off patch updating /api/routes endpoint,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_scanner_telegram.py,DELETE,95%,One-off patch wiring scanner to telegram notifier,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_strike_handler_authentic.py,DELETE,95%,One-off patch updating authentic strike resolution,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_trading_operations_dashboard.py,DELETE,95%,One-off patch updating trading operations UI,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/patch_verified_market_clock_skew.py,DELETE,95%,One-off patch fixing market clock skew calculation,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/poll_and_bind_chat.py,SECRET,100%,Telegram chat auto-discovery script with hardcoded token,None,Lines 4-12,None,None,Contains live raw hardcoded Telegram Bot token 8779214909:AAGR2ibZRpX3gakAZ9H56RySZKlUodLycwI; must never be committed
+scripts/query_cloud_run.py,DELETE,95%,One-off script probing live Cloud Run endpoint,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/query_ml_performance.py,DELETE,95%,One-off probe script for ML performance endpoint,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/read_contract.py,DELETE,95%,One-off helper script reading proof contract,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/read_contract_checks.py,DELETE,95%,One-off helper script parsing contract check list,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/read_gainers_raw.py,DELETE,95%,One-off helper reading raw gainer JSON files,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/read_telegram_test.py,DELETE,95%,One-off helper inspecting telegram test payload,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/read_test_assertions.py,DELETE,95%,One-off helper reading test assertion statements,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/restart_server.py,DELETE,95%,One-off local script killing and restarting port 8008,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/run_1872_acceptance_pipeline.py,DELETE,95%,One-off test pipeline executing 1872 acceptance checks,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/run_forensic_truth_audit.py,DELETE,95%,One-off ripgrep truth audit script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/run_local_backend.py,DELETE,95%,Ad-hoc local launcher running dashboard.backend.app on port 8000,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/run_verified_visual_audit.py,DELETE,95%,One-off script launching Chrome DevTools for visual audit,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/scan_all_tabs_cdp.py,DELETE,95%,One-off Chrome DevTools Protocol tab scanner,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/scan_question_marks.py,DELETE,95%,One-off regex scanner searching question marks,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/scrape_live_dom.py,DELETE,95%,One-off DOM scraper probing localhost:8008,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/search_auto_gates_stale.py,DELETE,95%,One-off search script for stale auto-gates entries,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/search_chain_data_keywords.py,DELETE,95%,One-off keyword search script for chain data,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/search_old_nifty.py,DELETE,95%,One-off search script for obsolete NIFTY references,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/search_walkforward_generators.py,DELETE,95%,One-off search script for walkforward generators,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/send_telegram_status.py,SECRET,100%,Telegram dispatch script with hardcoded bot token,None,Lines 4-8,None,None,Contains live raw hardcoded Telegram Bot token 8779214909:AAGR2ibZRpX3gakAZ9H56RySZKlUodLycwI; must never be committed
+scripts/set_telegram_commands.py,SECRET,100%,Telegram bot menu setup script with hardcoded token,None,Lines 4-10,None,None,Contains live raw hardcoded Telegram Bot token 8779214909:AAGR2ibZRpX3gakAZ9H56RySZKlUodLycwI; must never be committed
+scripts/start_backend_persistent.py,GITIGNORE,95%,Local persistent process spawner for Windows port 8008,None,Lines 1-60,None,None,Local development workstation process spawner; not used in cloud production
+scripts/start_port_8008_clean.py,GITIGNORE,95%,Local persistent process spawner for Windows port 8008,None,Lines 1-70,None,None,Local development workstation process spawner; not used in cloud production
+scripts/sync_firestore_validations.py,MANUAL_REVIEW,85%,Firestore sync script modifying cloud database state,None,Lines 1-34,None,None,Mutates production Cloud Firestore; requires explicit owner authorization under constitutional directives
+scripts/take_revision_104_screenshots.py,DELETE,95%,One-off screenshot capture script for rev 104,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/take_revision_106_screenshots.py,DELETE,95%,One-off screenshot capture script for rev 106,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/take_ui_snap.py,DELETE,95%,One-off screenshot capture script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/telegram_auto_bind_daemon.py,SECRET,100%,Background telegram listener with hardcoded token,None,Lines 4-14,None,None,Contains live raw hardcoded Telegram Bot token 8779214909:AAGR2ibZRpX3gakAZ9H56RySZKlUodLycwI; must never be committed
+scripts/telegram_bot_daemon.py,SECRET,100%,Continuous telegram command processor with hardcoded token,None,Lines 4-22,None,None,Contains live raw hardcoded Telegram Bot token 8779214909:AAGR2ibZRpX3gakAZ9H56RySZKlUodLycwI; must never be committed
+scripts/test_all_653_endpoints.py,DELETE,95%,One-off test script probing all 653 endpoints,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_auto_gates_local.py,DELETE,95%,One-off test script for local auto-gates,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_autonomous_market_sync.py,DELETE,95%,One-off test script for autonomous market sync daemon,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_chain_fetch_and_rank.py,DELETE,95%,One-off test script for chain fetch and ranking,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_dhan_connection.py,DELETE,95%,One-off test script for Dhan connection,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_endpoints.py,DELETE,95%,One-off test script for endpoints,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_live_auto_gates.py,DELETE,95%,One-off test script for live auto gates,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_live_board_and_chain.py,DELETE,95%,One-off test script for live board and chain,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_live_totp_and_rotate.py,SECRET,98%,Live TOTP generation and token rotation test,None,Lines 1-45,None,None,Uses live TOTP credentials for broker authentication; must never be committed
+scripts/test_ml_performance.py,DELETE,95%,One-off test script for ML performance,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_ml_performance_local.py,DELETE,95%,One-off test script for local ML performance,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_ml_router.py,DELETE,95%,One-off test script for ML router,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_subject_files.py,DELETE,95%,One-off test script for subject files manifest,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_ui_contracts.py,DELETE,95%,One-off test script for UI contracts,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/test_ui_interactivity_comprehensive.py,DELETE,95%,One-off test script for UI interactivity,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/update_all_deliverables_and_markdown.py,DELETE,95%,One-off script updating markdown deliverables,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/update_continuity_state.py,DELETE,95%,One-off script updating .agents/state/PROGRESS.md,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/update_create_order_gates.py,DELETE,95%,One-off patch script updating order gates,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_dhan_token.py,SECRET,98%,Script updating local Dhan access token from credentials,None,Lines 1-40,None,None,Directly mutates and stores broker bearer tokens; must never be committed
+scripts/update_gainers.py,DELETE,95%,One-off patch updating gainers logic,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_kill_switch_first.py,DELETE,95%,One-off patch updating kill switch check priority,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_multibagger_empty_state.py,DELETE,95%,One-off patch updating multibagger empty state in template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_premium_ui.py,DELETE,95%,One-off patch updating premium UI template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_premium_ui_phase3.py,DELETE,95%,One-off patch updating premium UI template phase 3,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_pytest_basetemp.py,DELETE,95%,One-off script adding --basetemp=.pytest_tmp to pyproject.toml,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_routes_filter.py,DELETE,95%,One-off patch updating route filter,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_template_broker_status.py,DELETE,95%,One-off patch updating broker status in template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_template_raw_quote.py,DELETE,95%,One-off patch updating raw quote rendering in template,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_test_no_disk_cache.py,DELETE,95%,One-off patch updating test assertion,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/update_test_session.py,DELETE,95%,One-off patch updating test session setup,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+scripts/verify_1872_acceptance_mission.py,DELETE,95%,One-off verifier for 1872 acceptance mission,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/verify_env_integrity.py,SECRET,98%,Script verifying environment secret keys,None,Lines 1-50,None,None,Audits presence and format of private API keys; must never be committed
+scripts/verify_live_cloud_run.py,DELETE,95%,One-off verifier probing live Cloud Run service,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/verify_live_tabs.py,DELETE,95%,One-off verifier for live UI tabs,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+scripts/verify_ui_truth.py,DELETE,95%,One-off verifier for UI truth badges,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+state/paper_validations/paper_validation_2026-11-01.json,GITIGNORE,100%,Historical paper validation state snapshot,None,N/A,None,None,Generated state snapshot artifact
+temp/,GITIGNORE,100%,Temporary files directory,None,N/A,None,None,Temporary local storage directory
+temp_tsc_errors.txt,GITIGNORE,100%,TypeScript compiler error log,None,N/A,None,None,Local temporary build output log
+test.txt,DELETE,99%,Temporary probe text file with zero repository references,None,N/A,None,None,Contains Hello World; no imports runtime references workflows or tests; safe to delete
+test_dhan_account.py,SECRET,98%,Broker account margin and profile authentication test,None,Lines 1-45,None,None,Directly tests broker credentials and fetches live funds; must never be committed
+test_dhan_direct.py,SECRET,98%,Direct Dhan API credential authentication probe,None,Lines 1-40,None,None,Directly tests live API secret keys against broker; must never be committed
+test_endpoints.py,DELETE,95%,One-off endpoint test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+test_ui_clean.py,DELETE,95%,One-off UI test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/analyze_all_url_paths.py,DELETE,95%,One-off URL path analysis helper script,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+tests/conftest.py,DEPLOY,100%,Root pytest configuration setting sys.path for test execution,pytest test framework,Lines 1-11,All test files in tests/,All CI test steps,Required by pytest: omission causes ModuleNotFoundError across entire test suite
+tests/test_6_pillars_verification.py,DELETE,95%,Redundant local port 8008 verification test,None,N/A,None,None,Redundant developer test; no imports runtime or workflow references
+tests/test_autonomous_market_discovery.py,DEPLOY,95%,Production-protection test verifying symbol discovery and scrip master,pytest,Lines 1-50,self,CI test suite,Protects broker symbol discovery pipeline against regression
+tests/test_autonomous_watchdog.py,DEPLOY,95%,Production-protection test verifying autonomous watchdog self-healing,pytest,Lines 1-65,self,CI test suite,Protects service auto-healing watchdog against regression
+tests/test_columnar_truth_architecture.py,DEPLOY,96%,Production-protection test verifying PyArrow store and DuckDB OLAP,pytest,Lines 1-97,self,CI test suite,Protects core analytical lake and columnar store against regression
+tests/test_correlation_id.py,DEPLOY,94%,Production-protection test verifying correlation ID propagation,pytest,Lines 1-35,self,CI test suite,Protects distributed telemetry tracing against regression
+tests/test_dashboard_failures.py,DELETE,95%,Ad-hoc failure injection test for dashboard,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_dhan_full_market_daemon.py,DEPLOY,96%,Production-protection test verifying full-market scanner and subscriptions,pytest,Lines 1-75,self,CI test suite,Protects broker WebSocket multiplexing subscription generation
+tests/test_direct_app.py,DELETE,95%,Ad-hoc direct app test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_genesis_500_routes.py,DELETE,95%,Ad-hoc route crawler test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_kill_switch.py,DEPLOY,98%,Production-protection test verifying that safety kill switch is ARMED,pytest,Lines 1-11,self,Production preflight,Protects trading circuit breaker safety gate against regression
+tests/test_live_nse_bse_reconcile.py,DELETE,95%,Ad-hoc reconciliation test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_local_full_dashboard_fallback.py,DELETE,95%,Ad-hoc local fallback test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_local_ui_visual_parity.py,DELETE,95%,Ad-hoc visual parity test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_middleware_failures.py,DELETE,95%,Ad-hoc audit middleware exception test,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_post_audit_failures.py,DELETE,95%,Ad-hoc POST audit test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_production_live_init.py,DELETE,95%,Ad-hoc localhost 8008 initialization test,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_router_failures.py,DELETE,95%,Ad-hoc router failure test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_search_failures.py,DELETE,95%,Ad-hoc search failure test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_telegram_downstream.py,DEPLOY,95%,Production-protection test verifying downstream telegram dispatching,pytest,Lines 1-80,self,CI test suite,Protects downstream risk notifications and trade receipts against regression
+tests/test_trade_failures.py,DELETE,95%,Ad-hoc trade failure test probe,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_truth_certification.py,DEPLOY,95%,Production-protection test certifying truth classification and anti-fake rules,pytest,Lines 1-70,self,CI test suite,Protects data provenance and anti-fake rules against regression
+tests/test_ui_p0_recovery_mission.py,DELETE,95%,Ad-hoc localhost 8008 recovery suite,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/test_ui_production_e2e.py,DELETE,95%,Ad-hoc localhost 8008 UI e2e test,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tests/verify_all_634_endpoints.py,DELETE,95%,Ad-hoc localhost 8008 endpoint crawler,None,N/A,None,None,Dead developer probe; no imports runtime or workflow references
+tools/repository_truth_audit_20261102.py,DELETE,95%,Historical audit script from Nov 2 2026,None,N/A,None,None,Dead developer script; no imports runtime or workflow references
+trades.csv,GITIGNORE,100%,Runtime paper trading execution ledger,content/app/app.py,Line 342,None,None,Runtime execution log; strictly forbidden from deployment by .csv/.log runtime rules
+ui_check.png,GITIGNORE,100%,UI verification screenshot artifact,None,N/A,None,None,Visual screenshot artifact
+ui_final.png,GITIGNORE,100%,UI verification screenshot artifact,None,N/A,None,None,Visual screenshot artifact
+ui_truth.png,GITIGNORE,100%,UI verification screenshot artifact,None,N/A,None,None,Visual screenshot artifact
+untracked_list.txt,GITIGNORE,100%,Input manifest for repository audit,None,N/A,None,None,Input manifest text file
+update_dash.py,DELETE,95%,One-off dashboard patch script,None,N/A,None,None,Historical patching script; no runtime or workflow references; safe to delete
+uvicorn_run.log,GITIGNORE,100%,Uvicorn server execution log file,None,N/A,None,None,Server log file; strictly forbidden from deployment by .log rule
+v0-1_golden.json,GITIGNORE,100%,Historical Cloud Run revision definition dump,None,N/A,None,None,Historical configuration snapshot artifact
+validate_environment.py,MANUAL_REVIEW,85%,Multi-point environment validation script with hardcoded local paths,None,Lines 1-59,None,None,Hardcodes C:/Genesis_System3_clean/content/app/app.py and .venv; requires path normalization
+venv_pinned.txt,GITIGNORE,100%,Local development dependency pinning file,None,N/A,None,None,Local environment pinning output

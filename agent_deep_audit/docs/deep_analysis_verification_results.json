@@ -1,0 +1,59 @@
+{
+  "analysis_date": "2025-12-03T21:55:53.308144",
+  "issues": [],
+  "warnings": [
+    {
+      "level": "Level 4 - Phase Tests",
+      "phase": "phase_222",
+      "warning": "Phase returned WARN",
+      "details": "Created 0 EV tables",
+      "severity": "MEDIUM"
+    },
+    {
+      "level": "Level 4 - Phase Tests",
+      "phase": "phase_263",
+      "warning": "Phase returned WARN",
+      "details": "Required input files not found",
+      "severity": "LOW"
+    },
+    {
+      "level": "Level 5 - Error Scan",
+      "file": "live_day_autopilot_20251201.log",
+      "warning": "Historical CSV parsing errors (from before fixes)",
+      "severity": "LOW",
+      "date": "2025-12-02"
+    },
+    {
+      "level": "Level 5 - Error Scan",
+      "file": "live_day_autopilot_20251203.log",
+      "warning": "CSV parsing errors from early run (before fixes applied)",
+      "severity": "LOW",
+      "note": "Errors occurred before fixes were applied"
+    },
+    {
+      "level": "Level 5 - Error Scan",
+      "file": "system3_autorun_master_20251202.log",
+      "warning": "Historical CSV parsing errors (from before fixes)",
+      "severity": "LOW",
+      "date": "2025-12-02"
+    }
+  ],
+  "recommendations": [
+    {
+      "phase": "phase_222",
+      "recommendation": "Run Phase 221 first to generate forward returns",
+      "priority": "LOW"
+    },
+    {
+      "phase": "phase_263",
+      "recommendation": "Required files will be auto-generated during live trading",
+      "priority": "LOW"
+    }
+  ],
+  "summary": {
+    "critical_issues": 0,
+    "medium_issues": 0,
+    "low_warnings": 4,
+    "medium_warnings": 1
+  }
+}

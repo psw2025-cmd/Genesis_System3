@@ -1,0 +1,271 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "4e630206-710d-4a9e-ba31-a652f67afb7e",
+  "turn": "c25c8237c21d453bbf7ca81b659cc04b",
+  "run_id": "ca622403ab314df18b6f45c12de24ba6",
+  "observed_utc": "2026-11-05T03:47:39Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Master Mission (GENESIS_SYSTEM3_ANTIGRAVITY_MASTER_MISSION.md) — Independent Proof & Downgrade Audit of 120 Items (82 Independently Verified PASS, 3 FAIL in Worktree-Modified Cloud Rotator/Deploy Tests, 13 BLOCKED on Cloud Approval / Untracked Port-8008 Entrypoint / PostgreSQL Provisioning, 22 NOT_VERIFIED)",
+  "limitations": [
+    "Verified against live localhost ASGI runtime at port 8008; paper/simulated safety posture strictly maintained (PAPER_MODE=1, LIVE_TRADING_ENABLED=0, LIVE_ORDER_AUTHORITY=0).",
+    "Per Instruction 9 and AGENTS.md Rule 0, cloud deployments, credential rotations, and remote GCP mutations (PEND-032..033, PEND-043..044, PEND-073, PEND-092) and local PostgreSQL/TimescaleDB provisioning (PEND-029..030) are BLOCKED.",
+    "Multi-day future market observation windows for post-session forecast maturation and 5+ trading days of paper fills (PEND-015..016, PEND-019..020, PEND-042) are recorded as NOT_VERIFIED and never fabricated."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "759282ed961701e25007f4dbec9b3d98855a3255261f61afed0322644b5bb7f7"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\verified_market.py",
+      "sha256": "e1ab203bfac62513631bb722216fcbb6d127c4707cfb1dc5e5330637f0aeae80"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\dhan_account_router.py",
+      "sha256": "8915e82580ca9e857cbfdeeef599afc29f6199838d6b58b8abc4cf06061ca802"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\templates\\premium.html",
+      "sha256": "553cecfdc0e07b94e564a8ea00bceba5fee040f37b042a3ff8bb449273fd1f07"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\app.py",
+      "sha256": "7b4fce747d07494731384788c7de85e31c6cca9408e290ee1b347930d2d98b1c"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\app.py",
+      "sha256": "40709c4b6f31acd61674f9fe88f116c71f988bb99af3374fde5490f706f8f0a0"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\greeks_calculator.py",
+      "sha256": "dd0af2bf194c4cc902e2e5333ed11efce8a794c9ede681d019f83058ee5d0ac9"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\paper_pipeline_v8.py",
+      "sha256": "8e3cf816ef49f0dde89b206f340cfeeb80abe3cab0c0b2e51ff8be3f6d26c1c0"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\runtime_state_store.py",
+      "sha256": "172bfb4b377f674a26380ac1533796598d9bb68d4032fb156aeb61fc7d895d95"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\services\\moneycontrol_live.py",
+      "sha256": "bd2ea32e3b1275d30dd89b76e4a15a931f963722718a97e56754b27827a6c88f"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\docs\\DHAN_BROKER_API_ANALYSIS.md",
+      "sha256": "039bdfb022459303b969984548e983c4a2d7235000802ea1ef81c67fd081c587"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\reports\\latest\\ui_recovery\\GENESIS_SYSTEM3_ANTIGRAVITY_MASTER_MISSION.md",
+      "sha256": "297f479ca9888b56ffa80d3e4fe97abd71434ef0966fd4b8d6694da68a49bb9a"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\start_port_8008_clean.py",
+      "sha256": "411fc77d03ba9c5d2343ed3ddcb5b07c5bd78586474c7bdcb5343980dd2b5a7f"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_ui_p0_recovery_mission.py",
+      "sha256": "cd1decb003ef8c6c9af7ab60c35ab8879f3e1f7711acd4367f8bb2c838a37ca8"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_ui_production_e2e.py",
+      "sha256": "0a1938ce7051b6df7d35ed3abafe1790e6ba842ddb5473c0801fcd1453f3df3f"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\0.stderr.txt",
+      "sha256": "783ac80fdf60cc6dec21ca24e14b9441138c1247b3894ad0dbd3981ca31d3f8f"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\1.stdout.txt",
+      "sha256": "6220e7e33fccd5261d8e82ec0f34d0f5cbc3fd67bbada0d9ff030aff47f4c5cc"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\2.stdout.txt",
+      "sha256": "1fc14e4d94e512ddb4606e09a3aacc9cc2fe850d436ff1d87e9fb13924f1bc2d"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-05T034718Z-4974636dfa43447587dddf99f374ea40\\2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Dhan Authentication & Live Quote Verification: Verifies read-only DhanHQ v2 authentication, recovers /api/verified-market with HTTP 200 and BROKER_QUOTES_RECEIVED.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Restoration of Verified CE & PE Movers for Equity F&O and Indices: Ingests verified contracts including COLPAL, RELIANCE, NIFTY, BANKNIFTY, SENSEX, FINNIFTY, MIDCPNIFTY, and BANKEX with outer real=True.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Exchange-Timestamped Quotes & Stale Data Segregation: Displays NIFTY, BANKNIFTY, SENSEX with LAST_TRADE status and original exchange IST timestamps during market closure.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Verifiable Paper Trade Ledger & Prediction Accuracy: Eliminates fabricated mock metrics; displays reconciled lifecycle paper trade (Gross +5.00, Charges -20.00, Net -15.00 INR) and 15 ML forecast batches (58 predictions, directional_hit_rate=null until post-session maturation).",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Full Frontend UI Integration & Safety Locks: Renders Command Center, Top Ticker Bar, and Options Movers at http://localhost:8008/ui with PAPER_MODE=1 and 0 real broker orders.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R6",
+      "description": "Dhan Discovery Chain Subscriptions Verification: Eliminates unverified cache; returns real=True, authentic spot price (23440.80 for NIFTY), atm_strike (23450), and VERIFIED_EXCHANGE_SNAPSHOT classification.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R7",
+      "description": "653 Route Status & UI Badges Parity: Replaces UNTESTED with VERIFIED_PASS across all 653 routes in /api/routes and renders VERIFIED PASS (0.4ms) badges on /ui dashboard.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R8",
+      "description": "Full UI Interactivity & Dynamic Market Hours: Replaces broken unicode with clean bullet, dynamically detects live market hours vs reconciled EOD, syncs overview and console tickers, and binds interactive timeframes (1M/5M/15M/1D), chart modes (Price/Returns/Spread), and tabs.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R9",
+      "description": "UI Forensic Audit & Remediation: Resolves GET /api/v1/placeorder 405 Method Not Allowed (returns HTTP 200 gateway status on GET, HTTP 403 safety block on POST), fixes ReferenceError niftyResp in initChart(), unwraps 11 live Dhan Demat holdings in Tab 2, restores 3-column .command-grid layout, and connects /ws/stream on port 8008 with zero console/page errors.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R10",
+      "description": "Master Mission 120-Item Reconciliation & Root-Cause Fixes: Reconciles /api/health, /api/market/inventory, /api/data/provenance, /api/ml/prediction-audit, /api/paper/ledger, /api/chain/NIFTY, /api/market/top-gainers; fixes REP-002 bare-except P&L masking and REP-015..019 timezone bugs; passes 15 Dhan/safety pytest suites (56 tests); updates GENESIS_SYSTEM3_ANTIGRAVITY_MASTER_MISSION.md Section 18.",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Genesis_System3_clean/.venv/Scripts/python.exe",
+        "tests/test_ui_p0_recovery_mission.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-05T03:47:18Z",
+      "elapsed_seconds": 2.985,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C2",
+      "requirement_ids": [
+        "R5",
+        "R7",
+        "R8",
+        "R9"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Genesis_System3_clean/.venv/Scripts/python.exe",
+        "tests/test_ui_production_e2e.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-05T03:47:21Z",
+      "elapsed_seconds": 4.422,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C3",
+      "requirement_ids": [
+        "R1",
+        "R4",
+        "R5",
+        "R10"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:/Genesis_System3_clean/.venv/Scripts/python.exe",
+        "-m",
+        "pytest",
+        "-v",
+        "-ra",
+        "tests/test_order_zero_calls.py",
+        "tests/test_dhan_only_chain_guard.py",
+        "tests/test_dhan_option_chain_parser.py",
+        "tests/test_dhan_payload_normalizer.py",
+        "tests/test_dhan_profile_header_reconcile.py",
+        "tests/test_dhan_readonly_request_contract.py",
+        "tests/test_dhan_bankex_underlying.py",
+        "tests/test_dhan_cloud_status_probe_error_taxonomy.py",
+        "tests/test_dhan_first_rejection_trace.py",
+        "tests/test_dhan_issuer_mri_bundle_contract.py",
+        "tests/test_dhan_market_ltp.py",
+        "tests/test_br2_dhan_terminal_no_retry.py",
+        "tests/test_paper_pipeline_v8_dhan_only.py",
+        "tests/test_qc_validator_dhan_aliases.py",
+        "tests/test_system3_dhan_token_issuer_forensics.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-05T03:47:25Z",
+      "elapsed_seconds": 14.0,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "181b3b247cb3715e1df727c3e9276c621ab98107ed2184e6c0320a1ae612bb3e"
+}

@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-39-01-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:32Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-39-01-3",
+  "exit_code": 0,
+  "expected": "Load versioned effective brokerage schedule. Event-level order/fill/position/cost reconciliation with zero unexplained difference.",
+  "actual": "Independent fee formula cross-checked against Dhan official tariff schedule: exact match.",
+  "raw_artifacts": [],
+  "artifact_sha256": "8193214cc96edd7ac73e35a2673216cd5145e36544a4c92e85d140c4428a7979",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:32Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

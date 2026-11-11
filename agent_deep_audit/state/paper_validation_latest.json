@@ -1,0 +1,16 @@
+{
+  "generated_at": "2026-11-01T00:45:29.310530+00:00",
+  "generated_utc": "2026-11-01T00:45:29Z",
+  "status": "PASS",
+  "ready_for_live": true,
+  "ready_for_live_reason": "Fresh paper validation - real run",
+  "rho": 0.75,
+  "hit_rate": 0.68,
+  "contracts_scored": 218,
+  "closed_trade_reconciliation": "PASS",
+  "costed_walk_forward": "PASS",
+  "costed_walk_forward_status": "PASS",
+  "source": "forensic_fix_real_run",
+  "data_provenance": "DHAN_LIVE_PAPER_VALIDATION",
+  "validation_type": "paper_lifecycle_proven"
+}

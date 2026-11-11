@@ -1,0 +1,35 @@
+F...F.....F..
+======================================================================
+FAIL: test_p0_01_dhan_auth_and_credentials (__main__.TestGenesisUIEmergencyRecovery.test_p0_01_dhan_auth_and_credentials)
+P0-1: Verify Dhan market data does NOT return AUTH_REQUIRED or credentials not configured.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_p0_recovery_mission.py", line 22, in test_p0_01_dhan_auth_and_credentials
+    self.assertEqual(data.get("state"), "BROKER_QUOTES_RECEIVED")
+AssertionError: 'BROKER_EOD_SETTLED' != 'BROKER_QUOTES_RECEIVED'
+- BROKER_EOD_SETTLED
++ BROKER_QUOTES_RECEIVED
+
+
+======================================================================
+FAIL: test_p0_05_and_06_market_closure_and_provenance (__main__.TestGenesisUIEmergencyRecovery.test_p0_05_and_06_market_closure_and_provenance)
+P0-5 & P0-6: Distinguish verified vs simulated; show LAST_TRADE or QUOTE_WITH_EXCHANGE_TIME with valid exchange timestamp.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_p0_recovery_mission.py", line 103, in test_p0_05_and_06_market_closure_and_provenance
+    self.assertTrue(q.get("last_trade_ist").startswith("2026-11"), f"{sym} timestamp must be current exchange date")
+AssertionError: False is not true : NIFTY timestamp must be current exchange date
+
+======================================================================
+FAIL: test_p0_12_all_653_routes_verified_pass (__main__.TestGenesisUIEmergencyRecovery.test_p0_12_all_653_routes_verified_pass)
+P0-12: Verify /api/routes lists 653 routes all marked VERIFIED_PASS with quantum audit provenance.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_p0_recovery_mission.py", line 174, in test_p0_12_all_653_routes_verified_pass
+    self.assertEqual(d.get("total"), 653)
+AssertionError: 666 != 653
+
+----------------------------------------------------------------------
+Ran 13 tests in 3.910s
+
+FAILED (failures=3)

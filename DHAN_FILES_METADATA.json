@@ -1,0 +1,65 @@
+[
+  {
+    "File": "content/app/dhan_account_router.py",
+    "Lines": 170,
+    "SizeKB": 6.23,
+    "Imports": [
+      "from __future__ import annotations",
+      "import os, sys, threading, time",
+      "from datetime import datetime, timezone",
+      "from pathlib import Path",
+      "from typing import Any, Dict, List",
+      "from fastapi import APIRouter",
+      "from core.brokers.dhan.dhan_readonly import ("
+    ]
+  },
+  {
+    "File": "content/app/verified_market.py",
+    "Lines": 309,
+    "SizeKB": 13.22,
+    "Imports": [
+      "from __future__ import annotations",
+      "import csv, json, os, threading, time, urllib.request",
+      "from datetime import datetime, timezone, time as day_time",
+      "from pathlib import Path",
+      "from zoneinfo import ZoneInfo",
+      "from fastapi import APIRouter"
+    ]
+  },
+  {
+    "File": "content/app/probe_dhan_credentials.py",
+    "Lines": 59,
+    "SizeKB": 3.13,
+    "Imports": [
+      "from __future__ import annotations",
+      "import base64,json,datetime,urllib.request,urllib.error",
+      "from pathlib import Path"
+    ]
+  },
+  {
+    "File": "dashboard/backend/routers/broker.py",
+    "Lines": 193,
+    "SizeKB": 7.02,
+    "Imports": [
+      "from __future__ import annotations",
+      "from datetime import datetime, timezone",
+      "from typing import Any, Dict",
+      "from fastapi import APIRouter"
+    ]
+  },
+  {
+    "File": "dashboard/backend/broker/dhan_auth.py",
+    "Lines": 3,
+    "SizeKB": 0.08,
+    "Imports": "from core.utils.env_loader import get_dhan_token"
+  },
+  {
+    "File": "dashboard/backend/gain_rank_spot_enrichment.py",
+    "Lines": 74,
+    "SizeKB": 2.38,
+    "Imports": [
+      "from __future__ import annotations",
+      "from typing import Any, Dict, List, Mapping, MutableMapping, Optional"
+    ]
+  }
+]

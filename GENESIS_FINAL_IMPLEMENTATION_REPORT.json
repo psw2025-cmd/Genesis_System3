@@ -1,0 +1,162 @@
+{
+  "repository_scan": {
+    "files_scanned": 2819,
+    "duplicates_found": 4,
+    "orphan_files": 2
+  },
+  "architecture": {
+    "status": "MERGE_CANDIDATES_MAPPED_DRY_RUN",
+    "primary_runtime": "dashboard/backend"
+  },
+  "dhan": {
+    "authentication": "FAILED_TOKEN_EXPIRED (HTTP 401 / DH-901; Expired 2026-11-10T08:38:50 UTC)",
+    "market_data": "BLOCKED_UPSTREAM_TOKEN_EXPIRED",
+    "paper_mode": "ACTIVE_VERIFIED (LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0)"
+  },
+  "merge_candidates": [
+    {
+      "source": "content/app/verified_market.py",
+      "destination": "dashboard/backend/routers/chain.py",
+      "features": [
+        "Dhan marketfeed quotes",
+        "Rate limiting",
+        "Market session validation",
+        "Verified market endpoint logic"
+      ]
+    },
+    {
+      "source": "content/app/probe_dhan_credentials.py",
+      "destination": "dashboard/backend/broker/dhan_auth.py",
+      "features": [
+        "JWT expiry decoding",
+        "Credential validation",
+        "Auth diagnostics",
+        "Secret-safe reporting"
+      ]
+    },
+    {
+      "source": "content/app/dhan_account_router.py",
+      "destination": "dashboard/backend/routers/broker.py",
+      "features": [
+        "Holdings normalization",
+        "Response normalization",
+        "Profile masking",
+        "Account summary helpers"
+      ]
+    },
+    {
+      "source": "content/app/configure_safe_env.py",
+      "destination": "scripts/configure_safe_env.py",
+      "features": [
+        "Strict environment safety lock enforcement"
+      ]
+    }
+  ],
+  "delete_candidates": [
+    "content/app/templates/premium.html.bak",
+    "content/app/truth_backups/20261102T162014Z/app.py",
+    "content/app/truth_backups/20261102T162014Z/premium.html",
+    "content/app/truth_backups/verified_gate_20261102T165613Z/app.py",
+    "content/app/truth_backups/verified_gate_20261102T165613Z/premium.html",
+    "content/app/uvicorn_detached.log",
+    "dashboard/backend/app.py.bak",
+    "dashboard/backend/app.py.bak_20261101_065834",
+    "dashboard/backend/app.py.bak_market_top_route",
+    "dashboard/backend/app.py.bak_perma_del_20261101_074025",
+    "dashboard/backend/app.py.bak_perma_del_20261101_074148",
+    "dashboard/backend/test_temp.txt"
+  ],
+  "blockers": [
+    {
+      "id": "BLK-01",
+      "title": "Dhan Access Token Expired (HTTP 401 DH-901)",
+      "root_cause": "Daily Dhan JWT expired on 2026-11-10T08:38:50 UTC. Read-only live quote and account endpoints return HTTP 401.",
+      "remediation": "Owner must generate a fresh 24-hour Dhan Access Token via Dhan web portal and update .secrets/dhan.env and GCP Secret Manager."
+    },
+    {
+      "id": "BLK-02",
+      "title": "Cloud Run Deployment & Mutation Restricted Without Explicit Owner Approval",
+      "root_cause": "Constitutional AGENTS.md and CLOUD_ONLY_OWNER_DIRECTIVE_20261018 strictly prohibit new billable cloud builds, container deployments, or IAM mutations without separate explicit owner consent.",
+      "remediation": "Present tested consolidation artifacts to owner for review and request explicit deployment authorization."
+    },
+    {
+      "id": "BLK-03",
+      "title": "Dual Parallel Architectures (content/app vs dashboard/backend)",
+      "root_cause": "Historical rapid prototyping led to duplicate route and broker logic across content/app and dashboard/backend.",
+      "remediation": "Execute Phase 2 controlled merge of verified_market.py, probe_dhan_credentials.py, and dhan_account_router.py into dashboard/backend."
+    }
+  ],
+  "risks": [
+    {
+      "risk": "Accidental Live Order Execution",
+      "severity": "CRITICAL",
+      "mitigation": "Hardlocked by LIVE_TRADING_ENABLED=0, SYSTEM3_LIVE_TRADING_ALLOWED=0, ANALYZE_MODE=1, PAPER_MODE=1, and zero-order safety gate."
+    },
+    {
+      "risk": "Market Data Degradation During Consolidation",
+      "severity": "HIGH",
+      "mitigation": "Preserve verified Dhan marketfeed rate limiter and security master resolution in dashboard/backend/routers/chain.py."
+    },
+    {
+      "risk": "Cloud Run Environment Drift",
+      "severity": "MEDIUM",
+      "mitigation": "Require exact Git SHA build provenance and verify Cloud Run revision image digest matches GitHub origin/main."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "criterion": "ARCHITECTURE: dashboard/backend is primary runtime; single canonical implementation; no active duplicates",
+      "verdict": "YELLOW (Mapped in dry run; pending merge execution)"
+    },
+    {
+      "criterion": "DHAN: Dhan authentication works; real Dhan data available; holdings/funds/positions work; no synthetic/mock production path",
+      "verdict": "RED (FAIL: Dhan JWT expired 2026-11-10T08:38:50 UTC; HTTP 401 DH-901)"
+    },
+    {
+      "criterion": "SAFETY: LIVE_TRADING_ENABLED=0; SYSTEM3_LIVE_TRADING_ALLOWED=0; zero real order execution path; paper trading functional",
+      "verdict": "GREEN (PASS: Constitutional safety locks fully intact and verified)"
+    },
+    {
+      "criterion": "TESTING: Unit tests pass; integration tests pass; startup validation passes; no runtime failures",
+      "verdict": "RED (FAIL: Unit safety & startup tests PASS; endpoint integration tests blocked by offline server and expired token)"
+    },
+    {
+      "criterion": "CLOUD: Cloud Run deployment succeeds; health endpoints pass; broker status passes; Dhan verified; no deployment regressions",
+      "verdict": "RED (BLOCKED: Revision 136 healthy, but deploy mutation requires explicit owner approval; Dhan token expired)"
+    }
+  ],
+  "deployment_signoff": [
+    {
+      "section": "SOURCE CONTROL",
+      "item": "GitHub main clean & no merge conflicts",
+      "status": "PENDING (9 commits behind origin/main)"
+    },
+    {
+      "section": "ARCHITECTURE",
+      "item": "dashboard/backend primary runtime & no duplicates",
+      "status": "BLOCKED (Requires merge execution)"
+    },
+    {
+      "section": "DHAN",
+      "item": "Authentication, market data, holdings verified",
+      "status": "BLOCKED (JWT token expired)"
+    },
+    {
+      "section": "SAFETY",
+      "item": "LIVE_TRADING_ENABLED=0 & real orders blocked",
+      "status": "APPROVED (PASS)"
+    },
+    {
+      "section": "TESTING",
+      "item": "Unit, integration, and startup tests pass",
+      "status": "BLOCKED (Token expired & server offline)"
+    },
+    {
+      "section": "CLOUD",
+      "item": "Cloud Run build, deploy, and health verified",
+      "status": "BLOCKED (Owner approval required)"
+    }
+  ],
+  "final_status": "RED",
+  "recommended_next_action": "STOP per mandate. Document Blocker BLK-01 (Dhan JWT expired) and BLK-02 (Cloud Run deployment approval required). Request owner token refresh and deployment approval before proceeding to live execution."
+}

@@ -1,0 +1,31 @@
+# Command: c:\Genesis_System3_clean\.venv\Scripts\python.exe -m pytest -v -ra tests/test_dhan_single_token_authority.py tests/test_br1_dhan_auth_reliability.py tests/test_dhan_rotator_forensic_redaction.py
+# Timestamp UTC: 2026-11-04T09:54:37.749108+00:00
+# Exit Code: 2
+# Duration Sec: 6.08
+
+--- STDOUT ---
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: c:\Genesis_System3_clean
+configfile: pyproject.toml
+plugins: anyio-4.16.0
+collected 38 items / 1 error
+
+=================================== ERRORS ====================================
+_______ ERROR collecting tests/test_dhan_rotator_forensic_redaction.py ________
+ImportError while importing test module 'c:\Genesis_System3_clean\tests\test_dhan_rotator_forensic_redaction.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_dhan_rotator_forensic_redaction.py:4: in <module>
+    from scripts.gcp_dhan_rotator_forensic import _redact
+E   ModuleNotFoundError: No module named 'scripts.gcp_dhan_rotator_forensic'
+=========================== short test summary info ===========================
+ERROR tests/test_dhan_rotator_forensic_redaction.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+========================= 1 warning, 1 error in 2.80s =========================
+
+--- STDERR ---
+

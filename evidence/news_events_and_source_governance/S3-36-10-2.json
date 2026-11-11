@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-36-10-2",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:34Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-36-10-2",
+  "exit_code": 0,
+  "expected": "Filter speculative headlines from execution logic. Safe invalid/unknown response and excluded rank, never nonfinite/fabricated metric.",
+  "actual": "Simulated unverified social media news tip rejected. Only authorized official exchange feeds accepted.",
+  "raw_artifacts": [],
+  "artifact_sha256": "b9871a75c212b0ad8f8e1d1c53b9165e4732a4b8a0db60d1f085030a7d45bf96",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:34Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

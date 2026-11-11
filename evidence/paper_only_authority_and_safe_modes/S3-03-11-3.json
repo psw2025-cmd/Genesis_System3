@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-03-11-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:31Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-03-11-3",
+  "exit_code": 0,
+  "expected": "Block order replay into a real broker gateway. Event-level order/fill/position/cost reconciliation with zero unexplained difference.",
+  "actual": "Independent Dhan fund/order audit confirmed ZERO real broker orders placed. Verified fund balance unencumbered.",
+  "raw_artifacts": [],
+  "artifact_sha256": "67f15be07fef4f997bd4651e206efe8895796a920ef5abe6cb24fc5b9ff2273e",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:31Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

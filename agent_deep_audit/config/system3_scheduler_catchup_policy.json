@@ -1,0 +1,135 @@
+{
+  "_comment": "Per-job missed-fire catch-up policy. Every enabled job in system3_job_scheduler.json must have an entry here (or fall back to 'default'). condition values are handled by core/engine/system3_scheduler_catchup.py's CONDITION_HANDLERS registry.",
+  "default": {
+    "catchup_window_minutes": 0,
+    "condition": "never",
+    "description": "No policy defined for this job — conservative default is no catch-up at all, exact-time fire only."
+  },
+  "jobs": {
+    "self_healing_watchdog": {
+      "catchup_window_minutes": 60,
+      "condition": "always",
+      "description": "Not market-dependent. Safe to catch up any time within 60 minutes of its 08:30 schedule."
+    },
+    "datasource_health_check": {
+      "catchup_window_minutes": 60,
+      "condition": "before_market_open",
+      "description": "Pre-market health probe. Catch up only if market hasn't opened yet (09:15 IST) and within 60 minutes of schedule_time."
+    },
+    "dashboard_endpoint_coverage": {
+      "catchup_window_minutes": 60,
+      "condition": "before_market_open",
+      "description": "Pre-market probe, same rule as datasource_health_check."
+    },
+    "auto_coordinator_premarket": {
+      "catchup_window_minutes": 65,
+      "condition": "before_market_open",
+      "description": "Must complete before market opens at 09:15 IST — catch up any time between schedule_time and market open."
+    },
+    "dhan_instruments_sync": {
+      "catchup_window_minutes": 65,
+      "condition": "before_market_open_or_before_first_lifecycle",
+      "description": "Instrument master must be fresh before market open OR before the first paper_lifecycle_proof run today, whichever governs — needed for valid_option_contract proof."
+    },
+    "daily_gain_rank": {
+      "catchup_window_minutes": 30,
+      "condition": "within_window_trading_day",
+      "description": "Narrow catch-up window (09:15-09:45 IST) on trading days only — ranking must reflect market-open conditions, not stale data hours later."
+    },
+    "paper_lifecycle_proof": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open_and_broker_and_contract_proven",
+      "requires_upstream": ["reports/latest/broker_truth/broker_truth_summary.json", "reports/latest/instrument_tradability/instrument_tradability_summary.json"],
+      "description": "Only catch up while market is genuinely open AND broker connection proof AND valid option contract proof both exist."
+    },
+    "ui_market_cross_verify": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open",
+      "description": "Only meaningful while market is open."
+    },
+    "paper_lifecycle_proof_midday": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open_and_broker_and_contract_proven",
+      "requires_upstream": ["reports/latest/broker_truth/broker_truth_summary.json", "reports/latest/instrument_tradability/instrument_tradability_summary.json"],
+      "description": "Same rule as paper_lifecycle_proof."
+    },
+    "ui_market_cross_verify_midday": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open",
+      "description": "Same rule as ui_market_cross_verify."
+    },
+    "paper_lifecycle_proof_afternoon": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open_and_broker_and_contract_proven",
+      "requires_upstream": ["reports/latest/broker_truth/broker_truth_summary.json", "reports/latest/instrument_tradability/instrument_tradability_summary.json"],
+      "description": "Same rule as paper_lifecycle_proof."
+    },
+    "ui_market_cross_verify_afternoon": {
+      "catchup_window_minutes": 60,
+      "condition": "market_open",
+      "description": "Same rule as ui_market_cross_verify."
+    },
+    "daily_gain_validate": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_close",
+      "description": "Post-market only — validates predictions vs actual NSE results, must run after 15:30 IST close."
+    },
+    "daily_gain_trend": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_upstream_exists",
+      "requires_upstream": ["reports/latest/performance_benchmark"],
+      "description": "Depends on daily_gain_validate output existing first."
+    },
+    "daily_prediction_benchmark": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_upstream_exists",
+      "requires_upstream": ["reports/latest/performance_benchmark"],
+      "description": "Skips with explicit notice if daily_gain_validate didn't succeed today first (own internal check) — catch-up here just needs post-market timing."
+    },
+    "system3_post_market_pipeline": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_upstream_exists",
+      "requires_upstream": ["reports/latest/performance_benchmark"],
+      "description": "Needs validation + benchmark artifacts to compute friction/gap/gate metrics."
+    },
+    "auto_retrain": {
+      "catchup_window_minutes": 180,
+      "condition": "retrain_signal_exists",
+      "requires_upstream": ["state/retrain_signal.json"],
+      "description": "Only catch up if a retrain signal file actually exists — never run an unconditional retrain."
+    },
+    "dashboard_browser_proof": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_api_running",
+      "description": "Needs the live API reachable to screenshot — catch up post-market if /api/health responds."
+    },
+    "auto_coordinator_post_market": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_upstream_exists",
+      "requires_upstream": ["reports/latest/performance_benchmark"],
+      "description": "Evening proof refresh, needs validation artifacts to exist."
+    },
+    "paper_day_proof_pack": {
+      "catchup_window_minutes": 120,
+      "condition": "post_market_upstream_exists",
+      "requires_upstream": ["reports/latest/dashboard_browser_proof/status.json", "reports/latest/performance_benchmark"],
+      "description": "Needs browser proof status.json and post-market pipeline output to exist first."
+    },
+    "bhavcopy_download": {
+      "catchup_window_minutes": 180,
+      "condition": "post_market_close",
+      "description": "NSE bhavcopy is typically published after market close — catch up any time post-market."
+    },
+    "signal_engine_bhavcopy": {
+      "catchup_window_minutes": 180,
+      "condition": "bhavcopy_available",
+      "requires_upstream": ["storage/bhavcopy"],
+      "description": "Only catch up once bhavcopy_download has actually produced today's file."
+    },
+    "weekly_repo_authority_audit": {
+      "catchup_window_minutes": 240,
+      "condition": "always",
+      "description": "Read-only weekly scan, no market/upstream dependency. Wide same-day catch-up window is safe since it only reads the repo."
+    }
+  }
+}

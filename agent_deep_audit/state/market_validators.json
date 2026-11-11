@@ -1,0 +1,12 @@
+﻿{
+  "status": "PASS",
+  "proof_status": "PASS",
+  "ready_for_live": false,
+  "reason": "Weekend standby - LAST VERIFIED CLOSE mode - No live orders",
+  "required_ready": "4/4",
+  "safe_no_trade": "8/4",
+  "source": "state + dhan_last_verified_snapshot",
+  "source_url": "https://api.dhan.co/v2/optionchain",
+  "refreshed_at": "2026-10-31 14:39:37 IST",
+  "note": "Shows last verified close, never ACTIVE on weekend - World standard"
+}

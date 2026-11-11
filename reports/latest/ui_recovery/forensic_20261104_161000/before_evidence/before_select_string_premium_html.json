@@ -1,0 +1,42 @@
+[
+  {
+    "line": 29,
+    "text": "// Live Order Modal & WebSocket Stream Logic"
+  },
+  {
+    "line": 47,
+    "text": "const symbol = document.getElementById(\"order-symbol\").value;"
+  },
+  {
+    "line": 66,
+    "text": "const resp = await fetch(\"/api/v1/placeorder\", {"
+  },
+  {
+    "line": 83,
+    "text": "function initLiveWebSocket() {"
+  },
+  {
+    "line": 88,
+    "text": "const ws = new WebSocket(wsUrl);"
+  },
+  {
+    "line": 114,
+    "text": "initLiveWebSocket();"
+  },
+  {
+    "line": 406,
+    "text": "<div style=\"color:#fff; font-weight:bold; margin-top:2px;\">POST /api/v1/placeorder</div>"
+  },
+  {
+    "line": 438,
+    "text": "<input type=\"text\" id=\"order-symbol\" value=\"NIFTY\" style=\"width:100%; background:#1c2026; border:1px solid #333; color:#fff; padding:8px; font-size:12px; border-radius:4px; box-sizing:border-box;\" required>"
+  },
+  {
+    "line": 684,
+    "text": "<div style=\"color:#fff; font-weight:bold; margin-top:2px;\">POST /api/v1/placeorder</div>"
+  },
+  {
+    "line": 1453,
+    "text": "if (r.path === \"/api/v1/placeorder\" && method === \"POST\") {"
+  }
+]

@@ -1,0 +1,81 @@
+{
+  "scope": "Genesis System3 Emergency P0 UI Recovery Mission \u2014 Dhan Auth, Market Data Trace, Options Gainers (Equity & Index F&O), Verified Quotes, Paper Ledger, Dhan Chain Subscriptions (NIFTY 23440.80), and Complete 653 Route Status Parity",
+  "limitations": [
+    "Verified against live localhost ASGI runtime at port 8008; paper/simulated safety posture strictly maintained."
+  ],
+  "subject_files": [
+    "content/app/verified_market.py",
+    "content/app/templates/premium.html",
+    "content/app/app.py",
+    "tests/test_ui_p0_recovery_mission.py",
+    "state/market_top_ce_pe.json"
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Dhan Authentication & Live Quote Verification: Rotates token via GCP Secret Manager TOTP, recovers /api/verified-market with HTTP 200 and BROKER_QUOTES_RECEIVED.",
+      "mandatory": true
+    },
+    {
+      "id": "R2",
+      "description": "Restoration of Verified CE & PE Movers for Equity F&O and Indices: Ingests 80 verified contracts including COLPAL, RELIANCE, NIFTY, BANKNIFTY, SENSEX, FINNIFTY, MIDCPNIFTY, and BANKEX.",
+      "mandatory": true
+    },
+    {
+      "id": "R3",
+      "description": "Exchange-Timestamped Quotes & Stale Data Segregation: Displays NIFTY, BANKNIFTY, SENSEX with LAST_TRADE status and original exchange IST timestamps during market closure.",
+      "mandatory": true
+    },
+    {
+      "id": "R4",
+      "description": "Verifiable Paper Trade Ledger & Prediction Accuracy: Eliminates fabricated mock metrics; displays 1 proven lifecycle paper trade (Net -15.00 INR) and 5 ML forecast batches.",
+      "mandatory": true
+    },
+    {
+      "id": "R5",
+      "description": "Full Frontend UI Integration & Safety Locks: Renders Command Center, Top Ticker Bar, and Options Movers at http://localhost:8008/ui with PAPER_MODE=1 and 0 real broker orders.",
+      "mandatory": true
+    },
+    {
+      "id": "R6",
+      "description": "Dhan Discovery Chain Subscriptions Verification: Eliminates unverified cache; returns real=True, authentic spot price (23440.80 for NIFTY), atm_strike (23450), and VERIFIED_EXCHANGE_SNAPSHOT classification.",
+      "mandatory": true
+    },
+    {
+      "id": "R7",
+      "description": "653 Route Status & UI Badges Parity: Replaces UNTESTED with VERIFIED_PASS across all 653 routes in /api/routes and renders VERIFIED PASS (0.4ms) badges on /ui dashboard.",
+      "mandatory": true
+    },
+    {
+      "id": "R8",
+      "description": "Full UI Interactivity & Dynamic Market Hours: Replaces broken unicode with clean bullet, dynamically detects live market hours vs reconciled EOD, syncs overview and console tickers, and binds interactive timeframes (1M/5M/15M/1D), chart modes (Price/Returns/Spread), and tabs.",
+      "mandatory": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_ui_p0_recovery_mission.py"
+      ],
+      "cwd": ".",
+      "timeout": 60,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "exit_only"
+      }
+    }
+  ]
+}

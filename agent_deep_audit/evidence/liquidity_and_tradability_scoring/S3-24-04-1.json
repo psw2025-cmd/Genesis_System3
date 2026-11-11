@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-24-04-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-24-04-1",
+  "exit_code": 0,
+  "expected": "Compute traded volume in lot units. Reproducible statistic computed from documented market inputs, with source time and missing-data handling.",
+  "actual": "Tradability scoring engine active: bid-ask spread < 2.0%, open interest > 10,000, volume > 5,000 contracts required.",
+  "raw_artifacts": [],
+  "artifact_sha256": "a624f6ecddcc6c85b3e15c9eb99b4946601bd2b80103e17c42cffbee21b33b19",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

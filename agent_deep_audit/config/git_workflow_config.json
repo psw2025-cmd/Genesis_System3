@@ -1,0 +1,63 @@
+{
+  "_comment": "Genesis System3 — Git Auto Workflow configuration. All user-facing decisions are automated.",
+
+  "main_branch": "main",
+  "branch_prefix": "auto",
+  "merge_strategy": "squash",
+
+  "version": {
+    "auto_tag": true,
+    "tag_prefix": "v",
+    "bump_strategy": "auto",
+    "initial_version": "1.0.0"
+  },
+
+  "commit": {
+    "style": "conventional",
+    "max_length": 72,
+    "use_claude_cli": true,
+    "staged_only": false,
+    "exclude_patterns": [
+      ".secrets/",
+      "*.env",
+      ".env*",
+      "state/iv_history.json",
+      "state/gain_rank_history.json",
+      "state/market_cache.json",
+      "state/scheduler_daemon.pid"
+    ]
+  },
+
+  "pr": {
+    "auto_merge": true,
+    "merge_method": "squash",
+    "delete_branch_after_merge": true,
+    "labels": ["auto-merge"],
+    "draft": false,
+    "add_checklist_to_body": true
+  },
+
+  "quality_gates": {
+    "run_tests_before_commit": true,
+    "test_command": "python -m pytest tests/ -q --tb=short",
+    "fail_on_test_failure": false,
+    "check_syntax": true
+  },
+
+  "changelog": {
+    "auto_append": true,
+    "file": "CHANGE_LOG.md"
+  },
+
+  "retry": {
+    "max_retries": 3,
+    "delay_seconds": 5,
+    "exponential_backoff": true
+  },
+
+  "notifications": {
+    "print_summary": true,
+    "write_workflow_log": true,
+    "log_file": "state/git_workflow.log"
+  }
+}

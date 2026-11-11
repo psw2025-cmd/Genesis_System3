@@ -1,0 +1,1154 @@
+ M .agy-proof/contract.json
+ M .agy-proof/receipt.json
+ M .dockerignore
+ M .env.example
+ M AGENTS.md
+ M CHANGE_LOG.md
+ M Dockerfile
+ M GEMINI.md
+ M README.md
+ D SYSTEM3/08_REPORTS/ARCHITECTURE_DISCOVERY_REPORT.md
+ D SYSTEM3/08_REPORTS/DEPLOYMENT_CANDIDATE_REPORT.md
+ D SYSTEM3/08_REPORTS/EVIDENCE_MATRIX.md
+ D SYSTEM3/08_REPORTS/FOUNDATION_AUDIT.md
+ M config/human_approval_gate.json
+ M core/utils/env_loader.py
+ M dashboard/backend/app.py
+ M dashboard/backend/contract_gain_scanner.py
+ M dashboard/backend/greeks_calculator.py
+ M dashboard/backend/paper_pipeline_v8.py
+ M dashboard/backend/routers/ml.py
+ M dashboard/backend/runtime_state_store.py
+ M dashboard/backend/services/moneycontrol_live.py
+ D dashboard/frontend/dist/assets/index-CGzxtZaK.js
+ M dashboard/frontend/dist/assets/index-DJZIqAmp.css
+ M dashboard/frontend/dist/index.html
+ M dashboard/frontend/src/components/BrokerProofPanel.tsx
+ M dashboard/frontend/src/components/EndToEndProof.tsx
+ M dashboard/frontend/src/components/GenesisTab.tsx
+ M dashboard/frontend/src/components/PendingLifecycleBanner.tsx
+ M dashboard/frontend/src/components/RiskDashboard.tsx
+ M dashboard/frontend/src/components/TruthStrip.tsx
+ M dashboard/frontend/src/lib/lifecycleTruth.ts
+ M docs/DHAN_BROKER_API_ANALYSIS.md
+ M local_perf.json
+ D reports/coordination/ACCESS_POLICY.yaml
+ D reports/coordination/AGENT_ACCESS_FAST_PATH.md
+ D reports/coordination/AGENT_ACCESS_REQUESTS.md
+ D reports/coordination/AGENT_LANE_LOCK.md
+ D reports/coordination/AGENT_OPERATING_OPTIONS.xlsx
+ D reports/coordination/AUDIT_LOG.jsonl
+ D reports/coordination/AUTHORITY_RANK_ANALYSIS.csv
+ D reports/coordination/COMMAND_CENTER.md
+ D reports/coordination/GCP_TO_LOCAL_ERADICATION_TRACKER.md
+ D reports/coordination/GITHUB_ACTION_MAP_STATUS.csv
+ D reports/coordination/GMAIL_AGENT_DIGEST.md
+ D reports/coordination/ISSUES_MERMAID.md
+ D reports/coordination/ISSUES_ONLY.md
+ D reports/coordination/LIVE_PROOF_CENTER_POINTER.md
+ D reports/coordination/PHASE2_FIVE_LAYER_ARCHITECTURE_AUDIT_20260826.md
+ D reports/coordination/RENDER_HOST_RETIRED_MRI_HANDOFF_20260823.md
+ D reports/coordination/RHUI_V2.2_GATE_BOARD.csv
+ D reports/coordination/RHUI_V2.2_Material_Change_Status.png
+ D reports/coordination/RHUI_V2.2_RiskExecution_SSOT.json
+ D reports/coordination/RHUI_V2.2_Verification_Checklist.json
+ D reports/coordination/RHUI_V2.3_GCP_ERADICATION_ACCEPTANCE.md
+ D reports/coordination/SMOKE_TEST_LAST.json
+ D reports/coordination/SYSTEM3_FULL_LIFECYCLE_MRI_DASHBOARD.html
+ D reports/coordination/SYSTEM3_FULL_LIFECYCLE_MRI_DATA.json
+ D reports/coordination/SYSTEM3_PATCH_0021_CURSOR_VERIFICATION.md
+ D reports/coordination/SYSTEM3_ULTRA_MRI_HANDOFF.md
+ D reports/coordination/System3_LIVE_PROOF_CENTER.xlsx
+ D reports/coordination/TODO_CHECKLIST_FULL_VERIFY.json
+ D reports/coordination/TODO_CHECKLIST_FULL_VERIFY.md
+ D reports/coordination/TRACKING_CHECKLIST.json
+ D reports/coordination/TRACKING_CHECKLIST.md
+ D reports/coordination/catalyst_phase0_ruhi022_health_proof_20260822T115910Z.json
+ D reports/coordination/catalyst_source_capability_matrix.csv
+ D reports/coordination/chatgpt_backlog/README.md
+ D reports/coordination/chatgpt_backlog/system3_agent_queries.csv
+ D reports/coordination/chatgpt_backlog/system3_micro_agent_queries.csv
+ D reports/coordination/chatgpt_backlog/system3_micro_execution_plan.csv
+ D reports/coordination/chatgpt_backlog/system3_micro_issue_master.csv
+ D reports/coordination/chatgpt_backlog/system3_micro_proof_matrix.csv
+ D reports/coordination/chatgpt_backlog/system3_pending_actions.csv
+ D reports/coordination/chatgpt_backlog/system3_proof_requirements.csv
+ D reports/coordination/chatgpt_backlog/system3_screenshot_evidence_register.csv
+ D reports/coordination/chatgpt_backlog/system3_signal_candidates.csv
+ D reports/coordination/chatgpt_backlog/system3_signal_candidates_annotated.csv
+ D reports/coordination/chatgpt_backlog/system3_world_class_recommendations.csv
+ D reports/coordination/pending_issues_master.csv
+ D reports/coordination/proof/DIFF_NAME_STATUS.txt
+ D reports/coordination/proof/DIFF_STAT.txt
+ D reports/coordination/proof/PATCH_0021_CURSOR_PYTEST.txt
+ D reports/coordination/proof/PATCH_0021_T11_SANITIZER_DEMO.json
+ D reports/coordination/proof/SMOKE_LOG_EXCERPT.txt
+ D reports/coordination/proof/SMOKE_TEST_LAST.json
+ D reports/coordination/ruhi_b002_recapture_20260822T103352Z.json
+ D reports/coordination/ruhi_task_ledger.csv
+ D reports/coordination/scheduler_health_gate/20260822T103306Z_canary.json
+ D reports/coordination/session_issues_master.csv
+ D reports/latest/AGENT_STATUS_LATEST.md
+ D reports/latest/CHATGPT_QC_DASHBOARD_FORENSIC_FINDINGS.md
+ D reports/latest/FINAL_HUMAN_READABLE_STATUS.md
+ D reports/latest/OWNER_AUTHENTICATED_RECOVERY.log
+ D reports/latest/access_capability/ACCESS_GRANT_REVISE.ps1
+ D reports/latest/access_capability/ACCESS_PROBE_RESULT.json
+ D reports/latest/access_capability/ACCESS_PROBE_RESULT.md
+ D reports/latest/access_capability/ACCESS_VERIFY_CONFIRM.md
+ D reports/latest/access_capability/USER_GRANT_RUN_20260825_134144.log
+ D reports/latest/access_capability/live_broker_now.json
+ D reports/latest/access_capability/live_deploy_now.json
+ D reports/latest/agent_status.json
+ D reports/latest/all_tabs_zero_audit.json
+ D reports/latest/analyzer_signal/analyzer_signal_summary.json
+ D reports/latest/analyzer_signal/analyzer_signal_summary.md
+ D reports/latest/api_health/api_health_summary.json
+ D reports/latest/api_health/api_health_summary.md
+ D reports/latest/auto_recovery_blockers/README.md
+ D reports/latest/auto_recovery_blockers/auto_recovery_blockers.json
+ D reports/latest/autonomous_kickoff_scheduler_health.json
+ D reports/latest/autonomous_loop/BACKLOG.md
+ D reports/latest/autonomous_loop/intent_tick.json
+ D reports/latest/autopilot_proof_board/summary.json
+ D reports/latest/autopilot_proof_board/summary.md
+ D reports/latest/backend_live_simulation/summary.json
+ D reports/latest/backend_live_simulation/summary.md
+ D reports/latest/broker_authority_6rules/project_run_jobs_run_inventory.json
+ D reports/latest/broker_chain_semantic_gate/summary.json
+ D reports/latest/broker_chain_semantic_gate/summary.md
+ D reports/latest/broker_health_confirmed/README.md
+ D reports/latest/broker_recovery_20260818_live/README.md
+ D reports/latest/broker_trader_validation/summary.json
+ D reports/latest/broker_trader_validation/summary.md
+ D reports/latest/broker_truth/broker_truth_summary.json
+ D reports/latest/broker_truth/broker_truth_summary.md
+ D reports/latest/claude_blocker_fixes_20260624/summary.md
+ D reports/latest/claude_forensic_audit_20260624/summary.md
+ D reports/latest/claude_memory_audit/CLAUDE_PROJECT_MEMORY_CROSS_VERIFY_20260825.json
+ D reports/latest/claude_memory_audit/CLAUDE_PROJECT_MEMORY_CROSS_VERIFY_20260825.md
+ D reports/latest/cloud_ci_trigger_20260624.md
+ D reports/latest/cloud_e2e_proof/README.md
+ D reports/latest/cloud_e2e_proof/summary.json
+ D reports/latest/cloud_health_proof/cloud_health_proof.json
+ D reports/latest/cloud_runtime_check/summary.json
+ D reports/latest/cloud_runtime_check/summary.md
+ D reports/latest/continuous_closure/resume_state.json
+ D reports/latest/continuous_closure/summary.json
+ D reports/latest/control_plane/NEXT_ACTION.md
+ D reports/latest/control_plane/bankex_expiry_premerge_20260824T080307Z/NEXT_ACTION.md
+ D reports/latest/control_plane/bankex_expiry_premerge_20260824T080307Z/workflow_issue_artifact_snapshot.json
+ D reports/latest/control_plane/bankex_premerge_20260824T075003Z/NEXT_ACTION.md
+ D reports/latest/control_plane/bankex_premerge_20260824T075003Z/workflow_issue_artifact_snapshot.json
+ D reports/latest/control_plane/bankex_segment_premerge_20260824T081519Z/NEXT_ACTION.md
+ D reports/latest/control_plane/bankex_segment_premerge_20260824T081519Z/workflow_issue_artifact_snapshot.json
+ D reports/latest/control_plane/p0_188_03_premerge_20260824T072112Z/NEXT_ACTION.md
+ D reports/latest/control_plane/p0_188_03_premerge_20260824T072112Z/workflow_issue_artifact_snapshot.json
+ D reports/latest/control_plane/resume_20260824T123345Z/NEXT_ACTION.md
+ D reports/latest/control_plane/resume_20260824T123345Z/workflow_issue_artifact_snapshot.json
+ D reports/latest/control_plane/workflow_issue_artifact_snapshot.json
+ D reports/latest/daily_gain_rank_and_validate/summary.json
+ D reports/latest/daily_gain_rank_and_validate/summary.md
+ D reports/latest/dashboard_auto_snap/endpoint_matrix.json
+ D reports/latest/dashboard_auto_snap/latest_auto_gates.json
+ D reports/latest/dashboard_auto_snap/latest_broker_status.json
+ D reports/latest/dashboard_auto_snap/latest_chain_nifty.json
+ D reports/latest/dashboard_auto_snap/latest_dashboard.png
+ D reports/latest/dashboard_auto_snap/latest_health.json
+ D reports/latest/dashboard_auto_snap/latest_instruments_health.json
+ D reports/latest/dashboard_auto_snap/latest_mobile.png
+ D reports/latest/dashboard_auto_snap/latest_paper.json
+ D reports/latest/dashboard_auto_snap/latest_qc.json
+ D reports/latest/dashboard_auto_snap/latest_state.json
+ D reports/latest/dashboard_auto_snap/latest_summary.md
+ D reports/latest/dashboard_auto_snap/latest_ui_preview.txt
+ D reports/latest/dashboard_auto_snap/latest_ui_response.json
+ D reports/latest/dashboard_auto_snap/latest_underlyings.json
+ D reports/latest/dashboard_auto_snap/latest_verdict.json
+ D reports/latest/dashboard_browser_proof/screenshots/.last-run.json
+ D reports/latest/dashboard_browser_proof/screenshots/desktop_1920x1080.png
+ D reports/latest/dashboard_browser_proof/screenshots/mobile_375x667.png
+ D reports/latest/dashboard_browser_proof/screenshots/tablet_768x1024.png
+ D reports/latest/dashboard_browser_proof/summary.json
+ D reports/latest/dashboard_browser_proof/summary.md
+ D reports/latest/dashboard_deploy_provenance/summary.json
+ D reports/latest/dashboard_deploy_provenance/summary.md
+ D reports/latest/dashboard_endpoint_coverage/endpoint_coverage_summary.json
+ D reports/latest/dashboard_endpoint_coverage/endpoint_results.json
+ D reports/latest/dashboard_full_audit/summary.json
+ D reports/latest/dashboard_full_audit/summary.md
+ D reports/latest/dashboard_shell_diagnostic/summary.json
+ D reports/latest/dashboard_shell_diagnostic/summary.md
+ D reports/latest/dashboard_truth/dashboard_truth_summary.json
+ D reports/latest/dashboard_truth/dashboard_truth_summary.md
+ D reports/latest/dashboard_truth/screenshots/ui_overview_20260702_2105ist.png
+ D reports/latest/dashboard_truth_proof/README.md
+ D reports/latest/dashboard_truth_proof/summary.json
+ D reports/latest/dashboard_ui_proof/latest.json
+ D reports/latest/dashboard_visible_issue_tracker/alerts.png
+ D reports/latest/dashboard_visible_issue_tracker/alerts.txt
+ D reports/latest/dashboard_visible_issue_tracker/broker.png
+ D reports/latest/dashboard_visible_issue_tracker/broker.txt
+ D reports/latest/dashboard_visible_issue_tracker/chain.png
+ D reports/latest/dashboard_visible_issue_tracker/chain.txt
+ D reports/latest/dashboard_visible_issue_tracker/e2e_proof.png
+ D reports/latest/dashboard_visible_issue_tracker/e2e_proof.txt
+ D reports/latest/dashboard_visible_issue_tracker/gates.png
+ D reports/latest/dashboard_visible_issue_tracker/gates.txt
+ D reports/latest/dashboard_visible_issue_tracker/genesis.png
+ D reports/latest/dashboard_visible_issue_tracker/genesis.txt
+ D reports/latest/dashboard_visible_issue_tracker/landing.png
+ D reports/latest/dashboard_visible_issue_tracker/ml.png
+ D reports/latest/dashboard_visible_issue_tracker/ml.txt
+ D reports/latest/dashboard_visible_issue_tracker/overview.png
+ D reports/latest/dashboard_visible_issue_tracker/overview.txt
+ D reports/latest/dashboard_visible_issue_tracker/paper.png
+ D reports/latest/dashboard_visible_issue_tracker/paper.txt
+ D reports/latest/dashboard_visible_issue_tracker/performance.png
+ D reports/latest/dashboard_visible_issue_tracker/performance.txt
+ D reports/latest/dashboard_visible_issue_tracker/positions.png
+ D reports/latest/dashboard_visible_issue_tracker/positions.txt
+ D reports/latest/dashboard_visible_issue_tracker/signals.png
+ D reports/latest/dashboard_visible_issue_tracker/signals.txt
+ D reports/latest/dashboard_visible_issue_tracker/sim_live.png
+ D reports/latest/dashboard_visible_issue_tracker/sim_live.txt
+ D reports/latest/dashboard_visible_issue_tracker/summary.json
+ D reports/latest/dashboard_visible_issue_tracker/summary.md
+ D reports/latest/dashboard_visible_issue_tracker/system.png
+ D reports/latest/dashboard_visible_issue_tracker/system.txt
+ D reports/latest/dashboard_visible_issue_tracker/trade.png
+ D reports/latest/dashboard_visible_issue_tracker/trade.txt
+ D reports/latest/dashboard_visible_issue_tracker/truth.png
+ D reports/latest/dashboard_visible_issue_tracker/truth.txt
+ D reports/latest/dashboard_visual_contract_check/summary.json
+ D reports/latest/dashboard_visual_contract_check/summary.md
+ D reports/latest/dashboard_visual_production_proof/summary.json
+ D reports/latest/dashboard_visual_production_proof/visual_proof.md
+ D reports/latest/deployment_and_endpoint_proof/README.md
+ D reports/latest/deployment_and_endpoint_proof/summary.json
+ D reports/latest/dhan_advance_platform_verification/claim_verification_matrix.csv
+ D reports/latest/dhan_advance_platform_verification/recommendation.md
+ D reports/latest/dhan_advance_platform_verification/source_manifest.json
+ D reports/latest/dhan_advance_platform_verification/summary.json
+ D reports/latest/dhan_advance_platform_verification/summary.md
+ D reports/latest/dhan_advance_platform_verification/system3_mapping_matrix.csv
+ D reports/latest/dhan_option_chain_schema_audit/summary.json
+ D reports/latest/dhan_option_chain_schema_audit/summary.md
+ D reports/latest/dhan_parity/DHAN_LIVE_PARITY_ISSUES.md
+ D reports/latest/dhan_parity/DHAN_PARITY_LIVE_COMPARE.json
+ D reports/latest/dhan_parity/ISSUE188_PARITY_COMMENT.md
+ D reports/latest/dhan_parity/api_broker_status.json
+ D reports/latest/dhan_parity/api_chain_BANKNIFTY.json
+ D reports/latest/dhan_parity/api_chain_NIFTY.json
+ D reports/latest/dhan_parity/api_chain_SENSEX.json
+ D reports/latest/dhan_parity/api_deploy_info.json
+ D reports/latest/dhan_parity/api_health.json
+ D reports/latest/dhan_parity/api_state.json
+ D reports/latest/dhan_parity/probe_api_charts_NIFTY.txt
+ D reports/latest/dhan_parity/probe_api_equity_options.txt
+ D reports/latest/dhan_parity/probe_api_funds.txt
+ D reports/latest/dhan_parity/probe_api_holdings.txt
+ D reports/latest/dhan_parity/probe_api_multibagger.txt
+ D reports/latest/dhan_parity/probe_api_option_chain.txt
+ D reports/latest/dhan_parity/probe_api_positions.txt
+ D reports/latest/dhan_parity/probe_api_scanner_equity_options.txt
+ D reports/latest/dhan_parity/probe_api_signals.txt
+ D reports/latest/dhan_parity/probe_api_top_gainers.txt
+ D reports/latest/dhan_token_issuer_forensics/summary.json
+ D reports/latest/documentation_contradictions.md
+ D reports/latest/experimental_solution_planner/summary.json
+ D reports/latest/experimental_solution_planner/summary.md
+ D reports/latest/external_data_yahoo/yahoo_data_summary.json
+ D reports/latest/fresh_data_automation_proof/README.md
+ D reports/latest/fresh_data_automation_proof/summary.json
+ D reports/latest/friction_expectancy/summary.json
+ D reports/latest/friction_expectancy/summary.md
+ D reports/latest/full_cross_verify_20260826_193000/FULL_VERIFY_REPORT.md
+ D reports/latest/full_cross_verify_20260826_193000/_gmail_pull.py
+ D reports/latest/full_cross_verify_20260826_193000/auto_gates.json
+ D reports/latest/full_cross_verify_20260826_193000/broker_status.json
+ D reports/latest/full_cross_verify_20260826_193000/deploy_info.json
+ D reports/latest/full_cross_verify_20260826_193000/gmail_system3_threads.json
+ D reports/latest/full_cross_verify_20260826_193000/health.json
+ D reports/latest/full_cross_verify_20260826_193000/ruleset_21581518.json
+ D reports/latest/full_cross_verify_20260826_193000/scheduler_health.json
+ D reports/latest/full_cross_verify_20260826_193000/state.json
+ D reports/latest/full_dashboard_api_audit/cloud_api_snapshot.json
+ D reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.json
+ D reports/latest/full_trading_pipeline_readiness/09_pipeline_gate_summary.md
+ D reports/latest/genesis_dashboard_qc/summary.json
+ D reports/latest/github_render_failure_tracker/excluded_workflows.json
+ D reports/latest/github_render_failure_tracker/preflight.json
+ D reports/latest/github_render_failure_tracker/summary.json
+ D reports/latest/github_render_failure_tracker/summary.md
+ D reports/latest/human_approval_gate/summary.json
+ D reports/latest/human_approval_gate/summary.md
+ D reports/latest/inspector_audit_response/README.md
+ D reports/latest/instrument_tradability/instrument_tradability_summary.json
+ D reports/latest/instrument_tradability/instrument_tradability_summary.md
+ D reports/latest/issue_00_01_gate_and_strike_provenance.md
+ D reports/latest/issue_188_proof/ISSUE_188_MASTER_PARITY_REPORT.json
+ D reports/latest/live_cloud_endpoint_truth/endpoint_check_20260701T193524Z.log
+ D reports/latest/live_current_issue_check/LIVE_CURRENT_ISSUE_REPORT.md
+ D reports/latest/live_current_issue_check/compile_results.json
+ D reports/latest/live_current_issue_check/endpoint_results.json
+ D reports/latest/live_current_issue_check/git_status.json
+ D reports/latest/live_current_issue_check/issues.json
+ D reports/latest/live_current_issue_check/live_current_issue_check.py
+ D reports/latest/live_current_issue_check/live_current_issue_check_20260614_141612.zip
+ D reports/latest/live_current_issue_check/live_current_issue_check_20260614_142201.zip
+ D reports/latest/live_current_issue_check/live_current_issue_check_20260614_142214.zip
+ D reports/latest/live_current_issue_check/live_current_issue_check_20260614_162315.zip
+ D reports/latest/live_current_issue_check/summary.json
+ D reports/latest/live_diag_20m/FINAL_AUDIT.md
+ D reports/latest/live_diag_20m_poll.log
+ D reports/latest/live_proof_center/LATEST/CROSS_VERIFY.json
+ D reports/latest/live_proof_center/LATEST/INDEX.md
+ D reports/latest/live_proof_center/LATEST/MANIFEST.json
+ D reports/latest/live_proof_center/LATEST/System3_LIVE_PROOF_CENTER.xlsx
+ D reports/latest/live_proof_center/LATEST/api/auth_status.json
+ D reports/latest/live_proof_center/LATEST/api/auto_gates.json
+ D reports/latest/live_proof_center/LATEST/api/batch_chains.json
+ D reports/latest/live_proof_center/LATEST/api/broker_status.json
+ D reports/latest/live_proof_center/LATEST/api/broker_truth.json
+ D reports/latest/live_proof_center/LATEST/api/chain_nifty.json
+ D reports/latest/live_proof_center/LATEST/api/continuous_closure.json
+ D reports/latest/live_proof_center/LATEST/api/deploy_info.json
+ D reports/latest/live_proof_center/LATEST/api/deploy_info_alias.json
+ D reports/latest/live_proof_center/LATEST/api/funds.json
+ D reports/latest/live_proof_center/LATEST/api/health.json
+ D reports/latest/live_proof_center/LATEST/api/holdings.json
+ D reports/latest/live_proof_center/LATEST/api/instruments_health.json
+ D reports/latest/live_proof_center/LATEST/api/kill_switch.json
+ D reports/latest/live_proof_center/LATEST/api/live_trading_gate.json
+ D reports/latest/live_proof_center/LATEST/api/positions.json
+ D reports/latest/live_proof_center/LATEST/api/proof_ledger.json
+ D reports/latest/live_proof_center/LATEST/api/scheduler_health.json
+ D reports/latest/live_proof_center/LATEST/api/signals_top.json
+ D reports/latest/live_proof_center/LATEST/api/state.json
+ D reports/latest/live_proof_center/LATEST/api/status.json
+ D reports/latest/live_proof_center/LATEST/api/system_health.json
+ D reports/latest/live_proof_center/LATEST/api/ui_root.json
+ D reports/latest/live_proof_center/LATEST/dashboard_tabs.json
+ D reports/latest/live_proof_center/README.md
+ D reports/latest/live_proof_center/from_actions_32953835848/coordination/LIVE_PROOF_CENTER_POINTER.md
+ D reports/latest/live_proof_center/from_actions_32953835848/coordination/System3_LIVE_PROOF_CENTER.xlsx
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/CROSS_VERIFY.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/INDEX.md
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/MANIFEST.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/System3_LIVE_PROOF_CENTER.xlsx
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/auth_status.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/auto_gates.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/batch_chains.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/broker_status.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/broker_truth.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/chain_nifty.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/continuous_closure.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/deploy_info.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/deploy_info_alias.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/funds.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/health.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/holdings.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/instruments_health.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/kill_switch.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/live_trading_gate.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/positions.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/proof_ledger.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/scheduler_health.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/signals_top.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/state.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/status.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/system_health.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/api/ui_root.json
+ D reports/latest/live_proof_center/from_actions_32953835848/latest/live_proof_center/LATEST/dashboard_tabs.json
+ D reports/latest/local_code_review/REVIEW.md
+ D reports/latest/local_code_review/summary.json
+ D reports/latest/manual_repo_qc_audit/summary.md
+ D reports/latest/markdown_inventory.json
+ D reports/latest/markdown_inventory.md
+ D reports/latest/market_session/market_session_summary.json
+ D reports/latest/market_session/market_session_summary.md
+ D reports/latest/market_session_proof_runner/start.json
+ D reports/latest/market_session_proof_runner/summary.json
+ D reports/latest/market_session_proof_runner/summary.md
+ D reports/latest/market_top_ce_pe_verify.json
+ D reports/latest/master_mri/latest_scan.json
+ D reports/latest/master_mri/t_c1_chain_warm_proof.md
+ D reports/latest/micro_audit/summary.json
+ D reports/latest/model_accuracy_report.json
+ D reports/latest/model_accuracy_report.md
+ D reports/latest/model_to_trade_gap/summary.json
+ D reports/latest/model_to_trade_gap/summary.md
+ D reports/latest/model_training_load_proof/README.md
+ D reports/latest/model_training_load_proof/dryrun_proof.json
+ D reports/latest/model_training_load_proof/summary.json
+ D reports/latest/mri/Concern_List.json
+ D reports/latest/mri/Concern_List.md
+ D reports/latest/mri/GENESIS_SYSTEM3_MASTER_120_MRI_TRUTH.csv
+ D reports/latest/mri/GENESIS_SYSTEM3_ULTRA_MASTER_MRI_RECOMMENDATIONS_2026.csv
+ D reports/latest/mri/MASTER_LIFECYCLE_AUDIT_SUMMARY.json
+ D reports/latest/mri_plan/MRI_GMAIL_SCHEDULER_5MIN_CONTROL_PLAN.md
+ D reports/latest/mri_watch/CHECKLIST.csv
+ D reports/latest/mri_watch/CHECKLIST.md
+ D reports/latest/mri_watch/DIGEST.md
+ D reports/latest/mri_watch/LATEST.json
+ D reports/latest/mri_watch/RECURRENCE.md
+ D reports/latest/mri_watch/TICK_LOG.jsonl
+ D reports/latest/mri_watch/_loop_runner.ps1
+ D reports/latest/mri_watch/_tick_stderr.txt
+ D reports/latest/mri_watch/_tick_stdout.txt
+ D reports/latest/mri_watch/gmail_latest.json
+ D reports/latest/option_strike_visibility.json
+ D reports/latest/option_strike_visibility.md
+ D reports/latest/options_ml_training_summary.json
+ D reports/latest/paper_symbol_selection_fix/README.md
+ D reports/latest/paper_trade_page_multi_source_compare.json
+ D reports/latest/paper_trade_page_verify.json
+ D reports/latest/parallel_root_cause_audit/backend_routes.json
+ D reports/latest/parallel_root_cause_audit/backend_routes.md
+ D reports/latest/parallel_root_cause_audit/broker_auth.json
+ D reports/latest/parallel_root_cause_audit/broker_auth.md
+ D reports/latest/parallel_root_cause_audit/chain_scanner.json
+ D reports/latest/parallel_root_cause_audit/chain_scanner.md
+ D reports/latest/parallel_root_cause_audit/final_truth.json
+ D reports/latest/parallel_root_cause_audit/final_truth.md
+ D reports/latest/parallel_root_cause_audit/ml_training.json
+ D reports/latest/parallel_root_cause_audit/ml_training.md
+ D reports/latest/parallel_root_cause_audit/paper_lifecycle.json
+ D reports/latest/parallel_root_cause_audit/paper_lifecycle.md
+ D reports/latest/parallel_root_cause_audit/render_truth.json
+ D reports/latest/parallel_root_cause_audit/render_truth.md
+ D reports/latest/parallel_root_cause_audit/summary.json
+ D reports/latest/parallel_root_cause_audit/summary.md
+ D reports/latest/parallel_root_cause_audit/visual_proof.json
+ D reports/latest/parallel_root_cause_audit/visual_proof.md
+ D reports/latest/pending_issues/LIVE_ENDPOINT_SWEEP_20260825.json
+ D reports/latest/pending_issues/PAPER_GATES_LIVE_20260825.json
+ D reports/latest/pending_issues/PENDING_ISSUES_MASTER_20260825.csv
+ D reports/latest/pending_issues/PENDING_ISSUES_README.md
+ D reports/latest/pending_issues/SESSION_ISSUES_MASTER.md
+ D reports/latest/pending_tasks_closure/summary.json
+ D reports/latest/pending_tasks_closure/summary.md
+ D reports/latest/performance_batch_proof/summary.json
+ D reports/latest/performance_batch_proof/summary.md
+ D reports/latest/performance_benchmark/benchmark_summary.md
+ D reports/latest/post369_live_proof_20260827_000506/api_broker_status.json
+ D reports/latest/post369_live_proof_20260827_000506/api_deploy_info.json
+ D reports/latest/post369_live_proof_20260827_000506/api_health.json
+ D reports/latest/post369_live_proof_20260827_000506/api_scheduler_health.json
+ D reports/latest/production_grade_readiness/summary.json
+ D reports/latest/production_grade_readiness/summary.md
+ D reports/latest/production_viability_bridge/latest.json
+ D reports/latest/production_viability_bridge/summary.md
+ D reports/latest/proof_ledger/ledger.jsonl
+ D reports/latest/proof_pack_closure_gate/summary.json
+ D reports/latest/proof_pack_closure_gate/summary.md
+ D reports/latest/proof_status_matrix/proof_status_matrix.json
+ D reports/latest/public_dashboard_proof/tab_visual_matrix.json
+ D reports/latest/qc_forensic_anomaly_audit/anomaly_matrix.csv
+ D reports/latest/qc_forensic_anomaly_audit/chain_matrix.json
+ D reports/latest/qc_forensic_anomaly_audit/endpoint_matrix.json
+ D reports/latest/qc_forensic_anomaly_audit/runtime_qc.json
+ D reports/latest/qc_forensic_anomaly_audit/safety_verdict.json
+ D reports/latest/qc_forensic_anomaly_audit/summary.json
+ D reports/latest/qc_forensic_anomaly_audit/summary.md
+ D reports/latest/readiness_evidence_normalized/summary.json
+ D reports/latest/readiness_evidence_normalized/summary.md
+ D reports/latest/real_market_data_proof/summary.json
+ D reports/latest/real_market_data_proof/summary.md
+ D reports/latest/recent_backtest_walkforward_proof/README.md
+ D reports/latest/recent_backtest_walkforward_proof/costed_walkforward_proof.json
+ D reports/latest/recent_backtest_walkforward_proof/summary.json
+ D reports/latest/recent_claude_change_audit/summary.json
+ D reports/latest/render_100_agent_swarm/agent_001.json
+ D reports/latest/render_100_agent_swarm/agent_001.md
+ D reports/latest/render_100_agent_swarm/agent_002.json
+ D reports/latest/render_100_agent_swarm/agent_002.md
+ D reports/latest/render_100_agent_swarm/agent_003.json
+ D reports/latest/render_100_agent_swarm/agent_003.md
+ D reports/latest/render_100_agent_swarm/agent_004.json
+ D reports/latest/render_100_agent_swarm/agent_004.md
+ D reports/latest/render_100_agent_swarm/agent_005.json
+ D reports/latest/render_100_agent_swarm/agent_005.md
+ D reports/latest/render_100_agent_swarm/agent_006.json
+ D reports/latest/render_100_agent_swarm/agent_006.md
+ D reports/latest/render_100_agent_swarm/agent_007.json
+ D reports/latest/render_100_agent_swarm/agent_007.md
+ D reports/latest/render_100_agent_swarm/agent_008.json
+ D reports/latest/render_100_agent_swarm/agent_008.md
+ D reports/latest/render_100_agent_swarm/agent_009.json
+ D reports/latest/render_100_agent_swarm/agent_009.md
+ D reports/latest/render_100_agent_swarm/agent_010.json
+ D reports/latest/render_100_agent_swarm/agent_010.md
+ D reports/latest/render_100_agent_swarm/agent_011.json
+ D reports/latest/render_100_agent_swarm/agent_011.md
+ D reports/latest/render_100_agent_swarm/agent_012.json
+ D reports/latest/render_100_agent_swarm/agent_012.md
+ D reports/latest/render_100_agent_swarm/agent_013.json
+ D reports/latest/render_100_agent_swarm/agent_013.md
+ D reports/latest/render_100_agent_swarm/agent_014.json
+ D reports/latest/render_100_agent_swarm/agent_014.md
+ D reports/latest/render_100_agent_swarm/agent_015.json
+ D reports/latest/render_100_agent_swarm/agent_015.md
+ D reports/latest/render_100_agent_swarm/agent_016.json
+ D reports/latest/render_100_agent_swarm/agent_016.md
+ D reports/latest/render_100_agent_swarm/agent_017.json
+ D reports/latest/render_100_agent_swarm/agent_017.md
+ D reports/latest/render_100_agent_swarm/agent_018.json
+ D reports/latest/render_100_agent_swarm/agent_018.md
+ D reports/latest/render_100_agent_swarm/agent_019.json
+ D reports/latest/render_100_agent_swarm/agent_019.md
+ D reports/latest/render_100_agent_swarm/agent_020.json
+ D reports/latest/render_100_agent_swarm/agent_020.md
+ D reports/latest/render_100_agent_swarm/agent_021.json
+ D reports/latest/render_100_agent_swarm/agent_021.md
+ D reports/latest/render_100_agent_swarm/agent_022.json
+ D reports/latest/render_100_agent_swarm/agent_022.md
+ D reports/latest/render_100_agent_swarm/agent_023.json
+ D reports/latest/render_100_agent_swarm/agent_023.md
+ D reports/latest/render_100_agent_swarm/agent_024.json
+ D reports/latest/render_100_agent_swarm/agent_024.md
+ D reports/latest/render_100_agent_swarm/agent_025.json
+ D reports/latest/render_100_agent_swarm/agent_025.md
+ D reports/latest/render_100_agent_swarm/agent_026.json
+ D reports/latest/render_100_agent_swarm/agent_026.md
+ D reports/latest/render_100_agent_swarm/agent_027.json
+ D reports/latest/render_100_agent_swarm/agent_027.md
+ D reports/latest/render_100_agent_swarm/agent_028.json
+ D reports/latest/render_100_agent_swarm/agent_028.md
+ D reports/latest/render_100_agent_swarm/agent_029.json
+ D reports/latest/render_100_agent_swarm/agent_029.md
+ D reports/latest/render_100_agent_swarm/agent_030.json
+ D reports/latest/render_100_agent_swarm/agent_030.md
+ D reports/latest/render_100_agent_swarm/agent_031.json
+ D reports/latest/render_100_agent_swarm/agent_031.md
+ D reports/latest/render_100_agent_swarm/agent_032.json
+ D reports/latest/render_100_agent_swarm/agent_032.md
+ D reports/latest/render_100_agent_swarm/agent_033.json
+ D reports/latest/render_100_agent_swarm/agent_033.md
+ D reports/latest/render_100_agent_swarm/agent_034.json
+ D reports/latest/render_100_agent_swarm/agent_034.md
+ D reports/latest/render_100_agent_swarm/agent_035.json
+ D reports/latest/render_100_agent_swarm/agent_035.md
+ D reports/latest/render_100_agent_swarm/agent_036.json
+ D reports/latest/render_100_agent_swarm/agent_036.md
+ D reports/latest/render_100_agent_swarm/agent_037.json
+ D reports/latest/render_100_agent_swarm/agent_037.md
+ D reports/latest/render_100_agent_swarm/agent_038.json
+ D reports/latest/render_100_agent_swarm/agent_038.md
+ D reports/latest/render_100_agent_swarm/agent_039.json
+ D reports/latest/render_100_agent_swarm/agent_039.md
+ D reports/latest/render_100_agent_swarm/agent_040.json
+ D reports/latest/render_100_agent_swarm/agent_040.md
+ D reports/latest/render_100_agent_swarm/agent_041.json
+ D reports/latest/render_100_agent_swarm/agent_041.md
+ D reports/latest/render_100_agent_swarm/agent_042.json
+ D reports/latest/render_100_agent_swarm/agent_042.md
+ D reports/latest/render_100_agent_swarm/agent_043.json
+ D reports/latest/render_100_agent_swarm/agent_043.md
+ D reports/latest/render_100_agent_swarm/agent_044.json
+ D reports/latest/render_100_agent_swarm/agent_044.md
+ D reports/latest/render_100_agent_swarm/agent_045.json
+ D reports/latest/render_100_agent_swarm/agent_045.md
+ D reports/latest/render_100_agent_swarm/agent_046.json
+ D reports/latest/render_100_agent_swarm/agent_046.md
+ D reports/latest/render_100_agent_swarm/agent_047.json
+ D reports/latest/render_100_agent_swarm/agent_047.md
+ D reports/latest/render_100_agent_swarm/agent_048.json
+ D reports/latest/render_100_agent_swarm/agent_048.md
+ D reports/latest/render_100_agent_swarm/agent_049.json
+ D reports/latest/render_100_agent_swarm/agent_049.md
+ D reports/latest/render_100_agent_swarm/agent_050.json
+ D reports/latest/render_100_agent_swarm/agent_050.md
+ D reports/latest/render_100_agent_swarm/agent_051.json
+ D reports/latest/render_100_agent_swarm/agent_051.md
+ D reports/latest/render_100_agent_swarm/agent_052.json
+ D reports/latest/render_100_agent_swarm/agent_052.md
+ D reports/latest/render_100_agent_swarm/agent_053.json
+ D reports/latest/render_100_agent_swarm/agent_053.md
+ D reports/latest/render_100_agent_swarm/agent_054.json
+ D reports/latest/render_100_agent_swarm/agent_054.md
+ D reports/latest/render_100_agent_swarm/agent_055.json
+ D reports/latest/render_100_agent_swarm/agent_055.md
+ D reports/latest/render_100_agent_swarm/agent_056.json
+ D reports/latest/render_100_agent_swarm/agent_056.md
+ D reports/latest/render_100_agent_swarm/agent_057.json
+ D reports/latest/render_100_agent_swarm/agent_057.md
+ D reports/latest/render_100_agent_swarm/agent_058.json
+ D reports/latest/render_100_agent_swarm/agent_058.md
+ D reports/latest/render_100_agent_swarm/agent_059.json
+ D reports/latest/render_100_agent_swarm/agent_059.md
+ D reports/latest/render_100_agent_swarm/agent_060.json
+ D reports/latest/render_100_agent_swarm/agent_060.md
+ D reports/latest/render_100_agent_swarm/agent_061.json
+ D reports/latest/render_100_agent_swarm/agent_061.md
+ D reports/latest/render_100_agent_swarm/agent_062.json
+ D reports/latest/render_100_agent_swarm/agent_062.md
+ D reports/latest/render_100_agent_swarm/agent_063.json
+ D reports/latest/render_100_agent_swarm/agent_063.md
+ D reports/latest/render_100_agent_swarm/agent_064.json
+ D reports/latest/render_100_agent_swarm/agent_064.md
+ D reports/latest/render_100_agent_swarm/agent_065.json
+ D reports/latest/render_100_agent_swarm/agent_065.md
+ D reports/latest/render_100_agent_swarm/agent_066.json
+ D reports/latest/render_100_agent_swarm/agent_066.md
+ D reports/latest/render_100_agent_swarm/agent_067.json
+ D reports/latest/render_100_agent_swarm/agent_067.md
+ D reports/latest/render_100_agent_swarm/agent_068.json
+ D reports/latest/render_100_agent_swarm/agent_068.md
+ D reports/latest/render_100_agent_swarm/agent_069.json
+ D reports/latest/render_100_agent_swarm/agent_069.md
+ D reports/latest/render_100_agent_swarm/agent_070.json
+ D reports/latest/render_100_agent_swarm/agent_070.md
+ D reports/latest/render_100_agent_swarm/agent_071.json
+ D reports/latest/render_100_agent_swarm/agent_071.md
+ D reports/latest/render_100_agent_swarm/agent_072.json
+ D reports/latest/render_100_agent_swarm/agent_072.md
+ D reports/latest/render_100_agent_swarm/agent_073.json
+ D reports/latest/render_100_agent_swarm/agent_073.md
+ D reports/latest/render_100_agent_swarm/agent_074.json
+ D reports/latest/render_100_agent_swarm/agent_074.md
+ D reports/latest/render_100_agent_swarm/agent_075.json
+ D reports/latest/render_100_agent_swarm/agent_075.md
+ D reports/latest/render_100_agent_swarm/agent_076.json
+ D reports/latest/render_100_agent_swarm/agent_076.md
+ D reports/latest/render_100_agent_swarm/agent_077.json
+ D reports/latest/render_100_agent_swarm/agent_077.md
+ D reports/latest/render_100_agent_swarm/agent_078.json
+ D reports/latest/render_100_agent_swarm/agent_078.md
+ D reports/latest/render_100_agent_swarm/agent_079.json
+ D reports/latest/render_100_agent_swarm/agent_079.md
+ D reports/latest/render_100_agent_swarm/agent_080.json
+ D reports/latest/render_100_agent_swarm/agent_080.md
+ D reports/latest/render_100_agent_swarm/agent_081.json
+ D reports/latest/render_100_agent_swarm/agent_081.md
+ D reports/latest/render_100_agent_swarm/agent_082.json
+ D reports/latest/render_100_agent_swarm/agent_082.md
+ D reports/latest/render_100_agent_swarm/agent_083.json
+ D reports/latest/render_100_agent_swarm/agent_083.md
+ D reports/latest/render_100_agent_swarm/agent_084.json
+ D reports/latest/render_100_agent_swarm/agent_084.md
+ D reports/latest/render_100_agent_swarm/agent_085.json
+ D reports/latest/render_100_agent_swarm/agent_085.md
+ D reports/latest/render_100_agent_swarm/agent_086.json
+ D reports/latest/render_100_agent_swarm/agent_086.md
+ D reports/latest/render_100_agent_swarm/agent_087.json
+ D reports/latest/render_100_agent_swarm/agent_087.md
+ D reports/latest/render_100_agent_swarm/agent_088.json
+ D reports/latest/render_100_agent_swarm/agent_088.md
+ D reports/latest/render_100_agent_swarm/agent_089.json
+ D reports/latest/render_100_agent_swarm/agent_089.md
+ D reports/latest/render_100_agent_swarm/agent_090.json
+ D reports/latest/render_100_agent_swarm/agent_090.md
+ D reports/latest/render_100_agent_swarm/agent_091.json
+ D reports/latest/render_100_agent_swarm/agent_091.md
+ D reports/latest/render_100_agent_swarm/agent_092.json
+ D reports/latest/render_100_agent_swarm/agent_092.md
+ D reports/latest/render_100_agent_swarm/agent_093.json
+ D reports/latest/render_100_agent_swarm/agent_093.md
+ D reports/latest/render_100_agent_swarm/agent_094.json
+ D reports/latest/render_100_agent_swarm/agent_094.md
+ D reports/latest/render_100_agent_swarm/agent_095.json
+ D reports/latest/render_100_agent_swarm/agent_095.md
+ D reports/latest/render_100_agent_swarm/agent_096.json
+ D reports/latest/render_100_agent_swarm/agent_096.md
+ D reports/latest/render_100_agent_swarm/agent_097.json
+ D reports/latest/render_100_agent_swarm/agent_097.md
+ D reports/latest/render_100_agent_swarm/agent_098.json
+ D reports/latest/render_100_agent_swarm/agent_098.md
+ D reports/latest/render_100_agent_swarm/agent_099.json
+ D reports/latest/render_100_agent_swarm/agent_099.md
+ D reports/latest/render_100_agent_swarm/agent_100.json
+ D reports/latest/render_100_agent_swarm/agent_100.md
+ D reports/latest/render_100_agent_swarm/summary.json
+ D reports/latest/render_100_agent_swarm/summary.md
+ D reports/latest/render_deploy_commit_proof/summary.json
+ D reports/latest/render_deploy_commit_proof/summary.md
+ D reports/latest/render_deployment_alternatives/CHATGPT_RENDER_DEPLOYMENT_PROOF_20260704.md
+ D reports/latest/render_dhanhq_fix/SUMMARY.md
+ D reports/latest/render_env_alignment/summary.json
+ D reports/latest/render_env_alignment/summary.md
+ D reports/latest/render_log_audit/summary.json
+ D reports/latest/render_log_audit/summary.md
+ D reports/latest/render_memory_audit/agent_prompt.md
+ D reports/latest/render_memory_audit/summary.json
+ D reports/latest/render_memory_audit/summary.md
+ D reports/latest/render_memory_stabilization/checklist.json
+ D reports/latest/render_memory_stabilization/deploy_plan.md
+ D reports/latest/render_memory_stabilization/summary.json
+ D reports/latest/render_memory_stabilization/summary.md
+ D reports/latest/render_token_audit/summary.json
+ D reports/latest/render_token_audit/summary.md
+ D reports/latest/render_worker_env_audit/summary.json
+ D reports/latest/render_worker_env_audit/summary.md
+ D reports/latest/render_worker_issue_proof/summary.json
+ D reports/latest/render_worker_issue_proof/summary.md
+ D reports/latest/render_worker_preflight/summary.json
+ D reports/latest/render_worker_preflight/summary.md
+ D reports/latest/repo_authority_and_duplicate_control/README.md
+ D reports/latest/repo_authority_and_duplicate_control/summary.json
+ D reports/latest/repo_path_audit/cloud_github_vs_laptop.json
+ D reports/latest/repo_path_audit/fetch.log
+ D reports/latest/repo_path_audit/live_broker.json
+ D reports/latest/repo_path_audit/live_deploy_info.json
+ D reports/latest/repo_path_audit/main_branch_protection_restore.json
+ D reports/latest/repo_path_audit/ruleset-21581518-put.json
+ D reports/latest/repo_path_audit/ruleset_21581518_priority_check_fix.json
+ D reports/latest/repo_path_audit/verify_summary.txt
+ D reports/latest/repo_path_audit/worktree_list.txt
+ D reports/latest/rhui_v22_verify/CROSS_VERIFY_LATEST.json
+ D reports/latest/rhui_v22_verify/INVESTIGATION_START_UTC.txt
+ D reports/latest/rhui_v22_verify/ISSUE_188_COMMENT.md
+ D reports/latest/rhui_v22_verify/ISSUE_188_CROSS_VERIFY_3.md
+ D reports/latest/rhui_v22_verify/RHUI_V2.2_Material_Change_Status.png
+ D reports/latest/rhui_v22_verify/RHUI_V2.2_RiskExecution_SSOT.json
+ D reports/latest/rhui_v22_verify/RHUI_V2.2_Verification_Checklist.json
+ D reports/latest/rhui_v22_verify/api_auto_gates.json
+ D reports/latest/rhui_v22_verify/api_batch_chains.json
+ D reports/latest/rhui_v22_verify/api_broker_status.json
+ D reports/latest/rhui_v22_verify/api_deploy_info.json
+ D reports/latest/rhui_v22_verify/api_health.json
+ D reports/latest/rhui_v22_verify/api_scheduler_health.json
+ D reports/latest/rhui_v22_verify/api_state.json
+ D reports/latest/rhui_v22_verify/cloud_github_vs_laptop.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/SUMMARY.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_auto_gates.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_batch_chains.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_broker_status.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_deploy_info.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_health.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_scheduler_health.json
+ D reports/latest/rhui_v22_verify/cross_verify_20260826T080731Z/api_state.json
+ D reports/latest/rhui_v22_verify/deploy_run_32923767070.json
+ D reports/latest/runtime_authority/runtime_authority_summary.json
+ D reports/latest/runtime_authority/runtime_authority_summary.md
+ D reports/latest/safe_repair_runner/summary.json
+ D reports/latest/safe_repair_runner/summary.md
+ D reports/latest/safety_and_secrets/README.md
+ D reports/latest/safety_and_secrets/summary.json
+ D reports/latest/safety_lock/safety_lock_summary.json
+ D reports/latest/safety_lock/safety_lock_summary.md
+ D reports/latest/scheduler_catchup/catchup_policy_summary.json
+ D reports/latest/scheduler_catchup/catchup_policy_summary.md
+ D reports/latest/scheduler_catchup/test_results.txt
+ D reports/latest/scheduler_catchup/test_summary.json
+ D reports/latest/scheduler_catchup/test_summary.md
+ D reports/latest/scheduler_zero_jobs_forensic/scheduler_zero_jobs_check_20260701T194141Z.log
+ D reports/latest/secure_install_credential_audit/summary.json
+ D reports/latest/secure_install_credential_audit/summary.md
+ D reports/latest/signals_x7rsm_logs_snip.txt
+ D reports/latest/strict_truth_proof/STRICT_ZERO_MOCK_PRODUCTION_PROOF.json
+ D reports/latest/system3_auto_coordinator/summary.json
+ D reports/latest/system3_auto_coordinator/summary.md
+ M reports/latest/system3_auto_gates/summary.json
+ M reports/latest/system3_auto_gates/summary.md
+ D reports/latest/system3_blocker_report.json
+ D reports/latest/system3_blocker_report.md
+ D reports/latest/system3_control_plane_status.json
+ D reports/latest/system3_control_plane_status.md
+ D reports/latest/system3_master_control_plane/README.md
+ D reports/latest/system3_master_control_plane/system3_master_control_plane.json
+ D reports/latest/system3_public_truth/cloud_runtime_check.summary.json
+ D reports/latest/system3_public_truth/cloud_runtime_check.summary.md
+ D reports/latest/system3_public_truth/dashboard_live_ui_proof.summary.json
+ D reports/latest/system3_public_truth/dashboard_live_ui_proof.summary.md
+ D reports/latest/system3_public_truth/index.json
+ D reports/latest/system3_public_truth/index.md
+ D reports/latest/system3_public_truth/permanent_live_log_watch.summary.json
+ D reports/latest/system3_public_truth/permanent_live_log_watch.summary.md
+ D reports/latest/system3_public_truth/screenshots/broker.png
+ D reports/latest/system3_public_truth/screenshots/gates.png
+ D reports/latest/system3_public_truth/screenshots/ml.png
+ D reports/latest/system3_public_truth/screenshots/mobile_390x844.png
+ D reports/latest/system3_public_truth/screenshots/overview.png
+ D reports/latest/system3_public_truth/screenshots/paper.png
+ D reports/latest/system3_public_truth/screenshots/signals.png
+ D reports/latest/system3_public_truth/screenshots/truth.png
+ D reports/latest/system3_public_truth/visual_proof.md
+ D reports/latest/system3_truth_bridge/latest.json
+ D reports/latest/system3_truth_bridge/summary.md
+ D reports/latest/todo_status_update/summary.json
+ D reports/latest/todo_status_update/summary.md
+ D reports/latest/tracking/COMMAND_CENTER.md
+ D reports/latest/tracking/ISSUES_MERMAID.md
+ D reports/latest/tracking/ISSUES_ONLY.md
+ D reports/latest/tracking/TRACKING_CHECKLIST.json
+ D reports/latest/tracking/TRACKING_CHECKLIST.md
+ D reports/latest/trader_requirements_audit/summary.json
+ D reports/latest/trader_requirements_audit/summary.md
+ D reports/latest/ui_design/GENESIS_SYSTEM3_GLOBAL_UI_UX_DESIGN_GUIDE.md
+ D reports/latest/ui_design/GENESIS_SYSTEM3_GLOBAL_UI_UX_MASTER_DESIGN_CATALOG.csv
+ D reports/latest/ui_route_verification/all_console_errors.json
+ D reports/latest/ui_route_verification/screenshots/00_initial_overview.png
+ D reports/latest/ui_route_verification/screenshots/alerts.png
+ D reports/latest/ui_route_verification/screenshots/broker.png
+ D reports/latest/ui_route_verification/screenshots/chain.png
+ D reports/latest/ui_route_verification/screenshots/gates.png
+ D reports/latest/ui_route_verification/screenshots/ml.png
+ D reports/latest/ui_route_verification/screenshots/overview.png
+ D reports/latest/ui_route_verification/screenshots/paper.png
+ D reports/latest/ui_route_verification/screenshots/performance.png
+ D reports/latest/ui_route_verification/screenshots/positions.png
+ D reports/latest/ui_route_verification/screenshots/signals.png
+ D reports/latest/ui_route_verification/screenshots/system.png
+ D reports/latest/ui_route_verification/screenshots/trade.png
+ D reports/latest/ui_route_verification/tab_results.json
+ D reports/latest/ui_snaps_20260825/INDEX.md
+ D reports/latest/ui_snaps_20260825/page-2026-08-25T10-28-18-103Z.png
+ D reports/latest/ui_snaps_20260825/page-2026-08-25T10-28-57-847Z.png
+ D reports/latest/ui_snaps_20260825/page-2026-08-25T10-29-38-615Z.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_broker.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_broker_holdings_positions.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_equity_hdfcbank_ce.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_multibagger.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_options_intel.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_options_intel_ce.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_overview.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_paper.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_paper_positions.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_positions.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_signals.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_trade_equity_ce.png
+ D reports/latest/ui_snaps_20260825/snap_20260825_trade_top_ce.png
+ D reports/latest/upstream_timeout_fix/README.md
+ D reports/latest/upstream_timeout_fix/proof_probes.txt
+ D reports/latest/websocket_tick_health/summary.json
+ D reports/latest/websocket_tick_health/summary.md
+ D reports/latest/windows_self_hosted_full_system_proof/index.html
+ D reports/latest/windows_self_hosted_full_system_proof/summary.json
+ D reports/latest/windows_self_hosted_full_system_proof/summary.md
+ D reports/latest/workflow_failure_tracker/summary.json
+ D runner.pid
+ M scripts/run_paper_validation.py
+ M src/ranking/daily_gain_scanner.py
+ M state/gain_rank_history.json
+ M state/iv_history.json
+?? .agents/
+?? .agy-proof/runs/2026-11-01T024051Z-06c81e33e175488f89e2ad4bee0e9843/
+?? .agy-proof/runs/2026-11-01T024212Z-4493b203abc948c99f5726ad0d14a1a2/
+?? .agy-proof/runs/2026-11-01T024302Z-507d3a71387b467cb03ae8e2404d57f9/
+?? .agy-proof/runs/2026-11-01T024326Z-10920fa1f7b846e0b87de535903728ea/
+?? .agy-proof/runs/2026-11-01T033725Z-2005a51bb707412082a6080bf3aeb0b9/
+?? .agy-proof/runs/2026-11-01T040913Z-4420cb9d0ad445e499c5689b87c78acc/
+?? .agy-proof/runs/2026-11-01T040935Z-71081d2f588946c28889098a3bfdb49c/
+?? .agy-proof/runs/2026-11-01T041553Z-48126423c36d481cb7962834b9b286ad/
+?? .agy-proof/runs/2026-11-01T210044Z-25103757ad694da78ba58a7532eef5dd/
+?? .agy-proof/runs/2026-11-01T222733Z-ad2774d8c9ff45f18d6e93e3ecf56288/
+?? .agy-proof/runs/2026-11-02T105902Z-de2ca30219664f58bb4462ec867d9faa/
+?? .agy-proof/runs/2026-11-02T110255Z-33b20471b3094d49b5079210026a5082/
+?? .agy-proof/runs/2026-11-02T110405Z-487301dae0ec467bba062dbf61ae8eb5/
+?? .agy-proof/runs/2026-11-02T111109Z-d593f948642d455a969ec0174fa13a27/
+?? .agy-proof/runs/2026-11-02T113223Z-f097bca73d194982924548a338396105/
+?? .agy-proof/runs/2026-11-02T113305Z-678490fd19ea4cdbb9b2b1022dad1715/
+?? .agy-proof/runs/2026-11-02T115036Z-58b4ca2349bb4329b74e7a9f3625be61/
+?? .agy-proof/runs/2026-11-02T115404Z-a9b5118f14bf4bd18f09119baf69ebb6/
+?? .agy-proof/runs/2026-11-02T115500Z-461637f25c064c85a8a62e9073a39f30/
+?? .agy-proof/runs/2026-11-02T120252Z-6e39537d9d044b7caaf83f242ab98689/
+?? .agy-proof/runs/2026-11-02T120323Z-e259e924e4bc41e8bd7fe9f1cf2bb878/
+?? .agy-proof/runs/2026-11-02T122556Z-5921340e342a4dd3bbae1eab4749eff1/
+?? .agy-proof/runs/2026-11-02T123223Z-5eed1a2e47b247b4916c78058716ca05/
+?? .agy-proof/runs/2026-11-02T123723Z-f8dd70dd9cd64635b6eb62edde44decc/
+?? .agy-proof/runs/2026-11-02T124332Z-639e93b4f9414e4dbeead0ff3bf9e53e/
+?? .agy-proof/runs/2026-11-02T124719Z-845487d880ea46c887e068b20f57ad96/
+?? .agy-proof/runs/2026-11-02T125535Z-bebc7ba860574e5ebc1e4bb86d6766fd/
+?? .agy-proof/runs/2026-11-02T130951Z-d08b26cfaf6240cea9fea11ca0c88fbb/
+?? .agy-proof/runs/2026-11-02T131422Z-498599be49d14b8aaccb78cf85bb6354/
+?? .agy-proof/runs/2026-11-02T140231Z-76c3f8960fed445a825554401342a0b4/
+?? .agy-proof/runs/2026-11-02T141538Z-d17b61cbeb204bb6adf700bcb54c50ff/
+?? .agy-proof/runs/2026-11-02T144906Z-5ad50e8142c645adbdadebd0b9e42f84/
+?? .agy-proof/runs/2026-11-02T145327Z-21ff09725d794948bdc8396bceba8fb5/
+?? .agy-proof/runs/2026-11-02T145805Z-492718d1a2cb444f948735793e5f68e9/
+?? .agy-proof/runs/2026-11-02T145857Z-e93e49dc65c7424096ba0b2d38527abc/
+?? .agy-proof/runs/2026-11-02T145955Z-0d191b1593424e6a9e25c9f7b3a42f81/
+?? .agy-proof/runs/2026-11-02T150459Z-6e03311440594c9d92f5ccfac7d7835d/
+?? .agy-proof/runs/2026-11-02T151240Z-d7d8da2e21eb45a08b3979514455cb69/
+?? .agy-proof/runs/2026-11-02T151409Z-d009b7de466e4dc6989dd2f99e422d1f/
+?? .agy-proof/runs/2026-11-02T151719Z-71631acce04240eab843abdc8c0eefad/
+?? .agy-proof/runs/2026-11-02T153604Z-78704c333b7c4f96b6620ab1d52e4d1a/
+?? .agy-proof/runs/2026-11-02T154732Z-09e63c0a7fb8401bbefb9580c0cb0725/
+?? .agy-proof/runs/2026-11-02T155814Z-f80cc117ad254c22977744f71203cccd/
+?? .agy-proof/runs/2026-11-02T160504Z-6bcc8cb934df442e92e4ec6324c6877f/
+?? .agy-proof/runs/2026-11-02T161157Z-ea5452b7967e45fc9e700693d877040a/
+?? .agy-proof/runs/2026-11-02T164200Z-aa20c33d680b4949aade0ee78cd14372/
+?? .agy-proof/runs/2026-11-02T165509Z-253f915c2be84770a8e308f7224462bb/
+?? .agy-proof/runs/2026-11-02T174223Z-38d8815dd72942e6a01ee806dc0e847b/
+?? .agy-proof/runs/2026-11-02T174434Z-281f4c81b3ed42f4ab710ca99a89d14a/
+?? .agy-proof/runs/2026-11-02T180617Z-4049e30c25f04c7db6a0f77e24b0f846/
+?? .agy-proof/runs/2026-11-02T182051Z-6871b761a3204085969deb5b55da8add/
+?? .agy-proof/runs/2026-11-02T182646Z-40b58ae1ae994f98908a912b582e59e3/
+?? .agy-proof/runs/2026-11-02T182955Z-0d4b5a71c64a429183f5428ff400bc4c/
+?? .agy-proof/runs/2026-11-02T190953Z-31c7086d472d42c7b42af7c1e2a50ed8/
+?? .agy-proof/runs/2026-11-02T192437Z-9116abb42b5d468c95dbe71c893b4850/
+?? .agy-proof/runs/2026-11-02T192959Z-01aabd8c5bfd446884229b53f418aaf2/
+?? .agy-proof/runs/2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361/
+?? .agy-proof/runs/2026-11-02T202001Z-93891f87d9ab47a1a561cbdcf9a80601/
+?? .agy-proof/runs/2026-11-02T204725Z-527251b878484ae59f191bd5bf79b5fd/
+?? .agy-proof/runs/2026-11-02T211452Z-e8a947cdb0c246899ddc717ff7c7985e/
+?? .agy-proof/runs/2026-11-02T215355Z-25f209b37e6246688debcbc8d48d8815/
+?? .agy-proof/runs/2026-11-02T225901Z-4685524ad8a94a7fb82b7fd881817699/
+?? .agy-proof/runs/2026-11-02T230147Z-7de5dcd63d124975896b902fec6cf5bd/
+?? .agy-proof/runs/2026-11-02T230903Z-f06018b5e6fc4fac9356ebb65b3164b1/
+?? .agy-proof/runs/2026-11-02T231529Z-05adb053874b4fe6963934875d0eabeb/
+?? .agy-proof/runs/2026-11-02T232039Z-4b01b63700df4a209c3f93d04a6df282/
+?? .agy-proof/runs/2026-11-02T232131Z-f3bc8fe2ff1f4b9486af31f7006de04c/
+?? .agy-proof/runs/2026-11-03T082619Z-4543fda345f84d77900034bbdb41ffab/
+?? .agy-proof/runs/2026-11-03T085037Z-342a78a51bd043c59ba3ae4a44122195/
+?? .agy-proof/runs/2026-11-03T123448Z-9ad209d655e74d17947bc56355523ffb/
+?? .agy-proof/runs/2026-11-03T140616Z-f0cd9755f70146cb945912ab69cbe19b/
+?? .agy-proof/runs/2026-11-03T141217Z-46226d0553f24231ad47939d2e709dc3/
+?? .agy-proof/runs/2026-11-03T141738Z-6a1ff2c5b0ae4d4bb5d0a8763a26e0ca/
+?? .agy-proof/runs/2026-11-03T142025Z-d7f8ef9ae06d4531b8bf946fd5eba1dd/
+?? .agy-proof/runs/2026-11-03T142354Z-577e61d9636a4ffb9ca7cf3894fe5a52/
+?? .agy-proof/runs/2026-11-03T142826Z-31c0314f929246c583bf22c0707aca62/
+?? .agy-proof/runs/2026-11-03T143057Z-859219cada5b429f8d88f23cde5f7c3c/
+?? .agy-proof/runs/2026-11-03T143414Z-4ed8bd43fa434f61a6d77902f9d255e1/
+?? .agy-proof/runs/2026-11-03T143800Z-fde502b717194997a2a01bf20603c1f4/
+?? .agy-proof/runs/2026-11-03T144417Z-b53cdd9b013540f5b3dcbfc12eb2bf9a/
+?? .agy-proof/runs/2026-11-03T144613Z-fad95600bc9b4f1d945518ef116c6672/
+?? .agy-proof/runs/2026-11-03T144858Z-56cca6efd8bf487392c30eb68604018e/
+?? .agy-proof/runs/2026-11-03T145144Z-31d68fa942e44bf4a57982bd15f14b42/
+?? .agy-proof/runs/2026-11-03T145440Z-7cc0d2cbf21248a7902eab455ee5388c/
+?? .agy-proof/runs/2026-11-03T145757Z-b7ee3ca3aad4486fa81998ca861eb3be/
+?? .agy-proof/runs/2026-11-03T151120Z-33d5ca10e71243779a83311c3394ea03/
+?? .agy-proof/runs/2026-11-03T151611Z-dea11d0ef1d141f691f8841371165f49/
+?? .agy-proof/runs/2026-11-03T151910Z-e6a7bcc055a14715aa2694d757a31973/
+?? .agy-proof/runs/2026-11-03T152154Z-943697bd6bed448bb7abcf624369b75f/
+?? .agy-proof/runs/2026-11-03T152448Z-461e867fbdd94ef8b57b6baf33c5023d/
+?? .agy-proof/runs/2026-11-03T152756Z-33095f6e8a6c482dbfcb4e7429cb4be4/
+?? .agy-proof/runs/2026-11-03T153049Z-6a1a6aaf4a1d44f38f24fc5f12415fb0/
+?? .agy-proof/runs/2026-11-03T153402Z-f7d5bea1ea134c188df5c51f033d90e8/
+?? .agy-proof/runs/2026-11-03T153652Z-858ac9dc9eca4e3988cd11705daf6c7c/
+?? .agy-proof/runs/2026-11-03T153956Z-d3eebf6c39994d0a9f0ec3dec85ad03d/
+?? .agy-proof/runs/2026-11-03T154303Z-2083f14abf5d409289c005ea852454d4/
+?? .agy-proof/runs/2026-11-03T154556Z-d84d18268bf548e4b50c33fbc704c56f/
+?? .agy-proof/runs/2026-11-03T154903Z-bfe59a7658f24437b547358ae4a451fd/
+?? .agy-proof/runs/2026-11-03T155214Z-c1e54fd49d17474c95b4af4e52db078e/
+?? .agy-proof/runs/2026-11-03T155507Z-46c7ab7a0d4c45b3995bffcca5a56ebe/
+?? .agy-proof/runs/2026-11-03T171441Z-8276ef3c96cc4d328e99bf724c27d6cf/
+?? .agy-proof/runs/2026-11-03T171821Z-7abcf1ae71584285a9bce439c5497b0b/
+?? .agy-proof/runs/2026-11-03T172142Z-20c84c57689d44b2b6b1f137b0e2ac37/
+?? .agy-proof/runs/2026-11-03T172534Z-bc2d3d9fc6a046a8b3c3f18a66d032d1/
+?? .agy-proof/runs/2026-11-03T172838Z-b5311056445c47a196839f5a673f0f4f/
+?? .agy-proof/runs/2026-11-03T172904Z-d7950c2caeab4b769cf199e79becc1a9/
+?? .agy-proof/runs/2026-11-03T173021Z-4f0ea61b6f8d4481a639470b2f3d005c/
+?? .agy-proof/runs/2026-11-03T182859Z-4cdbe45f09724a8eaff73e3f2843d87d/
+?? .agy-proof/runs/2026-11-03T193143Z-fbd6c39df70544a3a63a9ebb7724bb1f/
+?? .agy-proof/runs/2026-11-03T214722Z-945e9c9e92994a48837510df48cd22a0/
+?? .agy-proof/runs/2026-11-04T012645Z-014f3516dc4349c2b0191968f8d563ce/
+?? .agy-proof/runs/2026-11-04T013125Z-7d7bc07151fa49818256ee7de91f4a97/
+?? .agy-proof/runs/2026-11-04T014835Z-5abb9f9c52874c4789bde7f937b1d7e5/
+?? .agy-proof/runs/2026-11-04T022440Z-daffa2cf21784ffab4b1fb2c7d4238ff/
+?? .agy-proof/runs/2026-11-04T022521Z-264849f045534c6785a3f4d0bdf8b464/
+?? .agy-proof/runs/2026-11-04T023207Z-89605bdf68c54265a6cd2453430a3633/
+?? .agy-proof/runs/2026-11-04T023834Z-486b89baea74411287880ae27aaaed52/
+?? .agy-proof/runs/2026-11-04T033219Z-2bc131b43a744d91b7a0b0c9f7825765/
+?? .agy-proof/runs/2026-11-04T041009Z-43f9e3c266434c94996ad54b1d4587b9/
+?? .agy-proof/runs/2026-11-04T042757Z-0b6c83e506ea411aac3432f1f7697215/
+?? .agy-proof/runs/2026-11-04T061334Z-e5b84f620d724c1d8922b4032ddcd8fa/
+?? .agy-proof/runs/2026-11-04T061924Z-fb37d72314794708a23c467f9a018e93/
+?? .agy-proof/runs/2026-11-04T064705Z-64e8d293447745e2892dd41315bc76cf/
+?? .agy-proof/runs/2026-11-04T065507Z-d4a6d236f06140348c3d951bf1592b74/
+?? .agy-proof/runs/2026-11-04T065701Z-f3fead58531a4f1ea2ccdcda73940b97/
+?? .agy-proof/runs/2026-11-04T065907Z-361445b1061f48ed9773d61363c19d27/
+?? .agy-proof/runs/2026-11-04T070711Z-195a9916077c4e72b3cc62c2f559db3c/
+?? .agy-proof/runs/2026-11-04T071216Z-2b282b1618ab4b2aaefed04cdedcc455/
+?? .agy-proof/runs/2026-11-04T091058Z-1f266a6b3bda4facab2ee9bbfee6aadf/
+?? .agy-proof/runs/2026-11-04T091330Z-78284d8d0c4640bd88cf7352099d0575/
+?? .agy-proof/runs/2026-11-04T092834Z-907e2a1d5eed420d92820e91236b5d79/
+?? .agy-proof/runs/2026-11-04T095146Z-374c41cb88914b40aa02181728f48228/
+?? .agy-proof/runs/2026-11-04T095735Z-7f0b0103b4a9471585cdb78f80584212/
+?? .agy-proof/runs/2026-11-04T101814Z-75a406c9225a46469cff51cd59bbdfd2/
+?? .agy-proof/runs/2026-11-04T102036Z-de62f125213b4c6ca1c1336db19d2182/
+?? AGENTS.md.bak_forensic
+?? AGENTS.md.bak_master
+?? AGY_WRITE_TEST.txt
+?? DATASOURCE_TRUTH_CLASSIFICATION.csv
+?? DATASOURCE_TRUTH_CLASSIFICATION.md
+?? GEMINI.md.bak_forensic
+?? GEMINI.md.bak_master
+?? GENESIS_1872_MASTER_CHECKLIST.csv
+?? Genesis_Diagnose_Output.txt
+?? RUN_SUMMARY.json
+?? add_broker_status.py
+?? agent_control_audit/
+?? agent_deep_audit/
+?? agent_memory/proof_packs/
+?? antigravity_write_test.txt
+?? app.py
+?? audit/__init__.py
+?? audit/database.py
+?? audit/genesis_audit.db
+?? audit/main.py
+?? audit/middleware.py
+?? audit/models.py
+?? audit/router.py
+?? audit/schemas.py
+?? audit/service.py
+?? content/
+?? core/data_lake/columnar_store.py
+?? core/engine/anti_fake_guard.py
+?? core/engine/dhan_full_market_scanner.py
+?? core/engine/option_chain_pipeline.py
+?? core/engine/system3_self_healing_watchdog.py
+?? core/engine/telegram_notifier.py
+?? dashboard/backend/app.py.bak_20261101_065834
+?? dashboard/backend/app.py.bak_market_top_route
+?? dashboard/backend/app.py.bak_perma_del_20261101_074025
+?? dashboard/backend/app.py.bak_perma_del_20261101_074148
+?? dashboard/backend/sandbox/sandbox.db
+?? dashboard/backend/state_manager.py
+?? dashboard/frontend/dist/assets/index-3mLwQ-T7.js
+?? debug_totp.py
+?? evidence/
+?? forensic_bundle.txt
+?? master_config_audit_report.txt
+?? mockups/
+?? models/phantom_family_weights.json
+?? prototypes/
+?? reports/latest/ui_recovery/
+?? reports/latest/ui_trading_operations_snap.png
+?? reports/latest/ui_verified_snap.png
+?? scripts/add_wipro_gainer.py
+?? scripts/append_p0_14.py
+?? scripts/append_p0_tests.py
+?? scripts/append_telegram_routes.py
+?? scripts/audit_pending_items.py
+?? scripts/audit_ui_interactivity.py
+?? scripts/build_master_env.py
+?? scripts/categorize_env_vars.py
+?? scripts/check_keys_gainers.py
+?? scripts/check_pending_updates.py
+?? scripts/clean_premium_html.py
+?? scripts/clean_telegram_test.py
+?? scripts/debug_dhan_quote.py
+?? scripts/deep_inspect_html.py
+?? scripts/dump_search.py
+?? scripts/dump_tabs.py
+?? scripts/dump_trajectory.py
+?? scripts/fast_env_scanner.py
+?? scripts/find_html_in_py.py
+?? scripts/find_mismatch_subject.py
+?? scripts/find_options_gainers.py
+?? scripts/find_tickers.py
+?? scripts/fix_button.py
+?? scripts/fix_cache_and_eod.py
+?? scripts/fix_script_tag.py
+?? scripts/forensic_env_analyzer.py
+?? scripts/gcp_dhan_token_rotation_job.py
+?? scripts/generate_credentials_audit_csv.py
+?? scripts/inspect_by_und.py
+?? scripts/inspect_contract_subjects.py
+?? scripts/inspect_gainers_json.py
+?? scripts/inspect_gate_failure.py
+?? scripts/inspect_interactive_elements.py
+?? scripts/inspect_lines_250_320.py
+?? scripts/inspect_lines_330_385.py
+?? scripts/inspect_local_secrets_and_tools.py
+?? scripts/inspect_nifty_bytes.py
+?? scripts/inspect_pid_cwd.py
+?? scripts/inspect_process_and_folders.py
+?? scripts/inspect_state_files.py
+?? scripts/inspect_tail.py
+?? scripts/inspect_telegram_test.py
+?? scripts/orchestra_self_heal.py
+?? scripts/patch_app_audit.py
+?? scripts/patch_app_forensics.py
+?? scripts/patch_daily_gain_scanner.py
+?? scripts/patch_discovery_and_untested_badge.py
+?? scripts/patch_dynamic_bind_get.py
+?? scripts/patch_full_ui_solution.py
+?? scripts/patch_institutional_console_ui.py
+?? scripts/patch_notifier_secrets.py
+?? scripts/patch_premium_badges.py
+?? scripts/patch_premium_ui_final.py
+?? scripts/patch_provenance_and_routes.py
+?? scripts/patch_routes_api.py
+?? scripts/patch_scanner_telegram.py
+?? scripts/patch_strike_handler_authentic.py
+?? scripts/patch_trading_operations_dashboard.py
+?? scripts/patch_verified_market_clock_skew.py
+?? scripts/poll_and_bind_chat.py
+?? scripts/read_contract.py
+?? scripts/read_contract_checks.py
+?? scripts/read_gainers_raw.py
+?? scripts/read_telegram_test.py
+?? scripts/read_test_assertions.py
+?? scripts/restart_server.py
+?? scripts/run_1872_acceptance_pipeline.py
+?? scripts/run_forensic_truth_audit.py
+?? scripts/run_local_backend.py
+?? scripts/run_verified_visual_audit.py
+?? scripts/scan_all_tabs_cdp.py
+?? scripts/scan_question_marks.py
+?? scripts/search_chain_data_keywords.py
+?? scripts/search_old_nifty.py
+?? scripts/send_telegram_status.py
+?? scripts/set_telegram_commands.py
+?? scripts/start_backend_persistent.py
+?? scripts/start_port_8008_clean.py
+?? scripts/take_ui_snap.py
+?? scripts/telegram_auto_bind_daemon.py
+?? scripts/telegram_bot_daemon.py
+?? scripts/test_all_653_endpoints.py
+?? scripts/test_chain_fetch_and_rank.py
+?? scripts/test_dhan_connection.py
+?? scripts/test_live_totp_and_rotate.py
+?? scripts/test_subject_files.py
+?? scripts/test_ui_contracts.py
+?? scripts/test_ui_interactivity_comprehensive.py
+?? scripts/update_all_deliverables_and_markdown.py
+?? scripts/update_continuity_state.py
+?? scripts/update_dhan_token.py
+?? scripts/update_gainers.py
+?? scripts/update_premium_ui.py
+?? scripts/update_premium_ui_phase3.py
+?? scripts/update_routes_filter.py
+?? scripts/update_template_broker_status.py
+?? scripts/update_template_raw_quote.py
+?? scripts/update_test_no_disk_cache.py
+?? scripts/update_test_session.py
+?? scripts/verify_1872_acceptance_mission.py
+?? scripts/verify_env_integrity.py
+?? scripts/verify_ui_truth.py
+?? state/paper_validations/paper_validation_2026-11-01.json
+?? temp/
+?? test.txt
+?? test_dhan_account.py
+?? test_dhan_direct.py
+?? test_endpoints.py
+?? test_ui_clean.py
+?? tests/analyze_all_url_paths.py
+?? tests/conftest.py
+?? tests/test_6_pillars_verification.py
+?? tests/test_autonomous_market_discovery.py
+?? tests/test_autonomous_watchdog.py
+?? tests/test_columnar_truth_architecture.py
+?? tests/test_correlation_id.py
+?? tests/test_dashboard_failures.py
+?? tests/test_dhan_full_market_daemon.py
+?? tests/test_direct_app.py
+?? tests/test_genesis_500_routes.py
+?? tests/test_kill_switch.py
+?? tests/test_live_nse_bse_reconcile.py
+?? tests/test_local_ui_visual_parity.py
+?? tests/test_middleware_failures.py
+?? tests/test_post_audit_failures.py
+?? tests/test_production_live_init.py
+?? tests/test_router_failures.py
+?? tests/test_search_failures.py
+?? tests/test_telegram_downstream.py
+?? tests/test_trade_failures.py
+?? tests/test_truth_certification.py
+?? tests/test_ui_p0_recovery_mission.py
+?? tests/test_ui_production_e2e.py
+?? tests/verify_all_634_endpoints.py
+?? tools/repository_truth_audit_20261102.py
+?? trades.csv
+?? ui_check.png
+?? ui_final.png
+?? ui_truth.png
+?? update_dash.py
+?? uvicorn_run.log
+?? v0-1_golden.json
+?? validate_environment.py
+?? venv_pinned.txt

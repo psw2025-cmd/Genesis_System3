@@ -1,0 +1,442 @@
+﻿=== GENESIS DIAGNOSE 2026-11-03T02:40:27.4751476+05:30 ===
+--- .env keys (masked) ---
+SYSTEM3_MODE=paper
+ANALYZE_MODE=1
+PAPER_MODE=1
+LIVE_TRADING_ENABLED=0
+SYSTEM3_LIVE_TRADING_ALLOWED=0
+AUTO_EXECUTE_TRADES=0
+LIVE_ORDER_AUTHORITY=0
+ORDER_PLACEMENT_ALLOWED=false
+USE_LIVE_EXECUTION_ENGINE=0
+CLOUD_PAPER_ENGINE=0
+SYSTEM3_REAL_ONLY=1
+TRADING_CAPITAL_LIMIT_INR=50000.00
+DAILY_STOP_LOSS_LIMIT_INR=5000.00
+CIRCUIT_BREAKER_MAX_LOSS_INR=5000.00
+MAX_DRAWDOWN_PCT=10.0
+MEM_LIMIT_MB=512
+DHAN_CLIENT_ID=1106583741
+DHAN_ACCESS_TOKEN present, len=304
+DHAN_PIN present, len=6
+DHAN_TOTP_SECRET present, len=23
+DHAN_TOKEN_SOURCE present, len=3
+DHAN_ACCESS_TOKEN_SECRET_ID present, len=17
+DHAN_FEED_MODE=LIVE
+DHAN_STATUS_CACHE_TTL_S=15
+DHAN_TOKEN_CACHE_TTL_S present, len=2
+DHAN_TOKEN_ROTATION_JOB present, len=33
+DHAN_TOKEN_ROTATION_SCHEDULE present, len=12
+DHAN_AUTH_RELOAD_BACKOFF_S=30
+DHAN_CANONICAL_ROTATION_COOLDOWN_S=300
+DHAN_CANONICAL_ROTATION_SELF_HEAL=1
+DHAN_CANONICAL_ROTATION_WAIT_S=15
+DHAN_CHARTS_BASE_URL=https://charts.dhan.co
+DHAN_HISTORICAL_ENDPOINT=https://api.dhan.co/v2/charts/historical
+DHAN_INSTRUMENT_MASTER_URL=https://images.dhan.co/api-data/api-scrip-master.csv
+DHAN_INSTRUMENT_MIN_ROWS=100000
+DHAN_MARKETFEED_CACHE_TTL_S=1
+DHAN_MARKETFEED_RATE_LIMIT_COOLDOWN_S=5
+DHAN_OC_MIN_GAP_S=1
+DHAN_OPTION_CHAIN_EXPIRY=CURRENT
+DHAN_OPTION_CHAIN_SPACING_S=2
+DHAN_OPTION_CHAIN_TIMEOUT_S=10
+DHAN_ROTATE_PUBSUB_TOPIC=projects/system3-openalgo-safe/topics/dhan-token-rotate
+DHAN_ROTATION_EXPECTED_VERSION=latest
+DHAN_STATUS_REFRESH_COOLDOWN_S=10
+BROKER_SELF_HEAL_TOKEN_REFRESH present, len=1
+PORTFOLIO_BROKER_DETAILS=1
+DHAN_ENV_PATH=.secrets/dhan.env
+GOOGLE_CLOUD_PROJECT=system3-openalgo-safe
+GCP_PROJECT=system3-openalgo-safe
+GCP_REGION=asia-south1
+GCP_CLOUD_RUN_SERVICE=genesis-system3-web
+CLOUD_MODE=0
+SYSTEM3_DEPLOY_TARGET=hybrid-mumbai-workstation
+SYSTEM3_FIRESTORE_PROJECT=system3-openalgo-safe
+SYSTEM3_FIRESTORE_COLLECTION=system3_runtime
+SYSTEM3_FIRESTORE_DOCUMENT=state
+SYSTEM3_STATE_BACKEND=file
+SYSTEM3_STATE_BACKEND_REQUIRED=0
+SYSTEM3_LOCAL_STATE_MIRROR=1
+SYSTEM3_STATE_REFRESH_S=5
+SYSTEM3_SYNC_INTERVAL_S=5
+SYSTEM3_GCS_BUCKET=system3-openalgo-safe-state
+SYSTEM3_ARTIFACT_BUCKET=system3-openalgo-safe-artifacts
+MARKET_DATA_LAKE_BUCKET=system3-openalgo-safe-datalake
+SYSTEM3_WORKER_MODE=daemon
+SYSTEM3_JOB_KIND=smoke
+SYSTEM3_JOB_PUBLISH_STATE=1
+SYSTEM3_ENABLE_PAPER_JOB=1
+SYSTEM3_MONTHLY_COST_INR=0
+SYSTEM3_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+SYSTEM3_API_BASE=http://127.0.0.1:8000
+BACKEND_URL=http://127.0.0.1:8000
+DASHBOARD_URL=http://127.0.0.1:8000/ui
+DASHBOARD_BASE_URL=http://127.0.0.1:8000
+PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+PUBLIC_DASHBOARD_URL=http://127.0.0.1:8000/ui
+SYSTEM3_PRODUCTION_URL=https://system3-web-asia-south1.a.run.app
+SYSTEM3_BASE_URL=http://127.0.0.1:8000
+DEV_PROXY_TARGET=http://127.0.0.1:8000
+VITE_API_BASE_URL=/api
+PORT=8000
+ALLOWED_ORIGINS=http://127.0.0.1:8000,http://127.0.0.1:3000,http://localhost:8000,http://localhost:3000
+LOG_LEVEL=INFO
+UVICORN_LOG_LEVEL=info
+TELEGRAM_BOT_TOKEN present, len=46
+TELEGRAM_CHAT_ID present, len=10
+TELEGRAM_BOT_USERNAME present, len=14
+TELEGRAM_BOT_NAME present, len=11
+TELEGRAM_BOT_ID present, len=10
+SLACK_WEBHOOK_URL=
+DISCORD_WEBHOOK_URL=
+REQUIRE_API_KEY=false
+API_KEY=dash_sandbox_local_key_system3
+DASHBOARD_API_KEY=dash_sandbox_local_key_system3
+WORKER_PUSH_TOKEN present, len=31
+SCHEDULER_SECRET present, len=26
+DASHBOARD_SESSION_MAX_AGE=86400
+DATA_FEED_SOURCE=NSE_LIVE_DHAN_CERTIFIED
+LIVE_MARKET_FEED=true
+CHAIN_MAX_CONTRACTS=50
+INDEX_CHAIN_MICRO_STREAM=1
+MARKET_TOP_MICRO_STREAM=1
+MONEYCONTROL_SCRAPE=0
+SYSTEM3_UNDERLYINGS=NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY
+SYSTEM3_REQUIRED_UNDERLYINGS=NIFTY,BANKNIFTY,FINNIFTY,MIDCPNIFTY
+--- Procfile / Dockerfile / service.yaml ---
+--- Procfile ---
+web: uvicorn dashboard.backend.app:app --host 0.0.0.0 --port $PORT
+--- Dockerfile ---
+# SYSTEM3_ROOT_DOCKERFILE_NONPRODUCTION: legacy/developer image ONLY.
+# DO NOT use this file for GCP System3 Cloud Run production. It uses the
+# legacy backend app and a fixed port, unlike the audited Cloud Run launcher.
+# Canonical candidate image path: dashboard/backend/Dockerfile (repo-root context).
+# Cloud build/deploy still requires separate explicit owner authorization.
+# PERMANENT FIX: Exclude baked moneycontrol JSON â€” live data fetched via services/moneycontrol_live.py (Path B).
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    SYSTEM3_REAL_ONLY=1 \
+    LIVE_TRADING_ENABLED=0 \
+    SYSTEM3_LIVE_TRADING_ALLOWED=0
+
+WORKDIR /app
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential curl && rm -rf /var/lib/apt/lists/*
+COPY requirements.txt ./
+RUN pip install --upgrade pip && pip install -r requirements.txt
+COPY . .
+EXPOSE 8000
+CMD ["uvicorn", "dashboard.backend.app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# Persist state - LAST VERIFIED CLOSE for world standard
+COPY state/ /app/state/
+COPY state/chains/ /app/state/chains/
+
+--- service.yaml ---
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: genesis-system3
+  namespace: '802404398783'
+spec:
+  template:
+    spec:
+      containers:
+      - image: asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3@sha256:583586b5ce7107a7a39f3a5938e6774fbff9d8fe2372b74e6f4b40cef9625e98
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DHAN_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: dhan-client-id
+              key: latest
+        - name: DHAN_PIN
+          valueFrom:
+            secretKeyRef:
+              name: dhan-pin
+              key: latest
+        - name: DHAN_TOTP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dhan-totp-secret
+              key: latest
+        - name: DHAN_ACCESS_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: dhan-access-token
+              key: latest
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 512Mi
+      serviceAccountName: 802404398783-compute@developer.gserviceaccount.com
+  traffic:
+  - latestRevision: true
+    percent: 100
+PORT NOT_FOUND
+--- runner.pid ---
+23624
+--- system3_ultra head 120 ---
+"""
+System3 Ultra Control Panel
+
+Master entry point for all System3 operations (baseline + ultra).
+Provides unified menu interface with 100+ options organized into logical sections.
+
+SAFETY RULES ENFORCED:
+- No baseline overwrite
+- Ultra isolation
+- Read-only defaults
+- Manual promotion required
+- No auto-execution anywhere
+"""
+
+import os
+import sys
+import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Callable, Dict, Optional
+
+# Ensure project root is in path
+ROOT_DIR = Path(__file__).parent.absolute()
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
+from core.engine.dhan_automation_config import AUTOMATION_CONFIG
+
+# Safety imports
+from core.engine.ultra_safety import is_ultra_enabled, load_ultra_safety
+
+# Logging setup
+LOG_DIR = ROOT_DIR / "storage" / "logs_ultra"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+LOG_FILE = LOG_DIR / f"system3_ultra_{datetime.now().strftime('%Y%m%d')}.log"
+
+
+def _log(message: str, level: str = "INFO") -> None:
+    """Log message to file and console."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_entry = f"[{timestamp}] [{level}] {message}\n"
+    try:
+        with LOG_FILE.open("a", encoding="utf-8") as f:
+            f.write(log_entry)
+    except Exception:
+        pass
+    if level == "ERROR":
+        print(f"[ERROR] {message}")
+    elif level == "WARN":
+        print(f"[WARN] {message}")
+
+
+def _check_safety() -> Dict[str, bool]:
+    """Check all safety mechanisms."""
+    safety = load_ultra_safety()
+    automation = AUTOMATION_CONFIG
+
+    return {
+        "auto_execute_trades": not automation.auto_execute_trades,
+        "auto_simulate_pnl": not automation.auto_simulate_pnl,
+        "ultra_auto_execute": not safety.get("AUTO_EXECUTE_TRADES", False),
+        "ultra_auto_update": not safety.get("AUTO_UPDATE_THRESHOLDS", False),
+        "ultra_auto_retrain": not safety.get("AUTO_RETRAIN_MODELS", False),
+        "ultra_auto_promote": not safety.get("AUTO_PROMOTE_MODELS", False),
+    }
+
+
+def _safe_execute(module_name: str, function_name: str, *args, **kwargs) -> bool:
+    """
+    Safe execution wrapper.
+
+    Checks safety, logs execution, prevents baseline overwrite.
+    """
+    try:
+        # Pre-execution safety checks
+        safety_checks = _check_safety()
+        if not all(safety_checks.values()):
+            _log(f"Safety check failed for {module_name}.{function_name}", "WARN")
+            print("[WARN] Some safety mechanisms are not properly configured.")
+
+        # Log execution
+        _log(f"Executing: {module_name}.{function_name}")
+
+        # Import and execute
+        module = __import__(module_name, fromlist=[function_name])
+        func = getattr(module, function_name)
+        result = func(*args, **kwargs)
+
+        _log(f"Completed: {module_name}.{function_name}")
+        return True
+
+    except KeyboardInterrupt:
+        _log(f"Interrupted: {module_name}.{function_name}", "WARN")
+        print("\n[INFO] Operation interrupted by user.")
+        return False
+    except Exception as e:
+        _log(f"Error in {module_name}.{function_name}: {e}\n{traceback.format_exc()}", "ERROR")
+        print(f"[ERROR] {module_name}.{function_name} failed: {e}")
+        return False
+
+
+def _safe_execute_main(module_name: str) -> bool:
+    """Execute module's main() function safely."""
+    return _safe_execute(module_name, "main")
+
+
+def _safe_execute_phase(phase_module: str, phase_function: str) -> bool:
+    """Execute phase function safely."""
+    return _safe_execute(phase_module, phase_function)
+
+
+def show_menu() -> str:
+    """Display main menu with all options organized into sections."""
+    print("\n" + "=" * 70)
+    print("SYSTEM3 ULTRA CONTROL PANEL")
+    print("=" * 70)
+    print(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
+    # Safety status
+    safety = _check_safety()
+--- search uvicorn/FastAPI ---
+C:\Genesis_System3_clean\check_build_requirements.py:76: import fastapi
+C:\Genesis_System3_clean\check_build_requirements.py:77: ok("fastapi (backend)")
+C:\Genesis_System3_clean\check_build_requirements.py:79: fail("fastapi - run: pip install -r dashboard/backend/requirements.txt")
+C:\Genesis_System3_clean\check_build_requirements.py:82: import uvicorn
+C:\Genesis_System3_clean\check_build_requirements.py:83: ok("uvicorn (backend)")
+C:\Genesis_System3_clean\check_build_requirements.py:85: fail("uvicorn - run: pip install -r dashboard/backend/requirements.txt")
+C:\Genesis_System3_clean\check_integrity.py:31: elif cloud in content or "127.0.0.1:8000" in content or "a.run.app" in content:
+C:\Genesis_System3_clean\complete_end_to_end_validation.py:20: BASE_URL = "http://localhost:8000"
+C:\Genesis_System3_clean\comprehensive_pre_build_validation.py:18: BASE_URL = "http://localhost:8000"
+C:\Genesis_System3_clean\GENESIS_10K_BAAP.py:4: BASE = "http://localhost:8000"
+C:\Genesis_System3_clean\GENESIS_10K_BAAP.py:12: STRIKES = list(range(24000, 28000, 50)) # 80 strikes x 5 indices x 3 expiry = 1200 checks
+C:\Genesis_System3_clean\GENESIS_10K_BAAP.py:73: # 10. STRIKE LEVEL CHAIN 8000
+C:\Genesis_System3_clean\production_grade_validation.py:61: # Base URL: env BACKEND_URL or PORT (e.g. 8000 -> http://localhost:8000)
+C:\Genesis_System3_clean\production_grade_validation.py:65: self.base_url = base or "http://localhost:8000"
+C:\Genesis_System3_clean\.venv\Lib\site-packages\charset_normalizer\constant.py:226: "Meroitic Hieroglyphs": range(67968, 68000),
+C:\Genesis_System3_clean\.venv\Lib\site-packages\charset_normalizer\constant.py:227: "Meroitic Cursive": range(68000, 68096),
+C:\Genesis_System3_clean\.venv\Lib\site-packages\charset_normalizer\constant.py:373: "Variation Selectors Supplement": range(917760, 918000),
+C:\Genesis_System3_clean\.venv\Lib\site-packages\dateutil\utils.py:40: >>> dflt_tz = tzoffset("EST", -18000)
+C:\Genesis_System3_clean\.venv\Lib\site-packages\dateutil\tz\tz.py:366: >>> tzstr('EST5EDT') == tzrange("EST", -18000, "EDT")
+C:\Genesis_System3_clean\.venv\Lib\site-packages\dateutil\tz\tz.py:370: >>> range1 = tzrange("EST", -18000, "EDT")
+C:\Genesis_System3_clean\.venv\Lib\site-packages\dateutil\tz\tz.py:371: >>> range2 = tzrange("EST", -18000, "EDT", -14400,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:13: 0x3880000038B,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:23: 0x1F1800001F1E,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:25: 0x1F4800001F4E,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:31: 0x1F8000001FB5,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:46: 0x2E8000002E9A,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:52: 0x30380000303C,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:64: 0x2F8000002FA1E,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:73: 0xFB380000FB3D,
+C:\Genesis_System3_clean\.venv\Lib\site-packages\idna\idnadata.py:119: 0x62800000629,
+--- ports ---
+  TCP    127.0.0.1:8008         0.0.0.0:0              LISTENING       11564
+  TCP    127.0.0.1:8008         127.0.0.1:50857        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50891        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50894        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50895        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50902        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50908        TIME_WAIT       0
+  TCP    127.0.0.1:8008         127.0.0.1:50918        FIN_WAIT_2      11564
+  TCP    127.0.0.1:8008         127.0.0.1:50921        FIN_WAIT_2      11564
+  TCP    127.0.0.1:8008         127.0.0.1:50922        FIN_WAIT_2      11564
+  TCP    127.0.0.1:50918        127.0.0.1:8008         CLOSE_WAIT      12920
+  TCP    127.0.0.1:50921        127.0.0.1:8008         CLOSE_WAIT      12920
+  TCP    127.0.0.1:50922        127.0.0.1:8008         CLOSE_WAIT      12920
+(if no LISTENING above, API is OFF)
+--- runner status ---
+{
+  "runner": "STOPPED",
+  "pid": null,
+  "mode": "UNKNOWN",
+  "uptime_seconds": null,
+  "heartbeat_age_seconds": 317176,
+  "autopilot_running": false,
+  "market_status": "POST_MARKET",
+  "cycle_count": 394,
+  "health_score": 87.5
+}
+--- direct Dhan test (masked, no token print) ---
+DHAN_DIRECT: {"data":{"808":"Authentication Failed - Client ID or Token invalid"},"status":"failed"}
+RESULT: FAIL
+--- backend 8000 health ---
+8000_health_error: Unable to connect to the remote server
+--- backend 8008 health ---
+{
+    "data":  {
+                 "status":  "LOCAL_API_UP_FEED_UNVERIFIED",
+                 "uptime_sec":  307,
+                 "evidence_entries":  2244,
+                 "total_symbols":  60,
+                 "memory":  "NOT_MEASURED",
+                 "kill_switch":  false,
+                 "paper_mode":  true
+             },
+    "real":  false,
+    "hash":  "d62f72d0e6bc35939c70105387a7eac0b2ad19987de689072d47d2dda80f1329",
+    "timestamp":  "2026-11-02T21:11:48.151354+00:00",
+    "provenance":  {
+                       "source":  "LOCAL_SIMULATED_OR_UNVERIFIED_CACHE",
+                       "safety_mode":  "PAPER_MODE",
+                       "freshness_sec":  null,
+                       "exchange_feed_verified":  false,
+                       "classification":  "SIMULATED_OR_UNVERIFIED"
+                   }
+}
+--- logs tail ---
+LOGFILE: C:\Genesis_System3_clean\logs\system3_autorun_master_20261103.log
+2026-11-03 02:29:37,888 [WARNING] Forward pipeline guard skipped: No module named 'system3_forward_pipeline_guard'
+2026-11-03 02:29:50,452 [WARNING] Failed to load phase imports from 331-340 diagnostics: No module named 'system3_phase_331_340_diagnostics'
+2026-11-03 02:29:51,101 [WARNING] Failed to load phase 368: module 'core.engine.system3_phase368_broker_latency_monitor' has no attribute 'run_phase368'
+2026-11-03 02:29:51,625 [INFO] Loaded 134 phases into autorun master (range: 201-380)
+2026-11-03 02:29:51,627 [INFO] ======================================================================
+2026-11-03 02:29:51,627 [INFO] SYSTEM3 AUTORUN MASTER - STARTING (HARDENED)
+2026-11-03 02:29:51,628 [INFO] ======================================================================
+2026-11-03 02:29:51,628 [INFO] Date: 2026-11-03 02:29:51
+2026-11-03 02:29:51,628 [INFO] Root: C:\Genesis_System3_clean
+2026-11-03 02:29:51,629 [ERROR] Expected venv python missing at C:\Genesis_System3_clean\venv\Scripts\python.exe
+2026-11-03 02:31:25,920 [WARNING] Forward pipeline guard skipped: No module named 'system3_forward_pipeline_guard'
+2026-11-03 02:33:02,338 [WARNING] Failed to load phase imports from 331-340 diagnostics: No module named 'system3_phase_331_340_diagnostics'
+2026-11-03 02:33:02,890 [WARNING] Failed to load phase 368: module 'core.engine.system3_phase368_broker_latency_monitor' has no attribute 'run_phase368'
+2026-11-03 02:33:03,584 [INFO] Loaded 134 phases into autorun master (range: 201-380)
+2026-11-03 02:33:03,628 [INFO] ======================================================================
+2026-11-03 02:33:03,643 [INFO] SYSTEM3 AUTORUN MASTER - STARTING (HARDENED)
+2026-11-03 02:33:03,649 [INFO] ======================================================================
+2026-11-03 02:33:03,655 [INFO] Date: 2026-11-03 02:33:03
+2026-11-03 02:33:03,676 [INFO] Root: C:\Genesis_System3_clean
+2026-11-03 02:33:03,681 [ERROR] Expected venv python missing at C:\Genesis_System3_clean\venv\Scripts\python.exe
+LOGFILE: C:\Genesis_System3_clean\logs\2026-11-01.log
+2026-11-03 01:39:06,607 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 01:39:07,362 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 01:44:07,412 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 01:44:07,414 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 01:49:07,481 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 01:49:07,487 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 01:54:08,506 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 01:54:08,508 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 01:59:08,542 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 01:59:11,382 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 02:04:11,406 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 02:04:11,408 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 02:09:12,356 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 02:09:13,156 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 02:14:13,504 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 02:14:14,510 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 02:19:14,592 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 02:19:15,584 - WARNING - No chain data available â€” skipping prediction
+2026-11-03 02:24:15,624 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-03 02:24:16,402 - WARNING - No chain data available â€” skipping prediction
+LOGFILE: C:\Genesis_System3_clean\logs\2026-11-02.log
+2026-11-02 23:41:59,914 - INFO - === DAILY GAIN SCANNER: PREDICTION MODE ===
+2026-11-02 23:42:03,927 - INFO - [CHAIN] Successfully fetched option chain for NIFTY via DataSourceManager: 470 rows, spot=23440.8
+2026-11-02 23:42:10,744 - INFO - [CHAIN] Successfully fetched option chain for BANKNIFTY via DataSourceManager: 742 rows, spot=55002.2
+2026-11-02 23:42:17,639 - INFO - [CHAIN] Successfully fetched option chain for FINNIFTY via DataSourceManager: 494 rows, spot=24899.05
+2026-11-02 23:42:24,495 - INFO - [CHAIN] Successfully fetched option chain for MIDCPNIFTY via DataSourceManager: 614 rows, spot=13366.7
+2026-11-02 23:42:25,197 - INFO - Top predictions today:
+2026-11-02 23:42:25,197 - INFO -   #1 MIDCPNIFTY   | gain_score=74.4 | expected_move=4.00%
+2026-11-02 23:42:25,197 - INFO -   #2 NIFTY        | gain_score=71.0 | expected_move=0.30%
+2026-11-02 23:42:25,198 - INFO -   #3 BANKNIFTY    | gain_score=68.2 | expected_move=3.00%

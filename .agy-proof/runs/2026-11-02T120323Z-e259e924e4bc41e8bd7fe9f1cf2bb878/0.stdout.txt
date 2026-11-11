@@ -1,0 +1,12 @@
+Executing Autonomous Market-Wide Scrip & Chain Discovery Audit against http://127.0.0.1:8008...
+[1. Auto-Find] Discovered: 228 F&O underlyings (228 liquid filtered)
+[2. Auto-Work] NIFTY: Spot 25447.86 -> ATM 25450 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] BANKNIFTY: Spot 57815.19 -> ATM 57800 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] RELIANCE: Spot 1307.77 -> ATM 1300 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] TCS: Spot 3355.0 -> ATM 3350 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[3. Order Binding] NIFTY 25500.0 CE -> Status: EXECUTED_PAPER | Mode: PAPER_SIMULATED | SecurityId: DHAN-OPT-NIFTY-25500-CE | Fill Price: 164.65
+[3. Order Binding] BANKNIFTY 57500.0 PE -> Status: EXECUTED_PAPER | Mode: PAPER_SIMULATED | SecurityId: DHAN-OPT-BANKNIFTY-57500-PE | Fill Price: 195.55
+[3. Order Binding] RELIANCE 1320.0 CE -> Status: EXECUTED_PAPER | Mode: PAPER_SIMULATED | SecurityId: DHAN-OPT-RELIANCE-1320-CE | Fill Price: 24.45
+Autonomous discovery audit saved to reports\latest\autonomous_market_discovery_audit.json
+
+>>> AUTONOMOUS MARKET-WIDE DISCOVERY & ROUTING AUDIT PASSED! <<<

@@ -1,0 +1,9 @@
+{
+  "name": "01_git_rev_parse_head",
+  "command": "git rev-parse HEAD",
+  "exit_code": 0,
+  "duration_sec": 0.082,
+  "timestamp_utc": "2026-11-04T10:40:15.109724+00:00",
+  "stdout": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82\n",
+  "stderr": ""
+}

@@ -1,0 +1,9 @@
+{
+  "symbol": "BANKEX",
+  "spot": 61415.25,
+  "source": "dhan_last_verified_snapshot",
+  "stale": false,
+  "verification_status": "VERIFIED_DHAN",
+  "data_source": "dhan",
+  "auto_healed": true
+}

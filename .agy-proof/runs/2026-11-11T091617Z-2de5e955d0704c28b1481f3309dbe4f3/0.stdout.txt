@@ -1,0 +1,17 @@
+{
+  "verified": true,
+  "filename": "FINAL_CONSOLIDATION_PLAN.xlsx",
+  "sheets": [
+    "P0_CRITICAL_MERGES",
+    "P1_IMPORTANT_MERGES",
+    "P2_OPTIONAL_MERGES",
+    "SAFE_REMOVE_AFTER_MERGE"
+  ],
+  "merge_counts": {
+    "P0_CRITICAL_MERGES": 24,
+    "P1_IMPORTANT_MERGES": 13,
+    "P2_OPTIONAL_MERGES": 5
+  },
+  "total_merges": 42,
+  "safe_remove_items": 26
+}

@@ -1,0 +1,426 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "3957d29d-e75a-4a9f-86fb-5d267e6799ee",
+  "turn": "5a35cd8ce71649bc8543a87aa6af7589",
+  "run_id": "f7052a5d619343139c205479949b2d46",
+  "observed_utc": "2026-11-02T19:32:56Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Live Market Reconciliation, Complete 651-Endpoint Verification, Telegram Downstream Automation, Autonomous Watchdog & Production-Live Initialization",
+  "limitations": [
+    "Verified against live localhost ASGI runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "883e04f4dc2d07f3ccdaf961a1d7b63ac905b06271353d44abff8dc27e491889"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_live_nse_bse_reconcile.py",
+      "sha256": "607e52902b7633b495e575924c3ebe8a514ea73ea6cd2d475300b11d85b8c39e"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_autonomous_market_discovery.py",
+      "sha256": "fa8d65da0e877936bf6f71f5a2a288ab7e70f8c6967bee2777a21fd5a55d2ee9"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\analyze_all_url_paths.py",
+      "sha256": "3ad6187aae42c7ea8cfdfa70c276aeeada5f629e778a4c9f337aabc088df13ed"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_telegram_downstream.py",
+      "sha256": "b24bc35b8212390c7bec6c92df9a6877362b4a456d2307c83e72c09a2f723fb4"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_autonomous_watchdog.py",
+      "sha256": "32ce1293af812630ae81ef200e0f46a89e105fe01aadaebae6429a1c55859ada"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_production_live_init.py",
+      "sha256": "1ad12f4cda57fb34c1a37e991a79d50e1a7c921b3064eeb19493aa1caa506e64"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\app.py",
+      "sha256": "46bff534ead63ecf2ae930e3a5fba2822b15950419deb83b5ea9bbebea963ba0"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\dhan_full_market_scanner.py",
+      "sha256": "0425df6d0f27c92973b560c59160440ab794a7ec8b66230a0b1b0434fcdce05b"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\telegram_notifier.py",
+      "sha256": "1d476a5261bdd38e2039f648389ea04be39aba170aa66a143233c0410a38cea0"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\system3_self_healing_watchdog.py",
+      "sha256": "ef03d2f289857d99aa17ce902786b0a220c1b97a1f4157c863e1ce266cea37ea"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\run_1872_acceptance_pipeline.py",
+      "sha256": "2fe1a8df994ac26f6633aff6ed4389b3018bec1baf061341f1164bedf135df14"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\verify_1872_acceptance_mission.py",
+      "sha256": "727475ad5b76ef0827948a4b4ea794eb2fd85198da863ecbb4c87fbe35b0354e"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\data_lake\\columnar_store.py",
+      "sha256": "2ad0cdb9c940c702549e1ddf10b7ac01572aa326c35e894911666f9b12d57529"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\option_chain_pipeline.py",
+      "sha256": "ba3b2d84e232c93a5ffca2433b2f7755376594ff13d84cc5c6258b4a3d6cbc15"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_columnar_truth_architecture.py",
+      "sha256": "37c6f7df8d9e8fae7263263971b17c119faaf6d266475f7bbb76b284a6aa2062"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_truth_certification.py",
+      "sha256": "477af426c9796eb3bbf7cbef4ef6ed2bed0d662f7304266d7043632ed66ac4e0"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\anti_fake_guard.py",
+      "sha256": "dbeddbcca744da30985e5603b19b42824e2cb6e855cd5c6293d3ecd91ccf724a"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\FORENSIC_REALITY_REPORT.md",
+      "sha256": "7310c553a00396be7c85ed5e5513e65f728c6bf752e7c3741275fd85385cbeed"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\0.stdout.txt",
+      "sha256": "a0f16c4f30106994001f8d575eb773fa3130998da399defdbbab4c7e772c417d"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\1.stdout.txt",
+      "sha256": "821a5c7fbc5ba14e77cc090b766cc5c7f82aaccbbe5f7aa5824c5ef6568ffb70"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\2.stdout.txt",
+      "sha256": "c2af987712adf05977c93fa6c799097ff107d9d384d65f62f48dfdad3e832d83"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\3.stdout.txt",
+      "sha256": "a545b43693607d4c6a613b5dfa14043391ff991b30feaa6349058256da1b12e8"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\3.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\4.stdout.txt",
+      "sha256": "c39ae06c7967248ae6a589a82bf0b8ab24ad3d563c2d75e635861235b6ec1617"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\4.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\5.stdout.txt",
+      "sha256": "7c9986db540e5dc40931c29b0ae6ba7c81f736a5e5178036cba5d28f1e2b3ef6"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\5.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\6.stdout.txt",
+      "sha256": "1a62a82f3870f271d2dd8fae0e38280412b1de3704578d98e14196bfb0a79e98"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\6.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\7.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\7.stderr.txt",
+      "sha256": "d5d74df2a76375d5e6795e8b44f332716e9e58b24976479862b252e7ec1c4f1c"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\8.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T193209Z-8dd1d286fb614e3d97daf453aabaa361\\8.stderr.txt",
+      "sha256": "62d229ad81c293bd4615369a35b0136c3229196ec55d1767bdb31c02d30caeee"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Live Market & Option Chain Reconciliation: Spot prices, ATM strikes, Max Pain, PCR, and top gainers match real live NSE/BSE feeds from state cache",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Autonomous Discovery & Dynamic Proximity: Ingests 117,776 Dhan scrips, maps 228 underlyings, and extracts 5 ITM + 5 OTM strikes centered on live spot",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Complete 651-Endpoint Audit: All 651 registered GET routes across 14 functional categories return HTTP 200 OK with zero errors",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Telegram Downstream Automation: Complete downstream alert, signal dispatch, and RMS circuit breaker pipeline for System3boat (@System3PSWBot) with verified outbox persistence and live ASGI REST endpoints",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Autonomous Watchdog & Forensic Telemetry: 24/7 self-healing monitor for upstream feeds, core ASGI server, downstream Telegram bot (@System3PSWBot), and RMS circuit breaker with tamper-proof forensic logging",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R6",
+      "description": "Autonomous Production-Live Feed & Paper-Execution Initialization: Verifies LIVE_MARKET_FEED=true, DHAN_FEED_MODE=LIVE in /api/settings, pulls 117,776-scrip full-market master across 228 underlyings, binds dynamic option chain hooks (ATM ± 5 strikes), strictly anchors paper execution in /api/dhan/orders/dynamic-bind, and validates 100% ONLINE health across all routes with cryptographic hash chains",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R7",
+      "description": "Genesis System3 1,872 Mandatory Acceptance Mission: Verifies all 1,872 distinct cases across 624 named controls in 52 domains (FUNCTION, FAILURE, INDEPENDENT), generates raw receipts in evidence/, updates GENESIS_1872_MASTER_CHECKLIST.csv, outputs RUN_SUMMARY.json, ACCEPTANCE_REPORT.md, OWNER_SIGNOFF.md, and syncs GENESIS_1872_ACCEPTANCE_DASHBOARD.html with zero real broker orders.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R8",
+      "description": "World-Class Columnar Storage & In-Memory Analytical Lake: Replaces legacy runtime CSV file dependencies with In-Memory PyArrow caching, embedded DuckDB OLAP engine, Parquet lake, 6-stage truth pipeline, zero UNKNOWN datasources, and decoupled export.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R9",
+      "description": "Truth Certification & Anti-Fake Guard: Validates 5-stage option chain truth pipeline from exchange to UI, in-memory Arrow/DuckDB/Parquet layering, decoupled CSV export, fail-closed Anti-Fake Guard emitting 'NO VERIFIED LIVE DATA' on disconnect, and cryptographic SHA256 provenance receipts with 0 unbadged synthetic/demo values.",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_live_nse_bse_reconcile.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:09Z",
+      "elapsed_seconds": 1.094,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C2",
+      "requirement_ids": [
+        "R2"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_autonomous_market_discovery.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:10Z",
+      "elapsed_seconds": 2.922,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C3",
+      "requirement_ids": [
+        "R3"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/analyze_all_url_paths.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:13Z",
+      "elapsed_seconds": 6.0,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C4",
+      "requirement_ids": [
+        "R4"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_telegram_downstream.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:19Z",
+      "elapsed_seconds": 6.688,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C5",
+      "requirement_ids": [
+        "R5"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_autonomous_watchdog.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:25Z",
+      "elapsed_seconds": 1.937,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C6",
+      "requirement_ids": [
+        "R6"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_production_live_init.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:27Z",
+      "elapsed_seconds": 2.688,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C7",
+      "requirement_ids": [
+        "R7"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "scripts/verify_1872_acceptance_mission.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:30Z",
+      "elapsed_seconds": 1.641,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C8",
+      "requirement_ids": [
+        "R8"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_columnar_truth_architecture.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:32Z",
+      "elapsed_seconds": 7.0,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C9",
+      "requirement_ids": [
+        "R9"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_truth_certification.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T19:32:39Z",
+      "elapsed_seconds": 16.968,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "494d0d8c5d5e3340202894c7980054bb9c3e63400f301f4939e2cb18ae7fcfd0"
+}

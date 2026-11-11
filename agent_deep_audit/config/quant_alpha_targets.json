@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "targets": {
+    "min_oos_directional_accuracy_pct": 65.0,
+    "min_top_decile_precision_pct": 70.0,
+    "min_sharpe": 2.5,
+    "min_sortino": 3.5,
+    "max_drawdown_pct": 10.0,
+    "min_win_loss_ratio": 2.0,
+    "max_is_oos_accuracy_gap_pct_points": 15.0,
+    "min_oos_trades": 100,
+    "min_oos_days": 60,
+    "top_fraction": 0.1,
+    "periods_per_year": 252,
+    "min_deflated_sharpe_probability": 0.95
+  },
+  "governance": {
+    "targets_are_goals_not_current_claims": true,
+    "frozen_holdout_tuning_forbidden": true,
+    "automatic_model_promotion": false,
+    "live_trading_enabled": false,
+    "retry_budget": 5,
+    "retry_exhaustion_action": "RESEARCH_REJECTED_AFTER_RETRY_BUDGET",
+    "destructive_git_reset_allowed": false
+  }
+}

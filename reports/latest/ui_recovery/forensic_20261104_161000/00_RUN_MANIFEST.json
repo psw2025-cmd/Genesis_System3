@@ -1,0 +1,45 @@
+{
+  "run_id": "forensic_20261104_161000",
+  "started_at_utc": "2026-11-04T10:40:15.004447+00:00",
+  "started_at_ist": "2026-11-04T16:10:15.004447+05:30",
+  "workspace_root": "C:\\Genesis_System3_clean",
+  "git_branch": "fix/scanner-219-equity-rotate",
+  "git_head_sha": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82",
+  "dirty_worktree_entries_count": 1154,
+  "tracked_entrypoints_check": [
+    "dashboard/backend/app.py"
+  ],
+  "local_runtime_entrypoints": {
+    "port_8008": "content.app.app:app (UNTRACKED in git)",
+    "port_8021": "content.app.app:app canary (UNTRACKED in git)",
+    "cloud_run_dockerfile_cmd": "python scripts/start_cloud_run.py -> dashboard.backend.secure_app:app (TRACKED in git)"
+  },
+  "python_executable": "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "safety_locks": {
+    "PAPER_MODE": 1,
+    "LIVE_TRADING_ENABLED": 0,
+    "LIVE_ORDER_AUTHORITY": 0,
+    "REAL_BROKER_ORDERS": 0,
+    "AUTO_EXECUTE_TRADES": 0
+  },
+  "market_session_calendar": {
+    "exchange_tz": "Asia/Kolkata",
+    "regular_hours": "09:15-15:30 IST Mon-Fri",
+    "observed_time_ist": "2026-11-04 16:10:15 IST",
+    "session_state_at_run": "CLOSED"
+  },
+  "pre_edit_file_hashes_sha256": {
+    "content/app/app.py": "081d0bbe108b096548a54c98f18258a4ef7108a5010fc67b4b11629e95f85ee6",
+    "content/app/templates/premium.html": "a758ae3d2de95ce7c3b7b933c02b4d1c693d5e1b4f9578f0350c37030039f590",
+    "content/app/verified_market.py": "1e8330dd5c9e1e9612a27aeff291c608c0d35203092b1a027b0079ad45ccb608",
+    "content/app/dhan_account_router.py": "8915e82580ca9e857cbfdeeef599afc29f6199838d6b58b8abc4cf06061ca802",
+    "scripts/gcp_dhan_token_rotation_job.py": "36b94b646af12f6c8e8f3d32994e2b1ae41d1e1e20ed7ebd65ff0f59b5767a69",
+    "tests/test_ui_p0_recovery_mission.py": "cd1decb003ef8c6c9af7ab60c35ab8879f3e1f7711acd4367f8bb2c838a37ca8"
+  },
+  "before_pytest_exit_codes": {
+    "test_dhan_single_token_authority": 1,
+    "test_br1_dhan_auth_reliability": 1,
+    "test_dhan_rotator_forensic_redaction": 2
+  }
+}

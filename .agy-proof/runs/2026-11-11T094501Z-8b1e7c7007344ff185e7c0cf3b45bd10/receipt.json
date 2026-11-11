@@ -1,0 +1,87 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "0ea80800-87da-4cf5-9714-883298d46ce3",
+  "turn": "95f3743079ef4786bb2b55079423993c",
+  "run_id": "26cf260be6354408bbebc7ea5080a9ea",
+  "observed_utc": "2026-11-11T09:45:02Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Forensic audit and generation of CLOUD_GITHUB_TRUTH.xlsx comparing Source A (GitHub repository configured for Genesis_System3) and Source B (Google Cloud Run deployed service genesis-system3-web). Verifies deployment chain (GitHub commit SHA, branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, Cloud Run image digest) and SHA256 file hashes for core/brokers/dhan/dhan_readonly.py, dashboard/backend/routers/broker.py, dashboard/backend/broker/dhan_auth.py, and dashboard/backend/gain_rank_spot_enrichment.py across 5 sheets.",
+  "limitations": [
+    "Read-only cloud inspection; no live orders; no modifications to deployed cloud infrastructure; analyzer/paper safety preserved."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "954cb54a12e7e1548497e6589c28260fee19d039f9198271aadec5c03dac8481"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\CLOUD_GITHUB_TRUTH.xlsx",
+      "sha256": "5148b381b92421bc266461e13597f5fa9a0af56320429b232399247dde40abf2"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\generate_cloud_github_truth.py",
+      "sha256": "b012414f87114223cf3c7f543656b062710cdb005ac27ad75883a5c95b18a636"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_cloud_github_truth.py",
+      "sha256": "df7699604f74315a740ae6cfb9b711f88d9fa5830d6ce4c13f114e13698703a9"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T094501Z-8b1e7c7007344ff185e7c0cf3b45bd10\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T094501Z-8b1e7c7007344ff185e7c0cf3b45bd10\\0.stderr.txt",
+      "sha256": "105f273fd1cd7081c56791783a467654b47c4bfe94dd2513e54e2c0b3ce9e085"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "CLOUD_GITHUB_TRUTH.xlsx exists and contains all 5 required sheets (DEPLOYMENT_CHAIN, GITHUB_FILE_HASHES, CLOUD_FILE_HASHES, HASH_COMPARISON, DRIFT_REPORT) with exact 7 columns: File, GitHub SHA256, Cloud SHA256, Match YES/NO, GitHub Commit, Cloud Revision, Evidence.",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R2",
+      "description": "DEPLOYMENT_CHAIN verifies GitHub commit SHA, GitHub branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, and Cloud Run image digest. File hashes for the 4 target files are verified, and unproven live container filesystem bytes are strictly marked UNVERIFIED without inference.",
+      "mandatory": true,
+      "result": "FAIL"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python312\\python.exe",
+        "tests/test_cloud_github_truth.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T09:45:01Z",
+      "elapsed_seconds": 0.141,
+      "exit_code": 1,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "exit": 1
+      },
+      "result": "FAIL"
+    }
+  ],
+  "overall": "FAIL",
+  "integrity_signature": "5b94c15f1c1279b01f73bacc3ad952190d7a63e025703b3cef1fb800837f5579"
+}

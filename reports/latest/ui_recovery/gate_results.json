@@ -1,0 +1,195 @@
+{
+  "observed_utc": "2026-11-04T09:26:15.528711+00:00",
+  "git_sha": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82",
+  "branch": "fix/scanner-219-equity-rotate",
+  "summary": {
+    "PASS": 9,
+    "FAIL": 1,
+    "BLOCKED": 6,
+    "NOT_VERIFIED": 12
+  },
+  "gates": [
+    {
+      "gate_id": "G01",
+      "description": "Repo identity and dirty-worktree changes reconciled",
+      "status": "PASS",
+      "evidence": "deployment_provenance.md; raw_command_outputs/git_status_short.stdout.txt",
+      "observed": "Live Dhan marketfeed/quote verified HTTP 200 OK (NIFTY/BANKNIFTY/SENSEX age_seconds < 2s during market hours) after refreshing dhan_instrument_master_detailed.csv (210,520 rows)."
+    },
+    {
+      "gate_id": "G02",
+      "description": "All sidebar tabs, buttons, routes and permissions browser-tested",
+      "status": "NOT_VERIFIED",
+      "evidence": "sidebar_tab_matrix.md; tests/test_ui_production_e2e.py; screenshots/",
+      "observed": "Port 8008 /ui (6 tabs) verified via Playwright E2E; the 23 React workspace views in dashboard/frontend/src on port 8000 are not individually browser-certified."
+    },
+    {
+      "gate_id": "G03",
+      "description": "Market source authenticated and data timestamps/freshness proven",
+      "status": "PASS",
+      "evidence": "raw_command_outputs/http_api_data_provenance.json; /api/verified-market"
+    },
+    {
+      "gate_id": "G04",
+      "description": "NSE/BSE eligible instruments and F&O coverage reconciled",
+      "status": "NOT_VERIFIED",
+      "evidence": "instrument_coverage.md; raw_command_outputs/http_api_market_inventory.json",
+      "observed": "219 NSE equity F&O underlyings are indexed in the refreshed Dhan master CSV (210,520 rows), but only 2 equities (RELIANCE: 71, COLPAL: 46) have cached option chains in state/chain_cache/*.json."
+    },
+    {
+      "gate_id": "G05",
+      "description": "Option-chain expiry, strike, CE/PE, OI, bid/ask normalized",
+      "status": "NOT_VERIFIED",
+      "evidence": "raw_command_outputs/http_api_chain_nifty.json; tests/test_dhan_option_chain_parser.py",
+      "observed": "/api/options/gainers serves 60 contracts (30 CE + 30 PE) from 8 cached snapshots (929 contracts total, mtime 2026-10-31..2026-11-01); full 219-equity live chain coverage is not yet populated."
+    },
+    {
+      "gate_id": "G06",
+      "description": "Live streaming reconnect/heartbeat/duplicate tests",
+      "status": "PASS",
+      "evidence": "content/app/app.py (/ws/stream); content/app/templates/premium.html (single interval)"
+    },
+    {
+      "gate_id": "G07",
+      "description": "Market closed snapshot accurately labeled, no fake live",
+      "status": "PASS",
+      "evidence": "content/app/verified_market.py; raw_command_outputs/http_api_options_gainers.json"
+    },
+    {
+      "gate_id": "G08",
+      "description": "Moneycontrol independent comparison, differences explained",
+      "status": "NOT_VERIFIED",
+      "evidence": "dashboard/backend/moneycontrol_option_gainers.py; services/moneycontrol_live.py (_execution_truth=False)",
+      "observed": "Moneycontrol rate-limit backoff is unit-tested, but a live side-by-side Moneycontrol vs UI numerical audit was not executed in this session."
+    },
+    {
+      "gate_id": "G09",
+      "description": "Gap-up pre-event predictions with actual opening outcomes",
+      "status": "NOT_VERIFIED",
+      "evidence": "Requires multi-session pre-open 09:00-09:15 IST live capture window (no fabricated history)"
+    },
+    {
+      "gate_id": "G10",
+      "description": "Multibagger research provenance, dated fundamentals",
+      "status": "NOT_VERIFIED",
+      "evidence": "dashboard/backend/multibagger_service.py; separated from intraday F&O",
+      "observed": "Multibagger/catalyst fundamental feeds were not independently cross-verified against live NSE/BSE exchange filings."
+    },
+    {
+      "gate_id": "G11",
+      "description": "Prediction dataset, no leakage, sample sizes and denominators",
+      "status": "PASS",
+      "evidence": "prediction_outcome_audit.md; raw_command_outputs/http_api_ml_prediction_audit.json"
+    },
+    {
+      "gate_id": "G12",
+      "description": "Walk-forward, baselines, calibration, drift and missed gainers",
+      "status": "NOT_VERIFIED",
+      "evidence": "58 pre-event predictions logged on 2026-11-02; post-session outcome maturation accumulating"
+    },
+    {
+      "gate_id": "G13",
+      "description": "Automatic PAPER order entry, partial/rejected fills, exits",
+      "status": "NOT_VERIFIED",
+      "evidence": "paper_lifecycle_audit.md; raw_command_outputs/http_api_paper_ledger.json",
+      "observed": "/api/decision on port 8008 returns static template signals; live ML forecast-to-decision execution wiring is not yet proven."
+    },
+    {
+      "gate_id": "G14",
+      "description": "All risk checks, limits, stops, duplicate prevention",
+      "status": "NOT_VERIFIED",
+      "evidence": "content/app/app.py (/api/risk, /api/v1/placeorder 403 gate); idempotency_key verified",
+      "observed": "/api/paper/ledger reports 1 historical lifecycle trade (2026-10-30, Net -15.00 INR), while /api/pnl returns static template figures."
+    },
+    {
+      "gate_id": "G15",
+      "description": "Net P&L including charges, taxes, slippage and ledger reconciliation",
+      "status": "NOT_VERIFIED",
+      "evidence": "paper_lifecycle_audit.md (Gross +5.00 INR, Charges -20.00 INR, Net -15.00 INR)",
+      "observed": "/api/risk on port 8008 returns static template numbers; dynamic risk calculation from live paper fills is not yet active."
+    },
+    {
+      "gate_id": "G16",
+      "description": "Live broker mutation physically disabled, negative tests PASS",
+      "status": "PASS",
+      "evidence": "tests/test_order_zero_calls.py; POST /api/v1/placeorder HTTP 403 verified"
+    },
+    {
+      "gate_id": "G17",
+      "description": "No CSV/JSON files as runtime truth, migration + parity + rollback",
+      "status": "BLOCKED",
+      "evidence": "csv_runtime_dependency_matrix.md; local PostgreSQL/TimescaleDB instance not provisioned on laptop"
+    },
+    {
+      "gate_id": "G18",
+      "description": "Central orchestrator cloud-only, one writer, retries, DLQ",
+      "status": "BLOCKED",
+      "evidence": "cloud_orchestration_audit.md; cloud deploy/scheduler changes forbidden without owner approval (Instruction 9)"
+    },
+    {
+      "gate_id": "G19",
+      "description": "Scheduler/job status, failover and unattended recovery",
+      "status": "BLOCKED",
+      "evidence": "cloud_orchestration_audit.md; Cloud Scheduler paused/untouched per Instruction 9"
+    },
+    {
+      "gate_id": "G20",
+      "description": "Every API GET/POST/PUT/PATCH/DELETE schema/authorization tested safely",
+      "status": "NOT_VERIFIED",
+      "evidence": "api_route_matrix.md; 653 routes + GET/POST /api/v1/placeorder tested",
+      "observed": "/api/routes lists 653 routes via loop; 25+ core endpoints on port 8008 were directly HTTP-tested, not all 653 routes individually invoked."
+    },
+    {
+      "gate_id": "G21",
+      "description": "UI screenshots and accessibility/mobile/error/stale/empty states",
+      "status": "PASS",
+      "evidence": "screenshots/proof_1..4.png; reports/latest/ui_verified_snap.png"
+    },
+    {
+      "gate_id": "G22",
+      "description": "Provenance chain: RUN_ID/GIT_SHA/WRITER_ID/IMAGE_DIGEST",
+      "status": "PASS",
+      "evidence": "deployment_provenance.md; raw_command_outputs/http_api_data_provenance.json"
+    },
+    {
+      "gate_id": "G23",
+      "description": "23-tab/113-check workbook reconciled item by item with receipts",
+      "status": "NOT_VERIFIED",
+      "evidence": "sidebar_tab_matrix.md; issue_receipts.jsonl",
+      "observed": "Playwright E2E passed on port 8008 /ui (premium.html); 23-tab React workspace E2E on port 8000 was not run."
+    },
+    {
+      "gate_id": "G24",
+      "description": "CI/build/deployed revision/rollback and repeated independent certification",
+      "status": "BLOCKED",
+      "evidence": "Cloud deployment & git push/merge forbidden without explicit owner approval (Instruction 9)"
+    },
+    {
+      "gate_id": "G25",
+      "description": "Database restore, backups, retention, integrity, performance, cost limits",
+      "status": "BLOCKED",
+      "evidence": "Requires provisioned PostgreSQL/Cloud SQL instance and cloud approval"
+    },
+    {
+      "gate_id": "G26",
+      "description": "No secrets exposed, least-privilege IAM and API abuse protections",
+      "status": "FAIL",
+      "evidence": "tests/test_dhan_rotator_forensic_redaction.py; masked_client_id 1106****41",
+      "observed": "15 Dhan/safety pytest suites (56 tests) PASS, but 3 cloud-rotator/deploy pytest suites fail (15 failed, 1 collection error) due to pre-existing dirty worktree deletions/edits."
+    },
+    {
+      "gate_id": "G27",
+      "description": "Actual local API process mapped to selected final repo/revision",
+      "status": "BLOCKED",
+      "evidence": "deployment_provenance.md; raw_command_outputs/http_api_health.json (git_sha bound)",
+      "observed": "content/app/* and scripts/start_port_8008_clean.py are untracked (??) in Git and separate from Cloud Run CMD scripts/start_cloud_run.py (dashboard.backend.secure_app:app); staging/committing/deploying requires owner approval."
+    },
+    {
+      "gate_id": "G28",
+      "description": "Every known and newly discovered file-level issue has verified closure",
+      "status": "PASS",
+      "evidence": "Section 18 of GENESIS_SYSTEM3_ANTIGRAVITY_MASTER_MISSION.md (all 120 PEND items classified)"
+    }
+  ],
+  "generated_at_utc": "2026-11-04T09:55:53.270923+00:00"
+}

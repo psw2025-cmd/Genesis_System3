@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\analyze_all_url_paths.py", line 157, in <module>
+    analyze_all_url_paths()
+  File "C:\Genesis_System3_clean\tests\analyze_all_url_paths.py", line 153, in analyze_all_url_paths
+    assert failed_count == 0, f"{failed_count} endpoints failed HTTP analysis!"
+           ^^^^^^^^^^^^^^^^^
+AssertionError: 1 endpoints failed HTTP analysis!

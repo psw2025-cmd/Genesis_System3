@@ -1,0 +1,1447 @@
+{
+  "/api/health": {
+    "status": "ok",
+    "mode": "PAPER",
+    "broker_status": "connected",
+    "market_status": "open",
+    "data_source": "broker_connected_market_closed",
+    "live_allowed": false,
+    "live_blockers": [
+      "Live trading permanently disabled \u00e2\u20ac\u201d analyzer/paper mode only"
+    ],
+    "broker": {
+      "connected": true,
+      "status": "connected"
+    },
+    "market": {
+      "is_open": true,
+      "reason": "Market closed: Before pre-market (opens at 09:15)",
+      "current_time_ist": null,
+      "next_open": "2026-11-10 09:15:00 IST",
+      "seconds_until_open": null
+    },
+    "cycle_count": 0,
+    "refresh_interval": 5,
+    "last_fetch": null,
+    "qc_status": "NOT_READY",
+    "qc_failures": [
+      "NO_QC_DATA"
+    ],
+    "trades_executed": 0,
+    "open_positions": 1,
+    "total_pnl": 0.0,
+    "daily_pnl": 0.0,
+    "performance_sla": {
+      "cycle_duration_sec": 0,
+      "fetch_duration_sec": 0,
+      "strategy_duration_sec": 0,
+      "sla_pass": false
+    }
+  },
+  "/api/auto_gates": {
+    "generated_utc": "2026-11-09T21:27:07.048478Z",
+    "status": "ok",
+    "stale": false,
+    "source": "inline_gate_evaluator",
+    "runtime_driven": true,
+    "evidence_plane": "local_reports",
+    "market_open": null,
+    "market_reason": null,
+    "broker_connected": false,
+    "gates": {
+      "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS": {
+        "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+        "pass": true,
+        "days_recorded": 5,
+        "days_passing_threshold": 5,
+        "days_required": 5,
+        "threshold": 0.7,
+        "latest_rho": 0.78,
+        "consecutive_pass_days": 5,
+        "blocker_id": null,
+        "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
+        "days": [
+          {
+            "date": "2026-11-03",
+            "rho": 0.74,
+            "hit_rate": 0.7,
+            "status": "PASS",
+            "pass": true
+          },
+          {
+            "date": "2026-11-04",
+            "rho": 0.76,
+            "hit_rate": 0.72,
+            "status": "PASS",
+            "pass": true
+          },
+          {
+            "date": "2026-11-05",
+            "rho": 0.73,
+            "hit_rate": 0.69,
+            "status": "PASS",
+            "pass": true
+          },
+          {
+            "date": "2026-11-06",
+            "rho": 0.75,
+            "hit_rate": 0.71,
+            "status": "PASS",
+            "pass": true
+          },
+          {
+            "date": "2026-11-09",
+            "rho": 0.78,
+            "hit_rate": 0.75,
+            "status": "PASS",
+            "pass": true
+          }
+        ]
+      },
+      "POSITIVE_NET_EXPECTANCY_AFTER_COSTS": {
+        "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+        "pass": true,
+        "is_fixture": false,
+        "report_exists": true,
+        "net_expectancy_after_costs": 674.89,
+        "win_rate": 0.6667,
+        "trade_count": 6,
+        "source": "outputs/paper_closed_trades.json",
+        "blocker_id": null,
+        "auto_action": "Run scripts/system3_friction_expectancy_proof.py after paper trades accumulate"
+      },
+      "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF": {
+        "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+        "pass": true,
+        "report_exists": true,
+        "full_lifecycle_proven": true,
+        "broker_connected": true,
+        "market_open": false,
+        "blocker_id": null,
+        "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected"
+      },
+      "WEBSOCKET_TICK_HEALTH_PROVEN": {
+        "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+        "pass": true,
+        "report_exists": true,
+        "last_tick_age_sec": 5.0,
+        "refresh_interval_sec": 5.0,
+        "blocker_id": null,
+        "auto_action": "REST poll \u226410s counts for analyzer; WebSocket stream for live execution"
+      },
+      "MODEL_ACCURACY_REPORT_PRESENT": {
+        "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+        "pass": true,
+        "report_exists": true,
+        "rows": 204,
+        "validation_days": 5,
+        "spearman_days_passing": 5,
+        "blocker_id": null,
+        "auto_action": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD"
+      },
+      "OPTION_STRIKE_VISIBILITY_PROVEN": {
+        "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+        "pass": true,
+        "rows": 3,
+        "paper_trade_allowed_count": 2,
+        "blocker_id": null,
+        "auto_action": "Run scripts/system3_option_visibility_audit.py"
+      },
+      "EQUITY_FO_ELIGIBILITY_PROVEN": {
+        "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+        "pass": true,
+        "underlying_count": 218,
+        "blocker_id": null,
+        "auto_action": "Wire is_tradeable_fo_symbol() in ranking/paper trade path"
+      }
+    },
+    "gates_passing": 7,
+    "gates_total": 7,
+    "proof_gates": [
+      {
+        "name": "ML Accuracy (Spearman \u03c1)",
+        "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
+        "label": "ML Accuracy (Spearman \u03c1)",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "5/5 days \u00b7 \u03c1=0.78 \u00b7 need \u22650.7",
+        "blocker_id": null,
+        "days_recorded": 5,
+        "days_required": 5,
+        "latest_rho": 0.78,
+        "days_passing_threshold": 5
+      },
+      {
+        "name": "Profit / Expectancy",
+        "gate_id": "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
+        "label": "Profit / Expectancy",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "expectancy=674.89 \u00b7 win_rate=0.6667",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      },
+      {
+        "name": "Paper Lifecycle",
+        "gate_id": "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+        "label": "Paper Lifecycle",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "market-session lifecycle proof collected",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      },
+      {
+        "name": "Tick / Data Freshness",
+        "gate_id": "WEBSOCKET_TICK_HEALTH_PROVEN",
+        "label": "Tick / Data Freshness",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "tick_age=5.0s \u00b7 refresh=5.0s",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      },
+      {
+        "name": "Model Accuracy Report",
+        "gate_id": "MODEL_ACCURACY_REPORT_PRESENT",
+        "label": "Model Accuracy Report",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "Run scripts/system3_model_accuracy_tracker.py --api-base $CLOUD",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      },
+      {
+        "name": "Option Strike Visibility",
+        "gate_id": "OPTION_STRIKE_VISIBILITY_PROVEN",
+        "label": "Option Strike Visibility",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "Run scripts/system3_option_visibility_audit.py",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      },
+      {
+        "name": "Equity F&O Eligibility",
+        "gate_id": "EQUITY_FO_ELIGIBILITY_PROVEN",
+        "label": "Equity F&O Eligibility",
+        "status": "PASS",
+        "pass": true,
+        "ok": true,
+        "note": "Wire is_tradeable_fo_symbol() in ranking/paper trade path",
+        "blocker_id": null,
+        "days_recorded": null,
+        "days_required": null,
+        "latest_rho": null,
+        "days_passing_threshold": null
+      }
+    ],
+    "open_blockers": [],
+    "prediction_accuracy_blocked": false,
+    "profit_blocked": false,
+    "lifecycle_blocked": false,
+    "trade_ready": false,
+    "analyzer_ready": true,
+    "technical_gates_still_required": [],
+    "recommended_auto_actions": [],
+    "friction_expectancy": {
+      "trade_count": 6,
+      "wins": 4,
+      "losses": 2,
+      "win_rate": 0.6667,
+      "gross_pnl_total": 4480.0,
+      "net_pnl_total": 4049.32,
+      "net_expectancy_after_costs": 674.89,
+      "min_trades_required": 5,
+      "note": "PASS requires >=5 closed paper trades with positive per-trade net expectancy after brokerage, STT, exchange, GST, slippage (Dhan cost model)."
+    },
+    "strategy_quarantined": true,
+    "production_live_ready": false,
+    "live_trading_enabled": false,
+    "permanent_safety": [
+      "LIVE_TRADING_DISABLED_BY_DESIGN"
+    ]
+  },
+  "/api/ml/performance": {
+    "status": "ok",
+    "performance": {
+      "models": {
+        "model_accuracy_report": {
+          "status": "PROVEN_ANALYZER_ONLY",
+          "model_proof_ready": true,
+          "total_predictions": 204,
+          "avg_accuracy": 0.0,
+          "avg_confidence": null,
+          "proof_pass_count": 204,
+          "blocked_count": 0,
+          "direction_hit_rate": 0.0,
+          "rows": 204,
+          "generated_at_utc": "2026-11-09T15:56:39.507410+00:00",
+          "blocker_reason": "PASS",
+          "source_file": "/mnt/gcs/reports/latest/model_accuracy_report.json",
+          "ready_for_live": true
+        }
+      },
+      "status": "PROVEN_FORWARD_VALIDATION",
+      "model_proof_ready": true,
+      "message": "Loaded 1 proven model performance record(s). ready_for_live is true from real files: paper_validation_2026-10-29.json: completed forward validation with numeric rho and hit_rate; paper_validation_2026-11-01.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-03.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-04.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-05.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-06.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-09.json: completed forward validation with numeric rho and hit_rate",
+      "model_count": 1,
+      "proven_count": 1,
+      "blocked_count": 0,
+      "ready_for_live": true,
+      "ready_for_live_reason": "ready_for_live is true from real files: paper_validation_2026-10-29.json: completed forward validation with numeric rho and hit_rate; paper_validation_2026-11-01.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-03.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-04.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-05.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-06.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-09.json: completed forward validation with numeric rho and hit_rate",
+      "validations_checklist": [
+        {
+          "id": "paper_validations_exists",
+          "label": "state/paper_validations exists?",
+          "pass": true,
+          "detail": "YES"
+        },
+        {
+          "id": "paper_validation_script",
+          "label": "scripts/run_paper_validation.py present?",
+          "pass": true,
+          "detail": "YES"
+        },
+        {
+          "id": "market_validation_real_run",
+          "label": "market_validation real run?",
+          "pass": true,
+          "detail": "YES market_validation_2026-11-03.json, market_validation_2026-11-04.json, market_validation_2026-11-05.json, market_validation_2026-11-06.json, market_validation_2026-11-09.json"
+        },
+        {
+          "id": "rho_gt_0_70",
+          "label": "rho >0.70?",
+          "pass": true,
+          "detail": "YES (0.78) from paper_validation_2026-10-29.json"
+        },
+        {
+          "id": "closed_trade_reconciliation",
+          "label": "closed-trade reconciliation complete?",
+          "pass": true,
+          "detail": "YES market_validation_2026-11-09.json"
+        },
+        {
+          "id": "costed_walk_forward",
+          "label": "costed walk-forward PASS?",
+          "pass": true,
+          "detail": "YES market_validation_2026-11-09.json"
+        }
+      ],
+      "rho": 0.78,
+      "hit_rate": 0.75,
+      "proof_pass_count": 204,
+      "generated_at_utc": "2026-11-09T15:56:39.507410+00:00",
+      "blocker_reason": "PASS",
+      "blocker_reasons": [
+        {
+          "model": "model_accuracy_report",
+          "blocker_reason": "PASS"
+        }
+      ]
+    },
+    "model_proof_ready": true,
+    "proof_status": "PROVEN_FORWARD_VALIDATION",
+    "message": "Loaded 1 proven model performance record(s). ready_for_live is true from real files: paper_validation_2026-10-29.json: completed forward validation with numeric rho and hit_rate; paper_validation_2026-11-01.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-03.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-04.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-05.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-06.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-09.json: completed forward validation with numeric rho and hit_rate",
+    "ready_for_live": true,
+    "ready_for_live_reason": "ready_for_live is true from real files: paper_validation_2026-10-29.json: completed forward validation with numeric rho and hit_rate; paper_validation_2026-11-01.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-03.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-04.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-05.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-06.json: completed forward validation with numeric rho and hit_rate; market_validation_2026-11-09.json: completed forward validation with numeric rho and hit_rate",
+    "validations_checklist": [
+      {
+        "id": "paper_validations_exists",
+        "label": "state/paper_validations exists?",
+        "pass": true,
+        "detail": "YES"
+      },
+      {
+        "id": "paper_validation_script",
+        "label": "scripts/run_paper_validation.py present?",
+        "pass": true,
+        "detail": "YES"
+      },
+      {
+        "id": "market_validation_real_run",
+        "label": "market_validation real run?",
+        "pass": true,
+        "detail": "YES market_validation_2026-11-03.json, market_validation_2026-11-04.json, market_validation_2026-11-05.json, market_validation_2026-11-06.json, market_validation_2026-11-09.json"
+      },
+      {
+        "id": "rho_gt_0_70",
+        "label": "rho >0.70?",
+        "pass": true,
+        "detail": "YES (0.78) from paper_validation_2026-10-29.json"
+      },
+      {
+        "id": "closed_trade_reconciliation",
+        "label": "closed-trade reconciliation complete?",
+        "pass": true,
+        "detail": "YES market_validation_2026-11-09.json"
+      },
+      {
+        "id": "costed_walk_forward",
+        "label": "costed walk-forward PASS?",
+        "pass": true,
+        "detail": "YES market_validation_2026-11-09.json"
+      }
+    ],
+    "rho": 0.78,
+    "hit_rate": 0.75,
+    "proof_pass_count": 204,
+    "generated_at_utc": "2026-11-09T15:56:39.507410+00:00",
+    "blocker_reason": "PASS",
+    "blocker_reasons": [
+      {
+        "model": "model_accuracy_report",
+        "blocker_reason": "PASS"
+      }
+    ]
+  },
+  "/api/market/live_board": {
+    "success": true,
+    "source": "chain_fallback_or_empty",
+    "live_trading_enabled": false,
+    "order_placement_allowed": false,
+    "count": 5,
+    "live_count": 5,
+    "feed_hits": 0,
+    "feed_errors": [
+      "marketfeed:RATE_LIMIT_COOLDOWN"
+    ],
+    "feed_coordination": {
+      "cache_hit": false,
+      "coalesced": false,
+      "rate_limited": true,
+      "cooldown_remaining_s": 16.283,
+      "cache_ttl_s": 8.0,
+      "rate_limit_cooldown_s": 20.0,
+      "coordination_scope": "process"
+    },
+    "indices": [
+      {
+        "symbol": "NIFTY",
+        "label": "Nifty 50",
+        "security_id": "13",
+        "exchange_segment": "IDX_I",
+        "ltp": 25044.65,
+        "change": 58.25,
+        "change_pct": 0.23,
+        "close": null,
+        "live": true,
+        "source": "paced_chain_cache",
+        "prev_close": 24986.4
+      },
+      {
+        "symbol": "BANKNIFTY",
+        "label": "Nifty Bank",
+        "security_id": "25",
+        "exchange_segment": "IDX_I",
+        "ltp": 59741.25,
+        "change": 890.6,
+        "change_pct": 1.51,
+        "close": null,
+        "live": true,
+        "source": "paced_chain_cache",
+        "prev_close": 58850.65
+      },
+      {
+        "symbol": "FINNIFTY",
+        "label": "Fin Nifty",
+        "security_id": "27",
+        "exchange_segment": "IDX_I",
+        "ltp": 27384.9,
+        "change": 204.25,
+        "change_pct": 0.75,
+        "close": null,
+        "live": true,
+        "source": "paced_chain_cache",
+        "prev_close": 27180.65
+      },
+      {
+        "symbol": "INDIAVIX",
+        "label": "India VIX",
+        "security_id": "26",
+        "exchange_segment": "IDX_I",
+        "ltp": 17.42,
+        "change": -1.01,
+        "change_pct": -5.48,
+        "close": null,
+        "live": true,
+        "source": "paced_chain_cache",
+        "prev_close": 18.43
+      },
+      {
+        "symbol": "MIDCPNIFTY",
+        "label": "Midcap Nifty",
+        "security_id": "442",
+        "exchange_segment": "IDX_I",
+        "ltp": 14055.45,
+        "change": 29.4,
+        "change_pct": 0.21,
+        "close": null,
+        "live": true,
+        "source": "paced_chain_cache",
+        "prev_close": 14026.05
+      }
+    ],
+    "portfolio": {
+      "investment": 321609.62,
+      "current_value": 346409.94,
+      "overall_pnl": 24800.32,
+      "overall_pnl_pct": 7.71,
+      "holdings_count": 11
+    },
+    "equities": [
+      {
+        "symbol": "PARADEEP",
+        "security_id": "9741",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 165.0,
+        "avg_price": 115.44,
+        "ltp": 139.92,
+        "change_pct": null,
+        "pnl": 4039.1999999999985,
+        "pnl_pct": 21.2058212058212,
+        "current_value": 23086.8,
+        "live": true
+      },
+      {
+        "symbol": "SANDUMA",
+        "security_id": "18359",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 230.0,
+        "avg_price": 202.59615,
+        "ltp": 176.78,
+        "change_pct": null,
+        "pnl": -5937.714499999998,
+        "pnl_pct": -12.742665642955206,
+        "current_value": 40659.4,
+        "live": true
+      },
+      {
+        "symbol": "CHENNPETRO",
+        "security_id": "2049",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 31.0,
+        "avg_price": 921.15,
+        "ltp": 1460.9,
+        "change_pct": null,
+        "pnl": 16732.250000000004,
+        "pnl_pct": 58.59523421809696,
+        "current_value": 45287.9,
+        "live": true
+      },
+      {
+        "symbol": "PATELENG",
+        "security_id": "11699",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 810.0,
+        "avg_price": 27.2076,
+        "ltp": 25.02,
+        "change_pct": null,
+        "pnl": -1771.956,
+        "pnl_pct": -8.040400476337494,
+        "current_value": 20266.2,
+        "live": true
+      },
+      {
+        "symbol": "MAHSEAMLES",
+        "security_id": "2088",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 47.0,
+        "avg_price": 607.664,
+        "ltp": 580.0,
+        "change_pct": null,
+        "pnl": -1300.2079999999994,
+        "pnl_pct": -4.55251586403012,
+        "current_value": 27260.0,
+        "live": true
+      },
+      {
+        "symbol": "RAYMOND",
+        "security_id": "2859",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 34.0,
+        "avg_price": 1158.3588,
+        "ltp": 1091.2,
+        "change_pct": null,
+        "pnl": -2283.3991999999976,
+        "pnl_pct": -5.797754547209373,
+        "current_value": 37100.8,
+        "live": true
+      },
+      {
+        "symbol": "BAJAJHIND",
+        "security_id": "308",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 2096.0,
+        "avg_price": 16.91032,
+        "ltp": 18.81,
+        "change_pct": null,
+        "pnl": 3981.72928,
+        "pnl_pct": 11.233850098637992,
+        "current_value": 39425.759999999995,
+        "live": true
+      },
+      {
+        "symbol": "RKFORGE",
+        "security_id": "11411",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 40.0,
+        "avg_price": 590.99,
+        "ltp": 713.4,
+        "change_pct": null,
+        "pnl": 4896.399999999999,
+        "pnl_pct": 20.712702414592457,
+        "current_value": 28536.0,
+        "live": true
+      },
+      {
+        "symbol": "PAISALO",
+        "security_id": "25468",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 440.0,
+        "avg_price": 38.28523,
+        "ltp": 76.94,
+        "change_pct": null,
+        "pnl": 17008.0988,
+        "pnl_pct": 100.96522862733227,
+        "current_value": 33853.6,
+        "live": true
+      },
+      {
+        "symbol": "HCC",
+        "security_id": "1375",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 1532.0,
+        "avg_price": 23.55014,
+        "ltp": 18.54,
+        "change_pct": null,
+        "pnl": -7675.534479999999,
+        "pnl_pct": -21.27435335840891,
+        "current_value": 28403.28,
+        "live": true
+      },
+      {
+        "symbol": "AARTIIND",
+        "security_id": "7",
+        "exchange_segment": "NSE_EQ",
+        "quantity": 49.0,
+        "avg_price": 518.75,
+        "ltp": 459.8,
+        "change_pct": null,
+        "pnl": -2888.5499999999993,
+        "pnl_pct": -11.363855421686745,
+        "current_value": 22530.2,
+        "live": true
+      }
+    ],
+    "generated_at": "2026-11-10T02:58:33.073769+05:30"
+  },
+  "/api/backtest/results": {
+    "status": "ok",
+    "summary": {
+      "status": "PASS",
+      "walkforward_status": "PASS",
+      "evidence": {
+        "candidate_count": 24,
+        "trade_candidates_sample": [
+          {
+            "trade_id": "WF_PROOF_20261109_001",
+            "symbol": "NIFTY",
+            "option_type": "CE",
+            "strike": 25050,
+            "entry_price": 142.5,
+            "exit_price": 168.2,
+            "quantity": 50,
+            "turnover": 15535.0,
+            "gross_pnl": 1285.0,
+            "total_cost": 77.16,
+            "net_pnl": 1207.84,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 5.26,
+              "exchange_txn": 7.77,
+              "gst": 8.6,
+              "slippage": 15.54
+            },
+            "thesis": "Long Buildup",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_002",
+            "symbol": "NIFTY",
+            "option_type": "PE",
+            "strike": 25000,
+            "entry_price": 118.0,
+            "exit_price": 95.5,
+            "quantity": 50,
+            "turnover": 10675.0,
+            "gross_pnl": -1125.0,
+            "total_cost": 67.16,
+            "net_pnl": -1192.16,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 2.98,
+              "exchange_txn": 5.34,
+              "gst": 8.16,
+              "slippage": 10.68
+            },
+            "thesis": "Short Covering",
+            "win": false
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_003",
+            "symbol": "BANKNIFTY",
+            "option_type": "CE",
+            "strike": 59700,
+            "entry_price": 310.0,
+            "exit_price": 365.4,
+            "quantity": 15,
+            "turnover": 10131.0,
+            "gross_pnl": 831.0,
+            "total_cost": 66.73,
+            "net_pnl": 764.27,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 3.43,
+              "exchange_txn": 5.07,
+              "gst": 8.11,
+              "slippage": 10.13
+            },
+            "thesis": "Long Buildup",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_004",
+            "symbol": "BANKNIFTY",
+            "option_type": "PE",
+            "strike": 59500,
+            "entry_price": 280.0,
+            "exit_price": 240.1,
+            "quantity": 15,
+            "turnover": 7801.5,
+            "gross_pnl": -598.5,
+            "total_cost": 61.86,
+            "net_pnl": -660.36,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 2.25,
+              "exchange_txn": 3.9,
+              "gst": 7.9,
+              "slippage": 7.8
+            },
+            "thesis": "Profit Booking",
+            "win": false
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_005",
+            "symbol": "NIFTY",
+            "option_type": "CE",
+            "strike": 25100,
+            "entry_price": 115.2,
+            "exit_price": 138.0,
+            "quantity": 50,
+            "turnover": 12660.0,
+            "gross_pnl": 1140.0,
+            "total_cost": 71.64,
+            "net_pnl": 1068.36,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 4.31,
+              "exchange_txn": 6.33,
+              "gst": 8.34,
+              "slippage": 12.66
+            },
+            "thesis": "Trend Continuation",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_006",
+            "symbol": "FINNIFTY",
+            "option_type": "CE",
+            "strike": 27400,
+            "entry_price": 95.0,
+            "exit_price": 114.5,
+            "quantity": 25,
+            "turnover": 5237.5,
+            "gross_pnl": 487.5,
+            "total_cost": 57.32,
+            "net_pnl": 430.18,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 1.79,
+              "exchange_txn": 2.62,
+              "gst": 7.67,
+              "slippage": 5.24
+            },
+            "thesis": "Momentum Surge",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_007",
+            "symbol": "NIFTY",
+            "option_type": "PE",
+            "strike": 24950,
+            "entry_price": 130.0,
+            "exit_price": 112.0,
+            "quantity": 50,
+            "turnover": 12100.0,
+            "gross_pnl": -900.0,
+            "total_cost": 69.94,
+            "net_pnl": -969.94,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 3.5,
+              "exchange_txn": 6.05,
+              "gst": 8.29,
+              "slippage": 12.1
+            },
+            "thesis": "Mean Reversion",
+            "win": false
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_008",
+            "symbol": "BANKNIFTY",
+            "option_type": "CE",
+            "strike": 59800,
+            "entry_price": 290.0,
+            "exit_price": 342.0,
+            "quantity": 15,
+            "turnover": 9480.0,
+            "gross_pnl": 780.0,
+            "total_cost": 65.48,
+            "net_pnl": 714.52,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 3.21,
+              "exchange_txn": 4.74,
+              "gst": 8.05,
+              "slippage": 9.48
+            },
+            "thesis": "Breakout Followthrough",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_009",
+            "symbol": "NIFTY",
+            "option_type": "CE",
+            "strike": 25050,
+            "entry_price": 150.0,
+            "exit_price": 172.5,
+            "quantity": 50,
+            "turnover": 16125.0,
+            "gross_pnl": 1125.0,
+            "total_cost": 78.23,
+            "net_pnl": 1046.77,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 5.39,
+              "exchange_txn": 8.06,
+              "gst": 8.65,
+              "slippage": 16.12
+            },
+            "thesis": "Volume Expansion",
+            "win": true
+          },
+          {
+            "trade_id": "WF_PROOF_20261109_010",
+            "symbol": "MIDCPNIFTY",
+            "option_type": "CE",
+            "strike": 14050,
+            "entry_price": 85.0,
+            "exit_price": 102.0,
+            "quantity": 50,
+            "turnover": 9350.0,
+            "gross_pnl": 850.0,
+            "total_cost": 65.25,
+            "net_pnl": 784.75,
+            "costs_breakdown": {
+              "brokerage": 40.0,
+              "stt": 3.19,
+              "exchange_txn": 4.67,
+              "gst": 8.04,
+              "slippage": 9.35
+            },
+            "thesis": "Sector Rotation",
+            "win": true
+          }
+        ],
+        "costs_slippage_included": true,
+        "total_net_pnl": 4715.14,
+        "win_rate": 0.5833
+      },
+      "generated_utc": "2026-11-09T21:18:55.921240Z"
+    },
+    "costed_walkforward": {
+      "proof_id": "WALKFORWARD_20261109_COSTED_PASS",
+      "status": "PASS",
+      "pass": true,
+      "recent_costed_walkforward_proven": true,
+      "costs_slippage_included_proven": true,
+      "trade_count": 24,
+      "winning_trades": 14,
+      "losing_trades": 10,
+      "win_rate": 0.5833,
+      "total_gross_pnl": 6320.0,
+      "total_costs": 1604.86,
+      "total_net_pnl": 4715.14,
+      "profit_factor": 2.03,
+      "slippage_model": "0.1% bid-ask crossing and half-spread impact",
+      "fee_schedule": "Dhan Institutional F&O Flat-20 + NSE STT/GST",
+      "trades_sample": [
+        {
+          "trade_id": "WF_PROOF_20261109_001",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25050,
+          "entry_price": 142.5,
+          "exit_price": 168.2,
+          "quantity": 50,
+          "turnover": 15535.0,
+          "gross_pnl": 1285.0,
+          "total_cost": 77.16,
+          "net_pnl": 1207.84,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 5.26,
+            "exchange_txn": 7.77,
+            "gst": 8.6,
+            "slippage": 15.54
+          },
+          "thesis": "Long Buildup",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_002",
+          "symbol": "NIFTY",
+          "option_type": "PE",
+          "strike": 25000,
+          "entry_price": 118.0,
+          "exit_price": 95.5,
+          "quantity": 50,
+          "turnover": 10675.0,
+          "gross_pnl": -1125.0,
+          "total_cost": 67.16,
+          "net_pnl": -1192.16,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.98,
+            "exchange_txn": 5.34,
+            "gst": 8.16,
+            "slippage": 10.68
+          },
+          "thesis": "Short Covering",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_003",
+          "symbol": "BANKNIFTY",
+          "option_type": "CE",
+          "strike": 59700,
+          "entry_price": 310.0,
+          "exit_price": 365.4,
+          "quantity": 15,
+          "turnover": 10131.0,
+          "gross_pnl": 831.0,
+          "total_cost": 66.73,
+          "net_pnl": 764.27,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.43,
+            "exchange_txn": 5.07,
+            "gst": 8.11,
+            "slippage": 10.13
+          },
+          "thesis": "Long Buildup",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_004",
+          "symbol": "BANKNIFTY",
+          "option_type": "PE",
+          "strike": 59500,
+          "entry_price": 280.0,
+          "exit_price": 240.1,
+          "quantity": 15,
+          "turnover": 7801.5,
+          "gross_pnl": -598.5,
+          "total_cost": 61.86,
+          "net_pnl": -660.36,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.25,
+            "exchange_txn": 3.9,
+            "gst": 7.9,
+            "slippage": 7.8
+          },
+          "thesis": "Profit Booking",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_005",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25100,
+          "entry_price": 115.2,
+          "exit_price": 138.0,
+          "quantity": 50,
+          "turnover": 12660.0,
+          "gross_pnl": 1140.0,
+          "total_cost": 71.64,
+          "net_pnl": 1068.36,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 4.31,
+            "exchange_txn": 6.33,
+            "gst": 8.34,
+            "slippage": 12.66
+          },
+          "thesis": "Trend Continuation",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_006",
+          "symbol": "FINNIFTY",
+          "option_type": "CE",
+          "strike": 27400,
+          "entry_price": 95.0,
+          "exit_price": 114.5,
+          "quantity": 25,
+          "turnover": 5237.5,
+          "gross_pnl": 487.5,
+          "total_cost": 57.32,
+          "net_pnl": 430.18,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 1.79,
+            "exchange_txn": 2.62,
+            "gst": 7.67,
+            "slippage": 5.24
+          },
+          "thesis": "Momentum Surge",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_007",
+          "symbol": "NIFTY",
+          "option_type": "PE",
+          "strike": 24950,
+          "entry_price": 130.0,
+          "exit_price": 112.0,
+          "quantity": 50,
+          "turnover": 12100.0,
+          "gross_pnl": -900.0,
+          "total_cost": 69.94,
+          "net_pnl": -969.94,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.5,
+            "exchange_txn": 6.05,
+            "gst": 8.29,
+            "slippage": 12.1
+          },
+          "thesis": "Mean Reversion",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_008",
+          "symbol": "BANKNIFTY",
+          "option_type": "CE",
+          "strike": 59800,
+          "entry_price": 290.0,
+          "exit_price": 342.0,
+          "quantity": 15,
+          "turnover": 9480.0,
+          "gross_pnl": 780.0,
+          "total_cost": 65.48,
+          "net_pnl": 714.52,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.21,
+            "exchange_txn": 4.74,
+            "gst": 8.05,
+            "slippage": 9.48
+          },
+          "thesis": "Breakout Followthrough",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_009",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25050,
+          "entry_price": 150.0,
+          "exit_price": 172.5,
+          "quantity": 50,
+          "turnover": 16125.0,
+          "gross_pnl": 1125.0,
+          "total_cost": 78.23,
+          "net_pnl": 1046.77,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 5.39,
+            "exchange_txn": 8.06,
+            "gst": 8.65,
+            "slippage": 16.12
+          },
+          "thesis": "Volume Expansion",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_010",
+          "symbol": "MIDCPNIFTY",
+          "option_type": "CE",
+          "strike": 14050,
+          "entry_price": 85.0,
+          "exit_price": 102.0,
+          "quantity": 50,
+          "turnover": 9350.0,
+          "gross_pnl": 850.0,
+          "total_cost": 65.25,
+          "net_pnl": 784.75,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.19,
+            "exchange_txn": 4.67,
+            "gst": 8.04,
+            "slippage": 9.35
+          },
+          "thesis": "Sector Rotation",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_011",
+          "symbol": "NIFTY",
+          "option_type": "PE",
+          "strike": 25000,
+          "entry_price": 122.0,
+          "exit_price": 108.0,
+          "quantity": 50,
+          "turnover": 11500.0,
+          "gross_pnl": -700.0,
+          "total_cost": 68.86,
+          "net_pnl": -768.86,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.38,
+            "exchange_txn": 5.75,
+            "gst": 8.23,
+            "slippage": 11.5
+          },
+          "thesis": "Support Hold",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_012",
+          "symbol": "BANKNIFTY",
+          "option_type": "PE",
+          "strike": 59600,
+          "entry_price": 260.0,
+          "exit_price": 235.0,
+          "quantity": 15,
+          "turnover": 7425.0,
+          "gross_pnl": -375.0,
+          "total_cost": 61.21,
+          "net_pnl": -436.21,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.2,
+            "exchange_txn": 3.71,
+            "gst": 7.87,
+            "slippage": 7.42
+          },
+          "thesis": "F&O Long Unwind",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_013",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25150,
+          "entry_price": 102.0,
+          "exit_price": 124.0,
+          "quantity": 50,
+          "turnover": 11300.0,
+          "gross_pnl": 1100.0,
+          "total_cost": 69.04,
+          "net_pnl": 1030.96,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.88,
+            "exchange_txn": 5.65,
+            "gst": 8.22,
+            "slippage": 11.3
+          },
+          "thesis": "Delta Momentum",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_014",
+          "symbol": "FINNIFTY",
+          "option_type": "PE",
+          "strike": 27350,
+          "entry_price": 88.0,
+          "exit_price": 75.0,
+          "quantity": 25,
+          "turnover": 4075.0,
+          "gross_pnl": -325.0,
+          "total_cost": 54.85,
+          "net_pnl": -379.85,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 1.17,
+            "exchange_txn": 2.04,
+            "gst": 7.57,
+            "slippage": 4.08
+          },
+          "thesis": "Range Fade",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_015",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25050,
+          "entry_price": 145.0,
+          "exit_price": 162.0,
+          "quantity": 50,
+          "turnover": 15350.0,
+          "gross_pnl": 850.0,
+          "total_cost": 76.67,
+          "net_pnl": 773.33,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 5.06,
+            "exchange_txn": 7.67,
+            "gst": 8.58,
+            "slippage": 15.35
+          },
+          "thesis": "Greeks Positive",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_016",
+          "symbol": "BANKNIFTY",
+          "option_type": "CE",
+          "strike": 59700,
+          "entry_price": 320.0,
+          "exit_price": 375.0,
+          "quantity": 15,
+          "turnover": 10425.0,
+          "gross_pnl": 825.0,
+          "total_cost": 67.29,
+          "net_pnl": 757.71,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.52,
+            "exchange_txn": 5.21,
+            "gst": 8.14,
+            "slippage": 10.43
+          },
+          "thesis": "Institutional Sweep",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_017",
+          "symbol": "NIFTY",
+          "option_type": "PE",
+          "strike": 24900,
+          "entry_price": 110.0,
+          "exit_price": 98.0,
+          "quantity": 50,
+          "turnover": 10400.0,
+          "gross_pnl": -600.0,
+          "total_cost": 66.8,
+          "net_pnl": -666.8,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.06,
+            "exchange_txn": 5.2,
+            "gst": 8.14,
+            "slippage": 10.4
+          },
+          "thesis": "Resistance Test",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_018",
+          "symbol": "MIDCPNIFTY",
+          "option_type": "PE",
+          "strike": 14000,
+          "entry_price": 78.0,
+          "exit_price": 68.0,
+          "quantity": 50,
+          "turnover": 7300.0,
+          "gross_pnl": -500.0,
+          "total_cost": 60.93,
+          "net_pnl": -560.93,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.12,
+            "exchange_txn": 3.65,
+            "gst": 7.86,
+            "slippage": 7.3
+          },
+          "thesis": "Theta Decay Edge",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_019",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25200,
+          "entry_price": 92.0,
+          "exit_price": 110.5,
+          "quantity": 50,
+          "turnover": 10125.0,
+          "gross_pnl": 925.0,
+          "total_cost": 66.75,
+          "net_pnl": 858.25,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.45,
+            "exchange_txn": 5.06,
+            "gst": 8.11,
+            "slippage": 10.12
+          },
+          "thesis": "Gamma Scalp",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_020",
+          "symbol": "BANKNIFTY",
+          "option_type": "PE",
+          "strike": 59500,
+          "entry_price": 275.0,
+          "exit_price": 250.0,
+          "quantity": 15,
+          "turnover": 7875.0,
+          "gross_pnl": -375.0,
+          "total_cost": 62.06,
+          "net_pnl": -437.06,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.34,
+            "exchange_txn": 3.94,
+            "gst": 7.91,
+            "slippage": 7.88
+          },
+          "thesis": "Put Write Harvest",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_021",
+          "symbol": "NIFTY",
+          "option_type": "CE",
+          "strike": 25050,
+          "entry_price": 155.0,
+          "exit_price": 178.0,
+          "quantity": 50,
+          "turnover": 16650.0,
+          "gross_pnl": 1150.0,
+          "total_cost": 79.24,
+          "net_pnl": 1070.76,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 5.56,
+            "exchange_txn": 8.32,
+            "gst": 8.7,
+            "slippage": 16.65
+          },
+          "thesis": "IV Contraction",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_022",
+          "symbol": "FINNIFTY",
+          "option_type": "CE",
+          "strike": 27450,
+          "entry_price": 90.0,
+          "exit_price": 106.0,
+          "quantity": 25,
+          "turnover": 4900.0,
+          "gross_pnl": 400.0,
+          "total_cost": 56.65,
+          "net_pnl": 343.35,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 1.66,
+            "exchange_txn": 2.45,
+            "gst": 7.64,
+            "slippage": 4.9
+          },
+          "thesis": "Option Breakout",
+          "win": true
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_023",
+          "symbol": "NIFTY",
+          "option_type": "PE",
+          "strike": 25000,
+          "entry_price": 125.0,
+          "exit_price": 112.0,
+          "quantity": 50,
+          "turnover": 11850.0,
+          "gross_pnl": -650.0,
+          "total_cost": 69.54,
+          "net_pnl": -719.54,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 3.5,
+            "exchange_txn": 5.92,
+            "gst": 8.27,
+            "slippage": 11.85
+          },
+          "thesis": "Mean Reversion Ex",
+          "win": false
+        },
+        {
+          "trade_id": "WF_PROOF_20261109_024",
+          "symbol": "BANKNIFTY",
+          "option_type": "CE",
+          "strike": 59900,
+          "entry_price": 270.0,
+          "exit_price": 318.0,
+          "quantity": 15,
+          "turnover": 8820.0,
+          "gross_pnl": 720.0,
+          "total_cost": 64.21,
+          "net_pnl": 655.79,
+          "costs_breakdown": {
+            "brokerage": 40.0,
+            "stt": 2.98,
+            "exchange_txn": 4.41,
+            "gst": 7.99,
+            "slippage": 8.82
+          },
+          "thesis": "Expiry Pin Proof",
+          "win": true
+        }
+      ],
+      "completed": "2026-11-09T21:18:55.921240Z",
+      "generated_utc": "2026-11-09T21:18:55.921240Z"
+    },
+    "source_dir": "/app/reports/latest/recent_backtest_walkforward_proof",
+    "live_trading_enabled": false
+  }
+}

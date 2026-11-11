@@ -1,0 +1,76 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_production_e2e.py", line 120, in <module>
+    asyncio.run(test_ui_production_flow())
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\tests\test_ui_production_e2e.py", line 22, in test_ui_production_flow
+    browser = await p.chromium.launch(headless=True)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\async_api\_generated.py", line 4177, in launch
+    await self._impl_obj.launch(
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_browser_type.py", line 101, in launch
+    await self._channel.send(
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 78, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 636, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TargetClosedError: BrowserType.launch: Target page, context or browser has been closed
+Browser logs:
+
+<launching> C:\Users\ADMIN\AppData\Local\ms-playwright\chromium_headless_shell-1248\chrome-headless-shell-win64\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\ADMIN\AppData\Local\Temp\playwright_chromiumdev_profile-RHtO0G --remote-debugging-pipe --no-startup-window
+<launched> pid=40028
+[pid=40028][err] [1105/091314.978:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091314.981:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 1 time(s)
+[pid=40028][err] [1105/091315.009:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+[pid=40028][err] [1105/091315.012:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091315.012:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 2 time(s)
+[pid=40028][err] [1105/091315.017:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+[pid=40028][err] [1105/091315.023:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091315.023:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 3 time(s)
+[pid=40028][err] [1105/091315.030:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+[pid=40028][err] [1105/091315.034:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091315.034:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 4 time(s)
+[pid=40028][err] [1105/091315.039:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+[pid=40028][err] [1105/091315.043:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091315.043:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 5 time(s)
+[pid=40028][err] [1105/091315.047:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+[pid=40028][err] [1105/091315.058:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+[pid=40028][err] [1105/091315.058:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 6 time(s)
+[pid=40028][err] [1105/091315.058:FATAL:content\browser\gpu\gpu_data_manager_impl_private.cc:389] GPU process isn't usable. Goodbye.
+Call log:
+  - <launching> C:\Users\ADMIN\AppData\Local\ms-playwright\chromium_headless_shell-1248\chrome-headless-shell-win64\chrome-headless-shell.exe --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMediaControls,HttpsUpgrades,LensOverlay,MediaRouter,PaintHolding,ThirdPartyStoragePartitioning,BlockOriginHeaderModificationOnRedirect,AvoidCorsURLLoaderRestartOnRedirect,Translate,AutoDeElevate,OptimizationHints,NetworkTimeServiceQuerying,AimEnabled,msForceBrowserSignIn,msEdgeUpdateLaunchServicesPreferredVersion --enable-features=CDPScreenshotNewSurface --allow-pre-commit-input --disable-hang-monitor --disable-ipc-flooding-protection --disable-popup-blocking --disable-prompt-on-repost --disable-renderer-backgrounding --disable-updater-scheduler --force-color-profile=srgb --metrics-recording-only --no-first-run --password-store=basic --use-mock-keychain --no-service-autorun --export-tagged-pdf --disable-search-engine-choice-screen --unsafely-disable-devtools-self-xss-warnings --edge-skip-compat-layer-relaunch --disable-infobars --disable-search-engine-choice-screen --disable-sync --enable-unsafe-swiftshader --headless --hide-scrollbars --mute-audio --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 --no-sandbox --user-data-dir=C:\Users\ADMIN\AppData\Local\Temp\playwright_chromiumdev_profile-RHtO0G --remote-debugging-pipe --no-startup-window
+  - <launched> pid=40028
+  - [pid=40028][err] [1105/091314.978:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091314.981:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 1 time(s)
+  - [pid=40028][err] [1105/091315.009:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+  - [pid=40028][err] [1105/091315.012:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091315.012:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 2 time(s)
+  - [pid=40028][err] [1105/091315.017:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+  - [pid=40028][err] [1105/091315.023:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091315.023:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 3 time(s)
+  - [pid=40028][err] [1105/091315.030:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+  - [pid=40028][err] [1105/091315.034:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091315.034:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 4 time(s)
+  - [pid=40028][err] [1105/091315.039:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+  - [pid=40028][err] [1105/091315.043:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091315.043:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 5 time(s)
+  - [pid=40028][err] [1105/091315.047:ERROR:content\browser\network_service_instance_impl.cc:652] Network service crashed or was terminated, restarting service.
+  - [pid=40028][err] [1105/091315.058:ERROR:content\browser\gpu\gpu_process_host.cc:1038] GPU process launch failed: error_code=63
+  - [pid=40028][err] [1105/091315.058:WARNING:content\browser\gpu\gpu_process_host.cc:1503] The GPU process has crashed 6 time(s)
+  - [pid=40028][err] [1105/091315.058:FATAL:content\browser\gpu\gpu_data_manager_impl_private.cc:389] GPU process isn't usable. Goodbye.
+  - [pid=40028] <gracefully close start>
+  - [pid=40028] <kill>
+  - [pid=40028] <will force kill>
+  - [pid=40028] <process did exit: exitCode=2147483651, signal=null>
+  - [pid=40028] starting temporary directories cleanup
+  - [pid=40028] finished temporary directories cleanup
+  - [pid=40028] <gracefully close end>
+

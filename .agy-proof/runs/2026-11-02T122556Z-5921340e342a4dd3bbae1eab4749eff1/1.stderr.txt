@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_autonomous_market_discovery.py", line 127, in <module>
+    test_autonomous_market_discovery()
+  File "C:\Genesis_System3_clean\tests\test_autonomous_market_discovery.py", line 50, in test_autonomous_market_discovery
+    assert atm == tc["expected_atm"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

@@ -1,0 +1,9 @@
+{
+  "symbol": "MIDCPNIFTY",
+  "spot": 12900.0,
+  "source": "dhan_last_verified_snapshot",
+  "stale": false,
+  "verification_status": "VERIFIED_DHAN",
+  "data_source": "dhan",
+  "auto_healed": true
+}

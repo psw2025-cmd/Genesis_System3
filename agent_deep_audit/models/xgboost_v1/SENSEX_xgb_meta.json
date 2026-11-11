@@ -1,0 +1,51 @@
+{
+  "underlying": "SENSEX",
+  "n_samples": 650,
+  "n_train": 520,
+  "n_test": 130,
+  "n_features": 129,
+  "accuracy": 1.0,
+  "macro_f1": 1.0,
+  "per_class_metrics": {
+    "BUY": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 19
+    },
+    "HOLD": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 50
+    },
+    "SELL": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 61
+    }
+  },
+  "confusion_matrix": [
+    [
+      19,
+      0,
+      0
+    ],
+    [
+      0,
+      50,
+      0
+    ],
+    [
+      0,
+      0,
+      61
+    ]
+  ],
+  "label_mapping": {
+    "0": "BUY",
+    "1": "HOLD",
+    "2": "SELL"
+  }
+}
