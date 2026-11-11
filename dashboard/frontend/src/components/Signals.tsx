@@ -103,16 +103,18 @@ function asSignalFromCandidate(candidate: any, source: string): SignalView {
 export default function Signals() {
   const [signal, setSignal] = useState<SignalView | null>(null)
   const [qc, setQc] = useState<any>(null)
+  const [gapRunners, setGapRunners] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [authRequired, setAuthRequired] = useState(false)
   const [error, setError] = useState<{endpoint: string, status?: number, message: string} | null>(null)
 
   const fetchData = async () => {
     try {
-      const [stateRes, scannerRes, gainRes] = await Promise.allSettled([
+      const [stateRes, scannerRes, gainRes, gapRes] = await Promise.allSettled([
         axios.get(`${API_BASE}/api/state`),
         axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`),
         axios.get(`${API_BASE}/api/gain_rank`),
+        axios.get(`${API_BASE}/api/opportunity-gap`),
       ])
 
       if (stateRes.status === 'rejected') {
@@ -133,6 +135,9 @@ export default function Signals() {
       const scannerCandidate = firstCandidateFromScanner(scanner)
       const gainCandidate = firstCandidateFromGain(gain)
       const candidate = scannerCandidate || gainCandidate
+      if (gapRes && gapRes.status === 'fulfilled' && Array.isArray((gapRes.value as any)?.data?.runners)) {
+        setGapRunners((gapRes.value as any).data.runners)
+      }
 
       const stateSignals = state.signals || {}
       let signalData: SignalView
@@ -288,6 +293,69 @@ export default function Signals() {
             <div><div className="text-sm text-gray-400">Entry Mid</div><div className="text-lg">Rs {signal.entry_mid.toFixed(2)}</div></div>
             <div><div className="text-sm text-gray-400">Stop Loss</div><div className="text-lg">Rs {signal.stop_loss != null ? signal.stop_loss.toFixed(2) : 'N/A'}</div></div>
             <div><div className="text-sm text-gray-400">Target</div><div className="text-lg">Rs {signal.target != null ? signal.target.toFixed(2) : 'N/A'}</div></div>
+          </div>
+        )}
+      </div>
+
+      
+      {/* Premarket & Live Gap-Up Runners + ML Predictions */}
+      <div className="bg-gray-800 p-6 rounded-lg border border-purple-500/40">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h3 className="text-xl font-bold text-purple-400">⚡ Premarket & Live Gap-Up Runners + ML Predictions</h3>
+            <div className="text-xs text-gray-400">Real-time Dhan LTP vs Previous Close + Multi-Model ML Consensus Predictions</div>
+          </div>
+          <span className="px-3 py-1 bg-purple-900/40 border border-purple-500 text-purple-300 text-xs font-bold rounded">
+            {gapRunners.length} Candidates Screened
+          </span>
+        </div>
+
+        {gapRunners.length === 0 ? (
+          <div className="p-4 text-center text-gray-400 text-sm">Scanning option universe for gap-up candidates…</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-mono">
+              <thead>
+                <tr className="border-b border-gray-700 text-gray-400 uppercase">
+                  <th className="py-2 px-3">Symbol</th>
+                  <th className="py-2 px-3">LTP / Prev</th>
+                  <th className="py-2 px-3">Gap %</th>
+                  <th className="py-2 px-3">ML Signal</th>
+                  <th className="py-2 px-3">ML Confidence</th>
+                  <th className="py-2 px-3">Target Price</th>
+                  <th className="py-2 px-3">Rec. Strike</th>
+                  <th className="py-2 px-3">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-800">
+                {gapRunners.slice(0, 8).map((r: any, idx: number) => {
+                  const isUp = (r.gap_pct || 0) >= 0
+                  const ml = r.ml_prediction || {}
+                  return (
+                    <tr key={idx} className="hover:bg-gray-750 transition-colors">
+                      <td className="py-2 px-3 font-bold text-white">{r.symbol}</td>
+                      <td className="py-2 px-3 text-gray-300">₹{r.ltp} <span className="text-gray-500">/ ₹{r.previous_close}</span></td>
+                      <td className={`py-2 px-3 font-bold ${isUp ? 'text-green-400' : 'text-red-400'}`}>
+                        {isUp ? '+' : ''}{r.gap_pct}%
+                      </td>
+                      <td className="py-2 px-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${ml.signal === 'BUY' ? 'bg-green-900/60 text-green-300 border border-green-600' : 'bg-gray-800 text-gray-400'}`}>
+                          {ml.signal || 'WATCH'} {r.direction}
+                        </span>
+                      </td>
+                      <td className="py-2 px-3 font-bold text-indigo-300">{ml.confidence_pct}%</td>
+                      <td className="py-2 px-3 text-emerald-400 font-bold">₹{ml.target_price} <span className="text-gray-500 text-[10px]">(+{ml.expected_alpha_pct}%)</span></td>
+                      <td className="py-2 px-3 text-amber-300 font-bold">{ml.recommended_strike}</td>
+                      <td className="py-2 px-3">
+                        <span className="px-2 py-0.5 bg-blue-900/40 text-blue-300 rounded text-[10px]">
+                          {r.status}
+                        </span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

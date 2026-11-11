@@ -3,7 +3,12 @@ import axios from 'axios'
 import { API_BASE } from '../config'
 import { ResponsiveContainer, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell } from 'recharts'
 
-const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const UNDERLYINGS = [
+  'NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX',
+  'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN',
+  'TATAMOTORS', 'BHARTIARTL', 'ITC', 'LT', 'MARUTI', 'SUNPHARMA',
+  'TATASTEEL', 'BAJFINANCE', 'ADANIENT'
+]
 const CHART_COLORS = ['#22d3ee', '#a78bfa', '#34d399', '#fbbf24', '#fb7185', '#60a5fa']
 
 function chartNumber(value: unknown): number | null {
@@ -13,6 +18,7 @@ function chartNumber(value: unknown): number | null {
 }
 
 export default function AdvancedCharts() {
+  const [underlyingsList, setUnderlyingsList] = useState<string[]>(UNDERLYINGS)
   const [selectedUnderlying, setSelectedUnderlying] = useState('NIFTY')
   const [heatmapData, setHeatmapData] = useState<any>(null)
   const [ivSurface, setIvSurface] = useState<any>(null)
@@ -21,6 +27,20 @@ export default function AdvancedCharts() {
   const [selectedMetric, setSelectedMetric] = useState('oi')
   const [selectedGreek, setSelectedGreek] = useState('delta')
   const [chartError, setChartError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    axios.get(`${API_BASE}/api/underlyings`, { timeout: 8000 })
+      .then(res => {
+        if (cancelled) return
+        const list = Array.isArray(res.data?.underlyings) ? res.data.underlyings : []
+        if (list.length >= 200) {
+          setUnderlyingsList(Array.from(new Set(list)))
+        }
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [])
 
   const rawIvSurface = Array.isArray(ivSurface?.surface) ? ivSurface.surface : []
   const ivSeries = rawIvSurface.map((row: any, index: number) => ({
@@ -125,7 +145,7 @@ export default function AdvancedCharts() {
           onChange={(e) => setSelectedUnderlying(e.target.value)}
           className="bg-gray-700 text-white px-4 py-2 rounded"
         >
-          {UNDERLYINGS.map(u => (
+          {underlyingsList.map(u => (
             <option key={u} value={u}>{u}</option>
           ))}
         </select>

@@ -16,8 +16,8 @@
     --border: #17304b;
     --border-hi: #244c72;
     --text-pri: #e8f1fb;
-    --text-sec: #9bb0c8;
-    --text-mut: #58708d;
+    --text-sec: #cbd5e1;
+    --text-mut: #94a3b8;
     --text-primary: var(--text-pri);
     --text-secondary: var(--text-sec);
     --text-muted: var(--text-mut);
@@ -440,8 +440,20 @@
 
 .operations-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
+}
+
+@media (max-width: 1024px) {
+  .operations-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .operations-metrics-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Keep deploy-proof DOM for tests, but never paint the engineering strip on trading pages. */

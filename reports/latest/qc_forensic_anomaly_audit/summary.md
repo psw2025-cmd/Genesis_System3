@@ -1,11 +1,11 @@
 # Runtime QC Anomaly Audit
 
-- Generated UTC: 2026-06-27T21:57:26.771039Z
-- Backend URL: https://127.0.0.1:8000
-- Status: WARN
+- Generated UTC: 2026-11-11T14:01:05.965028Z
+- Backend URL: https://genesis-system3-web-802404398783.asia-south1.run.app
+- Status: PASS
 - Anomaly audit verdict: PASS_ANALYZER_PAPER_ONLY
-- Runtime QC available: False
-- Endpoint OK: 7/8
+- Runtime QC available: True
+- Endpoint OK: 44/44
 - Market closed zero-contract policy: expected skip, not failure
 - Live trading enabled: false
 - Order placement allowed: false
@@ -16,4 +16,4 @@
 
 ## Warnings
 
-- qc_runtime: endpoint not ok (404)
+- None

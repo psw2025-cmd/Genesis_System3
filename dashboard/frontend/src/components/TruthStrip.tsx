@@ -34,9 +34,9 @@ export function TruthStrip() {
     || ''
     
   return (
-    <div className="truth-strip bg-slate-900/90 border-b border-slate-800/80 px-4 py-2 text-xs text-slate-300 font-sans shadow-sm z-30 shrink-0">
+    <div className="truth-strip bg-slate-900/90 border-b border-slate-800/80 px-3 md:px-4 py-2 text-xs text-slate-300 font-sans shadow-sm z-30 shrink-0 flex flex-wrap items-center justify-between gap-2 overflow-x-hidden">
       {/* 1. Single Truth Badge */}
-      <div className="truth-strip-brand flex items-center gap-2">
+      <div className="truth-strip-brand flex items-center gap-2 shrink-0">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-950 border border-slate-700 text-slate-300 font-bold tracking-wide">
           <span className="w-2 h-2 rounded-full bg-slate-500" />
           <span>SYSTEM STATUS</span>
@@ -46,7 +46,7 @@ export function TruthStrip() {
       </div>
 
       {/* 2. Telemetry Badges */}
-      <div className="truth-strip-telemetry">
+      <div className="truth-strip-telemetry flex flex-wrap items-center gap-1.5 md:gap-2">
         {/* Dynamic Serving SHA */}
         <div className="flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800">
           <span className="text-slate-400 font-medium">SERVING:</span>
@@ -66,9 +66,10 @@ export function TruthStrip() {
           <Activity size={13} aria-hidden />
           <span>MARKET DATA: {feed.label.toUpperCase()}</span>
         </div>
-        <div data-testid="websocket-transport-status" title="WebSocket status describes the dashboard connection, not market-data freshness." className="inline-flex items-center gap-1.5 bg-slate-950 px-2.5 py-1 rounded-md border border-slate-800 font-medium">
-          <span className="text-slate-400">WEBSOCKET:</span>
-          <span className={`font-semibold ${wsStatus === 'live' ? 'text-emerald-400' : wsStatus === 'error' || wsStatus === 'off' ? 'text-rose-400' : 'text-amber-400'}`}>{transport}</span>
+        <div data-testid="websocket-transport-status" title="WebSocket status describes the dashboard connection, not market-data freshness." className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-950/70 border border-slate-800/80 text-[11px] text-slate-400">
+          <span className={`w-1.5 h-1.5 rounded-full ${wsStatus === 'live' ? 'bg-emerald-400' : wsStatus === 'error' || wsStatus === 'off' ? 'bg-rose-400' : 'bg-amber-400'}`} />
+          <span className="text-slate-400 text-[10px]">WS:</span>
+          <span className={`font-medium ${wsStatus === 'live' ? 'text-emerald-400' : wsStatus === 'error' || wsStatus === 'off' ? 'text-rose-400' : 'text-amber-400'}`}>{transport}</span>
         </div>
 
         {/* Option Chains */}
@@ -79,7 +80,7 @@ export function TruthStrip() {
       </div>
 
       {/* 3. Market State & Latency */}
-      <div className="truth-strip-market">
+      <div className="truth-strip-market flex items-center gap-1.5 shrink-0">
         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md border font-bold text-[11px] ${
           marketOpen
             ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400'

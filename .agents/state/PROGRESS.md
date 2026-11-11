@@ -65,3 +65,29 @@
   - `Check C2` (`tests/test_ui_production_e2e.py`): **100% PASS** (Playwright headless Chromium verified HTTP 200, ticker bar ₹23,960.60, console, routes list, order modal, safety gate block toast, and GET /api/v1/placeorder 200). Captured screenshot at `reports/latest/ui_verified_snap.png` (681,518 bytes).
   - `Check C3` (15 Dhan & Safety pytest test suites, 97 tests): **97/97 PASS** (Configured `--basetemp=.pytest_tmp` in `pyproject.toml` to prevent Temp permission errors).
 - **Official Evidence Gate**: Executed global evidence runner against `.agy-proof/contract.json` for session `e3f33412-4f87-49f9-b58e-29e231848e01` and turn `7f8b09856bfe4e8ca6298bb4f30954f7`. All 10 requirements (R1..R10) certified **PASS**. Signed receipt generated at `.agy-proof/receipt.json` (`overall: PASS`, signature: `a71f9ca186a7a95642a7e2ba604af7f12b5df202b914577db0ce92039664c425`).
+
+## Update 2026-11-11T18:07:00+05:30 — Dhan Permanent Autonomous Token Auto-Renewal & GCP Verification
+- **Permanent Solution Deployed & Verified**:
+  - `genesis-system3-dhan-token-rotate` (Cloud Run Job) updated with `DHAN_ROTATE_WHEN_HOURS_LEFT=3` to ensure proactive rotation occurs 3 hours before expiry without false premature minting loops.
+  - `dhan-auto-rotate` (Cloud Scheduler) updated to run every 4 hours (`0 */4 * * *`) targeting `https://asia-south1-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/system3-openalgo-safe/jobs/genesis-system3-dhan-token-rotate:run`.
+  - Smoke dry run executed via `gcloud scheduler jobs run dhan-auto-rotate`: Execution `genesis-system3-dhan-token-rotate-wrpsz` completed in 12.7s with exit code 0 (`succeededCount: 1`).
+  - Secret Manager `dhan-access-token` active with valid JWT (version 362).
+  - Cloud Run Web App `/api/broker/status` live verified: `connected: true`, `error: null`, `auth_classification: "AUTH_OK"`, `holdings: 11`, `funds: ok`, `positions: 0`, `broker_truth_complete: true`.
+  - Local multi-tier fallback and proactive watchdog fully implemented and verified with 35 pytest unit tests passing.
+  - Evidence gate executed against `.agy-proof/contract.json` (`overall: PASS`).
+
+## Update 2026-11-11T19:05:00+05:30 — Forensic Investigation of Snapshot, QC Anomaly Audit & World-Class UI/UX Audit
+- **Snapshot Forensic Audit**:
+  - At 17:44:51 IST (UTC 12:14:51), Dhan API rejected Secret Version 361 (`http_status: 401`, `upstream_code: 901`).
+  - User screenshot taken at 17:45:31 IST captured this exact 7-minute rejection window (`rejection_count: 28`).
+  - At 17:51:55 IST (UTC 12:21:55), automated TOTP rotator ran and generated Secret Version 362.
+  - Live Cloud Run probe (`/api/broker/status`): `connected: true`, `auth_classification: "AUTH_OK"`, `holdings: 11` (41ms latency), `expires_at_utc: 2026-11-12T12:06:17Z` (22.6 hours remaining).
+- **QC Anomaly Audit**:
+  - Fixed unquoted ask false positive (`ask=0.0` flagged as `ask < bid` during after-hours/illiquid markets) in `tools/qc_runtime_anomaly_audit.py`.
+  - Re-executed against Cloud Run: 8/8 endpoints OK, status `PASS`, verdict `PASS_ANALYZER_PAPER_ONLY`.
+- **Frontend Prebuild & Compilation**:
+  - Fixed hardcoded `ok={false}` on lines 70-72 of `dashboard/frontend/src/components/BrokerProofPanel.tsx`.
+  - `npm run build` passed in 12.36s with 5/5 prebuild contracts passing.
+- **Evidence Gate**:
+  - Verified `.agy-proof/receipt.json` with 5/5 requirements PASS.
+

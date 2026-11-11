@@ -1,0 +1,13 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.10, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Genesis_System3_clean
+configfile: pyproject.toml
+plugins: anyio-4.16.0, asyncio-1.4.1.post1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=function, asyncio_default_test_loop_scope=function
+collected 35 items
+
+tests\test_dhan_canonical_rotation_readonly.py ...........               [ 31%]
+tests\test_br1_dhan_auth_reliability.py ...................              [ 85%]
+tests\test_br2_dhan_terminal_no_retry.py .....                           [100%]
+
+============================= 35 passed in 2.44s ==============================

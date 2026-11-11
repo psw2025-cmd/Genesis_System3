@@ -1,10 +1,10 @@
 {
   "anomaly_audit_verdict": "PASS_ANALYZER_PAPER_ONLY",
-  "backend_url": "https://127.0.0.1:8000",
+  "backend_url": "https://<redacted>.asia-south1.run.app",
   "critical_failures": [],
-  "dashboard_url": "https://127.0.0.1:8000/ui",
-  "endpoint_count": 8,
-  "endpoint_ok_count": 7,
+  "dashboard_url": "https://<redacted>.asia-south1.run.app/ui",
+  "endpoint_count": 44,
+  "endpoint_ok_count": 44,
   "files_generated": [
     "summary.md",
     "summary.json",
@@ -14,12 +14,10 @@
     "anomaly_matrix.csv",
     "safety_verdict.json"
   ],
-  "generated_utc": "2026-06-27T21:57:26.771039Z",
+  "generated_utc": "2026-11-11T14:01:05.965028Z",
   "market_closed_zero_contract_policy": "zero contracts accepted when status is MARKET_CLOSED/MARKET_CLOSED_EXPECTED or skipped=true",
-  "runtime_qc_available": false,
+  "runtime_qc_available": true,
   "safety_verdict": "PASS_ANALYZER_PAPER_ONLY",
-  "status": "WARN",
-  "warnings": [
-    "qc_runtime: endpoint not ok (404)"
-  ]
+  "status": "PASS",
+  "warnings": []
 }

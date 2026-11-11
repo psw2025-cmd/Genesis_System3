@@ -1,22 +1,41 @@
 {
-  "scope": "Forensic audit and generation of CLOUD_GITHUB_TRUTH.xlsx comparing Source A (GitHub repository configured for Genesis_System3) and Source B (Google Cloud Run deployed service genesis-system3-web). Verifies deployment chain (GitHub commit SHA, branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, Cloud Run image digest) and SHA256 file hashes for core/brokers/dhan/dhan_readonly.py, dashboard/backend/routers/broker.py, dashboard/backend/broker/dhan_auth.py, and dashboard/backend/gain_rank_spot_enrichment.py across 5 sheets.",
+  "scope": "Permanent self-healing Dhan token auto-renewal engine and multi-tier resilience: auto-recovery from expired tokens, proactive pre-emptive renewal before expiry, multi-tier fallback ladder, permanent PAPER mode safety, zero token leakage, rate-limit cooldown handling, and prevention of future BLOCKED states.",
   "limitations": [
-    "Read-only cloud inspection; no live orders; no modifications to deployed cloud infrastructure; analyzer/paper safety preserved."
+    "Read-only/analyzer-only Dhan credential rotation; live trading locked to OFF; no real broker orders; PAPER mode enforced."
   ],
   "subject_files": [
-    "CLOUD_GITHUB_TRUTH.xlsx",
-    "scripts/generate_cloud_github_truth.py",
-    "tests/test_cloud_github_truth.py"
+    "core/brokers/dhan/cloud_runtime_patch.py",
+    "core/brokers/dhan/token_watchdog.py",
+    "core/utils/env_loader.py",
+    "scripts/dhan_token_auto_refresh.py",
+    "scripts/gcp_dhan_token_rotation_job.py",
+    "tests/test_dhan_token_auto_renewal.py",
+    "tools/dhan-rotator/main.py"
   ],
   "requirements": [
     {
       "id": "R1",
-      "description": "CLOUD_GITHUB_TRUTH.xlsx exists and contains all 5 required sheets (DEPLOYMENT_CHAIN, GITHUB_FILE_HASHES, CLOUD_FILE_HASHES, HASH_COMPARISON, DRIFT_REPORT) with exact 7 columns: File, GitHub SHA256, Cloud SHA256, Match YES/NO, GitHub Commit, Cloud Revision, Evidence.",
+      "description": "Auto-recovery from expired or missing token: when old token is expired or missing, auto-rotation mints and validates a fresh token via DhanLogin and profile probe without system interruption.",
       "mandatory": true
     },
     {
       "id": "R2",
-      "description": "DEPLOYMENT_CHAIN verifies GitHub commit SHA, GitHub branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, and Cloud Run image digest. File hashes for the 4 target files are verified, and unproven live container filesystem bytes are strictly marked UNVERIFIED without inference.",
+      "description": "Proactive pre-emptive renewal before expiry: watchdog proactively rotates expiring tokens (<= 3.0h remaining) before they ever expire, and skips healthy tokens.",
+      "mandatory": true
+    },
+    {
+      "id": "R3",
+      "description": "Multi-tier fallback and resilience: fast in-session renew fallback to PIN+TOTP minting; Cloud Run API failure fallback to in-process canonical rotation; Secret Manager failure fallback to local vault/.secrets/dhan.env.",
+      "mandatory": true
+    },
+    {
+      "id": "R4",
+      "description": "Permanent PAPER safety, zero secret leakage, and order authority lockout: LIVE_ORDER_AUTHORITY=0, LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false under all conditions, with zero token/secret leakage.",
+      "mandatory": true
+    },
+    {
+      "id": "R5",
+      "description": "Comprehensive test suite pass: all Dhan tests pass with zero regressions, and rate-limit/cooldown handling prevents future deadlocks.",
       "mandatory": true
     }
   ],
@@ -25,20 +44,70 @@
       "id": "C1",
       "requirement_ids": [
         "R1",
-        "R2"
+        "R2",
+        "R3",
+        "R4",
+        "R5"
       ],
-      "kind": "integration_test",
+      "kind": "unit_test",
       "argv": [
         "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
-        "tests/test_cloud_github_truth.py"
+        "-m",
+        "pytest",
+        "tests/test_dhan_token_auto_renewal.py",
+        "-v"
       ],
       "cwd": ".",
       "timeout": 60,
       "expected_exit": 0,
       "assertion": {
-        "type": "json_equals",
-        "path": "verified",
-        "expected": true
+        "type": "exit_only"
+      }
+    },
+    {
+      "id": "C2",
+      "requirement_ids": [
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_single_token_authority.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout": 60,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "exit_only"
+      }
+    },
+    {
+      "id": "C3",
+      "requirement_ids": [
+        "R1",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_canonical_rotation_readonly.py",
+        "tests/test_br1_dhan_auth_reliability.py",
+        "tests/test_br2_dhan_terminal_no_retry.py",
+        "-v"
+      ],
+      "cwd": ".",
+      "timeout": 60,
+      "expected_exit": 0,
+      "assertion": {
+        "type": "exit_only"
       }
     }
   ]

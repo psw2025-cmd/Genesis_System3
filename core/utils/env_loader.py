@@ -24,69 +24,111 @@ def _local_vault_secret(key: str) -> str:
         return ""
 
 
-def get_dhan_token():
+def _parse_jwt_hours_exp(token: str):
+    import datetime
+    exp = None
+    hours = None
+    if not token:
+        return None, None
     try:
-        from google.cloud import secretmanager
-        import datetime
-
-        client = secretmanager.SecretManagerServiceClient()
-        name = "projects/802404398783/secrets/dhan-access-token/versions/latest"
-        resp = client.access_secret_version(request={"name": name})
-        token = resp.payload.data.decode("UTF-8").strip()
-        ver = resp.name.split("/")[-1]  # 335
-        # Decode expiry from JWT
-        exp = None
+        import jwt
+        payload = jwt.decode(token, options={"verify_signature": False})
+        if "exp" in payload:
+            exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
+    except Exception:
+        pass
+    if exp is None:
         try:
-            import jwt
-            payload = jwt.decode(token, options={"verify_signature": False})
-            if "exp" in payload:
-                exp = datetime.datetime.fromtimestamp(payload["exp"], tz=datetime.timezone.utc)
+            import base64, json
+            parts = token.split(".")
+            if len(parts) >= 2:
+                body = parts[1] + "=" * (-len(parts[1]) % 4)
+                payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
+                exp_val = payload.get("exp")
+                if exp_val:
+                    exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
         except Exception:
             pass
-        if exp is None:
-            try:
-                import base64, json
-                parts = token.split(".")
-                if len(parts) >= 2:
-                    body = parts[1] + "=" * (-len(parts[1]) % 4)
-                    payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
-                    exp_val = payload.get("exp")
-                    if exp_val:
-                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
-            except Exception:
-                pass
-        hours = 23.5
-        if exp:
-            hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
-        return token, f"GCP_SECRET_MANAGER_V{ver}", "GCP_TOTP_ROTATE", hours, exp, False
-    except Exception as e:
-        # fallback local
-        local_token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
-        if not local_token:
-            local_token = _local_vault_secret("DHAN_ACCESS_TOKEN")
-        hours = 23.5
-        exp = None
-        if local_token:
-            try:
-                import base64, json, datetime
-                parts = local_token.split(".")
-                if len(parts) >= 2:
-                    body = parts[1] + "=" * (-len(parts[1]) % 4)
-                    payload = json.loads(base64.urlsafe_b64decode(body.encode("ascii")))
-                    exp_val = payload.get("exp")
-                    if exp_val:
-                        exp = datetime.datetime.fromtimestamp(float(exp_val), tz=datetime.timezone.utc)
-                        hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600
-            except Exception:
-                pass
-        return local_token, "LOCAL_JWT_SESSION_FALLBACK", "DHAN_LOCAL_ROTATE_FALLBACK", hours, exp, True
+    if exp:
+        hours = (exp - datetime.datetime.now(tz=datetime.timezone.utc)).total_seconds() / 3600.0
+    return hours, exp
+
+
+def get_dhan_token(force_refresh: bool = False, min_hours: float | None = None):
+    """Retrieve authoritative Dhan access token with automatic self-healing renewal."""
+    token = ""
+    source = "UNKNOWN"
+    provider = "DHAN_ROTATE"
+    hours = None
+    exp = None
+    is_fallback = True
+
+    # 1. Try GCP Secret Manager if enabled/available
+    try:
+        from google.cloud import secretmanager
+        project_num = os.getenv("GCP_PROJECT_NUMBER", "802404398783")
+        client = secretmanager.SecretManagerServiceClient()
+        name = f"projects/{project_num}/secrets/dhan-access-token/versions/latest"
+        resp = client.access_secret_version(request={"name": name})
+        token = resp.payload.data.decode("UTF-8").strip()
+        ver = resp.name.split("/")[-1]
+        source = f"GCP_SECRET_MANAGER_V{ver}"
+        provider = "GCP_TOTP_ROTATE"
+        is_fallback = False
+        hours, exp = _parse_jwt_hours_exp(token)
+    except Exception:
+        # 2. Local fallback
+        token = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+        if not token:
+            token = _local_vault_secret("DHAN_ACCESS_TOKEN")
+        source = "LOCAL_JWT_SESSION_FALLBACK"
+        provider = "DHAN_LOCAL_ROTATE_FALLBACK"
+        is_fallback = True
+        hours, exp = _parse_jwt_hours_exp(token)
+
+    # 3. Auto-renewal trigger:
+    # If token is missing, expired (hours <= 0), near expiry (<= min_hours), or force_refresh requested:
+    needs_renew = force_refresh or not token
+    if hours is not None:
+        if hours <= 0:
+            needs_renew = True
+        elif min_hours is not None and hours <= min_hours:
+            needs_renew = True
+
+    if needs_renew:
+        try:
+            from scripts.gcp_dhan_token_rotation_job import rotate_token
+            rot = rotate_token(force=True)
+            if rot.get("success"):
+                new_tok = os.getenv("DHAN_ACCESS_TOKEN", "").strip().lstrip("\ufeff")
+                if not new_tok:
+                    new_tok = _local_vault_secret("DHAN_ACCESS_TOKEN")
+                if new_tok:
+                    token = new_tok
+                    source = "ROTATED_AND_VERIFIED"
+                    provider = "DHAN_CANONICAL_ROTATE"
+                    hours, exp = _parse_jwt_hours_exp(token)
+                    is_fallback = False
+        except Exception:
+            pass
+
+    if hours is None:
+        hours = 23.5 if token else 0.0
+
+    return token, source, provider, hours, exp, is_fallback
 
 
 def _dynamic_cloud_token() -> str:
     """Load Dhan token with GCP Secret Manager dynamic authority or local fallback."""
-    token, _, _, _, _, is_fallback = get_dhan_token()
-    if token and not is_fallback:
+    token, _, _, hours, _, is_fallback = get_dhan_token()
+    if token and hours is not None and hours > 0 and not is_fallback:
         return token
+
+    # If expired or fallback, re-verify with auto-renewal
+    if not token or (hours is not None and hours <= 0):
+        token, _, _, _, _, _ = get_dhan_token(force_refresh=True)
+        if token:
+            return token
 
     # 1. Canonical local secure vault target.
     local_token = _local_vault_secret("DHAN_ACCESS_TOKEN")

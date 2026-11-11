@@ -1,0 +1,10 @@
+category,item,assertion,observed,verdict
+Broker & Auth Authority,Dhan Live Auth & Token Version,connected == True and auth_classification == AUTH_OK,"connected=True, auth=AUTH_OK, version=LOCAL_SECRETS_DHAN_ENV, hours_left=22.04",PASS
+Broker Portfolio Readback,Dhan 11 Demat Holdings Truth,holdings.ok == True and holdings.item_count == 11,"ok=True, count=11, latency=40ms",PASS
+Multi-Asset Strike Universe,Dynamic Underlyings Auto-Discovery (>220),len(underlyings) > 220,"total=224, indices=6, equity_options=218, contracts=111552",PASS
+Decision Intelligence & ML,Forward Model Validation Proof,status == ok and total_predictions > 0 and rho > 0.70,"status=ok, total_preds=204, rho=0.78, hit_rate=0.75",PASS
+Constitutional Safety Governance,Permanent Paper Lock & Order Authority,live_trading_enabled == False and order_placement_allowed == False,"live_trading_enabled=False, order_placement_allowed=False, mode=ANALYZER",PASS
+Runtime Anomaly Detection,QC Anomaly Audit & Strike Validation,status == PASS and critical_failures == [],"verdict=PASS_ANALYZER_PAPER_ONLY, endpoint_ok=44/44, critical_fails=0",PASS
+Frontend Build & Prebuild Contracts,Vite Production Build & Contracts (5/5 PASS),dist/index.html exists and 5/5 prebuild contracts pass,"2,098 modules transformed in 14.35s with 0 errors; 5/5 prebuild contracts pass",PASS
+Deployment & GitOps Governance,Cloud Run Serving Revision vs Local Branch,Owner consent required for billable cloud deploy per CLOUD_ONLY_OWNER_DIRECTIVE_20261018,Cloud Run serving b732bf0; local fixes verified on feature/consolidation-sync-fix (0ad065478). Ready for push and Cloud Build upon approval.,PENDING_OWNER_DEPLOY_CONSENT
+Market Hours Observation,Full Market-Day Live Continuous Tick Stream (60-Min Stability),Requires active weekday Indian market hours (09:15 to 15:30 IST),Current time is 2026-11-11 19:33:59 IST (Market Closed). Standby simulation verified; active session queued for next market open.,PENDING_MARKET_OPEN

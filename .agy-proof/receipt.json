@@ -1,56 +1,106 @@
 {
   "schema": 1,
   "policy": "AGY-EVIDENCE-INTEGRITY-v1",
-  "session": "0ea80800-87da-4cf5-9714-883298d46ce3",
-  "turn": "95f3743079ef4786bb2b55079423993c",
-  "run_id": "4cf910ba3b694975bf5c016df1775678",
-  "observed_utc": "2026-11-11T09:45:38Z",
+  "session": "466270f2-eadd-453e-ac62-5e4f9ea2a85d",
+  "turn": "5baf281509a14cfa870288a6c182ef05",
+  "run_id": "e4fc6ecbc9ac4bdab01e74377b96219a",
+  "observed_utc": "2026-11-11T14:33:41Z",
   "workspace": "C:\\Genesis_System3_clean",
-  "scope": "Forensic audit and generation of CLOUD_GITHUB_TRUTH.xlsx comparing Source A (GitHub repository configured for Genesis_System3) and Source B (Google Cloud Run deployed service genesis-system3-web). Verifies deployment chain (GitHub commit SHA, branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, Cloud Run image digest) and SHA256 file hashes for core/brokers/dhan/dhan_readonly.py, dashboard/backend/routers/broker.py, dashboard/backend/broker/dhan_auth.py, and dashboard/backend/gain_rank_spot_enrichment.py across 5 sheets.",
+  "scope": "Permanent self-healing Dhan token auto-renewal engine and multi-tier resilience: auto-recovery from expired tokens, proactive pre-emptive renewal before expiry, multi-tier fallback ladder, permanent PAPER mode safety, zero token leakage, rate-limit cooldown handling, and prevention of future BLOCKED states.",
   "limitations": [
-    "Read-only cloud inspection; no live orders; no modifications to deployed cloud infrastructure; analyzer/paper safety preserved."
+    "Read-only/analyzer-only Dhan credential rotation; live trading locked to OFF; no real broker orders; PAPER mode enforced."
   ],
   "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
   "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
   "contract": {
     "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
-    "sha256": "d2b3bc81dc91faf5afe9ea79be816741844d391fa43582d7aa2c9fe834237247"
+    "sha256": "34864c0db3f8f9921b2034cb6b0ff0e3329f368144614dfbf46e18fcd4af04fd"
   },
   "subjects": [
     {
-      "path": "C:\\Genesis_System3_clean\\CLOUD_GITHUB_TRUTH.xlsx",
-      "sha256": "5148b381b92421bc266461e13597f5fa9a0af56320429b232399247dde40abf2"
+      "path": "C:\\Genesis_System3_clean\\core\\brokers\\dhan\\cloud_runtime_patch.py",
+      "sha256": "5feb2801f17a944a2a8f495e6cb5ceec227c4ae07a4dca40ddf4794e6611299d"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\scripts\\generate_cloud_github_truth.py",
-      "sha256": "b012414f87114223cf3c7f543656b062710cdb005ac27ad75883a5c95b18a636"
+      "path": "C:\\Genesis_System3_clean\\core\\brokers\\dhan\\token_watchdog.py",
+      "sha256": "5ab23420afdaa6afd396b427e02fcb89b3b961c0adfb0e83bd680cb6b32eef59"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\tests\\test_cloud_github_truth.py",
-      "sha256": "df7699604f74315a740ae6cfb9b711f88d9fa5830d6ce4c13f114e13698703a9"
+      "path": "C:\\Genesis_System3_clean\\core\\utils\\env_loader.py",
+      "sha256": "82411415313ad8c89a1c7292c3d6a441425b442a54ef79c21d24463934c40f05"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\dhan_token_auto_refresh.py",
+      "sha256": "5aaf6eb367ba01dd71ee2e8ffc885319793926cdc9d7ed5d5d2a6c8870f675fe"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\gcp_dhan_token_rotation_job.py",
+      "sha256": "7f474dcdf9fe37178e6d91248ea460698cadf83474e510d6f6da4e9603952653"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_dhan_token_auto_renewal.py",
+      "sha256": "10ceb1a23d10a674957ba684201a706ab213c6ea1d2ae7da3bde0174abf789e2"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tools\\dhan-rotator\\main.py",
+      "sha256": "316ffb38c61c06211689b65d64ab2768de8b740f05b542a8d1c03b643e136478"
     }
   ],
   "subjects_unchanged_during_checks": true,
   "artifacts": [
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T094536Z-67d1cd61c4c24f84badd3161ee6fba55\\0.stdout.txt",
-      "sha256": "6e5573db8d4dd44dd02ae5bd71879e4e0d10ace763d993cb12a3edae6b51dd80"
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\0.stdout.txt",
+      "sha256": "b3fe89a44dd3926a27be62666ed3a72de2349d581ecb5706092133c8584022d2"
     },
     {
-      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T094536Z-67d1cd61c4c24f84badd3161ee6fba55\\0.stderr.txt",
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\1.stdout.txt",
+      "sha256": "c579ee733f47aff1f1a5e13c21df6dcf85002a58924c95afe07872887c1f4831"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\2.stdout.txt",
+      "sha256": "1d68172e82635d2bd3e8acce76e747a6d3955d5f7cce6a1b7a0690fb2d2a9e8a"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T143332Z-5c4a3b2f88df41368019b6bc79ee74f4\\2.stderr.txt",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     }
   ],
   "requirements": [
     {
       "id": "R1",
-      "description": "CLOUD_GITHUB_TRUTH.xlsx exists and contains all 5 required sheets (DEPLOYMENT_CHAIN, GITHUB_FILE_HASHES, CLOUD_FILE_HASHES, HASH_COMPARISON, DRIFT_REPORT) with exact 7 columns: File, GitHub SHA256, Cloud SHA256, Match YES/NO, GitHub Commit, Cloud Revision, Evidence.",
+      "description": "Auto-recovery from expired or missing token: when old token is expired or missing, auto-rotation mints and validates a fresh token via DhanLogin and profile probe without system interruption.",
       "mandatory": true,
       "result": "PASS"
     },
     {
       "id": "R2",
-      "description": "DEPLOYMENT_CHAIN verifies GitHub commit SHA, GitHub branch, Dockerfile used by build, Cloud Build source revision, Cloud Run revision, and Cloud Run image digest. File hashes for the 4 target files are verified, and unproven live container filesystem bytes are strictly marked UNVERIFIED without inference.",
+      "description": "Proactive pre-emptive renewal before expiry: watchdog proactively rotates expiring tokens (<= 3.0h remaining) before they ever expire, and skips healthy tokens.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Multi-tier fallback and resilience: fast in-session renew fallback to PIN+TOTP minting; Cloud Run API failure fallback to in-process canonical rotation; Secret Manager failure fallback to local vault/.secrets/dhan.env.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Permanent PAPER safety, zero secret leakage, and order authority lockout: LIVE_ORDER_AUTHORITY=0, LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false under all conditions, with zero token/secret leakage.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Comprehensive test suite pass: all Dhan tests pass with zero regressions, and rate-limit/cooldown handling prevents future deadlocks.",
       "mandatory": true,
       "result": "PASS"
     }
@@ -60,29 +110,88 @@
       "id": "C1",
       "requirement_ids": [
         "R1",
-        "R2"
+        "R2",
+        "R3",
+        "R4",
+        "R5"
       ],
-      "kind": "integration_test",
+      "kind": "unit_test",
       "argv": [
         "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
-        "tests/test_cloud_github_truth.py"
+        "-m",
+        "pytest",
+        "tests/test_dhan_token_auto_renewal.py",
+        "-v"
       ],
       "cwd": "C:\\Genesis_System3_clean",
-      "started_utc": "2026-11-11T09:45:36Z",
-      "elapsed_seconds": 1.141,
+      "started_utc": "2026-11-11T14:33:32Z",
+      "elapsed_seconds": 2.234,
       "exit_code": 0,
       "assertion": {
-        "type": "json_equals",
-        "path": "verified",
-        "expected": true
+        "type": "exit_only"
       },
       "observation": {
-        "actual": true,
-        "expected": true
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C2",
+      "requirement_ids": [
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_single_token_authority.py",
+        "-v"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T14:33:34Z",
+      "elapsed_seconds": 2.766,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C3",
+      "requirement_ids": [
+        "R1",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_canonical_rotation_readonly.py",
+        "tests/test_br1_dhan_auth_reliability.py",
+        "tests/test_br2_dhan_terminal_no_retry.py",
+        "-v"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T14:33:37Z",
+      "elapsed_seconds": 3.734,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
       },
       "result": "PASS"
     }
   ],
   "overall": "PASS",
-  "integrity_signature": "83de79896b8b05a0a6bfba15c184debc0eed95c338dff82660d094d76b55d339"
+  "integrity_signature": "40d92ed6b40ee86076d947d396d785203287c79ab78beeecbf86bf6bb6acf079"
 }

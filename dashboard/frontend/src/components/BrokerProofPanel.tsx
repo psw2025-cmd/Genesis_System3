@@ -67,9 +67,9 @@ export function BrokerProofPanel() {
         </div>
 
         <div className="workspace-grid" style={{ gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', marginTop: 10 }}>
-          <ProofMetric label="API / Broker" value={`${permission}${brokerStatus?.latency_ms != null ? ` · ${brokerStatus.latency_ms}ms read-only` : ''}`} ok={false} icon={<Activity size={13} />} />
-          <ProofMetric label="order_allowed" value={orderAllowed === null ? 'null' : String(orderAllowed)} ok={false} icon={<Shield size={13} />} />
-          <ProofMetric label="Available" value={available === null ? 'PENDING' : String(available)} ok={false} icon={<Wallet size={13} />} />
+          <ProofMetric label="API / Broker" value={`${permission}${brokerStatus?.latency_ms != null ? ` · ${brokerStatus.latency_ms}ms read-only` : ''}`} ok={brokerConnected === true || brokerStatus?.connected === true} icon={<Activity size={13} />} />
+          <ProofMetric label="order_allowed" value={orderAllowed === null ? 'null' : String(orderAllowed)} ok={orderAllowed === false} icon={<Shield size={13} />} />
+          <ProofMetric label="Available" value={available === null ? 'PENDING' : String(available)} ok={available != null} icon={<Wallet size={13} />} />
           <ProofMetric label="Token Source" value={proof?.source || 'PENDING'} ok={sourceOk} icon={<Shield size={13} />} />
           <ProofMetric label="Secret Version" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'PENDING'} ok={Boolean(proof?.secret_version)} icon={<Database size={13} />} />
           <ProofMetric label="Token Loaded" value={fmtTime(proof?.loaded_at_utc)} ok={Boolean(proof?.loaded_at_utc)} icon={<Activity size={13} />} />
