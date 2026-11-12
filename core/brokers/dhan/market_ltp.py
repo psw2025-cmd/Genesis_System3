@@ -9,6 +9,7 @@ Never places orders.
 from __future__ import annotations
 
 import logging
+import math
 import os
 import threading
 import time
@@ -65,10 +66,11 @@ DEFAULT_INDEX_BOARD: Tuple[str, ...] = (
 
 def _as_float(val: Any) -> Optional[float]:
     try:
-        if val is None or val == "":
+        if val is None or val == "" or isinstance(val, bool):
             return None
-        return float(val)
-    except (TypeError, ValueError):
+        parsed = float(val)
+        return parsed if math.isfinite(parsed) else None
+    except (TypeError, ValueError, OverflowError):
         return None
 
 
@@ -95,14 +97,14 @@ def _parse_quote_blob(blob: Any) -> Dict[str, Any]:
     high_p = _as_float(blob.get("high") or ohlc.get("high"))
     low_p = _as_float(blob.get("low") or ohlc.get("low"))
     close_p = _as_float(blob.get("close") or ohlc.get("close") or blob.get("prev_close"))
-    change = _as_float(blob.get("net_change") or blob.get("change"))
-    if change is None and ltp is not None and close_p not in (None, 0):
-        change = ltp - close_p
+    close_p = close_p if close_p is not None and close_p > 0 else None
+    # Daily change must use the previous close from this very quote packet.
+    # In particular, zero change is valid; do not replace it with an old baseline.
+    change = None
     change_pct = None
-    if change is not None and close_p not in (None, 0):
-        change_pct = (change / close_p) * 100.0
-    elif ltp is not None and close_p not in (None, 0):
-        change_pct = ((ltp - close_p) / close_p) * 100.0
+    if ltp is not None and ltp > 0 and close_p is not None:
+        change = ltp - close_p
+        change_pct = _as_float((change / close_p) * 100.0)
     return {
         "ltp": ltp,
         "open": open_p,
@@ -425,11 +427,16 @@ fetch_market_quotes.last_meta = {  # type: ignore[attr-defined]
 def build_index_board(
     symbols: Optional[Iterable[str]] = None,
     fallback_spots: Optional[Mapping[str, Mapping[str, Any]]] = None,
+    prefetched_quotes: Optional[Mapping[str, Mapping[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Live index ribbon matching Dhan web (LTP + change %)."""
     wanted = [str(s).upper() for s in (symbols or DEFAULT_INDEX_BOARD)]
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
-    quotes = fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
+    # An explicitly supplied empty batch is a completed source miss, not a reason
+    # to issue a second request (especially after upstream rate limiting).
+    quotes = prefetched_quotes if prefetched_quotes is not None else (
+        fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
+    )
     feed_errors = list(getattr(fetch_market_quotes, "last_errors", []) or [])
     feed_meta = dict(getattr(fetch_market_quotes, "last_meta", {}) or {})
     rows: List[Dict[str, Any]] = []
@@ -437,14 +444,21 @@ def build_index_board(
         sid = INDEX_SECURITY_IDS.get(sym)
         q = quotes.get(str(sid), {}) if sid else {}
         fb = (fallback_spots or {}).get(sym) or {}
-        ltp = q.get("ltp")
-        change = q.get("change")
-        change_pct = q.get("change_pct")
-        source = "dhan_marketfeed" if ltp is not None else None
+        ltp = _as_float(q.get("ltp"))
+        ltp = ltp if ltp is not None and ltp > 0 else None
+        quote_present = ltp is not None
+        close_p = _as_float(q.get("close"))
+        close_p = close_p if close_p is not None and close_p > 0 else None
+        change = ltp - close_p if quote_present and close_p is not None else None
+        change_pct = _as_float((change / close_p) * 100.0) if change is not None else None
+        source = "dhan_marketfeed" if quote_present else None
         if ltp is None and _as_float(fb.get("spot") or fb.get("ltp")):
             ltp = _as_float(fb.get("spot") or fb.get("ltp"))
-            change_pct = _as_float(fb.get("change_pct") or fb.get("pct_change"))
-            change = _as_float(fb.get("change"))
+            # Cache data has no verified current-session denominator. Preserve
+            # its spot for a labeled snapshot, never its alleged daily change.
+            ltp = ltp if ltp is not None and ltp > 0 else None
+            change_pct = None
+            change = None
             source = str(fb.get("source") or "chain_fallback")
         rows.append(
             {
@@ -455,9 +469,13 @@ def build_index_board(
                 "ltp": ltp,
                 "change": change,
                 "change_pct": change_pct,
-                "close": q.get("close"),
-                "live": ltp is not None,
+                "close": close_p if quote_present else None,
+                "prev_close": close_p if quote_present else None,
+                "live": quote_present,
                 "source": source,
+                "data_status": "BROKER_QUOTE" if quote_present else ("CACHED_UNVERIFIED" if ltp is not None else "UNAVAILABLE"),
+                "freshness": "UNVERIFIED",
+                "change_provenance": "SAME_QUOTE_CLOSE" if change_pct is not None else "UNVERIFIED",
             }
         )
     live_n = sum(1 for r in rows if r.get("live"))
