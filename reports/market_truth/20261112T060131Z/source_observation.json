@@ -1,0 +1,31 @@
+{
+  "utc": "2026-11-12T06:01:31.612639+00:00",
+  "ist": "2026-11-12T11:31:31.612639+05:30",
+  "label": "UNVERIFIED",
+  "orders_called": false,
+  "token_renewal": false,
+  "nse_http": 200,
+  "nse": [
+    {
+      "market": "Capital Market",
+      "marketStatus": "Open",
+      "tradeDate": "12-Nov-2026 11:30",
+      "index": "NIFTY 50",
+      "last": 25280
+    }
+  ],
+  "dhan_http": 200,
+  "dhan": {
+    "status": "success",
+    "instrument": "NIFTY 50 / IDX_I / 13",
+    "last_price": 25278.75,
+    "last_trade_time": "12/11/2026 11:31:33"
+  },
+  "received_utc": "2026-11-12T06:01:33.226834+00:00",
+  "received_ist": "2026-11-12T11:31:33.226834+05:30",
+  "nse_age_s": 93.227,
+  "nse_freshness": "STALE_OR_CLOCK_MISMATCH",
+  "dhan_age_s": 0.227,
+  "dhan_freshness": "FRESH",
+  "next": "Check source timestamp ages, same-instrument parity and independent clock evidence before LIVE."
+}
