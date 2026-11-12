@@ -53,3 +53,12 @@ Cloud errors, paper receipts/cost/slippage reconciliation, dependency vulnerabil
 
 CANONICAL_NOT_FOUND: local path repaired by recovering historical check identities into canonical tracker, all UNVERIFIED. Missing-path issue corrected; proof and push acceptance are separate. Earlier unconditional PASS certificates are historical claims only.
 Test setup failure: missing nested basetemp parent; corrected parent and disabled unrelated auto-loaded pytest plugins. Subsequent 15 tests exit 0. No assertions weakened.
+
+## GitHub save receipt
+UTC: 2026-11-12T06:13:06.578977+00:00
+Repair commit pushed: 1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Commit: https://github.com/psw2025-cmd/Genesis_System3/commit/1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Branch: fix/owner-nse-dhan-truth-20261112. Cloud deployment NOT performed. UI parity NOT certified.
+
+## Baseline repeat - 2026-11-12 11:43 IST / 06:13 UTC
+Draft PR: https://github.com/psw2025-cmd/Genesis_System3/pull/617 (repair head 1d57b2351eddc8364f71b5d168af961d8da9e0b8). Repeat is more than 10 minutes after first cloud screenshot. Health/state HTTP 200 and desktop screenshot acquired; mobile repeat timed out. No UI/API parity or sticky-fix certification; repair has NOT been deployed. Several hosted safety/architecture/compile/frontend gates passed at repair head; remaining security/full-proof checks pending at observation.

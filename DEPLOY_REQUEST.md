@@ -16,3 +16,9 @@ Rollback if an approved deployment regresses: restore prior observed traffic usi
 This command is a proposed cloud mutation, not executed. Expected operational duration is not measured; target under five minutes, verify readiness and UI afterward. Rollback restores prior traffic, not proven product readiness.
 
 Post-deploy: capture serving SHA/digest, enforce PAPER locks, inspect fresh NSE and Dhan, reconcile UI/API on desktop/mobile, repeat after 10 minutes. If unable to establish known-good rollback or exact-head validation, keep request pending and do not deploy.
+
+## GitHub save receipt
+UTC: 2026-11-12T06:13:06.578977+00:00
+Repair commit pushed: 1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Commit: https://github.com/psw2025-cmd/Genesis_System3/commit/1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Branch: fix/owner-nse-dhan-truth-20261112. Cloud deployment NOT performed. UI parity NOT certified.

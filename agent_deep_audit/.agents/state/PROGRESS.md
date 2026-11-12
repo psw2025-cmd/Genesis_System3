@@ -51,3 +51,12 @@ Branch: fix/owner-nse-dhan-truth-20261112. No deployment or acceptance claimed.
 Roles: PM selected saved safety work; Developer changed only scoped source; Tester ran offline failure/unknown/PAPER checks; Auditor/Critic withheld production PASS; Risk preserved order restrictions. This is role-based review, not a claim of a separate human reviewer.
 
 Next: push repair branch, preserve exact commit receipt, obtain separate deployment approval before merge/build because main has an auto-deploy workflow. Then verify exact deployed SHA, UI/API parity and repeat after 10 minutes.
+
+## GitHub save receipt
+UTC: 2026-11-12T06:13:06.578977+00:00
+Repair commit pushed: 1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Commit: https://github.com/psw2025-cmd/Genesis_System3/commit/1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Branch: fix/owner-nse-dhan-truth-20261112. Cloud deployment NOT performed. UI parity NOT certified.
+
+## Baseline repeat - 2026-11-12 11:43 IST / 06:13 UTC
+Draft PR: https://github.com/psw2025-cmd/Genesis_System3/pull/617 (repair head 1d57b2351eddc8364f71b5d168af961d8da9e0b8). Repeat is more than 10 minutes after first cloud screenshot. Health/state HTTP 200 and desktop screenshot acquired; mobile repeat timed out. No UI/API parity or sticky-fix certification; repair has NOT been deployed. Several hosted safety/architecture/compile/frontend gates passed at repair head; remaining security/full-proof checks pending at observation.

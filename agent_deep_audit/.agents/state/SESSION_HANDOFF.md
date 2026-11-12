@@ -32,3 +32,12 @@ Tracker: 1,872 unique historical IDs recovered, all independent verdicts UNVERIF
 Observed serving revision: genesis-system3-web-00131-2md. Desktop/mobile screenshots exist; screen has pending broker proof and empty values. Later API reads timed out. NSE source stale at final check, Dhan quote fresh; combined market LIVE UNVERIFIED. Local token expiry metadata preventive warning, no renewal attempted.
 
 Next: review exact branch/commit and raw receipts; do not merge into push-triggered deployment without separate explicit YES. Remaining cloud/data/UI evidence must be checked after any authorized deployment, including 10-minute repeat. PAPER/ANALYZE only; no order routes or token renewal during read-only checks.
+
+## GitHub save receipt
+UTC: 2026-11-12T06:13:06.578977+00:00
+Repair commit pushed: 1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Commit: https://github.com/psw2025-cmd/Genesis_System3/commit/1d57b2351eddc8364f71b5d168af961d8da9e0b8
+Branch: fix/owner-nse-dhan-truth-20261112. Cloud deployment NOT performed. UI parity NOT certified.
+
+## Baseline repeat - 2026-11-12 11:43 IST / 06:13 UTC
+Draft PR: https://github.com/psw2025-cmd/Genesis_System3/pull/617 (repair head 1d57b2351eddc8364f71b5d168af961d8da9e0b8). Repeat is more than 10 minutes after first cloud screenshot. Health/state HTTP 200 and desktop screenshot acquired; mobile repeat timed out. No UI/API parity or sticky-fix certification; repair has NOT been deployed. Several hosted safety/architecture/compile/frontend gates passed at repair head; remaining security/full-proof checks pending at observation.
