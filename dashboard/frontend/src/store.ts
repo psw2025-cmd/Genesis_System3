@@ -1,11 +1,10 @@
 import { create } from 'zustand'
-import { isMarketOpen } from './utils/marketHours'
 
 interface DashboardState {
   // Connection
   wsStatus: 'connecting' | 'live' | 'error' | 'off'
   brokerConnected: boolean
-  marketOpen: boolean
+  marketOpen: boolean | null
   lastSync: string
 
   // Live data
@@ -68,7 +67,7 @@ interface DashboardState {
   setCommandQuery: (q: string) => void
 }
 
-function marketOpenFromHealth(health: any, previous: boolean): boolean {
+export function marketOpenFromHealth(health: any): boolean | null {
   const explicit = health?.market?.is_open
   if (explicit === true || explicit === false) return explicit
 
@@ -76,18 +75,15 @@ function marketOpenFromHealth(health: any, previous: boolean): boolean {
   if (status === 'open' || status === 'live' || status === 'live_market') return true
   if (status === 'closed' || status.startsWith('closed_') || status === 'post_market') return false
 
-  // A slim/partial health payload is not evidence that the market is closed.
-  // Preserve the last known truth rather than coercing undefined -> false.
-  return previous
+  // Missing evidence means unknown, never calendar-derived OPEN or CLOSED.
+  return null
 }
 
 export const useStore = create<DashboardState>((set) => ({
   wsStatus: 'connecting',
   brokerConnected: false,
-  // Browser-local fallback is computed in Asia/Kolkata and is replaced only by
-  // explicit backend market truth. This avoids a false CLOSED banner during
-  // Cloud Run cold-start / partial-health hydration.
-  marketOpen: isMarketOpen(),
+  // Session status must come from source evidence, not the browser clock.
+  marketOpen: null,
   lastSync: '--',
   health: null,
   state: null,
@@ -127,13 +123,13 @@ export const useStore = create<DashboardState>((set) => ({
     return {
       health,
       brokerConnected,
-      marketOpen: marketOpenFromHealth(health, s.marketOpen),
+      marketOpen: marketOpenFromHealth(health),
       lastSync: new Date().toISOString(),
     }
   }),
-  setState: (state) => set((s) => ({
+  setState: (state) => set(() => ({
     state,
-    marketOpen: state?.market?.is_open != null ? Boolean(state.market.is_open) : s.marketOpen,
+    marketOpen: marketOpenFromHealth(state),
   })),
   setChain: (sym, data) => set((s) => ({
     chain: { ...s.chain, [sym]: data },

@@ -111,7 +111,7 @@ export function HolographicIndexCards() {
                   ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
                   : 'bg-sky-500/10 text-sky-400 border border-sky-500/30'
               }`}>
-                {marketOpen ? '● LIVE' : 'SESSION REPLAY'}
+                {marketOpen == null ? 'SESSION UNKNOWN' : marketOpen ? 'SESSION OPEN' : 'SESSION CLOSED'}
               </div>
             </div>
 

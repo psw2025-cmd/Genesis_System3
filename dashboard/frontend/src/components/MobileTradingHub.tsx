@@ -102,7 +102,7 @@ export function MobileTradingHub() {
       <section className="mobile-hub-status" aria-label="Live transport and safety status">
         <span className={wsStatus === 'live' ? 'is-ok' : 'is-warn'}>WS transport {wsStatus.toUpperCase()}</span>
         <span className={brokerConnected ? 'is-ok' : 'is-warn'}>Broker {brokerConnected ? 'CONNECTED' : 'WAITING'}</span>
-        <span className={marketOpen ? 'is-ok' : 'is-muted'}>Market {marketOpen ? 'OPEN' : 'CLOSED'}</span>
+        <span className={marketOpen ? 'is-ok' : 'is-muted'}>Market {marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED'}</span>
         <span className="is-safe">PAPER · LIVE OFF</span>
         <span className="is-muted">Portfolio rows {positions}</span>
         <span className="is-muted">Sync {lastSync === '--' ? 'pending' : new Date(lastSync).toLocaleTimeString('en-IN')}</span>

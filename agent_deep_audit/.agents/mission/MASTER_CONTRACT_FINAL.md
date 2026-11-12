@@ -250,6 +250,17 @@ Reason: Owner gave CONTINUE, Agent replied once and stopped. Loop broke because 
 - On next CONTINUE, Agent MUST first write: "LOOP_BROKEN fixed, resuming from [Last SHA + Last File], not restarting from zero."
 - Agent will NOT restart from zero. Agent will resume from last saved SHA + last file.
 
+
+## Current continuation - 2026-11-12T06:49:03.832600+00:00 UTC
+PART 14 saved once and GitHub read-back verified at 2eb65f90acc832b21fd07794f3ce303b7c2c39d8 (blob 292f298a5f141e23916aebfbae3e556d0b25625d). Startup pointers added to read it every Genesis turn.
+Follow-on branch: fix/source-failure-ui-truth-20261112, based on that SHA; no restart of original mission.
+Implemented in small source batches: unknown startup instead of browser clock; source outage no longer CLOSED; 60-second STALE threshold; desktop/mobile/session labels preserve UNKNOWN; special-session transport reads source status. Node behavior contract is now a mandatory prebuild gate.
+Validation: 31 targeted Python regressions, TypeScript typecheck, production build and all prebuild behavior contracts executed successfully. Browser visual proof is NOT PASS: attempt 1 HTTP-only isolation admitted a WebSocket session update and failed the assertion; attempt 2 isolated both transports but hung; attempt 3 added explicit 15s limits/progress output and also hung. Stopped only verified test process trees. LOOP_BLOCKER_BROWSER_SIMULATION: no fourth retry; external/tool-state investigation required before visual acceptance. Product UI remains UNVERIFIED.
+Fresh source scan at 2026-11-12 12:08:45 IST / 06:38:45 UTC: official NSE calendar/session JSON APIs HTTP 200; NSE session packet age 45.58s, Dhan quote age -0.42s (within 5s tolerance); both source age checks fresh. Independent clock and synchronized UI/price parity remain UNVERIFIED. No website scraping, token renewal or order call in source probe.
+Cloud read-only: serving revision 00131-2md unchanged; health HTTP 200. Local summary arithmetic matches 0.01 only, not cost/slippage/cloud receipt proof. Disk 77.38%; managed token expiry, option expiry, quotas, dependency vulnerabilities and corporate actions not fully verified. No production certification.
+Correction: earlier main auto-deploy warning came from divergent local checkout. The fetched approved main workflow inventory does NOT contain cloud-run-auto-deploy.yml. Separate explicit owner deployment approval remains mandatory regardless.
+Next: review pushed follow-on draft and resolve browser tooling LOOP_BLOCKER; do not deploy or claim UI PASS. Roles: PM resumed, Developer fixed source truth, Tester checked behavior/build, Auditor/Critic withheld visual and production acceptance, Risk kept PAPER/order restrictions.
+
 PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED:
 
 1. USER PROFILE: User ko coding, computer, path, folder kuch nahi pata. User sirf READY PRODUCT chahta hai. User se kabhi path mat pucho. Tum khud dhoondho, khud fix karo, khud verify karo. User sirf CONTINUE LOOP / YES / NO / STOP bolega.

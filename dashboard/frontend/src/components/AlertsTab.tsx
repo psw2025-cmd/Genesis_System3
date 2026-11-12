@@ -43,7 +43,7 @@ export function AlertsTab() {
     ['Critical', String(counts.CRITICAL || 0), counts.CRITICAL ? 'var(--down)' : 'var(--text-pri)'],
     ['High', String(counts.HIGH || 0), counts.HIGH ? 'var(--amber)' : 'var(--text-pri)'],
     ['Medium', String(counts.MEDIUM || 0), counts.MEDIUM ? 'var(--accent)' : 'var(--text-pri)'],
-    ['Market', marketOpen ? 'OPEN' : 'CLOSED', marketOpen ? 'var(--up)' : 'var(--amber)'],
+    ['Market', marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED', marketOpen ? 'var(--up)' : 'var(--amber)'],
     ['Broker', brokerConnected ? 'CONNECTED' : 'WAITING', brokerConnected ? 'var(--up)' : 'var(--amber)'],
     ['WebSocket transport', wsStatus === 'live' ? 'TRANSPORT LIVE' : wsStatus.toUpperCase(), wsStatus === 'live' ? 'var(--up)' : 'var(--amber)'],
   ]

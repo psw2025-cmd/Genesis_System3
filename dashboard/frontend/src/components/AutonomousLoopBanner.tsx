@@ -60,10 +60,10 @@ export function AutonomousLoopBanner() {
             : 'bg-slate-800 text-slate-300 border border-slate-700'
         }`}>
           <span className={`w-2 h-2 rounded-full ${marketOpen ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
-          <span>{marketOpen ? 'MARKET SESSION OPEN' : `MARKET CLOSED${isHolidayClosed ? ' (HOLIDAY)' : isWeekendClosed ? ' (WEEKEND STANDBY)' : ' (AFTER HOURS)'}`}</span>
+          <span>{marketOpen == null ? 'MARKET SESSION UNKNOWN' : marketOpen ? 'MARKET SESSION OPEN' : `MARKET CLOSED${isHolidayClosed ? ' (HOLIDAY)' : isWeekendClosed ? ' (WEEKEND STANDBY)' : ' (AFTER HOURS)'}`}</span>
         </div>
 
-        {!marketOpen && nextOpen !== '—' && (
+        {marketOpen === false && nextOpen !== '—' && (
           <div className="flex items-center gap-1.5 text-slate-300">
             <span>Next Live Market Open:</span>
             <span className="font-mono text-sky-400 font-bold">{nextOpen}</span>

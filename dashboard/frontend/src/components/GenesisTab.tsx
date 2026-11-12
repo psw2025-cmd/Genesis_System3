@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import axios from 'axios'
 import { Activity, Brain, Database, Shield, Sparkles, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { API_BASE, API_HEADERS } from '../config'
-import { useStore } from '../store'
+import { marketOpenFromHealth, useStore } from '../store'
 import { fmt, asPct } from '../lib/utils'
 import { brokerPermissionLabel } from '../lib/lifecycleTruth'
 import { PendingLifecycleBanner } from './PendingLifecycleBanner'
@@ -131,9 +131,7 @@ export function GenesisTab() {
 
   const effectiveHealth = data.health && !data.health?.error ? data.health : sharedHealth
   const effectiveSystem = data.system && !data.system?.error ? data.system : sharedState
-  const marketOpen = effectiveHealth?.market_status === 'open'
-    || Boolean(effectiveHealth?.market?.is_open)
-    || Boolean(sharedState?.market?.is_open)
+  const marketOpen = marketOpenFromHealth(sharedState) ?? marketOpenFromHealth(effectiveHealth)
   const liveAllowed = Boolean(sharedState?.live_trading_enabled ?? effectiveHealth?.live_allowed ?? effectiveHealth?.live_trading_enabled)
   const brokerOk = brokerStatus?.connected === true || brokerConnected === true || effectiveHealth?.broker?.connected === true
 
@@ -163,7 +161,7 @@ export function GenesisTab() {
   const topRankedUnderlying = String(rankingRows[0]?.underlying ?? rankingRows[0]?.symbol ?? 'NIFTY').toUpperCase()
   const neutralRankEvidence = `RANK EVIDENCE · ${topRankedUnderlying}`
   const bias = String(data.brain?.directional_bias ?? data.brain?.bias ?? sharedState?.signals?.directional_bias ?? sharedState?.signals?.bias ?? neutralRankEvidence).toUpperCase()
-  const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
+  const regime = String(data.brain?.market_regime ?? data.brief?.market_regime ?? (marketOpen == null ? 'SESSION UNKNOWN' : marketOpen ? 'MARKET OPEN' : 'AFTER HOURS'))
   const biasTone = /bull|up|long/i.test(bias) ? 'up' : /bear|down|short/i.test(bias) ? 'down' : 'warn'
 
   const modules: Array<[string, string, number | null]> = [
@@ -236,7 +234,7 @@ export function GenesisTab() {
 
       {/* Top 7 Metric Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 mb-4">
-        <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen ? 'Market open' : 'After-hours standby'} tone={marketOpen ? 'up' : 'accent'} />
+        <Metric label="Market Regime" value={regime.toUpperCase()} sub={marketOpen == null ? 'Session evidence unavailable' : marketOpen ? 'Market open' : 'After-hours standby'} tone={marketOpen ? 'up' : 'accent'} />
         <Metric label="Prediction Confidence" value={showPct(confidence)} sub="Payload or PENDING" tone="accent" />
         <Metric label="Model Ensemble" value="PENDING" sub="Not a live-trade state" tone="warn" />
         <Metric label="Truth Score" value={truthScore == null ? 'PENDING' : `${truthScore.toFixed(0)}%`} sub="Payload or PENDING" tone="accent" />

@@ -136,11 +136,12 @@ class LiveUiTruthRemediationContractTests(unittest.TestCase):
         self.assertIn("isMarketOpen(now: Date = new Date())", text)
         self.assertNotIn("getTimezoneOffset", text)
 
-    def test_partial_health_cannot_clobber_market_open_to_false(self):
+    def test_missing_health_is_unknown_without_browser_clock_assumption(self):
         text = self.text("dashboard/frontend/src/store.ts")
-        self.assertIn("marketOpen: isMarketOpen()", text)
+        self.assertNotIn("marketOpen: isMarketOpen()", text)
+        self.assertIn("marketOpen: null", text)
         self.assertIn("marketOpenFromHealth", text)
-        self.assertIn("return previous", text)
+        self.assertIn("return null", text)
         self.assertNotIn("Boolean(health?.market?.is_open ?? health?.market_status === 'open')", text)
 
     def test_local_browser_smoke_has_bounded_chrome_cold_start_budget(self):
