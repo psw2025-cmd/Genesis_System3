@@ -311,3 +311,21 @@ PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED
 - Maintain this PART 14 without duplicates, plus PROGRESS.md, BLOCKERS.md, INDEPENDENT_VERIFICATION.csv and LIVE_MARKET_STATE.md. Save reviewed changes to GitHub with exact SHA.
 - Resume saved Fix #618 / last pushed SHA and pending video-percentage provenance work; never restart from Fix #1. Tracker and fixer work can proceed in parallel; checkpoint report is not a stop instruction.
 - STOP only at the existing safety/approval boundary or the documented retry limit. Keep unverified work explicit. No unbounded background-monitoring claim without actual supervised-runtime proof.
+
+PART 15 - TOKEN SAVING + SELF-REASONING - PERMANENT
+
+- Resume from the short canonical PROGRESS.md checkpoint and LIVE_MARKET_STATE.md; consult PART 14/15/16 on policy changes and only relevant BLOCKERS lines. Read targeted rg matches, definitions and diffs, never repeatedly dump whole files. Necessary implementation/evidence reads remain allowed.
+- After each batch save three lines: Last SHA + Last File; Next; Market + Token status with observation time. UNKNOWN stays UNKNOWN. Owner report: five simple lines. 70% fewer tokens and 3x speed are targets, not measured achievements.
+- Reuse source snapshots for 10 seconds, preserve original exchange timestamps, fetch only requested symbols. Cache official NSE calendar once per IST day; invalidate on changed special-session evidence. No NSE homepage scraping, repeated login or automatic token creation.
+- Privately compare three approaches and choose the least costly safe approach with equal quality. Change approach after failure, maximum three attempts; save root cause, failed method and prevention. Source failures mean DATA SOURCE DOWN/UNKNOWN, never inferred CLOSED; software failures retain their actual error classification.
+- Maximum five implementation files per batch; parallelize independent tasks with exclusive file ownership. Tracker publishes every 10 seconds independently of fixer, with bounded independent symbol work and shared rate limits/collector lease. Do not claim unattended operation without runtime proof.
+- Lesson 12/11/2026: owner reports NSE website scraping failed/was blocked. Preferred method: Dhan read-only API + official NSE calendar JSON + suitable connected plugin when available. Do not retry website scraping or claim an unused plugin supplied evidence.
+- Keep one PART 15, push reviewed changes with SHA, resume pending Fix #618 rather than restarting. PAPER locks and evidence requirements remain mandatory.
+
+PART 16 - APPROVAL RULE - PERMANENT
+
+- Owner authorizes routine project reads, backed-up edits, tests, safe Git commits/pushes and independent parallel work inside C:\Genesis_System3_clean without repeated YES or "Would you like to make edits?" questions. Proceed with the default safe action.
+- Owner approval is required only for secret deletion/rotation, enabling live trading, billing/payment, and file deletion without a backup. This latest owner approval scope supersedes older project-level approval lists, including routine deployment/IAM work; still inspect each actual operation for these four protected effects.
+- Tool permission settings are controlled by the host, not this document. Current session reports full access and approval policy never; do not request escalation or claim this file permanently changes future host settings.
+- Preserve PAPER_MODE=1, ANALYZE_MODE=1, LIVE_TRADING_ENABLED=0, LIVE_ORDER_AUTHORITY=0, ORDER_PLACEMENT_ALLOWED=false. No real orders. A secret leak stops affected work; do not rotate/delete secrets without the required owner approval.
+- Backup before changes; preserve unrelated edits and append-only evidence. Continue from the saved checkpoint, keep reports to five simple lines and save actual results without fabricated PASS or permanent-background claims.
