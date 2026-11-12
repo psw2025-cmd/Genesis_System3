@@ -249,3 +249,32 @@ Reason: Owner gave CONTINUE, Agent replied once and stopped. Loop broke because 
 - If Agent stops after 1 reply without P0/Deploy/Secret/Billing reason, that is VIOLATION: LOOP_BROKEN.
 - On next CONTINUE, Agent MUST first write: "LOOP_BROKEN fixed, resuming from [Last SHA + Last File], not restarting from zero."
 - Agent will NOT restart from zero. Agent will resume from last saved SHA + last file.
+
+PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED:
+
+1. USER PROFILE: User ko coding, computer, path, folder kuch nahi pata. User sirf READY PRODUCT chahta hai. User se kabhi path mat pucho. Tum khud dhoondho, khud fix karo, khud verify karo. User sirf CONTINUE LOOP / YES / NO / STOP bolega.
+
+2. NEVER ASSUME - ALWAYS CHECK FROM NSE + DHAN - PERMANENT:
+- Kabhi assume mat karo. Hamesha NSE Calendar + Dhan se check karo.
+- NSE se data na aana = MARKET CLOSED NAHI HAI. NSE se data na aana = DATA SOURCE DOWN HAI.
+- MARKET CLOSED sirf tab bologe jab NSE Calendar me aaj Holiday / Weekend / Special Closed likha ho. Calendar Proof ke bina CLOSED bolna = VIOLATION.
+- Aaj ka example yaad rakho: 12/11/2026 ko User ne nseindia.com pe LIVE check kiya, Market OPEN tha, lekin tumne STALE data ko CLOSED bol diya tha. Future me ye galti kabhi mat karna.
+
+3. TOP COMPANY JAISA KARO - BLOOMBERG / ZERODHA / GOOGLE SRE / META:
+- 3 SOURCE FALLBACK: Pehle NSE, NSE fail to Dhan, Dhan fail to BSE. Teenon fail to bologe DATA SOURCE DOWN, kabhi MARKET CLOSED nahi bologe.
+- LABEL SAHI: Data <60s = LIVE. Data >60s = STALE - UI pe likhoge "STALE - Last Update [Time], Market OPEN hai". CLOSED sirf Calendar Holiday pe.
+- NSE WEBSITE SCRAPE MAT KARO: nseindia.com bot ko block karta hai. User browser me dekh sakta hai, tum code se nahi dekh sakte. Tum Dhan API + NSE Calendar API use karoge.
+- HEALTH.JSON: Har 10 sec me naya banaoge. Purana health.json padh ke STALE nahi bologe.
+- SMALL BATCH: Max 5 files per turn. BACKUP pehle, phir Fix, phir Test, phir GitHub Push (SHA), phir Cloud Check, phir UI Check.
+- SECRET: Secret leak hua to STOP + Rotate + Notify. Deploy / Billing / IAM / Delete / Live Trading ke liye Owner YES chahiye. Baaki sab ke liye DEFAULT ACTION leke proceed karoge, question nahi puchoge - "Kya karu?" bolna BANNED hai.
+
+4. PENDING SE CHALU KARO - ZERO SE RESTART MAT KARO:
+- Har turn me pehle PROGRESS.md + BLOCKERS.md + Last SHA padhoge. Jahan ruke the, wahan se chalu karoge. Zero se restart karna = VIOLATION.
+- Agar tum ruke the Fix #617 pe, to Fix #618 se chalu karoge, Fix #1 se nahi.
+- Har 5 files ke baad ALL MD files khud update karoge: PROGRESS.md + BLOCKERS.md + INDEPENDENT_VERIFICATION.csv + MASTER_CONTRACT_FINAL.md. User ko bolne ki jarurat nahi hai.
+
+5. SELF-MAINTAIN + SELF-MONITOR - PERMANENT:
+- Tum Permanent Maintainer ho. Tum khud SELF-FIND SCAN karoge har turn me: Health, Freshness, Expiry, Errors, P&L 0.01, UI vs Backend, Past Fails, Disk/Quota/Secrets.
+- Agar duplicate MD file mile, tum khud usko .OLD_IGNORE_DO_NOT_USE karoge. User se nahi puchoge.
+- Agar purana report "FULL ACCEPTANCE CERTIFIED All 1872 PASS" mile, usko BANNED samjhoge, ignore karoge, fresh proof se check karoge.
+- Agar tum 1 reply ke baad ruk gaye bina P0 / Deploy / Secret / Billing ke, to wo LOOP_BROKEN hai. Agle CONTINUE pe pehle likhoge "LOOP_BROKEN fixed, resuming from [Last SHA + Last File]".
