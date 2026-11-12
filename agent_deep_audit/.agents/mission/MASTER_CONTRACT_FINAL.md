@@ -289,3 +289,25 @@ PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED
 - Agar duplicate MD file mile, tum khud usko .OLD_IGNORE_DO_NOT_USE karoge. User se nahi puchoge.
 - Agar purana report "FULL ACCEPTANCE CERTIFIED All 1872 PASS" mile, usko BANNED samjhoge, ignore karoge, fresh proof se check karoge.
 - Agar tum 1 reply ke baad ruk gaye bina P0 / Deploy / Secret / Billing ke, to wo LOOP_BROKEN hai. Agle CONTINUE pe pehle likhoge "LOOP_BROKEN fixed, resuming from [Last SHA + Last File]".
+
+6. PERMANENT LIVE FILE + CACHE FIRST - 2026-11-12 OWNER ADDENDUM:
+- Single canonical file: C:\Genesis_System3_clean\agent_deep_audit\.agents\mission\LIVE_MARKET_STATE.md. Existing file mile to usi ko use/update karo; missing ho to ek baar banao. Never create agent_deep_audit.agents or another duplicate mission folder.
+- File retains: Market Status with calendar/session proof; last NSE source time; last Dhan source time; Dhan token OK / EXPIRED / UNKNOWN with evidence; holiday list; last five watched symbols and live prices; individual source age and LIVE / STALE / UNAVAILABLE labels.
+- Every fixer first reads this file. A snapshot no older than 10 seconds is reused; fresh remote data is requested only when needed. Re-read does not renew token, repeat login, scrape the NSE homepage or restart work from zero.
+- Snapshot write time and original exchange/source time are separate. A fresh heartbeat must NEVER relabel old prices LIVE. Unknown data or expired credentials are explicit, never invented prices or a CLOSED market claim.
+
+7. SEPARATE LIVE TRACKER AND FIXER - PARALLEL OWNER REQUIREMENT:
+- LIVE TRACKER is a separate supervised runtime loop, independent of fixer/chat progress, publishing the canonical snapshot every 10 seconds. Routine ticks and read-only refreshes never ask Owner YES.
+- FIXER repairs software and consumes the permanent snapshot; it does not wait behind a slow full-market scan or independently recreate broker sessions.
+- One active source-collector lease only: reuse the existing cloud feed/worker instead of starting duplicate Dhan pollers. Cache official calendar evidence with its date/source; refresh when expired/changed rather than scraping a website on every tick.
+- Tracker deployment and durable shared storage must preserve existing cloud-only runtime, PAPER locks, secret protections and cloud-change consent. A local diagnostic process is not an independent cloud runtime. Report actual running/heartbeat evidence; never claim always-on from code, a started process or old health.json alone.
+
+8. SINGLE-SYMBOL PARALLEL TRACKING - NO HEAD-OF-LINE WAIT:
+- If Owner names RELIANCE / NIFTY / BANKNIFTY or another symbol, track that watchlist instead of rescanning the entire market.
+- Independent bounded symbol tasks or broker-supported batching keep a delayed symbol from blocking other completed symbols or the 10-second snapshot. Each row has its own source timestamp, error and freshness.
+- Respect broker rate limits globally across concurrent tasks. Backoff and mark affected rows on 401 / 429 / 5xx; no hammering, no hidden retries, no token renewal or real-order routes.
+
+9. PERMANENT CONTINUATION AND TRUTH:
+- Maintain this PART 14 without duplicates, plus PROGRESS.md, BLOCKERS.md, INDEPENDENT_VERIFICATION.csv and LIVE_MARKET_STATE.md. Save reviewed changes to GitHub with exact SHA.
+- Resume saved Fix #618 / last pushed SHA and pending video-percentage provenance work; never restart from Fix #1. Tracker and fixer work can proceed in parallel; checkpoint report is not a stop instruction.
+- STOP only at the existing safety/approval boundary or the documented retry limit. Keep unverified work explicit. No unbounded background-monitoring claim without actual supervised-runtime proof.
