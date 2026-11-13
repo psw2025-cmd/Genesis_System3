@@ -4,7 +4,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from scripts.cloud_audit_publish import FILES, authorized_files, copy_and_verify, publish
+from unittest.mock import patch
+from scripts.cloud_audit_publish import FILES, authorized_files, copy_and_verify, publish, gcloud
 
 
 class InMemoryGcs:
@@ -53,6 +54,16 @@ class AuditPublicationTests(unittest.TestCase):
         (self.root / "audit_results" / FILES[0]).write_text("changed")
         with self.assertRaisesRegex(RuntimeError, "SHA256_MISMATCH"):
             publish(self.root, "a" * 40, storage)
+
+    def test_cli_error_reports_only_sanitized_class(self):
+        class Failed:
+            returncode = 1
+            stderr = "PERMISSION_DENIED: private-account@example.com not authorized"
+            stdout = ""
+        with patch("scripts.cloud_audit_publish.subprocess.run", return_value=Failed()):
+            with self.assertRaisesRegex(RuntimeError, "GCS_PERMISSION_DENIED_OP_CP") as caught:
+                gcloud("cp", "a", "b")
+        self.assertNotIn("private-account@", str(caught.exception))
 
     def test_missing_file_blocks_publication(self):
         (self.root / "audit_results" / FILES[0]).unlink()
