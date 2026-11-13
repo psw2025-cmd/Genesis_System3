@@ -8,6 +8,7 @@ from scripts.system3_gate_evaluator import (
     SPEARMAN_DAYS_REQUIRED,
     SPEARMAN_THRESHOLD,
     eval_spearman_gate,
+    eval_lifecycle_gate,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +80,37 @@ def test_spearman_gate_requires_30_consecutive_nse_proven_sessions(tmp_path):
     broken_link = eval_spearman_gate(tmp_path)
     assert broken_link["pass"] is False
     assert broken_link["consecutive_pass_days"] == 1
+
+
+def test_lifecycle_gate_rejects_synthetic_pass_and_open_position_shortcut(tmp_path):
+    proof_dir = tmp_path / "reports" / "latest" / "analyzer_paper_lifecycle_proof"
+    proof_dir.mkdir(parents=True)
+    (proof_dir / "summary.json").write_text(json.dumps({
+        "pass": True,
+        "evidence": {"full_lifecycle_proven": True, "broker_connected": True},
+    }), encoding="utf-8")
+    state = {"broker": {"connected": True}, "market": {"is_open": True},
+             "positions": [{"position_id": "P1", "strike": 100, "entry_price": 2}]}
+    result = eval_lifecycle_gate(tmp_path, state)
+    assert result["pass"] is False
+    assert result["full_lifecycle_proven"] is False
+    assert result["completed_paper_trades"] is None
+
+
+def test_lifecycle_gate_requires_100_trades_and_readback_evidence(tmp_path):
+    proof_dir = tmp_path / "reports" / "latest" / "analyzer_paper_lifecycle_proof"
+    proof_dir.mkdir(parents=True)
+    evidence = {
+        "full_lifecycle_proven": True, "broker_connected": True,
+        "completed_paper_trades": 100, "missing_trade_links": 0,
+        "reconciliation_mismatches": 0, "ledger_readback_verified": True,
+        "real_market_data": True,
+    }
+    (proof_dir / "summary.json").write_text(json.dumps({"pass": True, "evidence": evidence}), encoding="utf-8")
+    assert eval_lifecycle_gate(tmp_path)["pass"] is True
+    evidence["completed_paper_trades"] = 99
+    (proof_dir / "summary.json").write_text(json.dumps({"pass": True, "evidence": evidence}), encoding="utf-8")
+    assert eval_lifecycle_gate(tmp_path)["pass"] is False
 
 
 def test_alert_ui_separates_live_readiness_info_from_active_operational_alerts():

@@ -194,13 +194,20 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
     broker_connected = ev.get("lifecycle_proof_broker_not_connected") is not True
     if live_state:
         broker_connected = bool((live_state.get("broker") or {}).get("connected"))
-    full_proven = ev.get("full_lifecycle_proven") is True
-    if not full_proven and live_state and broker_connected:
-        positions = live_state.get("positions") or []
-        if positions and all(
-            isinstance(p, dict) and p.get("strike") and p.get("entry_price") and p.get("position_id") for p in positions
-        ):
-            full_proven = True
+    try:
+        completed_trades = int(ev.get("completed_paper_trades", -1))
+        missing_links = int(ev.get("missing_trade_links", -1))
+        reconciliation_mismatches = int(ev.get("reconciliation_mismatches", -1))
+    except (TypeError, ValueError, OverflowError):
+        completed_trades, missing_links, reconciliation_mismatches = 0, 1, 1
+    full_proven = (
+        ev.get("full_lifecycle_proven") is True
+        and completed_trades >= 100
+        and missing_links == 0
+        and reconciliation_mismatches == 0
+        and ev.get("ledger_readback_verified") is True
+        and ev.get("real_market_data") is True
+    )
     ok = (
         (data.get("pass") is True or full_proven)
         and full_proven
@@ -213,10 +220,14 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
         "pass": ok,
         "report_exists": path.exists(),
         "full_lifecycle_proven": full_proven,
+        "completed_paper_trades": completed_trades if completed_trades >= 0 else None,
+        "required_completed_paper_trades": 100,
+        "missing_trade_links": missing_links,
+        "reconciliation_mismatches": reconciliation_mismatches,
         "broker_connected": broker_connected,
         "market_open": market_open,
         "blocker_id": None if ok else "SYS3-BLK-008",
-        "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
+        "auto_action": "Accumulate 100 real market-data paper trades and independently read back/reconcile every ledger link",
     }
 
 
