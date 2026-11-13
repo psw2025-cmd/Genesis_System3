@@ -4971,8 +4971,27 @@ def _resolve_batch_chain_entry(sym: str) -> Dict[str, Any]:
         try:
             snap = json.loads(snap_file.read_text(encoding="utf-8"))
             if _usable_chain_snapshot(snap):
-                return _store_index_chain_snapshot(sym, snap, False)
-        except Exception:
+                # This is a READ path: do not invoke _store_index_chain_snapshot.
+                # That writer loads index baselines and performs enrichment and
+                # persistence (potentially costly remote I/O) on every batch
+                # GET. Cached Dhan rows already have the option-chain contract.
+                # Keep their original observed timestamp; never invent a live
+                # market tick from a revision-local EOD file.
+                from dashboard.backend.chain_adapter import normalize_index_chain_exchange
+                normalized = normalize_index_chain_exchange(snap, sym)
+                source = str(normalized.get("data_source") or "").strip().lower()
+                if (
+                    (source == "dhan" or source.startswith("dhan_"))
+                    and _usable_chain_snapshot(normalized)
+                    and normalized.get("verification_status") != "NOT_VERIFIED"
+                ):
+                    normalized["live"] = False
+                    normalized["stale"] = True
+                    normalized["snapshot"] = True
+                    normalized["verification_status"] = "DHAN_EOD_SNAPSHOT"
+                    normalized["source_priority"] = "dhan_saved_snapshot"
+                    return normalized
+        except (OSError, ValueError, TypeError, KeyError, ImportError):
             pass
     return _warming_chain_placeholder(sym)
 
