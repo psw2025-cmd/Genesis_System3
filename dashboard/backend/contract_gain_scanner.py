@@ -368,6 +368,57 @@ def equity_shard_coverage() -> Dict[str, Any]:
     }
 
 
+def equity_gainer_seed_symbols(
+    market_rows: Any, limit: int = 12
+) -> List[str]:
+    """Prioritize Moneycontrol hints using the Dhan OPTSTK master allow-list.
+
+    Market-wide gainers are discovery hints only. A stock is eligible for the
+    paced option-chain worker only if its F&O underlying is in the actual
+    instrument master. A missing master returns no symbols, not an invented
+    fixed list of tradeable names or a false claim of 219 coverage.
+    """
+    from core.brokers.dhan.equity_fo_universe import load_equity_fo_universe
+
+    requested = max(1, min(int(limit), 40))
+    master = load_equity_fo_universe()
+    if master.get("implemented") is not True:
+        return []
+    eligible = {
+        str(name).strip().upper()
+        for name in (master.get("underlyings") or [])
+        if str(name).strip()
+    }
+    if not eligible:
+        return []
+    selected: List[str] = []
+
+    def take(name: Any) -> None:
+        if not isinstance(name, str):
+            return
+        symbol = name.strip().upper()
+        # Do not guess symbols from a company display name, or strip arbitrary
+        # suffixes; the master determines exact tradable underlying codes.
+        if symbol in eligible and symbol not in selected:
+            selected.append(symbol)
+
+    if isinstance(market_rows, list):
+        for row in market_rows:
+            if not isinstance(row, dict):
+                continue
+            for key in ("underlying", "underlying_symbol", "symbol", "ticker"):
+                if isinstance(row.get(key), str):
+                    take(row[key])
+                    break
+            if len(selected) >= requested:
+                return selected[:requested]
+    for name in master.get("priority_underlyings") or []:
+        take(name)
+        if len(selected) >= requested:
+            break
+    return selected[:requested]
+
+
 def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
     """Return equity FO names for this scan tick.
 
