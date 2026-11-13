@@ -56,7 +56,7 @@ def main() -> None:
     ).start()
 
     uvicorn.run(
-        "dashboard.backend.secure_app:app",
+        "dashboard.backend.observability_app:app",
         host="0.0.0.0",
         port=port,
         workers=1,
