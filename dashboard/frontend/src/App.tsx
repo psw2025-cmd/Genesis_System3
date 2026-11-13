@@ -6,6 +6,7 @@ import { useData } from './hooks/useData'
 import { TopBar }    from './components/TopBar'
 import { TruthStrip } from './components/TruthStrip'
 import { Sidebar, DASHBOARD_TAB_IDS } from './components/Sidebar'
+import { SystemTruthControl } from './components/SystemTruthControl'
 import ErrorBoundary from './components/ErrorBoundary'
 import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
 import { AutonomousLoopBanner } from './components/AutonomousLoopBanner'
@@ -22,7 +23,6 @@ const SystemTab = lazy(() => import('./components/SystemTab').then((m) => ({ def
 const LiveTradingGate = lazy(() => import('./components/LiveTradingGate').then((m) => ({ default: m.LiveTradingGate })))
 const PerformanceTab = lazy(() => import('./components/PerformanceTab').then((m) => ({ default: m.PerformanceTab })))
 const EndToEndProof = lazy(() => import('./components/EndToEndProof').then((m) => ({ default: m.EndToEndProof })))
-const SystemTruthControl = lazy(() => import('./components/SystemTruthControl').then((m) => ({ default: m.SystemTruthControl })))
 const LiveSimulation = lazy(() => import('./components/LiveSimulation').then((m) => ({ default: m.LiveSimulation })))
 const MobileTradingHub = lazy(() => import('./components/MobileTradingHub').then((m) => ({ default: m.MobileTradingHub })))
 const DecisionIntelligence = lazy(() => import('./components/workspaces/DecisionIntelligence').then((m) => ({ default: m.DecisionIntelligence })))
@@ -108,7 +108,7 @@ export default function App() {
         import('./components/OptionChain'), import('./components/AlertsTab'),
         import('./components/SystemTab'), import('./components/LiveTradingGate'),
         import('./components/PerformanceTab'), import('./components/EndToEndProof'),
-        import('./components/SystemTruthControl'), import('./components/LiveSimulation'),
+        import('./components/LiveSimulation'),
         import('./components/MobileTradingHub'),
         import('./components/workspaces/DecisionIntelligence'),
         import('./components/workspaces/OptionsIntelligence'),
