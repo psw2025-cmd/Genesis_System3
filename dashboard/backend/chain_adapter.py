@@ -121,6 +121,78 @@ def _liquidity_bounce(df: pd.DataFrame) -> tuple[pd.DataFrame, Dict[str, int]]:
     }
 
 
+def normalize_index_chain_exchange(result: Any, underlying: str) -> Dict[str, Any]:
+    """Normalize a cached or broker-provided chain without upgrading its evidence.
+
+    A source payload can already be the 44-field /api/chain contract. Preserve
+    its contracts and original timestamp; never re-stamp an EOD snapshot as a
+    fresh live quote or manufacture missing CE/PE rows.
+    """
+    symbol = str(underlying or "").strip().upper()
+    if not isinstance(result, dict):
+        return {
+            "underlying": symbol, "symbol": symbol, "contracts": [],
+            "total_contracts": 0, "spot": 0.0, "data_source": None,
+            "status": "NO_DHAN_DATA", "live": False, "stale": True,
+            "verification_status": "NOT_VERIFIED",
+            "reason_if_unverified": "Option chain payload is not a mapping.",
+        }
+    payload = dict(result)
+    contracts = payload.get("contracts")
+    if not isinstance(contracts, list):
+        contracts = []
+    # Fail closed on invalid types; never convert a count into fictitious rows.
+    contracts = [c for c in contracts if isinstance(c, dict)]
+    raw_spot = payload.get("spot")
+    if raw_spot is None:
+        raw_spot = payload.get("underlying_spot")
+    try:
+        spot = float(raw_spot)
+        if not math.isfinite(spot) or spot <= 0:
+            spot = 0.0
+    except (TypeError, ValueError, OverflowError):
+        spot = 0.0
+
+    payload["underlying"] = symbol
+    payload["symbol"] = symbol
+    payload["contracts"] = contracts
+    payload["total_contracts"] = len(contracts)
+    payload["spot"] = spot
+    source = str(payload.get("data_source") or payload.get("source") or "").strip().lower()
+    status = str(payload.get("status") or "").strip().upper()
+    source_verified = source == "dhan" or source.startswith("dhan_")
+    closed_snapshot = status in {
+        "MARKET_CLOSED_DHAN_SNAPSHOT", "MARKET_CLOSED", "EOD_SNAPSHOT"
+    }
+    excluded_source = any(x in source for x in (
+        "mock", "synthetic", "csv", "fallback", "yahoo", "bhavcopy"
+    ))
+    chain_usable = bool(contracts and spot > 0 and source_verified and not excluded_source)
+
+    if not status:
+        payload["status"] = "NO_DHAN_DATA" if not chain_usable else "OK"
+    if not chain_usable:
+        payload["live"] = False
+        payload["stale"] = True
+        payload["verification_status"] = "NOT_VERIFIED"
+        payload["reason_if_unverified"] = (
+            "No independently sourced, positive-spot Dhan option-contract rows."
+        )
+    elif closed_snapshot:
+        payload["live"] = False
+        payload["snapshot"] = True
+        # An EOD chain is historical even when it is a valid broker snapshot.
+        payload["stale"] = True
+        payload["verification_status"] = "DHAN_EOD_SNAPSHOT"
+    else:
+        # Preserve the producer's market-session and freshness decisions.
+        payload["live"] = bool(payload.get("live", False))
+        payload["stale"] = bool(payload.get("stale", not payload["live"]))
+        if not payload.get("verification_status"):
+            payload["verification_status"] = "DHAN_SOURCE_REPORTED"
+    return payload
+
+
 def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional[Dict[str, Any]]:
     """Fetch one requested expiry from Dhan and normalize for /api/chain."""
     if not hasattr(dsm, "fetch_option_chain"):
