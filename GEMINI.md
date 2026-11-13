@@ -1,3 +1,6 @@
+## GENESIS_PERMANENT_MEMORY_BOOT_20261112
+Before every Genesis turn, read agent_deep_audit/.agents/mission/MASTER_CONTRACT_FINAL.md PART 14, canonical PROGRESS.md and BLOCKERS.md, and last pushed SHA. Resume pending work; do not restart. PART 14 is the latest source-truth and continuation instruction. No website scraping; source outage is not market closure. Keep permanent PAPER locks and separate cloud-mutation approval.
+
 
 ## OWNER_NSE_DHAN_LIVE_CHECK_20261112 - current owner instruction
 

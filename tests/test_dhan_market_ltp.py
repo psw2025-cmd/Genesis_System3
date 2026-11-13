@@ -1,6 +1,15 @@
 """Tests for Dhan marketfeed LTP helpers and position enrichment."""
 
 import threading
+import ast
+import inspect
+import asyncio
+import sys
+import types
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pytest
 
 import core.brokers.dhan.market_ltp as market_ltp
 from core.brokers.dhan.market_ltp import (
@@ -82,10 +91,127 @@ def test_build_index_board_uses_fallback(monkeypatch):
         symbols=["NIFTY", "INDIAVIX"],
         fallback_spots={"NIFTY": {"spot": 24320.55, "change_pct": -0.31, "source": "paced_chain_cache"}},
     )
-    assert board["success"] is True
+    assert board["success"] is False
     nifty = next(r for r in board["indices"] if r["symbol"] == "NIFTY")
     assert nifty["ltp"] == 24320.55
     assert nifty["source"] == "paced_chain_cache"
+    assert nifty["live"] is False
+    assert nifty["change_pct"] is None
+    assert nifty["data_status"] == "CACHED_UNVERIFIED"
+
+
+def test_cached_video_spot_cannot_borrow_september_daily_percentage(monkeypatch):
+    def forbidden_fetch(_):
+        raise AssertionError("prefetched source miss must not refetch")
+
+    monkeypatch.setattr(market_ltp, "fetch_market_quotes", forbidden_fetch)
+    video_spot, september_close = 25225.80, 23398.10
+    old_pct = (video_spot - september_close) / september_close * 100
+    assert round(old_pct, 2) == 7.81
+    board = market_ltp.build_index_board(
+        symbols=["NIFTY"], prefetched_quotes={},
+        fallback_spots={"NIFTY": {"spot": video_spot, "prev_close": september_close,
+                                   "change_pct": old_pct, "source": "paced_chain_cache"}},
+    )
+    row = board["indices"][0]
+    assert row["ltp"] == video_spot
+    assert row["live"] is False
+    assert row["close"] is None
+    assert row["change"] is None
+    assert row["change_pct"] is None
+    assert board["live_count"] == 0
+
+
+def test_prefetched_quote_uses_its_own_denominator_and_never_refetches(monkeypatch):
+    monkeypatch.setattr(market_ltp, "fetch_market_quotes", lambda _: pytest.fail("duplicate fetch"))
+    board = market_ltp.build_index_board(
+        symbols=["NIFTY"],
+        prefetched_quotes={"13": {"ltp": 25225.80, "close": 25255.05,
+                                  "change": 1827.70, "change_pct": 7.81}},
+        fallback_spots={"NIFTY": {"spot": 23118.60, "change_pct": -1.19}},
+    )
+    row = board["indices"][0]
+    assert row["change"] == pytest.approx(25225.80 - 25255.05)
+    assert row["change_pct"] == pytest.approx((25225.80 - 25255.05) / 25255.05 * 100)
+    assert row["change_pct"] < 0
+    assert row["change_provenance"] == "SAME_QUOTE_CLOSE"
+    assert row["freshness"] == "UNVERIFIED"
+
+
+def test_real_zero_percent_not_overridden_by_old_fallback():
+    row = market_ltp.build_index_board(
+        symbols=["NIFTY"],
+        prefetched_quotes={"13": {"ltp": 25225.80, "close": 25225.80, "change": 0, "change_pct": 0}},
+        fallback_spots={"NIFTY": {"spot": 25225.80, "prev_close": 23398.10, "change_pct": 7.81}},
+    )["indices"][0]
+    assert row["change"] == 0
+    assert row["change_pct"] == 0
+
+
+@pytest.mark.parametrize("close", [None, 0, -1, float("nan"), float("inf"), "invalid", True, 1e-320])
+def test_unverified_denominator_never_publishes_daily_percentage(close):
+    row = market_ltp.build_index_board(
+        symbols=["NIFTY"],
+        prefetched_quotes={"13": {"ltp": 25225.80, "close": close, "change_pct": 7.81}},
+    )["indices"][0]
+    assert row["change_pct"] is None
+    assert row["change_provenance"] == "UNVERIFIED"
+    parsed = _parse_quote_blob({"last_price": 25225.80, "ohlc": {"close": close}})
+    assert parsed["change_pct"] is None
+
+
+def test_live_board_route_matches_adapter_and_has_no_historical_baseline_calls():
+    source = (Path(__file__).resolve().parents[1] / "dashboard/backend/app.py").read_text(encoding="utf-8-sig")
+    route = next(n for n in ast.parse(source).body if isinstance(n, ast.AsyncFunctionDef) and n.name == "get_market_live_board")
+    calls = [n for n in ast.walk(route) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)]
+    assert not {"get_previous_close", "get_index_baseline"}.intersection(n.func.id for n in calls)
+    board_call = next(n for n in calls if n.func.id == "build_index_board")
+    kwargs = {kw.arg: {} for kw in board_call.keywords}
+    inspect.signature(market_ltp.build_index_board).bind(**kwargs)
+
+
+@pytest.mark.parametrize("quote", [{}, {"13": {"ltp": 25225.80, "close": 25255.05}}])
+def test_actual_route_build_reuses_single_batch_without_old_close(monkeypatch, quote):
+    # Execute only this trusted route AST: importing the whole app starts unrelated
+    # bootstrap paths. Every provider dependency below is a strict offline stub.
+    source = (Path(__file__).resolve().parents[1] / "dashboard/backend/app.py").read_text(encoding="utf-8-sig")
+    route = next(n for n in ast.parse(source).body if isinstance(n, ast.AsyncFunctionDef) and n.name == "get_market_live_board")
+    route.decorator_list = []
+    module = ast.fix_missing_locations(ast.Module(body=[route], type_ignores=[]))
+    calls = []
+
+    def fetch(securities):
+        calls.append(securities)
+        return quote
+
+    monkeypatch.setattr(market_ltp, "fetch_market_quotes", fetch)
+    monkeypatch.setitem(sys.modules, "core.brokers.dhan.dhan_readonly",
+                        types.SimpleNamespace(get_holdings=lambda: {"data": []}))
+
+    async def run_blocking(fn, timeout):
+        return fn()
+
+    namespace = {
+        "_cache_get": lambda *args: None,
+        "_cache_set": lambda key, value: value,
+        "_run_blocking": run_blocking,
+        "_TTL_CHAIN": 120,
+        "_PUSHED_CHAIN_CACHE": {"NIFTY": {"data": {"spot": 25225.80, "change_pct": 7.81}}},
+        "datetime": datetime, "IST": timezone.utc, "asyncio": asyncio,
+    }
+    exec(compile(module, "isolated_live_board_route", "exec"), namespace)
+    result = asyncio.run(namespace["get_market_live_board"]())
+    assert len(calls) == 1
+    assert "error" not in result
+    nifty = next(r for r in result["indices"] if r["symbol"] == "NIFTY")
+    assert nifty["ltp"] == 25225.80
+    if quote:
+        assert nifty["change_pct"] < 0
+        assert nifty["prev_close"] == 25255.05
+    else:
+        assert nifty["live"] is False
+        assert nifty["change_pct"] is None
+        assert nifty["prev_close"] is None
 
 
 def test_rest_marketfeed_does_not_retry_alternate_body_after_429(monkeypatch):

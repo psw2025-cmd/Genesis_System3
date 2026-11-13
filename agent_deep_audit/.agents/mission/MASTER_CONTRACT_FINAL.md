@@ -250,6 +250,17 @@ Reason: Owner gave CONTINUE, Agent replied once and stopped. Loop broke because 
 - On next CONTINUE, Agent MUST first write: "LOOP_BROKEN fixed, resuming from [Last SHA + Last File], not restarting from zero."
 - Agent will NOT restart from zero. Agent will resume from last saved SHA + last file.
 
+
+## Current continuation - 2026-11-12T06:49:03.832600+00:00 UTC
+PART 14 saved once and GitHub read-back verified at 2eb65f90acc832b21fd07794f3ce303b7c2c39d8 (blob 292f298a5f141e23916aebfbae3e556d0b25625d). Startup pointers added to read it every Genesis turn.
+Follow-on branch: fix/source-failure-ui-truth-20261112, based on that SHA; no restart of original mission.
+Implemented in small source batches: unknown startup instead of browser clock; source outage no longer CLOSED; 60-second STALE threshold; desktop/mobile/session labels preserve UNKNOWN; special-session transport reads source status. Node behavior contract is now a mandatory prebuild gate.
+Validation: 31 targeted Python regressions, TypeScript typecheck, production build and all prebuild behavior contracts executed successfully. Browser visual proof is NOT PASS: attempt 1 HTTP-only isolation admitted a WebSocket session update and failed the assertion; attempt 2 isolated both transports but hung; attempt 3 added explicit 15s limits/progress output and also hung. Stopped only verified test process trees. LOOP_BLOCKER_BROWSER_SIMULATION: no fourth retry; external/tool-state investigation required before visual acceptance. Product UI remains UNVERIFIED.
+Fresh source scan at 2026-11-12 12:08:45 IST / 06:38:45 UTC: official NSE calendar/session JSON APIs HTTP 200; NSE session packet age 45.58s, Dhan quote age -0.42s (within 5s tolerance); both source age checks fresh. Independent clock and synchronized UI/price parity remain UNVERIFIED. No website scraping, token renewal or order call in source probe.
+Cloud read-only: serving revision 00131-2md unchanged; health HTTP 200. Local summary arithmetic matches 0.01 only, not cost/slippage/cloud receipt proof. Disk 77.38%; managed token expiry, option expiry, quotas, dependency vulnerabilities and corporate actions not fully verified. No production certification.
+Correction: earlier main auto-deploy warning came from divergent local checkout. The fetched approved main workflow inventory does NOT contain cloud-run-auto-deploy.yml. Separate explicit owner deployment approval remains mandatory regardless.
+Next: review pushed follow-on draft and resolve browser tooling LOOP_BLOCKER; do not deploy or claim UI PASS. Roles: PM resumed, Developer fixed source truth, Tester checked behavior/build, Auditor/Critic withheld visual and production acceptance, Risk kept PAPER/order restrictions.
+
 PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED:
 
 1. USER PROFILE: User ko coding, computer, path, folder kuch nahi pata. User sirf READY PRODUCT chahta hai. User se kabhi path mat pucho. Tum khud dhoondho, khud fix karo, khud verify karo. User sirf CONTINUE LOOP / YES / NO / STOP bolega.
@@ -278,3 +289,43 @@ PART 14 - PERMANENT MEMORY - NEVER FORGET - TOP COMPANY RULE - 2026-11-12 LOCKED
 - Agar duplicate MD file mile, tum khud usko .OLD_IGNORE_DO_NOT_USE karoge. User se nahi puchoge.
 - Agar purana report "FULL ACCEPTANCE CERTIFIED All 1872 PASS" mile, usko BANNED samjhoge, ignore karoge, fresh proof se check karoge.
 - Agar tum 1 reply ke baad ruk gaye bina P0 / Deploy / Secret / Billing ke, to wo LOOP_BROKEN hai. Agle CONTINUE pe pehle likhoge "LOOP_BROKEN fixed, resuming from [Last SHA + Last File]".
+
+6. PERMANENT LIVE FILE + CACHE FIRST - 2026-11-12 OWNER ADDENDUM:
+- Single canonical file: C:\Genesis_System3_clean\agent_deep_audit\.agents\mission\LIVE_MARKET_STATE.md. Existing file mile to usi ko use/update karo; missing ho to ek baar banao. Never create agent_deep_audit.agents or another duplicate mission folder.
+- File retains: Market Status with calendar/session proof; last NSE source time; last Dhan source time; Dhan token OK / EXPIRED / UNKNOWN with evidence; holiday list; last five watched symbols and live prices; individual source age and LIVE / STALE / UNAVAILABLE labels.
+- Every fixer first reads this file. A snapshot no older than 10 seconds is reused; fresh remote data is requested only when needed. Re-read does not renew token, repeat login, scrape the NSE homepage or restart work from zero.
+- Snapshot write time and original exchange/source time are separate. A fresh heartbeat must NEVER relabel old prices LIVE. Unknown data or expired credentials are explicit, never invented prices or a CLOSED market claim.
+
+7. SEPARATE LIVE TRACKER AND FIXER - PARALLEL OWNER REQUIREMENT:
+- LIVE TRACKER is a separate supervised runtime loop, independent of fixer/chat progress, publishing the canonical snapshot every 10 seconds. Routine ticks and read-only refreshes never ask Owner YES.
+- FIXER repairs software and consumes the permanent snapshot; it does not wait behind a slow full-market scan or independently recreate broker sessions.
+- One active source-collector lease only: reuse the existing cloud feed/worker instead of starting duplicate Dhan pollers. Cache official calendar evidence with its date/source; refresh when expired/changed rather than scraping a website on every tick.
+- Tracker deployment and durable shared storage must preserve existing cloud-only runtime, PAPER locks, secret protections and cloud-change consent. A local diagnostic process is not an independent cloud runtime. Report actual running/heartbeat evidence; never claim always-on from code, a started process or old health.json alone.
+
+8. SINGLE-SYMBOL PARALLEL TRACKING - NO HEAD-OF-LINE WAIT:
+- If Owner names RELIANCE / NIFTY / BANKNIFTY or another symbol, track that watchlist instead of rescanning the entire market.
+- Independent bounded symbol tasks or broker-supported batching keep a delayed symbol from blocking other completed symbols or the 10-second snapshot. Each row has its own source timestamp, error and freshness.
+- Respect broker rate limits globally across concurrent tasks. Backoff and mark affected rows on 401 / 429 / 5xx; no hammering, no hidden retries, no token renewal or real-order routes.
+
+9. PERMANENT CONTINUATION AND TRUTH:
+- Maintain this PART 14 without duplicates, plus PROGRESS.md, BLOCKERS.md, INDEPENDENT_VERIFICATION.csv and LIVE_MARKET_STATE.md. Save reviewed changes to GitHub with exact SHA.
+- Resume saved Fix #618 / last pushed SHA and pending video-percentage provenance work; never restart from Fix #1. Tracker and fixer work can proceed in parallel; checkpoint report is not a stop instruction.
+- STOP only at the existing safety/approval boundary or the documented retry limit. Keep unverified work explicit. No unbounded background-monitoring claim without actual supervised-runtime proof.
+
+PART 15 - TOKEN SAVING + SELF-REASONING - PERMANENT
+
+- Resume from the short canonical PROGRESS.md checkpoint and LIVE_MARKET_STATE.md; consult PART 14/15/16 on policy changes and only relevant BLOCKERS lines. Read targeted rg matches, definitions and diffs, never repeatedly dump whole files. Necessary implementation/evidence reads remain allowed.
+- After each batch save three lines: Last SHA + Last File; Next; Market + Token status with observation time. UNKNOWN stays UNKNOWN. Owner report: five simple lines. 70% fewer tokens and 3x speed are targets, not measured achievements.
+- Reuse source snapshots for 10 seconds, preserve original exchange timestamps, fetch only requested symbols. Cache official NSE calendar once per IST day; invalidate on changed special-session evidence. No NSE homepage scraping, repeated login or automatic token creation.
+- Privately compare three approaches and choose the least costly safe approach with equal quality. Change approach after failure, maximum three attempts; save root cause, failed method and prevention. Source failures mean DATA SOURCE DOWN/UNKNOWN, never inferred CLOSED; software failures retain their actual error classification.
+- Maximum five implementation files per batch; parallelize independent tasks with exclusive file ownership. Tracker publishes every 10 seconds independently of fixer, with bounded independent symbol work and shared rate limits/collector lease. Do not claim unattended operation without runtime proof.
+- Lesson 12/11/2026: owner reports NSE website scraping failed/was blocked. Preferred method: Dhan read-only API + official NSE calendar JSON + suitable connected plugin when available. Do not retry website scraping or claim an unused plugin supplied evidence.
+- Keep one PART 15, push reviewed changes with SHA, resume pending Fix #618 rather than restarting. PAPER locks and evidence requirements remain mandatory.
+
+PART 16 - APPROVAL RULE - PERMANENT
+
+- Owner authorizes routine project reads, backed-up edits, tests, safe Git commits/pushes and independent parallel work inside C:\Genesis_System3_clean without repeated YES or "Would you like to make edits?" questions. Proceed with the default safe action.
+- Owner approval is required only for secret deletion/rotation, enabling live trading, billing/payment, and file deletion without a backup. This latest owner approval scope supersedes older project-level approval lists, including routine deployment/IAM work; still inspect each actual operation for these four protected effects.
+- Tool permission settings are controlled by the host, not this document. Current session reports full access and approval policy never; do not request escalation or claim this file permanently changes future host settings.
+- Preserve PAPER_MODE=1, ANALYZE_MODE=1, LIVE_TRADING_ENABLED=0, LIVE_ORDER_AUTHORITY=0, ORDER_PLACEMENT_ALLOWED=false. No real orders. A secret leak stops affected work; do not rotate/delete secrets without the required owner approval.
+- Backup before changes; preserve unrelated edits and append-only evidence. Continue from the saved checkpoint, keep reports to five simple lines and save actual results without fabricated PASS or permanent-background claims.

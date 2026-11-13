@@ -169,7 +169,7 @@ export function Overview() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 7, marginTop: 10 }}>
                 {[
                   ['Broker', brokerConnected ? 'PAPER LOCKED' : brokerResponded ? 'RESPONDED' : 'WAITING'],
-                  ['Market', marketOpen ? 'OPEN' : 'CLOSED / POLL'],
+                  ['Market', marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED / POLL'],
                   ['Alerts', String(alertCount)],
                   ['Proof Gates', `${passCount}/${proofGates.length || 0}`],
                 ].map(([label, value]) => (
@@ -261,7 +261,7 @@ export function Overview() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 10 }}>
             <Metric label="Max Drawdown" value={drawdown == null ? '--' : `${Math.abs(drawdown).toFixed(2)}%`} sub="Paper evidence" tone={drawdown == null ? undefined : Math.abs(drawdown) < 10 ? 'up' : 'warn'} />
             <Metric label="Proof Gates" value={`${passCount}/${proofGates.length || 0}`} sub="Current gate matrix" tone={proofGates.length > 0 && passCount === proofGates.length ? 'up' : 'warn'} />
-            <Metric label="Market" value={marketOpen ? 'OPEN' : 'CLOSED'} sub="Read-only data remains visible" tone={marketOpen ? 'up' : 'warn'} />
+            <Metric label="Market" value={marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED'} sub="Read-only data remains visible" tone={marketOpen ? 'up' : 'warn'} />
             <Metric label="Authority" value={liveAllowed ? 'REVIEW' : 'LOCKED'} sub="Live execution state" tone={liveAllowed ? 'down' : 'up'} />
           </div>
         </div>

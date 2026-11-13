@@ -330,7 +330,7 @@ export function OptionChain() {
     }
   }, [spot, chainSymbol, selectedExpiry, range, fullMobileTable])
 
-  const noDataReason = String(data?.message || expiryError || state?.market?.reason || (marketOpen ? 'Waiting for verified Dhan option-chain rows.' : 'Market closed; no verified broker chain snapshot is available.'))
+  const noDataReason = String(data?.message || expiryError || state?.market?.reason || (marketOpen == null ? 'Market session UNKNOWN; source data unavailable.' : marketOpen ? 'Waiting for verified Dhan option-chain rows.' : 'Market closed; no verified broker chain snapshot is available.'))
 
   function ltpChangePct(c: Contract | undefined) {
     if (!c) return null

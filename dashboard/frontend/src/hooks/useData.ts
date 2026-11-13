@@ -98,7 +98,7 @@ const fallbackHealth = (apiStatus: any) => ({
   qc_status: apiStatus?.status || 'API_LOCKED',
   live_allowed: false,
   broker: { connected: false, status: apiStatus?.status || 'API_LOCKED' },
-  market: { is_open: false, reason: apiStatus?.message || 'API temporarily offline', next_open: '--' },
+  market: { is_open: null, reason: `DATA SOURCE DOWN · market session UNKNOWN: ${apiStatus?.message || 'API temporarily offline'}`, next_open: '--' },
   live_blockers: [apiStatus?.message || 'API temporarily offline'],
 })
 

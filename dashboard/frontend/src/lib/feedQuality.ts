@@ -10,14 +10,14 @@ export type FeedQuality =
 
 export type FeedTone = 'ok' | 'warn' | 'error' | 'mut'
 
-const STALE_TICK_SEC = 120
+const STALE_TICK_SEC = 60
 
 function isMockSource(source: unknown): boolean {
   return /(mock|synthetic|fake|csv|yahoo|fallback)/i.test(String(source || ''))
 }
 
 export function resolveFeedQuality(input: {
-  marketOpen?: boolean
+  marketOpen?: boolean | null
   wsStatus?: string
   tickAgeSec?: number | string | null
   dataSource?: string | null
@@ -47,12 +47,16 @@ export function resolveFeedQuality(input: {
     return { label: 'Reconnecting', tone: 'warn', detail: 'Reconnecting to stream' }
   }
 
-  if (hasTickAge && tickAge > STALE_TICK_SEC) {
+  if (hasTickAge && tickAge >= STALE_TICK_SEC) {
     return {
       label: 'Stale',
       tone: 'warn',
-      detail: `Last tick ${Math.round(tickAge)}s ago`,
+      detail: `Last tick ${Math.round(tickAge)}s ago · market ${input.marketOpen === true ? 'OPEN' : input.marketOpen === false ? 'CLOSED' : 'UNKNOWN'}`,
     }
+  }
+
+  if (input.marketOpen == null) {
+    return { label: 'Delayed', tone: 'warn', detail: 'Market session UNKNOWN · source evidence unavailable' }
   }
 
   if (!marketOpen) {

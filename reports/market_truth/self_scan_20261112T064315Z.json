@@ -1,0 +1,12 @@
+{
+  "utc": "2026-11-12T06:43:15.372783+00:00",
+  "label": "UNVERIFIED",
+  "pnl_local_arithmetic_only": true,
+  "cost_slippage_cloud_reconciliation": "UNVERIFIED",
+  "disk_used_pct": 77.38,
+  "calendar_dhan_receipt": "reports/market_truth/20261112T063843Z/source_observation.json",
+  "expiry_quota_managed_secrets": "UNVERIFIED",
+  "past_fail": "source failure falsely labeled CLOSED; fixed under test",
+  "ui": "SIMULATION test pending; cloud patch not deployed",
+  "cloud_health_http": 200
+}

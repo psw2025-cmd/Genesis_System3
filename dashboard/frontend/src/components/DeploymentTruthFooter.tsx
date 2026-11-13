@@ -32,7 +32,7 @@ export function DeploymentTruthFooter() {
         {sha.length > 8 ? ` (${sha})` : ''}
       </span>
       <span>
-        Market {marketOpen ? 'OPEN' : 'CLOSED'}
+        Market {marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED'}
         {' · '}
         Sync {formatIstStamp(lastSync)}
         {' · '}

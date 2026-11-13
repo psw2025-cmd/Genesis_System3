@@ -36,7 +36,7 @@ export const OptionsIntelligence: React.FC = () => {
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
           <StatusChip label="SYMBOL" value={chainSymbol} status="ok" />
-          <StatusChip label="MARKET" value={marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'warn'} />
+          <StatusChip label="MARKET" value={marketOpen == null ? 'UNKNOWN' : marketOpen ? 'OPEN' : 'CLOSED'} status={marketOpen ? 'ok' : 'warn'} />
         </div>
       </header>
 

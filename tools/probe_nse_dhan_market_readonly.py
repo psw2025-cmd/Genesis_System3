@@ -19,7 +19,13 @@ def main():
     session = requests.Session()
     session.headers.update({"User-Agent": "Mozilla/5.0", "Accept": "application/json"})
     try:
-        session.get("https://www.nseindia.com/", timeout=15)
+        # Official JSON APIs only: never scrape the NSE website or bypass a block.
+        calendar = session.get("https://www.nseindia.com/api/holiday-master?type=trading", timeout=15)
+        result["nse_calendar_http"] = calendar.status_code
+        result["nse_calendar_available"] = False
+        if calendar.status_code == 200:
+            result["nse_calendar_packet"] = calendar.json()
+            result["nse_calendar_available"] = True
         r = session.get("https://www.nseindia.com/api/marketStatus", timeout=15)
         result["nse_http"] = r.status_code
         if r.status_code == 200:
@@ -70,7 +76,7 @@ def main():
     out = ROOT / "reports" / "market_truth" / now.strftime("%Y%m%dT%H%M%SZ")
     out.mkdir(parents=True, exist_ok=False)
     (out / "source_observation.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
-    print(json.dumps(result))
+    print(json.dumps({k: v for k, v in result.items() if k != "nse_calendar_packet"}))
 
 
 if __name__ == "__main__":

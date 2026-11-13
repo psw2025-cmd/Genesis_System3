@@ -1,11 +1,13 @@
 /**
  * WebSocket Hook for Real-time Updates
  * Falls back to polling if WebSocket is offline
- * Only activates during market hours (Monday-Friday, 9:15 AM - 3:30 PM IST)
+ * Uses source-reported session state, including special sessions.
  */
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { API_BASE } from '../config'
-import { isMarketOpen, getMarketStatus } from '../utils/marketHours'
+import { useStore } from '../store'
+
+const sourceSessionOpen = () => useStore.getState().marketOpen === true
 
 interface WebSocketMessage {
   type: string
@@ -53,9 +55,8 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
   const connect = useCallback(() => {
     if (!enabled) return
     
-    // Check if market is open - only connect during market hours
-    if (!isMarketOpen()) {
-      // Market is closed, use polling instead
+    // Unknown source status uses polling; it does not establish market closure.
+    if (!sourceSessionOpen()) {
       setUsePolling(true)
       setIsConnected(false)
       return
@@ -116,7 +117,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         // 1. It wasn't a normal closure (code 1000)
         // 2. WebSocket is still enabled
         // 3. Market is still open
-        if (event.code !== 1000 && enabled && wsRef.current === ws && isMarketOpen()) {
+        if (event.code !== 1000 && enabled && wsRef.current === ws && sourceSessionOpen()) {
           if (reconnectTimeoutRef.current) {
             clearTimeout(reconnectTimeoutRef.current)
           }
@@ -130,7 +131,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           const jitter = baseDelay * 0.2 * Math.random()
           const delay = baseDelay + jitter
           reconnectTimeoutRef.current = setTimeout(() => {
-            if (enabled && !isConnectingRef.current && isMarketOpen()) {
+            if (enabled && !isConnectingRef.current && sourceSessionOpen()) {
               connect()
             }
           }, delay)
@@ -171,12 +172,12 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     if (enabled) {
       // Check market status and connect if market is open
       const checkAndConnect = () => {
-        if (isMarketOpen()) {
+        if (sourceSessionOpen()) {
           if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
             connect()
           }
         } else {
-          // Market is closed, disconnect and use polling
+          // Closed or unknown session: poll for fresh source evidence.
           disconnect()
           setUsePolling(true)
         }

@@ -35,12 +35,12 @@ function MarketTicker({
   label: string
   spot?: number
   chg?: number | null
-  marketOpen: boolean
+  marketOpen: boolean | null
   missingLabel?: string
 }) {
   const up = (chg ?? 0) >= 0
   const missing = !spot || spot <= 0
-  const missingText = missingLabel || (marketOpen ? 'Warming' : 'After hours')
+  const missingText = missingLabel || (marketOpen == null ? 'Session unknown' : marketOpen ? 'Warming' : 'After hours')
 
   return (
     <div className="flex flex-col justify-center px-3 py-1 border-l border-slate-800/80 min-w-[100px] shrink-0" title={missing ? missingText : undefined}>

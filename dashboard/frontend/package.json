@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality && npm run test:lifecycle-display && npm run test:risk-numeric-truth",
+    "prebuild": "npm run test:market-source && npm run test:broker-status && npm run test:data-integrity && npm run test:source-quality && npm run test:lifecycle-display && npm run test:risk-numeric-truth",
+    "test:market-source": "node scripts/market_session_truth_contract.mjs",
     "test:lifecycle-display": "node scripts/lifecycle_display_contract.mjs",
     "build": "vite build",
     "preview": "vite preview",

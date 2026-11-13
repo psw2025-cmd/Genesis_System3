@@ -736,7 +736,9 @@ async def get_state():
     if (state.get("mode") or "").upper() == "LIVE" and (not broker_connected or ds in ("SYNTHETIC", "NOT_READY")):
         state = dict(state)
         state["mode"] = "PAPER"
-    return state
+    from dashboard.backend.phase1_safe_gates import gate_model_state
+
+    return gate_model_state(state)
 
 
 @app.get("/api/state/history")
@@ -1182,15 +1184,11 @@ async def get_market_live_board():
         )
         from core.brokers.dhan.dhan_readonly import get_holdings
 
-        # Prefer live marketfeed; fall back to paced/TTL chain spots already in memory.
+        # Cached chain spots are display-only snapshots, not a current daily close.
         fallback = {}
         try:
-            from dashboard.backend.index_history_service import get_index_baseline
             for sym in ("NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX", "INDIAVIX"):
-                base = get_index_baseline(sym)
                 row = None
-                chg = None
-                chg_pct = None
                 pushed = _PUSHED_CHAIN_CACHE.get(sym) if isinstance(_PUSHED_CHAIN_CACHE, dict) else None
                 if isinstance(pushed, dict) and isinstance(pushed.get("data"), dict):
                     row = pushed["data"]
@@ -1199,26 +1197,12 @@ async def get_market_live_board():
                     if isinstance(ttl_hit, dict):
                         row = ttl_hit
                 spot = (row.get("spot") or row.get("underlying_spot")) if isinstance(row, dict) else None
-                if not spot or float(spot) <= 0:
-                    spot = base["spot"]
-                    chg = base.get("change", 0.0)
-                    chg_pct = base.get("change_pct", 0.0)
-
-                prev_c = base.get("prev_close")
-                if prev_c and float(prev_c) > 0 and spot:
-                    chg = round(float(spot) - float(prev_c), 2)
-                    chg_pct = round((chg / float(prev_c)) * 100.0, 2)
-                else:
-                    if chg_pct is None:
-                        chg_pct = (row.get("change_pct") or row.get("pct_change")) if isinstance(row, dict) else base.get("change_pct", 0.0)
-                    if chg is None:
-                        chg = row.get("change") if isinstance(row, dict) else base.get("change", 0.0)
+                if spot is None:
+                    continue
 
                 fallback[sym] = {
                     "spot": float(spot),
-                    "change": chg,
-                    "change_pct": chg_pct,
-                    "source": "paced_chain_cache" if isinstance(row, dict) else "genesis_storage_baseline",
+                    "source": "paced_chain_cache",
                 }
         except Exception:
             fallback = {}
@@ -1258,27 +1242,6 @@ async def get_market_live_board():
             batch_req["NSE_EQ"] = need_ids[:40]
         quotes = fetch_market_quotes(batch_req)
         board = build_index_board(fallback_spots=fallback, prefetched_quotes=quotes)
-
-        # Double-check all index rows against authoritative previous close
-        try:
-            from dashboard.backend.index_history_service import get_previous_close
-            for row in board.get("indices", []):
-                sym = row.get("symbol")
-                ltp = row.get("ltp")
-                chg = row.get("change")
-                chg_pct = row.get("change_pct")
-                prev = get_previous_close(sym)
-                if prev and prev > 0 and ltp is not None:
-                    if (
-                        chg is None
-                        or chg_pct is None
-                        or (abs(float(chg or 0.0)) < 0.0001 and abs(float(chg_pct or 0.0)) < 0.0001 and abs(float(ltp) - float(prev)) > 0.01)
-                    ):
-                        row["change"] = round(float(ltp) - float(prev), 2)
-                        row["change_pct"] = round((row["change"] / float(prev)) * 100.0, 2)
-                    row["prev_close"] = prev
-        except Exception:
-            pass
 
         # Enrich equity rows with live quotes from the same batch response
         for row in equity_rows:
@@ -1330,12 +1293,50 @@ async def get_market_live_board():
         }
 
 
+def _live_price_truth(symbol: str, quote: dict, retrieved_at: str | None = None) -> dict:
+    """Only label a Dhan quote live when it carries a recent exchange timestamp."""
+    source = str(quote.get("source") or "UNVERIFIED")
+    try:
+        last_known = float(quote.get("ltp") or quote.get("spot") or 0)
+        if not math.isfinite(last_known) or last_known <= 0:
+            last_known = 0.0
+    except (TypeError, ValueError):
+        last_known = 0.0
+    exchange_time = quote.get("exchange_timestamp") or quote.get("last_trade_time")
+    age = None
+    if isinstance(exchange_time, str):
+        try:
+            parsed = datetime.fromisoformat(exchange_time.replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                age = (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds()
+        except ValueError:
+            pass
+    recent = age is not None and -5 <= age <= 60
+    broker_quote = source in ("dhan_marketfeed", "DHAN_LIVE") and quote.get("data_status", "BROKER_QUOTE") == "BROKER_QUOTE"
+    live = bool(last_known and recent and broker_quote and quote.get("live", True))
+    if live:
+        return {
+            "symbol": symbol, "spot": last_known, "ltp": last_known,
+            "change": quote.get("change"), "change_pct": quote.get("change_pct"),
+            "source": "DHAN_LIVE", "timestamp": exchange_time,
+            "exchange_timestamp": exchange_time, "tick_age_sec": round(max(age, 0), 2),
+            "status": "SUCCESS", "freshness": "LIVE",
+        }
+    return {
+        "symbol": symbol, "spot": None, "ltp": None,
+        "last_known_ltp": last_known or None,
+        "change": None, "change_pct": None, "source": source,
+        "timestamp": exchange_time, "retrieved_at": retrieved_at,
+        "tick_age_sec": round(age, 2) if age is not None else None,
+        "status": "STALE" if age is not None and age > 60 else "UNVERIFIED",
+        "freshness": "STALE" if age is not None and age > 60 else "UNVERIFIED",
+    }
+
+
 @app.get("/api/live_price/{symbol}")
 @app.get("/api/live_price")
 async def get_live_price_endpoint(symbol: str = "NIFTY"):
-    """Authoritative live price endpoint for Dhan marketfeed quotes.
-    Returns {symbol, spot, change, change_pct, source: DHAN_LIVE, timestamp, status}.
-    """
+    """Return a live price only with a recent, exchange-timestamped Dhan quote."""
     sym = str(symbol or "NIFTY").strip().upper()
     if sym in ("BTCUSDT", "BTC-USD", "CRYPTO"):
         sym = "NIFTY"
@@ -1345,22 +1346,13 @@ async def get_live_price_endpoint(symbol: str = "NIFTY"):
     if isinstance(cached_board, dict):
         for row in (cached_board.get("indices") or []) + (cached_board.get("equities") or []):
             if str(row.get("symbol") or "").strip().upper() == sym:
-                return {
-                    "symbol": sym,
-                    "spot": float(row.get("ltp") or 0.0),
-                    "ltp": float(row.get("ltp") or 0.0),
-                    "change": float(row.get("change") or 0.0),
-                    "change_pct": float(row.get("change_pct") or 0.0),
-                    "source": "DHAN_LIVE",
-                    "timestamp": cached_board.get("generated_at") or datetime.now(IST).isoformat(),
-                    "status": "SUCCESS",
-                }
+                return _live_price_truth(sym, row, cached_board.get("generated_at"))
 
     # Fetch live price via core.data.live_fetcher
     try:
         from core.data.live_fetcher import get_live_price
         res = await asyncio.to_thread(get_live_price, sym)
-        return res
+        return _live_price_truth(sym, res, res.get("timestamp"))
     except Exception as e:
         return {
             "symbol": sym,
@@ -2846,6 +2838,9 @@ async def get_deploy_info():
         or os.environ.get("SYSTEM3_API_BASE")
         or (str(cfg.get("public_base_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app") if on_cloud_run else "http://127.0.0.1:8000")
     ).rstrip("/")
+    from dashboard.backend.phase1_safe_gates import public_url_for_runtime
+
+    base = public_url_for_runtime(base, on_cloud_run=on_cloud_run)
     return {
         "git_sha": git_sha,
         "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
@@ -11949,6 +11944,13 @@ async def get_ml_predictions():
                     pass
 
         enriched = []
+        from dashboard.backend.phase1_safe_gates import gate_model_prediction
+
+        model_metrics = (state.get("model") or {}).get("metrics") or {}
+        try:
+            loaded_model_count = int(model_metrics.get("models_loaded") or 0)
+        except (TypeError, ValueError):
+            loaded_model_count = 0
         for row in predictions[:10]:
             if not isinstance(row, dict):
                 continue
@@ -11963,7 +11965,7 @@ async def get_ml_predictions():
                 merged["strike"] = hint.get("suggested_atm_strike")
             if not merged.get("expiry"):
                 merged["expiry"] = hint.get("suggested_expiry")
-            enriched.append(merged)
+            enriched.append(gate_model_prediction(merged, loaded_model_count=loaded_model_count))
         predictions = enriched
         if SSOT_AVAILABLE and state_store is not None:
             try:
