@@ -8160,7 +8160,16 @@ async def validate_all_profits():
                 "all_warn_or_pass": all_warn,
                 "pass_count": sum(1 for v in validations if v["validation"]["validation_status"] == "PASS"),
                 "warn_count": sum(1 for v in validations if v["validation"]["validation_status"] == "WARN"),
-                "fail_count": sum(1 for v in validations if v["validation"]["validation_status"] == "FAIL"),
+                "fail_count": sum(
+                    1 for v in validations
+                    if v["validation"]["validation_status"] not in ("PASS", "WARN")
+                ),
+                "unverified_count": sum(
+                    1 for v in validations
+                    if v["validation"]["validation_status"] in (
+                        "NO_DATA", "NO_INDEPENDENT_OPTION_QUOTE", "NO_OPTION_QUOTE"
+                    )
+                ),
             },
         }
     except Exception as e:
