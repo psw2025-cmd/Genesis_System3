@@ -1,20 +1,35 @@
+# Canonical immutable Cloud Run image build.
+# Use: gcloud builds submit --config cloudbuild.yaml --substitutions=_GIT_SHA=<commit> .
+# Do not use `gcloud run deploy --source .`: it selects the legacy root Dockerfile.
 steps:
-  # Reject source-based mini-app uploads and missing production routes before build.
-  - name: 'python:3.11-slim'
-    entrypoint: 'python'
-    args: ['scripts/cloud_run_source_integrity_gate.py', '--root', '.']
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: python:3.11-slim
+    id: immutable-build-metadata-gate
+    entrypoint: python
     args:
-      - 'build'
-      - '-f'
-      - 'dashboard/backend/Dockerfile'
-      - '-t'
-      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
-      - '-t'
-      - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:$COMMIT_SHA'
-      - '.'
+      - scripts/cloud_run_build_metadata_gate.py
+      - ${_GIT_SHA}
+      - ${_IMAGE}
+  - name: python:3.11-slim
+    id: source-integrity-gate
+    entrypoint: python
+    args: [scripts/cloud_run_source_integrity_gate.py, --root, .]
+  - name: gcr.io/cloud-builders/docker
+    id: build-canonical-image
+    args:
+      - build
+      - --file=dashboard/backend/Dockerfile
+      - --build-arg=DEPLOY_GIT_SHA=${_GIT_SHA}
+      - --tag=${_IMAGE}:${_GIT_SHA}
+      - .
+  - name: gcr.io/cloud-builders/docker
+    id: push-immutable-image
+    args:
+      - push
+      - ${_IMAGE}:${_GIT_SHA}
 images:
-  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:latest'
-  - 'asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web:$COMMIT_SHA'
+  - ${_IMAGE}:${_GIT_SHA}
 options:
   logging: CLOUD_LOGGING_ONLY
+substitutions:
+  _GIT_SHA: UNSET
+  _IMAGE: asia-south1-docker.pkg.dev/system3-openalgo-safe/cloud-run-source-deploy/genesis-system3-web

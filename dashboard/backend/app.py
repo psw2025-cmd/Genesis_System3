@@ -638,6 +638,12 @@ except Exception as _e:
 async def root():
     from core.config.cloud_runtime import public_base_url, public_dashboard_url, public_ui_path
 
+    # Cloud Run's public root is a browser entry point. Keep the local diagnostic
+    # JSON response for development, while sending Cloud Run browsers to the SPA.
+    from core.config.cloud_runtime import is_cloud_runtime
+    if is_cloud_runtime():
+        return RedirectResponse(url=f"{public_ui_path().rstrip('/')}/", status_code=307)
+
     base_url = public_base_url()
     dashboard_url = public_dashboard_url()
     ui_path = public_ui_path()
@@ -736,7 +742,7 @@ async def get_state():
     if (state.get("mode") or "").upper() == "LIVE" and (not broker_connected or ds in ("SYNTHETIC", "NOT_READY")):
         state = dict(state)
         state["mode"] = "PAPER"
-    return state
+    return _redact_public_credentials(state)
 
 
 @app.get("/api/state/history")
@@ -775,47 +781,70 @@ async def get_state_history(limit: int = 100):
     return {"history": history, "count": len(history), "limit": limit}
 
 
-def _enrich_broker_status(status: dict, client_id_val: str) -> dict:
+def _redact_public_credentials(value):
+    """Remove credential and account-identifier fields from nested API payloads."""
+    blocked_keys = {
+        "clientid", "dhanclientid", "accesstoken", "dhantoken", "token",
+        "tokenvalue", "bearertoken", "authorization", "apisecret",
+        "totpsecret", "secretpayload",
+    }
+    if isinstance(value, dict):
+        cleaned = {}
+        for key, item in value.items():
+            normalized = re.sub(r"[^a-z0-9]", "", str(key).lower())
+            if normalized in blocked_keys:
+                continue
+            cleaned[key] = _redact_public_credentials(item)
+        return cleaned
+    if isinstance(value, list):
+        return [_redact_public_credentials(item) for item in value]
+    if isinstance(value, tuple):
+        return tuple(_redact_public_credentials(item) for item in value)
+    return value
+
+
+def _enrich_broker_status(status: dict) -> dict:
     if not isinstance(status, dict):
         return status
-    status["client_id"] = client_id_val
-    status["clientId"] = client_id_val
-    status["dhan_client_id"] = client_id_val
-    status["dhanClientId"] = client_id_val
+    # Public status may contain nested account and token fields from SDKs.
+    status = _redact_public_credentials(status)
     try:
         from core.utils.env_loader import get_dhan_token
-        token, source_str, provider_str, hours, exp, is_fallback = get_dhan_token()
-        ver_num = source_str.split("_V")[-1] if "_V" in source_str else "335"
-        if not ver_num.isdigit():
-            ver_num = "335"
-        now_iso = datetime.now(timezone.utc).isoformat()
-        exp_iso = exp.isoformat() if exp else (datetime.now(timezone.utc) + timedelta(hours=23.5)).isoformat()
-        hours_val = round(hours, 2) if (hours is not None and hours > 0) else 23.5
-
+        token, source_str, _provider_str, _hours, exp, is_fallback = get_dhan_token()
+        observed_at = datetime.now(timezone.utc)
+        verified_exp = exp if isinstance(exp, datetime) and exp.tzinfo else None
+        hours_val = (verified_exp - observed_at).total_seconds() / 3600 if verified_exp else None
+        source_text = str(source_str or "")
+        version = source_text.rsplit("_V", 1)[-1] if "_V" in source_text else ""
+        version = version if version.isdigit() and not is_fallback else None
+        proof_source = "LOCAL_FALLBACK" if is_fallback else "GCP_SECRET_MANAGER"
         status["token_proof"] = {
-            "source": f"GCP_SECRET_MANAGER_V{ver_num}" if not is_fallback else "GCP_SECRET_MANAGER_V335",
-            "secret_version": f"GCP_V{ver_num}" if not is_fallback else "GCP_V335",
-            "provider": "GCP_TOTP_ROTATE",
-            "loaded_at_utc": now_iso,
-            "expires_at_utc": exp_iso,
-            "hours_remaining": hours_val,
-            "expired": False,
+            "source": proof_source if token else None,
+            "secret_version": version,
+            "observed_at_utc": observed_at.isoformat(),
+            "expires_at_utc": verified_exp.isoformat() if verified_exp else None,
+            "hours_remaining": round(hours_val, 2) if hours_val is not None else None,
+            "expired": hours_val <= 0 if hours_val is not None else None,
+            "authenticated": status.get("connected") is True,
             "token_value_exposed": False,
         }
         status["token_reload"] = {
-            "attempted": True,
-            "success": True,
+            "attempted": False,
+            "success": None,
         }
         status["canonical_rotation"] = {
-            "configured": True,
-            "provider": "GCP_TOTP_ROTATE",
+            "configured": False,
+            "attempted": False,
+            "success": None,
+            "reason": "READ_ONLY_STATUS_CHECK",
         }
-        # In ANALYZER mode: keep live_trading_enabled=False BUT set auto_renew=True, fetch_allowed=True, totp_renew=True
+        # Status checks are read-only. They must never imply that a token was
+        # refreshed or that a rotation workflow ran.
         status["live_trading_enabled"] = False
         status["order_placement_allowed"] = False
-        status["auto_renew"] = True
-        status["fetch_allowed"] = True
-        status["totp_renew"] = True
+        status["auto_renew"] = False
+        status["fetch_allowed"] = bool(token)
+        status["totp_renew"] = False
     except Exception as exc:
         logger.warning(f"Failed to enrich broker status with token proof: {exc}")
     return status
@@ -824,13 +853,12 @@ def _enrich_broker_status(status: dict, client_id_val: str) -> dict:
 @app.get("/api/broker/status")
 async def get_broker_status():
     """Get broker connection status. Uses Dhan broker (read-only, analyzer mode)."""
-    client_id_val = os.getenv("DHAN_CLIENT_ID", "1106583741").strip().lstrip("\ufeff")
     try:
         from core.brokers.dhan.dhan_readonly import get_status as _dhan_status
 
         status = await asyncio.wait_for(asyncio.to_thread(_dhan_status), timeout=12)
         if isinstance(status, dict):
-            status = _enrich_broker_status(status, client_id_val)
+            status = _enrich_broker_status(status)
 
         # Only persist definitive results to SSOT — never write timeout/error noise.
         if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
@@ -855,7 +883,7 @@ async def get_broker_status():
             out["transient"] = True
             out["error"] = out.get("error") or f"status_probe_timeout:{str(_e)[:80]}"
             out["stale"] = True
-            return _enrich_broker_status(out, client_id_val)
+            return _enrich_broker_status(out)
         err_res = {
             "connected": False,
             "name": "dhan",
@@ -867,19 +895,18 @@ async def get_broker_status():
             "transient": True,
             "credentials_present": True,
         }
-        return _enrich_broker_status(err_res, client_id_val)
+        return _enrich_broker_status(err_res)
 
 
 @app.get("/api/broker/dhan/status")
 async def get_dhan_broker_status():
     """Dhan read-only broker status. Never returns access token. No live trading."""
-    client_id_val = os.getenv("DHAN_CLIENT_ID", "1106583741").strip().lstrip("\ufeff")
     try:
         from core.brokers.dhan.dhan_readonly import get_status as dhan_get_status
 
         status = await asyncio.wait_for(asyncio.to_thread(dhan_get_status), timeout=12)
         if isinstance(status, dict):
-            status = _enrich_broker_status(status, client_id_val)
+            status = _enrich_broker_status(status)
 
         if SSOT_AVAILABLE and state_store is not None and isinstance(status, dict):
             if status.get("connected") is True or status.get("error") in (
@@ -899,7 +926,7 @@ async def get_dhan_broker_status():
             "credentials_present": False,
             "error": f"MODULE_NOT_AVAILABLE: {str(exc)[:200]}",
         }
-        return _enrich_broker_status(err_res, client_id_val)
+        return _enrich_broker_status(err_res)
     except Exception as exc:
         cached = None
         if SSOT_AVAILABLE and state_store is not None:
@@ -912,7 +939,7 @@ async def get_dhan_broker_status():
             out["transient"] = True
             out["stale"] = True
             out["error"] = out.get("error") or f"status_probe_timeout:{str(exc)[:80]}"
-            return _enrich_broker_status(out, client_id_val)
+            return _enrich_broker_status(out)
         err_res = {
             "broker": "dhan",
             "mode": "ANALYZER",
@@ -923,7 +950,7 @@ async def get_dhan_broker_status():
             "error": str(exc)[:200],
             "transient": True,
         }
-        return _enrich_broker_status(err_res, client_id_val)
+        return _enrich_broker_status(err_res)
 
 
 @app.get("/api/broker/truth")
@@ -1345,15 +1372,34 @@ async def get_live_price_endpoint(symbol: str = "NIFTY"):
     if isinstance(cached_board, dict):
         for row in (cached_board.get("indices") or []) + (cached_board.get("equities") or []):
             if str(row.get("symbol") or "").strip().upper() == sym:
+                if row.get("live") is True and row.get("freshness") == "LIVE":
+                    return {
+                        "symbol": sym,
+                        "spot": float(row.get("ltp") or 0.0),
+                        "ltp": float(row.get("ltp") or 0.0),
+                        "change": float(row.get("change") or 0.0),
+                        "change_pct": float(row.get("change_pct") or 0.0),
+                        "source": "DHAN_LIVE",
+                        "timestamp": cached_board.get("generated_at") or datetime.now(IST).isoformat(),
+                        "status": "SUCCESS",
+                        "freshness": "LIVE",
+                        "source_timestamp": row.get("source_timestamp"),
+                        "age_seconds": row.get("age_seconds"),
+                    }
                 return {
                     "symbol": sym,
                     "spot": float(row.get("ltp") or 0.0),
                     "ltp": float(row.get("ltp") or 0.0),
-                    "change": float(row.get("change") or 0.0),
-                    "change_pct": float(row.get("change_pct") or 0.0),
-                    "source": "DHAN_LIVE",
-                    "timestamp": cached_board.get("generated_at") or datetime.now(IST).isoformat(),
-                    "status": "SUCCESS",
+                    "change": row.get("change"),
+                    "change_pct": row.get("change_pct"),
+                    "source": str(row.get("source") or "DHAN_MARKETFEED"),
+                    "timestamp": cached_board.get("generated_at"),
+                    "source_timestamp": row.get("source_timestamp"),
+                    "age_seconds": row.get("age_seconds"),
+                    "freshness": row.get("freshness") or "UNVERIFIED",
+                    "status": "STALE" if row.get("freshness") == "STALE" else "UNVERIFIED",
+                    "live_trading_enabled": False,
+                    "order_placement_allowed": False,
                 }
 
     # Fetch live price via core.data.live_fetcher
@@ -2841,11 +2887,9 @@ async def get_deploy_info():
         os.environ.get("SYSTEM3_DEPLOY_TARGET")
         or ("gcp-cloud-run" if on_cloud_run else "local-laptop")
     ).strip()
-    base = (
-        os.environ.get("SYSTEM3_PUBLIC_BACKEND_URL")
-        or os.environ.get("SYSTEM3_API_BASE")
-        or (str(cfg.get("public_base_url") or "https://genesis-system3-web-doq2wplepa-el.a.run.app") if on_cloud_run else "http://127.0.0.1:8000")
-    ).rstrip("/")
+    from core.config.cloud_runtime import public_base_url, public_ui_path
+
+    base = public_base_url()
     return {
         "git_sha": git_sha,
         "git_branch": os.environ.get("GITHUB_REF_NAME") or "",
@@ -2853,7 +2897,7 @@ async def get_deploy_info():
         "deploy_target": target,
         "cloud_provider": "google_cloud" if on_cloud_run else "unknown",
         "public_base_url": base,
-        "ui_url": f"{base}{cfg.get('ui_path') or '/ui'}",
+        "ui_url": f"{base}{public_ui_path()}",
         "region": (os.environ.get("GCP_REGION") or cfg.get("region") or "") if on_cloud_run else "",
         "project_id": (os.environ.get("GOOGLE_CLOUD_PROJECT") or cfg.get("project_id") or "") if on_cloud_run else "",
         "cloud_mode": os.environ.get("CLOUD_MODE", "0"),
@@ -3842,6 +3886,7 @@ def _slim_token_proof(proof: Any) -> Dict[str, Any]:
         "secret_version",
         "secret_version_created_at_utc",
         "loaded_at_utc",
+        "observed_at_utc",
         "cache_age_s",
         "cache_ttl_s",
         "expires_at_utc",
@@ -12060,6 +12105,46 @@ async def get_compliance_check():
     }
 
 
+def _apply_model_readiness_gate(predictions: list, model_state: dict) -> list:
+    """Never expose a trade-like recommendation without loaded-model proof."""
+    metrics = model_state.get("metrics") if isinstance(model_state, dict) else {}
+    metrics = metrics if isinstance(metrics, dict) else {}
+    candidates = [
+        model_state.get("models_loaded") if isinstance(model_state, dict) else None,
+        metrics.get("models_loaded"),
+    ]
+    loaded_count = 0
+    for candidate in candidates:
+        if isinstance(candidate, bool):
+            continue
+        if isinstance(candidate, (int, float)):
+            loaded_count = max(loaded_count, int(candidate))
+        elif isinstance(candidate, dict):
+            total = candidate.get("total")
+            values = [value for value in candidate.values() if isinstance(value, (int, float)) and not isinstance(value, bool)]
+            count = int(total) if isinstance(total, (int, float)) else sum(int(value) for value in values)
+            loaded_count = max(loaded_count, count)
+
+    gated = []
+    for prediction in predictions:
+        if not isinstance(prediction, dict):
+            continue
+        row = dict(prediction)
+        if loaded_count <= 0 or row.get("model_loaded") is not True:
+            row.update(
+                {
+                    "recommendation": "WAIT",
+                    "signal": "HOLD",
+                    "confidence_pct": 0,
+                    "confidence": 0,
+                    "model_loaded": False,
+                    "blocker": "TRAINED_MODEL_NOT_LOADED" if loaded_count <= 0 else "MODEL_PROOF_MISSING",
+                }
+            )
+        gated.append(row)
+    return gated
+
+
 @app.get("/api/ml/predictions")
 async def get_ml_predictions():
     try:
@@ -12119,6 +12204,7 @@ async def get_ml_predictions():
                 except Exception:
                     pass
 
+        predictions = _apply_model_readiness_gate(predictions, state.get("model") or {})
         enriched = []
         for row in predictions[:10]:
             if not isinstance(row, dict):

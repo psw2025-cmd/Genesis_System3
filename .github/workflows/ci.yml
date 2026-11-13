@@ -644,7 +644,7 @@ jobs:
         shell: bash
         run: python -m py_compile ../../scripts/frontend_local_runtime_smoke.py
 
-      - name: Prove all 22 canonical tabs render in Chrome
+      - name: Prove all 23 canonical tabs render in Chrome
         shell: bash
         run: |
           set -euo pipefail

@@ -244,11 +244,81 @@ def test_root_ignores_stale_cloud_env_in_local_runtime(app, monkeypatch):
     assert data["dashboard_url"] == "http://127.0.0.1:8000/ui"
 
 
+def test_cloud_root_redirects_browsers_to_react_dashboard(app, monkeypatch):
+    monkeypatch.setenv("K_SERVICE", "genesis-system3-web")
+    status, headers, _ = call(app, "GET", "/")
+    assert status == 307
+    assert headers[b"location"] == b"/ui/"
+    monkeypatch.delenv("K_SERVICE", raising=False)
+
+
+def test_cloud_deploy_info_ignores_loopback_public_url_override(app, monkeypatch):
+    monkeypatch.setenv("K_SERVICE", "genesis-system3-web")
+    monkeypatch.setenv("PUBLIC_BACKEND_URL", "http://localhost:8000")
+    monkeypatch.setenv("SYSTEM3_PUBLIC_BACKEND_URL", "http://127.0.0.1:8000")
+    monkeypatch.setenv("SYSTEM3_API_BASE", "http://localhost:8000")
+    monkeypatch.setenv("DASHBOARD_BASE_URL", "http://127.0.0.1:8000")
+    status, _, body = call(app, "GET", "/api/deploy/info")
+    assert status == 200
+    data = json.loads(body)
+    assert data["public_base_url"].startswith("https://")
+    assert "127.0.0.1" not in data["public_base_url"]
+    assert "localhost" not in data["public_base_url"]
+    assert data["ui_url"].startswith(data["public_base_url"])
+    monkeypatch.delenv("K_SERVICE", raising=False)
+
+
 def test_state_endpoint_returns_200(app):
     status, _, body = call(app, "GET", "/api/state")
     assert status == 200
     data = json.loads(body)
     assert "state_version" in data
+
+
+def test_missing_model_proof_forces_hold_and_zero_confidence(app):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/ml/predictions")
+    gate = endpoint.__globals__["_apply_model_readiness_gate"]
+    result = gate(
+        [{"symbol": "NIFTY", "recommendation": "TRADE", "signal": "BUY", "confidence_pct": 99.54}],
+        {"metrics": {"models_loaded": 0}},
+    )
+    assert result == [
+        {
+            "symbol": "NIFTY",
+            "recommendation": "WAIT",
+            "signal": "HOLD",
+            "confidence_pct": 0,
+            "confidence": 0,
+            "model_loaded": False,
+            "blocker": "TRAINED_MODEL_NOT_LOADED",
+        }
+    ]
+
+
+def test_state_endpoint_redacts_nested_broker_credentials(app, monkeypatch):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 1,
+            "mode": "PAPER",
+            "data_source": "BROKER_CONNECTED",
+            "broker": {
+                "connected": True,
+                "client_id": "private-id",
+                "dhanClientId": "private-id",
+                "access_token": "private-token",
+            },
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["broker"] == {"connected": True}
+    assert "private-id" not in body.decode()
+    assert "private-token" not in body.decode()
 
 
 def test_kill_switch_status_endpoint(app):

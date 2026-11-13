@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react'
 import { useStore } from './store'
 import { useData } from './hooks/useData'
 
@@ -11,35 +11,31 @@ import { SystemHealthDiagnostics } from './components/SystemHealthDiagnostics'
 import { AutonomousLoopBanner } from './components/AutonomousLoopBanner'
 import { DeploymentTruthFooter } from './components/DeploymentTruthFooter'
 
-// ── Tier A: Store-based tabs (no axios needed, data already streaming) ─
-import { Overview }      from './components/Overview'
-import { TradeTab }      from './components/TradeTab'
-import { Positions }     from './components/Positions'
-import { BrokerProofPanel } from './components/BrokerProofPanel'
-import { OptionChain }   from './components/OptionChain'
-import { AlertsTab }     from './components/AlertsTab'
-import { SystemTab }     from './components/SystemTab'
-import { LiveTradingGate } from './components/LiveTradingGate'
-import { PerformanceTab }  from './components/PerformanceTab'
-import { EndToEndProof }   from './components/EndToEndProof'
-import { SystemTruthControl } from './components/SystemTruthControl'
-import { LiveSimulation } from './components/LiveSimulation'
-import { MobileTradingHub } from './components/MobileTradingHub'
-
-// ── V5 Workspaces ─────────────────────────────────────────────────────
-import { DecisionIntelligence } from './components/workspaces/DecisionIntelligence'
-import { OptionsIntelligence }  from './components/workspaces/OptionsIntelligence'
-import { MultibaggerResearch }  from './components/workspaces/MultibaggerResearch'
-import { RiskAndScenarios }     from './components/workspaces/RiskAndScenarios'
-import { DataIntegrity }        from './components/workspaces/DataIntegrity'
-import { PredictionAudit }      from './components/workspaces/PredictionAudit'
-
-// ── Tier B: Axios-based tabs (need axios dep, call backend directly) ───
-import Signals       from './components/Signals'
-import PaperTrading  from './components/PaperTrading'
-import MLPerformance from './components/MLPerformance'
-import SystemReadiness from './components/SystemReadiness'
-import { GenesisTab } from './components/GenesisTab'
+// Route-level chunks keep the initial dashboard light and load each workspace on demand.
+const Overview = lazy(() => import('./components/Overview').then((m) => ({ default: m.Overview })))
+const TradeTab = lazy(() => import('./components/TradeTab').then((m) => ({ default: m.TradeTab })))
+const Positions = lazy(() => import('./components/Positions').then((m) => ({ default: m.Positions })))
+const BrokerProofPanel = lazy(() => import('./components/BrokerProofPanel').then((m) => ({ default: m.BrokerProofPanel })))
+const OptionChain = lazy(() => import('./components/OptionChain').then((m) => ({ default: m.OptionChain })))
+const AlertsTab = lazy(() => import('./components/AlertsTab').then((m) => ({ default: m.AlertsTab })))
+const SystemTab = lazy(() => import('./components/SystemTab').then((m) => ({ default: m.SystemTab })))
+const LiveTradingGate = lazy(() => import('./components/LiveTradingGate').then((m) => ({ default: m.LiveTradingGate })))
+const PerformanceTab = lazy(() => import('./components/PerformanceTab').then((m) => ({ default: m.PerformanceTab })))
+const EndToEndProof = lazy(() => import('./components/EndToEndProof').then((m) => ({ default: m.EndToEndProof })))
+const SystemTruthControl = lazy(() => import('./components/SystemTruthControl').then((m) => ({ default: m.SystemTruthControl })))
+const LiveSimulation = lazy(() => import('./components/LiveSimulation').then((m) => ({ default: m.LiveSimulation })))
+const MobileTradingHub = lazy(() => import('./components/MobileTradingHub').then((m) => ({ default: m.MobileTradingHub })))
+const DecisionIntelligence = lazy(() => import('./components/workspaces/DecisionIntelligence').then((m) => ({ default: m.DecisionIntelligence })))
+const OptionsIntelligence = lazy(() => import('./components/workspaces/OptionsIntelligence').then((m) => ({ default: m.OptionsIntelligence })))
+const MultibaggerResearch = lazy(() => import('./components/workspaces/MultibaggerResearch').then((m) => ({ default: m.MultibaggerResearch })))
+const RiskAndScenarios = lazy(() => import('./components/workspaces/RiskAndScenarios').then((m) => ({ default: m.RiskAndScenarios })))
+const DataIntegrity = lazy(() => import('./components/workspaces/DataIntegrity').then((m) => ({ default: m.DataIntegrity })))
+const PredictionAudit = lazy(() => import('./components/workspaces/PredictionAudit').then((m) => ({ default: m.PredictionAudit })))
+const Signals = lazy(() => import('./components/Signals'))
+const PaperTrading = lazy(() => import('./components/PaperTrading'))
+const MLPerformance = lazy(() => import('./components/MLPerformance'))
+const SystemReadiness = lazy(() => import('./components/SystemReadiness'))
+const GenesisTab = lazy(() => import('./components/GenesisTab').then((m) => ({ default: m.GenesisTab })))
 
 function Content() {
   const { activeTab } = useStore()
@@ -101,6 +97,32 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
+  useEffect(() => {
+    // Keep navigation responsive after the first screen: warm the route chunks
+    // once the dashboard has mounted so a later tab click cannot sit on the
+    // Suspense fallback while the browser fetches its first module chunk.
+    const timer = window.setTimeout(() => {
+      void Promise.allSettled([
+        import('./components/Overview'), import('./components/TradeTab'),
+        import('./components/Positions'), import('./components/BrokerProofPanel'),
+        import('./components/OptionChain'), import('./components/AlertsTab'),
+        import('./components/SystemTab'), import('./components/LiveTradingGate'),
+        import('./components/PerformanceTab'), import('./components/EndToEndProof'),
+        import('./components/SystemTruthControl'), import('./components/LiveSimulation'),
+        import('./components/MobileTradingHub'),
+        import('./components/workspaces/DecisionIntelligence'),
+        import('./components/workspaces/OptionsIntelligence'),
+        import('./components/workspaces/MultibaggerResearch'),
+        import('./components/workspaces/RiskAndScenarios'),
+        import('./components/workspaces/DataIntegrity'),
+        import('./components/workspaces/PredictionAudit'),
+        import('./components/Signals'), import('./components/PaperTrading'),
+        import('./components/MLPerformance'), import('./components/SystemReadiness'),
+        import('./components/GenesisTab'),
+      ])
+    }, 1000)
+    return () => window.clearTimeout(timer)
+  }, [])
   const activeTab = useStore((s) => s.activeTab)
   useLayoutEffect(() => {
     const main = document.getElementById('dashboard-main')
@@ -133,7 +155,9 @@ export default function App() {
         <Sidebar />
         <main id="dashboard-main" tabIndex={-1} style={{ flex: 1, minWidth: 0, minHeight: 0, overflow: 'hidden' }}>
           <ErrorBoundary>
-            <Content />
+            <Suspense fallback={<div role="status" style={{ padding: 20 }}>Loading dashboard section…</div>}>
+              <Content />
+            </Suspense>
           </ErrorBoundary>
         </main>
       </div>

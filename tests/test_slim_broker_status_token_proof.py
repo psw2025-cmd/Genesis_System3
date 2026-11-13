@@ -1,6 +1,68 @@
-"""Batch slim broker status must retain safe token_proof for System tab."""
+"""Broker status must report only observed token facts and never expose IDs."""
 
-from dashboard.backend.app import _slim_broker_status, _slim_token_proof
+from datetime import datetime, timedelta, timezone
+from unittest.mock import patch
+
+from dashboard.backend.app import (
+    _enrich_broker_status,
+    _redact_public_credentials,
+    _slim_broker_status,
+    _slim_token_proof,
+)
+
+
+def test_public_credential_redaction_covers_nested_state_and_preserves_safe_flags():
+    public = _redact_public_credentials(
+        {
+            "broker": {
+                "client_id": "private-id",
+                "dhanClientId": "private-id",
+                "access_token": "private-token",
+                "nested": {"Authorization": "Bearer private-token"},
+                "access_token_present": True,
+            }
+        }
+    )
+    assert public == {"broker": {"nested": {}, "access_token_present": True}}
+
+
+def test_broker_enrichment_does_not_fabricate_rotation_or_expiry():
+    expiry = datetime.now(timezone.utc) + timedelta(hours=2)
+    raw_token = "opaque.secret.payload"
+    with patch(
+        "core.utils.env_loader.get_dhan_token",
+        return_value=(raw_token, "GCP_SECRET_MANAGER_V363", "unused-provider", 23.5, expiry, False),
+    ):
+        status = _enrich_broker_status(
+            {"connected": True, "client_id": "private-client-id", "dhanClientId": "private-client-id"}
+        )
+
+    proof = status["token_proof"]
+    assert proof["source"] == "GCP_SECRET_MANAGER"
+    assert proof["secret_version"] == "363"
+    assert proof["expires_at_utc"] == expiry.isoformat()
+    assert 1.9 < proof["hours_remaining"] <= 2.0
+    assert proof["expired"] is False
+    assert proof["authenticated"] is True
+    assert status["token_reload"] == {"attempted": False, "success": None}
+    assert status["canonical_rotation"]["attempted"] is False
+    assert status["auto_renew"] is False
+    assert status["totp_renew"] is False
+    assert all(key not in status for key in ("client_id", "clientId", "dhan_client_id", "dhanClientId"))
+    assert raw_token not in repr(status)
+
+
+def test_broker_enrichment_keeps_expiry_unknown_when_claim_missing():
+    with patch(
+        "core.utils.env_loader.get_dhan_token",
+        return_value=("opaque", "LOCAL_JWT_SESSION_FALLBACK", "unused-provider", 23.5, None, True),
+    ):
+        status = _enrich_broker_status({"connected": False})
+    proof = status["token_proof"]
+    assert proof["source"] == "LOCAL_FALLBACK"
+    assert proof["expires_at_utc"] is None
+    assert proof["hours_remaining"] is None
+    assert proof["expired"] is None
 
 
 def test_slim_token_proof_strips_secrets_and_keeps_provenance():

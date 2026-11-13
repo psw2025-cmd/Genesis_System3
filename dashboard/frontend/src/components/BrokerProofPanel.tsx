@@ -72,7 +72,7 @@ export function BrokerProofPanel() {
           <ProofMetric label="Available" value={available === null ? 'PENDING' : String(available)} ok={false} icon={<Wallet size={13} />} />
           <ProofMetric label="Token Source" value={proof?.source || 'PENDING'} ok={sourceOk} icon={<Shield size={13} />} />
           <ProofMetric label="Secret Version" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'PENDING'} ok={Boolean(proof?.secret_version)} icon={<Database size={13} />} />
-          <ProofMetric label="Token Loaded" value={fmtTime(proof?.loaded_at_utc)} ok={Boolean(proof?.loaded_at_utc)} icon={<Activity size={13} />} />
+          <ProofMetric label="Token Observed" value={fmtTime(proof?.observed_at_utc)} ok={Boolean(proof?.observed_at_utc)} icon={<Activity size={13} />} />
           <ProofMetric label="Token Time Left" value={hours == null ? 'PENDING' : `${Number(hours).toFixed(2)} HOURS`} ok={tokenHealthy} icon={<Activity size={13} />} />
           <ProofMetric label="Account APIs" value={`${responded(brokerFunds) ? 'F' : '-'} / ${responded(brokerHoldings) ? 'H' : '-'} / ${responded(brokerPositions) ? 'P' : '-'}`} ok={responded(brokerFunds) && responded(brokerHoldings) && responded(brokerPositions)} icon={<Wallet size={13} />} />
         </div>

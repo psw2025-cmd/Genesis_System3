@@ -12,6 +12,7 @@ import logging
 import os
 import threading
 import time
+from datetime import datetime, timezone
 from typing import Any, Dict, Iterable, List, Mapping, MutableMapping, Optional, Sequence, Tuple
 
 logger = logging.getLogger("dhan_market_ltp")
@@ -111,7 +112,48 @@ def _parse_quote_blob(blob: Any) -> Dict[str, Any]:
         "close": close_p,
         "change": change,
         "change_pct": change_pct,
+        "source_timestamp": (
+            blob.get("last_trade_time")
+            or blob.get("exchange_timestamp")
+            or blob.get("source_timestamp")
+        ),
     }
+
+
+def classify_quote_freshness(source_timestamp: Any, *, now: Optional[datetime] = None) -> Dict[str, Any]:
+    """Classify only provider exchange timestamps; retrieval time is never substituted."""
+    if source_timestamp is None or source_timestamp == "":
+        return {"status": "UNVERIFIED", "age_seconds": None}
+    try:
+        if isinstance(source_timestamp, (int, float)):
+            stamp = float(source_timestamp)
+            if stamp > 10_000_000_000:
+                stamp /= 1000.0
+            observed = datetime.fromtimestamp(stamp, tz=timezone.utc)
+        else:
+            raw = str(source_timestamp).strip().replace("Z", "+00:00")
+            try:
+                observed = datetime.fromisoformat(raw)
+            except ValueError:
+                # Dhan v2 quote packets serialize last_trade_time as
+                # DD/MM/YYYY HH:MM:SS (the ISO parser rejects this format).
+                observed = datetime.strptime(raw, "%d/%m/%Y %H:%M:%S")
+            if observed.tzinfo is None:
+                # Dhan exchange-local date-time values are IST when no offset is supplied.
+                from zoneinfo import ZoneInfo
+                observed = observed.replace(tzinfo=ZoneInfo("Asia/Kolkata"))
+            observed = observed.astimezone(timezone.utc)
+        current = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
+        age = (current - observed).total_seconds()
+    except (TypeError, ValueError, OverflowError, OSError):
+        return {"status": "UNVERIFIED", "age_seconds": None}
+    if age < -5:
+        status = "UNVERIFIED"
+    elif age <= 60:
+        status = "LIVE"
+    else:
+        status = "STALE"
+    return {"status": status, "age_seconds": round(age, 3)}
 
 
 def _normalize_securities(securities: Mapping[str, Sequence[Any]]) -> Dict[str, List[str]]:
@@ -183,11 +225,11 @@ def _flatten_quotes(payload: Any) -> Dict[str, Dict[str, Any]]:
         ):
             for sid, blob in val.items():
                 parsed = _parse_quote_blob(blob)
-                if parsed.get("ltp") is not None:
+                if parsed.get("ltp") is not None and parsed["ltp"] > 0:
                     out[str(sid)] = parsed
         else:
             parsed = _parse_quote_blob(val)
-            if parsed.get("ltp") is not None:
+            if parsed.get("ltp") is not None and parsed["ltp"] > 0:
                 out[str(key)] = parsed
     return out
 
@@ -425,11 +467,16 @@ fetch_market_quotes.last_meta = {  # type: ignore[attr-defined]
 def build_index_board(
     symbols: Optional[Iterable[str]] = None,
     fallback_spots: Optional[Mapping[str, Mapping[str, Any]]] = None,
+    prefetched_quotes: Optional[Mapping[str, Mapping[str, Any]]] = None,
 ) -> Dict[str, Any]:
     """Live index ribbon matching Dhan web (LTP + change %)."""
     wanted = [str(s).upper() for s in (symbols or DEFAULT_INDEX_BOARD)]
     sec_ids = [INDEX_SECURITY_IDS[s] for s in wanted if s in INDEX_SECURITY_IDS]
-    quotes = fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
+    quotes = (
+        {str(key): dict(value) for key, value in prefetched_quotes.items() if isinstance(value, Mapping)}
+        if prefetched_quotes is not None
+        else fetch_market_quotes({"IDX_I": sec_ids}) if sec_ids else {}
+    )
     feed_errors = list(getattr(fetch_market_quotes, "last_errors", []) or [])
     feed_meta = dict(getattr(fetch_market_quotes, "last_meta", {}) or {})
     rows: List[Dict[str, Any]] = []
@@ -438,14 +485,19 @@ def build_index_board(
         q = quotes.get(str(sid), {}) if sid else {}
         fb = (fallback_spots or {}).get(sym) or {}
         ltp = q.get("ltp")
+        if ltp is not None and _as_float(ltp) is not None and _as_float(ltp) <= 0:
+            ltp = None
         change = q.get("change")
         change_pct = q.get("change_pct")
         source = "dhan_marketfeed" if ltp is not None else None
+        source_timestamp = q.get("source_timestamp")
         if ltp is None and _as_float(fb.get("spot") or fb.get("ltp")):
             ltp = _as_float(fb.get("spot") or fb.get("ltp"))
             change_pct = _as_float(fb.get("change_pct") or fb.get("pct_change"))
             change = _as_float(fb.get("change"))
             source = str(fb.get("source") or "chain_fallback")
+            source_timestamp = fb.get("source_timestamp") or fb.get("exchange_timestamp")
+        freshness = classify_quote_freshness(source_timestamp)
         rows.append(
             {
                 "symbol": sym,
@@ -456,17 +508,23 @@ def build_index_board(
                 "change": change,
                 "change_pct": change_pct,
                 "close": q.get("close"),
-                "live": ltp is not None,
+                "live": ltp is not None and freshness["status"] == "LIVE",
+                "quote_available": ltp is not None,
+                "freshness": freshness["status"],
+                "source_timestamp": source_timestamp,
+                "age_seconds": freshness["age_seconds"],
                 "source": source,
             }
         )
     live_n = sum(1 for r in rows if r.get("live"))
+    quote_n = sum(1 for r in rows if r.get("quote_available"))
     return {
-        "success": live_n > 0,
+        "success": quote_n > 0,
         "source": "dhan_marketfeed_ohlc" if quotes else "chain_fallback_or_empty",
         "live_trading_enabled": False,
         "order_placement_allowed": False,
         "count": len(rows),
+        "quote_count": quote_n,
         "live_count": live_n,
         "feed_hits": len(quotes),
         "feed_errors": feed_errors[:6],
@@ -514,10 +572,15 @@ def enrich_positions_with_market_ltp(rows: Sequence[MutableMapping[str, Any]]) -
         sid = str(raw.get("securityId") or item.get("security_id") or "").strip()
         q = quotes.get(sid) if sid else None
         if q and q.get("ltp") is not None:
-            item["ltp"] = float(q["ltp"])
-            item["ltp_source"] = "dhan_marketfeed"
-            out.append(item)
-            continue
+            freshness = classify_quote_freshness(q.get("source_timestamp"))
+            item["ltp_freshness"] = freshness["status"]
+            item["ltp_source_timestamp"] = q.get("source_timestamp")
+            item["ltp_age_seconds"] = freshness["age_seconds"]
+            if freshness["status"] == "LIVE":
+                item["ltp"] = float(q["ltp"])
+                item["ltp_source"] = "dhan_marketfeed"
+                out.append(item)
+                continue
 
         # Derive LTP from MTM when marketfeed unavailable (Dhan positions often omit LTP).
         try:

@@ -1,10 +1,12 @@
 """Tests for Dhan marketfeed LTP helpers and position enrichment."""
 
 import threading
+from datetime import datetime, timedelta, timezone
 
 import core.brokers.dhan.market_ltp as market_ltp
 from core.brokers.dhan.market_ltp import (
     INDEX_SECURITY_IDS,
+    classify_quote_freshness,
     _parse_quote_blob,
     _reset_marketfeed_coordination_for_tests,
     _rest_marketfeed,
@@ -19,6 +21,10 @@ def test_parse_quote_blob_change_pct():
     assert abs(parsed["change"] - (24320.0 - 24395.85)) < 1e-6
     assert parsed["change_pct"] is not None
     assert parsed["change_pct"] < 0
+
+
+def test_zero_price_is_not_admitted_as_a_market_quote():
+    assert market_ltp._flatten_quotes({"data": {"IDX_I": {"13": {"last_price": 0}}}}) == {}
 
 
 def test_india_vix_security_id():
@@ -53,7 +59,11 @@ def test_enrich_positions_derives_ltp_from_unrealized(monkeypatch):
 def test_enrich_positions_prefers_marketfeed(monkeypatch):
     monkeypatch.setattr(
         "core.brokers.dhan.market_ltp.fetch_market_quotes",
-        lambda securities: {"138976": {"ltp": 0.70, "change_pct": -10.0}},
+        lambda securities: {"138976": {
+            "ltp": 0.70,
+            "change_pct": -10.0,
+            "source_timestamp": datetime.now(timezone.utc).isoformat(),
+        }},
     )
     rows = enrich_positions_with_market_ltp(
         [
@@ -71,6 +81,24 @@ def test_enrich_positions_prefers_marketfeed(monkeypatch):
     assert rows[0]["ltp_source"] == "dhan_marketfeed"
 
 
+def test_position_ltp_does_not_use_unverified_quote(monkeypatch):
+    monkeypatch.setattr(
+        "core.brokers.dhan.market_ltp.fetch_market_quotes",
+        lambda securities: {"138976": {"ltp": 0.70}},
+    )
+    rows = enrich_positions_with_market_ltp([{
+        "symbol": "POWERGRID-Aug2026-280-CE",
+        "net_qty": 3800.0,
+        "avg_price": 1.54545,
+        "ltp": 0.0,
+        "unrealized_pnl": -3022.71,
+        "raw": {"securityId": "138976", "exchangeSegment": "NSE_FNO"},
+    }])
+    assert rows[0]["ltp_source"] == "derived_from_unrealized"
+    assert rows[0]["ltp_freshness"] == "UNVERIFIED"
+    assert rows[0]["ltp"] != 0.70
+
+
 def test_build_index_board_uses_fallback(monkeypatch):
     monkeypatch.setattr(
         "core.brokers.dhan.market_ltp.fetch_market_quotes",
@@ -86,6 +114,62 @@ def test_build_index_board_uses_fallback(monkeypatch):
     nifty = next(r for r in board["indices"] if r["symbol"] == "NIFTY")
     assert nifty["ltp"] == 24320.55
     assert nifty["source"] == "paced_chain_cache"
+    assert nifty["quote_available"] is True
+    assert nifty["live"] is False
+    assert nifty["freshness"] == "UNVERIFIED"
+
+
+def test_build_index_board_reuses_prefetched_quotes_without_second_provider_call(monkeypatch):
+    def unexpected_fetch(_securities):
+        raise AssertionError("must reuse the index/equity batch quote")
+
+    monkeypatch.setattr(market_ltp, "fetch_market_quotes", unexpected_fetch)
+    stamp = datetime.now(timezone.utc).isoformat()
+    board = market_ltp.build_index_board(
+        symbols=["NIFTY"],
+        prefetched_quotes={"13": {"ltp": 25000.0, "source_timestamp": stamp}},
+    )
+    nifty = board["indices"][0]
+    assert nifty["ltp"] == 25000.0
+    assert nifty["live"] is True
+    assert nifty["freshness"] == "LIVE"
+
+
+def test_quote_freshness_fails_closed_for_missing_stale_and_future_source_times():
+    now = datetime(2026, 11, 13, 12, 0, tzinfo=timezone.utc)
+    assert classify_quote_freshness(None, now=now)["status"] == "UNVERIFIED"
+    stale = classify_quote_freshness((now - timedelta(seconds=61)).isoformat(), now=now)
+    assert stale == {"status": "STALE", "age_seconds": 61.0}
+    future = classify_quote_freshness((now + timedelta(seconds=6)).isoformat(), now=now)
+    assert future["status"] == "UNVERIFIED"
+
+
+def test_quote_freshness_parses_dhan_v2_last_trade_time():
+    from zoneinfo import ZoneInfo
+
+    now = datetime(2026, 11, 13, 15, 30, tzinfo=ZoneInfo("Asia/Kolkata"))
+    result = classify_quote_freshness("13/11/2026 15:29:59", now=now)
+    assert result["status"] == "LIVE"
+    assert result["age_seconds"] == 1.0
+
+
+def test_legacy_live_fetcher_uses_dhan_and_never_calls_order_routes(monkeypatch):
+    stamp = datetime.now(timezone.utc).isoformat()
+    calls = []
+
+    def fake_fetch(securities):
+        calls.append(securities)
+        return {"13": {"ltp": 25001.25, "source_timestamp": stamp}}
+
+    monkeypatch.setattr(market_ltp, "fetch_market_quotes", fake_fetch)
+    from core.data.live_fetcher import get_live_price
+
+    quote = get_live_price("nifty")
+    assert quote["spot"] == 25001.25
+    assert quote["source"] == "DHAN_MARKETFEED"
+    assert quote["status"] == "LIVE"
+    assert quote["order_placement_allowed"] is False
+    assert calls == [{"IDX_I": ["13"]}]
 
 
 def test_rest_marketfeed_does_not_retry_alternate_body_after_429(monkeypatch):

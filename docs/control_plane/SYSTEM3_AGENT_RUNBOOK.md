@@ -35,7 +35,7 @@ No real broker order placement/modification/cancellation/square-off; no order-sh
 2. Make scoped policy/code corrections, run GitHub-hosted tests and review exact-head CI. Investigate failures without weakening gates. Do not merge an old laptop-only or stale cloud PR blindly.
 3. Read-only GCP verification uses explicit project and region; confirm resource ownership, deployment absence/presence, WIF bindings and image provenance without deploying or reading secret values.
 4. Stop at the separate owner approval boundary for cloud configuration/deploy. If not approved, mark `BLOCKED_OWNER_APPROVAL` and continue only safe GitHub/read-only work.
-5. After later authorized deployment, independently prove source/revision/image traceability; startup and service health; exactly one broker worker lease; session-aware broker, symbols/expiry/option-chain completeness; continuous timestamps; persisted PAPER lifecycle; 22-tab same-session semantic UI/API parity; independent zero-real-order proof; signed or SHA-256 anchored evidence.
+5. After later authorized deployment, independently prove source/revision/image traceability; startup and service health; exactly one broker worker lease; session-aware broker, symbols/expiry/option-chain completeness; continuous timestamps; persisted PAPER lifecycle; all 23 sidebar tabs with same-session semantic UI/API parity; independent zero-real-order proof; signed or SHA-256 anchored evidence.
 
 `CI green`, `image exists`, `HTTP 200`, `tab rendered` or `connected=true` alone NEVER establish full production PASS. Treat market closure truthfully. Status is `PASS/FAIL/BLOCKED/UNKNOWN/NOT_PROVEN`, each with UTC, project, exact SHA/digest and raw receipt. Historical resources remain historical until newly certified.
 

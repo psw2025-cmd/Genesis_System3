@@ -110,9 +110,9 @@ export default function Signals() {
   const fetchData = async () => {
     try {
       const [stateRes, scannerRes, gainRes] = await Promise.allSettled([
-        axios.get(`${API_BASE}/api/state`),
-        axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`),
-        axios.get(`${API_BASE}/api/gain_rank`),
+        axios.get(`${API_BASE}/api/state`, { timeout: 8000 }),
+        axios.get(`${API_BASE}/api/scanner/top_contract_gainers?top_n=5&market_top_n=25&include_equity=true`, { timeout: 8000 }),
+        axios.get(`${API_BASE}/api/gain_rank`, { timeout: 8000 }),
       ])
 
       if (stateRes.status === 'rejected') {
@@ -194,7 +194,7 @@ export default function Signals() {
   }, [])
 
   if (isLoading && !signal && !authRequired) {
-    return <div className="p-6"><div className="text-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><div className="text-xl font-bold">Loading signals...</div></div></div>
+    return <div className="p-6"><h2 className="sr-only">Signals & Recommendations</h2><div className="text-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div><div className="text-xl font-bold">Loading signals...</div></div></div>
   }
 
   if (authRequired) {
