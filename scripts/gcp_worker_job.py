@@ -51,7 +51,7 @@ def _parse_scheduler_target(uri: str, project: str, region: str) -> tuple[Option
             rf"/v2/projects/{re.escape(project)}/locations/{re.escape(region)}/jobs/([A-Za-z0-9_-]+):run",
             parsed.path,
         )
-        if parsed.hostname == "run.googleapis.com" and v2:
+        if parsed.hostname in {"run.googleapis.com", f"{region}-run.googleapis.com"} and v2:
             return v2.group(1), True
         v1 = re.fullmatch(
             rf"/apis/run.googleapis.com/v1/namespaces/{re.escape(project)}/jobs/([A-Za-z0-9_-]+):run",
@@ -104,6 +104,30 @@ def _base_result(kind: str) -> Dict[str, Any]:
     }
 
 
+def _collector_job_targets(
+    expected: list[str], resources: list[Dict[str, Any]]
+) -> list[str]:
+    """Include actual authenticated Cloud Run Job targets in evidence collection.
+
+    The expected GitHub inventory remains the strict acceptance contract.
+    Discovering extra *valid* enabled job targets fills diagnostic evidence;
+    it must not turn schedule/identity drift into a green health result.
+    """
+    chosen = {
+        name for name in expected
+        if isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_-]+", name)
+    }
+    for row in resources:
+        if not isinstance(row, dict) or row.get("state") != "ENABLED":
+            continue
+        if row.get("target_type") != "http" or row.get("target_uri_valid") is not True:
+            continue
+        name = row.get("target_job")
+        if isinstance(name, str) and re.fullmatch(r"[A-Za-z0-9_-]+", name):
+            chosen.add(name)
+    return sorted(chosen)
+
+
 def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
     project = os.environ.get("GOOGLE_CLOUD_PROJECT", "").strip()
     region = os.environ.get("GCP_REGION", "asia-south1").strip()
@@ -140,7 +164,7 @@ def _collect_scheduler_facts(session=None) -> Dict[str, Any]:
     jobs = []
     from dashboard.backend.scheduler_contract import expected_job_targets
 
-    targets = expected_job_targets()
+    targets = _collector_job_targets(expected_job_targets(), resources)
     by_job = {str(row.get("name", "")).rsplit("/", 1)[-1]: row for row in run_rows}
 
     def _completion_key(row: Dict[str, Any]):
