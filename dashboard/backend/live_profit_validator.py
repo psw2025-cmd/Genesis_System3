@@ -11,7 +11,35 @@ from typing import Any, Dict, List, Optional
 import pytz
 import requests
 
+from dashboard.backend.autonomous_paper_core import estimate_costed_paper_pnl
+
 IST = pytz.timezone("Asia/Kolkata")
+
+
+def calculate_costed_paper_mark(position: Dict[str, Any], mark_price: float) -> Dict[str, float]:
+    """Separate gross and estimated net PAPER P&L using the canonical cost model.
+
+    These fees are conservative simulations, not broker-confirmed charges.
+    """
+    entry = float(position["entry_price"])
+    mark = float(mark_price)
+    quantity = float(position["qty"])
+    if not quantity.is_integer() or quantity <= 0:
+        raise ValueError("INVALID_PAPER_QTY")
+    count = int(quantity)
+    side = str(position.get("positionType") or position.get("position_type") or "LONG").upper()
+    if side in ("SHORT", "SELL"):
+        gross = (entry - mark) * count
+        net = estimate_costed_paper_pnl(mark, entry, count)
+    else:
+        gross = (mark - entry) * count
+        net = estimate_costed_paper_pnl(entry, mark, count)
+    return {
+        "gross_pnl": round(gross, 2),
+        "estimated_charges": round(gross - net, 2),
+        "net_pnl": net,
+    }
+
 
 
 class LiveProfitValidator:
@@ -47,14 +75,12 @@ class LiveProfitValidator:
                 }
             else:
                 # Fallback: calculate from position data
-                entry_price = position.get("entry_price", 0)
-                current_price = position.get("current_price", entry_price)
-                qty = position.get("qty", 0)
-                broker_pnl = (current_price - entry_price) * qty
-
+                values = calculate_costed_paper_mark(position, position["current_price"])
                 return {
                     "source": "broker_calculated",
-                    "pnl": broker_pnl,
+                    "pnl": values["net_pnl"],
+                    **values,
+                    "cost_method": "ESTIMATED_CHARGES_NOT_ACTUAL_BROKER_FEES",
                     "timestamp": datetime.now(IST).isoformat(),
                     "status": "CALCULATED",
                 }
@@ -101,12 +127,12 @@ class LiveProfitValidator:
                 "status": "NO_OPTION_QUOTE",
                 "reason": "Independent timestamped contract-price evidence is unavailable",
             }
-        side = str(position.get("positionType") or position.get("position_type") or "LONG").upper()
-        direction = -1 if side in {"SHORT", "SELL"} else 1
-        pnl = direction * (quote - entry) * abs(quantity)
+        values = calculate_costed_paper_mark(position, quote)
         return {
             "source": "market_verified_option",
-            "pnl": pnl,
+            "pnl": values["net_pnl"],
+            **values,
+            "cost_method": "ESTIMATED_CHARGES_NOT_ACTUAL_BROKER_FEES",
             "option_price": quote,
             "quote_source": source,
             "quote_timestamp": stamp,
@@ -179,11 +205,22 @@ class LiveProfitValidator:
 
         # Internal calculation
         if "internal" in validation_sources:
-            entry_price = position.get("entry_price", 0)
-            current_price = position.get("current_price", entry_price)
-            qty = position.get("qty", 0)
-            internal_pnl = (current_price - entry_price) * qty
-            validations.append({"source": "internal", "pnl": internal_pnl, "status": "SUCCESS"})
+            try:
+                values = calculate_costed_paper_mark(position, position["current_price"])
+                validations.append({
+                    "source": "internal",
+                    "pnl": values["net_pnl"],
+                    **values,
+                    "cost_method": "ESTIMATED_CHARGES_NOT_ACTUAL_BROKER_FEES",
+                    "status": "CALCULATED",
+                })
+            except (ValueError, KeyError, TypeError) as exc:
+                validations.append({
+                    "source": "internal",
+                    "pnl": None,
+                    "status": "NO_DATA",
+                    "reason": type(exc).__name__,
+                })
 
         # Broker validation
         if "broker" in validation_sources:
