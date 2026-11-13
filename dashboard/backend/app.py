@@ -5272,6 +5272,14 @@ async def get_six_index_truth():
     }
 
 
+# Snapshot reads may touch slow SQLite/disk paths. Keep them off the ASGI
+# loop and cap worker threads, so closed-market UI truth endpoints cannot hang.
+_BATCH_CHAIN_SNAPSHOT_EXECUTOR = ThreadPoolExecutor(
+    max_workers=6, thread_name_prefix="system3-batch-snapshot"
+)
+_BATCH_CHAIN_RESOLVE_TIMEOUT_S = 2.5
+
+
 @app.get("/api/chains")
 @app.get("/api/batch/chains")
 async def batch_chains():
@@ -5286,9 +5294,36 @@ async def batch_chains():
         out["cache_hit"] = True
         return out
 
-    chains: Dict[str, Any] = {
-        sym: _resolve_batch_chain_entry(sym) for sym in _INDEX_STREAM_SYMBOLS
-    }
+    async def _bounded_snapshot(sym: str) -> Dict[str, Any]:
+        try:
+            loop = asyncio.get_running_loop()
+            result = await asyncio.wait_for(
+                loop.run_in_executor(
+                    _BATCH_CHAIN_SNAPSHOT_EXECUTOR, _resolve_batch_chain_entry, sym
+                ),
+                timeout=_BATCH_CHAIN_RESOLVE_TIMEOUT_S,
+            )
+            if not isinstance(result, dict):
+                raise ValueError("invalid snapshot response")
+            return result
+        except asyncio.TimeoutError:
+            item = _warming_chain_placeholder(sym)
+            item["status"] = "CHAIN_SNAPSHOT_READ_TIMEOUT"
+            item["pending_reason"] = "Bounded local snapshot read timed out"
+            return item
+        except Exception as exc:
+            item = _warming_chain_placeholder(sym)
+            item["status"] = "CHAIN_SNAPSHOT_READ_ERROR"
+            item["pending_reason"] = type(exc).__name__
+            return item
+
+    # Execute six independent local snapshot reads concurrently; no Dhan OC
+    # network calls are made on the request path. Each slow disk/SQLite reader
+    # has a 2.5s wall-clock budget and cannot freeze /api/truth or the UI.
+    resolved = await asyncio.gather(
+        *(_bounded_snapshot(sym) for sym in _INDEX_STREAM_SYMBOLS)
+    )
+    chains: Dict[str, Any] = dict(zip(_INDEX_STREAM_SYMBOLS, resolved))
     ready = _required_chain_symbols_ready(chains)
     payload = {
         "cache_hit": False,
