@@ -8932,9 +8932,9 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
     }
     best = data.get("best_model")
     phantom = str(best or "") in phantom_names
-    verified_name = "XGBoost-Baseline-v2"
     if phantom:
-        best = verified_name
+        # Do not relabel an unweighted model as a different, supposedly verified model.
+        best = None
     best_metrics = results.get(best, {}) if best and isinstance(results.get(best), dict) else {}
     sanitized_results = {
         name: rec
@@ -8947,11 +8947,11 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
         {
             "status": "REPORTED_NOT_VERIFIED",
             "model_proof_ready": False,
-            "best_model": best or verified_name,
-            "verified_local_artifact": "models/xgboost_v1",
+            "best_model": best or "UNVERIFIED",
+            "verified_local_artifact": None if phantom else "models/xgboost_v1",
             "results": sanitized_results,
             "total_predictions": int(data.get("dataset_rows") or data.get("total_predictions") or 0),
-            "avg_accuracy": best_metrics.get("accuracy", data.get("avg_accuracy")),
+            "avg_accuracy": None if phantom else best_metrics.get("accuracy", data.get("avg_accuracy")),
             "avg_confidence": data.get("avg_confidence"),
             "proof_pass_count": int(data.get("proof_pass_count") or 0),
             "validation_pending_count": int(data.get("validation_pending_count") or 0),
