@@ -1293,12 +1293,50 @@ async def get_market_live_board():
         }
 
 
+def _live_price_truth(symbol: str, quote: dict, retrieved_at: str | None = None) -> dict:
+    """Only label a Dhan quote live when it carries a recent exchange timestamp."""
+    source = str(quote.get("source") or "UNVERIFIED")
+    try:
+        last_known = float(quote.get("ltp") or quote.get("spot") or 0)
+        if not math.isfinite(last_known) or last_known <= 0:
+            last_known = 0.0
+    except (TypeError, ValueError):
+        last_known = 0.0
+    exchange_time = quote.get("exchange_timestamp") or quote.get("last_trade_time")
+    age = None
+    if isinstance(exchange_time, str):
+        try:
+            parsed = datetime.fromisoformat(exchange_time.replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                age = (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds()
+        except ValueError:
+            pass
+    recent = age is not None and -5 <= age <= 60
+    broker_quote = source in ("dhan_marketfeed", "DHAN_LIVE") and quote.get("data_status", "BROKER_QUOTE") == "BROKER_QUOTE"
+    live = bool(last_known and recent and broker_quote and quote.get("live", True))
+    if live:
+        return {
+            "symbol": symbol, "spot": last_known, "ltp": last_known,
+            "change": quote.get("change"), "change_pct": quote.get("change_pct"),
+            "source": "DHAN_LIVE", "timestamp": exchange_time,
+            "exchange_timestamp": exchange_time, "tick_age_sec": round(max(age, 0), 2),
+            "status": "SUCCESS", "freshness": "LIVE",
+        }
+    return {
+        "symbol": symbol, "spot": None, "ltp": None,
+        "last_known_ltp": last_known or None,
+        "change": None, "change_pct": None, "source": source,
+        "timestamp": exchange_time, "retrieved_at": retrieved_at,
+        "tick_age_sec": round(age, 2) if age is not None else None,
+        "status": "STALE" if age is not None and age > 60 else "UNVERIFIED",
+        "freshness": "STALE" if age is not None and age > 60 else "UNVERIFIED",
+    }
+
+
 @app.get("/api/live_price/{symbol}")
 @app.get("/api/live_price")
 async def get_live_price_endpoint(symbol: str = "NIFTY"):
-    """Authoritative live price endpoint for Dhan marketfeed quotes.
-    Returns {symbol, spot, change, change_pct, source: DHAN_LIVE, timestamp, status}.
-    """
+    """Return a live price only with a recent, exchange-timestamped Dhan quote."""
     sym = str(symbol or "NIFTY").strip().upper()
     if sym in ("BTCUSDT", "BTC-USD", "CRYPTO"):
         sym = "NIFTY"
@@ -1308,22 +1346,13 @@ async def get_live_price_endpoint(symbol: str = "NIFTY"):
     if isinstance(cached_board, dict):
         for row in (cached_board.get("indices") or []) + (cached_board.get("equities") or []):
             if str(row.get("symbol") or "").strip().upper() == sym:
-                return {
-                    "symbol": sym,
-                    "spot": float(row.get("ltp") or 0.0),
-                    "ltp": float(row.get("ltp") or 0.0),
-                    "change": float(row.get("change") or 0.0),
-                    "change_pct": float(row.get("change_pct") or 0.0),
-                    "source": "DHAN_LIVE",
-                    "timestamp": cached_board.get("generated_at") or datetime.now(IST).isoformat(),
-                    "status": "SUCCESS",
-                }
+                return _live_price_truth(sym, row, cached_board.get("generated_at"))
 
     # Fetch live price via core.data.live_fetcher
     try:
         from core.data.live_fetcher import get_live_price
         res = await asyncio.to_thread(get_live_price, sym)
-        return res
+        return _live_price_truth(sym, res, res.get("timestamp"))
     except Exception as e:
         return {
             "symbol": sym,
