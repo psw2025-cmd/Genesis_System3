@@ -742,6 +742,10 @@ async def get_state():
     if (state.get("mode") or "").upper() == "LIVE" and (not broker_connected or ds in ("SYNTHETIC", "NOT_READY")):
         state = dict(state)
         state["mode"] = "PAPER"
+    # This route is the dashboard SSOT and must enforce the same fail-closed
+    # recommendation contract as /api/ml/predictions. Do not trust cached
+    # scanner history or a REST refresh timestamp as proof of a live quote.
+    state = _gate_state_recommendations(state)
     return _redact_public_credentials(state)
 
 
@@ -12156,6 +12160,78 @@ def _apply_model_readiness_gate(predictions: list, model_state: dict) -> list:
             )
         gated.append(row)
     return gated
+
+
+def _gate_state_recommendations(state: dict) -> dict:
+    """Fail closed for dashboard recommendations without verified live evidence.
+
+    A valid trading recommendation requires an explicitly verified open
+    exchange session and a timestamped market quote no older than 60 seconds.
+    Poll/cycle timestamps are intentionally not treated as quote timestamps.
+    """
+    if not isinstance(state, dict):
+        return state
+    result = dict(state)
+    market = result.get("market") if isinstance(result.get("market"), dict) else {}
+    session_ok = market.get("is_open") is True and market.get("calendar_verified") is True
+    quote_time = None
+    for container in (result, market):
+        for key in (
+            "market_data_timestamp_utc",
+            "last_market_data_timestamp",
+            "quote_timestamp_utc",
+        ):
+            value = container.get(key)
+            if isinstance(value, str) and value.strip():
+                quote_time = value.strip()
+                break
+        if quote_time:
+            break
+    quote_fresh = False
+    if quote_time:
+        try:
+            parsed = datetime.fromisoformat(quote_time.replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                age = (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds()
+                quote_fresh = -5 <= age <= 60
+        except (TypeError, ValueError, OverflowError):
+            quote_fresh = False
+
+    reason = None
+    if not session_ok:
+        reason = "MARKET_SESSION_NOT_VERIFIED_OPEN"
+    elif not quote_fresh:
+        reason = "FRESH_MARKET_QUOTE_NOT_VERIFIED"
+
+    predictions = result.get("ml_predictions")
+    if isinstance(predictions, list):
+        result["ml_predictions"] = _apply_model_readiness_gate(predictions, result.get("model") or {})
+
+    if reason:
+        def hold_trade_outputs(value):
+            if isinstance(value, list):
+                return [hold_trade_outputs(item) for item in value]
+            if not isinstance(value, dict):
+                return value
+            row = {key: hold_trade_outputs(item) for key, item in value.items()}
+            recommendation = str(row.get("recommendation") or "").upper()
+            signal = str(row.get("signal") or "").upper()
+            action = str(row.get("action") or "").upper()
+            if recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"} or signal in {"BUY", "SELL", "LONG", "SHORT"} or action in {"BUY", "SELL", "LONG", "SHORT"}:
+                row.update({
+                    "recommendation": "WAIT",
+                    "signal": "HOLD",
+                    "confidence": 0,
+                    "confidence_pct": 0,
+                    "blocker": reason,
+                })
+            return row
+
+        result = hold_trade_outputs(result)
+        result["recommendation_safety"] = {"status": "BLOCKED", "reason": reason}
+    else:
+        result["recommendation_safety"] = {"status": "VERIFIED", "reason": None}
+    return result
 
 
 @app.get("/api/ml/predictions")

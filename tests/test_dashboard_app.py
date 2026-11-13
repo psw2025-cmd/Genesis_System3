@@ -275,6 +275,78 @@ def test_state_endpoint_returns_200(app):
     assert "state_version" in data
 
 
+def test_state_endpoint_holds_cached_trade_recommendations_without_verified_live_market(app, monkeypatch):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 9,
+            "mode": "PAPER",
+            "data_source": "dhan_verified_cache",
+            "market": {"is_open": False, "calendar_verified": False},
+            "model": {"models_loaded": 1, "metrics": {"models_loaded": 1}},
+            "ml_predictions": [{
+                "symbol": "NIFTY",
+                "recommendation": "TRADE",
+                "signal": "BUY",
+                "confidence_pct": 75.2,
+                "model_loaded": True,
+            }],
+            "signals": {
+                "NIFTY": {
+                    "recommendation": "TRADE",
+                    "signal": "BUY",
+                    "confidence": 75.2,
+                }
+            },
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "MARKET_SESSION_NOT_VERIFIED_OPEN",
+    }
+    assert data["ml_predictions"][0]["recommendation"] == "WAIT"
+    assert data["ml_predictions"][0]["signal"] == "HOLD"
+    assert data["ml_predictions"][0]["confidence_pct"] == 0
+    assert data["signals"]["NIFTY"]["recommendation"] == "WAIT"
+    assert data["signals"]["NIFTY"]["signal"] == "HOLD"
+    assert data["signals"]["NIFTY"]["confidence"] == 0
+
+
+def test_state_endpoint_rejects_stale_market_quote_even_with_verified_open_session(app, monkeypatch):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 10,
+            "mode": "PAPER",
+            "data_source": "dhan",
+            "market": {
+                "is_open": True,
+                "calendar_verified": True,
+                "market_data_timestamp_utc": "2026-11-14T03:00:00+00:00",
+            },
+            "signals": {"NIFTY": {"signal": "BUY", "confidence": 80}},
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "FRESH_MARKET_QUOTE_NOT_VERIFIED",
+    }
+    assert data["signals"]["NIFTY"]["signal"] == "HOLD"
+    assert data["signals"]["NIFTY"]["confidence"] == 0
+
+
 def test_missing_model_proof_forces_hold_and_zero_confidence(app):
     endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/ml/predictions")
     gate = endpoint.__globals__["_apply_model_readiness_gate"]
