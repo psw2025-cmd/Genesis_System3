@@ -13,6 +13,7 @@ on:
       - 'scripts/cloud_infrastructure_inventory.py'
       - 'scripts/cloud_audit_publish.py'
       - 'tests/test_cloud_audit_publish.py'
+      - 'tests/test_audit_publication_trigger.py'
       - 'tests/test_cloud_infrastructure_inventory.py'
       - 'scripts/dhan_canonical_rotation_readonly.py'
   push:
@@ -49,7 +50,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate target and safety without GCP credentials
-        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract tests.test_cloud_infrastructure_inventory tests.test_cloud_audit_publish
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract tests.test_cloud_infrastructure_inventory tests.test_cloud_audit_publish tests.test_audit_publication_trigger
 
   synthetic-paper-proof:
     name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
@@ -263,7 +264,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --name-only HEAD^ HEAD -- audit_results/ scripts/cloud_audit_publish.py .github/workflows/cloud-verify.yml | grep -Eq '^(audit_results/|scripts/cloud_audit_publish\\.py$|\\.github/workflows/cloud-verify\\.yml$)'; then
+          changes="$(git diff --name-only HEAD^ HEAD -- audit_results/ scripts/cloud_audit_publish.py .github/workflows/cloud-verify.yml)"
+          if [[ -n "$changes" ]]; then
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           else
             echo 'changed=false' >> "$GITHUB_OUTPUT"
