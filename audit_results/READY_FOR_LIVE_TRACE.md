@@ -1,0 +1,77 @@
+# READY_FOR_LIVE TRACE
+
+> **Evidence scope:** tracked files in clean GitHub-main snapshot `8c2b4019c67b3a01dc64fbbee979c74d31044e9d`, observed 2026-11-13T22:16:41.190395+00:00. Static findings are not runtime proof. No trades, cloud writes, or deployments performed.
+
+### Definitions, writes, routes and consumers
+- `core/engine/system3_phases_351_360_safety_automation.py:356` — source location only; review content in repository
+- `dashboard/backend/app.py:2350` — source location only; review content in repository
+- `dashboard/backend/app.py:2356` — source location only; review content in repository
+- `dashboard/backend/app.py:2363` — source location only; review content in repository
+- `dashboard/backend/app.py:8898` — source location only; review content in repository
+- `dashboard/backend/app.py:8960` — source location only; review content in repository
+- `dashboard/backend/app.py:9033` — source location only; review content in repository
+- `dashboard/backend/app.py:9034` — source location only; review content in repository
+- `dashboard/backend/app.py:9075` — source location only; review content in repository
+- `dashboard/backend/app.py:9096` — source location only; review content in repository
+- `dashboard/backend/app.py:9097` — source location only; review content in repository
+- `dashboard/backend/app.py:9111` — source location only; review content in repository
+- `dashboard/backend/app.py:9112` — source location only; review content in repository
+- `dashboard/backend/app.py:9176` — source location only; review content in repository
+- `dashboard/backend/app.py:9182` — source location only; review content in repository
+- `dashboard/backend/app.py:9415` — source location only; review content in repository
+- `dashboard/backend/app.py:9424` — source location only; review content in repository
+- `dashboard/backend/app.py:9433` — source location only; review content in repository
+- `dashboard/backend/app.py:9443` — source location only; review content in repository
+- `dashboard/backend/app.py:9446` — source location only; review content in repository
+- `dashboard/backend/ml_intelligence_service.py:82` — source location only; review content in repository
+- `dashboard/backend/moneycontrol_option_gainers.py:251` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:361` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:365` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:373` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:442` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:542` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:543` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:555` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:556` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:583` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:587` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:599` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:604` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:636` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:637` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:705` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:706` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:714` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:715` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:729` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:750` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:774` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:784` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:794` — source location only; review content in repository
+- `dashboard/backend/routers/ml.py:803` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:23` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:32` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:33` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:45` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:46` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:114` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:139` — source location only; review content in repository
+- `dashboard/frontend/src/components/MLPerformance.tsx:141` — source location only; review content in repository
+- `dashboard/frontend/src/components/PendingLifecycleBanner.tsx:29` — source location only; review content in repository
+- `dashboard/frontend/src/components/PendingLifecycleBanner.tsx:36` — source location only; review content in repository
+- `dashboard/frontend/src/components/PendingLifecycleBanner.tsx:98` — source location only; review content in repository
+- `dashboard/frontend/src/components/PerformanceTab.tsx:251` — source location only; review content in repository
+- `dashboard/frontend/src/components/PerformanceTab.tsx:260` — source location only; review content in repository
+- `dashboard/frontend/src/components/PerformanceTab.tsx:263` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:34` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:37` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:48` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:84` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:153` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:160` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemReadiness.tsx:174` — source location only; review content in repository
+- `dashboard/frontend/src/components/SystemTruthControl.tsx:160` — source location only; review content in repository
+- `docs/SYSTEM3_PHASES_331_360_IMPLEMENTATION.md.md:1493` — source location only; review content in repository
+- `docs/audits/system3_quant_lifecycle/sessions/20260816T123000Z/supporting/agent_Q11_Q20_strategy_paper.md:175` — source location only; review content in repository
+
+Exact persisted producer→consumer lineage: **NOT PROVEN** without runtime/state verification.
