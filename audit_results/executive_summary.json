@@ -1,0 +1,209 @@
+{
+  "schema": "genesis-executive-truth-v1",
+  "source_sha": "8c2b4019c67b3a01dc64fbbee979c74d31044e9d",
+  "observed_utc": "2026-11-13T22:16:41.190395+00:00",
+  "tracked_files": 3241,
+  "scanned_text_files": 2937,
+  "assessment_method": "static tracked source only; no runtime or secret access",
+  "production_readiness_score": null,
+  "paper_readiness_score": null,
+  "live_readiness_score": null,
+  "score_reason": "No complete runtime/integration/source-lineage evidence; numeric readiness would be fabricated",
+  "areas": {
+    "Broker Authentication": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Broker Session Management": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Market Data": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Instrument Master": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Prediction Generation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Signal Generation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Order Generation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Paper Trading": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Position Tracking": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Exit Logic": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "PnL Calculation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Audit Trail": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Risk Engine": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Safety Engine": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Runtime Truth Layer": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "ML Validation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Walk Forward Validation": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Reconciliation Engine": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Performance Reporting": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    },
+    "Live Readiness Engine": {
+      "status": "PARTIAL",
+      "confidence_pct": null,
+      "evidence_count": 5
+    }
+  },
+  "release_blockers": [
+    {
+      "priority": "P0",
+      "title": "Integrated PAPER lifecycle not proven"
+    },
+    {
+      "priority": "P0",
+      "title": "Failed Cloud Run candidate startup"
+    },
+    {
+      "priority": "P0",
+      "title": "Deployed source/image lineage unresolved"
+    },
+    {
+      "priority": "P0",
+      "title": "Option chain coverage not proven"
+    },
+    {
+      "priority": "P0",
+      "title": "Market data freshness and parity unverified"
+    },
+    {
+      "priority": "P0",
+      "title": "Real broker order safety needs independent enforcement proof"
+    },
+    {
+      "priority": "P0",
+      "title": "ML out-of-sample results unverified"
+    },
+    {
+      "priority": "P0",
+      "title": "23 UI tab acceptance not proven"
+    },
+    {
+      "priority": "P1",
+      "title": "Secret consumer mapping incomplete"
+    },
+    {
+      "priority": "P1",
+      "title": "Cloud scheduling ownership and duplicate triggers unverified"
+    },
+    {
+      "priority": "P1",
+      "title": "Risk limits need persistent runtime proof"
+    },
+    {
+      "priority": "P1",
+      "title": "Backend API route contracts need end-to-end tests"
+    },
+    {
+      "priority": "P1",
+      "title": "Prediction history lineage unverified"
+    },
+    {
+      "priority": "P1",
+      "title": "Writer concurrency/reconciliation unverified"
+    },
+    {
+      "priority": "P1",
+      "title": "Restart recovery lacks certification"
+    },
+    {
+      "priority": "P1",
+      "title": "Cost/fee accounting unproven"
+    },
+    {
+      "priority": "P1",
+      "title": "Cloud observability missing acceptance proof"
+    },
+    {
+      "priority": "P1",
+      "title": "Database migration/data retention unverified"
+    },
+    {
+      "priority": "P2",
+      "title": "React hook and stale closure review requires path corroboration"
+    },
+    {
+      "priority": "P2",
+      "title": "Complexity and type coverage need reproducible baseline"
+    }
+  ],
+  "reports": [
+    "FAKE_COMPONENTS_REPORT.md",
+    "ML_TRUTH_REPORT.md",
+    "PAPER_TRADING_AUDIT.md",
+    "PREDICTION_LIFECYCLE_REPORT.md",
+    "PRODUCTION_READINESS_TRUTH.md",
+    "READY_FOR_LIVE_TRACE.md",
+    "RECONCILIATION_TRUTH.md",
+    "SAFETY_AUDIT.md",
+    "SYSTEM_INVENTORY.md",
+    "TOP20_RELEASE_BLOCKERS.md",
+    "WALK_FORWARD_TRUTH.md"
+  ]
+}
