@@ -75,6 +75,11 @@ def test_spearman_gate_requires_30_consecutive_nse_proven_sessions(tmp_path):
     unverified = eval_spearman_gate(tmp_path)
     assert unverified["pass"] is False
 
+    write_session(sessions[30], previous=sessions[28])
+    broken_link = eval_spearman_gate(tmp_path)
+    assert broken_link["pass"] is False
+    assert broken_link["consecutive_pass_days"] == 1
+
 
 def test_alert_ui_separates_live_readiness_info_from_active_operational_alerts():
     helper = (ROOT / "dashboard/frontend/src/lib/alertTruth.ts").read_text(encoding="utf-8")
