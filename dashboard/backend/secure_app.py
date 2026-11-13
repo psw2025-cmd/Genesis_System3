@@ -199,10 +199,11 @@ async def market_status_readonly():
         return response
     clock_open = details["is_open"]
     response.update({
-        "status": "CLOCK_WINDOW_OPEN" if clock_open else "CLOCK_WINDOW_CLOSED",
-        "market_open": clock_open,
-        "is_open": clock_open,
-        "market_status": "open" if clock_open else "closed",
+        "status": "NOT_VERIFIED",
+        "clock_window_open": clock_open,
+        "market_open": None,
+        "is_open": None,
+        "market_status": "NOT_VERIFIED",
         "reason": str(details.get("reason") or "CLOCK_WINDOW_ONLY")[:120],
         "next_open": details.get("next_open"),
         "verification_status": "CLOCK_WINDOW_ONLY_NOT_EXCHANGE_VERIFIED",
