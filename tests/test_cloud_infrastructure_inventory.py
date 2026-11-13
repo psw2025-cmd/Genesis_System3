@@ -15,11 +15,33 @@ class InventoryTests(unittest.TestCase):
             if args[:3] == ("run", "services", "list"):
                 return [{"metadata": {"name": "genesis-system3-web"}},
                         {"metadata": {"name": "genesis-system3-web-staging"}}]
+            if args[:3] == ("projects", "get-iam-policy", "system3-openalgo-safe"):
+                return {"bindings": [{"role": "roles/viewer", "members": ["secret@example.com"]}], "version": 1}
+            if args[:3] == ("billing", "projects", "describe"):
+                return {"billingEnabled": True, "billingAccountName": "SECRET_BILLING_ACCOUNT"}
             return [{"name": "projects/p/secrets/token", "payload": "NEVER_PRINT"}] if args[:2] == ("secrets", "list") else []
         proof = collect(runner)
         self.assertEqual(proof["status"], "PASS")
         self.assertTrue(proof["scopes"]["cloud_run_services"]["canonical_production_present"])
         self.assertNotIn("NEVER_PRINT", str(proof))
+        self.assertNotIn("SECRET_BILLING_ACCOUNT", str(proof))
+        self.assertNotIn("secret@example.com", str(proof))
+
+    def test_missing_cloud_run_targets_fail_closed(self):
+        def runner(args):
+            if args[:2] == ("projects", "describe"):
+                return {"projectId": "system3-openalgo-safe", "lifecycleState": "ACTIVE"}
+            if args[:2] == ("projects", "get-iam-policy"):
+                return {"bindings": [], "version": 1}
+            if args[:2] == ("billing", "projects"):
+                return {"billingEnabled": True}
+            return []
+        proof = collect(runner)
+        self.assertEqual(proof["status"], "NOT_VERIFIED")
+        self.assertEqual(proof["scopes"]["cloud_run_services"]["status"], "FAIL")
+
+    def test_unlinked_billing_fail_closed(self):
+        self.assertEqual(summarize("billing_linkage", {"billingEnabled": False})["status"], "FAIL")
 
     def test_permission_failure_not_pass(self):
         def runner(args):

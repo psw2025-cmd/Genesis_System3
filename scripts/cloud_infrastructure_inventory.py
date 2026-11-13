@@ -10,6 +10,8 @@ PROJECT = "system3-openalgo-safe"
 REGION = "asia-south1"
 SCOPES = {
     "project": ("projects", "describe", PROJECT),
+    "project_iam_policy": ("projects", "get-iam-policy", PROJECT),
+    "billing_linkage": ("billing", "projects", "describe", PROJECT),
     "enabled_apis": ("services", "list", "--enabled", "--project", PROJECT),
     "iam_service_accounts": ("iam", "service-accounts", "list", "--project", PROJECT),
     "cloud_run_services": ("run", "services", "list", "--project", PROJECT, "--region", REGION),
@@ -19,6 +21,10 @@ SCOPES = {
     "artifact_repositories": ("artifacts", "repositories", "list", "--project", PROJECT, "--location", REGION),
     "cloud_builds": ("builds", "list", "--project", PROJECT, "--region", REGION, "--limit", "30"),
     "logging_sinks": ("logging", "sinks", "list", "--project", PROJECT),
+    "storage_buckets": ("storage", "buckets", "list", "--project", PROJECT),
+    "vpc_networks": ("compute", "networks", "list", "--project", PROJECT),
+    "vpc_firewall_rules": ("compute", "firewall-rules", "list", "--project", PROJECT),
+    "sql_instances": ("sql", "instances", "list", "--project", PROJECT),
 }
 
 
@@ -47,11 +53,24 @@ def safe_name(obj):
 
 
 def summarize(scope, response):
+    if scope == "project_iam_policy":
+        if not isinstance(response, dict) or not isinstance(response.get("bindings", []), list):
+            raise ValueError("IAM_POLICY_SCHEMA")
+        return {"status": "PASS", "binding_count": len(response.get("bindings", [])),
+                "policy_version": response.get("version")}
+    if scope == "billing_linkage":
+        if not isinstance(response, dict):
+            raise ValueError("BILLING_SCHEMA")
+        enabled = response.get("billingEnabled")
+        return {"status": "PASS" if enabled is True else "FAIL",
+                "billing_enabled": enabled is True}
     if scope == "project":
         if not isinstance(response, dict):
             raise ValueError("PROJECT_SCHEMA")
-        return {"status": "PASS", "project_id_match": response.get("projectId") == PROJECT,
-                "lifecycle_state": str(response.get("lifecycleState") or "UNKNOWN")[:40]}
+        is_match = response.get("projectId") == PROJECT
+        is_active = response.get("lifecycleState") == "ACTIVE"
+        return {"status": "PASS" if is_match and is_active else "FAIL",
+                "project_id_match": is_match, "lifecycle_state": str(response.get("lifecycleState") or "UNKNOWN")[:40]}
     if not isinstance(response, list):
         raise ValueError("LIST_SCHEMA")
     names = sorted(set(n for item in response if (n := safe_name(item))))
@@ -60,6 +79,8 @@ def summarize(scope, response):
     if scope == "cloud_run_services":
         result["canonical_production_present"] = "genesis-system3-web" in names
         result["canonical_staging_present"] = "genesis-system3-web-staging" in names
+        if not result["canonical_production_present"] or not result["canonical_staging_present"]:
+            result["status"] = "FAIL"
     if scope == "secret_metadata":
         result["note"] = "Identifiers only; secret payloads and versions not retrieved"
     return result
@@ -73,8 +94,6 @@ def collect(runner=run_gcloud):
         except (RuntimeError, ValueError, TypeError, KeyError) as exc:
             scopes[name] = {"status": "NOT_VERIFIED", "error_class": type(exc).__name__}
     ready = all(entry["status"] == "PASS" for entry in scopes.values())
-    if not scopes["project"].get("project_id_match", False):
-        ready = False
     return {"schema": "genesis-cloud-infrastructure-inventory-v1",
             "observed_utc": datetime.now(timezone.utc).isoformat(),
             "project": PROJECT, "region": REGION,
