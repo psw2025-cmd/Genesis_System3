@@ -1,0 +1,54 @@
+{
+  "utc": "2026-11-12T05:56:25.076955+00:00",
+  "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "verdict": "UNVERIFIED",
+  "/api/health": {
+    "http": 200,
+    "observed": {
+      "timestamp_utc": null,
+      "timestamp_ist": null,
+      "mode": "PAPER",
+      "market": {
+        "is_open": true,
+        "reason": "Market open",
+        "current_time_ist": null
+      },
+      "qc": null,
+      "data_source": "broker_connected_market_open"
+    }
+  },
+  "/api/state": {
+    "http": 200,
+    "observed": {
+      "timestamp_utc": "2026-11-12T05:56:25.097004Z",
+      "timestamp_ist": "2026-11-12T11:26:25.097005+05:30",
+      "mode": "PAPER",
+      "market": {
+        "is_open": true,
+        "reason": "Market open",
+        "next_open": "2026-11-12 09:15:00 IST",
+        "current_time_ist": "2026-11-12T11:26:25.093468+05:30"
+      },
+      "qc": {
+        "status": "PASS",
+        "reasons": [],
+        "contracts_total": 3102,
+        "underlyings": 6,
+        "failures": []
+      },
+      "data_source": "BROKER_LIVE"
+    }
+  },
+  "disk_used_pct": 77.18,
+  "desktop": {
+    "http": 200,
+    "screenshot": "desktop.png",
+    "js_error_count": 0,
+    "parity": "UNVERIFIED",
+    "utc": "2026-11-12T05:56:34.904799+00:00"
+  },
+  "browser": {
+    "error_type": "TimeoutError",
+    "verified": false
+  }
+}

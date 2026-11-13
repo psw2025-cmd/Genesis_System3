@@ -1,0 +1,15 @@
+{
+  "reports\\market_truth\\artifact_hashes.json": "d0e71e10182b2427f0b70cb7f9a303556a7873365f6f4fc3363b7faf0ce46e5f",
+  "reports\\market_truth\\github_push_receipt.json": "1a11e0249054e2c82aee2d072b2179229bb66746b295eb70403b0d6b13ddc72a",
+  "reports\\market_truth\\pytest_receipt.log": "1c4e0c4945ea268c3bc11a7a613907555ed512b9eeaf46afe02b9e771b929bcc",
+  "reports\\market_truth\\pytest_retry2.log": "1c4e0c4945ea268c3bc11a7a613907555ed512b9eeaf46afe02b9e771b929bcc",
+  "reports\\market_truth\\20261112T055625Z_cloud\\desktop.png": "7dc52e9c1b18520e33a75dd5524f0bae4b4457cddc5f02403638de408115ca08",
+  "reports\\market_truth\\20261112T055625Z_cloud\\observation.json": "7e2e59f1fab0571c80bd5c2b77676fb50cb1d451d649d59eb1754b7617240b96",
+  "reports\\market_truth\\20261112T055827Z_cloud\\desktop.png": "dcd7fb4cf4ec409cd74d9945ec1d323c75dae8f4e79978c063fd2ca4a92b17c6",
+  "reports\\market_truth\\20261112T055827Z_cloud\\mobile.png": "21b16aa00faf1523d9865efb80154714de47ed6887ff24488e39c1fb70db5380",
+  "reports\\market_truth\\20261112T055827Z_cloud\\observation.json": "091c31aafe5bd9dfe37f3d5dd147fecc6de1e2e639d37c73192b7b417f170212",
+  "reports\\market_truth\\20261112T060118Z\\source_observation.json": "5491ef59b2d055ee879c1eaeb3ca81ba43bbb28bc0c5a2ae2a7f26050a2280a0",
+  "reports\\market_truth\\20261112T060131Z\\source_observation.json": "63e6eccd468c7c6e2b8e88033d7dc659f28d89a5cd8c6d9150fd8af1e4bc0b25",
+  "reports\\market_truth\\20261112T061339Z_cloud\\desktop.png": "f4eec5dea70785ed417f849663aa1b2c50f91525b02f9fb115118b35776fde73",
+  "reports\\market_truth\\20261112T061339Z_cloud\\observation.json": "5d73a7758b8482c79ace2fbf227176cedeaa036d9fc68242dee56f50ba0cd263"
+}
