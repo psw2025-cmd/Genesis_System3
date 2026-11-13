@@ -70,48 +70,49 @@ class LiveProfitValidator:
     def validate_against_market_data(
         self, position: Dict[str, Any], market_data_source: str = "yahoo"
     ) -> Dict[str, Any]:
-        """
-        Validate profit against live market data
+        """Validate PAPER option P&L only against a separate verified option quote.
 
-        Args:
-            position: Position dictionary
-            market_data_source: Market data source ('yahoo', 'nse', etc.)
+        An underlying-index spot (Yahoo/NSE/BSE) is not an option premium;
+        intrinsic value plus guessed time value must never count as an
+        independent quote or successful profit validation.
 
-        Returns:
-            Validation result
+        A producer may supply validation_option_ltp, validation_option_source
+        and validation_option_timestamp. Reusing current_price or ltp from the
+        position itself is not independent validation.
         """
+        source = str(position.get("validation_option_source") or "").strip().upper()
+        stamp = str(position.get("validation_option_timestamp") or "").strip()
+        raw = position.get("validation_option_ltp")
+        allowed = {"DHAN_OPTION_CHAIN", "DHAN_OPTION_QUOTE", "NSE_OPTION_QUOTE", "BSE_OPTION_QUOTE"}
         try:
-            underlying = position.get("underlying", "NIFTY")
-            strike = position.get("strike", 0)
-            option_type = position.get("option_type", "CE")
-            expiry = position.get("expiry", "")
-
-            # Get current spot price
-            spot_price = self._get_live_spot_price(underlying, market_data_source)
-
-            # Calculate option price from spot (simplified Black-Scholes approximation)
-            option_price = self._calculate_option_price(spot_price, strike, option_type, expiry)
-
-            entry_price = position.get("entry_price", 0)
-            qty = position.get("qty", 0)
-            market_pnl = (option_price - entry_price) * qty
-
+            quote = float(raw) if raw is not None and not isinstance(raw, bool) else None
+            entry = float(position["entry_price"])
+            quantity = float(position["qty"])
+        except (TypeError, ValueError, KeyError, OverflowError):
+            quote = None
+        if (
+            quote is None or quote <= 0
+            or source not in allowed or not stamp
+            or not __import__("math").isfinite(quote)
+        ):
             return {
-                "source": f"market_{market_data_source}",
-                "pnl": market_pnl,
-                "spot_price": spot_price,
-                "option_price": option_price,
-                "timestamp": datetime.now(IST).isoformat(),
-                "status": "SUCCESS",
+                "source": "market_verified_option",
+                "pnl": None,
+                "status": "NO_OPTION_QUOTE",
+                "reason": "Independent timestamped contract-price evidence is unavailable",
             }
-        except Exception as e:
-            return {
-                "source": f"market_{market_data_source}",
-                "pnl": 0.0,
-                "error": str(e),
-                "timestamp": datetime.now(IST).isoformat(),
-                "status": "ERROR",
-            }
+        side = str(position.get("positionType") or position.get("position_type") or "LONG").upper()
+        direction = -1 if side in {"SHORT", "SELL"} else 1
+        pnl = direction * (quote - entry) * abs(quantity)
+        return {
+            "source": "market_verified_option",
+            "pnl": pnl,
+            "option_price": quote,
+            "quote_source": source,
+            "quote_timestamp": stamp,
+            "timestamp": datetime.now(IST).isoformat(),
+            "status": "SUCCESS",
+        }
 
     def validate_against_historical(
         self, position: Dict[str, Any], historical_data: List[Dict[str, Any]]
@@ -194,9 +195,13 @@ class LiveProfitValidator:
             try:
                 market_validation = self.validate_against_market_data(position)
                 validations.append(market_validation)
-            except:
-                # Skip market validation if it times out
-                pass
+            except Exception as exc:
+                validations.append({
+                    "source": "market_verified_option",
+                    "status": "ERROR",
+                    "reason": type(exc).__name__,
+                    "pnl": None,
+                })
 
         # Historical validation
         if "historical" in validation_sources:
@@ -205,7 +210,15 @@ class LiveProfitValidator:
             validations.append(historical_validation)
 
         # Calculate consensus
-        successful_validations = [v for v in validations if v.get("status") == "SUCCESS"]
+        # Internal arithmetic, broker_calculated and historical analogues
+        # are not independent current option-price observations.
+        successful_validations = [
+            v for v in validations
+            if v.get("status") == "SUCCESS"
+            and v.get("source") not in {"internal", "broker_calculated", "historical"}
+            and isinstance(v.get("pnl"), (int, float))
+            and __import__("math").isfinite(float(v["pnl"]))
+        ]
         if successful_validations:
             pnl_values = [v["pnl"] for v in successful_validations]
             consensus_pnl = sum(pnl_values) / len(pnl_values)
@@ -229,7 +242,7 @@ class LiveProfitValidator:
             consensus_pnl = reported_pnl
             max_difference = 0
             avg_difference = 0
-            status = "NO_DATA"
+            status = "NO_INDEPENDENT_OPTION_QUOTE"
             confidence = 0.0
 
         result = {
