@@ -5966,102 +5966,100 @@ async def get_top_signal():
 
 @app.get("/api/positions")
 async def get_positions():
-    """Get open positions with Firestore / state-store provenance."""
+    """Report PAPER positions with honest storage provenance and freshness.
+
+    Cloud Run revision-local files are ephemeral. HTTP request time is not
+    evidence of tick freshness; an empty file is not evidence of a flat account.
+    """
     utc_now = datetime.now(timezone.utc).isoformat()
+
+    def _response(rows, source, verification_status, *, durable=False,
+                  source_timestamp=None, closed_count=None, reason=""):
+        out = {
+            "positions": rows,
+            "open_count": len(rows),
+            "data_mode": "PAPER",
+            "source": source,
+            "as_of_utc": utc_now,
+            "source_timestamp": source_timestamp,
+            "freshness_seconds": None,
+            "durable": durable,
+            "verification_status": verification_status,
+            "reason_if_unverified": reason,
+        }
+        if closed_count is not None:
+            out["closed_count"] = closed_count
+        return out
+
     try:
-        # Check runtime state store first
         if SSOT_AVAILABLE and state_store is not None:
             try:
                 st = state_store.get_state()
                 st_pos = st.get("paper_positions") or st.get("positions")
                 if isinstance(st_pos, list) and st_pos:
-                    st_pos = filter_paper_trade_rows(st_pos)
-                    if st_pos:
-                        return {
-                            "positions": st_pos,
-                            "open_count": len(st_pos),
-                            "data_mode": "PAPER",
-                            "source": "firestore:system3_paper_positions",
-                            "as_of_utc": utc_now,
-                            "freshness_seconds": 1.0,
-                            "verification_status": "VERIFIED_SIMULATION",
-                            "reason_if_unverified": "Active paper trading positions loaded from cloud state.",
-                        }
+                    rows = filter_paper_trade_rows(st_pos)
+                    if rows:
+                        firestore = getattr(state_store, "_remote_backend", None) is not None
+                        return _response(
+                            rows,
+                            "firestore:system3_runtime/state" if firestore
+                            else "runtime_memory:revision_local",
+                            "SIMULATED_SOURCE_REPORTED",
+                            durable=firestore,
+                            source_timestamp=st.get("timestamp_utc"),
+                            reason=(
+                                "Source reported paper positions; fills, option marks "
+                                "and outcomes require independent reconciliation."
+                            ),
+                        )
             except Exception:
+                # Continue to local fallback but never claim Firestore truth.
                 pass
 
         positions_file = OUTPUTS_DIR / "positions_live.json"
         if not positions_file.exists():
-            return {
-                "positions": [],
-                "open_count": 0,
-                "data_mode": "PAPER",
-                "source": "firestore:system3_paper_positions",
-                "as_of_utc": utc_now,
-                "freshness_seconds": 0.0,
-                "verification_status": "VERIFIED_SIMULATION",
-                "reason_if_unverified": "Market closed — zero active paper positions.",
-                "message": "Zero active open paper positions",
-            }
+            return _response(
+                [], "runtime_ephemeral:outputs/positions_live.json",
+                "NO_POSITION_SOURCE",
+                reason=(
+                    "No local paper positions file on this revision. "
+                    "Account flatness and historical closes are NOT VERIFIED."
+                ),
+            )
 
-        data = json.loads(positions_file.read_text())
-
-        # Handle different formats
+        data = json.loads(positions_file.read_text(encoding="utf-8"))
         if isinstance(data, dict):
-            positions = filter_paper_trade_rows(data.get("positions", []) or [])
-            for pos in positions:
-                if "current_price" not in pos:
-                    pos["current_price"] = pos.get("entry_price", 0)
-                if "unrealized_pnl" not in pos:
-                    entry = pos.get("entry_price", 0)
-                    current = pos.get("current_price", entry)
-                    qty = pos.get("qty", pos.get("quantity", 0))
-                    pos["unrealized_pnl"] = (current - entry) * qty
-            return {
-                "positions": positions,
-                "open_count": len(positions),
-                "closed_count": data.get("closed_count", 0),
-                "timestamp": data.get("timestamp"),
-                "data_mode": "PAPER",
-                "source": "paper_cloud_sim",
-                "as_of_utc": utc_now,
-                "freshness_seconds": 1.0,
-                "verification_status": "VERIFIED_SIMULATION",
-            }
-        elif isinstance(data, list):
-            data = filter_paper_trade_rows(data)
-            return {
-                "positions": data,
-                "open_count": len(data),
-                "closed_count": 0,
-                "data_mode": "PAPER",
-                "source": "paper_cloud_sim",
-                "as_of_utc": utc_now,
-                "freshness_seconds": 1.0,
-                "verification_status": "VERIFIED_SIMULATION",
-            }
-        else:
-            return {
-                "positions": [],
-                "open_count": 0,
-                "data_mode": "PAPER",
-                "source": "firestore:system3_paper_positions",
-                "as_of_utc": utc_now,
-                "freshness_seconds": 0.0,
-                "verification_status": "VERIFIED_SIMULATION",
-                "reason_if_unverified": "Zero open positions",
-            }
-    except Exception as e:
-        return {
-            "positions": [],
-            "open_count": 0,
-            "data_mode": "PAPER",
-            "source": "firestore:system3_paper_positions",
-            "as_of_utc": utc_now,
-            "freshness_seconds": 0.0,
-            "verification_status": "VERIFIED_SIMULATION",
-            "reason_if_unverified": f"Paper position store query error: {str(e)}",
-        }
+            rows = filter_paper_trade_rows(data.get("positions") or [])
+            for row in rows:
+                if "current_price" not in row:
+                    row["current_price"] = None
+                    row["mark_verification_status"] = "NO_VERIFIED_OPTION_MARK"
+                if "unrealized_pnl" not in row:
+                    row["unrealized_pnl"] = None
+                    row["pnl_verification_status"] = "NO_VERIFIED_PNL"
+            return _response(
+                rows, "runtime_ephemeral:outputs/positions_live.json",
+                "SIMULATED_UNVERIFIED", durable=False,
+                source_timestamp=data.get("timestamp"),
+                closed_count=data.get("closed_count", 0),
+                reason="Revision-local file is not a durable verified trade ledger.",
+            )
+        if isinstance(data, list):
+            rows = filter_paper_trade_rows(data)
+            return _response(
+                rows, "runtime_ephemeral:outputs/positions_live.json",
+                "SIMULATED_UNVERIFIED", durable=False, closed_count=0,
+                reason="Revision-local list is not a durable verified trade ledger.",
+            )
+        return _response(
+            [], "runtime_ephemeral:outputs/positions_live.json",
+            "INVALID_POSITION_SOURCE", reason="Unexpected local file format.",
+        )
+    except Exception as exc:
+        return _response(
+            [], "runtime_ephemeral:outputs/positions_live.json",
+            "POSITION_SOURCE_ERROR", reason=type(exc).__name__,
+        )
 
 
 @app.get("/api/pnl")
