@@ -9412,38 +9412,51 @@ def _fetch_cloud_ml_performance() -> Dict[str, Any]:
         return {
             "ok": False,
             "url": _CLOUD_ML_PERFORMANCE_URL,
-            "ready_for_live": None,
-            "status": None,
-            "message": None,
+            "ready_for_live": False,
+            "status": "UNVERIFIED",
+            "message": "Live readiness is blocked because cloud evidence could not be read.",
             "error": str(exc)[:300],
         }
     if not isinstance(data, dict):
         return {
             "ok": False,
             "url": _CLOUD_ML_PERFORMANCE_URL,
-            "ready_for_live": None,
-            "status": None,
-            "message": None,
+            "ready_for_live": False,
+            "status": "UNVERIFIED",
+            "message": "Live readiness is blocked because the cloud evidence payload is invalid.",
             "error": "cloud payload was not an object",
         }
     perf = data.get("performance") if isinstance(data.get("performance"), dict) else {}
+    ready = data.get("ready_for_live", perf.get("ready_for_live"))
+    status = data.get("proof_status") or perf.get("status") or data.get("status")
     return {
         "ok": True,
         "url": _CLOUD_ML_PERFORMANCE_URL,
-        "ready_for_live": data.get("ready_for_live", perf.get("ready_for_live")),
-        "status": data.get("proof_status") or perf.get("status") or data.get("status"),
-        "message": data.get("message") or perf.get("message"),
+        # Unknown and truthy non-boolean values must never become authorization.
+        "ready_for_live": ready is True,
+        "status": (status or "READY") if ready is True else "BLOCKED",
+        "message": data.get("message") or perf.get("message") or (
+            "Live readiness is blocked because proof is incomplete."
+            if ready is not True else "Readiness evidence reported ready."
+        ),
         "error": None,
     }
 
 
 def _local_ml_readiness_view(perf: Dict[str, Any]) -> Dict[str, Any]:
     performance = perf.get("performance") if isinstance(perf.get("performance"), dict) else {}
+    ready = perf.get("ready_for_live", performance.get("ready_for_live"))
+    status = perf.get("proof_status") or performance.get("status")
     return {
-        "ready_for_live": perf.get("ready_for_live", performance.get("ready_for_live")),
-        "status": perf.get("proof_status") or performance.get("status"),
-        "message": perf.get("message") or performance.get("message"),
-        "ready_for_live_reason": perf.get("ready_for_live_reason") or performance.get("ready_for_live_reason"),
+        "ready_for_live": ready is True,
+        "status": (status or "READY") if ready is True else "BLOCKED",
+        "message": perf.get("message") or performance.get("message") or (
+            "Live readiness is blocked because proof is incomplete."
+            if ready is not True else "Readiness evidence reported ready."
+        ),
+        "ready_for_live_reason": perf.get("ready_for_live_reason") or performance.get("ready_for_live_reason") or (
+            "ML_PROOF_MISSING_OR_UNVERIFIED" if ready is not True else "Evidence source reported ready."
+        ),
         "rho": perf.get("rho", performance.get("rho")),
         "hit_rate": perf.get("hit_rate", performance.get("hit_rate")),
         "proof_pass_count": perf.get("proof_pass_count", performance.get("proof_pass_count")),
