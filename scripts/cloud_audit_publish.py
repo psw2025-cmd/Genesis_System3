@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -56,7 +57,7 @@ def authorized_files(root: Path):
 def gcloud(*args):
     try:
         result = subprocess.run(
-            ["gcloud", "storage", *args],
+            ["gcloud.cmd" if os.name == "nt" else "gcloud", "storage", *args],
             text=True, capture_output=True, check=False, timeout=180
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
