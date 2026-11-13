@@ -8160,7 +8160,16 @@ async def validate_all_profits():
                 "all_warn_or_pass": all_warn,
                 "pass_count": sum(1 for v in validations if v["validation"]["validation_status"] == "PASS"),
                 "warn_count": sum(1 for v in validations if v["validation"]["validation_status"] == "WARN"),
-                "fail_count": sum(1 for v in validations if v["validation"]["validation_status"] == "FAIL"),
+                "fail_count": sum(
+                    1 for v in validations
+                    if v["validation"]["validation_status"] not in ("PASS", "WARN")
+                ),
+                "unverified_count": sum(
+                    1 for v in validations
+                    if v["validation"]["validation_status"] in (
+                        "NO_DATA", "NO_INDEPENDENT_OPTION_QUOTE", "NO_OPTION_QUOTE"
+                    )
+                ),
             },
         }
     except Exception as e:
@@ -11898,6 +11907,83 @@ async def get_safety_status():
         "safety": "PAPER_LOCKED",
         "kill_switch": "ENGAGED",
         "promotion_allowed": False,
+    }
+
+
+@app.get("/api/data-truth-score")
+async def get_data_truth_score():
+    """Read-only, fail-closed evidence coverage; HTTP success is not proof PASS.
+
+    Reports separate observable gates. It never manufactures prediction or
+    trade evidence, and does not imply real-order-count verification.
+    """
+    safety = await get_safety_status()
+    ml = await get_ml_performance()
+    broker = await get_broker_status()
+    scheduler = await get_scheduler_health()
+    profits = await validate_all_profits()
+    profit_summary = profits.get("summary") if isinstance(profits, dict) else None
+    if not isinstance(profit_summary, dict):
+        profit_summary = {}
+    proof_count = ml.get("proof_pass_count")
+    checks = {
+        "paper_order_authority_locked": (
+            safety.get("live_trading_enabled") is False
+            and safety.get("system3_live_trading_allowed") is False
+            and safety.get("auto_execute_trades") is False
+            and safety.get("analyze_mode") is True
+            and broker.get("order_placement_allowed") is False
+        ),
+        "broker_readonly_account_connected": broker.get("connected") is True,
+        "trained_model_evidence": (
+            ml.get("model_proof_ready") is True
+            and isinstance(proof_count, (int, float))
+            and not isinstance(proof_count, bool)
+            and proof_count > 0
+            and not ml.get("blocker_reasons")
+        ),
+        "scheduler_receipts_healthy": scheduler.get("healthy") is True,
+        "paper_pnl_all_positions_reconciled": (
+            profits.get("status") == "ok"
+            and profit_summary.get("all_pass") is True
+            and profits.get("total_positions", 0) > 0
+        ),
+    }
+    verified_count = sum(value is True for value in checks.values())
+    passed = all(checks.values())
+    return {
+        "status": "PASS" if passed else "BLOCKED",
+        "as_of_utc": datetime.now(timezone.utc).isoformat(),
+        "scope": "PAPER_READONLY_EVIDENCE_COVERAGE_ONLY",
+        "score_pct": round(100.0 * verified_count / len(checks), 2),
+        "verified_checks": verified_count,
+        "total_checks": len(checks),
+        "checks": checks,
+        "proof_status": ml.get("proof_status"),
+        "prediction_blockers": ml.get("blocker_reasons") or [],
+        "pnl_validation_fail_count": profit_summary.get("fail_count"),
+        "live_broker_order_count_independently_verified": False,
+        "production_grade_certified": False,
+    }
+
+
+@app.get("/api/compliance-check")
+async def get_compliance_check():
+    """Safety/evidence checklist, NOT a legal or live-trading certification."""
+    truth = await get_data_truth_score()
+    return {
+        "status": "PASS" if truth["status"] == "PASS" else "BLOCKED",
+        "as_of_utc": truth["as_of_utc"],
+        "paper_safety_pass": truth["checks"]["paper_order_authority_locked"],
+        "model_and_paper_evidence_pass": (
+            truth["checks"]["trained_model_evidence"]
+            and truth["checks"]["paper_pnl_all_positions_reconciled"]
+        ),
+        "scheduler_evidence_pass": truth["checks"]["scheduler_receipts_healthy"],
+        "checks": truth["checks"],
+        "legal_compliance_certified": False,
+        "live_money_trading_authorized": False,
+        "production_grade_certified": False,
     }
 
 
