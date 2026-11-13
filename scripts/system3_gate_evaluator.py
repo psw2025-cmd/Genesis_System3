@@ -28,6 +28,7 @@ GATE_IDS = [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
     "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+    "CLOSED_TRADE_RECONCILIATION_100_MIN",
     "WEBSOCKET_TICK_HEALTH_PROVEN",
     "MODEL_ACCURACY_REPORT_PRESENT",
     "OPTION_STRIKE_VISIBILITY_PROVEN",
@@ -231,6 +232,56 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
     }
 
 
+def eval_trade_reconciliation_gate(root: Path) -> Dict[str, Any]:
+    """Require itemized, independently reviewed reconciliation for >=100 closes."""
+    path = root / "reports" / "latest" / "trade_reconciliation" / "summary.json"
+    data = _read_json(path) or {}
+    ev = data.get("evidence") if isinstance(data.get("evidence"), dict) else {}
+    try:
+        completed = int(ev.get("completed_trades", -1))
+        mismatches = int(ev.get("mismatch_count", -1))
+        mismatch_rate = float(ev.get("mismatch_rate", 1.0))
+    except (TypeError, ValueError, OverflowError):
+        completed, mismatches, mismatch_rate = -1, -1, 1.0
+    required_checks = (
+        "entry_price_verified", "exit_price_verified", "quantity_verified",
+        "charges_verified", "pnl_verified", "broker_records_verified",
+        "internal_records_verified", "ledger_readback_verified",
+    )
+    checks_ok = all(ev.get(key) is True for key in required_checks)
+    generator = str(ev.get("generator_id") or "").strip()
+    reviewer = str(ev.get("independent_reviewer_id") or "").strip()
+    independently_reviewed = bool(reviewer and generator and reviewer != generator)
+    hashes = ev.get("evidence_sha256") if isinstance(ev.get("evidence_sha256"), dict) else {}
+    hash_names = ("broker_records", "internal_ledger", "reconciliation")
+    hashes_ok = all(
+        isinstance(hashes.get(name), str)
+        and len(hashes[name]) == 64
+        and all(ch in "0123456789abcdefABCDEF" for ch in hashes[name])
+        for name in hash_names
+    )
+    mismatch_ok = mismatches == 0 or (0.0 <= mismatch_rate < 0.001)
+    ok = (
+        data.get("status") == "PASS" and data.get("pass") is True
+        and completed >= 100 and mismatch_ok and checks_ok
+        and independently_reviewed and hashes_ok
+    )
+    return {
+        "gate_id": "CLOSED_TRADE_RECONCILIATION_100_MIN",
+        "pass": ok,
+        "report_exists": path.exists(),
+        "completed_trades": completed if completed >= 0 else None,
+        "required_completed_trades": 100,
+        "mismatch_count": mismatches if mismatches >= 0 else None,
+        "mismatch_rate": mismatch_rate if mismatch_rate >= 0 else None,
+        "itemized_checks_pass": checks_ok,
+        "independent_review_pass": independently_reviewed,
+        "evidence_hashes_pass": hashes_ok,
+        "blocker_id": None if ok else "SYS3-BLK-009",
+        "auto_action": "Reconcile 100+ completed PAPER trades against broker read records and immutable internal ledger; require independent review",
+    }
+
+
 def eval_tick_health_gate(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     path = root / "reports" / "latest" / "websocket_tick_health" / "summary.json"
     data = _read_json(path) or {}
@@ -363,6 +414,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
         eval_spearman_gate(root),
         eval_expectancy_gate(root),
         eval_lifecycle_gate(root, live_state),
+        eval_trade_reconciliation_gate(root),
         eval_tick_health_gate(root, live_state),
         eval_model_accuracy_report(root),
         eval_option_visibility(root, live_state),
@@ -380,6 +432,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
         "prediction_accuracy_blocked": not gates[0]["pass"],
         "profit_blocked": not gates[1]["pass"],
         "lifecycle_blocked": not gates[2]["pass"],
+        "reconciliation_blocked": not gates[3]["pass"],
         "human_approval": human.get("approved"),
         "live_trading_enabled": False,
         "trade_ready": passing == len(gates),
@@ -393,6 +446,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
                 "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
                 "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
                 "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+                "CLOSED_TRADE_RECONCILIATION_100_MIN",
                 "WEBSOCKET_TICK_HEALTH_PROVEN",
             )
         ],

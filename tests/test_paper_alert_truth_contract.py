@@ -9,6 +9,7 @@ from scripts.system3_gate_evaluator import (
     SPEARMAN_THRESHOLD,
     eval_spearman_gate,
     eval_lifecycle_gate,
+    eval_trade_reconciliation_gate,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -111,6 +112,32 @@ def test_lifecycle_gate_requires_100_trades_and_readback_evidence(tmp_path):
     evidence["completed_paper_trades"] = 99
     (proof_dir / "summary.json").write_text(json.dumps({"pass": True, "evidence": evidence}), encoding="utf-8")
     assert eval_lifecycle_gate(tmp_path)["pass"] is False
+
+
+def test_trade_reconciliation_gate_requires_itemized_100_trade_independent_proof(tmp_path):
+    path = tmp_path / "reports" / "latest" / "trade_reconciliation" / "summary.json"
+    path.parent.mkdir(parents=True)
+    proof = {
+        "status": "PASS", "pass": True,
+        "evidence": {
+            "completed_trades": 100, "mismatch_count": 0, "mismatch_rate": 0,
+            "entry_price_verified": True, "exit_price_verified": True,
+            "quantity_verified": True, "charges_verified": True, "pnl_verified": True,
+            "broker_records_verified": True, "internal_records_verified": True,
+            "ledger_readback_verified": True, "generator_id": "builder",
+            "independent_reviewer_id": "reviewer",
+            "evidence_sha256": {key: "a" * 64 for key in ("broker_records", "internal_ledger", "reconciliation")},
+        },
+    }
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is True
+    proof["evidence"]["independent_reviewer_id"] = "builder"
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["independent_reviewer_id"] = "reviewer"
+    proof["evidence"]["completed_trades"] = 99
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
 
 
 def test_alert_ui_separates_live_readiness_info_from_active_operational_alerts():
@@ -218,7 +245,7 @@ def test_proof_gate_adapter_never_forces_failed_evaluator_gates_to_pass():
     }
 
     adapted = _proof_gates_from_payload(payload)
-    assert len(adapted) == 7
+    assert len(adapted) == 8
     assert all(row["pass"] is False for row in adapted)
     assert all(row["ok"] is False for row in adapted)
     assert all(row["status"] == "COLLECTING" for row in adapted)

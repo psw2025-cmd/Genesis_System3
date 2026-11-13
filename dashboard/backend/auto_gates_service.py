@@ -65,6 +65,7 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
         ("ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS", "ML Accuracy (Spearman ρ)"),
         ("POSITIVE_NET_EXPECTANCY_AFTER_COSTS", "Profit / Expectancy"),
         ("REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF", "Paper Lifecycle"),
+        ("CLOSED_TRADE_RECONCILIATION_100_MIN", "Closed Trade Reconciliation"),
         ("WEBSOCKET_TICK_HEALTH_PROVEN", "Tick / Data Freshness"),
         ("MODEL_ACCURACY_REPORT_PRESENT", "Model Accuracy Report"),
         ("OPTION_STRIKE_VISIBILITY_PROVEN", "Option Strike Visibility"),
@@ -93,6 +94,12 @@ def _proof_gates_from_payload(payload: Dict[str, Any]) -> List[Dict[str, Any]]:
                 "market-session lifecycle proof collected"
                 if full
                 else f"proof pending · broker_connected={str(broker).lower()}"
+            )
+        elif gid == "CLOSED_TRADE_RECONCILIATION_100_MIN":
+            note = (
+                f"closed={g.get('completed_trades', '?')}/100 · "
+                f"mismatches={g.get('mismatch_count', '?')} · "
+                f"independent_review={str(g.get('independent_review_pass', False)).lower()}"
             )
         elif gid == "WEBSOCKET_TICK_HEALTH_PROVEN":
             tick_age = g.get("last_tick_age_sec")
