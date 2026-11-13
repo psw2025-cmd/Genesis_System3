@@ -68,3 +68,18 @@ def test_collector_integration_passes_live_resources_to_discovery():
 
 def test_expected_targets_remain_included_when_actual_rows_missing():
     assert _collector_job_targets(["genesis-system3-validate"], []) == ["genesis-system3-validate"]
+
+
+@pytest.mark.parametrize("uri,valid", [
+    ("https://asia-south1-run.googleapis.com/v2/projects/proj/locations/asia-south1/jobs/system3-smoketest-job:run", True),
+    ("https://run.googleapis.com/v2/projects/proj/locations/asia-south1/jobs/system3-smoketest-job:run", True),
+    ("https://us-central1-run.googleapis.com/v2/projects/proj/locations/asia-south1/jobs/system3-smoketest-job:run", False),
+    ("https://asia-south1-run.googleapis.com/v2/projects/other/locations/asia-south1/jobs/system3-smoketest-job:run", False),
+    ("https://asia-south1-run.googleapis.com/v2/projects/proj/locations/asia-south1/jobs/system3-smoketest-job:run?token=1", False),
+    ("https://evil.example/v2/projects/proj/locations/asia-south1/jobs/system3-smoketest-job:run", False),
+])
+def test_v2_cloud_run_regional_and_global_hosts_are_strictly_recognized(uri, valid):
+    from scripts.gcp_worker_job import _parse_scheduler_target
+    name, ok = _parse_scheduler_target(uri, "proj", "asia-south1")
+    assert ok is valid
+    assert name == ("system3-smoketest-job" if valid else None)
