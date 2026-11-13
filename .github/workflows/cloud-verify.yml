@@ -11,6 +11,8 @@ on:
       - 'tests/test_dhan_canonical_rotation_readonly.py'
       - 'scripts/cloud_discover_readonly.py'
       - 'scripts/cloud_infrastructure_inventory.py'
+      - 'scripts/cloud_audit_publish.py'
+      - 'tests/test_cloud_audit_publish.py'
       - 'tests/test_cloud_infrastructure_inventory.py'
       - 'scripts/dhan_canonical_rotation_readonly.py'
   push:
@@ -23,6 +25,9 @@ on:
       - 'tests/test_cloud_infrastructure_inventory.py'
       - 'scripts/dhan_canonical_rotation_readonly.py'
       - 'dashboard/backend/paper_market_replay.py'
+      - 'audit_results/**'
+      - 'scripts/cloud_audit_publish.py'
+      - 'tests/test_cloud_audit_publish.py'
 
 permissions:
   contents: read
@@ -44,7 +49,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate target and safety without GCP credentials
-        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract tests.test_cloud_infrastructure_inventory
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract tests.test_cloud_infrastructure_inventory tests.test_cloud_audit_publish
 
   synthetic-paper-proof:
     name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
@@ -235,3 +240,69 @@ jobs:
         if: always()
         shell: bash
         run: rm -f cloud-run-describe-private.json
+
+  immutable-audit-publication:
+    # Separate from Cloud Run verification and deployment. Writes only the
+    # 13 allow-listed reports + receipt under an immutable commit SHA prefix.
+    # GCS writer identity must have only bucket-scoped object create/read.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: GCS - publish verified versioned audit evidence (never deploy)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout exact merged commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 2
+      - name: Gate on changed audit results or publisher implementation
+        id: changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --name-only HEAD^ HEAD -- audit_results/ scripts/cloud_audit_publish.py .github/workflows/cloud-verify.yml | grep -Eq '^(audit_results/|scripts/cloud_audit_publish\\.py$|\\.github/workflows/cloud-verify\\.yml$)'; then
+            echo 'changed=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'changed=false' >> "$GITHUB_OUTPUT"
+            echo 'AUDIT_PUBLICATION_SKIPPED=no_audit_or_publisher_changes'
+          fi
+      - name: Select existing auth mode
+        if: steps.changed.outputs.changed == 'true'
+        id: pub-auth
+        env:
+          GCP_WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+          GCP_WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+          GCP_JSON_PRESENT: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON != '' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -n "$GCP_WIF_PROVIDER" && -n "$GCP_WIF_SERVICE_ACCOUNT" ]]; then
+            echo 'mode=wif' >> "$GITHUB_OUTPUT"
+          elif [[ "$GCP_JSON_PRESENT" == 'true' ]]; then
+            echo 'mode=json' >> "$GITHUB_OUTPUT"
+          else
+            echo 'AUDIT_PUBLICATION_AUTH_NOT_VERIFIED'
+            exit 2
+          fi
+      - name: Authenticate with keyless WIF
+        if: steps.pub-auth.outputs.mode == 'wif'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      - name: Authenticate with existing encrypted fallback
+        if: steps.pub-auth.outputs.mode == 'json'
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
+      - name: Install Google Cloud SDK
+        if: steps.changed.outputs.changed == 'true'
+        uses: google-github-actions/setup-gcloud@v2
+      - name: Publish immutable audit files and verify cloud readback
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          CLOUDSDK_CORE_DISABLE_PROMPTS: '1'
+        run: python -S scripts/cloud_audit_publish.py --repo-root . --publication-sha "${{ github.sha }}"
