@@ -3068,7 +3068,17 @@ async def get_scheduler_health(refresh: bool = False):
     `healthy=False` covers transport/control-plane failure modes.
     Use `?refresh=true` to bypass the short in-process cache.
     """
-    if os.environ.get("SYSTEM3_STATE_BACKEND", "file").strip().lower() == "firestore":
+    from dashboard.backend.scheduler_evidence_policy import scheduler_evidence_backend
+    try:
+        evidence_backend = scheduler_evidence_backend()
+    except ValueError:
+        return {
+            "healthy": False,
+            "status": "UNHEALTHY",
+            "unhealthy_reasons": ["Unsupported scheduler evidence backend"],
+            "live_trading_enabled": False,
+        }
+    if evidence_backend == "firestore":
         try:
             cache_key = "scheduler_health_firestore"
             if not refresh:
@@ -3084,6 +3094,8 @@ async def get_scheduler_health(refresh: bool = False):
             payload["cache_hit"] = False
             payload["cache_ttl_s"] = 30
             payload["deploy_git_sha"] = os.environ.get("DEPLOY_GIT_SHA") or os.environ.get("SYSTEM3_GIT_SHA")
+            payload["evidence_source"] = "firestore:system3_scheduler_evidence/current"
+            payload["runtime_state_backend_unchanged"] = True
             return _cache_set(cache_key, payload)
         except Exception as exc:
             return {"healthy": False, "status": "UNHEALTHY", "unhealthy_reasons": [f"scheduler evidence unavailable: {type(exc).__name__}"], "live_trading_enabled": False, "cache_hit": False}
