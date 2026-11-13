@@ -12,6 +12,7 @@ import argparse
 import json
 import tempfile
 import sys
+import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -63,7 +64,16 @@ def run_mock_replay(*, symbol_count: int = 219) -> dict:
     closed = []
     duplicate_guard = []
     validation = []
-    with tempfile.TemporaryDirectory(prefix="system3-replay-ephemeral-") as tmp:
+    # Windows' inherited system TEMP may be denied to the desktop worker.
+    # Choose an explicitly writable ephemeral root, never an application state
+    # directory or cloud database. Linux Cloud Run defaults to /tmp.
+    temp_root = os.environ.get("SYSTEM3_MOCK_REPLAY_TEMP_ROOT")
+    if not temp_root and os.name == "nt":
+        desktop = Path.home() / "Desktop"
+        temp_root = str(desktop) if desktop.is_dir() else None
+    with tempfile.TemporaryDirectory(
+        prefix="system3-replay-ephemeral-", dir=temp_root
+    ) as tmp:
         path = Path(tmp) / "paper.db"
         ledger = MasterPaperLedger(path)
         for idx, selected in enumerate(selection):
