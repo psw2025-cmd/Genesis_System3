@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
@@ -247,12 +248,25 @@ def eval_trade_reconciliation_gate(root: Path) -> Dict[str, Any]:
     path = root / "reports" / "latest" / "trade_reconciliation" / "summary.json"
     data = _read_json(path) or {}
     ev = data.get("evidence") if isinstance(data.get("evidence"), dict) else {}
+
+    def _evidence_count(value: Any) -> int:
+        if isinstance(value, bool):
+            return -1
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            return int(value) if math.isfinite(value) and value.is_integer() else -1
+        if isinstance(value, str) and value.strip().isdecimal():
+            return int(value.strip())
+        return -1
+
     try:
-        completed = int(ev.get("completed_trades", -1))
-        mismatches = int(ev.get("mismatch_count", -1))
-        mismatch_rate = float(ev.get("mismatch_rate", 1.0))
+        completed = _evidence_count(ev.get("completed_trades"))
+        mismatches = _evidence_count(ev.get("mismatch_count"))
+        reported_mismatch_rate = float(ev.get("mismatch_rate", float("nan")))
     except (TypeError, ValueError, OverflowError):
-        completed, mismatches, mismatch_rate = -1, -1, 1.0
+        completed, mismatches, reported_mismatch_rate = -1, -1, float("nan")
+    derived_mismatch_rate = mismatches / completed if completed > 0 and mismatches >= 0 else None
     required_checks = (
         "entry_price_verified", "exit_price_verified", "quantity_verified",
         "charges_verified", "pnl_verified", "broker_records_verified",
@@ -270,7 +284,14 @@ def eval_trade_reconciliation_gate(root: Path) -> Dict[str, Any]:
         and all(ch in "0123456789abcdefABCDEF" for ch in hashes[name])
         for name in hash_names
     )
-    mismatch_ok = mismatches == 0 or (0.0 <= mismatch_rate < 0.001)
+    mismatch_ok = bool(
+        completed >= 100
+        and 0 <= mismatches <= completed
+        and derived_mismatch_rate is not None
+        and math.isfinite(reported_mismatch_rate)
+        and abs(reported_mismatch_rate - derived_mismatch_rate) <= 1e-9
+        and derived_mismatch_rate < 0.001
+    )
     ok = (
         data.get("status") == "PASS" and data.get("pass") is True
         and completed >= 100 and mismatch_ok and checks_ok
@@ -283,7 +304,7 @@ def eval_trade_reconciliation_gate(root: Path) -> Dict[str, Any]:
         "completed_trades": completed if completed >= 0 else None,
         "required_completed_trades": 100,
         "mismatch_count": mismatches if mismatches >= 0 else None,
-        "mismatch_rate": mismatch_rate if mismatch_rate >= 0 else None,
+        "mismatch_rate": derived_mismatch_rate,
         "itemized_checks_pass": checks_ok,
         "independent_review_pass": independently_reviewed,
         "evidence_hashes_pass": hashes_ok,

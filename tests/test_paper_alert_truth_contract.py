@@ -138,6 +138,33 @@ def test_trade_reconciliation_gate_requires_itemized_100_trade_independent_proof
     }
     path.write_text(json.dumps(proof), encoding="utf-8")
     assert eval_trade_reconciliation_gate(tmp_path)["pass"] is True
+    proof["evidence"]["mismatch_count"] = 1
+    proof["evidence"]["mismatch_rate"] = 0
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["mismatch_count"] = 0
+    proof["evidence"].pop("mismatch_rate")
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["mismatch_count"] = 1
+    proof["evidence"]["mismatch_rate"] = 0.01
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["mismatch_count"] = 1.5
+    proof["evidence"]["mismatch_rate"] = 0.01
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["mismatch_count"] = True
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False
+    proof["evidence"]["completed_trades"] = 2000
+    proof["evidence"]["mismatch_count"] = 1
+    proof["evidence"]["mismatch_rate"] = 0.0005
+    path.write_text(json.dumps(proof), encoding="utf-8")
+    assert eval_trade_reconciliation_gate(tmp_path)["pass"] is True
+    proof["evidence"]["completed_trades"] = 100
+    proof["evidence"]["mismatch_count"] = 0
+    proof["evidence"]["mismatch_rate"] = 0
     proof["evidence"]["independent_reviewer_id"] = "builder"
     path.write_text(json.dumps(proof), encoding="utf-8")
     assert eval_trade_reconciliation_gate(tmp_path)["pass"] is False

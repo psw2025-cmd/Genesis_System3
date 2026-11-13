@@ -134,6 +134,52 @@ def test_scheduler_collector_lease_is_idempotent_and_exclusive():
         backend.publish(evidence, owner="execution-b", fence=2)
 
 
+def test_validation_day_roundtrip_preserves_nse_session_proof_and_same_rho_update():
+    client = FakeClient()
+    clock = FakeClock("2026-08-14T01:00:00Z")
+    backend = FirestoreSchedulerEvidenceBackend(client=client, transactional=passthrough_transactional, clock=clock)
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "source": "market_result_validator",
+    }
+    backend.upsert_validation_day(report)
+    assert "exchange_session_proof" not in backend.list_validation_days()[0]
+
+    report["exchange_session_proof"] = {
+        "verified": True,
+        "exchange": "NSE",
+        "session_date": "2026-08-14",
+        "previous_session_date": "2026-08-13",
+        "source_url": "https://www.nseindia.com/all-reports",
+    }
+    stored = backend.upsert_validation_day(report)
+    assert stored["exchange_session_proof"] == report["exchange_session_proof"]
+    assert backend.list_validation_days()[0]["exchange_session_proof"] == report["exchange_session_proof"]
+    clock.set("2026-08-14T01:00:01Z")
+    assert backend.upsert_validation_day(report) == stored
+
+
+def test_validation_day_rejects_non_nse_session_proof():
+    backend = FirestoreSchedulerEvidenceBackend(
+        client=FakeClient(), transactional=passthrough_transactional,
+        clock=FakeClock("2026-08-14T01:00:00Z"),
+    )
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "exchange_session_proof": {
+            "verified": True,
+            "exchange": "NSE",
+            "session_date": "2026-08-14",
+            "previous_session_date": "2026-08-13",
+            "source_url": "https://evil.example/?next=nseindia.com",
+        },
+    }
+    with pytest.raises(ValueError, match="official NSE evidence"):
+        backend.upsert_validation_day(report)
+
+
 def test_scheduler_evidence_rejects_future_unknown_and_oversized_payloads():
     client = FakeClient()
     clock = FakeClock("2026-08-14T01:00:00Z")
