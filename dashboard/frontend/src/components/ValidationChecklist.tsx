@@ -19,8 +19,11 @@ export function ValidationChecklist({ items }: { items: ChecklistItem[] | null |
     return <div data-testid="validations-checklist">validations_checklist: empty</div>
   }
   return (
-    <div data-testid="validations-checklist">
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+    <div
+      data-testid="validations-checklist"
+      style={{ maxWidth: '100%', minWidth: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}
+    >
+      <table style={{ width: '100%', minWidth: 520, borderCollapse: 'collapse', fontSize: 12 }}>
         <thead>
           <tr>
             <th className="thead">Check</th>
