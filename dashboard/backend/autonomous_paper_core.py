@@ -12,6 +12,8 @@ import json
 import math
 import sqlite3
 from datetime import datetime, timezone
+from contextlib import contextmanager
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -106,12 +108,23 @@ class MasterPaperLedger:
                 previous_hash TEXT NOT NULL,
                 event_hash TEXT NOT NULL UNIQUE)""")
 
-    def _db(self) -> sqlite3.Connection:
+    @contextmanager
+    def _db(self) -> Iterator[sqlite3.Connection]:
+        """Commit or rollback and close the connection on every path.
+
+        sqlite3.Connection.__exit__ commits transactions but does not close
+        the handle. Under Windows, orphaned handles block replay cleanup and
+        restart; under Cloud Run they waste descriptors over long sessions.
+        """
         db = sqlite3.connect(self.path, timeout=20)
-        db.execute("PRAGMA busy_timeout=20000")
-        db.execute("PRAGMA synchronous=FULL")
-        db.execute("PRAGMA journal_mode=WAL")
-        return db
+        try:
+            db.execute("PRAGMA busy_timeout=20000")
+            db.execute("PRAGMA synchronous=FULL")
+            db.execute("PRAGMA journal_mode=WAL")
+            with db:
+                yield db
+        finally:
+            db.close()
 
     @staticmethod
     def _digest(event_id: str, trade_id: str, kind: str, timestamp: str,
