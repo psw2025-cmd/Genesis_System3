@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-08-06T00:00:00",
+  "source": "NSE",
+  "symbols": [
+    "NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY",
+    "SBIN", "AXISBANK", "ICICIBANK", "HDFC", "HDFCBANK",
+    "RELIANCE", "TCS", "INFY", "LT", "ITC",
+    "BHARTIARTL", "SUNPHARMA", "WIPRO", "ASIANPAINT", "MARUTI",
+    "BAJAJ-AUTO", "BAJAJFINSV", "HEROMOTOCO", "KOTAKBANK",
+    "DRREDDY", "CIPLA", "DIVISLAB", "TECHM", "TATAMOTORS",
+    "TATASTEEL", "BAJFINANCE", "HINDUNILVR", "ADANIENT", "NTPC",
+    "M&M", "POWERGRID", "ONGC", "GAIL"
+  ],
+  "count": 38,
+  "last_updated": "2026-08-06",
+  "notes": "Seed whitelist; runtime also merges Dhan OPTSTK universe when available"
+}

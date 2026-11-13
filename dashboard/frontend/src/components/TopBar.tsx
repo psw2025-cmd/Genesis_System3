@@ -184,14 +184,14 @@ export function TopBar() {
       </div>
 
       {/* Right Actions & Telemetry */}
-      <div className="dashboard-topbar-actions flex items-center gap-2.5 shrink-0">
+      <div className="dashboard-topbar-actions flex items-center flex-wrap gap-1.5 md:gap-2.5 shrink-0">
         <Clock />
 
         {/* Broker Button */}
         <button
           type="button"
           onClick={() => setActiveTab('broker')}
-          className={`dashboard-broker-button flex items-center gap-2 px-2.5 py-1 rounded-lg border text-xs font-semibold transition-all ${
+          className={`dashboard-broker-button flex items-center gap-1.5 px-2 py-1 rounded-lg border text-xs font-semibold transition-all ${
             brokerConnected || brokerGood
               ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20'
               : 'bg-amber-500/10 border-amber-500/30 text-amber-400 hover:bg-amber-500/20'
@@ -199,7 +199,8 @@ export function TopBar() {
           title="Open Broker Status"
         >
           <Shield size={14} />
-          <span>Dhan · {brokerLabel}</span>
+          <span className="hidden sm:inline">Dhan · </span>
+          <span>{brokerLabel}</span>
         </button>
 
         {/* Paper / Live Mode Pill */}

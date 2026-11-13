@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genesis System3 · Premium Dashboard (SIMULATED)</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<style>
+  :root{--bg:#0a0a0a;--panel:#121212;--panel2:#171717;--line:#262626;--gold:#FFD700;--green:#00FF88;--red:#ff4d6d;--amber:#ff9f43;--txt:#e8e8e8;--mut:#8a8a8a}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:13px/1.45 "Segoe UI",Roboto,Arial,sans-serif}
+  code,.mono{font-family:Consolas,"JetBrains Mono",monospace}
+  header{display:flex;align-items:center;gap:18px;padding:10px 18px;border-bottom:1px solid var(--line);background:#0d0d0d;position:sticky;top:0;z-index:5;flex-wrap:wrap}
+  .brand{color:var(--gold);font-weight:700;font-size:16px;letter-spacing:.5px}
+  .tick{display:flex;gap:8px;align-items:baseline;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+  .tick b{color:var(--gold)} .up{color:var(--green)} .dn{color:var(--red)}
+  .hash{color:var(--mut);font-size:11px}
+  .badge{padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;border:1px solid}
+  .b-sim{color:var(--amber);border-color:var(--amber)} .b-safe{color:var(--green);border-color:var(--green)} .b-bad{color:var(--red);border-color:var(--red)}
+  .spacer{flex:1}
+  .grid{display:grid;grid-template-columns:300px 1fr 320px;gap:14px;padding:14px;min-height:calc(100vh - 60px)}
+  @media(max-width:1100px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:14px}
+  .card h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--gold);display:flex;justify-content:space-between;align-items:center}
+  input,select{width:100%;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  nav a{display:block;padding:7px 10px;border-radius:8px;color:var(--txt);text-decoration:none}
+  nav a:hover{background:var(--panel2);color:var(--gold)}
+  .routes{max-height:400px;overflow-y:auto;margin-top:8px;border-top:1px solid var(--line)}
+  .route{display:flex;align-items:center;gap:7px;padding:4px 2px;border-bottom:1px solid #1b1b1b;font-size:11.5px;cursor:pointer}
+  .route:hover{color:var(--gold)}
+  .dot{width:8px;height:8px;border-radius:50%;flex:none;background:#555}
+  .dot.ok{background:var(--green);box-shadow:0 0 6px var(--green)} .dot.err{background:var(--red)} .dot.cli{background:var(--amber)}
+  .big{font-size:28px;font-weight:700;color:var(--gold)}
+  .kv{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #222}
+  .kv span:first-child{color:var(--mut)}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  td,th{padding:3px 4px;text-align:right} th{color:var(--mut);font-weight:500}
+  td:first-child,th:first-child{text-align:left}
+  .chartwrap{position:relative;height:320px}
+  #log{height:300px;overflow-y:auto;font-size:11.5px;background:#0d0d0d;border:1px solid var(--line);border-radius:8px;padding:6px}
+  .row{display:grid;grid-template-columns:70px 92px 90px 1fr;gap:8px;padding:2px 4px;border-bottom:1px solid #161616;animation:fade .6s}
+  @keyframes fade{from{background:#1f1a00}to{background:transparent}}
+  .muted{color:var(--mut)} .small{font-size:11px}
+  .notice{border:1px solid var(--amber);color:var(--amber);background:#1a1206;border-radius:10px;padding:8px 12px;margin:0 14px}
+  .conn{font-size:11px}
+  .pill{display:inline-block;padding:2px 8px;border-radius:6px;background:var(--panel2);margin:2px;border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">GENESIS SYSTEM3</div>
+  <div class="tick"><b>NIFTY</b><span id="t-nifty">—</span><span id="c-nifty"></span><span class="hash mono" id="h-nifty"></span></div>
+  <div class="tick"><b>RELIANCE</b><span id="t-rel">—</span><span id="c-rel"></span><span class="hash mono" id="h-rel"></span></div>
+  <div class="spacer"></div>
+  <span class="badge b-sim">DATA: SIMULATED</span>
+  <span class="badge b-safe" id="safety-badge">PAPER / ANALYZE</span>
+  <span class="conn muted" id="conn">connecting…</span>
+</header>
+<div class="notice small" style="margin-top:10px">Prices, order book and signals on this page come from a <b>random-walk simulator</b>, not NSE. Hashes prove the evidence log was not altered after it was recorded. They do <b>not</b> prove a price is correct. Orders cannot be placed from this app.</div>
+
+<div class="grid">
+  <!-- LEFT -->
+  <aside>
+    <div class="card">
+      <input id="search" placeholder="Search routes or symbols…  (e.g. truth/score, INFY)">
+      <nav style="margin-top:8px">
+        <a href="#sec-chart">📈 Chart</a>
+        <a href="#sec-log">🧾 Evidence log</a>
+        <a href="#sec-risk">🛡 Risk</a>
+        <a href="/docs" target="_blank">📚 API docs</a>
+      </nav>
+    </div>
+    <div class="card">
+      <h3>Auto-found @app.get <span class="mono" id="rt-total">…</span></h3>
+      <div class="small muted" id="rt-sub">Counted live from app.routes</div>
+      <div class="small" style="margin-top:4px"><span class="dot ok" style="display:inline-block"></span> served OK &nbsp; <span class="dot" style="display:inline-block"></span> not called yet &nbsp; <span class="dot err" style="display:inline-block"></span> error</div>
+      <div class="routes" id="routes"></div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main>
+    <div class="card" id="sec-chart">
+      <h3>Price chart <span style="width:180px"><select id="sym"></select></span></h3>
+      <div class="chartwrap"><canvas id="chart"></canvas></div>
+      <div class="small muted" id="chart-note"></div>
+    </div>
+    <div class="card" id="sec-log">
+      <h3>Evidence log (hash chain) <span class="small mono" id="chain-status">checking…</span></h3>
+      <div class="row muted small"><span>seq</span><span>time (UTC)</span><span>symbol / price</span><span>hash → prev</span></div>
+      <div id="log"></div>
+      <div class="small muted" style="margin-top:6px">Store size: <span id="ev-size">…</span> · head <span class="mono" id="ev-head">…</span></div>
+    </div>
+  </main>
+
+  <!-- RIGHT -->
+  <aside>
+    <div class="card">
+      <h3>Order book <span class="small muted" id="ob-sym"></span></h3>
+      <table><thead><tr><th>Bid qty</th><th>Bid</th><th>Ask</th><th>Ask qty</th></tr></thead><tbody id="ob"></tbody></table>
+      <div class="small muted" style="margin-top:4px">Synthetic depth (simulated)</div>
+    </div>
+    <div class="card">
+      <h3>Integrity ("truth") score</h3>
+      <div class="big" id="ts-score">—</div>
+      <div id="ts-comp" class="small"></div>
+      <div class="small muted" id="ts-note"></div>
+    </div>
+    <div class="card" id="sec-risk">
+      <h3>Risk metrics</h3>
+      <div id="risk" class="small"></div>
+    </div>
+    <div class="card">
+      <h3>Research signals</h3>
+      <div id="sig" class="small"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const state = { sym: "NIFTY", lastSeq: 0, routes: [], chart: null, fails: 0 };
+const short = h => h ? "0x" + h.slice(0, 10) + "…" : "";
+const fmt = (n, d = 2) => (n === null || n === undefined) ? "—" : Number(n).toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+async function getJSON(url) {
+  const r = await fetch(url, { cache: "no-store" });
+  if (!r.ok) throw new Error(url + " → HTTP " + r.status);
+  return r.json();
+}
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+function setConn(ok, msg) { const c = $("conn"); c.textContent = msg; c.style.color = ok ? "var(--green)" : "var(--red)"; }
+
+/* ---------- top bar + symbol select ---------- */
+async function loadMarket() {
+  const m = await getJSON("/api/market");
+  const by = Object.fromEntries(m.data.quotes.map(q => [q.symbol, q]));
+  for (const [sym, p] of [["NIFTY", "nifty"], ["RELIANCE", "rel"]]) {
+    const q = by[sym]; if (!q) continue;
+    $("t-" + p).textContent = fmt(q.price);
+    const c = $("c-" + p); c.textContent = (q.change_pct >= 0 ? "▲ " : "▼ ") + fmt(q.change_pct, 2) + "%"; c.className = q.change_pct >= 0 ? "up" : "dn";
+    $("h-" + p).textContent = short(m.hash);
+  }
+  const sel = $("sym");
+  if (!sel.options.length) {
+    m.data.quotes.forEach(q => sel.appendChild(new Option(q.symbol, q.symbol)));
+    sel.value = state.sym;
+    sel.onchange = () => { state.sym = sel.value; refreshSymbol(); };
+  }
+}
+
+/* ---------- routes card ---------- */
+function renderRoutes() {
+  const f = $("search").value.trim().toLowerCase();
+  const box = $("routes");
+  const list = state.routes.filter(r => !f || r.path.toLowerCase().includes(f) || r.name.toLowerCase().includes(f));
+  const frag = document.createDocumentFragment();
+  for (const r of list) {
+    const row = el("div", "route");
+    const dot = el("span", "dot " + (r.status === "OK" ? "ok" : r.status === "ERROR" ? "err" : r.status === "CLIENT_ERROR" ? "cli" : ""));
+    dot.title = r.status + (r.last_status ? " (HTTP " + r.last_status + ", hits " + r.hits + ")" : "");
+    row.append(dot, el("span", "mono", r.path));
+    if (!r.path.includes("{")) row.onclick = () => window.open(r.path, "_blank");
+    frag.appendChild(row);
+  }
+  box.replaceChildren(frag);
+  $("rt-sub").textContent = (f ? list.length + " match · " : "") + "counted live from app.routes";
+}
+async function loadRoutes() {
+  const r = await getJSON("/api/routes");
+  state.routes = r.routes;
+  $("rt-total").textContent = "(" + r.app_defined_get_routes + ")";
+  renderRoutes();
+}
+
+/* ---------- chart (Chart.js, with a built-in canvas fallback) ---------- */
+function drawFallback(points) {
+  const cv = $("chart"), ctx = cv.getContext("2d");
+  const w = cv.width = cv.clientWidth, h = cv.height = cv.clientHeight;
+  ctx.clearRect(0, 0, w, h);
+  const ys = points.map(p => p.p), min = Math.min(...ys), max = Math.max(...ys), pad = 24;
+  ctx.strokeStyle = "#262626"; for (let i = 0; i < 5; i++) { const y = pad + i * (h - 2 * pad) / 4; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  ctx.strokeStyle = "#FFD700"; ctx.lineWidth = 2; ctx.beginPath();
+  ys.forEach((v, i) => { const x = i * (w / (ys.length - 1)), y = h - pad - (v - min) / ((max - min) || 1) * (h - 2 * pad); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+  ctx.stroke(); ctx.fillStyle = "#8a8a8a"; ctx.fillText(fmt(max), 4, pad - 6); ctx.fillText(fmt(min), 4, h - 6);
+  $("chart-note").textContent = "Chart.js unavailable (offline CDN) – using built-in renderer.";
+}
+async function loadChart() {
+  const h = await getJSON("/api/history?symbol=" + encodeURIComponent(state.sym) + "&points=200");
+  const pts = h.data.points;
+  if (window.Chart) {
+    const labels = pts.map(p => p.t.slice(11, 19)), data = pts.map(p => p.p);
+    if (!state.chart) {
+      state.chart = new Chart($("chart"), {
+        type: "line",
+        data: { labels, datasets: [{ label: state.sym + " (simulated)", data, borderColor: "#FFD700", backgroundColor: "rgba(255,215,0,.08)", fill: true, pointRadius: 0, tension: .25, borderWidth: 2 }] },
+        options: { animation: false, maintainAspectRatio: false, plugins: { legend: { labels: { color: "#e8e8e8" } } },
+          scales: { x: { ticks: { color: "#8a8a8a", maxTicksLimit: 8 }, grid: { color: "#1c1c1c" } }, y: { ticks: { color: "#8a8a8a" }, grid: { color: "#1c1c1c" } } } }
+      });
+    } else {
+      state.chart.data.labels = labels; state.chart.data.datasets[0].data = data; state.chart.data.datasets[0].label = state.sym + " (simulated)"; state.chart.update("none");
+    }
+    $("chart-note").textContent = "Last " + pts.length + " ticks · response hash " + short(h.hash);
+  } else { drawFallback(pts); }
+}
+
+/* ---------- evidence log (incremental, capped DOM) ---------- */
+async function loadEvidence() {
+  const ev = await getJSON("/api/evidence?limit=60&after_seq=" + state.lastSeq);
+  const log = $("log"), atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 20;
+  for (const e of ev.data.entries) {
+    const row = el("div", "row mono");
+    row.append(el("span", "muted", "#" + e.seq), el("span", "", e.timestamp.slice(11, 23)), el("span", "", e.symbol + " " + fmt(e.price)),
+      el("span", "", short(e.hash) + " → " + short(e.prev_hash)));
+    log.appendChild(row);
+    state.lastSeq = Math.max(state.lastSeq, e.seq);
+  }
+  while (log.childElementCount > 500) log.firstElementChild.remove();
+  if (atBottom) log.scrollTop = log.scrollHeight;
+  $("ev-size").textContent = ev.data.store_size.toLocaleString("en-IN");
+  $("ev-head").textContent = short(ev.data.head_hash);
+}
+async function loadChain() {
+  const c = await getJSON("/api/hash-chain");
+  const s = $("chain-status");
+  s.textContent = c.data.verified ? "✔ chain verified (" + c.data.checked.toLocaleString("en-IN") + " links)" : "✖ BROKEN at seq " + c.data.broken_at_seq + " – " + c.data.reason;
+  s.style.color = c.data.verified ? "var(--green)" : "var(--red)";
+}
+
+/* ---------- right column ---------- */
+async function refreshSymbol() {
+  const [ob, ts] = await Promise.all([getJSON("/api/depth?symbol=" + state.sym), getJSON("/api/truth/score/" + state.sym)]);
+  $("ob-sym").textContent = state.sym;
+  const tb = document.createDocumentFragment();
+  ob.data.bids.forEach((b, i) => { const a = ob.data.asks[i], tr = el("tr");
+    tr.append(el("td", "", b.qty.toLocaleString("en-IN")), el("td", "up", fmt(b.price)), el("td", "dn", fmt(a.price)), el("td", "", a.qty.toLocaleString("en-IN"))); tb.appendChild(tr); });
+  $("ob").replaceChildren(tb);
+  const d = ts.data; $("ts-score").textContent = d.integrity_score + " / 100";
+  const comp = document.createDocumentFragment();
+  for (const [k, v] of Object.entries(d.components)) { const r = el("div", "kv"); r.append(el("span", "", k.replaceAll("_", " ")), el("span", v ? "up" : "dn", v ? "PASS" : "FAIL")); comp.appendChild(r); }
+  $("ts-comp").replaceChildren(comp); $("ts-note").textContent = d.meaning;
+  loadChart().catch(() => {});
+}
+async function loadRisk() {
+  const [r, k, s] = await Promise.all([getJSON("/api/risk"), getJSON("/api/kill-switch"), getJSON("/api/decision")]);
+  const d = r.data, box = document.createDocumentFragment();
+  [["Reference", d.reference], ["VaR " + (d.confidence * 100) + "% (" + d.horizon + ")", fmt(d.historical_var_pct, 4) + "%"],
+   ["VaR on ₹" + fmt(d.notional_inr, 0), "₹" + fmt(d.historical_var_inr)], ["Max drawdown", fmt(d.max_drawdown_pct, 3) + "%"],
+   ["Sample size", d.sample_size], ["Live trading", k.data.live_trading], ["Order placement possible", String(k.data.order_placement_possible)]]
+   .forEach(([a, b]) => { const row = el("div", "kv"); row.append(el("span", "", a), el("span", "", String(b))); box.appendChild(row); });
+  $("risk").replaceChildren(box);
+  const ok = k.data.matches_required_paper_posture; const b = $("safety-badge");
+  b.textContent = ok ? "PAPER / ANALYZE" : "SAFETY MISMATCH"; b.className = "badge " + (ok ? "b-safe" : "b-bad");
+  const sg = document.createDocumentFragment();
+  s.data.signals.forEach(x => { const row = el("div", "kv"); row.append(el("span", "", x.symbol), el("span", x.research_signal.startsWith("BULL") ? "up" : x.research_signal.startsWith("BEAR") ? "dn" : "", x.research_signal)); sg.appendChild(row); });
+  const note = el("div", "muted", "Execution: " + s.data.execution); sg.appendChild(note);
+  $("sig").replaceChildren(sg);
+}
+
+/* ---------- loop ---------- */
+async function cycle() {
+  const results = await Promise.allSettled([loadMarket(), loadEvidence(), loadRoutes(), refreshSymbol(), loadRisk(), loadChain()]);
+  const failed = results.filter(r => r.status === "rejected");
+  if (failed.length) { state.fails++; setConn(false, "API issue: " + failed[0].reason.message + " (retrying)"); }
+  else { state.fails = 0; setConn(true, "live · " + new Date().toLocaleTimeString()); }
+}
+$("search").addEventListener("input", () => {
+  renderRoutes();
+  const q = $("search").value.trim().toUpperCase(), sel = $("sym");
+  if ([...sel.options].some(o => o.value === q)) { sel.value = q; state.sym = q; refreshSymbol(); }
+});
+window.addEventListener("load", () => { cycle(); setInterval(cycle, 2000); });
+</script>
+</body>
+</html>

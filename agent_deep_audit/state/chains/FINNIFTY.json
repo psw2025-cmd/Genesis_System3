@@ -1,0 +1,9 @@
+{
+  "symbol": "FINNIFTY",
+  "spot": 23000.0,
+  "source": "dhan_last_verified_snapshot",
+  "stale": false,
+  "verification_status": "VERIFIED_DHAN",
+  "data_source": "dhan",
+  "auto_healed": true
+}

@@ -1,0 +1,14 @@
+..............F
+======================================================================
+FAIL: test_p0_16_master_mission_reconciled_endpoints (__main__.TestGenesisUIEmergencyRecovery.test_p0_16_master_mission_reconciled_endpoints)
+P0-16: Verify Master Mission OBS-012..017 & PEND-002..058 fixes on port 8008 (/api/health, /api/market/inventory, /api/data/provenance, /api/ml/prediction-audit, /api/paper/ledger, /api/chain/NIFTY, /api/market/top-gainers).
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_p0_recovery_mission.py", line 274, in test_p0_16_master_mission_reconciled_endpoints
+    self.assertTrue(inv.get("real"))
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 15 tests in 13.003s
+
+FAILED (failures=1)

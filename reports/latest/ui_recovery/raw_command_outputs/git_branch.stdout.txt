@@ -1,0 +1,1 @@
+fix/scanner-219-equity-rotate

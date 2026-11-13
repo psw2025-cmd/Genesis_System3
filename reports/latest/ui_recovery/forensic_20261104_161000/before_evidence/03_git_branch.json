@@ -1,0 +1,9 @@
+{
+  "name": "03_git_branch",
+  "command": "git branch --show-current",
+  "exit_code": 0,
+  "duration_sec": 0.106,
+  "timestamp_utc": "2026-11-04T10:40:15.417512+00:00",
+  "stdout": "fix/scanner-219-equity-rotate\n",
+  "stderr": ""
+}

@@ -1,0 +1,3248 @@
+{
+  "timestamp_utc": "2026-11-04T08:51:00.865317+00:00",
+  "git_tracked_count": 3197,
+  "scanned_files": 2150,
+  "python_parsed": 953,
+  "python_parse_errors": [],
+  "exact_duplicate_groups": [
+    [
+      "config/runtime_flags.json",
+      "runtime_flags.json"
+    ],
+    [
+      "config/system3_config.json",
+      "core/engine/config/system3_config.json"
+    ],
+    [
+      "docs/Phases 311–330 = Integrity + Anti-corruption + Observability layer for System3.md",
+      "docs/SYSTEM3_WARN_PHASES_ANALYSIS_20251205.md"
+    ],
+    [
+      "docs/audits/system3_quant_lifecycle/sessions/20260816T123000Z/00_INSTRUCTION_SOURCE.md",
+      "docs/chatgpt_instruction_for_cursar_2.md"
+    ],
+    [
+      "docs/system3_phases_101_130_final_test_results - Copy.md",
+      "docs/system3_phases_101_130_final_test_results.md"
+    ]
+  ],
+  "repeated_non_init_basenames": [
+    [
+      ".agy-proof/receipt.json",
+      ".agy-proof/runs/2026-10-30T043400Z-acc25d6d452d4615852adea290a10fa8/receipt.json",
+      ".agy-proof/runs/2026-10-30T043443Z-e0db2824c3e84ca8a32e6100760fd666/receipt.json",
+      ".agy-proof/runs/2026-10-30T055731Z-52aead48e6f949f4a129d206ff704b3f/receipt.json",
+      ".agy-proof/runs/2026-10-30T055823Z-8839d775f87d4f12a9009a37b9bc240d/receipt.json"
+    ],
+    [
+      ".cursor/settings.json",
+      ".vscode/settings.json"
+    ],
+    [
+      ".vscode/tasks.json",
+      "agent_memory/tasks.json"
+    ],
+    [
+      "README.md",
+      "dashboard/README.md",
+      "docs/ultra_micro/README.md",
+      "reports/latest/analyzer_paper_lifecycle_proof/README.md"
+    ],
+    [
+      "config/kill_switch.json",
+      "kill_switch.json"
+    ],
+    [
+      "config/runtime_flags.json",
+      "runtime_flags.json"
+    ],
+    [
+      "config/system3_config.json",
+      "core/engine/config/system3_config.json"
+    ],
+    [
+      "core/engine/ensemble_predictor.py",
+      "src/ml/ensemble_predictor.py"
+    ],
+    [
+      "core/engine/greeks_engine/greeks_calculator.py",
+      "dashboard/backend/greeks_calculator.py"
+    ],
+    [
+      "dashboard/app.py",
+      "dashboard/backend/app.py"
+    ],
+    [
+      "dashboard/frontend/package-lock.json",
+      "desktop_app/package-lock.json",
+      "package-lock.json",
+      "tools/playwright-setup/package-lock.json"
+    ],
+    [
+      "dashboard/frontend/package.json",
+      "desktop_app/package.json",
+      "package.json",
+      "tools/package.json",
+      "tools/playwright-setup/package.json"
+    ],
+    [
+      "reports/latest/analyzer_paper_lifecycle_proof/summary.json",
+      "reports/latest/system3_auto_gates/summary.json"
+    ],
+    [
+      "reports/latest/analyzer_paper_lifecycle_proof/summary.md",
+      "reports/latest/system3_auto_gates/summary.md"
+    ],
+    [
+      "scripts/performance_metrics.py",
+      "src/analytics/performance_metrics.py"
+    ],
+    [
+      "src/ranking/market_result_validator.py",
+      "src/validation/market_result_validator.py"
+    ]
+  ],
+  "sensitive_call_sites": [
+    {
+      "file": "core/data/datasource_manager.py",
+      "line": 217,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/data/instruments_cache.py",
+      "line": 35,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/data_balancing_v2.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/feature_engineering_v2.py",
+      "line": 455,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ai_model/feature_engineering_v2.py",
+      "line": 446,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/ml_predictor.py",
+      "line": 98,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/ml_predictor.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/smote_balancer.py",
+      "line": 270,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ai_model/smote_balancer.py",
+      "line": 245,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/smote_balancer.py",
+      "line": 243,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/xgboost_trainer.py",
+      "line": 82,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/xgboost_trainer.py",
+      "line": 88,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ai_model/xgboost_trainer.py",
+      "line": 94,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/build_dhan_training_dataset.py",
+      "line": 269,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/build_dhan_training_dataset.py",
+      "line": 23,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_adaptive_volatility_map.py",
+      "line": 37,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_alerting_system.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_alerting_system.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_auto_threshold_adjuster.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_auto_threshold_adjuster.py",
+      "line": 115,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_dataset_builder.py",
+      "line": 114,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_dataset_builder.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_dataset_builder.py",
+      "line": 49,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer.py",
+      "line": 90,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer.py",
+      "line": 67,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer_v2.py",
+      "line": 180,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer_v2.py",
+      "line": 35,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_model_trainer_v2.py",
+      "line": 120,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_training_orchestrator_dryrun.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_training_v3.py",
+      "line": 79,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_training_v3.py",
+      "line": 101,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_blended_training_v3.py",
+      "line": 95,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_confidence_calibrator.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_confidence_calibrator.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_daily_pnl_summary.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_daily_pnl_summary.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_daily_report_generator.py",
+      "line": 103,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_daily_report_generator.py",
+      "line": 139,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_daily_report_generator.py",
+      "line": 175,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_dataset_merger_real_synth_v1.py",
+      "line": 127,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_dataset_merger_real_synth_v1.py",
+      "line": 159,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_dataset_merger_real_synth_v1.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_dataset_merger_real_synth_v1.py",
+      "line": 67,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_execution_guardrail.py",
+      "line": 114,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_drift_analyzer.py",
+      "line": 51,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_drift_analyzer.py",
+      "line": 52,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_drift_analyzer.py",
+      "line": 180,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_importance.py",
+      "line": 142,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_importance.py",
+      "line": 186,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_importance.py",
+      "line": 37,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_ranker.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_feature_ranker.py",
+      "line": 89,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_intraday_pnl_monitor.py",
+      "line": 33,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_intraday_pnl_monitor.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_latency_drift_observatory.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_live_ai_signals.py",
+      "line": 291,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_live_ai_signals.py",
+      "line": 435,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_live_signals.py",
+      "line": 79,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_live_snapshot_reasoner.py",
+      "line": 86,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_market_intelligence_dashboard.py",
+      "line": 39,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_market_regime_recorder.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_market_regime_recorder.py",
+      "line": 132,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_market_regime_recorder.py",
+      "line": 96,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_market_regime_recorder.py",
+      "line": 91,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_misfire_classifier_v2.py",
+      "line": 142,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_misfire_classifier_v2.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_misfire_classifier_v2.py",
+      "line": 136,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_misfire_detector.py",
+      "line": 129,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_misfire_detector.py",
+      "line": 123,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_options_analyze.py",
+      "line": 223,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_options_analyze.py",
+      "line": 23,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_outcome_placeholder_generator.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_outcome_placeholder_generator.py",
+      "line": 74,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_outcome_placeholder_generator.py",
+      "line": 104,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_performance_consistency_checker.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_pnl_dummy_seed.py",
+      "line": 26,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_pnl_dummy_seed.py",
+      "line": 85,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_pnl_simulator.py",
+      "line": 202,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_pnl_simulator.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_pnl_simulator.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_data_capture_starter.py",
+      "line": 58,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_data_capture_starter.py",
+      "line": 88,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_data_capture_starter.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_data_extractor.py",
+      "line": 146,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_data_extractor.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_master_dataset.py",
+      "line": 200,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_master_dataset.py",
+      "line": 66,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_master_dataset.py",
+      "line": 79,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_master_dataset.py",
+      "line": 92,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_master_dataset.py",
+      "line": 105,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_outcome_logger.py",
+      "line": 87,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_outcome_logger.py",
+      "line": 105,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_outcome_logger.py",
+      "line": 82,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_signal_collector_v2.py",
+      "line": 86,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_signal_collector_v2.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_signal_collector_v2.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_signal_collector_v2.py",
+      "line": 73,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_real_threshold_reco_v3.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_risk_profile_optimizer_v3.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_rolling_learning_dashboard.py",
+      "line": 151,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_safety_checks.py",
+      "line": 104,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_safety_checks.py",
+      "line": 124,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_safety_layer_v3.py",
+      "line": 118,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_signal_outcome_analyzer.py",
+      "line": 210,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_signal_record_buffer.py",
+      "line": 73,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_signal_record_buffer.py",
+      "line": 95,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_signal_record_buffer.py",
+      "line": 68,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_strategy_optimizer.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_synthetic_backtester.py",
+      "line": 622,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_synthetic_backtester.py",
+      "line": 623,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_threshold_tuner.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_threshold_tuner.py",
+      "line": 198,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_decision.py",
+      "line": 185,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_decision.py",
+      "line": 234,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_executor.py",
+      "line": 152,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_executor.py",
+      "line": 33,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_executor.py",
+      "line": 92,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_executor.py",
+      "line": 147,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_lifecycle_logger.py",
+      "line": 65,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_lifecycle_logger.py",
+      "line": 73,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_lifecycle_logger.py",
+      "line": 84,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_trade_lifecycle_logger.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_ultra_mode_readiness_report.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 77,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 107,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 108,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 134,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 164,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_unified_outcome_logger_v3.py",
+      "line": 72,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/dhan_watchdog_recovery.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/generate_synthetic_dhan_training.py",
+      "line": 260,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/merge_key_normalizer.py",
+      "line": 286,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/merge_key_normalizer.py",
+      "line": 287,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/merge_key_normalizer.py",
+      "line": 323,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/merge_key_normalizer.py",
+      "line": 324,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/offline_dhan_ai_test.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/phase_389_feature_engineering_production.py",
+      "line": 690,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/phase_389_feature_engineering_production.py",
+      "line": 642,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/scoring_engine/threshold_calibrator.py",
+      "line": 48,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/scoring_engine/threshold_calibrator.py",
+      "line": 52,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_auto_heal_orchestrator.py",
+      "line": 85,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_auto_heal_orchestrator.py",
+      "line": 126,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase102_order_ledger_schema.py",
+      "line": 66,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase102_order_ledger_schema.py",
+      "line": 82,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase103_order_ledger_support.py",
+      "line": 78,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase103_order_ledger_support.py",
+      "line": 116,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase103_order_ledger_support.py",
+      "line": 142,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase103_order_ledger_support.py",
+      "line": 245,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase104_tradeplan_to_orders.py",
+      "line": 156,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase104_tradeplan_to_orders.py",
+      "line": 194,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase104_tradeplan_to_orders.py",
+      "line": 222,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase105_ledger_integrity_check.py",
+      "line": 39,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase105_ledger_integrity_check.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase105_ledger_integrity_check.py",
+      "line": 140,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase106_dryrun_execution_bridge.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase106_dryrun_execution_bridge.py",
+      "line": 141,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase107_live_execution_engine.py",
+      "line": 115,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase107_live_execution_engine.py",
+      "line": 250,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase108_order_status_refresher.py",
+      "line": 81,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase108_order_status_refresher.py",
+      "line": 151,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase109_intraday_risk_guard.py",
+      "line": 100,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase110_exit_rule_builder.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase110_exit_rule_builder.py",
+      "line": 117,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase114_live_session_health.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase117_live_to_learning_bridge.py",
+      "line": 55,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase117_live_to_learning_bridge.py",
+      "line": 100,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase117_live_to_learning_bridge.py",
+      "line": 115,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase118_daily_live_pnl_snapshot.py",
+      "line": 48,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase136_dhan_symbol_universe.py",
+      "line": 58,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase137_expiry_calendar_map.py",
+      "line": 98,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase137_expiry_calendar_map.py",
+      "line": 67,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase138_risk_tier_assignment.py",
+      "line": 90,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase138_risk_tier_assignment.py",
+      "line": 63,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase139_lot_margin_estimator.py",
+      "line": 93,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase139_lot_margin_estimator.py",
+      "line": 65,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase140_capital_guardrail.py",
+      "line": 97,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase140_capital_guardrail.py",
+      "line": 51,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase141_spread_liquidity_estimator.py",
+      "line": 138,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase141_spread_liquidity_estimator.py",
+      "line": 86,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase142_slippage_calculator.py",
+      "line": 133,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase142_slippage_calculator.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase142_slippage_calculator.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase143_execution_quality.py",
+      "line": 99,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase143_execution_quality.py",
+      "line": 65,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase144_pnl_vs_execution_scenario.py",
+      "line": 157,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase144_pnl_vs_execution_scenario.py",
+      "line": 52,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase144_pnl_vs_execution_scenario.py",
+      "line": 66,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase145_one_lot_health_report.py",
+      "line": 51,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase145_one_lot_health_report.py",
+      "line": 66,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase145_one_lot_health_report.py",
+      "line": 82,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase145_one_lot_health_report.py",
+      "line": 101,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase156_capital_curve_analysis.py",
+      "line": 128,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase156_capital_curve_analysis.py",
+      "line": 52,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase157_misfire_breakdown.py",
+      "line": 89,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase157_misfire_breakdown.py",
+      "line": 49,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase158_regime_stability.py",
+      "line": 25,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase159_threshold_drift.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase160_error_attribution.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase161_risk_attribution.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase161_risk_attribution_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase162_capital_efficiency.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase162_capital_efficiency_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase163_trade_frequency.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase163_trade_frequency_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase164_win_rate.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase164_win_rate_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase165_risk-reward_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase165_risk_reward.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase166_underlying_performance.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase166_underlying_performance_comparison.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase167_time-of-day_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase167_time_of_day.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase168_volatility_impact.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase168_volatility_impact_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase169_confidence_calibration.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase169_confidence_calibration_analysis.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase170_stability_metrics.py",
+      "line": 23,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase170_stability_metrics_summary.py",
+      "line": 41,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase197_micro_capital_test_plan.py",
+      "line": 48,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase208_signal_consistency.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase208_signal_consistency.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase209_duplicate_purger.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase209_duplicate_purger.py",
+      "line": 112,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase209_duplicate_purger.py",
+      "line": 113,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase209_duplicate_purger.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase210_timegap_analyzer.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase210_timegap_analyzer.py",
+      "line": 93,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase210_timegap_analyzer.py",
+      "line": 96,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase210_timegap_analyzer.py",
+      "line": 64,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase211_feature_drift.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase211_feature_drift.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase212_label_quality.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase212_label_quality.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase213_training_window.py",
+      "line": 87,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase213_training_window.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase213_training_window.py",
+      "line": 98,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase216_greeks_audit.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase216_greeks_audit.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase217_vol_regime.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase217_vol_regime.py",
+      "line": 114,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase217_vol_regime.py",
+      "line": 116,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase217_vol_regime.py",
+      "line": 76,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase218_momentum_scanner.py",
+      "line": 71,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase218_momentum_scanner.py",
+      "line": 128,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase218_momentum_scanner.py",
+      "line": 130,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase218_momentum_scanner.py",
+      "line": 73,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase219_breakout_analyzer.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase219_breakout_analyzer.py",
+      "line": 64,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase220_correlation_map.py",
+      "line": 128,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase220_correlation_map.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase220_correlation_map.py",
+      "line": 63,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase220_historical_aggregation.py",
+      "line": 299,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase220_historical_aggregation.py",
+      "line": 107,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase221_forward_returns.py",
+      "line": 91,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase221_forward_returns.py",
+      "line": 235,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase221_forward_returns.py",
+      "line": 238,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase222_signal_edge.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase223_threshold_optimizer.py",
+      "line": 90,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase224_score_attribution.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase224_score_attribution.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase225_label_reconciliation.py",
+      "line": 119,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase225_label_reconciliation.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase225_label_reconciliation.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase227_latency_profiler.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase227_latency_profiler.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase228_snapshot_coverage.py",
+      "line": 94,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase228_snapshot_coverage.py",
+      "line": 63,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase228_snapshot_coverage.py",
+      "line": 65,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase229_schema_guard.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase229_schema_guard.py",
+      "line": 71,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase229_schema_guard.py",
+      "line": 74,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase249_lstm_forward_predictor.py",
+      "line": 337,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase249_lstm_forward_predictor.py",
+      "line": 362,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase250_online_learning_manager.py",
+      "line": 98,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase255_model_performance_logger.py",
+      "line": 84,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase261_portfolio_risk_analyzer.py",
+      "line": 59,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase262_multitimeframe_consistency.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase263_advanced_pnl_attribution.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase263_advanced_pnl_attribution.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase264_signal_quality_metrics.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase265_execution_quality_analyzer.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase266_capital_efficiency_tracker.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase267_drawdown_analyzer.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase268_sharpe_ratio_calculator.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase269_winrate_by_time.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase270_regime_performance_comparison.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase270_regime_performance_comparison.py",
+      "line": 66,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase272_feature_selection_optimizer.py",
+      "line": 46,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase276_risk_reward_optimizer.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase277_entry_timing_optimizer.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase278_exit_timing_optimizer.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase279_portfolio_rebalancer.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase280_strategy_backtester.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase281_realtime_performance_monitor.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase282_anomaly_detector.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase283_drift_monitor.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase286_performance_degradation_detector.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase288_latency_monitor.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase291_daily_performance_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase292_weekly_summary_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase293_monthly_analytics_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase294_strategy_performance_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase295_risk_metrics_report.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase296_model_performance_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase297_trade_execution_report.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase299_master_summary_report.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase301_daily_live_vs_forward.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase301_daily_live_vs_forward.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase302_regime_performance.py",
+      "line": 36,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase303_edge_decay.py",
+      "line": 38,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase304_forward_returns.py",
+      "line": 71,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase304_forward_returns.py",
+      "line": 165,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase304_forward_returns.py",
+      "line": 188,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase305_confidence_tier.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase305_confidence_tier.py",
+      "line": 151,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase305_reconciliation.py",
+      "line": 93,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase305_reconciliation.py",
+      "line": 108,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase305_reconciliation.py",
+      "line": 104,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase306_staleness_guard.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase306_staleness_guard.py",
+      "line": 157,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase307_live_vs_test_consistency.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase308_daily_dashboard.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase315_transactional_write_guard.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase315_transactional_write_guard.py",
+      "line": 90,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase31_ultra_fusion.py",
+      "line": 344,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase31_ultra_fusion.py",
+      "line": 38,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase31_ultra_fusion.py",
+      "line": 55,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase31_ultra_fusion.py",
+      "line": 81,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase32_ultra_vs_baseline.py",
+      "line": 246,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase32_ultra_vs_baseline.py",
+      "line": 34,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase32_ultra_vs_baseline.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase32_ultra_vs_baseline.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase331_signal_integrity.py",
+      "line": 72,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase332_signal_volume_coverage.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase333_signal_consistency.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase334_model_drift_snapshot.py",
+      "line": 79,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase335_model_drift_analyzer.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase337_forward_return_quality_tracker.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase338_signal_outcome_correlation.py",
+      "line": 49,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase33_promotion_planner.py",
+      "line": 34,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase341_model_drift_detector_v2.py",
+      "line": 354,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase341_model_drift_detector_v2.py",
+      "line": 443,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase342_live_performance_estimator.py",
+      "line": 65,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase342_live_performance_estimator.py",
+      "line": 72,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase343_signals_freshness_enforcer.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase343_signals_freshness_enforcer.py",
+      "line": 93,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase344_pipeline_schema_guard.py",
+      "line": 142,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase344_pipeline_schema_guard.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase345_warn_root_cause_tracker.py",
+      "line": 81,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase34_ultra_shadow_exec.py",
+      "line": 35,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase34_ultra_shadow_exec.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase34_ultra_shadow_exec.py",
+      "line": 138,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase34_ultra_shadow_exec.py",
+      "line": 165,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase35_ultra_auditor.py",
+      "line": 178,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase35_ultra_auditor.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase35_ultra_auditor.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase361_signal_pipeline_snapshot.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase362_forward_calibrator.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase365_accuracy_tracker.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase365_accuracy_tracker.py",
+      "line": 201,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase366_strategy_ensemble_evaluator.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase367_safety_guardrail_recommender.py",
+      "line": 76,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase367_safety_guardrail_recommender.py",
+      "line": 123,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase370_signal_schema_normalizer.py",
+      "line": 150,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase370_signal_schema_normalizer.py",
+      "line": 183,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase371_signal_duplicate_scanner.py",
+      "line": 82,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase372_signal_conflict_resolver.py",
+      "line": 64,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase372_signal_conflict_resolver.py",
+      "line": 72,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase373_signal_clean_curated_builder.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase373_signal_clean_curated_builder.py",
+      "line": 53,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase376_self_test_suite.py",
+      "line": 131,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase377_validation_report_generator.py",
+      "line": 109,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase378_performance_optimizer.py",
+      "line": 100,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase379_edge_case_handler.py",
+      "line": 52,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase379_edge_case_handler.py",
+      "line": 125,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase37_policy_risk_monitor.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase37_policy_risk_monitor.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase38_governance_summary.py",
+      "line": 58,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase390_smote_balancing.py",
+      "line": 154,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase392_ensemble_integration.py",
+      "line": 459,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase392_ensemble_integration.py",
+      "line": 532,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_phase39_shadow_campaign.py",
+      "line": 113,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase39_shadow_campaign.py",
+      "line": 140,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase40_weekly_governance_pack.py",
+      "line": 113,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase76_geni_self_critique.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase76_geni_self_critique.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase76_geni_self_critique.py",
+      "line": 64,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase78_geni_consensus.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase78_geni_consensus.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase79_adaptive_thresholds.py",
+      "line": 48,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase79_adaptive_thresholds.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase83_tick_to_trade_latency.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase83_tick_to_trade_latency.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase87_expected_value.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase88_portfolio_risk.py",
+      "line": 41,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase88_portfolio_risk.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase89_optimal_entry.py",
+      "line": 65,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase90_optimal_exit.py",
+      "line": 75,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase91_live_dashboard.py",
+      "line": 73,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase91_live_dashboard.py",
+      "line": 85,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase91_live_dashboard.py",
+      "line": 97,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase92_session_replay.py",
+      "line": 40,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase92_session_replay.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase92_session_replay.py",
+      "line": 83,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase93_operator_override.py",
+      "line": 83,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phase93_operator_override.py",
+      "line": 115,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phases_346_350_hardening_pack.py",
+      "line": 122,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_phases_393_400.py",
+      "line": 55,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_signal_engine.py",
+      "line": 115,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/system3_signal_engine.py",
+      "line": 976,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/system3_signal_engine.py",
+      "line": 119,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/train_dhan_models.py",
+      "line": 84,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/train_dhan_models.py",
+      "line": 49,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_feature_engineering.py",
+      "line": 257,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_feature_engineering.py",
+      "line": 166,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_feature_engineering.py",
+      "line": 194,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_feature_engineering.py",
+      "line": 188,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_hparam_explorer.py",
+      "line": 105,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_hparam_explorer.py",
+      "line": 191,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_hparam_explorer.py",
+      "line": 103,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_multi_consensus.py",
+      "line": 190,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_multi_consensus.py",
+      "line": 85,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_pnl_analyzer.py",
+      "line": 169,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_pnl_analyzer.py",
+      "line": 53,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_regime_classifier.py",
+      "line": 99,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_regime_classifier.py",
+      "line": 145,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_regime_classifier.py",
+      "line": 96,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_shadow_data_engine.py",
+      "line": 216,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_shadow_data_engine.py",
+      "line": 63,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_shadow_data_engine.py",
+      "line": 76,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_shadow_data_engine.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_shadow_data_engine.py",
+      "line": 110,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_threshold_lab.py",
+      "line": 130,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_threshold_lab.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_threshold_lab.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_trade_simulator.py",
+      "line": 140,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_trade_simulator.py",
+      "line": 182,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_trade_simulator.py",
+      "line": 213,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/engine/ultra_trade_simulator.py",
+      "line": 60,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_trade_simulator.py",
+      "line": 70,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_train_models.py",
+      "line": 156,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/engine/ultra_train_models.py",
+      "line": 147,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/execution/live_execution_engine.py",
+      "line": 233,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/monitoring/continuous_validators.py",
+      "line": 82,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/monitoring/continuous_validators.py",
+      "line": 211,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/monitoring/continuous_validators.py",
+      "line": 212,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/tools/clean_dhan_signals_csv.py",
+      "line": 361,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/tools/clean_dhan_signals_csv.py",
+      "line": 366,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/tools/clean_dhan_signals_csv.py",
+      "line": 117,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/tools/clean_dhan_signals_csv.py",
+      "line": 297,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/tools/schema_audit.py",
+      "line": 202,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/tools/validate_clean_csv.py",
+      "line": 188,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/tools/validate_clean_csv.py",
+      "line": 193,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/tools/validate_clean_csv.py",
+      "line": 201,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase21_adaptive_risk_engine.py",
+      "line": 258,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase21_adaptive_risk_engine.py",
+      "line": 56,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase23_volatility_impact.py",
+      "line": 206,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase24_confidence_drift.py",
+      "line": 134,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase24_confidence_drift.py",
+      "line": 148,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase24_confidence_drift.py",
+      "line": 162,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase28_auto_corrector.py",
+      "line": 141,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase28_auto_corrector.py",
+      "line": 150,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase28_auto_corrector.py",
+      "line": 159,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase29_sensitivity.py",
+      "line": 204,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase30_calibration_engine.py",
+      "line": 222,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase46_meta_fusion.py",
+      "line": 192,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase46_meta_fusion.py",
+      "line": 32,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase47_confidence_vector.py",
+      "line": 207,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase47_confidence_vector.py",
+      "line": 39,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase48_error_scanner.py",
+      "line": 206,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase48_error_scanner.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase48_error_scanner.py",
+      "line": 43,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase49_risk_regulator.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase50_prediction_explainer.py",
+      "line": 196,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase50_prediction_explainer.py",
+      "line": 32,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase51_probability_engine.py",
+      "line": 208,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase51_probability_engine.py",
+      "line": 32,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase52_multi_broker.py",
+      "line": 83,
+      "call": "place_order"
+    },
+    {
+      "file": "core/ultra/phase53_monitoring_agent.py",
+      "line": 46,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase54_back_reconstruction.py",
+      "line": 167,
+      "call": "to_csv"
+    },
+    {
+      "file": "core/ultra/phase54_back_reconstruction.py",
+      "line": 36,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase54_back_reconstruction.py",
+      "line": 45,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 35,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 48,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 62,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 86,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 111,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/ultra/phase55_intelligence_dashboard.py",
+      "line": 122,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/validation/post_close_signal_audit.py",
+      "line": 90,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/validation/pre_market_signal_dryrun.py",
+      "line": 84,
+      "call": "read_csv"
+    },
+    {
+      "file": "core/validation/validate_live_thresholds.py",
+      "line": 144,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 5758,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 9646,
+      "call": "cancel_order"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 11101,
+      "call": "cancel_order"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 6362,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 5622,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 6099,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 10732,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/equity_option_scanner.py",
+      "line": 36,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/live_profit_validator.py",
+      "line": 328,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/multi_validation_audit.py",
+      "line": 376,
+      "call": "read_csv"
+    },
+    {
+      "file": "dashboard/backend/order_gateway.py",
+      "line": 173,
+      "call": "place_order"
+    },
+    {
+      "file": "scripts/add_realtime_data_refresh.py",
+      "line": 57,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/add_realtime_data_refresh.py",
+      "line": 62,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/analyze_chain_raw_live.py",
+      "line": 27,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/auto_retrain.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/bhavcopy_downloader.py",
+      "line": 140,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/bhavcopy_downloader.py",
+      "line": 156,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/bhavcopy_downloader.py",
+      "line": 186,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/bhavcopy_downloader.py",
+      "line": 196,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/build_advanced_excel_with_ai_predictions.py",
+      "line": 63,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/build_advanced_excel_with_ai_predictions.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/build_options_history_contracts.py",
+      "line": 106,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/build_production_optionchain_master.py",
+      "line": 51,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/calibrate_factor_weights.py",
+      "line": 76,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_all_issues.py",
+      "line": 102,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_all_issues.py",
+      "line": 159,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_all_outputs.py",
+      "line": 83,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_csv_comprehensive.py",
+      "line": 31,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_csv_comprehensive.py",
+      "line": 116,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_csv_comprehensive.py",
+      "line": 175,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_monitor_output.py",
+      "line": 22,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_output_files.py",
+      "line": 30,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_output_files.py",
+      "line": 46,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_paper_trading_status.py",
+      "line": 99,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/check_pending_items.py",
+      "line": 72,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/comprehensive_end_to_end_verification.py",
+      "line": 257,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/comprehensive_paper_trading_check.py",
+      "line": 174,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/comprehensive_performance_analysis.py",
+      "line": 86,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/comprehensive_performance_analysis.py",
+      "line": 89,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/daily_gain_rank_and_validate.py",
+      "line": 195,
+      "call": "to_json"
+    },
+    {
+      "file": "scripts/end_to_end_verification.py",
+      "line": 87,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/enhance_optionchain_with_predictions.py",
+      "line": 320,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/final_data_check.py",
+      "line": 18,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/final_status_check.py",
+      "line": 9,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/final_verification.py",
+      "line": 42,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/final_verification.py",
+      "line": 92,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/final_verification_test.py",
+      "line": 149,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/fix_csv_structure.py",
+      "line": 27,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/fix_csv_structure.py",
+      "line": 89,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/fix_csv_structure.py",
+      "line": 112,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/fix_csv_structure.py",
+      "line": 166,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/fix_csv_structure.py",
+      "line": 205,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/fix_dashboard_data_issues.py",
+      "line": 61,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/fix_dashboard_data_issues.py",
+      "line": 68,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/live_paper_trading_monitor.py",
+      "line": 70,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/live_paper_trading_monitor.py",
+      "line": 130,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/micro_level_monitor.py",
+      "line": 163,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/monitor_10min.py",
+      "line": 80,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/monitor_paper_trades.py",
+      "line": 67,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 94,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 120,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 150,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 187,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 231,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 285,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 325,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 348,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/multi_verify_all_conditions.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/options_ce_pe_history_pipeline.py",
+      "line": 377,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/pre_trading_validation.py",
+      "line": 111,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/pre_trading_validation.py",
+      "line": 206,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/profit_focused_monitor.py",
+      "line": 35,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/profit_focused_monitor.py",
+      "line": 102,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/profit_focused_monitor.py",
+      "line": 147,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/replay_test.py",
+      "line": 235,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/run_and_monitor_system.py",
+      "line": 179,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/run_signal_engine_from_bhavcopy.py",
+      "line": 47,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/show_full_orchestra.py",
+      "line": 94,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/show_full_orchestra.py",
+      "line": 107,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/show_practical_results.py",
+      "line": 70,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/show_practical_results.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/simple_micro_monitor.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/sync_dhan_instruments_master.py",
+      "line": 73,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/system3_master_proof_orchestrator.py",
+      "line": 816,
+      "call": "to_json"
+    },
+    {
+      "file": "scripts/system3_master_proof_orchestrator.py",
+      "line": 851,
+      "call": "to_json"
+    },
+    {
+      "file": "scripts/system3_maximum_safe_production_probe.py",
+      "line": 197,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_maximum_safe_production_probe.py",
+      "line": 198,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_maximum_safe_production_probe.py",
+      "line": 199,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_maximum_safe_production_probe.py",
+      "line": 115,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 160,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 198,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 221,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 233,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 245,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 299,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_production_viability_bridge.py",
+      "line": 300,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/system3_truth_bridge.py",
+      "line": 84,
+      "call": "read_json"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 29,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 50,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 71,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 93,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 166,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 187,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 118,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 139,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_edge_cases.py",
+      "line": 140,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_write_scenarios.py",
+      "line": 54,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_write_scenarios.py",
+      "line": 116,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_write_scenarios.py",
+      "line": 182,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_write_scenarios.py",
+      "line": 246,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_csv_write_scenarios.py",
+      "line": 301,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/test_excel_with_virtual_live_data.py",
+      "line": 151,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/verify_all_data_completeness.py",
+      "line": 28,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/verify_all_outputs.py",
+      "line": 49,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 33,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 134,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 207,
+      "call": "read_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 103,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 254,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 102,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/verify_csv_files.py",
+      "line": 253,
+      "call": "to_csv"
+    },
+    {
+      "file": "scripts/verify_dhan_readonly.py",
+      "line": 146,
+      "call": "place_order"
+    },
+    {
+      "file": "scripts/verify_tri_state_working.py",
+      "line": 55,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/core/schemas.py",
+      "line": 169,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/output/export_csv.py",
+      "line": 136,
+      "call": "to_csv"
+    },
+    {
+      "file": "src/output/export_csv.py",
+      "line": 161,
+      "call": "to_csv"
+    },
+    {
+      "file": "src/ranking/daily_gain_scanner.py",
+      "line": 95,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/ranking/ml_signal_aggregator.py",
+      "line": 44,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/sim/replay_engine.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/storage/trade_history.py",
+      "line": 112,
+      "call": "to_csv"
+    },
+    {
+      "file": "src/storage/trade_history.py",
+      "line": 114,
+      "call": "to_csv"
+    },
+    {
+      "file": "src/storage/trade_history.py",
+      "line": 74,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/storage/trade_history.py",
+      "line": 147,
+      "call": "read_csv"
+    },
+    {
+      "file": "src/trading/pnl_tracker.py",
+      "line": 133,
+      "call": "to_csv"
+    },
+    {
+      "file": "src/trading/pnl_tracker.py",
+      "line": 135,
+      "call": "to_csv"
+    }
+  ],
+  "errors": []
+}

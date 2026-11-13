@@ -368,6 +368,21 @@ def equity_shard_coverage() -> Dict[str, Any]:
     }
 
 
+def equity_gainer_seed_symbols(mc_rows: Optional[List[Dict[str, Any]]] = None, limit: int = 12) -> List[str]:
+    """Extract equity FO symbols from MoneyControl gainer rows or fallback to priority universe."""
+    symbols: List[str] = []
+    if mc_rows:
+        for r in mc_rows:
+            sym = str(r.get("underlying") or r.get("symbol") or "").strip().upper()
+            if sym and sym not in symbols:
+                symbols.append(sym)
+            if len(symbols) >= limit:
+                break
+    if not symbols:
+        return _equity_scan_universe(limit=limit, rotate=False)
+    return symbols[:limit]
+
+
 def _equity_scan_universe(limit: int = 12, rotate: bool = True) -> List[str]:
     """Return equity FO names for this scan tick.
 

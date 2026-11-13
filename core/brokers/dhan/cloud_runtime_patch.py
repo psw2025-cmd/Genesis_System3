@@ -303,6 +303,16 @@ def _invoke_canonical_rotation(reason: str) -> dict[str, Any]:
             proof["error_type"] = "SecretVersionDidNotAdvance"
         return proof
     except Exception as exc:
+        try:
+            from scripts.gcp_dhan_token_rotation_job import rotate_token
+            res = rotate_token(force=True)
+            if res.get("success"):
+                proof["success"] = True
+                proof["strategy"] = "in_process_canonical_rotation_fallback"
+                get_access_token(force_refresh=True, reason="canonical_rotation_fallback_completed")
+                return proof
+        except Exception:
+            pass
         proof["error_type"] = type(exc).__name__
         proof["message"] = str(exc)[:160]
         return proof

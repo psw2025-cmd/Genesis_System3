@@ -1,0 +1,11 @@
+﻿{
+  "symbol": "NIFTY",
+  "spot": 23053.10,
+  "pcr": 1.60,
+  "atm_iv": 12.76,
+  "source": "dhan_last_verified_snapshot",
+  "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+  "source_url": "https://api.dhan.co/v2/optionchain + https://options-trader.dhan.co",
+  "refreshed_at": "2026-10-31 14:39:37 IST",
+  "note": "LAST VERIFIED CLOSE - Dhan official se exact match"
+}

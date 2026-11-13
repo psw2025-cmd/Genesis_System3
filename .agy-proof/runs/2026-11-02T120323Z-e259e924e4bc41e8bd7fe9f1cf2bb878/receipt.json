@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "b771e640-6876-4881-9919-27b7caef42db",
+  "turn": "ca4a7ab1b76e48d9a16e3177066b286f",
+  "run_id": "8d61a98782f54a369553e3408fee9f58",
+  "observed_utc": "2026-11-02T12:03:29Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Autonomous Market-Wide Scrip Discovery and Router Verification",
+  "limitations": [
+    "Verified against live localhost ASGI runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "d2e11149da79f55107a0ccf7cc1d9079753a139c8421f41df9b3f960d7cd3506"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_autonomous_market_discovery.py",
+      "sha256": "cc1f8259b20a89a3d10943e50e7d4df1bb9b19c64bd63b0f9247faa61b97224c"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T120323Z-e259e924e4bc41e8bd7fe9f1cf2bb878\\0.stdout.txt",
+      "sha256": "eddaaa114ecc0f8d43259094f5da6e65f452c166288eab8d6cad4adee66c66ad"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T120323Z-e259e924e4bc41e8bd7fe9f1cf2bb878\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Full-market discovery: Discovers 228 liquid F&O underlyings across equities and indices from Dhan scrip master",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Dynamic chain subscriptions: Automatically extracts 5 ITM + 5 OTM strikes around ATM and formats WebSocket subscription packet across multiple underlyings",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Dynamic order routing and safety: Maps dynamic securityId, segment NSE_FNO, and enforces PAPER_SIMULATED execution with LIVE_ORDER_AUTHORITY=0 lock",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_autonomous_market_discovery.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T12:03:23Z",
+      "elapsed_seconds": 5.594,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "3ba75c65d5a6b484ee1f84fd46568d6d8be4f093417df6fc0ba6c9f191946142"
+}

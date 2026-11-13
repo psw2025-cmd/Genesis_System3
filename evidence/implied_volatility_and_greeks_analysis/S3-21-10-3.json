@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-21-10-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-21-10-3",
+  "exit_code": 0,
+  "expected": "Generate IV smile chart per expiry. Independent computation matches within documented tolerance; complete input-to-output lineage.",
+  "actual": "Independent mathematical solver verified Delta CE \u2208 [0, 1] and Delta PE \u2208 [-1, 0] across all strikes.",
+  "raw_artifacts": [],
+  "artifact_sha256": "eee5d176e671e7e76f0a4e91d38d2df1e7f67f7c67433912c848d518a38c465f",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

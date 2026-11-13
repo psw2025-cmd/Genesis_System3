@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Isolated dependencies for dashboard proof tools. Keeps root package.json trading/runtime dependencies out of proof setup."
+}

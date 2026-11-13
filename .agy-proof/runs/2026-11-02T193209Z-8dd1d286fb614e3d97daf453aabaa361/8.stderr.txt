@@ -1,0 +1,11 @@
+C:\Genesis_System3_clean\core\data_lake\columnar_store.py:89: Pandas4Warning: The default formatting of datetime/timedelta values will change from numbers ("epoch") to strings ("iso") in a future version. Specify `date_format="iso"` explicitly in the `to_json()` call to opt-in to the future behaviour and silence this warning.
+  payload_bytes = clean_df.to_json(orient="records").encode("utf-8")
+.C:\Genesis_System3_clean\core\data_lake\columnar_store.py:89: Pandas4Warning: The default formatting of datetime/timedelta values will change from numbers ("epoch") to strings ("iso") in a future version. Specify `date_format="iso"` explicitly in the `to_json()` call to opt-in to the future behaviour and silence this warning.
+  payload_bytes = clean_df.to_json(orient="records").encode("utf-8")
+.C:\Genesis_System3_clean\core\data_lake\columnar_store.py:89: Pandas4Warning: The default formatting of datetime/timedelta values will change from numbers ("epoch") to strings ("iso") in a future version. Specify `date_format="iso"` explicitly in the `to_json()` call to opt-in to the future behaviour and silence this warning.
+  payload_bytes = clean_df.to_json(orient="records").encode("utf-8")
+...
+----------------------------------------------------------------------
+Ran 5 tests in 0.691s
+
+OK

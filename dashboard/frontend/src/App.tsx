@@ -103,14 +103,22 @@ export default function App() {
   useData()
   const activeTab = useStore((s) => s.activeTab)
   useLayoutEffect(() => {
+    window.scrollTo(0, 0)
     const main = document.getElementById('dashboard-main')
-    if (!main) return
-    for (const element of main.querySelectorAll<HTMLElement>('*')) {
-      if (element.scrollTop > 0 || element.scrollLeft > 0) {
-        element.scrollTop = 0
-        element.scrollLeft = 0
+    if (main) {
+      main.scrollTop = 0
+      main.scrollLeft = 0
+      for (const element of main.querySelectorAll<HTMLElement>('*')) {
+        if (element.scrollTop > 0 || element.scrollLeft > 0) {
+          element.scrollTop = 0
+          element.scrollLeft = 0
+        }
       }
     }
+    document.querySelectorAll<HTMLElement>('[data-testid$="-root"], .workspace-shell, .workspace-root').forEach((el) => {
+      el.scrollTop = 0
+      el.scrollLeft = 0
+    })
   }, [activeTab])
   const mobileTradingRoute = new URLSearchParams(window.location.search).get('view') === 'mobile-trader'
   if (mobileTradingRoute) return <MobileTradingHub />

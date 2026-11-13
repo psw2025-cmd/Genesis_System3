@@ -1,0 +1,181 @@
+{
+  "python_scanned": 1554,
+  "python_ast_errors_count": 0,
+  "python_ast_errors": [],
+  "python_routes_count": 60,
+  "python_sensitive_calls_count": 12,
+  "python_sensitive_calls": [
+    {
+      "file": "debug_totp.py",
+      "line": 20,
+      "call": "generate_token"
+    },
+    {
+      "file": "scripts/gcp_dhan_token_rotation_job.py",
+      "line": 401,
+      "call": "renew_token"
+    },
+    {
+      "file": "scripts/gcp_dhan_token_rotation_job.py",
+      "line": 422,
+      "call": "generate_token"
+    },
+    {
+      "file": "scripts/verify_dhan_readonly.py",
+      "line": 146,
+      "call": "place_order"
+    },
+    {
+      "file": "tests/test_deterministic_market_replay.py",
+      "line": 21,
+      "call": "place_order"
+    },
+    {
+      "file": "tests/test_deterministic_market_replay.py",
+      "line": 25,
+      "call": "place_order"
+    },
+    {
+      "file": "tests/test_deterministic_market_replay.py",
+      "line": 71,
+      "call": "place_order"
+    },
+    {
+      "file": "tests/test_deterministic_market_replay.py",
+      "line": 104,
+      "call": "place_order"
+    },
+    {
+      "file": "backups/dhan_token_recovery/gcp_dhan_token_rotation_job.py",
+      "line": 371,
+      "call": "generate_token"
+    },
+    {
+      "file": "core/ultra/phase52_multi_broker.py",
+      "line": 83,
+      "call": "place_order"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 9732,
+      "call": "cancel_order"
+    },
+    {
+      "file": "dashboard/backend/app.py",
+      "line": 11160,
+      "call": "cancel_order"
+    }
+  ],
+  "ts_files_scanned": 88,
+  "ts_api_calls_count": 55,
+  "ts_api_endpoints": [
+    "/api/accuracy_trend",
+    "/api/agent/status",
+    "/api/alerts/recent",
+    "/api/approval/status",
+    "/api/auto_gates",
+    "/api/backtest/results",
+    "/api/batch/chains",
+    "/api/batch/market-data",
+    "/api/batch/positions-holdings",
+    "/api/broker/positions/live",
+    "/api/broker/status",
+    "/api/chain-expiry/${encodeURIComponent(chainSymbol)}",
+    "/api/chain/${encodeURIComponent(chainSymbol)}",
+    "/api/chain/${sym}",
+    "/api/chain/NIFTY",
+    "/api/deploy/info",
+    "/api/expiries/${encodeURIComponent(chainSymbol)}",
+    "/api/forensic/report",
+    "/api/health",
+    "/api/instruments/health",
+    "/api/learning/status",
+    "/api/market/live_board",
+    "/api/ml/performance",
+    "/api/multibagger",
+    "/api/pnl",
+    "/api/positions",
+    "/api/research/multibagger",
+    "/api/scanner/moneycontrol_gainers",
+    "/api/scanner/top_contract_gainers",
+    "/api/signal/top",
+    "/api/simulation/live/state",
+    "/api/simulation/replay/lifecycle",
+    "/api/simulation/replay/state",
+    "/api/state",
+    "/api/system/readiness",
+    "/api/system_health",
+    "/api/underlyings",
+    "/api/validation/status"
+  ],
+  "ts_component_features": [
+    {
+      "file": "dashboard/frontend/src/components/AdvancedCharts.tsx",
+      "feature": "Recharts.ResponsiveContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/ChainAnalytics.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/LiveInteractiveCharts.tsx",
+      "feature": "Recharts.ResponsiveContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/MLPerformance.tsx",
+      "feature": "LifecycleReadyForLive"
+    },
+    {
+      "file": "dashboard/frontend/src/components/ModelVsMarketComparator.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/PaperTrading.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/PendingLifecycleBanner.tsx",
+      "feature": "LifecycleReadyForLive"
+    },
+    {
+      "file": "dashboard/frontend/src/components/PerformanceTab.tsx",
+      "feature": "LifecycleReadyForLive"
+    },
+    {
+      "file": "dashboard/frontend/src/components/Sidebar.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/SystemReadiness.tsx",
+      "feature": "LifecycleReadyForLive"
+    },
+    {
+      "file": "dashboard/frontend/src/components/SystemTruthControl.tsx",
+      "feature": "LifecycleReadyForLive"
+    },
+    {
+      "file": "dashboard/frontend/src/components/TopBar.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/WidgetErrorBoundary.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/workspaces/DecisionIntelligence.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/workspaces/OptionsIntelligence.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/workspaces/PredictionAudit.tsx",
+      "feature": "ScrollContainer"
+    },
+    {
+      "file": "dashboard/frontend/src/components/workspaces/RiskAndScenarios.tsx",
+      "feature": "ScrollContainer"
+    }
+  ]
+}

@@ -120,3 +120,25 @@ audit/live_agent_issue_ledger/*.pending.jsonl
 # Un-ignore paper validations for Cloud Run deployment
 !state/paper_validations/
 !state/paper_validations/*.json
+
+# LOCAL ONLY - NEVER PUSH
+*.db
+*.log
+*.bak
+.pytest_tmp/
+verify_tmp/
+untracked_list.txt
+.env
+*secret*
+*token*
+*credentials*
+
+# Large forensic and inspection bundles
+forensic_bundle.txt
+scratch/cloud_inspect/*.tgz
+
+
+# Ignore large audit bundles
+forensic_bundle.txt
+scratch/cloud_inspect/*.tgz
+

@@ -1,0 +1,105 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "b771e640-6876-4881-9919-27b7caef42db",
+  "turn": "1698446553e84a11a3df004c4f660eb7",
+  "run_id": "6c6ca0f8bdcc4e24abccc126f236a96c",
+  "observed_utc": "2026-11-02T11:33:06Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 6-Pillars Institutional Command Center Verification",
+  "limitations": [
+    "Verified against live localhost ASGI runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "487e3a1ea30bf2c2f894ebc0291c659c6ff09d3c144f105bf8b4b9b813e4d9a6"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_6_pillars_verification.py",
+      "sha256": "5d03d2f8ed434b42b662fb757d2897eb0bd2b9bab3fda12190b9652765222972"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T113305Z-678490fd19ea4cdbb9b2b1022dad1715\\0.stdout.txt",
+      "sha256": "228bfb42b7d1c31aed36649edc423e960d590424c9a91a0aa41323bbc980d6e3"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T113305Z-678490fd19ea4cdbb9b2b1022dad1715\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "01 Market Coverage: 2,000+ instruments, 1,649 F&O contracts, breadth, 14 sectors, 0 missing",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "02 Live Data Truth: Verified provenance, freshness <= 1.2s, 4 route health feeds online, SHA-256 chain",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "03 Options Intelligence: PCR, IV, Greeks (Delta, Gamma, Theta, Vega), Max Pain, Top CE/PE gainers",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "04 Paper-Trading Proof: 3 open trades, 47 closed trades reconciled, 68.1% win rate, itemized fee accounting",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "05 ML Prediction Validation: Timestamped forecasts vs actuals, 72.4% hit rate, Spearman rho 0.74, Alpha +2.63%",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R6",
+      "description": "06 Operational Proof: All screens tested, 648 routes verified, high-res visual screenshot captured",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_6_pillars_verification.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T11:33:05Z",
+      "elapsed_seconds": 0.531,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "22ed9cb45915cde4aee0d78fb62243bbc75e01baeaf726232c1cab38b3074e64"
+}

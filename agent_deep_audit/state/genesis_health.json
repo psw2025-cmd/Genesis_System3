@@ -1,0 +1,7 @@
+{
+  "timestamp": "2026-11-02T01:36:48.644871+05:30",
+  "uptime_seconds": null,
+  "last_self_heal": "startup_guard_checked",
+  "issues_fixed_without_human": 0,
+  "resurrection_protocol": "Read state files, restore caches, keep live trading disabled until gates pass."
+}

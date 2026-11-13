@@ -1,0 +1,50 @@
+{
+  "observed_utc": "2026-11-04T09:49:01.371148+00:00",
+  "canary_port": 8018,
+  "old_port": 8008,
+  "checks": [
+    {
+      "name": "health_inventory_equal",
+      "pass": true,
+      "detail": [
+        929,
+        929
+      ]
+    },
+    {
+      "name": "inventory_no_false_live",
+      "pass": true,
+      "detail": "CACHE_COVERAGE_FRESHNESS_NOT_VERIFIED"
+    },
+    {
+      "name": "market_no_false_live",
+      "pass": true,
+      "detail": false
+    },
+    {
+      "name": "route_health_no_fake_telemetry",
+      "pass": true,
+      "detail": "NOT_VERIFIED"
+    },
+    {
+      "name": "paper_safety",
+      "pass": true,
+      "detail": "paper=true live=false authority=0"
+    },
+    {
+      "name": "old_mismatch_reproduced",
+      "pass": true,
+      "detail": [
+        80,
+        929
+      ]
+    },
+    {
+      "name": "old_mislabel_reproduced",
+      "pass": true,
+      "detail": "old three routes real=true"
+    }
+  ],
+  "passed": 7,
+  "total": 7
+}

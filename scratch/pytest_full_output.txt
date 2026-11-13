@@ -1,0 +1,106 @@
+
+=================================== ERRORS ====================================
+_______ ERROR collecting tests/authority/test_batch1_local_authority.py _______
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\authority\test_batch1_local_authority.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\authority\test_batch1_local_authority.py:8: in <module>
+    import yaml
+E   ModuleNotFoundError: No module named 'yaml'
+____ ERROR collecting tests/evals/test_autonomous_e2e_runbook_contract.py _____
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\evals\test_autonomous_e2e_runbook_contract.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\evals\test_autonomous_e2e_runbook_contract.py:11: in <module>
+    import jsonschema
+E   ModuleNotFoundError: No module named 'jsonschema'
+_____ ERROR collecting tests/evals/test_eval_full_dashboard_acceptance.py _____
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\evals\test_eval_full_dashboard_acceptance.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\evals\test_eval_full_dashboard_acceptance.py:6: in <module>
+    from scripts.gcp_full_dashboard_acceptance import (
+E   ModuleNotFoundError: No module named 'scripts.gcp_full_dashboard_acceptance'
+___ ERROR collecting tests/evals/test_eval_live_ui_semantic_after_hours.py ____
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\evals\test_eval_live_ui_semantic_after_hours.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\evals\test_eval_live_ui_semantic_after_hours.py:6: in <module>
+    from scripts.gcp_live_ui_semantic_proof import (
+E   ModuleNotFoundError: No module named 'scripts.gcp_live_ui_semantic_proof'
+_____ ERROR collecting tests/evals/test_eval_rhui_strict_semantic_gate.py _____
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\evals\test_eval_rhui_strict_semantic_gate.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\evals\test_eval_rhui_strict_semantic_gate.py:12: in <module>
+    from scripts.gcp_rhui_strict_semantic_gate import _api_failures, _text_failures
+E   ModuleNotFoundError: No module named 'scripts.gcp_rhui_strict_semantic_gate'
+_________ ERROR collecting tests/test_columnar_truth_architecture.py __________
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\test_columnar_truth_architecture.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_columnar_truth_architecture.py:11: in <module>
+    from core.data_lake.columnar_store import columnar_store, ColumnarStore
+core\data_lake\columnar_store.py:20: in <module>
+    import pyarrow as pa
+E   ModuleNotFoundError: No module named 'pyarrow'
+______________ ERROR collecting tests/test_genesis_500_routes.py ______________
+tests\test_genesis_500_routes.py:32: in <module>
+    assert "GENESIS" in res_ui.text
+E   assert 'GENESIS' in '<!doctype html><html><head><meta charset="utf-8">\n<title>Genesis System3 Auto-Reload</title><meta http-equiv="refres...sis System3 - Auto-Recovering Dashboard...</h2><p style="color:#00FF88;">Auto-reload active every 2s</p></body></html>'
+E    +  where '<!doctype html><html><head><meta charset="utf-8">\n<title>Genesis System3 Auto-Reload</title><meta http-equiv="refres...sis System3 - Auto-Recovering Dashboard...</h2><p style="color:#00FF88;">Auto-reload active every 2s</p></body></html>' = <Response [200 OK]>.text
+------------------------------- Captured stdout -------------------------------
+Total GET routes: 653
+Evidence store count: 1350
+/api/routes status: 200, total: 653, real: True
+/ui status: 200, html len: 511, contains GENESIS: False
+_________ ERROR collecting tests/test_mutation_capability_manifest.py _________
+tests\test_mutation_capability_manifest.py:13: in <module>
+    from dashboard.backend.secure_app import app
+dashboard\backend\secure_app.py:214: in <module>
+    assert_runtime_manifest(app)
+dashboard\backend\mutation_policy.py:198: in assert_runtime_manifest
+    raise RuntimeError(
+E   RuntimeError: MUTATION_MANIFEST_INVALID unknown=[POST /api/v1/placeorder] duplicates=[none]
+_____________ ERROR collecting tests/test_truth_certification.py ______________
+ImportError while importing test module 'C:\Genesis_System3_clean\tests\test_truth_certification.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\importlib\__init__.py:90: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_truth_certification.py:18: in <module>
+    from core.data_lake.columnar_store import columnar_store, ColumnarStore
+core\data_lake\columnar_store.py:20: in <module>
+    import pyarrow as pa
+E   ModuleNotFoundError: No module named 'pyarrow'
+=========================== short test summary info ===========================
+ERROR tests/authority/test_batch1_local_authority.py
+ERROR tests/evals/test_autonomous_e2e_runbook_contract.py
+ERROR tests/evals/test_eval_full_dashboard_acceptance.py
+ERROR tests/evals/test_eval_live_ui_semantic_after_hours.py
+ERROR tests/evals/test_eval_rhui_strict_semantic_gate.py
+ERROR tests/test_columnar_truth_architecture.py
+ERROR tests/test_genesis_500_routes.py - assert 'GENESIS' in '<!doctype html>...
+ERROR tests/test_mutation_capability_manifest.py - RuntimeError: MUTATION_MAN...
+ERROR tests/test_truth_certification.py
+!!!!!!!!!!!!!!!!!!! Interrupted: 9 errors during collection !!!!!!!!!!!!!!!!!!!
+

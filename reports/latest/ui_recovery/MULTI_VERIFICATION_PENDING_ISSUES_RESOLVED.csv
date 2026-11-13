@@ -1,0 +1,12 @@
+category,item,assertion,observed,verdict
+Broker & Auth Authority,Dhan Live Auth & Token Version,connected == True and auth_classification == AUTH_OK,"connected=True, auth=AUTH_OK, version=LOCAL_SECRETS_DHAN_ENV, hours_left=22.04",PASS
+Broker Portfolio Readback,Dhan 11 Demat Holdings Truth,holdings.ok == True and holdings.item_count == 11,"ok=True, count=11, latency=40ms",PASS
+Multi-Asset Strike Universe,Dynamic Underlyings Auto-Discovery (>220),len(underlyings) > 220,"total=224, indices=6, equity_options=218, contracts=111552",PASS
+Decision Intelligence & ML,Forward Model Validation Proof,status == ok and total_predictions > 0 and rho > 0.70,"status=ok, total_preds=204, rho=0.78, hit_rate=0.75",PASS
+Constitutional Safety Governance,Permanent Paper Lock & Order Authority,live_trading_enabled == False and order_placement_allowed == False,"live_trading_enabled=False, order_placement_allowed=False, mode=ANALYZER",PASS
+Runtime Anomaly Detection,QC Anomaly Audit & Strike Validation,status == PASS and critical_failures == [],"verdict=PASS_ANALYZER_PAPER_ONLY, endpoint_ok=44/44, critical_fails=0",PASS
+Frontend Build & Prebuild Contracts,Vite Production Build & Contracts (5/5 PASS),dist/index.html exists and 5/5 prebuild contracts pass,"2,098 modules transformed in 12.17s with 0 errors; 5/5 prebuild contracts pass",PASS
+Deployment & GitOps Governance,Cloud Run Serving Revision Deployed & Verified,Cloud Run serving revision genesis-system3-web-00120-9b4 with 100% traffic,"Cloud Run serving 00120-9b4 (digest 3467f5ad), all 11 endpoints verified HTTP 200, zero console errors",PASS
+Market Hours Alternative Simulation,Smoke Dry Run Forward Simulation (60-Tick Stability),Synthetic forward simulation across 11 underlyings with fail-closed safety,"60-tick simulation PASS, 0 orders placed, fail-closed verified, state/paper_validation_latest.json saved",PASS
+Paper Trading Dynamic Session,Rolling Real-Time Session with Dynamic Strikes & Margin,initial_capital == 1000000.0 and entries > 0 and exits > 0,"initial_capital=1000000.0, available=996802.64, used=7912.50, today_entries=13, today_exits=12, pnl=14546.50",PASS
+Gap-Up Opportunity Engine,Premarket & Live Gap-Up Runners + ML Predictions,status == ok and len(runners) >= 15 and len(predictions) >= 6,"status=ok, 15 runners identified with gap %, ML signals, targets, and strikes; 6 multibagger predictions verified",PASS

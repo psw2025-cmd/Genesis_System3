@@ -1,0 +1,582 @@
+{
+  "api_results": {
+    "/api/broker/status": {
+      "status": 200,
+      "elapsed": 1.824,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 39 keys"
+    },
+    "/api/chain/NIFTY": {
+      "status": 200,
+      "elapsed": 8.74,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 15 keys"
+    },
+    "/api/charting/greeks/NIFTY?greek=delta": {
+      "status": 200,
+      "elapsed": 8.683,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/charting/heatmap/NIFTY?metric=oi": {
+      "status": 200,
+      "elapsed": 0.697,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/charting/iv-surface/NIFTY": {
+      "status": 200,
+      "elapsed": 0.675,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/charting/pcr/NIFTY": {
+      "status": 200,
+      "elapsed": 0.68,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/data/provenance": {
+      "status": 404,
+      "elapsed": 0.67,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/dhan/funds": {
+      "status": 404,
+      "elapsed": 0.694,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/dhan/holdings": {
+      "status": 404,
+      "elapsed": 0.651,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/expiries/NIFTY": {
+      "status": 200,
+      "elapsed": 0.845,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 8 keys"
+    },
+    "/api/health": {
+      "status": 200,
+      "elapsed": 0.714,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 22 keys"
+    },
+    "/api/market/inventory": {
+      "status": 404,
+      "elapsed": 0.68,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/market/top-gainers": {
+      "status": 200,
+      "elapsed": 0.699,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 5 keys"
+    },
+    "/api/ml/forecast-vs-actual": {
+      "status": 404,
+      "elapsed": 0.686,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/ml/prediction-audit": {
+      "status": 404,
+      "elapsed": 0.711,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 2 keys"
+    },
+    "/api/multibagger/predictions": {
+      "status": 200,
+      "elapsed": 0.663,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 6 keys"
+    },
+    "/api/opportunity-gap": {
+      "status": 200,
+      "elapsed": 0.666,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 8 keys"
+    },
+    "/api/paper/account": {
+      "status": 200,
+      "elapsed": 0.708,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 9 keys"
+    },
+    "/api/qc": {
+      "status": 200,
+      "elapsed": 0.68,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 9 keys"
+    },
+    "/api/state": {
+      "status": 200,
+      "elapsed": 0.692,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 31 keys"
+    },
+    "/api/t1-pre-ignition": {
+      "status": 200,
+      "elapsed": 0.649,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 5 keys"
+    },
+    "/api/trades/history": {
+      "status": 200,
+      "elapsed": 0.68,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 5 keys"
+    },
+    "/api/trades/today": {
+      "status": 200,
+      "elapsed": 0.825,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 7 keys"
+    },
+    "/api/underlyings": {
+      "status": 200,
+      "elapsed": 0.772,
+      "has_error": false,
+      "error_msg": "",
+      "data_summary": "dict with 19 keys"
+    }
+  },
+  "tab_health": {
+    "decision-intel": {
+      "name": "Decision Intelligence",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Symbol switchers (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY)"
+      ],
+      "clicks": [
+        "Nav buttons to Truth, Options, Risk, Data, System",
+        "Ops board tab switchers"
+      ],
+      "sorts": [],
+      "status": "PASS"
+    },
+    "truth": {
+      "name": "Truth Control",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Re-probe health",
+        "Refresh state"
+      ],
+      "sorts": [
+        "QC anomaly checks table"
+      ],
+      "status": "PASS"
+    },
+    "genesis": {
+      "name": "Genesis Brain",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Inspect brain cycle",
+        "Refresh telemetry"
+      ],
+      "sorts": [],
+      "status": "PASS"
+    },
+    "e2e-proof": {
+      "name": "E2E Proof",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Verification checklist toggle"
+      ],
+      "sorts": [
+        "Gate checklist table"
+      ],
+      "status": "PASS"
+    },
+    "overview": {
+      "name": "Overview",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "Main Index Mini-Charts",
+        "Holographic Cards"
+      ],
+      "filters": [
+        "Index toggles"
+      ],
+      "clicks": [
+        "Index card click",
+        "Quick action buttons"
+      ],
+      "sorts": [
+        "Top CE/PE movers table (sort by % gain)"
+      ],
+      "status": "PASS"
+    },
+    "sim-live": {
+      "name": "Sim Live",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "Simulation P&L Line"
+      ],
+      "filters": [
+        "Speed selector (1x, 2x, 5x)"
+      ],
+      "clicks": [
+        "Play/Pause simulation",
+        "Reset sim",
+        "Step tick"
+      ],
+      "sorts": [
+        "Simulated fills log table"
+      ],
+      "status": "PASS"
+    },
+    "options-intel": {
+      "name": "Options Intelligence",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "AdvancedCharts - Heatmap (BarChart)",
+        "AdvancedCharts - IV Surface (LineChart)",
+        "AdvancedCharts - Greeks (BarChart)",
+        "AdvancedCharts - PCR (BarChart)"
+      ],
+      "filters": [
+        "Underlying dropdown (224 symbols)",
+        "Heatmap metric dropdown (OI, Volume, IV, LTP)",
+        "Greek dropdown (Delta, Gamma, Theta, Vega)",
+        "Expiry selector"
+      ],
+      "clicks": [
+        "Symbol pill buttons",
+        "Open full chain button"
+      ],
+      "sorts": [
+        "Positions table",
+        "Rankings list"
+      ],
+      "status": "PASS"
+    },
+    "chain": {
+      "name": "Option Chain",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Core index pills (NIFTY, BANKNIFTY, FINNIFTY, MIDCPNIFTY, SENSEX, BANKEX)",
+        "Underlying search input with autocomplete datalist (224 symbols)",
+        "Expiry dropdown selector",
+        "Strike range selector (+/-5, +/-10, +/-20, +/-40, ALL)",
+        "Greeks view toggle (STANDARD vs GREEKS VIEW)",
+        "Mobile view toggle (Compact cards vs Full table)"
+      ],
+      "clicks": [
+        "Symbol pills",
+        "Greeks toggle button",
+        "Mobile view toggle button",
+        "ATM strike auto-scroll target"
+      ],
+      "sorts": [
+        "Strikes ascending sort with sticky ATM marker"
+      ],
+      "status": "PASS"
+    },
+    "signals": {
+      "name": "Signals",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Signal category toggle"
+      ],
+      "clicks": [
+        "Runner row inspect",
+        "Refresh signals"
+      ],
+      "sorts": [
+        "Gap-up runners sort by gap %",
+        "T1 pre-ignition sort by score",
+        "Predictions sort by confidence"
+      ],
+      "status": "PASS"
+    },
+    "trade": {
+      "name": "Trade",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Order type (Market/Limit)",
+        "Product (Intraday/Normal)"
+      ],
+      "clicks": [
+        "Submit order (Safety gate locked / Paper only modal)"
+      ],
+      "sorts": [],
+      "status": "PASS"
+    },
+    "paper": {
+      "name": "Paper Trades",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "Paper Equity Curve Canvas Chart"
+      ],
+      "filters": [
+        "Trade status filter (All / Open / Closed)"
+      ],
+      "clicks": [
+        "Manual paper close",
+        "Refresh ledger",
+        "Export trades CSV"
+      ],
+      "sorts": [
+        "Trades sorted by timestamp descending"
+      ],
+      "status": "PASS"
+    },
+    "positions": {
+      "name": "Positions",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Positions filter (Active / All)"
+      ],
+      "clicks": [
+        "Square off disabled / Paper safety notice"
+      ],
+      "sorts": [
+        "Positions sorted by P&L / Symbol"
+      ],
+      "status": "PASS"
+    },
+    "risk-scenarios": {
+      "name": "Risk & Scenarios",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "VaR & Stress Scenarios"
+      ],
+      "filters": [
+        "Scenario stress multiplier (+1%, -1%, +2%, -2%)"
+      ],
+      "clicks": [
+        "Run scenario recalculation"
+      ],
+      "sorts": [],
+      "status": "PASS"
+    },
+    "multibagger": {
+      "name": "Multibagger Research",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Horizon filter (Weekly, Monthly, Yearly, All)"
+      ],
+      "clicks": [
+        "Horizon tab buttons",
+        "Candidate card expand"
+      ],
+      "sorts": [
+        "Sorted by expected gain % and confidence score"
+      ],
+      "status": "PASS"
+    },
+    "prediction-audit": {
+      "name": "Prediction Audit",
+      "apis_ok": false,
+      "failing_apis": [
+        "/api/ml/prediction-audit",
+        "/api/ml/forecast-vs-actual"
+      ],
+      "charts": [
+        "Forecast vs Actual Scatter/Bar"
+      ],
+      "filters": [
+        "Date range filter",
+        "Horizon filter"
+      ],
+      "clicks": [
+        "Batch inspect",
+        "Filter apply"
+      ],
+      "sorts": [
+        "Audited forecasts table sorted by date"
+      ],
+      "status": "PARTIAL"
+    },
+    "performance": {
+      "name": "Performance",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "Daily P&L Bar Chart",
+        "Drawdown Line Chart"
+      ],
+      "filters": [
+        "Timeframe (7D, 30D, ALL)"
+      ],
+      "clicks": [
+        "Timeframe pills"
+      ],
+      "sorts": [
+        "Performance metrics breakdown"
+      ],
+      "status": "PASS"
+    },
+    "ml": {
+      "name": "ML Model",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "Feature Importance Bar Chart"
+      ],
+      "filters": [
+        "Model version select"
+      ],
+      "clicks": [
+        "Inspect feature weights",
+        "Refresh metrics"
+      ],
+      "sorts": [
+        "Features sorted by importance weight"
+      ],
+      "status": "PASS"
+    },
+    "data-integrity": {
+      "name": "Data Integrity",
+      "apis_ok": false,
+      "failing_apis": [
+        "/api/data/provenance",
+        "/api/market/inventory"
+      ],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Verify checksums button",
+        "Inspect SHA-256 hashes"
+      ],
+      "sorts": [
+        "Data tables sorted by dataset name"
+      ],
+      "status": "PARTIAL"
+    },
+    "broker": {
+      "name": "Broker",
+      "apis_ok": false,
+      "failing_apis": [
+        "/api/dhan/holdings",
+        "/api/dhan/funds"
+      ],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Test broker connection",
+        "Refresh token info"
+      ],
+      "sorts": [
+        "Holdings table sorted by value/pnl"
+      ],
+      "status": "PARTIAL"
+    },
+    "alerts": {
+      "name": "Alerts",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [
+        "Severity filter (Info, Warning, Critical)"
+      ],
+      "clicks": [
+        "Dismiss alert",
+        "Clear all alerts"
+      ],
+      "sorts": [
+        "Alerts sorted by timestamp descending"
+      ],
+      "status": "PASS"
+    },
+    "system": {
+      "name": "System",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [
+        "System Memory & CPU Gauges"
+      ],
+      "filters": [],
+      "clicks": [
+        "Diagnostics run",
+        "Inspect process health"
+      ],
+      "sorts": [],
+      "status": "PASS"
+    },
+    "gates": {
+      "name": "Live Trading Gate",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Inspect gate checklist",
+        "Gate verification report"
+      ],
+      "sorts": [
+        "Gates sorted by gate number G01-G28"
+      ],
+      "status": "PASS"
+    },
+    "system-readiness": {
+      "name": "System Readiness",
+      "apis_ok": true,
+      "failing_apis": [],
+      "charts": [],
+      "filters": [],
+      "clicks": [
+        "Check readiness"
+      ],
+      "sorts": [
+        "Readiness checks checklist"
+      ],
+      "status": "PASS"
+    }
+  }
+}

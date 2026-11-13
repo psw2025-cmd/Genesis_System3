@@ -1,0 +1,333 @@
+{
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "executed_at_utc": "2026-11-02T15:54:35.465245+00:00",
+  "total_checks": 1872,
+  "verified_pass": 1872,
+  "verified_fail": 0,
+  "blocked": 0,
+  "unverified": 0,
+  "p0_open_gates": 0,
+  "priorities": {
+    "P0": {
+      "pass": 504,
+      "total": 504
+    },
+    "P1": {
+      "pass": 912,
+      "total": 912
+    },
+    "P2": {
+      "pass": 456,
+      "total": 456
+    }
+  },
+  "phases": {
+    "1 Governance": {
+      "total": 144,
+      "pass": 144
+    },
+    "3 Data ingestion": {
+      "total": 288,
+      "pass": 288
+    },
+    "5 ML": {
+      "total": 324,
+      "pass": 324
+    },
+    "6 Paper Trading": {
+      "total": 180,
+      "pass": 180
+    },
+    "8 Platform": {
+      "total": 252,
+      "pass": 252
+    },
+    "2 Universe": {
+      "total": 216,
+      "pass": 216
+    },
+    "4 Options": {
+      "total": 216,
+      "pass": 216
+    },
+    "4 Discovery": {
+      "total": 108,
+      "pass": 108
+    },
+    "7 Dashboard": {
+      "total": 144,
+      "pass": 144
+    }
+  },
+  "modules": {
+    "Mission and owner success contract": {
+      "phase": "1 Governance",
+      "total": 36,
+      "pass": 36
+    },
+    "Audit ownership and evidence protocol": {
+      "phase": "1 Governance",
+      "total": 36,
+      "pass": 36
+    },
+    "Paper-only authority and safe modes": {
+      "phase": "1 Governance",
+      "total": 36,
+      "pass": 36
+    },
+    "Broker API login and session state": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Quote validation and data freshness": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Immutable forecast origination": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Outcome maturity and label verification": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Paper order creation and lifecycle": {
+      "phase": "6 Paper Trading",
+      "total": 36,
+      "pass": 36
+    },
+    "Execution fill and slippage simulation": {
+      "phase": "6 Paper Trading",
+      "total": 36,
+      "pass": 36
+    },
+    "Transaction charges and net P&L": {
+      "phase": "6 Paper Trading",
+      "total": 36,
+      "pass": 36
+    },
+    "Positions margin and exposure controls": {
+      "phase": "6 Paper Trading",
+      "total": 36,
+      "pass": 36
+    },
+    "Risk kill switch and loss prevention": {
+      "phase": "6 Paper Trading",
+      "total": 36,
+      "pass": 36
+    },
+    "Security secrets and provider entitlements": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Owner signoff and completion gate": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Exchange hours holiday and session rules": {
+      "phase": "1 Governance",
+      "total": 36,
+      "pass": 36
+    },
+    "NSE cash market security master": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "BSE cash market security master": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "Eligible equity derivatives underlyings": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "Index futures and options universe": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "Stock futures and options universe": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "Corporate actions and identity continuity": {
+      "phase": "2 Universe",
+      "total": 36,
+      "pass": 36
+    },
+    "WebSocket subscription management": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Binary tick parser and clock normalization": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Independent market source reconciliation": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Five-level market depth book": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Full market depth entitlement and parsing": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Historical bars and reference prices": {
+      "phase": "3 Data ingestion",
+      "total": 36,
+      "pass": 36
+    },
+    "Option underlying and expiry discovery": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Option chain data completeness": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Implied volatility and Greeks analysis": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Open interest PCR and positioning": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Top CE PE gainer discovery": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Liquidity and tradability scoring": {
+      "phase": "4 Options",
+      "total": 36,
+      "pass": 36
+    },
+    "Market breadth and participation": {
+      "phase": "4 Discovery",
+      "total": 36,
+      "pass": 36
+    },
+    "Sector heatmap and price movers": {
+      "phase": "4 Discovery",
+      "total": 36,
+      "pass": 36
+    },
+    "Spot futures and regime context": {
+      "phase": "4 Discovery",
+      "total": 36,
+      "pass": 36
+    },
+    "Point-in-time feature engineering": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Model training and registry": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Calibration drift and model governance": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Walk-forward tests and realistic simulation": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Benchmark attribution and reporting": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Signal lifecycle and recommendation truth": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "News events and source governance": {
+      "phase": "5 ML",
+      "total": 36,
+      "pass": 36
+    },
+    "Market command center top-level view": {
+      "phase": "7 Dashboard",
+      "total": 36,
+      "pass": 36
+    },
+    "Symbol explorer and global search": {
+      "phase": "7 Dashboard",
+      "total": 36,
+      "pass": 36
+    },
+    "Options analytics trade and proof screens": {
+      "phase": "7 Dashboard",
+      "total": 36,
+      "pass": 36
+    },
+    "Responsive accessibility and interaction": {
+      "phase": "7 Dashboard",
+      "total": 36,
+      "pass": 36
+    },
+    "API contracts and route reliability": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Database transaction and storage integrity": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Logging metrics tracing and incident response": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Deployment CI automation and regression": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    },
+    "Reports exports and evidence archive": {
+      "phase": "8 Platform",
+      "total": 36,
+      "pass": 36
+    }
+  },
+  "safety_invariants": {
+    "paper_mode": 1,
+    "live_order_authority": 0,
+    "capital_limit_inr": 50000.0,
+    "daily_stop_loss_inr": 5000.0,
+    "circuit_breaker_inr": 5000.0,
+    "zero_real_orders_verified": true
+  }
+}

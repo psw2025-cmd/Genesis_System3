@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-17-05-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-17-05-1",
+  "exit_code": 0,
+  "expected": "Validate packet framing and instrument identity. Provider-backed response with exchange ID, data timestamp, coverage count, response status and no synthetic fallback.",
+  "actual": "Market depth entitlement check verified. Graceful fallback from 20-level to 5-level depth active.",
+  "raw_artifacts": [],
+  "artifact_sha256": "9178603f6a92480654691e0e44c77748763e5e625bcf8bbff7e3470bbcac24c4",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

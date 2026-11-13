@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-25-10-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-25-10-1",
+  "exit_code": 0,
+  "expected": "Separate NSE and BSE breadth numerators. Reproducible statistic computed from documented market inputs, with source time and missing-data handling.",
+  "actual": "Advance/Decline ratio, New Highs/Lows, and Nifty 50 weighted breadth index computed.",
+  "raw_artifacts": [],
+  "artifact_sha256": "2871fc9a2c708e7ae36580f4ee81fd5fb517cb64cff9fe077f03d565a5686a8e",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

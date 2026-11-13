@@ -1,0 +1,8 @@
+{
+  "triggered_at": "2026-10-30T08:48:01.050173Z",
+  "reason": "latest Spearman rho=0.2 below 0.4 (SYS3-BLK-005)",
+  "action": "run scripts/auto_retrain.py; do not mark ensemble VERIFIED; LIVE remains locked",
+  "promotion_allowed": false,
+  "live_trading_enabled": false,
+  "source": "genesis_ml_health"
+}

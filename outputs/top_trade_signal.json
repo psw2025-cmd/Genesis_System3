@@ -1,0 +1,12 @@
+{
+  "action": "TRADE",
+  "signal": "BUY_CE",
+  "underlying": "NIFTY",
+  "direction": "BULLISH",
+  "option_side": "CE",
+  "strike": 25050.0,
+  "expiry": "2026-11-12",
+  "confidence": 0.9954,
+  "confidence_pct": 99.54,
+  "reason": "XGBoost BULLISH CE @ Strike 25050.0"
+}

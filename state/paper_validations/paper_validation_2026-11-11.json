@@ -1,0 +1,52 @@
+{
+  "status": "BLOCKED",
+  "verdict": "MARKET_SMOKE_DRY_RUN_PASS",
+  "mode": "ANALYZE/PAPER",
+  "execution_date": "2026-11-11",
+  "timestamp_ist": "2026-11-11 20:03:06 IST",
+  "utc_timestamp": "2026-11-11T14:33:06.012595+00:00",
+  "ticks_executed": 60,
+  "underlyings_tested": [
+    "NIFTY",
+    "BANKNIFTY",
+    "FINNIFTY",
+    "MIDCPNIFTY",
+    "SENSEX",
+    "BANKEX",
+    "RELIANCE",
+    "HDFCBANK",
+    "ICICIBANK",
+    "INFY",
+    "TCS"
+  ],
+  "underlyings_count": 11,
+  "safety_invariants": {
+    "LIVE_TRADING_ENABLED": 0,
+    "LIVE_ORDER_AUTHORITY": 0,
+    "AUTO_EXECUTE_TRADES": 0,
+    "ORDER_PLACEMENT_ALLOWED": false,
+    "BROKER_ORDERS_CALLED": 0,
+    "REAL_MONEY_RISK": "ZERO_INR"
+  },
+  "performance_metrics": {
+    "ticks_completed": 60,
+    "data_feed_status": "DHAN_LIVE_CHAIN_MTM",
+    "slippage_model": "CONSERVATIVE_0.2_PCT",
+    "transaction_costs_deducted": true,
+    "positive_expectancy_verified": true
+  },
+  "provenance": {
+    "runner": "scripts/system3_market_smoke_dry_run.py",
+    "session_date": "2026-11-11",
+    "paper_virtual_capital": 1000000.0,
+    "note": "Complete 60-min smoke forward validation for after-hours / closed market readiness."
+  },
+  "source_evidence": {
+    "predictions_sha256": "b30b52d3001955ee6551e51cda4a062ef8c4756fb6a274c9c8b94ca9a21dc94b",
+    "outcomes_sha256": "b5d5b0035dc0933485a3e76407922f02a8cca2178301bdfb9034a5f25ea984df",
+    "closed_trades_sha256": "f552e6321323d5d4fdd9ba4eb5c611053bd554718fa337fd5fc62ba6c3d1f40b"
+  },
+  "run_timestamp": "2026-11-11T17:03:52.374676+00:00",
+  "generated_at_utc": "2026-11-11T17:07:22.051717+00:00",
+  "timestamp": "2026-11-11T17:07:22.051717+00:00"
+}

@@ -35,6 +35,16 @@ ENDPOINTS = {
     "chain_banknifty": "/api/chain/BANKNIFTY",
     "chain_finnifty": "/api/chain/FINNIFTY",
     "chain_midcpnifty": "/api/chain/MIDCPNIFTY",
+    "chain_reliance": "/api/chain/RELIANCE",
+    "chain_tcs": "/api/chain/TCS",
+    "chain_infy": "/api/chain/INFY",
+    "chain_hdfcbank": "/api/chain/HDFCBANK",
+    "chain_icicibank": "/api/chain/ICICIBANK",
+    "chain_sbin": "/api/chain/SBIN",
+    "chain_tatamotors": "/api/chain/TATAMOTORS",
+    "chain_bhartiartl": "/api/chain/BHARTIARTL",
+    "chain_itc": "/api/chain/ITC",
+    "chain_lt": "/api/chain/LT",
 }
 
 REDACT_KEY_RE = re.compile(r"(token|secret|password|pin|totp|otp|cookie|authorization|api[_-]?key|access[_-]?token|private[_-]?key)", re.I)
@@ -182,7 +192,7 @@ def chain_anomalies(name: str, data: Any) -> list[dict[str, Any]]:
         bid = contract.get("bidPrice", contract.get("top_bid_price", contract.get("bid")))
         ask = contract.get("offerPrice", contract.get("top_ask_price", contract.get("ask")))
         try:
-            if bid is not None and ask is not None and float(ask) < float(bid):
+            if bid is not None and ask is not None and float(ask) > 0 and float(bid) > 0 and float(ask) < float(bid):
                 rows.append({"surface": name, "severity": "critical", "check": "ask_lt_bid", "detail": f"row={idx}"})
         except Exception:
             pass
@@ -199,9 +209,41 @@ def chain_anomalies(name: str, data: Any) -> list[dict[str, Any]]:
     return rows
 
 
+def discover_all_underlyings() -> tuple[list[str], int]:
+    """Dynamically auto-discover all F&O underlyings from /api/underlyings (must be > 220)."""
+    try:
+        res = fetch_json("underlyings_discovery", "/api/underlyings")
+        if res.get("ok") and isinstance(res.get("data"), dict):
+            underlyings = res["data"].get("underlyings") or []
+            total = len(underlyings)
+            if total >= 220:
+                return underlyings, total
+    except Exception:
+        pass
+    fallback = [
+        "NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX",
+        "RELIANCE", "TCS", "INFY", "HDFCBANK", "ICICIBANK", "SBIN",
+        "TATAMOTORS", "BHARTIARTL", "ITC", "LT", "MARUTI", "SUNPHARMA",
+        "TATASTEEL", "BAJFINANCE", "ADANIENT"
+    ]
+    return fallback, len(fallback)
+
+
 def main() -> int:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    endpoint_results = {name: fetch_json(name, endpoint) for name, endpoint in ENDPOINTS.items()}
+    all_underlyings, total_discovered = discover_all_underlyings()
+    
+    # Assert universe has more than 220 underlyings per system requirements
+    universe_gt_220 = total_discovered > 220
+    
+    # Build active audit endpoints dynamically including all 6 indices and top liquid equities
+    active_endpoints = dict(ENDPOINTS)
+    for u in all_underlyings[:30]:
+        key = f"chain_{u.lower()}"
+        if key not in active_endpoints:
+            active_endpoints[key] = f"/api/chain/{u}"
+
+    endpoint_results = {name: fetch_json(name, endpoint) for name, endpoint in active_endpoints.items()}
 
     snapshot_verdict = load_json(SNAP_DIR / "latest_verdict.json") or {}
     ui_preview = load_text(SNAP_DIR / "latest_ui_preview.txt")

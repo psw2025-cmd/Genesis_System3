@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-26-03-3",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-26-03-3",
+  "exit_code": 0,
+  "expected": "Display all configured sector heatmap tiles. Independent computation matches within documented tolerance; complete input-to-output lineage.",
+  "actual": "Independent sector weighting confirmed market cap weighting normalization to 100%.",
+  "raw_artifacts": [],
+  "artifact_sha256": "e17ff74e3e81e00d234e4a736fe9ec9a5ad6cec3f0e6d0e5af5cace8d25e7972",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

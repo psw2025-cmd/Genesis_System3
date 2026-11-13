@@ -116,7 +116,21 @@ def normalize_funds_row(item: Dict[str, Any]) -> Dict[str, Any]:
         total_f = float(total) if total is not None else None
     except (TypeError, ValueError):
         avail_f = utilized_f = total_f = None
+
+    status_str = str(item.get("status") or "").upper()
+    is_failure = (
+        status_str in {"FAILURE", "FAILED", "ERROR"}
+        or "error" in item
+        or "remarks" in item
+        or "error_code" in str(item)
+        or "DH-901" in str(item)
+        or avail_f is None
+    )
+    ok = not is_failure
     return {
+        "status": "PASS" if ok else "FAIL",
+        "ok": ok,
+        "valid": ok,
         "available_balance": avail_f,
         "utilized_amount": utilized_f,
         "total_limit": total_f,

@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "b771e640-6876-4881-9919-27b7caef42db",
+  "turn": "da72447f6c4a4c6fa01d08a0db541b09",
+  "run_id": "fb0541279801455789b3f2c088aae0fa",
+  "observed_utc": "2026-11-02T11:04:09Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 500+ Routes Live Endpoint Verification and Visual Audit",
+  "limitations": [
+    "Verified against live localhost ASGI runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "fb233ed65bc9ceaaaad2301e0d09875ab1bc3755155fa66bd0b6e573b2ae0476"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\verify_all_634_endpoints.py",
+      "sha256": "be53f7624e0e2acb2be6b620471c0e14636ba91cb1bce1f825d65dd22bf1f6bc"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T110405Z-487301dae0ec467bba062dbf61ae8eb5\\0.stdout.txt",
+      "sha256": "bf45c176f0ad3e59e6dd696d46d38a4d95d47ddb042d2d8e0001d9b5ad2651e7"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T110405Z-487301dae0ec467bba062dbf61ae8eb5\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "All 634 dynamically auto-discovered GET routes verified with HTTP 200 OK over real network socket",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Premium dashboard UI /ui verified responsive with dark theme, top tickers, charts, order book and auto-refresh",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Visual headless browser screenshot rendered, captured and validated in artifacts",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/verify_all_634_endpoints.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T11:04:05Z",
+      "elapsed_seconds": 4.047,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "6edce5f5b55029caf98cf2f69c7bf9c1a88f17a858888142c9e80aa15c96aad9"
+}

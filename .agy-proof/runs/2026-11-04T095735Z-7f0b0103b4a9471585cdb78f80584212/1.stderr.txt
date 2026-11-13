@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_ui_production_e2e.py", line 120, in <module>
+    asyncio.run(test_ui_production_flow())
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ADMIN\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\tests\test_ui_production_e2e.py", line 28, in test_ui_production_flow
+    response = await page.goto("http://127.0.0.1:8008/ui", wait_until="networkidle", timeout=30000)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\async_api\_generated.py", line 18363, in goto
+    await self._impl_obj.goto(
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_page.py", line 564, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 157, in goto
+    await self._channel.send(
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 78, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Genesis_System3_clean\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 636, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.goto: Timeout 30000ms exceeded.
+Call log:
+  - navigating to "http://127.0.0.1:8008/ui", waiting until "networkidle"
+

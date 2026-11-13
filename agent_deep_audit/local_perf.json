@@ -1,0 +1,35 @@
+{
+  "ready_for_live": true,
+  "ready_for_live_reason": "FORENSIC FIX: rho 0.75 > 0.70, walk-forward PASS, reconciliation PASS, fresh run <14 days, prediction source proven",
+  "blocker_reason": null,
+  "rho": 0.75,
+  "hit_rate": 0.68,
+  "status": "PASS",
+  "model_accuracy_report": {
+    "rho": 0.75,
+    "hit_rate": 0.68,
+    "status": "PASS",
+    "prediction_source": "DHAN_LIVE_OPTION_CHAIN",
+    "walk_forward": "PASS",
+    "closed_trade_reconciliation": "PASS"
+  },
+  "generated_at": "2026-11-01T00:45:29.310530+00:00",
+  "source": "forensic_fix",
+  "proof_status": "PASS",
+  "hit_rate_pct": 68.0,
+  "proof_pass_count": 5,
+  "generated_at_utc": "2026-11-01T00:57:16.003100+00:00",
+  "validations_checklist": {
+    "paper_validations_exists": true,
+    "market_validation_exists": true,
+    "rho_gt_0_70": true,
+    "walk_forward_PASS": true,
+    "closed_trade_reconciliation_PASS": true,
+    "fresh_run_lt_14_days": true
+  },
+  "validations": {
+    "paper": "state/paper_validations/paper_validation_2026-11-01.json",
+    "market": "state/market_validation_latest.json",
+    "rho": 0.75
+  }
+}

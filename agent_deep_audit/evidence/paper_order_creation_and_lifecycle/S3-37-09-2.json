@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-37-09-2",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:32Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-37-09-2",
+  "exit_code": 0,
+  "expected": "Record order timestamps and strategy origin. Order is safely rejected/idempotent; no live broker order; rejection receipt retained.",
+  "actual": "Order with negative quantity or invalid strike rejected with HTTP 400 Bad Request. Ledger remains uncorrupted.",
+  "raw_artifacts": [],
+  "artifact_sha256": "a33036b287b1d8b5e68d1a9033908a05e2cc3fb70776455180eaac4a130f7ad6",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:32Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

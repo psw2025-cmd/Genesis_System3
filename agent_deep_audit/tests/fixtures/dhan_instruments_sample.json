@@ -1,0 +1,6 @@
+[
+  {"token": "52175", "symbol": "NIFTY05FEB2623500CE", "name": "NIFTY", "expiry": "2026-02-05", "strike": 23500.0, "lotsize": 50, "instrumenttype": "OPTIDX", "exch_seg": "NFO", "tick_size": 0.05},
+  {"token": "52176", "symbol": "BANKNIFTY05FEB2648500PE", "name": "BANKNIFTY", "expiry": "2026-02-05", "strike": 48500.0, "lotsize": 15, "instrumenttype": "OPTIDX", "exch_seg": "NFO", "tick_size": 0.05},
+  {"token": "52177", "symbol": "NIFTY05FEB2623400PE", "name": "NIFTY", "expiry": "2026-02-05", "strike": 23400.0, "lotsize": 50, "instrumenttype": "OPTIDX", "exch_seg": "NFO", "tick_size": 0.05},
+  {"token": "1333", "symbol": "HDFCBANK-EQ", "name": "HDFCBANK", "expiry": "", "strike": 0.0, "lotsize": 1, "instrumenttype": "EQ", "exch_seg": "NSE", "tick_size": 0.05}
+]

@@ -1,0 +1,24 @@
+{
+  "at_utc": "2026-11-04T10:53:03.738689+00:00",
+  "env_checks": {
+    "PAPER_MODE": true,
+    "LIVE_TRADING_ENABLED": true,
+    "LIVE_ORDER_AUTHORITY": true,
+    "REAL_BROKER_ORDERS": true,
+    "AUTO_EXECUTE_TRADES": true
+  },
+  "readonly_order_guards": {
+    "place_order": "PASS_BLOCKED",
+    "modify_order": "PASS_BLOCKED",
+    "cancel_order": "PASS_BLOCKED",
+    "place_super_order": "PASS_BLOCKED",
+    "modify_super_order": "PASS_BLOCKED",
+    "cancel_super_order": "PASS_BLOCKED",
+    "place_forever": "PASS_BLOCKED",
+    "modify_forever": "PASS_BLOCKED",
+    "cancel_forever": "PASS_BLOCKED",
+    "place_slice_order": "PASS_BLOCKED",
+    "kill_switch": "PASS_BLOCKED"
+  },
+  "scope": "DhanReadOnly adapter methods only; not all broker paths or deployed cloud"
+}

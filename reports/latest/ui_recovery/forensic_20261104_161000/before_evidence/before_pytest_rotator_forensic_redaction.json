@@ -1,0 +1,9 @@
+{
+  "name": "before_pytest_rotator_forensic_redaction",
+  "command": "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe -m pytest -q tests/test_dhan_rotator_forensic_redaction.py",
+  "exit_code": 2,
+  "duration_sec": 4.684,
+  "timestamp_utc": "2026-11-04T10:40:30.030348+00:00",
+  "stdout": "\n=================================== ERRORS ====================================\n_______ ERROR collecting tests/test_dhan_rotator_forensic_redaction.py ________\nImportError while importing test module 'C:\\Genesis_System3_clean\\tests\\test_dhan_rotator_forensic_redaction.py'.\nHint: make sure your test modules/packages have valid Python names.\nTraceback:\nC:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python312\\Lib\\importlib\\__init__.py:90: in import_module\n    return _bootstrap._gcd_import(name[level:], package, level)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\ntests\\test_dhan_rotator_forensic_redaction.py:4: in <module>\n    from scripts.gcp_dhan_rotator_forensic import _redact\nE   ModuleNotFoundError: No module named 'scripts.gcp_dhan_rotator_forensic'\n=========================== short test summary info ===========================\nERROR tests/test_dhan_rotator_forensic_redaction.py\n!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!\n",
+  "stderr": ""
+}

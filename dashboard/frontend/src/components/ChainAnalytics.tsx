@@ -2,7 +2,12 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { API_BASE } from '../config'
 
-const UNDERLYINGS = ['NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX']
+const UNDERLYINGS = [
+  'NIFTY', 'BANKNIFTY', 'FINNIFTY', 'MIDCPNIFTY', 'SENSEX',
+  'RELIANCE', 'TCS', 'INFY', 'HDFCBANK', 'ICICIBANK', 'SBIN',
+  'TATAMOTORS', 'BHARTIARTL', 'ITC', 'LT', 'MARUTI', 'SUNPHARMA',
+  'TATASTEEL', 'BAJFINANCE', 'ADANIENT'
+]
 
 export default function ChainAnalytics() {
   const [selectedUnderlying, setSelectedUnderlying] = useState('NIFTY')

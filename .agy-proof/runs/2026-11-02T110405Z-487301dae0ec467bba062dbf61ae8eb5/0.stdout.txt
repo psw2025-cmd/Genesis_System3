@@ -1,0 +1,14 @@
+Connecting to Genesis System3 service at http://127.0.0.1:8008...
+Total routes discovered via /api/routes: 634
+Tested 100/634 routes... (Success: 100, Fail: 0)
+Tested 200/634 routes... (Success: 200, Fail: 0)
+Tested 300/634 routes... (Success: 300, Fail: 0)
+Tested 400/634 routes... (Success: 400, Fail: 0)
+Tested 500/634 routes... (Success: 500, Fail: 0)
+Tested 600/634 routes... (Success: 600, Fail: 0)
+Tested 634/634 routes... (Success: 634, Fail: 0)
+
+Completed testing 634 endpoints in 3.43s.
+Passed: 634 | Failed: 0
+UI verification passed: HTTP 200, length 21840 bytes.
+Audit report saved to reports\latest\genesis_endpoints_audit.json

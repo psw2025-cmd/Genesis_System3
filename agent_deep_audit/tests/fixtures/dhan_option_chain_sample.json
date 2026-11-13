@@ -1,0 +1,68 @@
+{
+  "status": "success",
+  "data": {
+    "last_price": 24500.5,
+    "data": [
+      {
+        "strike_price": 24400,
+        "last_price": 24500.5,
+        "ce": {
+          "security_id": "52175",
+          "last_price": 180.5,
+          "previous_close_price": 170.0,
+          "oi": 12000,
+          "previous_oi": 11000,
+          "volume": 5500,
+          "previous_volume": 5000,
+          "top_bid_price": 179.5,
+          "top_bid_quantity": 150,
+          "top_ask_price": 181.0,
+          "top_ask_quantity": 200,
+          "implied_volatility": 17.25,
+          "average_price": 180.0,
+          "greeks": {
+            "delta": 0.62,
+            "gamma": 0.0009,
+            "theta": -4.8,
+            "vega": 11.5
+          }
+        },
+        "pe": {
+          "security_id": "52176",
+          "last_price": 95.0,
+          "previous_close_price": 90.0,
+          "oi": 8000,
+          "previous_oi": 8500,
+          "volume": 3200,
+          "previous_volume": 3000,
+          "top_bid_price": 94.5,
+          "top_bid_quantity": 100,
+          "top_ask_price": 95.5,
+          "top_ask_quantity": 120,
+          "implied_volatility": 16.8,
+          "average_price": 94.8,
+          "greeks": {
+            "delta": -0.38,
+            "gamma": 0.0008,
+            "theta": -3.9,
+            "vega": 10.2
+          }
+        }
+      },
+      {
+        "strike_price": 24500,
+        "ce": {
+          "security_id": "52177",
+          "last_price": null,
+          "oi": null,
+          "previous_oi": null,
+          "top_bid_price": null,
+          "top_ask_price": null,
+          "implied_volatility": null,
+          "greeks": null
+        },
+        "pe": {}
+      }
+    ]
+  }
+}

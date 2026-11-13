@@ -1,0 +1,108 @@
+{
+  "at_utc": "2026-11-04T10:10:03.586957+00:00",
+  "master_path": "C:\\Genesis_System3_clean\\storage\\instruments\\api-scrip-master-detailed.csv",
+  "master_rows": 201786,
+  "master_columns": [
+    "EXCH_ID",
+    "SEGMENT",
+    "SECURITY_ID",
+    "ISIN",
+    "INSTRUMENT",
+    "UNDERLYING_SECURITY_ID",
+    "UNDERLYING_SYMBOL",
+    "SYMBOL_NAME",
+    "DISPLAY_NAME",
+    "INSTRUMENT_TYPE",
+    "SERIES",
+    "LOT_SIZE",
+    "SM_EXPIRY_DATE",
+    "STRIKE_PRICE",
+    "OPTION_TYPE",
+    "TICK_SIZE",
+    "EXPIRY_FLAG",
+    "BRACKET_FLAG",
+    "COVER_FLAG",
+    "ASM_GSM_FLAG",
+    "ASM_GSM_CATEGORY",
+    "BUY_SELL_INDICATOR",
+    "BUY_CO_MIN_MARGIN_PER",
+    "BUY_CO_SL_RANGE_MAX_PERC",
+    "BUY_CO_SL_RANGE_MIN_PERC",
+    "BUY_BO_MIN_MARGIN_PER",
+    "BUY_BO_PROFIT_RANGE_MAX_PERC",
+    "BUY_BO_PROFIT_RANGE_MIN_PERC",
+    "MTF_LEVERAGE",
+    "SM_UPPER_LIMIT",
+    "SM_LOWER_LIMIT",
+    "SM_FREEZE_QTY",
+    ""
+  ],
+  "cached_chain_symbols": [
+    "BANKEX",
+    "BANKNIFTY",
+    "COLPAL",
+    "FINNIFTY",
+    "MIDCPNIFTY",
+    "NIFTY",
+    "RELIANCE",
+    "SENSEX"
+  ],
+  "fresh_cache_symbols": [],
+  "equity_cached_symbols": [
+    "COLPAL",
+    "RELIANCE"
+  ],
+  "inventory": {
+    "total_instruments": 60,
+    "local_stream_symbols": 60,
+    "discovered_fo_underlyings": 228,
+    "nse_equity_fo_target": 219,
+    "master_instruments_total": 210520,
+    "master_downloaded_at_utc": "2026-11-04T09:42:46.863931+00:00",
+    "fo_contracts_count": 117776,
+    "verified_chain_snapshots_count": 8,
+    "verified_chain_contracts_count": 929,
+    "nifty_chain_contracts_count": 171,
+    "options_gainers_displayed_count": 60,
+    "ui_top_movers_badge_capacity": 80,
+    "per_symbol_chain_contracts": {
+      "BANKEX": 23,
+      "BANKNIFTY": 204,
+      "COLPAL": 46,
+      "FINNIFTY": 72,
+      "MIDCPNIFTY": 124,
+      "NIFTY": 171,
+      "RELIANCE": 71,
+      "SENSEX": 218
+    },
+    "chain_cache_oldest_mtime_ist": "2026-10-31T02:53:00.232697+05:30",
+    "chain_cache_newest_mtime_ist": "2026-11-01T05:44:07.924676+05:30",
+    "chain_cache_newest_age_seconds": 294955.3,
+    "chain_cache_oldest_age_seconds": 391623.0,
+    "chain_cache_fresh_snapshots_count": 0,
+    "chain_cache_status": "STALE_OR_INCOMPLETE_CACHE",
+    "indices_count": 6,
+    "equity_fo_snapshots": [
+      "RELIANCE",
+      "COLPAL"
+    ],
+    "equity_fo_cached_count": 2,
+    "equity_fo_missing_live_chains_count": 217,
+    "cash_equities_count": 55,
+    "sectors_monitored": 14,
+    "status": "RECONCILED_MULTI_SCOPE_UNIVERSE"
+  },
+  "paper_safety": {
+    "paper_mode": true,
+    "live_trading_enabled": false,
+    "live_order_authority": 0
+  },
+  "paper_ledger": {
+    "keys": [
+      "open_trades",
+      "reconciled_trades",
+      "closed_summary"
+    ],
+    "status": null
+  }
+}

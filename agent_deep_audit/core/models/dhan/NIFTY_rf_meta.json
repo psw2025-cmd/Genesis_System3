@@ -1,0 +1,24 @@
+{
+  "underlying": "NIFTY",
+  "n_rows": 600,
+  "features": [
+    "strike",
+    "ltp",
+    "spot",
+    "moneyness",
+    "atm_dist_abs",
+    "atm_dist_pct",
+    "ltp_chg_1_pct",
+    "spot_chg_1_pct",
+    "ltp_roll_std_5",
+    "spot_roll_std_5",
+    "ce_pe_diff",
+    "side_enc"
+  ],
+  "label_map": {
+    "HOLD": 0,
+    "BUY_CE": 1,
+    "BUY_PE": 2
+  },
+  "train_accuracy": 1.0
+}

@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "b771e640-6876-4881-9919-27b7caef42db",
+  "turn": "6a75504840ee4a9e8a49b3af2643e5d1",
+  "run_id": "c66f8f16e81e43809e575c11b04f5174",
+  "observed_utc": "2026-11-02T11:50:43Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Dhan Full-Market Scanning Daemon & Router Verification",
+  "limitations": [
+    "Verified against live localhost runtime; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "5cd74cea752593edd27681e6c0c1da8ffc9963ee86f8f12ed5f14152ad8adfc9"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\engine\\dhan_full_market_scanner.py",
+      "sha256": "89971c2d3d098fd8308d11ff021bcea31619a525fd4090345a37411294a37484"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_dhan_full_market_daemon.py",
+      "sha256": "0401da721040bf23a8e7beb87043b949787142f446ebc6ae84712ffa89fb3b20"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T115036Z-58b4ca2349bb4329b74e7a9f3625be61\\0.stdout.txt",
+      "sha256": "60cb6926ee57da48da01dda395a6475cfbb4d9b4759b74c1f2a8531dbb49f325"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T115036Z-58b4ca2349bb4329b74e7a9f3625be61\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Full-Market Discovery: Ingests Dhan scrip master and discovers 180+ liquid F&O underlyings with auto-filtering",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Dynamic Chain Subscriptions: Generates 5 ITM + 5 OTM strikes around ATM and Dhan WebSocket subscription packet",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Broker Execution Binding: Maps dynamic Dhan payload and enforces PAPER/ANALYZER safety locks (LIVE_ORDER_AUTHORITY=0)",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_dhan_full_market_daemon.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T11:50:36Z",
+      "elapsed_seconds": 6.829,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "fd322864e4696cff7d315963f941da59ac4ec5a968a510a59b1705ba9caa96cc"
+}

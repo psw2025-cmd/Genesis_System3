@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "466270f2-eadd-453e-ac62-5e4f9ea2a85d",
+  "turn": "9ef8ac28a2584cbd997993ee7efc1abc",
+  "run_id": "085d642ae52f44ca85403c18711a71f1",
+  "observed_utc": "2026-11-11T12:59:27Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Permanent self-healing Dhan token auto-renewal engine and multi-tier resilience: auto-recovery from expired tokens, proactive pre-emptive renewal before expiry, multi-tier fallback ladder, permanent PAPER mode safety, zero token leakage, rate-limit cooldown handling, and prevention of future BLOCKED states.",
+  "limitations": [
+    "Read-only/analyzer-only Dhan credential rotation; live trading locked to OFF; no real broker orders; PAPER mode enforced."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "34864c0db3f8f9921b2034cb6b0ff0e3329f368144614dfbf46e18fcd4af04fd"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\brokers\\dhan\\cloud_runtime_patch.py",
+      "sha256": "5feb2801f17a944a2a8f495e6cb5ceec227c4ae07a4dca40ddf4794e6611299d"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\brokers\\dhan\\token_watchdog.py",
+      "sha256": "5ab23420afdaa6afd396b427e02fcb89b3b961c0adfb0e83bd680cb6b32eef59"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\core\\utils\\env_loader.py",
+      "sha256": "82411415313ad8c89a1c7292c3d6a441425b442a54ef79c21d24463934c40f05"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\dhan_token_auto_refresh.py",
+      "sha256": "5aaf6eb367ba01dd71ee2e8ffc885319793926cdc9d7ed5d5d2a6c8870f675fe"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\scripts\\gcp_dhan_token_rotation_job.py",
+      "sha256": "7f474dcdf9fe37178e6d91248ea460698cadf83474e510d6f6da4e9603952653"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_dhan_token_auto_renewal.py",
+      "sha256": "10ceb1a23d10a674957ba684201a706ab213c6ea1d2ae7da3bde0174abf789e2"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tools\\dhan-rotator\\main.py",
+      "sha256": "316ffb38c61c06211689b65d64ab2768de8b740f05b542a8d1c03b643e136478"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\0.stdout.txt",
+      "sha256": "05fefc171cbd4b9927db73addda9facf66d8caf58df20fca09fdab1c371959c7"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\1.stdout.txt",
+      "sha256": "b20ada91f9eed3d024d4915128d87de210e8b31cc15b1a8d6934cd5179a964e2"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\1.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\2.stdout.txt",
+      "sha256": "e59dfcd9fec1c53e33f23ec5c52859955e37d1169fe39e7ebdaf9f300577b7e7"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T125917Z-16de47a1ad4744259b6ddcd9b01e9dc3\\2.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Auto-recovery from expired or missing token: when old token is expired or missing, auto-rotation mints and validates a fresh token via DhanLogin and profile probe without system interruption.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Proactive pre-emptive renewal before expiry: watchdog proactively rotates expiring tokens (<= 3.0h remaining) before they ever expire, and skips healthy tokens.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Multi-tier fallback and resilience: fast in-session renew fallback to PIN+TOTP minting; Cloud Run API failure fallback to in-process canonical rotation; Secret Manager failure fallback to local vault/.secrets/dhan.env.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Permanent PAPER safety, zero secret leakage, and order authority lockout: LIVE_ORDER_AUTHORITY=0, LIVE_TRADING_ENABLED=0, ORDER_PLACEMENT_ALLOWED=false under all conditions, with zero token/secret leakage.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Comprehensive test suite pass: all Dhan tests pass with zero regressions, and rate-limit/cooldown handling prevents future deadlocks.",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_token_auto_renewal.py",
+        "-v"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T12:59:17Z",
+      "elapsed_seconds": 2.281,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C2",
+      "requirement_ids": [
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_single_token_authority.py",
+        "-v"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T12:59:19Z",
+      "elapsed_seconds": 2.812,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    },
+    {
+      "id": "C3",
+      "requirement_ids": [
+        "R1",
+        "R4",
+        "R5"
+      ],
+      "kind": "unit_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "-m",
+        "pytest",
+        "tests/test_dhan_canonical_rotation_readonly.py",
+        "tests/test_br1_dhan_auth_reliability.py",
+        "tests/test_br2_dhan_terminal_no_retry.py",
+        "-v"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T12:59:22Z",
+      "elapsed_seconds": 5.016,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "7c451ffb2ef40234746070f95308762809206b3c95d3444cd40692533a23284d"
+}

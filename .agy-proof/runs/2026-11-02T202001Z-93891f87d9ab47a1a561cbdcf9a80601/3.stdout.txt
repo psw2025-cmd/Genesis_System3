@@ -1,0 +1,6 @@
+=== Running Genesis System3 Telegram Downstream Test Suite ===
+PASS: TelegramNotifier identity and paper mode verified.
+PASS: Formatting engine accurately renders signals, RMS alerts, and paper receipts.
+PASS: Outbox persistence verified. Total entries logged: 5.
+PASS: Inbound command processor (/status, /risk, /pnl, /chains) verified.
+PASS: Scanner order bind auto-dispatch to Telegram outbox verified.

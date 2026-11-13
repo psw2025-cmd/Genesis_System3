@@ -1,0 +1,158 @@
+[
+  {
+    "date": "2026-11-02",
+    "time": "23:32:27",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "NIFTY",
+        "gain_score": 71.03,
+        "expected_move_pct": 0.003,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "BANKNIFTY",
+        "gain_score": 68.15,
+        "expected_move_pct": 0.03,
+        "recommendation": "TRADE"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-02",
+    "time": "23:36:55",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 74.41,
+        "expected_move_pct": 0.04,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 71.02,
+        "expected_move_pct": 0.003,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 68.15,
+        "expected_move_pct": 0.03,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "FINNIFTY",
+        "gain_score": 31.65,
+        "expected_move_pct": 0.032,
+        "recommendation": "SKIP"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-02",
+    "time": "23:36:55",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 74.41,
+        "expected_move_pct": 0.04,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 71.02,
+        "expected_move_pct": 0.003,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 68.15,
+        "expected_move_pct": 0.03,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "FINNIFTY",
+        "gain_score": 31.65,
+        "expected_move_pct": 0.032,
+        "recommendation": "SKIP"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-02",
+    "time": "23:42:24",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 74.41,
+        "expected_move_pct": 0.04,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 71.02,
+        "expected_move_pct": 0.003,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 68.15,
+        "expected_move_pct": 0.03,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "FINNIFTY",
+        "gain_score": 31.65,
+        "expected_move_pct": 0.032,
+        "recommendation": "SKIP"
+      }
+    ]
+  },
+  {
+    "date": "2026-11-02",
+    "time": "23:42:25",
+    "predictions": [
+      {
+        "rank": 1,
+        "underlying": "MIDCPNIFTY",
+        "gain_score": 74.41,
+        "expected_move_pct": 0.04,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 2,
+        "underlying": "NIFTY",
+        "gain_score": 71.02,
+        "expected_move_pct": 0.003,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 3,
+        "underlying": "BANKNIFTY",
+        "gain_score": 68.15,
+        "expected_move_pct": 0.03,
+        "recommendation": "TRADE"
+      },
+      {
+        "rank": 4,
+        "underlying": "FINNIFTY",
+        "gain_score": 31.65,
+        "expected_move_pct": 0.032,
+        "recommendation": "SKIP"
+      }
+    ]
+  }
+]

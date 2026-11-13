@@ -1,0 +1,41 @@
+{
+  "date": "2026-11-11",
+  "timestamp": "2026-11-11T15:40:00+00:00",
+  "spearman_correlation": 0.80,
+  "hit_rate": 0.78,
+  "status": "PASS",
+  "reconciliation_complete": true,
+  "closed_trade_ids": [
+    "PAPER_TR_20261111_001",
+    "PAPER_TR_20261111_002"
+  ],
+  "costed_walk_forward_pass": true,
+  "walk_forward_trades": 20,
+  "actual_details": [
+    {
+      "underlying": "NIFTY",
+      "combined_gain_score": 76.5,
+      "actual_rank": 1
+    },
+    {
+      "underlying": "MIDCPNIFTY",
+      "combined_gain_score": 72.8,
+      "actual_rank": 2
+    },
+    {
+      "underlying": "BANKNIFTY",
+      "combined_gain_score": 68.4,
+      "actual_rank": 3
+    },
+    {
+      "underlying": "FINNIFTY",
+      "combined_gain_score": 38.2,
+      "actual_rank": 4
+    }
+  ],
+  "source_evidence": {
+    "predictions_sha256": "b30b52d3001955ee6551e51cda4a062ef8c4756fb6a274c9c8b94ca9a21dc94b",
+    "outcomes_sha256": "b5d5b0035dc0933485a3e76407922f02a8cca2178301bdfb9034a5f25ea984df",
+    "closed_trades_sha256": "f552e6321323d5d4fdd9ba4eb5c611053bd554718fa337fd5fc62ba6c3d1f40b"
+  }
+}

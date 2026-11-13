@@ -1,0 +1,24 @@
+{
+  "status": "ok",
+  "total_cycles": 1480,
+  "refresh_interval": 5,
+  "last_data_fetch": "2026-11-11T23:25:05Z",
+  "is_connected": true,
+  "broker_status": "connected",
+  "data_source": "dhan",
+  "qc_status": "PASS",
+  "contracts_total": 3102,
+  "underlyings": 6,
+  "qc_failures": [],
+  "mode": "PAPER",
+  "trades_executed": 12,
+  "open_positions": 1,
+  "total_pnl": 15499.0,
+  "daily_pnl": 14546.5,
+  "performance_sla": {
+    "cycle_duration_sec": 0.42,
+    "fetch_duration_sec": 0.28,
+    "strategy_duration_sec": 0.14,
+    "sla_pass": true
+  }
+}

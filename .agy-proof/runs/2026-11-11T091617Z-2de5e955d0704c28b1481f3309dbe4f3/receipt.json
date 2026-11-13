@@ -1,0 +1,84 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "85edced3-3652-47c7-8ffb-4da992baa163",
+  "turn": "8c894039d1d4443b8599a5bab7ac57a8",
+  "run_id": "be58f6d3101b4436a912a63878b8d390",
+  "observed_utc": "2026-11-11T09:16:20Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Creation and verification of FINAL_CONSOLIDATION_PLAN.xlsx based on FEATURE_TRUTH_MATRIX.xlsx with 4 sheets (P0_CRITICAL_MERGES, P1_IMPORTANT_MERGES, P2_OPTIONAL_MERGES, SAFE_REMOVE_AFTER_MERGE), exact source lines, destination files, and CONSOLIDATION_SCORECARD",
+  "limitations": [
+    "Analytical and consolidation planning; paper and analyze modes preserved; no real orders; source code files not modified."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "e1b7433c317babc5e2590639bf165d86c90e45eaf17020989b75bb060e792732"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\FINAL_CONSOLIDATION_PLAN.xlsx",
+      "sha256": "448a9c111c04c2c6570b871163332541526ef745dc4dd9178941b331e4ec2307"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\verify_consolidation_plan.py",
+      "sha256": "5142664a8c91b29a51d26dc430a5e38f9236ca41d3f52f6fb6eff3b46ed05286"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T091617Z-2de5e955d0704c28b1481f3309dbe4f3\\0.stdout.txt",
+      "sha256": "9b734aac37e0609d2e080a10ecfdc2f452c1b5738abaf1e17ceed30cd7753d56"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-11T091617Z-2de5e955d0704c28b1481f3309dbe4f3\\0.stderr.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "FINAL_CONSOLIDATION_PLAN.xlsx exists and contains all 4 required sheets: P0_CRITICAL_MERGES, P1_IMPORTANT_MERGES, P2_OPTIONAL_MERGES, SAFE_REMOVE_AFTER_MERGE",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "All merge rows in P0, P1, P2 have valid non-empty fields for Priority, Source File (with exact line numbers), Source Function, Destination File, Destination Function, Dependencies, Risk, Estimated Code Size, and Merge Order covering all 42 candidate items from FEATURE_TRUTH_MATRIX.xlsx, and SAFE_REMOVE_AFTER_MERGE has 26 verified removal entries",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:\\Genesis_System3_clean\\.venv\\Scripts\\python.exe",
+        "tests/verify_consolidation_plan.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-11T09:16:17Z",
+      "elapsed_seconds": 3.0,
+      "exit_code": 0,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "actual": true,
+        "expected": true
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "835484adc9aabd178e0545aae59a4ab70fb83f4fe109ad3c819c6cbda30db445"
+}

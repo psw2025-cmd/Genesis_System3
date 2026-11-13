@@ -1,0 +1,10 @@
+Connecting to live server at http://127.0.0.1:8008...
+[1. Auto-Find] Discovered: 228 F&O underlyings (228 liquid filtered)
+[2. Auto-Work] NIFTY: Spot 25447.86 -> ATM 25450 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] BANKNIFTY: Spot 57815.19 -> ATM 57800 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] RELIANCE: Spot 1307.77 -> ATM 1300 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[2. Auto-Work] TCS: Spot 3355.0 -> ATM 3350 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items
+[3. Order Execution Binding] NIFTY 25500.0 CE -> Mode: PAPER | ID: ORD-DHAN-PAPER-1793630948
+[3. Order Execution Binding] BANKNIFTY 57500.0 PE -> Mode: PAPER | ID: ORD-DHAN-PAPER-1793630948
+[3. Order Execution Binding] RELIANCE 1320.0 CE -> Mode: PAPER | ID: ORD-DHAN-PAPER-1793630948
+ALL AUTONOMOUS MARKET DISCOVERY & ROUTING CHECKS PASSED!

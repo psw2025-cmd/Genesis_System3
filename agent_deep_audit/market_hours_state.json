@@ -1,0 +1,7 @@
+{
+  "market_state": "MARKET_OPEN",
+  "is_market_open": true,
+  "current_time": "09:45:00",
+  "simulated": true,
+  "reason": "DEMO_SIMULATION"
+}

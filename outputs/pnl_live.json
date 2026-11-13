@@ -1,0 +1,18 @@
+{
+  "timestamp": "2026-11-11T23:25:05.552082+00:00",
+  "timestamp_ist": "2026-11-12 04:55:05 IST",
+  "total_trades": 12,
+  "winning_trades": 8,
+  "losing_trades": 4,
+  "win_rate": 0.6667,
+  "total_realized_pnl": 14546.5,
+  "total_unrealized_pnl": 952.5,
+  "total_pnl": 15499.0,
+  "realized_pnl": 14546.5,
+  "unrealized_pnl": 952.5,
+  "avg_pnl_per_trade": 1212.21,
+  "open_positions": 1,
+  "mode": "PAPER_VERIFIED_FORWARD",
+  "live_trading_enabled": false,
+  "provenance": "ROLLING_FORWARD_20261111_COSTED_PASS"
+}

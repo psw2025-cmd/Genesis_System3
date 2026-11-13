@@ -1,0 +1,16 @@
+{
+  "schema": 1,
+  "deploy_target": "local-laptop",
+  "cloud_provider": "local",
+  "region": "",
+  "project_id": "",
+  "service_name": "local-laptop",
+  "public_base_url": "http://127.0.0.1:8000",
+  "public_origin_aliases": [],
+  "ui_path": "/ui",
+  "notes": [
+    "Default development/runtime host is the local laptop loopback URL.",
+    "Frontend dev server should target http://127.0.0.1:8000 for API access.",
+    "Environment variables may still override these defaults when needed."
+  ]
+}

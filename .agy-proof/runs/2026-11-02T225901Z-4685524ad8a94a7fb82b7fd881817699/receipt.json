@@ -1,0 +1,114 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "3957d29d-e75a-4a9f-86fb-5d267e6799ee",
+  "turn": "eee0a08069af47198b31da16189f3fd6",
+  "run_id": "dc8b585300244018beea9796d828bd0f",
+  "observed_utc": "2026-11-02T22:59:05Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Emergency P0 UI Recovery Mission — Dhan Auth, Market Data Trace, Options Gainers (Equity & Index F&O), Verified Quotes, Paper Ledger & Prediction Accuracy Integration",
+  "limitations": [
+    "Verified against live localhost ASGI runtime at port 8008; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "6f4cae74f334f62ae87db946c89a39cd2ceefaf896b0cb0b3b6513b638feb4d2"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\verified_market.py",
+      "sha256": "0ba45505da100a75804dd3c25daa019c40cadd9a192e6fd2171313d120bc1b76"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\templates\\premium.html",
+      "sha256": "af2bd07e144402a7b0441993c54f9ab052aff198a35a61b23e7555ee5ddb55df"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\app.py",
+      "sha256": "517d504b99aabd7dc903b99230cc9c8d24aee3ac32022969dbc9f56c4e797786"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_ui_p0_recovery_mission.py",
+      "sha256": "f47cc8dd63da16ca1c74e67dbff846535945dc0ae4c4a32a46fb4b38c8a8e606"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\state\\market_top_ce_pe.json",
+      "sha256": "509db7ac1d60dded63021da3fedbc6a5bd1e9b437e5bc0ee0bac548cf8e3a9f1"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T225901Z-4685524ad8a94a7fb82b7fd881817699\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-02T225901Z-4685524ad8a94a7fb82b7fd881817699\\0.stderr.txt",
+      "sha256": "6e4b8d49a4c00317807802ef6178425ab3642aceeeffa30b78b5b512f27d8959"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Dhan Authentication & Live Quote Verification: Rotates token via GCP Secret Manager TOTP, recovers /api/verified-market with HTTP 200 and BROKER_QUOTES_RECEIVED.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Restoration of Verified CE & PE Movers for Equity F&O and Indices: Ingests 80 verified contracts including COLPAL, RELIANCE, NIFTY, BANKNIFTY, SENSEX, FINNIFTY, MIDCPNIFTY, and BANKEX.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Exchange-Timestamped Quotes & Stale Data Segregation: Displays NIFTY, BANKNIFTY, SENSEX with LAST_TRADE status and original exchange IST timestamps during market closure.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Verifiable Paper Trade Ledger & Prediction Accuracy: Eliminates fabricated mock metrics; displays 1 proven lifecycle paper trade (Net -15.00 INR) and 5 ML forecast batches.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Full Frontend UI Integration & Safety Locks: Renders Command Center, Top Ticker Bar, and Options Movers at http://localhost:8008/ui with PAPER_MODE=1 and 0 real broker orders.",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_ui_p0_recovery_mission.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-02T22:59:01Z",
+      "elapsed_seconds": 3.844,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "b56d65504cd475fc2819c4639a1b43b6930e31ff5540c66a88cc1a7503d00a66"
+}

@@ -1,0 +1,13 @@
+Connecting to live Genesis System3 server at http://127.0.0.1:8008...
+Discovered 653 registered GET endpoints.
+Tested 100/653 URL endpoints... (Passed: 99, Failed: 1)
+Tested 200/653 URL endpoints... (Passed: 199, Failed: 1)
+Tested 300/653 URL endpoints... (Passed: 299, Failed: 1)
+Tested 400/653 URL endpoints... (Passed: 399, Failed: 1)
+Tested 500/653 URL endpoints... (Passed: 499, Failed: 1)
+Tested 600/653 URL endpoints... (Passed: 599, Failed: 1)
+Tested 653/653 URL endpoints... (Passed: 652, Failed: 1)
+
+Completed complete analysis of 653 URL paths in 11.09s.
+Total Passed: 652 | Total Failed: 1
+Complete URL paths analysis saved to reports\latest\complete_url_paths_analysis.json

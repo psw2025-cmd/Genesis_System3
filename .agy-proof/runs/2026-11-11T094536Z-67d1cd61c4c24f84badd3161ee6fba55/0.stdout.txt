@@ -1,0 +1,27 @@
+{
+  "verified": true,
+  "file_path": "CLOUD_GITHUB_TRUTH.xlsx",
+  "sheets_verified": [
+    "DEPLOYMENT_CHAIN",
+    "GITHUB_FILE_HASHES",
+    "CLOUD_FILE_HASHES",
+    "HASH_COMPARISON",
+    "DRIFT_REPORT"
+  ],
+  "sheet_stats": {
+    "DEPLOYMENT_CHAIN": 10,
+    "GITHUB_FILE_HASHES": 4,
+    "CLOUD_FILE_HASHES": 8,
+    "HASH_COMPARISON": 12,
+    "DRIFT_REPORT": 8
+  },
+  "target_files_count": 4,
+  "deployment_points_verified": [
+    "GitHub Commit SHA",
+    "GitHub Branch",
+    "Dockerfile used by build",
+    "Cloud Build source revision",
+    "Cloud Run revision",
+    "Cloud Run image digest"
+  ]
+}

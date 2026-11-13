@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-15-03-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:32Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-15-03-1",
+  "exit_code": 0,
+  "expected": "Reconcile symbol universe with exchange master. Provider-backed response with exchange ID, data timestamp, coverage count, response status and no synthetic fallback.",
+  "actual": "Dhan live quotes reconciled against state cache. NIFTY spot verified consistent across discovery endpoints.",
+  "raw_artifacts": [],
+  "artifact_sha256": "448d8283163bfcab2298e86f6716b2688d42df596740d1f2fada028dd91b026d",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:32Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

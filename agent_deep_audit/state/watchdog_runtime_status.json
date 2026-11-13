@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-12-10T08:21:18.722015",
+  "watchdog_pid": 18008,
+  "master_pid": 21832,
+  "master_running": true,
+  "restarts_today": 0,
+  "restart_date": "2025-12-10",
+  "heartbeat_stale": false,
+  "heartbeat_age_seconds": 53.040627,
+  "overall_status": "GREEN"
+}

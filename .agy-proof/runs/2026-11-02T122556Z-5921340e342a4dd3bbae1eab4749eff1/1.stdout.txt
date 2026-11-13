@@ -1,0 +1,3 @@
+Executing Autonomous Market-Wide Scrip & Chain Discovery Audit against http://127.0.0.1:8008...
+[1. Auto-Find] Discovered: 228 F&O underlyings (228 liquid filtered)
+[2. Auto-Work] NIFTY: Spot 25447.86 -> ATM 23050 | CE Strikes: 11, PE Strikes: 11 | WS Packet: 22 items

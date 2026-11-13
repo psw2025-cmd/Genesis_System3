@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Open System3 Dashboard (local)",
+      "type": "shell",
+      "command": "start",
+      "args": ["http://127.0.0.1:8000/ui/"],
+      "windows": {
+        "command": "start",
+        "args": ["http://127.0.0.1:8000/ui/"]
+      },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Open Backend API Docs (local)",
+      "type": "shell",
+      "command": "start",
+      "args": ["http://127.0.0.1:8000/docs"],
+      "windows": {
+        "command": "start",
+        "args": ["http://127.0.0.1:8000/docs"]
+      },
+      "presentation": { "reveal": "silent", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start Dashboard Backend (FastAPI)",
+      "type": "shell",
+      "command": "python",
+      "args": [
+        "-m",
+        "uvicorn",
+        "dashboard.backend.app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8000"
+      ],
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-32-03-1",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:33Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-32-03-1",
+  "exit_code": 0,
+  "expected": "Track directional hit rate with confidence interval. Versioned and timestamped model artifact or forecast with observed inputs and no future leakage.",
+  "actual": "Model calibration monitored: Brier score, Expected Calibration Error (ECE), and population drift index tracked.",
+  "raw_artifacts": [],
+  "artifact_sha256": "2a989b40e8ca57091ff205613568841d6b899069f05715ca9ee35e7f066e3b05",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:33Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

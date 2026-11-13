@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "3957d29d-e75a-4a9f-86fb-5d267e6799ee",
+  "turn": "de99c298e1b44e0f858e2d35bfe52f76",
+  "run_id": "6f6c517a1b4e45be8f0956d9ff971b86",
+  "observed_utc": "2026-11-01T02:40:56Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "System3 Localhost UI & Backend Full Analysis, Error Resolution and Visual Verification",
+  "limitations": [
+    "Localhost analysis and visual audit only; cloud deployment and external mutations strictly held until separate owner direction"
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "1a76eb609bbe5a416c05af91199767f503b147e837425e28c6d84763c333378f"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\app.py",
+      "sha256": "3aa5dbe36703b96978c19f6ceaba21124293778faa143d55629dfd899046a9d4"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\backend\\routers\\ml.py",
+      "sha256": "db01b234c6062f9b60ba1c2bfa5e1c50a279829224f8fcc6fcdaa6356e048923"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\frontend\\src\\lib\\lifecycleTruth.ts",
+      "sha256": "8dd3fb4b0f94c4ad2837992970ba5e66457eda6e7ccb4a30c3f6c17561daa54a"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\frontend\\src\\components\\EndToEndProof.tsx",
+      "sha256": "035e2c0433e0320b267450b78d81236cae92510e70be4207a6ffdb990313f9dd"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\frontend\\src\\components\\RiskDashboard.tsx",
+      "sha256": "7cbcecd887282215023bc4dbea2dbcc4fa73e90676285d6e33e5f9943e9b14d6"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\dashboard\\frontend\\src\\components\\GenesisTab.tsx",
+      "sha256": "b89e4805c20f784e991f586976c3bca08c4ceb009470c15413ff4246973baf63"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_local_ui_visual_parity.py",
+      "sha256": "af89e372f6013141fb406efff4c53aeb3e7733ba2358edecfe6374bcb0190cde"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\reports\\latest\\ui_analysis\\visual_verification_report.json",
+      "sha256": "2829f5eb0d4f354a725ff7c7607977df3761801c6ffdce71b3c7863a5ac80085"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-01T024051Z-06c81e33e175488f89e2ad4bee0e9843\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-01T024051Z-06c81e33e175488f89e2ad4bee0e9843\\0.stderr.txt",
+      "sha256": "a9a09f4478939b3bf7d57202c3c0a691eadea37fdc03ce25c277e28c75283b40"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Full analysis of all 23 UI tabs on localhost with zero unhandled crashes or error boundaries",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R2",
+      "description": "Scan and resolve false PENDING badges in Dashboard Shell (TruthStrip, lifecycle banner, telemetry)",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R3",
+      "description": "Scan and resolve hardcoded and false PARTIAL Data Grid Status Badges across the entire viewport",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R4",
+      "description": "Backend and frontend production bundle built cleanly with zero contract test regressions",
+      "mandatory": true,
+      "result": "FAIL"
+    },
+    {
+      "id": "R5",
+      "description": "Full visual verification screenshots captured for all 23 tabs in artifact directory and documented in visual report",
+      "mandatory": true,
+      "result": "FAIL"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_local_ui_visual_parity.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-01T02:40:51Z",
+      "elapsed_seconds": 5.516,
+      "exit_code": null,
+      "assertion": {
+        "type": "json_equals",
+        "path": "verified",
+        "expected": true
+      },
+      "observation": {
+        "error": "JSONDecodeError"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "overall": "FAIL",
+  "integrity_signature": "f9cf70d8de12c320ab693be8883ee1751d799a8cffcf16ad772a009031c86a1c"
+}

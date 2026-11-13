@@ -1,0 +1,27 @@
+{
+  "timestamp_ist": "2026-11-04T16:36:42.933957+05:30",
+  "compileall_exit": 0,
+  "p0_pytest_exit": 1,
+  "p0_pytest_summary": "FAILED tests/test_ui_p0_recovery_mission.py::TestGenesisUIEmergencyRecovery::test_p0_16_master_mission_reconciled_endpoints",
+  "rotator_3suites_exit": 0,
+  "rotator_3suites_summary": ".........................................                          [100%]",
+  "playwright_e2e_exit": 0,
+  "playwright_e2e_summary": "=== ALL PLAYWRIGHT E2E ASSERTIONS 100% PASSED ===",
+  "app_py_checks": {
+    "has_hardcoded_chain_dir": false,
+    "has_hardcoded_2026_11_02": false,
+    "has_verified_spot_map": false,
+    "has_sync_profile_in_gainers": false,
+    "has_portable_state_dir": false,
+    "has_ttl_cache_helper": true,
+    "has_ws_heartbeat_seq": false
+  },
+  "premium_html_checks": {
+    "has_fake_apikey": false,
+    "has_fake_executed_catch": false,
+    "has_escape_text": true,
+    "has_contract_ticket_fn": false,
+    "has_ws_backoff": true,
+    "has_canonical_order_fields": true
+  }
+}

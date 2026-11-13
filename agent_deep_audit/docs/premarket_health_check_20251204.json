@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-12-04T02:27:56.255508",
+  "overall_status": "PASS",
+  "blocking_failures": [],
+  "warnings": [],
+  "checks": {
+    "disk_space": {
+      "status": "PASS",
+      "free_gb": 146.49,
+      "total_gb": 237.87,
+      "used_percent": 38.42,
+      "min_required_gb": 1.0
+    },
+    "internet": {
+      "status": "PASS",
+      "host": "8.8.8.8"
+    },
+    "critical_files": {
+      "status": "PASS",
+      "total": 7,
+      "existing": 7,
+      "missing": 0,
+      "missing_files": []
+    },
+    "python_version": {
+      "status": "PASS",
+      "version": "3.10.11",
+      "major": 3,
+      "minor": 10,
+      "micro": 11
+    },
+    "dependencies": {
+      "status": "PASS",
+      "total": 4,
+      "existing": 4,
+      "missing": 0,
+      "missing_deps": []
+    },
+    "last_shutdown": {
+      "status": "PASS",
+      "shutdown_flag_exists": true,
+      "shutdown_date": "2025-12-03",
+      "shutdown_reason": "scheduled_shutdown_4pm",
+      "heartbeat_exists": true,
+      "heartbeat_age_seconds": 37666.6
+    },
+    "configuration": {
+      "status": "PASS",
+      "errors": [],
+      "warnings": []
+    },
+    "log_files": {
+      "status": "PASS",
+      "total_size_mb": 10.19,
+      "large_files": [],
+      "max_mb": 100.0
+    },
+    "signal_files": {
+      "status": "PASS",
+      "signals_file_exists": true,
+      "signals_file_rows": 30,
+      "curated_file_exists": true,
+      "curated_file_rows": 608
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "system_enabled": true,
+  "trading_enabled": true,
+  "live_trading": false,
+  "dry_run_mode": true,
+  "risk_management_enabled": true,
+  "max_daily_loss": 50000,
+  "max_single_trade_loss": 5000,
+  "max_positions": 10,
+  "max_lots_per_symbol": 5,
+  "auto_restart_enabled": true,
+  "monitoring_enabled": true,
+  "alerts_enabled": true,
+  "data_validation_enabled": true,
+  "model_validation_enabled": true,
+  "performance_tracking_enabled": true,
+  "last_updated": "2025-12-09T09:00:00Z",
+  "version": "3.0.0"
+}

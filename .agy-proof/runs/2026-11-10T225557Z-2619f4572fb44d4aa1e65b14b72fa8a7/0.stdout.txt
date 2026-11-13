@@ -1,0 +1,1 @@
+{"verified": true, "sheets_count": 8, "total_rows": 159, "sheet_row_counts": {"API_ENDPOINTS": 61, "BROKER_FEATURES": 14, "DHAN_FEATURES": 12, "ML_FEATURES": 13, "VALIDATION_FEATURES": 14, "SECURITY_FEATURES": 13, "MERGE_REQUIRED": 12, "SAFE_REMOVE": 20}}

@@ -1,0 +1,264 @@
+{
+  "decision-intel": {
+    "file": "workspaces/DecisionIntelligence.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 6,
+    "lines": 222
+  },
+  "options-intel": {
+    "file": "workspaces/OptionsIntelligence.tsx",
+    "endpoints": [],
+    "charts": [
+      "Recharts"
+    ],
+    "filters": [],
+    "sorts": [],
+    "button_count": 2,
+    "lines": 189
+  },
+  "multibagger": {
+    "file": "workspaces/MultibaggerResearch.tsx",
+    "endpoints": [
+      "/api/multibagger"
+    ],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 2,
+    "lines": 345
+  },
+  "risk-scenarios": {
+    "file": "workspaces/RiskAndScenarios.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 81
+  },
+  "data-integrity": {
+    "file": "workspaces/DataIntegrity.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 187
+  },
+  "prediction-audit": {
+    "file": "workspaces/PredictionAudit.tsx",
+    "endpoints": [
+      "/api/accuracy_trend",
+      "/api/auto_gates"
+    ],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 289
+  },
+  "truth": {
+    "file": "SystemTruthControl.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 226
+  },
+  "overview": {
+    "file": "Overview.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 276
+  },
+  "trade": {
+    "file": "TradeTab.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 1,
+    "lines": 128
+  },
+  "positions": {
+    "file": "Positions.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 1,
+    "lines": 156
+  },
+  "chain": {
+    "file": "OptionChain.tsx",
+    "endpoints": [
+      "/api/chain-expiry/${encodeURIComponent(chainSymbol)}?expiry=${encodeURIComponent(selectedExpiry)}",
+      "/api/chain/${encodeURIComponent(chainSymbol)}",
+      "/api/expiries/${encodeURIComponent(chainSymbol)}",
+      "/api/underlyings"
+    ],
+    "charts": [],
+    "filters": [
+      "Select dropdown",
+      "Filter logic/controls"
+    ],
+    "sorts": [
+      "Sort logic/controls"
+    ],
+    "button_count": 4,
+    "lines": 531
+  },
+  "signals": {
+    "file": "Signals.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [
+      "Sort logic/controls"
+    ],
+    "button_count": 1,
+    "lines": 408
+  },
+  "paper": {
+    "file": "PaperTrading.tsx",
+    "endpoints": [],
+    "charts": [
+      "Canvas/Chart.js"
+    ],
+    "filters": [],
+    "sorts": [],
+    "button_count": 3,
+    "lines": 459
+  },
+  "performance": {
+    "file": "PerformanceTab.tsx",
+    "endpoints": [
+      "/api/backtest/results",
+      "/api/ml/performance",
+      "/api/pnl"
+    ],
+    "charts": [
+      "Canvas/Chart.js"
+    ],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 270
+  },
+  "ml": {
+    "file": "MLPerformance.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 2,
+    "lines": 271
+  },
+  "system-readiness": {
+    "file": "SystemReadiness.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 216
+  },
+  "genesis": {
+    "file": "GenesisTab.tsx",
+    "endpoints": [
+      "/api/system_health"
+    ],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 1,
+    "lines": 303
+  },
+  "e2e-proof": {
+    "file": "EndToEndProof.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 175
+  },
+  "broker": {
+    "file": "BrokerProofPanel.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 93
+  },
+  "alerts": {
+    "file": "AlertsTab.tsx",
+    "endpoints": [],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 152
+  },
+  "system": {
+    "file": "SystemTab.tsx",
+    "endpoints": [
+      "/api/system/readiness"
+    ],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 135
+  },
+  "gates": {
+    "file": "LiveTradingGate.tsx",
+    "endpoints": [
+      "/api/approval/status"
+    ],
+    "charts": [],
+    "filters": [],
+    "sorts": [],
+    "button_count": 0,
+    "lines": 240
+  },
+  "sim-live": {
+    "file": "LiveSimulation.tsx",
+    "endpoints": [
+      "/api/simulation/live/state?scenario=${encodeURIComponent(scenario)}",
+      "/api/simulation/replay/lifecycle?scenario=${encodeURIComponent(scenario)}&step=${replayStep}",
+      "/api/simulation/replay/state?scenario=${encodeURIComponent(scenario)}&step=${replayStep}"
+    ],
+    "charts": [],
+    "filters": [
+      "Filter logic/controls"
+    ],
+    "sorts": [],
+    "button_count": 4,
+    "lines": 285
+  }
+}

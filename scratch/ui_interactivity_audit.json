@@ -1,0 +1,1245 @@
+{
+  "workspaces/DecisionIntelligence.tsx": {
+    "lines": 222,
+    "imports": [
+      "react",
+      "lucide-react",
+      "../../store",
+      "./TruthUI",
+      "../../lib/healthTruth",
+      "../../lib/lifecycleTruth",
+      "../../lib/formatLive",
+      "../PendingLifecycleBanner"
+    ],
+    "buttons": [
+      {
+        "text": "setActiveTab(id)}\n                  styl",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('truth'",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('option",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('risk-s",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('data-i",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('system",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "workspaces/OptionsIntelligence.tsx": {
+    "lines": 189,
+    "imports": [
+      "react",
+      "../../store",
+      "./TruthUI",
+      "lucide-react",
+      "../AdvancedCharts"
+    ],
+    "buttons": [
+      {
+        "text": "setChainSymbol(symbol)}>{symbol}",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setActiveTab('chain')}>OPEN FULL OPTION ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Instrument",
+        "sortable": false
+      },
+      {
+        "text": "Qty",
+        "sortable": false
+      },
+      {
+        "text": "Avg",
+        "sortable": false
+      },
+      {
+        "text": "LTP",
+        "sortable": false
+      },
+      {
+        "text": "P&L",
+        "sortable": false
+      }
+    ],
+    "charts": [
+      "Recharts BarChart"
+    ],
+    "inputs": []
+  },
+  "workspaces/MultibaggerResearch.tsx": {
+    "lines": 345,
+    "imports": [
+      "lucide-react",
+      "../../store",
+      "../../config",
+      "../../lib/formatLive",
+      "../../lib/feedQuality",
+      "../../lib/healthTruth",
+      "../../lib/sourceQuality"
+    ],
+    "buttons": [
+      {
+        "text": "{loading ? 'Scanning...' : 'Refresh Rese",
+        "has_click": true,
+        "disabled": true
+      },
+      {
+        "text": "setActiveHorizon(id as HorizonType)}\n   ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Rank &amp; Symbol",
+        "sortable": false
+      },
+      {
+        "text": "Horizon / Type",
+        "sortable": false
+      },
+      {
+        "text": "Current Px",
+        "sortable": false
+      },
+      {
+        "text": "Breakout / Entry",
+        "sortable": false
+      },
+      {
+        "text": "Target Px",
+        "sortable": false
+      },
+      {
+        "text": "Upside Potential",
+        "sortable": false
+      },
+      {
+        "text": "Stop Loss",
+        "sortable": false
+      },
+      {
+        "text": "Vol Exp (Del%)",
+        "sortable": false
+      },
+      {
+        "text": "Pattern / Thesis",
+        "sortable": false
+      },
+      {
+        "text": "Key Catalyst",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "workspaces/RiskAndScenarios.tsx": {
+    "lines": 81,
+    "imports": [
+      "react",
+      "../../store",
+      "./TruthUI",
+      "lucide-react",
+      "../RiskDashboard"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "workspaces/DataIntegrity.tsx": {
+    "lines": 187,
+    "imports": [
+      "react",
+      "../../store",
+      "./TruthUI",
+      "lucide-react",
+      "../../lib/formatLive",
+      "../../lib/healthTruth",
+      "../../lib/feedQuality",
+      "../SystemHealthDiagnostics",
+      "../SystemProgressPanel"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "workspaces/PredictionAudit.tsx": {
+    "lines": 289,
+    "imports": [
+      "lucide-react",
+      "../../store",
+      "./TruthUI",
+      "../../lib/formatLive",
+      "../../config",
+      "../LiveInteractiveCharts"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "SystemTruthControl.tsx": {
+    "lines": 226,
+    "imports": [
+      "../store",
+      "./PendingLifecycleBanner",
+      "../lib/strictFlags",
+      "../lib/lifecycleTruth"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Layer",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      },
+      {
+        "text": "Required",
+        "sortable": false
+      },
+      {
+        "text": "Current shared evidence",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "Overview.tsx": {
+    "lines": 276,
+    "imports": [
+      "lucide-react",
+      "../store",
+      "../lib/utils",
+      "../lib/statusTone",
+      "./AuthUnlock",
+      "./ContinuousClosureBoard",
+      "./HolographicIndexCards",
+      "./ModelVsMarketComparator",
+      "./LiveInteractiveCharts"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "{['Underlying / Contract', 'Sp",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "TradeTab.tsx": {
+    "lines": 128,
+    "imports": [
+      "./OptionChain",
+      "./PendingLifecycleBanner",
+      "./MarketTopCePeTable",
+      "../store",
+      "../lib/utils"
+    ],
+    "buttons": [
+      {
+        "text": "row?.underlying && setChainSymbol(String",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "Positions.tsx": {
+    "lines": 156,
+    "imports": [
+      "../store",
+      "./ui/PriceCell",
+      "../lib/utils"
+    ],
+    "buttons": [
+      {
+        "text": "setActiveTab('broker')}>Open read-only D",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "{['Symbol','Type','Entry','LTP",
+        "sortable": false
+      },
+      {
+        "text": "{['Symbol','Type','Entry','Exi",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "OptionChain.tsx": {
+    "lines": 531,
+    "imports": [
+      "react",
+      "../store",
+      "../config",
+      "./ui/PriceCell",
+      "../lib/utils",
+      "../lib/sourceQuality",
+      "../lib/lifecycleTruth"
+    ],
+    "buttons": [
+      {
+        "text": "choose(symbol)}\n        className={cn('p",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "Load",
+        "has_click": false,
+        "disabled": false
+      },
+      {
+        "text": "setShowGreeks(!showGreeks)} className={c",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setFullMobileTable(value => !value)}\n   ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [
+      {
+        "options_count": 1,
+        "options_sample": [
+          [
+            "",
+            "AUTO / NEAREST"
+          ]
+        ],
+        "has_change": true
+      },
+      {
+        "options_count": 2,
+        "options_sample": [
+          "ALL STRIKES ({strikes.length})",
+          "+/-{value} ATM"
+        ],
+        "has_change": true
+      }
+    ],
+    "table_headers": [
+      {
+        "text": "{showGreeks ? (\n            \n ",
+        "sortable": false
+      },
+      {
+        "text": "CE \u0393",
+        "sortable": false
+      },
+      {
+        "text": "CE \u0398",
+        "sortable": false
+      },
+      {
+        "text": "CE V",
+        "sortable": false
+      },
+      {
+        "text": "BUILDUP",
+        "sortable": false
+      },
+      {
+        "text": "CE OI",
+        "sortable": false
+      },
+      {
+        "text": "LTP CHG%",
+        "sortable": false
+      },
+      {
+        "text": "CE LTP",
+        "sortable": false
+      },
+      {
+        "text": "STRIKE",
+        "sortable": false
+      },
+      {
+        "text": "PE LTP",
+        "sortable": false
+      },
+      {
+        "text": "LTP CHG%",
+        "sortable": false
+      },
+      {
+        "text": "PE OI",
+        "sortable": false
+      },
+      {
+        "text": "BUILDUP",
+        "sortable": false
+      },
+      {
+        "text": "PE \u0394",
+        "sortable": false
+      },
+      {
+        "text": "PE \u0393",
+        "sortable": false
+      },
+      {
+        "text": "PE \u0398",
+        "sortable": false
+      },
+      {
+        "text": "PE V",
+        "sortable": false
+      },
+      {
+        "text": "BUILDUP",
+        "sortable": false
+      },
+      {
+        "text": "CE OI",
+        "sortable": false
+      },
+      {
+        "text": "CE OI%",
+        "sortable": false
+      },
+      {
+        "text": "CE VOL%",
+        "sortable": false
+      },
+      {
+        "text": "LTP CHG%",
+        "sortable": false
+      },
+      {
+        "text": "CE LTP",
+        "sortable": false
+      },
+      {
+        "text": "CE IV",
+        "sortable": false
+      },
+      {
+        "text": "CE BID",
+        "sortable": false
+      },
+      {
+        "text": "STRIKE",
+        "sortable": false
+      },
+      {
+        "text": "PE ASK",
+        "sortable": false
+      },
+      {
+        "text": "PE IV",
+        "sortable": false
+      },
+      {
+        "text": "PE LTP",
+        "sortable": false
+      },
+      {
+        "text": "LTP CHG%",
+        "sortable": false
+      },
+      {
+        "text": "PE VOL%",
+        "sortable": false
+      },
+      {
+        "text": "PE OI%",
+        "sortable": false
+      },
+      {
+        "text": "PE OI",
+        "sortable": false
+      },
+      {
+        "text": "BUILDUP",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": [
+      {
+        "type": "text",
+        "has_change": true,
+        "placeholder": ""
+      }
+    ]
+  },
+  "Signals.tsx": {
+    "lines": 408,
+    "imports": [
+      "axios",
+      "../config",
+      "./EmptyState",
+      "./ErrorBanner",
+      "./AuthUnlock",
+      "./MarketTopCePeTable",
+      "../lib/strictFlags"
+    ],
+    "buttons": [
+      {
+        "text": "{\n            const blob = new Blob([JSO",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Symbol",
+        "sortable": false
+      },
+      {
+        "text": "LTP / Prev",
+        "sortable": false
+      },
+      {
+        "text": "Gap %",
+        "sortable": false
+      },
+      {
+        "text": "ML Signal",
+        "sortable": false
+      },
+      {
+        "text": "ML Confidence",
+        "sortable": false
+      },
+      {
+        "text": "Target Price",
+        "sortable": false
+      },
+      {
+        "text": "Rec. Strike",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "PaperTrading.tsx": {
+    "lines": 459,
+    "imports": [
+      "axios",
+      "../config",
+      "./DataSourceWarning",
+      "./ErrorBanner",
+      "./PendingLifecycleBanner"
+    ],
+    "buttons": [
+      {
+        "text": "Refresh",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "triggerSmokeLoop('NIFTY')}\n             ",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "triggerSmokeLoop('BANKNIFTY')}\n         ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Pos ID",
+        "sortable": false
+      },
+      {
+        "text": "Trading Symbol",
+        "sortable": false
+      },
+      {
+        "text": "Side",
+        "sortable": false
+      },
+      {
+        "text": "CE/PE",
+        "sortable": false
+      },
+      {
+        "text": "Strike",
+        "sortable": false
+      },
+      {
+        "text": "Expiry",
+        "sortable": false
+      },
+      {
+        "text": "Qty",
+        "sortable": false
+      },
+      {
+        "text": "Buy Avg",
+        "sortable": false
+      },
+      {
+        "text": "LTP",
+        "sortable": false
+      },
+      {
+        "text": "Unrealized",
+        "sortable": false
+      },
+      {
+        "text": "SL",
+        "sortable": false
+      },
+      {
+        "text": "Target",
+        "sortable": false
+      },
+      {
+        "text": "Product",
+        "sortable": false
+      },
+      {
+        "text": "Provenance",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "PerformanceTab.tsx": {
+    "lines": 270,
+    "imports": [
+      "react",
+      "../store",
+      "../lib/utils",
+      "./LiveInteractiveCharts",
+      "./ValidationChecklist",
+      "./PendingLifecycleBanner"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "{['Date', 'Trades', 'Win Rate'",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "MLPerformance.tsx": {
+    "lines": 271,
+    "imports": [
+      "react",
+      "axios",
+      "../config",
+      "../store",
+      "./ValidationChecklist",
+      "./PendingLifecycleBanner"
+    ],
+    "buttons": [
+      {
+        "text": "setRetryKey(key => key + 1)} style={{ ma",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "useStore.getState().setActiveTab('system",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Model",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      },
+      {
+        "text": "Predictions",
+        "sortable": false
+      },
+      {
+        "text": "Avg accuracy",
+        "sortable": false
+      },
+      {
+        "text": "reported rho",
+        "sortable": false
+      },
+      {
+        "text": "hit_rate",
+        "sortable": false
+      },
+      {
+        "text": "Proof pass",
+        "sortable": false
+      },
+      {
+        "text": "Blocker",
+        "sortable": false
+      },
+      {
+        "text": "Generated",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "SystemReadiness.tsx": {
+    "lines": 216,
+    "imports": [
+      "react",
+      "axios",
+      "../config",
+      "./ValidationChecklist",
+      "./PendingLifecycleBanner"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "GenesisTab.tsx": {
+    "lines": 303,
+    "imports": [
+      "react",
+      "axios",
+      "lucide-react",
+      "../config",
+      "../store",
+      "../lib/utils",
+      "../lib/lifecycleTruth",
+      "./PendingLifecycleBanner"
+    ],
+    "buttons": [
+      {
+        "text": "{data.loading ? 'Refreshing\u2026' : 'Refresh",
+        "has_click": true,
+        "disabled": true
+      }
+    ],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "EndToEndProof.tsx": {
+    "lines": 175,
+    "imports": [
+      "react",
+      "../store",
+      "./PendingLifecycleBanner",
+      "../lib/lifecycleTruth"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Required evidence",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      },
+      {
+        "text": "Current shared evidence",
+        "sortable": false
+      },
+      {
+        "text": "Symbol",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      },
+      {
+        "text": "Source",
+        "sortable": false
+      },
+      {
+        "text": "API status",
+        "sortable": false
+      },
+      {
+        "text": "Spot",
+        "sortable": false
+      },
+      {
+        "text": "Contracts",
+        "sortable": false
+      },
+      {
+        "text": "Reason",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "BrokerProofPanel.tsx": {
+    "lines": 93,
+    "imports": [
+      "lucide-react",
+      "../store",
+      "./BrokerPanel",
+      "./PendingLifecycleBanner",
+      "../lib/lifecycleTruth"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "AlertsTab.tsx": {
+    "lines": 152,
+    "imports": [
+      "../store",
+      "../lib/alertTruth",
+      "../lib/utils",
+      "lucide-react"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "SystemTab.tsx": {
+    "lines": 135,
+    "imports": [
+      "react",
+      "../store",
+      "../lib/utils",
+      "./AuthUnlock"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "LiveTradingGate.tsx": {
+    "lines": 240,
+    "imports": [
+      "react",
+      "../store",
+      "./PendingLifecycleBanner",
+      "../lib/lifecycleTruth"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "LiveSimulation.tsx": {
+    "lines": 285,
+    "imports": [
+      "react"
+    ],
+    "buttons": [
+      {
+        "text": "{ setReplayStep(stage.step); setLifecycl",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setRunning(v => !v)} style={{ padding: '",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setTick(v => v + 1)} style={{ padding: '",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setScenario(s)} style={{ padding: '9px 1",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "ID",
+        "sortable": false
+      },
+      {
+        "text": "Symbol",
+        "sortable": false
+      },
+      {
+        "text": "Side",
+        "sortable": false
+      },
+      {
+        "text": "Strike",
+        "sortable": false
+      },
+      {
+        "text": "Expiry",
+        "sortable": false
+      },
+      {
+        "text": "LTP",
+        "sortable": false
+      },
+      {
+        "text": "P&L",
+        "sortable": false
+      },
+      {
+        "text": "Status",
+        "sortable": false
+      },
+      {
+        "text": "Source",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "AdvancedCharts.tsx": {
+    "lines": 387,
+    "imports": [
+      "axios",
+      "../config",
+      "recharts"
+    ],
+    "buttons": [],
+    "selects": [
+      {
+        "options_count": 1,
+        "options_sample": [
+          "{u}"
+        ],
+        "has_change": true
+      },
+      {
+        "options_count": 4,
+        "options_sample": [
+          [
+            "oi",
+            "Open Interest"
+          ],
+          [
+            "volume",
+            "Volume"
+          ],
+          [
+            "iv",
+            "Implied Volatility"
+          ],
+          [
+            "ltp",
+            "Last Traded Price"
+          ]
+        ],
+        "has_change": true
+      },
+      {
+        "options_count": 4,
+        "options_sample": [
+          [
+            "delta",
+            "Delta"
+          ],
+          [
+            "gamma",
+            "Gamma"
+          ],
+          [
+            "theta",
+            "Theta"
+          ],
+          [
+            "vega",
+            "Vega"
+          ]
+        ],
+        "has_change": true
+      }
+    ],
+    "table_headers": [],
+    "charts": [
+      "Recharts ResponsiveContainer",
+      "Recharts LineChart",
+      "Recharts BarChart"
+    ],
+    "inputs": []
+  },
+  "ChainAnalytics.tsx": {
+    "lines": 245,
+    "imports": [
+      "axios",
+      "../config"
+    ],
+    "buttons": [
+      {
+        "text": "setSelectedUnderlying(u)}\n              ",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setSelectedUnderlying(u)}\n            cl",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "Strike",
+        "sortable": false
+      },
+      {
+        "text": "Type",
+        "sortable": false
+      },
+      {
+        "text": "LTP",
+        "sortable": false
+      },
+      {
+        "text": "OI",
+        "sortable": false
+      },
+      {
+        "text": "Volume",
+        "sortable": false
+      },
+      {
+        "text": "IV",
+        "sortable": false
+      },
+      {
+        "text": "Delta",
+        "sortable": false
+      },
+      {
+        "text": "Gamma",
+        "sortable": false
+      },
+      {
+        "text": "Vega",
+        "sortable": false
+      },
+      {
+        "text": "Theta",
+        "sortable": false
+      },
+      {
+        "text": "Liquidity",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": [
+      {
+        "type": "number",
+        "has_change": true,
+        "placeholder": ""
+      },
+      {
+        "type": "number",
+        "has_change": true,
+        "placeholder": ""
+      },
+      {
+        "type": "checkbox",
+        "has_change": true,
+        "placeholder": ""
+      },
+      {
+        "type": "number",
+        "has_change": true,
+        "placeholder": ""
+      },
+      {
+        "type": "checkbox",
+        "has_change": true,
+        "placeholder": ""
+      }
+    ]
+  },
+  "MarketTopCePeTable.tsx": {
+    "lines": 306,
+    "imports": [
+      "react",
+      "../config",
+      "../store",
+      "../lib/utils",
+      "./AuthUnlock"
+    ],
+    "buttons": [
+      {
+        "text": "setBoard('moneycontrol')}\n          >\n  ",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setBoard('dhan')}\n          >\n          ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [
+      {
+        "text": "{['#', 'Symbol', 'Expiry', 'Ty",
+        "sortable": false
+      }
+    ],
+    "charts": [],
+    "inputs": []
+  },
+  "TopBar.tsx": {
+    "lines": 272,
+    "imports": [
+      "react",
+      "lucide-react",
+      "../store",
+      "../lib/utils",
+      "../lib/healthTruth",
+      "../lib/lifecycleTruth",
+      "./Sidebar"
+    ],
+    "buttons": [
+      {
+        "text": "setSidebarOpen(!sidebarOpen)}\n        >",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "setActiveTab('broker')}\n          classN",
+        "has_click": true,
+        "disabled": false
+      },
+      {
+        "text": "e.preventDefault()}\n                    ",
+        "has_click": false,
+        "disabled": false
+      },
+      {
+        "text": "setActiveTab('alerts')}\n        >\n      ",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": [
+      {
+        "type": "search",
+        "has_change": true,
+        "placeholder": "Search (Ctrl+K)"
+      }
+    ]
+  },
+  "TruthStrip.tsx": {
+    "lines": 101,
+    "imports": [
+      "react",
+      "../store",
+      "lucide-react",
+      "../lib/lifecycleTruth",
+      "../lib/feedQuality"
+    ],
+    "buttons": [],
+    "selects": [],
+    "table_headers": [],
+    "charts": [],
+    "inputs": []
+  },
+  "Sidebar.tsx": {
+    "lines": 153,
+    "imports": [
+      "lucide-react",
+      "../store"
+    ],
+    "buttons": [
+      {
+        "text": "setActiveTab(id)}\n                  titl",
+        "has_click": true,
+        "disabled": false
+      }
+    ],
+    "selects": [],
+    "table_headers": [],
+    "charts": [
+      "Recharts BarChart"
+    ],
+    "inputs": []
+  }
+}

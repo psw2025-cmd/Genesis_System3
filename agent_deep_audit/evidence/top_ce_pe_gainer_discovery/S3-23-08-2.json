@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-23-08-2",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:34Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-23-08-2",
+  "exit_code": 0,
+  "expected": "Require observable volume and OI evidence. Safe invalid/unknown response and excluded rank, never nonfinite/fabricated metric.",
+  "actual": "Illiquid strike with 100% gain on 1 trade rejected by MinimumTurnoverFilter (\u20b91,00,000 threshold).",
+  "raw_artifacts": [],
+  "artifact_sha256": "792b53ed7c0ec99d48e0aea006b787d3d84e92389f743d236cbfd483eaac500e",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:34Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

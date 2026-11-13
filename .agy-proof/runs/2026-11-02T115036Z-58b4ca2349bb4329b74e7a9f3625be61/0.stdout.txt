@@ -1,0 +1,9 @@
+Executing Dhan Full-Market Scanning Daemon & Router Tests...
+[1. Auto-Find] Discovered 228 underlyings (228 liquid filtered)
+[2. Auto-Work] NIFTY Spot: 25447.86 -> ATM Strike: 25450
+[2. Auto-Work] WebSocket subscription packet generated with 22 dynamic strikes
+[3. Broker Binding] Order Status: EXECUTED_PAPER | Mode: PAPER_SIMULATED
+[3. Broker Binding] Dhan payload mapped to securityId: DHAN-OPT-NIFTY-25500-CE
+[3. Broker Binding] Paper fill: Rs. 164.65 (Slippage: 0.15 pts, STT: Rs. 10.29)
+
+>>> ALL DHAN FULL-MARKET SCANNER & ROUTER TESTS PASSED! <<<

@@ -1,0 +1,629 @@
+{
+  "observed_utc": "2026-11-04T09:41:09.447466+00:00",
+  "routes": [
+    {
+      "route": "/api/health",
+      "http": 200,
+      "response_bytes": 815,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:40:51.089125+00:00",
+      "provenance": {
+        "source": "VERIFIED_LOCAL_RUNTIME_AND_DHAN_READONLY",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_RUNTIME_HEALTH"
+      },
+      "data_shape": {
+        "status": "VERIFIED_LOCAL_API_AND_DHAN_READONLY",
+        "uptime_sec": 1791,
+        "evidence_entries": 5772,
+        "total_symbols": 60,
+        "discovered_fo_underlyings": 228,
+        "master_instruments_total": 205282,
+        "verified_chain_contracts": 80,
+        "memory": "142.0 MB",
+        "kill_switch": false,
+        "paper_mode": true,
+        "live_trading_enabled": false,
+        "live_order_authority": 0,
+        "market_session": "OPEN",
+        "git_sha": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82",
+        "branch": "fix/scanner-219-equity-rotate",
+        "workspace": "C:\\Genesis_System3_clean",
+        "pid": 24620
+      },
+      "sha256": "8f95d89ef81d60b035b186392c97de4e9d1a22b865649fc0628928c9ff037e65",
+      "data_keys": [
+        "status",
+        "uptime_sec",
+        "evidence_entries",
+        "total_symbols",
+        "discovered_fo_underlyings",
+        "master_instruments_total",
+        "verified_chain_contracts",
+        "memory",
+        "kill_switch",
+        "paper_mode",
+        "live_trading_enabled",
+        "live_order_authority",
+        "market_session",
+        "git_sha",
+        "branch",
+        "workspace",
+        "pid"
+      ],
+      "numeric_counts": {
+        "total_symbols": 60,
+        "discovered_fo_underlyings": 228,
+        "master_instruments_total": 205282,
+        "verified_chain_contracts": 80
+      }
+    },
+    {
+      "route": "/api/market/inventory",
+      "http": 200,
+      "response_bytes": 728,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:40:51.266074+00:00",
+      "provenance": {
+        "source": "RECONCILED_DHAN_MASTER_AND_CHAIN_SNAPSHOTS",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_EXCHANGE_SNAPSHOT"
+      },
+      "data_shape": {
+        "total_instruments": 60,
+        "local_stream_symbols": 60,
+        "discovered_fo_underlyings": 228,
+        "nse_equity_fo_target": 219,
+        "master_instruments_total": 205282,
+        "fo_contracts_count": 117776,
+        "verified_chain_snapshots_count": 8,
+        "verified_chain_contracts_count": 929,
+        "indices_count": 6,
+        "equity_fo_snapshots": {
+          "count": 2,
+          "first_item_shape": "RELIANCE"
+        },
+        "cash_equities_count": 55,
+        "sectors_monitored": 14,
+        "status": "RECONCILED_MULTI_SCOPE_UNIVERSE"
+      },
+      "sha256": "5f0ae18d9b626830af61a21ec588bfb9dcf82f0bcdb27b093c713fefc4bc37c5",
+      "data_keys": [
+        "total_instruments",
+        "local_stream_symbols",
+        "discovered_fo_underlyings",
+        "nse_equity_fo_target",
+        "master_instruments_total",
+        "fo_contracts_count",
+        "verified_chain_snapshots_count",
+        "verified_chain_contracts_count",
+        "indices_count",
+        "equity_fo_snapshots",
+        "cash_equities_count",
+        "sectors_monitored",
+        "status"
+      ],
+      "numeric_counts": {
+        "total_instruments": 60,
+        "local_stream_symbols": 60,
+        "discovered_fo_underlyings": 228,
+        "master_instruments_total": 205282,
+        "fo_contracts_count": 117776,
+        "verified_chain_snapshots_count": 8,
+        "verified_chain_contracts_count": 929,
+        "indices_count": 6,
+        "cash_equities_count": 55
+      }
+    },
+    {
+      "route": "/api/data/provenance",
+      "http": 200,
+      "response_bytes": 785,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:40:53.953910+00:00",
+      "provenance": {
+        "source": "DHANHQ_READONLY_AND_SHA256_CHAIN",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_PROVENANCE"
+      },
+      "data_shape": {
+        "exchange_feed": "DHANHQ_V2_AUTHENTICATED_READONLY",
+        "auth_provider": "LOCAL_ENV_FILE:LOCAL_SECRETS_DHAN_ENV",
+        "token_hours_remaining": 16.0,
+        "hash_chain_verified": true,
+        "chain_head": "74d5d96736e7fceac7ed9bf54918f81dd147c7c84ee61685d43ce76970fce779",
+        "chain_entries": 5772,
+        "git_sha": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82",
+        "branch": "fix/scanner-219-equity-rotate",
+        "writer_id": "local_port_8008_paper_readonly",
+        "paper_mode": true,
+        "live_orders_allowed": false,
+        "clock_skew_ms": 0.4
+      },
+      "sha256": "4611b423d357059ab714402c23aaada744f3c9fb52a67c5b0da66e9d55a9c67f",
+      "data_keys": [
+        "exchange_feed",
+        "auth_provider",
+        "token_hours_remaining",
+        "hash_chain_verified",
+        "chain_head",
+        "chain_entries",
+        "git_sha",
+        "branch",
+        "writer_id",
+        "paper_mode",
+        "live_orders_allowed",
+        "clock_skew_ms"
+      ],
+      "numeric_counts": {}
+    },
+    {
+      "route": "/api/chain/NIFTY",
+      "http": 200,
+      "response_bytes": 180854,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:40:55.785450+00:00",
+      "provenance": {
+        "source": "DHAN_VERIFIED_OPTION_CHAIN",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_EXCHANGE_SNAPSHOT"
+      },
+      "data_shape": {
+        "underlying": "NIFTY",
+        "symbol": "NIFTY",
+        "spot_price": 23053.1,
+        "atm_strike": 23050.0,
+        "pcr": 1.598,
+        "max_pain": 23000.0,
+        "total_ce_oi": 144162005,
+        "total_pe_oi": 230440080,
+        "contracts_count": 171,
+        "contracts": {
+          "count": 171,
+          "first_item_shape": {
+            "exchange": "str",
+            "underlying_symbol": "str",
+            "underlying_type": "str",
+            "expiry": "str",
+            "strike": "float",
+            "option_type": "str",
+            "spot_price": "float",
+            "atm_reference": "float",
+            "moneyness_bucket": "str",
+            "distance_from_atm_abs": "float",
+            "distance_from_atm_pct": "float",
+            "ltp": "float",
+            "change": "float",
+            "change_percent": "float",
+            "top_bid_price": "float",
+            "top_ask_price": "float",
+            "bid": "float",
+            "ask": "float",
+            "bid_ask_spread": "float",
+            "bid_ask_spread_pct": "float",
+            "volume": "int",
+            "previous_volume": "int",
+            "volume_change": "int",
+            "volume_change_percent": "float",
+            "oi": "int",
+            "oi_change": "int",
+            "oi_change_pct": "float",
+            "iv": "float",
+            "iv_change": "float",
+            "delta": "float",
+            "gamma": "float",
+            "theta": "float",
+            "vega": "float",
+            "rho": "NoneType",
+            "intrinsic_value": "float",
+            "time_value": "float",
+            "lot_size": "int",
+            "turnover": "float",
+            "liquidity_score": "int",
+            "buildup_type": "str",
+            "support_resistance_tag": "str",
+            "unusual_activity_flag": "bool",
+            "previous_close_price": "float",
+            "security_id": "int",
+            "trading_symbol": "str",
+            "source": "str",
+            "data_source": "str",
+            "verification_status": "str",
+            "symbol": "str"
+          }
+        },
+        "market_session": "OPEN",
+        "status": "LIVE_CHAIN",
+        "source": "DHAN_VERIFIED_OPTION_CHAIN"
+      },
+      "sha256": "89c9335c3ca42548626eddec2a31fb2c9a951881ecab771efdac5f50181f8c51",
+      "data_keys": [
+        "underlying",
+        "symbol",
+        "spot_price",
+        "atm_strike",
+        "pcr",
+        "max_pain",
+        "total_ce_oi",
+        "total_pe_oi",
+        "contracts_count",
+        "contracts",
+        "market_session",
+        "status",
+        "source"
+      ],
+      "numeric_counts": {
+        "total_ce_oi": 144162005,
+        "total_pe_oi": 230440080,
+        "contracts_count": 171
+      }
+    },
+    {
+      "route": "/api/market/top-gainers",
+      "http": 200,
+      "response_bytes": 15492,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:40:59.407543+00:00",
+      "provenance": {
+        "source": "DHAN_VERIFIED_F_AND_O_CHAINS",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_EXCHANGE_SNAPSHOT"
+      },
+      "data_shape": {
+        "status": "ok",
+        "ce_gainers": {
+          "count": 15,
+          "first_item_shape": {
+            "contract": "str",
+            "symbol": "str",
+            "strike": "float",
+            "option_type": "str",
+            "ltp": "float",
+            "change": "float",
+            "change_pct": "float",
+            "oi": "int",
+            "oi_change_pct": "float",
+            "volume": "int",
+            "source": "str",
+            "data_provenance": "str"
+          }
+        },
+        "pe_gainers": {
+          "count": 15,
+          "first_item_shape": {
+            "contract": "str",
+            "symbol": "str",
+            "strike": "float",
+            "option_type": "str",
+            "ltp": "float",
+            "change": "float",
+            "change_pct": "float",
+            "oi": "int",
+            "oi_change_pct": "float",
+            "volume": "int",
+            "source": "str",
+            "data_provenance": "str"
+          }
+        },
+        "gainers": {
+          "count": 30,
+          "first_item_shape": {
+            "contract": "str",
+            "symbol": "str",
+            "strike": "float",
+            "option_type": "str",
+            "ltp": "float",
+            "change": "float",
+            "change_pct": "float",
+            "oi": "int",
+            "oi_change_pct": "float",
+            "volume": "int",
+            "source": "str",
+            "data_provenance": "str"
+          }
+        },
+        "count": 30,
+        "source": "DHAN_VERIFIED_F_AND_O_CHAINS"
+      },
+      "sha256": "2d2b449fbddd487562daffeb283a71e5feeb28acc892098c6af2c4395a65c72d",
+      "data_keys": [
+        "status",
+        "ce_gainers",
+        "pe_gainers",
+        "gainers",
+        "count",
+        "source"
+      ],
+      "numeric_counts": {
+        "count": 30
+      }
+    },
+    {
+      "route": "/api/options/gainers",
+      "http": 200,
+      "response_bytes": 15658,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:41:01.410892+00:00",
+      "provenance": {
+        "source": "DHAN_VERIFIED_F_AND_O_CHAINS",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_EXCHANGE_SNAPSHOT"
+      },
+      "data_shape": {
+        "ce_gainers": {
+          "count": 30,
+          "first_item_shape": {
+            "contract": "str",
+            "symbol": "str",
+            "strike": "float",
+            "option_type": "str",
+            "ltp": "float",
+            "change": "float",
+            "change_pct": "float",
+            "oi": "int",
+            "oi_change_pct": "float",
+            "volume": "int",
+            "source": "str",
+            "data_provenance": "str"
+          }
+        },
+        "pe_gainers": {
+          "count": 30,
+          "first_item_shape": {
+            "contract": "str",
+            "symbol": "str",
+            "strike": "float",
+            "option_type": "str",
+            "ltp": "float",
+            "change": "float",
+            "change_pct": "float",
+            "oi": "int",
+            "oi_change_pct": "float",
+            "volume": "int",
+            "source": "str",
+            "data_provenance": "str"
+          }
+        },
+        "total_ce": 448,
+        "total_pe": 481,
+        "unique_contracts_count": 929,
+        "indices_covered": {
+          "count": 6,
+          "first_item_shape": "BANKEX"
+        },
+        "equity_fo_covered": {
+          "count": 2,
+          "first_item_shape": "COLPAL"
+        },
+        "source": "DHAN_VERIFIED_F_AND_O_CHAINS",
+        "market_session": "OPEN",
+        "snapshot_type": "LIVE_INTRADAY_EXCHANGE_FEED"
+      },
+      "sha256": "6fd12b8a7410064afee1bab4625510589539daf6c8855a90429a5b8a144b106d",
+      "data_keys": [
+        "ce_gainers",
+        "pe_gainers",
+        "total_ce",
+        "total_pe",
+        "unique_contracts_count",
+        "indices_covered",
+        "equity_fo_covered",
+        "source",
+        "market_session",
+        "snapshot_type"
+      ],
+      "numeric_counts": {
+        "total_ce": 448,
+        "total_pe": 481,
+        "unique_contracts_count": 929
+      }
+    },
+    {
+      "route": "/api/ml/prediction-audit",
+      "http": 200,
+      "response_bytes": 1007,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:41:04.388296+00:00",
+      "provenance": {
+        "source": "STATE_GAIN_RANK_HISTORY_AUDIT",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_FORECAST_AUDIT"
+      },
+      "data_shape": {
+        "gain_rank_predictions_logged": 58,
+        "forecast_batches_logged": 15,
+        "underlyings_evaluated": {
+          "count": 4,
+          "first_item_shape": "BANKNIFTY"
+        },
+        "matured_outcomes_count": 0,
+        "pending_outcomes_count": 58,
+        "directional_hit_rate": null,
+        "hit_rate_numerator": 0,
+        "hit_rate_denominator": 0,
+        "cutoff_verified_pre_event": true,
+        "future_leakage_detected": false,
+        "verification_status": "PRE_EVENT_FORECASTS_LOGGED_OUTCOME_MATURATION_PENDING",
+        "drift_detected": false,
+        "walk_forward_status": "FORWARD_OBSERVATION_IN_PROGRESS",
+        "note": "15 timestamped predictions across 5 batches logged on 2026-11-02 (23:32-23:49 IST) prior to next mar"
+      },
+      "sha256": "c0939fd5d221ab3525a72c814532bc8759e165e9194c5541da9defec9f4c9d2e",
+      "data_keys": [
+        "gain_rank_predictions_logged",
+        "forecast_batches_logged",
+        "underlyings_evaluated",
+        "matured_outcomes_count",
+        "pending_outcomes_count",
+        "directional_hit_rate",
+        "hit_rate_numerator",
+        "hit_rate_denominator",
+        "cutoff_verified_pre_event",
+        "future_leakage_detected",
+        "verification_status",
+        "drift_detected",
+        "walk_forward_status",
+        "note"
+      ],
+      "numeric_counts": {
+        "matured_outcomes_count": 0,
+        "pending_outcomes_count": 58
+      }
+    },
+    {
+      "route": "/api/paper/ledger",
+      "http": 200,
+      "response_bytes": 1114,
+      "top_keys": [
+        "data",
+        "real",
+        "hash",
+        "timestamp",
+        "provenance"
+      ],
+      "real_flag": true,
+      "timestamp": "2026-11-04T09:41:07.036117+00:00",
+      "provenance": {
+        "source": "RECONCILED_PAPER_LIFECYCLE_LEDGER",
+        "safety_mode": "PAPER_MODE",
+        "freshness_sec": 0,
+        "exchange_feed_verified": true,
+        "classification": "VERIFIED_PAPER_LEDGER"
+      },
+      "data_shape": {
+        "open_trades": {
+          "count": 0,
+          "first_item_shape": null
+        },
+        "reconciled_trades": {
+          "count": 1,
+          "first_item_shape": {
+            "proof_id": "str",
+            "signal_id": "str",
+            "idempotency_key": "str",
+            "symbol": "str",
+            "option_type": "str",
+            "entry_time_ist": "str",
+            "exit_time_ist": "str",
+            "gross_pnl_inr": "float",
+            "charges_inr": "float",
+            "net_pnl_inr": "float",
+            "execution_mode": "str",
+            "real_broker_orders_sent": "int",
+            "reconciled": "bool"
+          }
+        },
+        "closed_summary": {
+          "proof_id": "LIFECYCLE_20261030_152644",
+          "full_lifecycle_proven": true,
+          "total_trades": 1,
+          "trade_count_friction_pool": 0,
+          "gross_pnl_inr": 5.0,
+          "charges_inr": 20.0,
+          "net_pnl_inr": -15.0,
+          "status": "PAPER_LIFECYCLE_PROVEN_ACCUMULATING",
+          "note": "Requires >=5 closed trades for statistical positive net expectancy",
+          "paper_mode": true,
+          "live_orders_allowed": false
+        }
+      },
+      "sha256": "80503f1beef83681f3d3632a21d9bb30a52c65cac4914c0a6435f67cc06bb08f",
+      "data_keys": [
+        "open_trades",
+        "reconciled_trades",
+        "closed_summary"
+      ],
+      "numeric_counts": {}
+    },
+    {
+      "route": "/api/verified-market",
+      "http": 200,
+      "response_bytes": 1697,
+      "top_keys": [
+        "state",
+        "reason",
+        "checked_at_utc",
+        "market_session",
+        "quotes",
+        "exchange_quotes_verified",
+        "verified_instruments",
+        "read_only",
+        "paper_mode",
+        "live_orders_allowed",
+        "instrument_master",
+        "resolved_indices",
+        "data_url"
+      ],
+      "real_flag": null,
+      "timestamp": null,
+      "provenance": {},
+      "data_shape": {},
+      "sha256": "e9e2a83e01b5e2980966e20d6fd8c5ff304119918d70fc48e395a91eefb7175d",
+      "data_keys": [],
+      "numeric_counts": {}
+    }
+  ]
+}

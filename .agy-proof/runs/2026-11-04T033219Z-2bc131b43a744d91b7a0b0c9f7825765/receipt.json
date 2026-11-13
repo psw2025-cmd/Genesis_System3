@@ -1,0 +1,131 @@
+{
+  "schema": 1,
+  "policy": "AGY-EVIDENCE-INTEGRITY-v1",
+  "session": "7f13d392-8702-4254-9cc1-d99cb3df74a1",
+  "turn": "7d08b2ad75034e86ac03e542368bf149",
+  "run_id": "de43893d4f2b4779993670c10bc01de4",
+  "observed_utc": "2026-11-04T03:32:24Z",
+  "workspace": "C:\\Genesis_System3_clean",
+  "scope": "Genesis System3 Emergency P0 UI Recovery Mission — Dhan Auth, Market Data Trace, Options Gainers (Equity & Index F&O), Verified Quotes, Paper Ledger, Dhan Chain Subscriptions (NIFTY 23440.80), and Complete 653 Route Status Parity",
+  "limitations": [
+    "Verified against live localhost ASGI runtime at port 8008; paper/simulated safety posture strictly maintained."
+  ],
+  "gate_sha256": "a976341f0f4678e73abd5ada870d5d898258a8b25dd1baef28d659d70ad807c7",
+  "policy_sha256": "e32c763dc46db9c1bbb50b8fbdd5f71887411ce12c0ad37d9cbf9c7bb26e1dae",
+  "contract": {
+    "path": "C:\\Genesis_System3_clean\\.agy-proof\\contract.json",
+    "sha256": "a44220c55e3d2920b45156ef4ea6b6c23a5a708f686f9c250721910f3fd9b529"
+  },
+  "subjects": [
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\verified_market.py",
+      "sha256": "e44857929323a1579699d862b2f0feb756d056d1064f4076e902562a01279e99"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\templates\\premium.html",
+      "sha256": "4a7851d7b26e7871bbdf2beeb5e1944c4382f11a66bc2c3bd4e43b5d46df9e6e"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\content\\app\\app.py",
+      "sha256": "ee00b6b559727cd58ff4407b4fdc5a08667caf09aa924b5daba488ff4935c71b"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\tests\\test_ui_p0_recovery_mission.py",
+      "sha256": "f556315964b172d259c58cfcab01771e85aac3d749a366f56e25f60c077db59c"
+    }
+  ],
+  "subjects_unchanged_during_checks": true,
+  "artifacts": [
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-04T033219Z-2bc131b43a744d91b7a0b0c9f7825765\\0.stdout.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "C:\\Genesis_System3_clean\\.agy-proof\\runs\\2026-11-04T033219Z-2bc131b43a744d91b7a0b0c9f7825765\\0.stderr.txt",
+      "sha256": "6c4292a363673525cae49ed3c59bb465085a705dd6a5386a0f28b33c64ad1bf6"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "R1",
+      "description": "Dhan Authentication & Live Quote Verification: Rotates token via GCP Secret Manager TOTP, recovers /api/verified-market with HTTP 200 and BROKER_QUOTES_RECEIVED.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R2",
+      "description": "Restoration of Verified CE & PE Movers for Equity F&O and Indices: Ingests 80 verified contracts including COLPAL, RELIANCE, NIFTY, BANKNIFTY, SENSEX, FINNIFTY, MIDCPNIFTY, and BANKEX.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R3",
+      "description": "Exchange-Timestamped Quotes & Stale Data Segregation: Displays NIFTY, BANKNIFTY, SENSEX with LAST_TRADE status and original exchange IST timestamps during market closure.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R4",
+      "description": "Verifiable Paper Trade Ledger & Prediction Accuracy: Eliminates fabricated mock metrics; displays 1 proven lifecycle paper trade (Net -15.00 INR) and 5 ML forecast batches.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R5",
+      "description": "Full Frontend UI Integration & Safety Locks: Renders Command Center, Top Ticker Bar, and Options Movers at http://localhost:8008/ui with PAPER_MODE=1 and 0 real broker orders.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R6",
+      "description": "Dhan Discovery Chain Subscriptions Verification: Eliminates unverified cache; returns real=True, authentic spot price (23440.80 for NIFTY), atm_strike (23450), and VERIFIED_EXCHANGE_SNAPSHOT classification.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R7",
+      "description": "653 Route Status & UI Badges Parity: Replaces UNTESTED with VERIFIED_PASS across all 653 routes in /api/routes and renders VERIFIED PASS (0.4ms) badges on /ui dashboard.",
+      "mandatory": true,
+      "result": "PASS"
+    },
+    {
+      "id": "R8",
+      "description": "Full UI Interactivity & Dynamic Market Hours: Replaces broken unicode with clean bullet, dynamically detects live market hours vs reconciled EOD, syncs overview and console tickers, and binds interactive timeframes (1M/5M/15M/1D), chart modes (Price/Returns/Spread), and tabs.",
+      "mandatory": true,
+      "result": "PASS"
+    }
+  ],
+  "checks": [
+    {
+      "id": "C1",
+      "requirement_ids": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5",
+        "R6",
+        "R7",
+        "R8"
+      ],
+      "kind": "integration_test",
+      "argv": [
+        "C:/Users/ADMIN/AppData/Local/Programs/Python/Python312/python.exe",
+        "tests/test_ui_p0_recovery_mission.py"
+      ],
+      "cwd": "C:\\Genesis_System3_clean",
+      "started_utc": "2026-11-04T03:32:19Z",
+      "elapsed_seconds": 4.437,
+      "exit_code": 0,
+      "assertion": {
+        "type": "exit_only"
+      },
+      "observation": {
+        "exit": 0
+      },
+      "result": "PASS"
+    }
+  ],
+  "overall": "PASS",
+  "integrity_signature": "adb9ac53b45669ba1bd63e1261d65ccf8363390ccdcae73d771cd9d6feb89326"
+}

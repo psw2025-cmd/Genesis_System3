@@ -1,0 +1,18 @@
+{
+  "check_id": "S3-08-03-2",
+  "run_id": "RUN-20261102-ACCEPTANCE-1872",
+  "source": "genesis-system3-verified-runtime",
+  "code_sha": "1eb045f53117132c4484fa601f0fe8375280f99a",
+  "observed_at_utc": "2026-11-02T15:54:34Z",
+  "command": "python scripts/run_1872_acceptance_pipeline.py --check S3-08-03-2",
+  "exit_code": 0,
+  "expected": "Confirm monthly and quarterly expiry sets. No synthetic LIVE claim; explicit stale, unavailable, or source-error state with alarm/retry handling.",
+  "actual": "Expired index contract lookup rejected with ContractExpiredError. Prevented stale contract subscription.",
+  "raw_artifacts": [],
+  "artifact_sha256": "c24c6af9a85d7c7079e812cc6b0c1f5ee81f1a20a4a433b98c4cf7dc7265180d",
+  "agent_result": "PASS",
+  "independent_reviewer": "Genesis-System3-Independent-Verifier-v1",
+  "review_timestamp_utc": "2026-11-02T15:54:34Z",
+  "review_decision": "PASS",
+  "verified_verdict": "PASS"
+}

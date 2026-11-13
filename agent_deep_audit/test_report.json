@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-02-10T00:35:37.538285",
+  "total_tests": 6,
+  "passed": 4,
+  "failed": 2,
+  "success_rate": 66.66666666666666,
+  "results": {
+    "Backend API": false,
+    "WebSocket": true,
+    "Installed App Structure": false,
+    "Python Detection": true,
+    "Backend Dependencies": true,
+    "Frontend Features": true
+  }
+}

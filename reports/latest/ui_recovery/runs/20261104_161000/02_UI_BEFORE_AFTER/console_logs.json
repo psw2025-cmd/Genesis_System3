@@ -1,0 +1,32 @@
+{
+  "ui_assertions": {
+    "ws_stream_status_badge": "MARKET CLOSED \u2014 LAST VERIFIED CLOSE (2026-11-04T16:35:45+05:30)",
+    "initial_order_symbol": "NIFTY 05NOV2026 23450 CE",
+    "initial_order_exchange_segment": "NSE_FNO",
+    "initial_order_security_id": "43891",
+    "initial_order_expiry": "2026-11-05",
+    "initial_order_strike": "23450",
+    "initial_order_option_type": "CE",
+    "initial_order_lot_size": "75",
+    "after_contract_click_symbol": "RELIANCE 26NOV2026 1300 CE",
+    "after_contract_click_lot_size": "500",
+    "order_submit_response_msg": "Order Blocked by Backend Safety Gate: Live trading is locked (LIVE_TRADING_ENABLED=0)",
+    "console_error_count": 1,
+    "page_error_count": 0,
+    "network_request_count": 48,
+    "network_5xx_count": 0
+  },
+  "console_messages": [
+    {
+      "type": "log",
+      "text": "[WS] Paper telemetry websocket connected.",
+      "ts": "2026-11-04T16:35:46.573270+05:30"
+    },
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 403 (Forbidden)",
+      "ts": "2026-11-04T16:35:53.799936+05:30"
+    }
+  ],
+  "page_errors": []
+}

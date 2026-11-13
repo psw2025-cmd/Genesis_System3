@@ -1,0 +1,11 @@
+{
+  "timestamp": "2026-11-11T23:25:05Z",
+  "qc_passed": true,
+  "status": "PASS",
+  "total_contracts": 3102,
+  "underlying_count": 6,
+  "market_open": false,
+  "data_source": "dhan",
+  "qc_failures": [],
+  "message": "Verified Dhan Option Chain QC PASS"
+}

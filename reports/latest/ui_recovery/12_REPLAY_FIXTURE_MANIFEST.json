@@ -1,0 +1,64 @@
+{
+  "generated_at_ist": "2026-11-04T16:36:14.468883+05:30",
+  "git_sha": "d5ad4d0c7a9dc3c26ad13666fb791bb9e2a13a82",
+  "replay_mode_policy": "STRICT_SEPARATION_FROM_LIVE_MARKET",
+  "fixture_count": 7,
+  "fixtures": [
+    {
+      "relative_path": "content/app/verified_sources/dhan_instrument_master_detailed.csv",
+      "size_bytes": 35835418,
+      "sha256": "98a851f0d9bdda0624f5cff408e6fb0aa41fe684650fa6315c57b0012edb78f9",
+      "mtime_ist": "2026-11-04T15:12:46.549564+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "content/app/verified_sources/master_manifest.json",
+      "size_bytes": 1031,
+      "sha256": "ea1aefa38051acaf56ec97edd4194e07ae1d5e8d6e19354c25b2dcbd80835a37",
+      "mtime_ist": "2026-11-04T15:12:46.865937+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "storage/instruments/api-scrip-master-detailed.csv",
+      "size_bytes": 34342386,
+      "sha256": "a7e148f06189b709749c56a75261629f0a106469afc37dd59ee1d3ec5b6fdfac",
+      "mtime_ist": "2026-10-30T11:31:29.364985+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "state/chain_cache/NIFTY.json",
+      "size_bytes": 198225,
+      "sha256": "394345a38d52a40d2fea6ba5d2f49297647d5fb39631d97091b2e9e27d112212",
+      "mtime_ist": "2026-10-31T02:53:37.492740+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "state/chain_cache/BANKNIFTY.json",
+      "size_bytes": 240227,
+      "sha256": "4e9d0401dbaef645624a1000667eb261db6dfe08e6f0b5e33170504fc148ca54",
+      "mtime_ist": "2026-10-31T02:53:00.232697+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "state/chain_cache/SENSEX.json",
+      "size_bytes": 252370,
+      "sha256": "fe23a742a477651ec8694aca977cfd5ec5bc80e1b63562189d90b9118132b6f9",
+      "mtime_ist": "2026-10-31T02:53:22.995713+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    },
+    {
+      "relative_path": "state/chain_cache/RELIANCE.json",
+      "size_bytes": 83530,
+      "sha256": "80598ec97c0706aee6edff29e698f12e7d0434301cee2db34c5ae0967ed9d028",
+      "mtime_ist": "2026-11-01T05:44:01.242086+05:30",
+      "classification": "RECORDED_HISTORICAL_REPLAY_OR_VERIFIED_MASTER",
+      "live_market_claim_allowed": false
+    }
+  ]
+}

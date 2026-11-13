@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "C:\Genesis_System3_clean\tests\test_telegram_downstream.py", line 194, in <module>
+    test_scanner_order_bind_auto_dispatch()
+  File "C:\Genesis_System3_clean\tests\test_telegram_downstream.py", line 147, in test_scanner_order_bind_auto_dispatch
+    assert len(after_outbox) >= init_outbox_count + 1
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
