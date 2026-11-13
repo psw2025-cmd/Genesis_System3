@@ -1,0 +1,171 @@
+{
+  "validators": {
+    "statistical": {
+      "description": "Spearman and classification metrics on rolling windows",
+      "checks": [
+        {
+          "name": "spearman_5d",
+          "type": "spearman",
+          "window_days": 5,
+          "threshold": 0.70,
+          "severity": "MRI-002"
+        },
+        {
+          "name": "precision_at_k",
+          "type": "precision_at_k",
+          "k": 50,
+          "threshold": 0.60,
+          "severity": "MRI-003"
+        },
+        {
+          "name": "prediction_accuracy_1d",
+          "type": "accuracy",
+          "window_days": 1,
+          "threshold": 0.92,
+          "severity": "MRI-002"
+        }
+      ],
+      "evidence": [
+        "predictions.ndjson",
+        "backtest_report.json"
+      ]
+    },
+    "operational": {
+      "description": "Service health, latency, and endpoint correctness",
+      "checks": [
+        {
+          "name": "service_health",
+          "type": "http_status",
+          "endpoints": [
+            "/api/healthz",
+            "/api/state",
+            "/api/broker/status",
+            "/api/paper/run"
+          ],
+          "expected": 200,
+          "severity": "MRI-002"
+        },
+        {
+          "name": "median_latency_ms",
+          "type": "latency",
+          "threshold": 250,
+          "severity": "MRI-003"
+        },
+        {
+          "name": "latency_staleness",
+          "type": "latency_staleness",
+          "threshold_ms": 1000,
+          "severity": "MRI-003"
+        }
+      ],
+      "evidence": [
+        "deploy_info.json",
+        "health.json",
+        "metrics.json"
+      ]
+    },
+    "cryptographic": {
+      "description": "Artifact integrity",
+      "checks": [
+        {
+          "name": "artifact_sha256_match",
+          "type": "sha256_match",
+          "artifacts": [
+            "run_manifest.json",
+            "model_snapshot.tar.gz"
+          ],
+          "severity": "MRI-001"
+        },
+        {
+          "name": "image_digest_pin",
+          "type": "image_digest",
+          "severity": "MRI-001"
+        }
+      ],
+      "evidence": [
+        "artifact_manifest.json",
+        "run_manifest.sha256"
+      ]
+    },
+    "backtest": {
+      "description": "Simulated PnL and slippage modeling",
+      "checks": [
+        {
+          "name": "backtest_sharpe",
+          "type": "sharpe",
+          "threshold": 1.0,
+          "severity": "MRI-003"
+        },
+        {
+          "name": "backtest_drawdown",
+          "type": "max_drawdown",
+          "threshold": 0.30,
+          "severity": "MRI-003"
+        }
+      ],
+      "evidence": [
+        "backtest_report.json"
+      ]
+    },
+    "market_alignment": {
+      "description": "Predicted top symbols vs actual market top performers",
+      "checks": [
+        {
+          "name": "topk_overlap",
+          "type": "topk_overlap",
+          "k": 50,
+          "threshold": 0.25,
+          "severity": "MRI-003"
+        }
+      ],
+      "evidence": [
+        "predictions.ndjson",
+        "market_close_topk.json"
+      ]
+    }
+  },
+  "evidence_schema": {
+    "final_audit.json": {
+      "fields": [
+        "audit_id",
+        "checked_at_utc",
+        "overall_verdict",
+        "parameters",
+        "results",
+        "missing_or_mismatched_items",
+        "recommended_actions"
+      ]
+    },
+    "predictions.ndjson": {
+      "per_line": [
+        "symbol",
+        "timestamp",
+        "score",
+        "confidence",
+        "model_version"
+      ]
+    },
+    "execution_log.ndjson": {
+      "per_line": [
+        "timestamp",
+        "action",
+        "symbol",
+        "size",
+        "price",
+        "mode",
+        "outcome",
+        "latency_ms"
+      ]
+    }
+  },
+  "validator_runner": {
+    "retry_policy": {
+      "max_attempts": 3,
+      "backoff_seconds": 10
+    },
+    "fail_fast_severities": [
+      "MRI-001",
+      "MRI-002"
+    ]
+  }
+}
