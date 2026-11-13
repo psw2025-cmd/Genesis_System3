@@ -8768,7 +8768,7 @@ def _ml_accuracy_report_record(report_json: Path) -> Dict[str, Any]:
         "generated_at_utc": summary.get("generated_at_utc"),
         "blocker_reason": blocker,
         "source_file": str(report_json),
-        "ready_for_live": ml_router._check_real_validations()[0],
+        "ready_for_live": bool(ml_router._check_real_validations()[0] and model_proof_ready),
     }
 
 
@@ -8830,10 +8830,22 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
             "validation_pending_count": int(data.get("validation_pending_count") or 0),
             "blocker_reason": "PHANTOM_FAMILY_NO_WEIGHTS" if phantom else (data.get("reason") or status_raw or "OPTIONS_ML_NOT_PROMOTABLE"),
             "source_file": str(options_ml),
-            "ready_for_live": ml_router._check_real_validations()[0],
+            "ready_for_live": False,
         }
     )
     return out
+
+
+def _ml_promotion_allowed(validation_ready: Any, model_proof_ready: Any, proof_pass_count: Any) -> bool:
+    """Historical validation alone cannot authorize an ML readiness claim.
+
+    This flag only reports evidence readiness; it cannot enable broker orders.
+    """
+    try:
+        count = int(proof_pass_count or 0)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return validation_ready is True and model_proof_ready is True and count > 0
 
 
 def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
@@ -8891,7 +8903,7 @@ def _ml_models_proof_summary(models: Dict[str, Any]) -> Dict[str, Any]:
         "model_count": len(usable),
         "proven_count": len(proven),
         "blocked_count": len(blocked),
-        "ready_for_live": live_ready,
+        "ready_for_live": _ml_promotion_allowed(live_ready, any_proven, next((v.get("proof_pass_count") for v in proven.values() if v.get("proof_pass_count")), 0)),
         "ready_for_live_reason": live_reason,
     }
 
@@ -8933,7 +8945,7 @@ async def get_ml_performance(model_name: Optional[str] = None):
             rec.setdefault("status", "PROVEN_ANALYZER_ONLY" if has_metrics else "BLOCKED")
             if not has_metrics:
                 rec.setdefault("blocker_reason", "TRACKER_METRICS_INCOMPLETE")
-        rec["ready_for_live"] = ml_router._check_real_validations()[0]
+        rec["ready_for_live"] = _ml_promotion_allowed(ml_router._check_real_validations()[0], rec.get("model_proof_ready"), rec.get("proof_pass_count"))
     if not models:
         models["status"] = {
             "status": "NOT_TRAINED",
@@ -8954,8 +8966,8 @@ async def get_ml_performance(model_name: Optional[str] = None):
         for name, rec in models.items()
         if isinstance(rec, dict) and rec.get("blocker_reason")
     ]
-    performance["ready_for_live"] = truth["ready_for_live"]
-    performance["ready_for_live_reason"] = truth["ready_for_live_reason"]
+    performance["ready_for_live"] = _ml_promotion_allowed(truth["ready_for_live"], summary["model_proof_ready"], acc.get("proof_pass_count"))
+    performance["ready_for_live_reason"] = truth["ready_for_live_reason"] if (performance["ready_for_live"] or not truth["ready_for_live"]) else "MODEL_PROOF_OR_MATURED_PREDICTIONS_MISSING; " + truth["ready_for_live_reason"]
     performance["validations_checklist"] = truth["validations_checklist"]
     performance["rho"] = truth["rho"]
     performance["hit_rate"] = truth["hit_rate"]
@@ -8969,8 +8981,8 @@ async def get_ml_performance(model_name: Optional[str] = None):
         "model_proof_ready": summary["model_proof_ready"],
         "proof_status": summary["status"],
         "message": summary["message"],
-        "ready_for_live": bool(truth["ready_for_live"]),
-        "ready_for_live_reason": truth["ready_for_live_reason"],
+        "ready_for_live": performance["ready_for_live"],
+        "ready_for_live_reason": performance["ready_for_live_reason"],
         "validations_checklist": truth["validations_checklist"],
         "rho": truth["rho"],
         "hit_rate": truth["hit_rate"],
