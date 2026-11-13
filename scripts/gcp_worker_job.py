@@ -51,7 +51,7 @@ def _parse_scheduler_target(uri: str, project: str, region: str) -> tuple[Option
             rf"/v2/projects/{re.escape(project)}/locations/{re.escape(region)}/jobs/([A-Za-z0-9_-]+):run",
             parsed.path,
         )
-        if parsed.hostname == "run.googleapis.com" and v2:
+        if parsed.hostname in {"run.googleapis.com", f"{region}-run.googleapis.com"} and v2:
             return v2.group(1), True
         v1 = re.fullmatch(
             rf"/apis/run.googleapis.com/v1/namespaces/{re.escape(project)}/jobs/([A-Za-z0-9_-]+):run",
