@@ -33,15 +33,34 @@ _TRUTHY = {"1", "true", "yes", "on", "enabled"}
 
 
 def _parse_scheduler_target(uri: str, project: str, region: str) -> tuple[Optional[str], bool]:
+    """Recognize only exact supported Google Cloud Run Jobs run endpoints.
+
+    Scheduler may use v2 global host or v1 regional host. Never accept
+    arbitrary URLs, userinfo, fragments, query strings or cross-project jobs.
+    """
     try:
         parsed = urllib.parse.urlsplit(uri)
-        match = re.fullmatch(
-            rf"/v2/projects/{re.escape(project)}/locations/{re.escape(region)}/jobs/([^/:]+):run",
+        if (
+            parsed.scheme != "https"
+            or parsed.port is not None
+            or parsed.username or parsed.password
+            or parsed.query or parsed.fragment
+        ):
+            return None, False
+        v2 = re.fullmatch(
+            rf"/v2/projects/{re.escape(project)}/locations/{re.escape(region)}/jobs/([A-Za-z0-9_-]+):run",
             parsed.path,
         )
-        valid = bool(parsed.scheme == "https" and parsed.hostname == "run.googleapis.com" and parsed.port is None and not parsed.username and not parsed.password and not parsed.query and not parsed.fragment and match)
-        return (match.group(1) if match else None), valid
-    except Exception:
+        if parsed.hostname == "run.googleapis.com" and v2:
+            return v2.group(1), True
+        v1 = re.fullmatch(
+            rf"/apis/run.googleapis.com/v1/namespaces/{re.escape(project)}/jobs/([A-Za-z0-9_-]+):run",
+            parsed.path,
+        )
+        if parsed.hostname == f"{region}-run.googleapis.com" and v1:
+            return v1.group(1), True
+        return None, False
+    except (ValueError, AttributeError):
         return None, False
 
 
