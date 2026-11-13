@@ -347,6 +347,45 @@ def test_state_endpoint_rejects_stale_market_quote_even_with_verified_open_sessi
     assert data["signals"]["NIFTY"]["confidence"] == 0
 
 
+def test_state_endpoint_holds_recommendation_for_expired_contract(app, monkeypatch):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    fresh_quote = datetime.now(timezone.utc).isoformat()
+    expired_date = (datetime.now(timezone.utc).date() - timedelta(days=1)).isoformat()
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 11,
+            "mode": "PAPER",
+            "data_source": "dhan",
+            "market": {
+                "is_open": True,
+                "calendar_verified": True,
+                "market_data_timestamp_utc": fresh_quote,
+            },
+            "ml_predictions": [{
+                "symbol": "NIFTY",
+                "recommendation": "TRADE",
+                "signal": "BUY",
+                "confidence_pct": 80,
+                "model_loaded": True,
+                "expiry": expired_date,
+            }],
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "TRADE_CONTRACT_EXPIRY_NOT_VERIFIED_OR_EXPIRED",
+    }
+    assert data["ml_predictions"][0]["recommendation"] == "WAIT"
+    assert data["ml_predictions"][0]["signal"] == "HOLD"
+    assert data["ml_predictions"][0]["confidence_pct"] == 0
+
+
 def test_missing_model_proof_forces_hold_and_zero_confidence(app):
     endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/ml/predictions")
     gate = endpoint.__globals__["_apply_model_readiness_gate"]

@@ -12202,6 +12202,8 @@ def _gate_state_recommendations(state: dict) -> dict:
         reason = "MARKET_SESSION_NOT_VERIFIED_OPEN"
     elif not quote_fresh:
         reason = "FRESH_MARKET_QUOTE_NOT_VERIFIED"
+    elif _has_unverified_or_expired_trade_contract(result):
+        reason = "TRADE_CONTRACT_EXPIRY_NOT_VERIFIED_OR_EXPIRED"
 
     predictions = result.get("ml_predictions")
     if isinstance(predictions, list):
@@ -12232,6 +12234,31 @@ def _gate_state_recommendations(state: dict) -> dict:
     else:
         result["recommendation_safety"] = {"status": "VERIFIED", "reason": None}
     return result
+
+
+def _has_unverified_or_expired_trade_contract(value) -> bool:
+    """Cached trade-like outputs need a parseable, non-expired contract date."""
+    if isinstance(value, list):
+        return any(_has_unverified_or_expired_trade_contract(item) for item in value)
+    if not isinstance(value, dict):
+        return False
+    recommendation = str(value.get("recommendation") or "").upper()
+    signal = str(value.get("signal") or "").upper()
+    action = str(value.get("action") or "").upper()
+    trade_like = (
+        recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+        or signal in {"BUY", "SELL", "LONG", "SHORT"}
+        or action in {"BUY", "SELL", "LONG", "SHORT"}
+    )
+    if trade_like:
+        raw_expiry = value.get("expiry") or value.get("expiry_date") or value.get("suggested_expiry")
+        try:
+            expiry = datetime.fromisoformat(str(raw_expiry)).date() if raw_expiry else None
+        except (TypeError, ValueError, OverflowError):
+            expiry = None
+        if expiry is None or expiry < datetime.now(IST).date():
+            return True
+    return any(_has_unverified_or_expired_trade_contract(item) for item in value.values())
 
 
 @app.get("/api/ml/predictions")
