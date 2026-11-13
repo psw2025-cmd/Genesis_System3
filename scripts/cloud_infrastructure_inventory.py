@@ -2,6 +2,8 @@
 """Fail-closed read-only GCP inventory; records sanitized metadata only."""
 import argparse
 import json
+import os
+import shutil
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,14 +30,54 @@ SCOPES = {
 }
 
 
+def _gcloud_command(args, *, windows=None):
+    """Build an argument vector that works with both Unix and Windows SDK launchers."""
+    if windows is None:
+        windows = os.name == "nt"
+    if not windows:
+        return ["gcloud", *args, "--format=json", "--quiet"]
+
+    # Google Cloud SDK installs gcloud.cmd plus a companion gcloud.ps1. Python
+    # cannot CreateProcess a .CMD launcher directly, so use PowerShell's native
+    # script runner while preserving every argument as a separate token.
+    launcher = shutil.which("gcloud")
+    if not launcher:
+        raise RuntimeError("GCLOUD_NOT_FOUND")
+    ps1 = Path(launcher).with_suffix(".ps1")
+    powershell = shutil.which("powershell.exe") or shutil.which("pwsh.exe")
+    if ps1.is_file() and powershell:
+        return [powershell, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass",
+                "-File", str(ps1), *args, "--format=json", "--quiet"]
+    # An executable launcher (for example a packaged gcloud.exe) can be invoked
+    # directly. Do not route arbitrary commands through cmd.exe.
+    if launcher.lower().endswith((".exe",)):
+        return [launcher, *args, "--format=json", "--quiet"]
+    raise RuntimeError("GCLOUD_WINDOWS_LAUNCHER_UNSUPPORTED")
+
+
+def _safe_gcloud_error(stderr):
+    """Map provider text to a small allowlist; never persist raw command output."""
+    text = str(stderr or "").lower()
+    if "permission_denied" in text or "permission denied" in text or "does not have" in text:
+        return "GCLOUD_PERMISSION_DENIED"
+    if "not authenticated" in text or "credentials" in text and "invalid" in text:
+        return "GCLOUD_AUTH_UNAVAILABLE"
+    if "api" in text and ("disabled" in text or "not been used" in text):
+        return "GCLOUD_API_DISABLED"
+    if "not found" in text or "was not found" in text:
+        return "GCLOUD_RESOURCE_NOT_FOUND"
+    return "GCLOUD_NONZERO_EXIT"
+
+
 def run_gcloud(args):
     try:
-        result = subprocess.run(["gcloud", *args, "--format=json", "--quiet"],
+        result = subprocess.run(_gcloud_command(args),
                                 capture_output=True, text=True, timeout=45, check=False)
     except (OSError, subprocess.TimeoutExpired) as exc:
-        raise RuntimeError(type(exc).__name__) from None
+        code = "GCLOUD_TIMEOUT" if isinstance(exc, subprocess.TimeoutExpired) else "GCLOUD_LAUNCH_FAILED"
+        raise RuntimeError(code) from None
     if result.returncode:
-        raise RuntimeError("GCLOUD_NONZERO_EXIT")
+        raise RuntimeError(_safe_gcloud_error(result.stderr))
     try:
         return json.loads(result.stdout)
     except (ValueError, TypeError):
@@ -92,7 +134,8 @@ def collect(runner=run_gcloud):
         try:
             scopes[name] = summarize(name, runner(args))
         except (RuntimeError, ValueError, TypeError, KeyError) as exc:
-            scopes[name] = {"status": "NOT_VERIFIED", "error_class": type(exc).__name__}
+            code = str(exc) if str(exc).startswith("GCLOUD_") else type(exc).__name__
+            scopes[name] = {"status": "NOT_VERIFIED", "error_code": code}
     ready = all(entry["status"] == "PASS" for entry in scopes.values())
     return {"schema": "genesis-cloud-infrastructure-inventory-v1",
             "observed_utc": datetime.now(timezone.utc).isoformat(),

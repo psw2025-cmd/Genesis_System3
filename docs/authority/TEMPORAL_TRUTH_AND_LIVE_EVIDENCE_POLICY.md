@@ -77,6 +77,7 @@ A claim that the System3 UI is healthy or complete requires fresh production-bro
 - broker
 - alerts
 - system
+- system-readiness
 - gates
 
 For each tab, capture:

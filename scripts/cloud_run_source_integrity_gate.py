@@ -18,6 +18,7 @@ REQUIRED_FILES = (
     "dashboard/frontend/package.json",
     "dashboard/frontend/src/components/Sidebar.tsx",
     "scripts/start_cloud_run.py",
+    "scripts/cloud_run_build_metadata_gate.py",
     "AGENTS.md",
     "GEMINI.md",
 )
@@ -70,10 +71,32 @@ def verify_source(root: Path, *, minimum_backend_bytes: int = MIN_BACKEND_BYTES)
     docker_source = docker_file.read_text(encoding="utf-8")
     if "scripts/start_cloud_run.py" not in docker_source or "EXPOSE 8080" not in docker_source:
         raise ValueError("Canonical Cloud Run Dockerfile/launcher contract missing")
+    build_config = root / "cloudbuild.yaml"
+    if not build_config.is_file():
+        raise ValueError("Canonical immutable Cloud Build config missing")
+    build_source = build_config.read_text(encoding="utf-8")
+    if (
+        "--file=dashboard/backend/Dockerfile" not in build_source
+        or "--build-arg=DEPLOY_GIT_SHA=${_GIT_SHA}" not in build_source
+        or "${_IMAGE}:${_GIT_SHA}" not in build_source
+        or "scripts/cloud_run_build_metadata_gate.py" not in build_source
+        or "cloud-run-source-deploy/genesis-system3-web" not in build_source
+    ):
+        raise ValueError("Cloud Build must select canonical Dockerfile and immutable SHA image")
+    if "ARG DEPLOY_GIT_SHA" not in docker_source or "ENV DEPLOY_GIT_SHA=${DEPLOY_GIT_SHA}" not in docker_source:
+        raise ValueError("Canonical Cloud Run image must expose exact source SHA")
+    safety_contract = (
+        "PAPER_MODE=1", "ANALYZE_MODE=1", "LIVE_ORDER_AUTHORITY=0",
+        "REAL_BROKER_ORDERS=0", "LIVE_TRADING_ENABLED=0", "ORDER_PLACEMENT_ALLOWED=false",
+    )
+    if any(flag not in docker_source for flag in safety_contract):
+        raise ValueError("Canonical Cloud Run image must lock PAPER mode and disable broker orders")
 
     return {
         "status": "PASS",
         "canonical_dockerfile": "dashboard/backend/Dockerfile",
+        "canonical_build_config": "cloudbuild.yaml",
+        "build_metadata_gate": "scripts/cloud_run_build_metadata_gate.py",
         "required_routes": sorted(REQUIRED_ROUTES),
         "backend_bytes": backend_size,
         "backend_sha256": hashlib.sha256(backend_file.read_bytes()).hexdigest(),

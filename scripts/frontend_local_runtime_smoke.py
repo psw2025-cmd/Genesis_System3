@@ -10,6 +10,7 @@ is intentionally called.
 from __future__ import annotations
 
 import base64
+import hashlib
 import json
 import shutil
 import socket
@@ -19,6 +20,7 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
@@ -38,8 +40,9 @@ TABS = [
     "decision-intel", "truth", "genesis", "e2e-proof", "overview", "sim-live",
     "options-intel", "chain", "signals", "trade", "paper", "positions",
     "risk-scenarios", "multibagger", "prediction-audit", "performance", "ml",
-    "data-integrity", "broker", "alerts", "system", "gates",
+    "data-integrity", "broker", "alerts", "system", "system-readiness", "gates",
 ]
+MOBILE_VIEWPORT_WIDTH = 390
 
 
 def _verify_deploy_markers() -> None:
@@ -148,6 +151,12 @@ class Browser:
     def navigate(self, url: str) -> None:
         self._request("POST", f"/session/{self.session_id}/url", {"url": url}, timeout=12)
 
+    def set_viewport(self, width: int, height: int) -> None:
+        self._request("POST", f"/session/{self.session_id}/goog/cdp/execute", {
+            "cmd": "Emulation.setDeviceMetricsOverride",
+            "params": {"width": width, "height": height, "deviceScaleFactor": 1, "mobile": True},
+        }, timeout=8)
+
     def _execute(self, script: str, args: list | None = None):
         return self._request(
             "POST", f"/session/{self.session_id}/execute/sync",
@@ -168,14 +177,28 @@ return true;
         value = self._execute(r"""
 const id = arguments[0];
 const root = document.getElementById('root');
+const main = document.getElementById('dashboard-main');
+const mainText = (main && main.innerText || '').trim();
+const heading = main && main.querySelector('h1,h2,h3,.workspace-title,.panel-title');
+const overflowNodes = main ? Array.from(main.querySelectorAll('*')).filter(el => {
+  const style = getComputedStyle(el);
+  const rect = el.getBoundingClientRect();
+  return rect.width > 0 && rect.height > 0 && (rect.right > window.innerWidth + 2 || el.scrollWidth > el.clientWidth + 8) && style.display !== 'none';
+}).slice(0, 8).map(el => ({tag: el.tagName, cls: String(el.className || '').slice(0, 90), right: Math.round(el.getBoundingClientRect().right), client: el.clientWidth, scroll: el.scrollWidth, overflowX: getComputedStyle(el).overflowX})) : [];
 const button = document.querySelector('[data-dashboard-tab="' + CSS.escape(id) + '"]');
 const text = (document.body && document.body.innerText || '').toUpperCase();
 return {
   readyState: document.readyState,
+  viewportWidth: window.innerWidth,
   rootChildren: root ? root.childElementCount : -1,
   active: !!button && button.getAttribute('aria-current') === 'page',
   system3: text.includes('SYSTEM3'),
   keyPrompt: text.includes('DASHBOARD API KEY') || text.includes('ENTER API KEY'),
+  horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+  mainChars: mainText.length,
+  mainHeading: heading ? (heading.innerText || '').trim().slice(0, 100) : '',
+  loadingFallback: mainText.includes('Loading dashboard section'),
+  overflowNodes,
   bodyText: text.slice(0, 300),
 };
 """, [tab_id])
@@ -188,12 +211,19 @@ return {
             path.write_bytes(base64.b64decode(encoded))
 
 
-def _wait_tab(browser: Browser, tab_id: str, timeout_s: float = 3.0) -> dict:
+def _wait_tab(browser: Browser, tab_id: str, timeout_s: float = 10.0) -> dict:
     deadline = time.monotonic() + timeout_s
     snap: dict = {}
     while time.monotonic() < deadline:
         snap = browser.snapshot(tab_id)
-        if snap.get("rootChildren", 0) > 0 and snap.get("system3") and snap.get("active"):
+        if (
+            snap.get("rootChildren", 0) > 0
+            and snap.get("system3")
+            and snap.get("active")
+            and snap.get("mainChars", 0) > 10
+            and snap.get("mainHeading")
+            and not snap.get("loadingFallback")
+        ):
             return snap
         time.sleep(0.15)
     return snap
@@ -216,8 +246,13 @@ def main() -> int:
 
     preview_port = _free_port()
     base_url = f"http://{HOST}:{preview_port}/ui/"
+    node = shutil.which("node")
+    vite_cli = FRONTEND / "node_modules" / "vite" / "bin" / "vite.js"
+    if not node or not vite_cli.is_file():
+        print("FAIL: node or local Vite CLI unavailable", file=sys.stderr)
+        return 2
     preview = subprocess.Popen(
-        ["npm", "run", "preview", "--", "--host", HOST, "--port", str(preview_port), "--strictPort"],
+        [node, str(vite_cli), "preview", "--host", HOST, "--port", str(preview_port), "--strictPort"],
         cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
     )
     failures: list[str] = []
@@ -236,7 +271,7 @@ def main() -> int:
                     failures.append(f"{tab_id}:sidebar_button_missing")
                     print("TAB_FAIL", tab_id, "sidebar_button_missing")
                     continue
-                snap = _wait_tab(browser, tab_id, 3)
+                snap = _wait_tab(browser, tab_id, 10)
                 tab_failures: list[str] = []
                 if snap.get("rootChildren", 0) <= 0:
                     tab_failures.append("react_root_empty")
@@ -244,6 +279,10 @@ def main() -> int:
                     tab_failures.append("system3_marker_missing")
                 if not snap.get("active"):
                     tab_failures.append("active_tab_not_proven")
+                if snap.get("mainChars", 0) <= 10 or not snap.get("mainHeading"):
+                    tab_failures.append("tab_content_not_proven")
+                if snap.get("loadingFallback"):
+                    tab_failures.append("lazy_content_still_loading")
                 if snap.get("keyPrompt"):
                     tab_failures.append("credential_prompt_rendered")
                 if tab_failures:
@@ -255,6 +294,42 @@ def main() -> int:
                     captured += 1
                     print("TAB_PASS", tab_id, f"screenshot={tab_id}.png")
 
+            # Give the mobile viewport a fresh renderer. Desktop chart-heavy tabs
+            # otherwise accumulate GPU/DOM state and can crash Chromium mid-loop.
+            browser.__exit__(None, None, None)
+            browser = Browser().__enter__()
+            browser.navigate(base_url + "?tab=decision-intel")
+            _wait_tab(browser, "decision-intel", 10)
+            browser.set_viewport(MOBILE_VIEWPORT_WIDTH, 844)
+            # Let the app's bounded route-chunk prefetch settle in the new
+            # mobile renderer before measuring per-tab loading behavior.
+            time.sleep(3)
+            for tab_id in TABS:
+                if not browser.activate(tab_id):
+                    failures.append(f"mobile_{tab_id}:sidebar_button_missing")
+                    continue
+                snap = _wait_tab(browser, tab_id, 10)
+                if tab_id == "decision-intel":
+                    print("MOBILE_LAYOUT_DIAGNOSTIC", json.dumps(snap.get("overflowNodes", []), sort_keys=True))
+                if (
+                    not snap.get("active")
+                    or not snap.get("system3")
+                    or abs(snap.get("viewportWidth", 9999) - MOBILE_VIEWPORT_WIDTH) > 1
+                    or snap.get("mainChars", 0) <= 10
+                    or not snap.get("mainHeading")
+                    or snap.get("loadingFallback")
+                ):
+                    failures.append(f"mobile_{tab_id}:render_not_proven")
+                    print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))
+                    continue
+                if snap.get("horizontalOverflow"):
+                    failures.append(f"mobile_{tab_id}:horizontal_overflow")
+                    print("MOBILE_TAB_FAIL", tab_id, "horizontal_overflow")
+                    continue
+                browser.screenshot(PROOF_DIR / "mobile" / f"{tab_id}.png")
+                captured += 1
+                print("MOBILE_TAB_PASS", tab_id)
+
             if failures:
                 browser.screenshot(PROOF_DIR / "_failure.png")
     finally:
@@ -265,21 +340,51 @@ def main() -> int:
             preview.kill()
 
     elapsed = round(time.monotonic() - started, 2)
+    desktop_failed = {item.split(":", 1)[0] for item in failures if not item.startswith("mobile_")}
+    mobile_failed = {
+        item.split(":", 1)[0].removeprefix("mobile_")
+        for item in failures if item.startswith("mobile_")
+    }
+
+    def screenshot_record(relative: str) -> dict:
+        path = PROOF_DIR / relative
+        if not path.is_file():
+            return {"path": relative, "status": "MISSING"}
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        return {"path": relative, "status": "CAPTURED", "sha256": digest}
+
+    tab_results = []
+    for tab_id in TABS:
+        desktop = screenshot_record(f"{tab_id}.png")
+        mobile = screenshot_record(f"mobile/{tab_id}.png")
+        desktop_ok = tab_id not in desktop_failed and desktop["status"] == "CAPTURED"
+        mobile_ok = tab_id not in mobile_failed and mobile["status"] == "CAPTURED"
+        tab_results.append({
+            "tab_id": tab_id,
+            "desktop_status": "PASS" if desktop_ok else "FAIL",
+            "desktop_screenshot": desktop,
+            "mobile_status": "PASS" if mobile_ok else "FAIL",
+            "mobile_screenshot": mobile,
+        })
     manifest = {
+        "observed_at_utc": datetime.now(timezone.utc).isoformat(),
         "tabs_expected": len(TABS),
         "screenshots_captured": captured,
+        "desktop_tabs_passed": sum(item["desktop_status"] == "PASS" for item in tab_results),
+        "mobile_tabs_passed": sum(item["mobile_status"] == "PASS" for item in tab_results),
         "failures": failures,
         "elapsed_s": elapsed,
-        "viewport": "1600x1000",
+        "viewports": ["1600x1000", "390x844"],
         "live_trading_actions": 0,
         "deploy_markers": list(REQUIRED_DEPLOY_MARKERS),
+        "tabs": tab_results,
     }
     (PROOF_DIR / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     if failures:
         print("FRONTEND_RUNTIME_SMOKE=FAIL", json.dumps(failures), f"elapsed_s={elapsed}", file=sys.stderr)
         return 1
-    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} screenshots={captured} elapsed_s={elapsed} live_trading_actions=0")
+    print(f"FRONTEND_RUNTIME_SMOKE=PASS tabs={len(TABS)} desktop_mobile_screenshots={captured} mobile_viewport={MOBILE_VIEWPORT_WIDTH}px elapsed_s={elapsed} live_trading_actions=0")
     return 0
 
 

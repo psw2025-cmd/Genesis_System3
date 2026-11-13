@@ -1,6 +1,8 @@
 """Offline schema, privacy and fail-closed inventory regression tests."""
 import unittest
-from scripts.cloud_infrastructure_inventory import SCOPES, collect, safe_name, summarize
+from scripts.cloud_infrastructure_inventory import (
+    SCOPES, _safe_gcloud_error, collect, safe_name, summarize,
+)
 
 
 class InventoryTests(unittest.TestCase):
@@ -59,6 +61,26 @@ class InventoryTests(unittest.TestCase):
     def test_private_identity_filter(self):
         self.assertIsNone(safe_name({"name": "person@example.com"}))
         self.assertEqual(safe_name({"name": "projects/p/secrets/token"}), "token")
+
+    def test_gcloud_error_is_classified_without_echoing_provider_text(self):
+        private = "PERMISSION_DENIED: private-resource and token=do-not-print"
+        self.assertEqual(_safe_gcloud_error(private), "GCLOUD_PERMISSION_DENIED")
+        proof = collect(lambda _args: (_ for _ in ()).throw(RuntimeError("GCLOUD_PERMISSION_DENIED")))
+        self.assertNotIn("do-not-print", str(proof))
+        self.assertEqual(proof["scopes"]["project"]["error_code"], "GCLOUD_PERMISSION_DENIED")
+
+    def test_windows_launcher_uses_powershell_script(self):
+        from unittest.mock import patch
+        import scripts.cloud_infrastructure_inventory as inventory
+
+        with patch.object(inventory.shutil, "which", side_effect=lambda name: {
+                 "gcloud": "/opt/google-cloud-sdk/bin/gcloud.CMD",
+                 "powershell.exe": "/powershell.exe",
+             }.get(name)), patch.object(inventory.Path, "is_file", return_value=True):
+            command = inventory._gcloud_command(("projects", "describe", "project-id"), windows=True)
+        self.assertIn("-File", command)
+        self.assertTrue(command[command.index("-File") + 1].endswith("gcloud.ps1"))
+        self.assertEqual(command[-3:], ["project-id", "--format=json", "--quiet"])
 
 
 if __name__ == "__main__":

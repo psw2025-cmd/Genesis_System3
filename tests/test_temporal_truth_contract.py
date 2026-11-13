@@ -92,7 +92,7 @@ class TemporalTruthContractTests(unittest.TestCase):
             "decision-intel", "truth", "genesis", "e2e-proof", "overview", "sim-live",
             "options-intel", "chain", "signals", "trade", "paper", "positions",
             "risk-scenarios", "multibagger", "prediction-audit", "performance", "ml",
-            "data-integrity", "broker", "alerts", "system", "gates",
+            "data-integrity", "broker", "alerts", "system", "system-readiness", "gates",
         ]:
             self.assertIn(f'"{tab}"', text)
 

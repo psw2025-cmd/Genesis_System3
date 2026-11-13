@@ -94,7 +94,7 @@ export function SystemTab() {
         </div>
         <Row label="Token Source" value={proof?.source || 'PENDING PROOF'} ok={proof?.source ? tokenSourceProven : undefined} />
         <Row label="Secret Version" value={proof?.secret_version ? `VERSION ${proof.secret_version}` : 'PENDING PROOF'} ok={proof?.secret_version ? true : undefined} />
-        <Row label="Token Loaded (IST)" value={fmtIst(proof?.loaded_at_utc)} />
+        <Row label="Token Observed (IST)" value={fmtIst(proof?.observed_at_utc)} />
         <Row label="Token Expiry (IST)" value={fmtIst(proof?.expires_at_utc)} ok={proof?.expires_at_utc ? tokenHealthy : undefined} />
         <Row label="Token Time Left" value={hoursRemaining == null || Number.isNaN(hoursRemaining) ? 'PENDING PROOF' : `${hoursRemaining.toFixed(2)} h`} ok={hoursRemaining == null || Number.isNaN(hoursRemaining) ? undefined : tokenHealthy} />
         <Row label="Last Reload" value={proof?.last_reload_reason || 'NOT YET PROVEN'} ok={proof?.last_error_type ? false : proof?.last_reload_reason ? true : undefined} />
