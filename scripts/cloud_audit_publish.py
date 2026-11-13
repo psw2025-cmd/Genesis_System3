@@ -12,7 +12,6 @@ import json
 import re
 import subprocess
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
 
 BUCKET = "system3-openalgo-safe-reports"
@@ -90,7 +89,6 @@ def publish(root: Path, commit: str, runner=gcloud):
         "schema": "genesis-immutable-gcs-audit-receipt-v1",
         "publication_commit_sha": commit,
         "audited_source_sha": audited_sha,
-        "published_at_utc": datetime.now(timezone.utc).isoformat(),
         "objects": {},
         "object_count": len(FILES),
         "production_traffic_mutated": False,
