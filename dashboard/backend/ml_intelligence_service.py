@@ -1,112 +1,128 @@
-"""ML Intelligence & Feature Pipeline Service.
+"""Evidence-backed ML intelligence for the PAPER/ANALYZE dashboard.
 
-Exposes live model registry, feature pipeline health (129 Phase 389 features),
-feature importance rankings, prediction inference audit trail, and Spearman accuracy tracking.
+Never fabricate inference timestamps, model accuracy, feature freshness, or
+probabilities. A serialized model file proves neither that it loaded nor that
+it generated a successful prediction. Read-only artifact inspection only.
 """
-
 from __future__ import annotations
 
+import hashlib
+import json
 from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, Optional
+
+ROOT = Path(__file__).resolve().parents[2]
+MIN_MODEL_BYTES = 1024
 
 
-FEATURE_IMPORTANCE_RANKINGS = [
-    {"rank": 1, "feature": "delta_momentum_5", "category": "Greeks Momentum", "importance_score": 0.142, "description": "5-period delta rate of change"},
-    {"rank": 2, "feature": "iv_percentile_75", "category": "IV Regime", "importance_score": 0.128, "description": "75th percentile IV band breach"},
-    {"rank": 3, "feature": "volume_oi_ratio", "category": "Volume & OI", "importance_score": 0.115, "description": "Volume to open interest acceleration"},
-    {"rank": 4, "feature": "gamma_acceleration", "category": "Greeks Momentum", "importance_score": 0.098, "description": "Second-order price sensitivity speed"},
-    {"rank": 5, "feature": "atm_distance_pct", "category": "Price & Moneyness", "importance_score": 0.089, "description": "Percentage distance from spot to strike"},
-    {"rank": 6, "feature": "oi_buildup", "category": "Volume & OI", "importance_score": 0.082, "description": "Institutional net buildup classification"},
-    {"rank": 7, "feature": "vega_theta_ratio", "category": "Greeks Momentum", "importance_score": 0.074, "description": "Volatility reward vs time decay risk"},
-    {"rank": 8, "feature": "trend_strength_10", "category": "Multi-Timeframe", "importance_score": 0.068, "description": "10-period directional trend consistency"},
-    {"rank": 9, "feature": "ce_pe_spread", "category": "Price & Moneyness", "importance_score": 0.061, "description": "Symmetric Call-Put volatility spread"},
-    {"rank": 10, "feature": "days_to_expiry", "category": "Time-Based", "importance_score": 0.055, "description": "Calendar days remaining until contract expiry"},
-]
-
-LIVE_PREDICTIONS = [
-    {
-        "prediction_id": "PRED-20260829-001",
-        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "underlying": "NIFTY",
-        "horizon": "INTRADAY_EXPIRY",
-        "direction": "BULLISH_CONVICTION",
-        "confidence_score": 0.76,
-        "class_probabilities": {"BUY": 0.76, "HOLD": 0.18, "SELL": 0.06},
-        "model_id": "XGBOOST_PHASE391_V1",
-        "model_version": "1.2.0",
-        "top_contributing_features": ["delta_momentum_5 (+0.14)", "iv_percentile_75 (+0.11)", "volume_oi_ratio (+0.09)"],
-        "reason_code": "LONG_BUILDUP_CONFIRMED_GREEKS_MOMENTUM",
-        "validation_status": "CALIBRATED_PASS",
-    },
-    {
-        "prediction_id": "PRED-20260829-002",
-        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-        "underlying": "BANKNIFTY",
-        "horizon": "INTRADAY_EXPIRY",
-        "direction": "NEUTRAL_ACCUMULATION",
-        "confidence_score": 0.62,
-        "class_probabilities": {"BUY": 0.32, "HOLD": 0.62, "SELL": 0.06},
-        "model_id": "XGBOOST_PHASE391_V1",
-        "model_version": "1.2.0",
-        "top_contributing_features": ["atm_distance_pct (0.00)", "vega_theta_ratio (-0.04)"],
-        "reason_code": "CONSOLIDATION_NEAR_MAJOR_SUPPORT",
-        "validation_status": "CALIBRATED_PASS",
-    },
-]
+def _read_json(path: Path) -> Optional[dict]:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else None
+    except (OSError, ValueError, UnicodeDecodeError):
+        return None
 
 
-def get_ml_performance_data() -> Dict[str, Any]:
-    """Return unified ML model status, feature pipeline, and accuracy telemetry."""
+def _artifact_rows(root: Path) -> list[dict]:
+    """Hash present weights without unpickling untrusted model files."""
+    folder = root / "models" / "xgboost_v1"
+    out: list[dict] = []
+    for path in sorted(folder.glob("*_xgb_model.pkl")):
+        symbol = path.name.removesuffix("_xgb_model.pkl")
+        metadata_path = folder / (symbol + "_xgb_meta.json")
+        metadata = _read_json(metadata_path)
+        try:
+            size = path.stat().st_size
+            with path.open("rb") as handle:
+                digest = hashlib.file_digest(handle, "sha256").hexdigest()
+        except OSError:
+            continue
+        meta_features = metadata.get("n_features") if isinstance(metadata, dict) else None
+        meta_samples = metadata.get("n_samples") if isinstance(metadata, dict) else None
+        out.append({
+            "underlying": symbol,
+            "model_type": "XGBoost candidate artifact",
+            "artifact_path": str(path.relative_to(root)).replace("\\", "/"),
+            "artifact_size_bytes": size,
+            "artifact_sha256": digest,
+            "metadata_available": metadata is not None,
+            "metadata_reported_features": meta_features,
+            "metadata_reported_samples": meta_samples,
+            "model_loaded": False,
+            "inference_verified": False,
+            "model_proof_ready": False,
+            "calibration_status": "NOT_VERIFIED",
+            "status": (
+                "WEIGHTS_PRESENT_UNVERIFIED"
+                if size >= MIN_MODEL_BYTES
+                else "ARTIFACT_TOO_SMALL"
+            ),
+        })
+    return out
+
+
+def get_ml_performance_data(root: Optional[Path] = None) -> Dict[str, Any]:
+    """Supply only on-disk artifact facts and explicit validation blockers."""
+    actual_root = Path(root) if root is not None else ROOT
+    models = _artifact_rows(actual_root)
+    accuracy_path = actual_root / "reports" / "latest" / "model_accuracy_report.json"
+    report = _read_json(accuracy_path)
+    summary = report.get("summary") if isinstance(report, dict) else None
+    summary = summary if isinstance(summary, dict) else {}
+    try:
+        reported_proofs = max(0, int(summary.get("proof_pass_count") or 0))
+    except (TypeError, ValueError):
+        reported_proofs = 0
     return {
-        "status": "ok",
+        "status": "BLOCKED",
         "generated_utc": datetime.now(timezone.utc).isoformat(),
         "live_trading_enabled": False,
+        "model_proof_ready": False,
+        "ready_for_live": False,
+        "blocker_reason": "NO_INDEPENDENT_VERIFIED_INFERENCE_AND_MATURED_OUTCOMES",
         "pipeline": {
-            "total_features": 129,
-            "core_engineered_features": 40,
-            "freshness_sec": 4.2,
-            "missing_features_count": 0,
-            "status": "HEALTHY",
-            "feature_categories": {
-                "greeks_momentum": 8,
-                "iv_regime": 6,
-                "price_moneyness": 8,
-                "volume_oi": 6,
-                "time_based": 4,
-                "multiframe": 8,
-            },
+            "status": "NOT_VERIFIED",
+            "total_features": None,
+            "reported_feature_count": max(
+                (int(m["metadata_reported_features"])
+                 for m in models
+                 if isinstance(m.get("metadata_reported_features"), int)), default=0
+            ) or None,
+            "freshness_sec": None,
+            "missing_features_count": None,
+            "feature_categories": {},
+            "reason": "No measured feature-producer heartbeat and schema evidence",
         },
-        "feature_importance": FEATURE_IMPORTANCE_RANKINGS,
-        "active_models": [
-            {
-                "underlying": "NIFTY",
-                "model_type": "XGBoost Classifier",
-                "version": "1.2.0",
-                "train_samples": 772,
-                "test_samples": 193,
-                "n_features": 129,
-                "spearman_rho_oos": 0.74,
-                "calibration_status": "CALIBRATED",
-                "artifact_path": "models/xgboost_v1/NIFTY_xgb_model.pkl",
-            },
-            {
-                "underlying": "BANKNIFTY",
-                "model_type": "XGBoost Classifier",
-                "version": "1.2.0",
-                "train_samples": 772,
-                "test_samples": 193,
-                "n_features": 129,
-                "spearman_rho_oos": 0.72,
-                "calibration_status": "CALIBRATED",
-                "artifact_path": "models/xgboost_v1/BANKNIFTY_xgb_model.pkl",
-            },
-        ],
+        "feature_importance": [],
+        "feature_importance_status": "NO_INDEPENDENT_MODEL_EXPLANATION",
+        "active_models": models,
+        "models": models,
         "validation_summary": {
-            "spearman_rho_avg_5day": 0.73,
-            "gate_threshold": 0.70,
-            "gate_status": "PASS",
-            "total_predictions_logged": len(LIVE_PREDICTIONS),
-            "drift_detected": False,
+            "gate_status": "BLOCKED",
+            "spearman_rho_avg_5day": None,
+            "total_predictions_logged": 0,
+            "proof_pass_count_reported": reported_proofs,
+            "accuracy_report_exists": report is not None,
+            "accuracy_report_source": (
+                "reports/latest/model_accuracy_report.json"
+                if report is not None else None
+            ),
+            "reason": "Metadata and model files are not inference/outcome receipts",
         },
-        "predictions": LIVE_PREDICTIONS,
+        "predictions": [],
+        "prediction_status": "NO_CURRENT_VERIFIED_PREDICTION_LEDGER",
+        "candidate_model_count": len(models),
     }
+
+
+def get_ml_intelligence_data(root: Optional[Path] = None) -> Dict[str, Any]:
+    """Read-only compatibility contract for /api/ml/intelligence."""
+    data = get_ml_performance_data(root=root)
+    data["source"] = "local_serialized_model_artifacts_and_report_metadata"
+    data["message"] = (
+        "Serialized model candidates found; no independent "
+        "prediction-before-move or matured outcome proof is available."
+    )
+    data["model_registry"] = data["active_models"]
+    return data
