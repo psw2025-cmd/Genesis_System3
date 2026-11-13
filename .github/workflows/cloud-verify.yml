@@ -10,6 +10,8 @@ on:
       - 'tests/test_cloud_discover_readonly.py'
       - 'tests/test_dhan_canonical_rotation_readonly.py'
       - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/cloud_infrastructure_inventory.py'
+      - 'tests/test_cloud_infrastructure_inventory.py'
       - 'scripts/dhan_canonical_rotation_readonly.py'
   push:
     branches: [main]
@@ -17,6 +19,8 @@ on:
       - '.github/workflows/cloud-verify.yml'
       - 'scripts/cloud_verify_readonly.py'
       - 'scripts/cloud_discover_readonly.py'
+      - 'scripts/cloud_infrastructure_inventory.py'
+      - 'tests/test_cloud_infrastructure_inventory.py'
       - 'scripts/dhan_canonical_rotation_readonly.py'
       - 'dashboard/backend/paper_market_replay.py'
 
@@ -40,7 +44,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate target and safety without GCP credentials
-        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract
+        run: python -m unittest tests.test_cloud_verify_target_contract tests.test_cloud_discover_readonly tests.test_dhan_canonical_rotation_readonly tests.test_cloud_run_env_contract tests.test_cloud_infrastructure_inventory
 
   synthetic-paper-proof:
     name: OFFLINE - synthetic PAPER lifecycle (not broker proof)
@@ -173,6 +177,10 @@ jobs:
           credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON }}
       - name: Install gcloud
         uses: google-github-actions/setup-gcloud@v2
+      - name: Full cloud infrastructure inventory (sanitized, read only)
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: python -S scripts/cloud_infrastructure_inventory.py --output cloud-infrastructure-inventory.json
       - name: Describe discovered Cloud Run service (read only)
         env:
           DISCOVERED_PROJECT: ${{ needs.name-discovery.outputs.project }}
@@ -220,6 +228,7 @@ jobs:
           path: |
             cloud-verify-evidence.jsonl
             cloud-run-sanitized-evidence.json
+            cloud-infrastructure-inventory.json
           if-no-files-found: warn
           retention-days: 7
       - name: Remove private Cloud Run description
