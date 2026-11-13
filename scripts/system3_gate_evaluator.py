@@ -21,7 +21,7 @@ from typing import Any, Dict, List, Optional, Tuple
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "system3_auto_gates"
 SPEARMAN_THRESHOLD = 0.70
-SPEARMAN_DAYS_REQUIRED = 5
+SPEARMAN_DAYS_REQUIRED = 30
 HUMAN_GATE_PATH = ROOT / "config" / "human_approval_gate.json"
 
 GATE_IDS = [
@@ -71,12 +71,23 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         day = str(data.get("date") or fallback_date or "").strip()
         if not day:
             return
+        session_proof = data.get("exchange_session_proof")
+        session_verified = bool(
+            isinstance(session_proof, dict)
+            and session_proof.get("verified") is True
+            and str(session_proof.get("exchange") or "").upper() == "NSE"
+            and str(session_proof.get("session_date") or "") == day
+            and bool(str(session_proof.get("previous_session_date") or "").strip())
+            and "nseindia.com" in str(session_proof.get("source_url") or "").lower()
+        )
         by_date[day] = {
             "date": day,
             "rho": round(rho, 4),
             "hit_rate": data.get("hit_rate", data.get("match_rate_top3")),
             "status": data.get("status") or data.get("grade"),
-            "pass": rho >= SPEARMAN_THRESHOLD,
+            "pass": rho >= SPEARMAN_THRESHOLD and session_verified,
+            "session_verified": session_verified,
+            "previous_session_date": str((session_proof or {}).get("previous_session_date") or ""),
         }
 
     mv_dir = root / "state" / "market_validations"
@@ -112,21 +123,28 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
 def eval_spearman_gate(root: Path) -> Dict[str, Any]:
     days, passing, latest = load_spearman_days(root)
     consecutive_pass = 0
-    for d in reversed(days):
-        if d["pass"]:
+    previous_day = None
+    for d in days:
+        linked = previous_day is None or d.get("previous_session_date") == previous_day
+        if d["pass"] and linked:
             consecutive_pass += 1
+        elif d["pass"]:
+            consecutive_pass = 1
         else:
-            break
-    ok = passing >= SPEARMAN_DAYS_REQUIRED
+            consecutive_pass = 0
+        previous_day = d["date"]
+    # A total of scattered passing rows is not a consecutive validation streak.
+    # Missing/failed sessions and rows without official NSE session provenance break it.
+    ok = consecutive_pass >= SPEARMAN_DAYS_REQUIRED
     return {
         "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
         "pass": ok,
         "days_recorded": len(days),
         "days_passing_threshold": passing,
+        "consecutive_pass_days": consecutive_pass,
         "days_required": SPEARMAN_DAYS_REQUIRED,
         "threshold": SPEARMAN_THRESHOLD,
         "latest_rho": latest,
-        "consecutive_pass_days": consecutive_pass,
         "blocker_id": None if ok else "SYS3-BLK-005",
         "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
         "days": days[-14:],

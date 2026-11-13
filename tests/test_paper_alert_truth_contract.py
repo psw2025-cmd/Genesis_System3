@@ -4,7 +4,11 @@ import json
 from pathlib import Path
 
 from dashboard.backend.auto_gates_service import _proof_gates_from_payload
-from scripts.system3_gate_evaluator import SPEARMAN_DAYS_REQUIRED, SPEARMAN_THRESHOLD
+from scripts.system3_gate_evaluator import (
+    SPEARMAN_DAYS_REQUIRED,
+    SPEARMAN_THRESHOLD,
+    eval_spearman_gate,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -21,8 +25,55 @@ def test_owner_approval_and_live_latch_are_distinct_and_live_stays_off():
 
 
 def test_spearman_gate_threshold_is_evidence_based_not_kill_switch_override():
-    assert SPEARMAN_DAYS_REQUIRED == 5
+    assert SPEARMAN_DAYS_REQUIRED == 30
     assert SPEARMAN_THRESHOLD == 0.70
+
+
+def test_spearman_gate_requires_30_consecutive_nse_proven_sessions(tmp_path):
+    import datetime as dt
+
+    validation_dir = tmp_path / "state" / "market_validations"
+    validation_dir.mkdir(parents=True)
+    start = dt.date(2026, 1, 1)
+    sessions = []
+    while len(sessions) < 31:
+        if start.weekday() < 5:
+            sessions.append(start)
+        start += dt.timedelta(days=1)
+
+    def write_session(day, rho=0.75, proof=True, previous=None):
+        record = {"date": day.isoformat(), "rho": rho}
+        if proof:
+            record["exchange_session_proof"] = {
+                "verified": True,
+                "exchange": "NSE",
+                "session_date": day.isoformat(),
+                "previous_session_date": (previous or (day - dt.timedelta(days=1))).isoformat(),
+                "source_url": "https://www.nseindia.com/all-reports",
+            }
+        (validation_dir / f"market_validation_{day.isoformat()}.json").write_text(
+            json.dumps(record), encoding="utf-8"
+        )
+
+    for index, day in enumerate(sessions[:30]):
+        write_session(day, previous=sessions[index - 1] if index else day - dt.timedelta(days=1))
+    short = eval_spearman_gate(tmp_path)
+    assert short["pass"] is True
+    assert short["consecutive_pass_days"] == 30
+
+    write_session(sessions[30], previous=sessions[29])
+    full = eval_spearman_gate(tmp_path)
+    assert full["pass"] is True
+    assert full["consecutive_pass_days"] == 31
+
+    write_session(sessions[30], rho=0.69, previous=sessions[29])
+    broken = eval_spearman_gate(tmp_path)
+    assert broken["pass"] is False
+    assert broken["consecutive_pass_days"] == 0
+
+    write_session(sessions[30], proof=False, previous=sessions[29])
+    unverified = eval_spearman_gate(tmp_path)
+    assert unverified["pass"] is False
 
 
 def test_alert_ui_separates_live_readiness_info_from_active_operational_alerts():
