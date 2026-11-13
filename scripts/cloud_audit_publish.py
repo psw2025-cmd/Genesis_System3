@@ -63,8 +63,21 @@ def gcloud(*args):
     except (OSError, subprocess.TimeoutExpired) as exc:
         raise RuntimeError("GCS_OPERATION_UNAVAILABLE: " + type(exc).__name__) from None
     if result.returncode:
-        # Do not emit remote output that may contain account or access metadata.
-        raise RuntimeError("GCS_OPERATION_FAILED")
+        # Classify safe error codes, never print raw upstream stderr.
+        error = (result.stderr or "").lower()
+        if any(x in error for x in ("403", "permission_denied", "permission denied", "access denied", "not have permission")):
+            reason = "PERMISSION_DENIED"
+        elif "requester pays" in error or "billing project" in error:
+            reason = "BILLING_PROJECT_REQUIRED"
+        elif any(x in error for x in ("unrecognized arguments", "invalid choice", "unknown argument")):
+            reason = "INVALID_GCLOUD_ARGUMENT"
+        elif "404" in error or "not found" in error:
+            reason = "RESOURCE_NOT_FOUND"
+        elif "precondition" in error or "412" in error:
+            reason = "GENERATION_PRECONDITION_FAILED"
+        else:
+            reason = "UNKNOWN_GCLOUD_ERROR"
+        raise RuntimeError("GCS_" + reason + "_OP_" + str(args[0]).upper())
     return result
 
 
