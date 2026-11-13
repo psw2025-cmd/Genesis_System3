@@ -28,6 +28,7 @@ export const DASHBOARD_TABS = [
   { id: 'broker',         label: 'Broker',         Icon: Database,        group: 'system' },
   { id: 'alerts',         label: 'Alerts',         Icon: Bell,            group: 'system' },
   { id: 'system',         label: 'System',         Icon: Activity,        group: 'system' },
+  { id: 'system-readiness', label: 'System readiness', Icon: CheckCircle, group: 'system' },
   { id: 'gates',          label: 'Live Gate',      Icon: Shield,          group: 'system' },
 ] as const
 
