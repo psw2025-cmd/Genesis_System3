@@ -17,6 +17,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "system3_auto_gates"
@@ -73,13 +74,22 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         if not day:
             return
         session_proof = data.get("exchange_session_proof")
+        try:
+            source_url = urlparse(str((session_proof or {}).get("source_url") or ""))
+            source_host = (source_url.hostname or "").lower()
+            official_nse_host = (
+                source_url.scheme.lower() == "https"
+                and (source_host == "nseindia.com" or source_host.endswith(".nseindia.com"))
+            )
+        except (AttributeError, ValueError):
+            official_nse_host = False
         session_verified = bool(
             isinstance(session_proof, dict)
             and session_proof.get("verified") is True
             and str(session_proof.get("exchange") or "").upper() == "NSE"
             and str(session_proof.get("session_date") or "") == day
             and bool(str(session_proof.get("previous_session_date") or "").strip())
-            and "nseindia.com" in str(session_proof.get("source_url") or "").lower()
+            and official_nse_host
         )
         by_date[day] = {
             "date": day,

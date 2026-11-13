@@ -68,6 +68,13 @@ def test_spearman_gate_requires_30_consecutive_nse_proven_sessions(tmp_path):
     assert full["pass"] is True
     assert full["consecutive_pass_days"] == 31
 
+    last_path = validation_dir / f"market_validation_{sessions[30].isoformat()}.json"
+    last_record = json.loads(last_path.read_text(encoding="utf-8"))
+    last_record["exchange_session_proof"]["source_url"] = "https://evil.example/?next=nseindia.com"
+    last_path.write_text(json.dumps(last_record), encoding="utf-8")
+    spoofed_source = eval_spearman_gate(tmp_path)
+    assert spoofed_source["pass"] is False
+
     write_session(sessions[30], rho=0.69, previous=sessions[29])
     broken = eval_spearman_gate(tmp_path)
     assert broken["pass"] is False
