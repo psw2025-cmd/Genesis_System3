@@ -5980,6 +5980,21 @@ async def get_top_signal():
 async def get_positions():
     """Get open positions with Firestore / state-store provenance."""
     utc_now = datetime.now(timezone.utc).isoformat()
+    # This route must never claim Firestore durability when runtime SSOT is
+    # merely a local, per-revision file/cache. Cloud Run revisions are isolated.
+    remote_store = (
+        SSOT_AVAILABLE
+        and state_store is not None
+        and getattr(state_store, "_remote_backend", None) is not None
+    )
+    state_source = (
+        "firestore:system3_runtime/state"
+        if remote_store else "local_instance_runtime_state"
+    )
+    state_verification = (
+        "CLOUD_BACKED_PAPER_SIMULATION_NOT_BROKER_FILL_PROOF"
+        if remote_store else "LOCAL_INSTANCE_ONLY_NOT_DURABLE"
+    )
     try:
         # Check runtime state store first
         if SSOT_AVAILABLE and state_store is not None:
@@ -5993,11 +6008,11 @@ async def get_positions():
                             "positions": st_pos,
                             "open_count": len(st_pos),
                             "data_mode": "PAPER",
-                            "source": "firestore:system3_paper_positions",
+                            "source": state_source,
                             "as_of_utc": utc_now,
                             "freshness_seconds": 1.0,
-                            "verification_status": "VERIFIED_SIMULATION",
-                            "reason_if_unverified": "Active paper trading positions loaded from cloud state.",
+                            "verification_status": state_verification,
+                            "reason_if_unverified": "Paper positions are runtime-reported; fill and cross-revision evidence must be verified separately.",
                         }
             except Exception:
                 pass
@@ -6008,11 +6023,11 @@ async def get_positions():
                 "positions": [],
                 "open_count": 0,
                 "data_mode": "PAPER",
-                "source": "firestore:system3_paper_positions",
+                "source": "no_position_state",
                 "as_of_utc": utc_now,
                 "freshness_seconds": 0.0,
-                "verification_status": "VERIFIED_SIMULATION",
-                "reason_if_unverified": "Market closed — zero active paper positions.",
+                "verification_status": "LOCAL_INSTANCE_SIMULATION_NOT_DURABLE",
+                "reason_if_unverified": "No positions found in this runtime. Market closure and cloud-ledger completeness are not proven.",
                 "message": "Zero active open paper positions",
             }
 
@@ -6035,10 +6050,10 @@ async def get_positions():
                 "closed_count": data.get("closed_count", 0),
                 "timestamp": data.get("timestamp"),
                 "data_mode": "PAPER",
-                "source": "paper_cloud_sim",
+                "source": "local_instance_file:positions_live.json",
                 "as_of_utc": utc_now,
                 "freshness_seconds": 1.0,
-                "verification_status": "VERIFIED_SIMULATION",
+                "verification_status": "LOCAL_INSTANCE_SIMULATION_NOT_DURABLE",
             }
         elif isinstance(data, list):
             data = filter_paper_trade_rows(data)
@@ -6047,32 +6062,32 @@ async def get_positions():
                 "open_count": len(data),
                 "closed_count": 0,
                 "data_mode": "PAPER",
-                "source": "paper_cloud_sim",
+                "source": "local_instance_file:positions_live.json",
                 "as_of_utc": utc_now,
                 "freshness_seconds": 1.0,
-                "verification_status": "VERIFIED_SIMULATION",
+                "verification_status": "LOCAL_INSTANCE_SIMULATION_NOT_DURABLE",
             }
         else:
             return {
                 "positions": [],
                 "open_count": 0,
                 "data_mode": "PAPER",
-                "source": "firestore:system3_paper_positions",
+                "source": "no_position_state",
                 "as_of_utc": utc_now,
                 "freshness_seconds": 0.0,
-                "verification_status": "VERIFIED_SIMULATION",
-                "reason_if_unverified": "Zero open positions",
+                "verification_status": "LOCAL_INSTANCE_SIMULATION_NOT_DURABLE",
+                "reason_if_unverified": "No runtime positions; independent durable ledger reconciliation unavailable.",
             }
     except Exception as e:
         return {
             "positions": [],
             "open_count": 0,
             "data_mode": "PAPER",
-            "source": "firestore:system3_paper_positions",
+            "source": "no_position_state",
             "as_of_utc": utc_now,
             "freshness_seconds": 0.0,
-            "verification_status": "VERIFIED_SIMULATION",
-            "reason_if_unverified": f"Paper position store query error: {str(e)}",
+            "verification_status": "LOCAL_INSTANCE_SIMULATION_NOT_DURABLE",
+            "reason_if_unverified": f"Paper position read failed: {type(e).__name__}",
         }
 
 
