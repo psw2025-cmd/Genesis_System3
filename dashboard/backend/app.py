@@ -5050,15 +5050,28 @@ def _store_index_chain_snapshot(sym: str, result: Dict[str, Any], open_now: bool
 
 async def _warm_one_index_chain(sym: str) -> Optional[Dict[str, Any]]:
     """Fetch one index chain into push/TTL cache. Serial Dhan OC owner path."""
-    open_now = bool(_market_open_from_state())
-    # DSM paces ~3.4s twice plus expiry_list; 70s covers queue wait without cancelling the worker.
+    # Session detection can invoke remote SSOT fallback. Never block ASGI.
+    try:
+        open_now = bool(await _run_blocking(_market_open_from_state, timeout=2.0))
+    except (asyncio.TimeoutError, Exception):
+        # Market-open is never assumed when its source stalls.
+        open_now = False
+    # DSM paces option-chain traffic in its worker. Do not call in-loop sync I/O.
     result = await _get_chain_uncached(sym, closed_timeout_s=70.0)
     if not isinstance(result, dict) or float(result.get("spot") or 0) <= 0:
         return None
     if _csv_or_fallback_chain(result) or str(result.get("status") or "") == "DHAN_LAST_GOOD":
         print(f"[index-chain-micro] {sym} skip non-live store status={result.get('status')}")
         return None
-    payload = _store_index_chain_snapshot(sym, result, open_now)
+    # Baseline enrichment and local persistence may do disk/network I/O.
+    # They belong to a bounded worker, not the ASGI event loop.
+    try:
+        payload = await _run_blocking(
+            _store_index_chain_snapshot, sym, result, open_now, timeout=3.0
+        )
+    except asyncio.TimeoutError:
+        print(f"[index-chain-micro] {sym} snapshot enrichment timed out")
+        return None
     print(
         f"[index-chain-micro] {sym} spot={payload.get('spot')} "
         f"n={payload.get('total_contracts') or len(payload.get('contracts') or [])} "
@@ -7605,7 +7618,8 @@ async def index_chain_micro_loop():
     await asyncio.sleep(2)
     await _warm_required_index_chains_cold_start()
     try:
-        first_eq = _next_equity_gainer_symbol()
+        # Official F&O master may be 200k+ rows; never parse inline on ASGI.
+        first_eq = await _run_blocking(_next_equity_gainer_symbol, timeout=3.0)
         if first_eq:
             print(f"[index-chain-micro] first equity gainer warm {first_eq}")
             await _warm_one_index_chain(first_eq)
@@ -7613,11 +7627,18 @@ async def index_chain_micro_loop():
         print(f"[index-chain-micro] first equity warm failed: {exc}")
     idx = 0
     while True:
-        open_now = bool(_market_open_from_state())
+        try:
+            open_now = bool(await _run_blocking(_market_open_from_state, timeout=2.0))
+        except Exception:
+            open_now = False
+        sym = _INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]
         if open_now and idx % 2 == 1:
-            sym = _next_equity_gainer_symbol() or _INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]
-        else:
-            sym = _INDEX_STREAM_SYMBOLS[idx % len(_INDEX_STREAM_SYMBOLS)]
+            try:
+                sym = (
+                    await _run_blocking(_next_equity_gainer_symbol, timeout=3.0)
+                ) or sym
+            except Exception as exc:
+                print(f"[index-chain-micro] equity selector unavailable: {type(exc).__name__}")
         idx += 1
         try:
             await _warm_one_index_chain(sym)
