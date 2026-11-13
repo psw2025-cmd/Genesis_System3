@@ -100,7 +100,15 @@ def test_equity_selector_and_market_detection_run_in_bounded_workers():
     assert "await _run_blocking(_market_open_from_state, timeout=2.0)" in joined
 
 
-def test_no_live_order_authority_added_by_chain_fix():
-    txt = SOURCE.read_text(encoding="utf-8")
-    assert 'LIVE_ORDER_AUTHORITY' in txt
-    assert 'REAL_BROKER_ORDERS' in txt
+def test_chain_background_loops_have_no_order_placement_calls():
+    tree = ast.parse(SOURCE.read_text(encoding="utf-8"))
+    for name in ("_warm_one_index_chain", "index_chain_micro_loop"):
+        fn = next(n for n in tree.body
+                  if isinstance(n, ast.AsyncFunctionDef) and n.name == name)
+        symbols = " ".join(
+            ast.unparse(n.func) for n in ast.walk(fn)
+            if isinstance(n, (ast.Call, ast.Await)) and isinstance(n, ast.Call)
+        ).lower()
+        assert "place_order" not in symbols
+        assert "placeorder" not in symbols
+        assert "execute_trade" not in symbols
