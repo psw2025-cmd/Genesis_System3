@@ -12297,7 +12297,13 @@ def _gate_state_recommendations(state: dict) -> dict:
             recommendation = str(row.get("recommendation") or "").upper()
             signal = str(row.get("signal") or "").upper()
             action = str(row.get("action") or "").upper()
-            if recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"} or signal in {"BUY", "SELL", "LONG", "SHORT"} or action in {"BUY", "SELL", "LONG", "SHORT"}:
+            status = str(row.get("status") or "").upper()
+            if (
+                recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+                or signal in {"BUY", "SELL", "LONG", "SHORT"}
+                or action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+                or status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+            ):
                 row.update({
                     "recommendation": "WAIT",
                     "signal": "HOLD",
@@ -12305,6 +12311,10 @@ def _gate_state_recommendations(state: dict) -> dict:
                     "confidence_pct": 0,
                     "blocker": reason,
                 })
+                if status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}:
+                    row["status"] = "HOLD"
+                if action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}:
+                    row["action"] = "HOLD"
             return row
 
         result = hold_trade_outputs(result)
@@ -12323,10 +12333,12 @@ def _has_unverified_or_expired_trade_contract(value) -> bool:
     recommendation = str(value.get("recommendation") or "").upper()
     signal = str(value.get("signal") or "").upper()
     action = str(value.get("action") or "").upper()
+    status = str(value.get("status") or "").upper()
     trade_like = (
         recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
         or signal in {"BUY", "SELL", "LONG", "SHORT"}
-        or action in {"BUY", "SELL", "LONG", "SHORT"}
+        or action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+        or status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
     )
     if trade_like:
         raw_expiry = value.get("expiry") or value.get("expiry_date") or value.get("suggested_expiry")

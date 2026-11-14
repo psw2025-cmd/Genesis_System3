@@ -338,6 +338,8 @@ def test_state_endpoint_holds_cached_trade_recommendations_without_verified_live
                 "model_loaded": True,
             }],
             "signals": {
+                "status": "BUY",
+                "last_signal": {"action": "TRADE", "confidence": 75.2},
                 "NIFTY": {
                     "recommendation": "TRADE",
                     "signal": "BUY",
@@ -359,6 +361,9 @@ def test_state_endpoint_holds_cached_trade_recommendations_without_verified_live
     assert data["signals"]["NIFTY"]["recommendation"] == "WAIT"
     assert data["signals"]["NIFTY"]["signal"] == "HOLD"
     assert data["signals"]["NIFTY"]["confidence"] == 0
+    assert data["signals"]["status"] == "HOLD"
+    assert data["signals"]["last_signal"]["action"] == "HOLD"
+    assert data["signals"]["last_signal"]["confidence"] == 0
 
 
 def test_state_endpoint_rejects_stale_market_quote_even_with_verified_open_session(app, monkeypatch):
