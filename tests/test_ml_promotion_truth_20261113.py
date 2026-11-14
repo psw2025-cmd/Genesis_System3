@@ -57,12 +57,17 @@ class MLPromotionGuardTests(unittest.TestCase):
             path = Path(tmp) / "options_ml_training_summary.json"
             path.write_text(json.dumps({
                 "status": "PASS", "best_model": "CatBoost-Challenger-v4",
-                "proof_pass_count": 0, "dataset_rows": 0, "results": {},
+                "proof_pass_count": 0, "dataset_rows": 0,
+                "avg_accuracy": 0.99,
+                "results": {"CatBoost-Challenger-v4": {"accuracy": 0.99}},
             }), encoding="utf-8")
             record = func(path)
         self.assertFalse(record["model_proof_ready"])
         self.assertFalse(record["ready_for_live"])
         self.assertEqual(record["blocker_reason"], "PHANTOM_FAMILY_NO_WEIGHTS")
+        self.assertEqual(record["best_model"], "UNVERIFIED")
+        self.assertIsNone(record["avg_accuracy"])
+        self.assertIsNone(record["verified_local_artifact"])
 
     def test_api_uses_guard_for_root_readiness(self):
         source = SOURCE.read_text(encoding="utf-8")

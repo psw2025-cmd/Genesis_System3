@@ -24,12 +24,26 @@ def test_accuracy_trend_aligns_with_load_spearman_days(tmp_path, monkeypatch):
                     "rank_correlation_spearman": 0.55,
                     "hit_rate": 0.5,
                     "grade": "B",
+                    "exchange_session_proof": {
+                        "verified": True,
+                        "exchange": "NSE",
+                        "session_date": "2026-08-11",
+                        "previous_session_date": "2026-08-10",
+                        "source_url": "https://www.nseindia.com/all-reports",
+                    },
                 },
                 {
                     "date": "2026-08-12",
                     "rank_correlation_spearman": 0.72,
                     "hit_rate": 0.7,
                     "grade": "A",
+                    "exchange_session_proof": {
+                        "verified": True,
+                        "exchange": "NSE",
+                        "session_date": "2026-08-12",
+                        "previous_session_date": "2026-08-11",
+                        "source_url": "https://www.nseindia.com/all-reports",
+                    },
                 },
             ]
 

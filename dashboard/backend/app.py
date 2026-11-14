@@ -47,6 +47,10 @@ _SCANNER_EOD_TIMEOUT_S = 180.0
 _TRUTH_IO_TIMEOUT_S = 45.0
 _EOD_SCANNER_CACHE: tuple[float, Dict[str, Any]] = (0.0, {})
 _EOD_SCANNER_TTL_S = 1800.0
+_PROOF_READ_TIMEOUT_S = 8.0
+_PROOF_READ_EXECUTOR = ThreadPoolExecutor(max_workers=1, thread_name_prefix="proof-read")
+_PROOF_READ_FUTURES: Dict[str, asyncio.Future] = {}
+_PROOF_READ_LOCK = threading.Lock()
 
 # Dedicated small executor for the spot-price background refresh, isolated
 # from the shared default asyncio.to_thread() executor. asyncio.wait_for()
@@ -742,6 +746,15 @@ async def get_state():
     if (state.get("mode") or "").upper() == "LIVE" and (not broker_connected or ds in ("SYNTHETIC", "NOT_READY")):
         state = dict(state)
         state["mode"] = "PAPER"
+    # Recompute NSE session proof from the versioned official-circular cache.
+    # Cached runtime `market.is_open` alone is not exchange-calendar evidence.
+    from core.utils.nse_holidays import attach_market_calendar_evidence
+
+    state = attach_market_calendar_evidence(state)
+    # This route is the dashboard SSOT and must enforce the same fail-closed
+    # recommendation contract as /api/ml/predictions. Do not trust cached
+    # scanner history or a REST refresh timestamp as proof of a live quote.
+    state = _gate_state_recommendations(state)
     return _redact_public_credentials(state)
 
 
@@ -2396,31 +2409,47 @@ async def get_scanner_segments():
 @app.get("/api/accuracy_trend")
 async def get_accuracy_trend():
     """Spearman ρ trend aligned with auto_gates (local + Firestore validation days)."""
-    _hit = _cache_get("accuracy_trend", _TTL_ACCURACY)
-    if _hit is not None:
-        return _hit
-    try:
+    def _read_accuracy_trend():
         try:
             from dashboard.backend.accuracy_trend_service import build_accuracy_trend_payload
         except ImportError:
             from accuracy_trend_service import build_accuracy_trend_payload
-        payload = build_accuracy_trend_payload(
+        return build_accuracy_trend_payload(
             ROOT_DIR,
             retrain_needed=RETRAIN_FLAG.exists(),
         )
-        return _cache_set("accuracy_trend", payload)
-    except Exception as e:
-        return {"status": "error", "error": str(e), "trend": [], "retrain_needed": False}
+
+    return await _bounded_proof_read(
+        "accuracy_trend",
+        _read_accuracy_trend,
+        timeout_s=_PROOF_READ_TIMEOUT_S,
+        cache_ttl_s=_TTL_ACCURACY,
+        fallback={"trend": [], "avg_rho": None, "days_available": 0, "retrain_needed": False},
+    )
 
 
 @app.get("/api/auto_gates")
 async def get_auto_gates(refresh: bool = False):
     """Published snapshot reader; never evaluates gates or blocks on state in request handlers."""
-    try:
-        from dashboard.backend.auto_gates_service import build_auto_gates_report
-    except ImportError:
-        from auto_gates_service import build_auto_gates_report
-    return build_auto_gates_report()
+    def _read_auto_gates():
+        try:
+            from dashboard.backend.auto_gates_service import build_auto_gates_report
+        except ImportError:
+            from auto_gates_service import build_auto_gates_report
+        return build_auto_gates_report()
+
+    return await _bounded_proof_read(
+        "auto_gates",
+        _read_auto_gates,
+        timeout_s=_PROOF_READ_TIMEOUT_S,
+        cache_ttl_s=_TTL_AUTO_GATES,
+        force=refresh,
+        fallback={
+            "gates": {}, "proof_gates": [], "gates_passing": None, "gates_total": None,
+            "production_live_ready": False, "trade_ready": False,
+            "live_trading_enabled": False, "order_placement_allowed": False,
+        },
+    )
 
 
 @app.get("/api/world_class_tracker")
@@ -3706,6 +3735,59 @@ def _cache_set(key: str, value):
     return value
 
 
+async def _bounded_proof_read(
+    key: str,
+    read_fn,
+    *,
+    fallback: Dict[str, Any],
+    timeout_s: float = _PROOF_READ_TIMEOUT_S,
+    cache_ttl_s: float = 30.0,
+    force: bool = False,
+) -> Dict[str, Any]:
+    """Keep synchronous proof/Firestore reads off the ASGI event loop.
+
+    A timed-out thread cannot be cancelled safely. Reuse its single-flight
+    future instead of spawning another blocked thread; return an explicit
+    non-PASS result while it is still running. The dedicated one-worker pool
+    prevents a wedged proof read from starving market/API request workers.
+    """
+    cached = None if force else _cache_get(key, cache_ttl_s)
+    if isinstance(cached, dict):
+        return cached
+
+    loop = asyncio.get_running_loop()
+    with _PROOF_READ_LOCK:
+        future = _PROOF_READ_FUTURES.get(key)
+        if future is not None and future.done():
+            try:
+                completed = future.result()
+            except Exception:
+                _PROOF_READ_FUTURES.pop(key, None)
+                future = None
+            else:
+                _PROOF_READ_FUTURES.pop(key, None)
+                if isinstance(completed, dict):
+                    return _cache_set(key, completed)
+                future = None
+        if future is None:
+            future = loop.run_in_executor(_PROOF_READ_EXECUTOR, read_fn)
+            _PROOF_READ_FUTURES[key] = future
+
+    try:
+        result = await asyncio.wait_for(asyncio.shield(future), timeout=timeout_s)
+    except asyncio.TimeoutError:
+        return {**fallback, "status": "timeout", "stale": True, "stale_reason": "PROOF_READ_TIMEOUT"}
+    except Exception as exc:
+        return {**fallback, "status": "error", "stale": True, "stale_reason": f"PROOF_READ_FAILED:{type(exc).__name__}"}
+
+    with _PROOF_READ_LOCK:
+        if _PROOF_READ_FUTURES.get(key) is future:
+            _PROOF_READ_FUTURES.pop(key, None)
+    if not isinstance(result, dict):
+        return {**fallback, "status": "error", "stale": True, "stale_reason": "PROOF_READ_INVALID_PAYLOAD"}
+    return _cache_set(key, result)
+
+
 # TTL constants (seconds)
 _TTL_BROKER = 30  # holdings, positions, funds — Dhan API calls
 _TTL_PAPER = 15  # paper positions/pnl — changes each tick
@@ -3715,10 +3797,10 @@ _MARKET_TOP_MICRO_INTERVAL_S = 30.0  # leave Dhan OC budget for index chain stre
 _WS_MARKET_TOP_PUSH_S = 3.0
 _WS_CHAIN_PUSH_S_OPEN = 3.0
 _WS_CHAIN_PUSH_S_CLOSED = 15.0
-_TTL_ACCURACY = 120  # accuracy trend — file read, slow
+_TTL_ACCURACY = 10  # proof read — bounded freshness; never keep a hidden old gate verdict
 _TTL_PERF = 120  # performance data
 _TTL_PORTFOLIO = 30  # portfolio/unified
-_TTL_AUTO_GATES = 60  # auto gates — reads several files
+_TTL_AUTO_GATES = 10  # gate proof — avoid Firestore read bursts without stale readiness claims
 _TTL_BROKER_TRUTH = 30  # broker truth validator
 _TTL_BATCH = 8.0  # dashboard batch endpoints — 5–10s window
 
@@ -8932,9 +9014,9 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
     }
     best = data.get("best_model")
     phantom = str(best or "") in phantom_names
-    verified_name = "XGBoost-Baseline-v2"
     if phantom:
-        best = verified_name
+        # Do not relabel an unweighted model as a different, supposedly verified model.
+        best = None
     best_metrics = results.get(best, {}) if best and isinstance(results.get(best), dict) else {}
     sanitized_results = {
         name: rec
@@ -8947,11 +9029,11 @@ def _ml_options_training_record(options_ml: Path) -> Dict[str, Any]:
         {
             "status": "REPORTED_NOT_VERIFIED",
             "model_proof_ready": False,
-            "best_model": best or verified_name,
-            "verified_local_artifact": "models/xgboost_v1",
+            "best_model": best or "UNVERIFIED",
+            "verified_local_artifact": None if phantom else "models/xgboost_v1",
             "results": sanitized_results,
             "total_predictions": int(data.get("dataset_rows") or data.get("total_predictions") or 0),
-            "avg_accuracy": best_metrics.get("accuracy", data.get("avg_accuracy")),
+            "avg_accuracy": None if phantom else best_metrics.get("accuracy", data.get("avg_accuracy")),
             "avg_confidence": data.get("avg_confidence"),
             "proof_pass_count": int(data.get("proof_pass_count") or 0),
             "validation_pending_count": int(data.get("validation_pending_count") or 0),
@@ -9412,38 +9494,51 @@ def _fetch_cloud_ml_performance() -> Dict[str, Any]:
         return {
             "ok": False,
             "url": _CLOUD_ML_PERFORMANCE_URL,
-            "ready_for_live": None,
-            "status": None,
-            "message": None,
+            "ready_for_live": False,
+            "status": "UNVERIFIED",
+            "message": "Live readiness is blocked because cloud evidence could not be read.",
             "error": str(exc)[:300],
         }
     if not isinstance(data, dict):
         return {
             "ok": False,
             "url": _CLOUD_ML_PERFORMANCE_URL,
-            "ready_for_live": None,
-            "status": None,
-            "message": None,
+            "ready_for_live": False,
+            "status": "UNVERIFIED",
+            "message": "Live readiness is blocked because the cloud evidence payload is invalid.",
             "error": "cloud payload was not an object",
         }
     perf = data.get("performance") if isinstance(data.get("performance"), dict) else {}
+    ready = data.get("ready_for_live", perf.get("ready_for_live"))
+    status = data.get("proof_status") or perf.get("status") or data.get("status")
     return {
         "ok": True,
         "url": _CLOUD_ML_PERFORMANCE_URL,
-        "ready_for_live": data.get("ready_for_live", perf.get("ready_for_live")),
-        "status": data.get("proof_status") or perf.get("status") or data.get("status"),
-        "message": data.get("message") or perf.get("message"),
+        # Unknown and truthy non-boolean values must never become authorization.
+        "ready_for_live": ready is True,
+        "status": (status or "READY") if ready is True else "BLOCKED",
+        "message": data.get("message") or perf.get("message") or (
+            "Live readiness is blocked because proof is incomplete."
+            if ready is not True else "Readiness evidence reported ready."
+        ),
         "error": None,
     }
 
 
 def _local_ml_readiness_view(perf: Dict[str, Any]) -> Dict[str, Any]:
     performance = perf.get("performance") if isinstance(perf.get("performance"), dict) else {}
+    ready = perf.get("ready_for_live", performance.get("ready_for_live"))
+    status = perf.get("proof_status") or performance.get("status")
     return {
-        "ready_for_live": perf.get("ready_for_live", performance.get("ready_for_live")),
-        "status": perf.get("proof_status") or performance.get("status"),
-        "message": perf.get("message") or performance.get("message"),
-        "ready_for_live_reason": perf.get("ready_for_live_reason") or performance.get("ready_for_live_reason"),
+        "ready_for_live": ready is True,
+        "status": (status or "READY") if ready is True else "BLOCKED",
+        "message": perf.get("message") or performance.get("message") or (
+            "Live readiness is blocked because proof is incomplete."
+            if ready is not True else "Readiness evidence reported ready."
+        ),
+        "ready_for_live_reason": perf.get("ready_for_live_reason") or performance.get("ready_for_live_reason") or (
+            "ML_PROOF_MISSING_OR_UNVERIFIED" if ready is not True else "Evidence source reported ready."
+        ),
         "rho": perf.get("rho", performance.get("rho")),
         "hit_rate": perf.get("hit_rate", performance.get("hit_rate")),
         "proof_pass_count": perf.get("proof_pass_count", performance.get("proof_pass_count")),
@@ -12143,6 +12238,117 @@ def _apply_model_readiness_gate(predictions: list, model_state: dict) -> list:
             )
         gated.append(row)
     return gated
+
+
+def _gate_state_recommendations(state: dict) -> dict:
+    """Fail closed for dashboard recommendations without verified live evidence.
+
+    A valid trading recommendation requires an explicitly verified open
+    exchange session and a timestamped market quote no older than 60 seconds.
+    Poll/cycle timestamps are intentionally not treated as quote timestamps.
+    """
+    if not isinstance(state, dict):
+        return state
+    result = dict(state)
+    market = result.get("market") if isinstance(result.get("market"), dict) else {}
+    session_ok = market.get("is_open") is True and market.get("calendar_verified") is True
+    quote_time = None
+    for container in (result, market):
+        for key in (
+            "market_data_timestamp_utc",
+            "last_market_data_timestamp",
+            "quote_timestamp_utc",
+        ):
+            value = container.get(key)
+            if isinstance(value, str) and value.strip():
+                quote_time = value.strip()
+                break
+        if quote_time:
+            break
+    quote_fresh = False
+    if quote_time:
+        try:
+            parsed = datetime.fromisoformat(quote_time.replace("Z", "+00:00"))
+            if parsed.tzinfo is not None:
+                age = (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds()
+                quote_fresh = -5 <= age <= 60
+        except (TypeError, ValueError, OverflowError):
+            quote_fresh = False
+
+    reason = None
+    if not session_ok:
+        reason = "MARKET_SESSION_NOT_VERIFIED_OPEN"
+    elif not quote_fresh:
+        reason = "FRESH_MARKET_QUOTE_NOT_VERIFIED"
+    elif _has_unverified_or_expired_trade_contract(result):
+        reason = "TRADE_CONTRACT_EXPIRY_NOT_VERIFIED_OR_EXPIRED"
+
+    predictions = result.get("ml_predictions")
+    if isinstance(predictions, list):
+        result["ml_predictions"] = _apply_model_readiness_gate(predictions, result.get("model") or {})
+
+    if reason:
+        def hold_trade_outputs(value):
+            if isinstance(value, list):
+                return [hold_trade_outputs(item) for item in value]
+            if not isinstance(value, dict):
+                return value
+            row = {key: hold_trade_outputs(item) for key, item in value.items()}
+            recommendation = str(row.get("recommendation") or "").upper()
+            signal = str(row.get("signal") or "").upper()
+            action = str(row.get("action") or "").upper()
+            status = str(row.get("status") or "").upper()
+            if (
+                recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+                or signal in {"BUY", "SELL", "LONG", "SHORT"}
+                or action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+                or status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+            ):
+                row.update({
+                    "recommendation": "WAIT",
+                    "signal": "HOLD",
+                    "confidence": 0,
+                    "confidence_pct": 0,
+                    "blocker": reason,
+                })
+                if status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}:
+                    row["status"] = "HOLD"
+                if action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}:
+                    row["action"] = "HOLD"
+            return row
+
+        result = hold_trade_outputs(result)
+        result["recommendation_safety"] = {"status": "BLOCKED", "reason": reason}
+    else:
+        result["recommendation_safety"] = {"status": "VERIFIED", "reason": None}
+    return result
+
+
+def _has_unverified_or_expired_trade_contract(value) -> bool:
+    """Cached trade-like outputs need a parseable, non-expired contract date."""
+    if isinstance(value, list):
+        return any(_has_unverified_or_expired_trade_contract(item) for item in value)
+    if not isinstance(value, dict):
+        return False
+    recommendation = str(value.get("recommendation") or "").upper()
+    signal = str(value.get("signal") or "").upper()
+    action = str(value.get("action") or "").upper()
+    status = str(value.get("status") or "").upper()
+    trade_like = (
+        recommendation in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+        or signal in {"BUY", "SELL", "LONG", "SHORT"}
+        or action in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+        or status in {"TRADE", "BUY", "SELL", "LONG", "SHORT"}
+    )
+    if trade_like:
+        raw_expiry = value.get("expiry") or value.get("expiry_date") or value.get("suggested_expiry")
+        try:
+            expiry = datetime.fromisoformat(str(raw_expiry)).date() if raw_expiry else None
+        except (TypeError, ValueError, OverflowError):
+            expiry = None
+        if expiry is None or expiry < datetime.now(IST).date():
+            return True
+    return any(_has_unverified_or_expired_trade_contract(item) for item in value.values())
 
 
 @app.get("/api/ml/predictions")

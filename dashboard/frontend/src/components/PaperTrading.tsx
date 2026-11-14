@@ -121,7 +121,7 @@ export default function PaperTrading() {
   if (error && !bundle) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold break-words">Paper Trading Console</h2>
         <ErrorBanner endpoint={`${API_BASE}/api/state`} message={error} onRetry={fetchData} />
       </div>
     )
@@ -130,7 +130,7 @@ export default function PaperTrading() {
   if (!bundle) {
     return (
       <div className="space-y-6">
-        <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+        <h2 className="text-2xl sm:text-3xl font-bold break-words">Paper Trading Console</h2>
         <div className="p-6 text-center text-gray-400">Loading paper positions + Dhan mark-to-market…</div>
       </div>
     )
@@ -175,10 +175,10 @@ export default function PaperTrading() {
   const usedMargin = account.used_margin == null ? null : Number(account.used_margin)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 paper-trading-console">
       <div className="flex justify-between items-start gap-4 flex-wrap">
-        <div>
-          <h2 className="text-3xl font-bold">Paper Trading Console</h2>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-2xl sm:text-3xl font-bold break-words">Paper Trading Console</h2>
           <PendingLifecycleBanner />
           <div className="text-sm text-gray-400 mt-1">
             Aligned to DhanHQ v2 Positions fields · Source: {positionsSource} · Refresh: {lastRefresh || '—'}

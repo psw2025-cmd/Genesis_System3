@@ -106,13 +106,24 @@ def _atomic_write_text(path: Path, text: str) -> None:
 class CloudPaperEngine:
     """Lightweight in-process paper trading. State persisted to JSON/CSV."""
 
-    def __init__(self, outputs_dir: Path):
+    def __init__(self, outputs_dir: Path, master_ledger: Any = None):
         self.out = outputs_dir
         self.positions_file = outputs_dir / "positions_live.json"
         self.pnl_file = outputs_dir / "pnl_live.json"
         self.trades_csv = outputs_dir / "paper_trades_live.csv"
         self.state_file = outputs_dir / "paper_engine_state.json"
-        self.master_ledger = MasterPaperLedger(outputs_dir / "paper_master_ledger.sqlite3")
+        if master_ledger is not None:
+            self.master_ledger = master_ledger
+        elif os.environ.get("K_SERVICE"):
+            # Cloud Run's writable container filesystem is revision-local and
+            # ephemeral. Never silently downgrade production PAPER history to it.
+            try:
+                from dashboard.backend.firestore_paper_ledger import FirestorePaperLedger
+            except ImportError:
+                from firestore_paper_ledger import FirestorePaperLedger
+            self.master_ledger = FirestorePaperLedger()
+        else:
+            self.master_ledger = MasterPaperLedger(outputs_dir / "paper_master_ledger.sqlite3")
         # Only a separately implemented trusted source verifier may enable
         # market-outcome attestation. Never infer trust from inbound JSON.
         self.independent_outcome_verifier = None

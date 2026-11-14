@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following twelve GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following thirteen GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -18,6 +18,7 @@ Only the following twelve GitHub Actions workflows are allowed in `.github/workf
 10. `live-proof-center.yml` — read-only public dashboard/API forensic MRI for multi-agent access.
 11. `system3-runbook-audit.yml` — persistent autonomous runbook validation.
 12. `cloud-verify.yml` — GitHub-hosted, read-only WIF Cloud Run environment inspection, Dhan GET orders, and clearly labeled synthetic PAPER replay evidence, plus **the sole narrowly scoped exception**: commit-addressed audit-results publication to Google Cloud Storage with no-clobber and SHA-256 readback; no deploy or broker POST.
+13. `ui-truth.yml` — read-only Playwright UI/API watcher on pull requests, main pushes, manual dispatch, and weekdays at 08:30 IST; it has no cloud credentials or write permissions.
 
 ### Retired workflows (GCP Exit Complete)
 
@@ -29,7 +30,7 @@ All previously retired Google Cloud Platform deployment and mutation workflows (
 
 ## Scheduling authority
 
-GitHub Actions `schedule:` remains prohibited. Runtime recurrence belongs to the local laptop Windows Service.
+GitHub Actions schedules remain prohibited except for the single read-only `ui-truth.yml` check at 03:00 UTC on weekdays (08:30 IST). It cannot deploy or mutate cloud resources. Runtime recurrence for trading remains with the managed runtime scheduler; the UI check is evidence-only.
 
 ## Operating rules
 

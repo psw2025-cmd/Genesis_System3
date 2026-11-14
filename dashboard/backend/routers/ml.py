@@ -624,20 +624,27 @@ def _validation_metrics() -> Dict:
     predictions = _load_history()
     prediction_days = [p for p in predictions if p.get("predictions")]
     proof_records = len(validations)
-    threshold_met = bool(avg_rho is not None and avg_rho >= 0.70 and proof_records >= 10)
+    # This summary is not allowed to certify a model from a ten-report average.
+    # Promotion's authoritative gate requires 30 consecutive NSE-session proofs.
+    from scripts.system3_gate_evaluator import eval_spearman_gate
+
+    spearman_gate = eval_spearman_gate(ROOT)
+    threshold_met = bool(spearman_gate.get("pass") is True)
     live_ready, live_reason = _check_real_validations()
     return {
         "validation_days": proof_records,
+        "spearman_consecutive_days": spearman_gate.get("consecutive_pass_days", 0),
+        "spearman_days_required": spearman_gate.get("days_required", 30),
         "prediction_days": len(prediction_days),
         "avg_rho": round(avg_rho, 4) if avg_rho is not None else None,
         "avg_hit_rate": round(avg_hit, 4) if avg_hit is not None else None,
         "target_rho": 0.70,
-        "min_validation_days": 10,
+        "min_validation_days": 30,
         "ready_for_live": live_ready,
         "ready_for_live_reason": live_reason,
         "model_proof_ready": threshold_met,
         "status": "PROVEN_ANALYZER_ONLY" if threshold_met else "BLOCKED",
-        "reason": "threshold_met" if threshold_met else "Need at least 10 real post-market validation reports and average Spearman rho >= 0.70",
+        "reason": "threshold_met" if threshold_met else "Need 30 consecutive NSE-session proofs, linked to prior sessions, each with Spearman rho >= 0.70",
         "latest_validation_file": validations[-1].get("_file") if validations else None,
         "benchmark_summary_exists": BENCHMARK_SUMMARY.exists(),
     }
