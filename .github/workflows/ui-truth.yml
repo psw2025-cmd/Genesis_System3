@@ -33,11 +33,14 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
+      - name: Install dashboard dependencies
+        run: npm ci
+        working-directory: dashboard/frontend
       - run: npx playwright install --with-deps chromium
       - name: Verify dashboard UI truth
         run: |
           if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
-            GENESIS_UI_MODE=local GENESIS_BASE_URL=http://127.0.0.1:5173 npx playwright test --config=tests/ui/playwright.config.ts
+            GENESIS_UI_MODE=local GENESIS_BASE_URL=http://127.0.0.1:5173/ui npx playwright test --config=tests/ui/playwright.config.ts
           else
             GENESIS_UI_MODE=cloud npx playwright test --config=tests/ui/playwright.config.ts
           fi
