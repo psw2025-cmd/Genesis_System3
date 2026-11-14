@@ -71,8 +71,8 @@ def test_short_daily_bhavcopy_run_is_written_as_blocked_not_pass(tmp_path, monke
     report_dir.mkdir()
     for day, close in (("20260105", 100.0), ("20260106", 105.0)):
         (bhavcopy / f"{day}_fo_bhavcopy.csv").write_text(
-            "Symbol,Close,OI,ChngInOpnIntrst,OptTp,Strike,Expiry\n"
-            f"NIFTY,{close},1000,100,CE,25000,2026-01-29\n",
+            "Symbol,Close,OI,ChngInOpnIntrst,OptTp,Strike,Expiry,NewBrdLotQty\n"
+            f"NIFTY,{close},1000,100,CE,25000,2026-01-29,65\n",
             encoding="utf-8",
         )
     monkeypatch.setattr(MODULE, "BHAVCOPY_DIR", bhavcopy)
@@ -84,3 +84,15 @@ def test_short_daily_bhavcopy_run_is_written_as_blocked_not_pass(tmp_path, monke
     assert result["recent_costed_walkforward_proven"] is False
     assert saved["costs_slippage_included_proven"] is False
     assert "NEED_AT_LEAST_30_TRADING_SESSIONS" in saved["reason"]
+
+
+def test_dated_exchange_lot_size_controls_pnl_not_a_static_symbol_table():
+    cost = MODULE.compute_cost(20.0, 25.0, "NIFTY", 65)
+    assert cost["contracts"] == 65
+    assert cost["gross_pnl"] == 325.0
+
+
+def test_missing_exchange_lot_size_fails_closed():
+    import pytest
+    with pytest.raises(ValueError, match="exchange lot"):
+        MODULE.compute_cost(20.0, 25.0, "NIFTY", 0)

@@ -44,7 +44,6 @@ SLIPPAGE_PCT = 0.001  # 0.1% slippage on entry + exit
 MIN_FORWARD_SESSIONS = 30
 
 INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"}
-LOT_SIZES = {"NIFTY": 75, "BANKNIFTY": 30, "FINNIFTY": 40, "MIDCPNIFTY": 75}
 
 
 def assess_costed_walkforward(trading_sessions: int, trades: list[dict]) -> dict:
@@ -85,9 +84,11 @@ def assess_costed_walkforward(trading_sessions: int, trades: list[dict]) -> dict
 
 
 def compute_cost(entry_price: float, exit_price: float, symbol: str, qty: int) -> dict:
-    lot_size = LOT_SIZES.get(symbol, 50)
-    lots = max(1, qty // lot_size)
-    contracts = lots * lot_size
+    # qty comes from the dated exchange contract row; historical lot sizes change.
+    if isinstance(qty, bool) or not isinstance(qty, int) or qty <= 0:
+        raise ValueError("A positive exchange lot quantity is required")
+    contracts = qty
+    lots = 1
 
     entry_value = entry_price * contracts
     exit_value = exit_price * contracts
@@ -167,6 +168,7 @@ def load_bhavcopy(csv_path: Path) -> list[dict]:
                             "option_type": (row.get("OptTp") or row.get("OptionType") or "CE").strip(),
                             "strike": float(row.get("StrkPric") or row.get("Strike") or 0),
                             "expiry": (row.get("XpryDt") or row.get("Expiry") or "").strip(),
+                            "lot_size": int(float(row.get("NewBrdLotQty") or 0)),
                         }
                     )
                 except (ValueError, TypeError):
@@ -289,7 +291,11 @@ def run_proof() -> dict:
             if entry_price <= 0:
                 continue
 
-            cost_detail = compute_cost(entry_price, exit_price, symbol, lot_size := LOT_SIZES.get(symbol, 50))
+            lot_size = signal["lot_size"]
+            if lot_size <= 0 or exit_row["lot_size"] != lot_size:
+                input_warnings.append(f"MISSING_OR_CHANGED_LOT_SIZE:{day0['date']}:{symbol}")
+                continue
+            cost_detail = compute_cost(entry_price, exit_price, symbol, lot_size)
             trade = {
                 "symbol": symbol,
                 "strike": signal["strike"],
@@ -301,6 +307,7 @@ def run_proof() -> dict:
                 "exit_price": round(exit_price, 2),
                 "oi_at_entry": signal["oi"],
                 "oi_chg_at_entry": signal["oi_chg"],
+                "lot_size": lot_size,
                 "cost_model": cost_detail,
             }
             trades.append(trade)
@@ -397,7 +404,7 @@ def run_proof() -> dict:
 
     print(f"\n[WalkForwardProof] {proof['status']}")
     print(f"  Trades: {len(trades)} | Win rate: {win_rate:.1f}%")
-    print(f"  Gross P&L: ₹{total_gross_pnl:.0f} | Total costs: ₹{total_costs:.0f} | Net P&L: ₹{total_net_pnl:.0f}")
+    print(f"  Gross P&L: Rs{total_gross_pnl:.0f} | Total costs: Rs{total_costs:.0f} | Net P&L: Rs{total_net_pnl:.0f}")
     print(f"  Report: {OUT / 'costed_walkforward_proof.json'}")
     return proof
 

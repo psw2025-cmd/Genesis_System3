@@ -54,23 +54,15 @@ def _get_session() -> requests.Session:
     s = requests.Session()
     s.headers.update(
         {
-            "User-Agent": (
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " "AppleWebKit/537.36 Chrome/124.0 Safari/537.36"
-            ),
-            "Accept": "*/*",
-            "Referer": "https://www.nseindia.com/",
-            "Accept-Language": "en-US,en;q=0.9",
+            "User-Agent": "Genesis-System3-Historical-Research/1.0",
+            "Accept": "application/zip",
         }
     )
-    try:
-        s.get("https://www.nseindia.com", timeout=8)
-    except Exception:
-        pass
     return s
 
 
 def _trading_days(start: date, end: date) -> list[date]:
-    """Returns list of weekdays between start and end (inclusive)."""
+    """Returns archive candidate weekdays; holidays require archive proof."""
     days = []
     cur = start
     while cur <= end:
@@ -102,7 +94,7 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
         _URL_OLD.format(yyyy=yyyy, mon_upper=mon, dd=dd),
     ]
 
-    max_retries = 5
+    max_retries = 3
     for url in urls:
         resp = None
         for attempt in range(1, max_retries + 1):
@@ -116,10 +108,14 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
             if resp is not None and resp.status_code == 200:
                 break
             if resp is not None and resp.status_code == 429 and attempt < max_retries:
-                backoff = 1.0 * (2 ** (attempt - 1))  # 1s, 2s, 4s, 8s, ...
+                backoff = 30.0 * (2 ** (attempt - 1))
                 print(f"HTTP 429, backing off {backoff:.0f}s")
                 time.sleep(backoff)
                 continue
+            if resp is not None and resp.status_code in (401, 403, 429):
+                print(f"HTTP {resp.status_code}: archive access unavailable; stop without changing market status")
+                _failed.append(date_str)
+                return "failed"
             if resp is not None:
                 print(f"HTTP {resp.status_code}")
             break
@@ -151,7 +147,14 @@ def download_bhavcopy(ref_date: date, session: requests.Session) -> str:
             elif "FinInstrmTp" in df.columns:
                 has_opt = df["FinInstrmTp"].astype(str).isin(["IDO", "STO"]).any()
 
-            # Save regardless (even futures data is useful for future extension)
+            if not has_opt:
+                print("no option rows; rejecting archive")
+                continue
+            required = {"TckrSymb", "OptnTp", "ClsPric", "XpryDt", "NewBrdLotQty"}
+            if "FinInstrmTp" in df.columns and not required.issubset(df.columns):
+                print(f"missing required UDiFF fields: {sorted(required - set(df.columns))}")
+                continue
+
             BHAVCOPY_DIR.mkdir(parents=True, exist_ok=True)
             df.to_csv(local_path, index=False)
 
