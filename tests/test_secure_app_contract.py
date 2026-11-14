@@ -55,6 +55,8 @@ class SecureAppContractTests(unittest.TestCase):
         body = ast.get_source_segment(source, routes[0]) or ""
         for marker in (
             '"market_open": None',
+            '"market_status": "NOT_VERIFIED"',
+            '"clock_window_open": clock_open',
             '"calendar_verified": False',
             '"live_market_data_verified": False',
             '"real": False',

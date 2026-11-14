@@ -1,0 +1,51 @@
+name: Genesis UI Truth Watcher
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 08:30 IST on weekdays = 03:00 UTC.
+    - cron: '0 3 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: genesis-ui-truth-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ui-truth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      GENESIS_BASE_URL: https://genesis-system3-web-doq2wplepa-el.a.run.app/ui
+      PLAYWRIGHT_UI_ARTIFACTS: reports/latest/playwright_ui_truth
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Verify dashboard UI truth
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "pull_request" ]; then
+            GENESIS_UI_MODE=local GENESIS_BASE_URL=http://127.0.0.1:5173 npx playwright test --config=tests/ui/playwright.config.ts
+          else
+            GENESIS_UI_MODE=cloud npx playwright test --config=tests/ui/playwright.config.ts
+          fi
+      - name: Upload screenshots and traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: genesis-ui-truth-${{ github.run_id }}
+          path: reports/latest/playwright_ui_truth/
+          if-no-files-found: warn
+          retention-days: 14

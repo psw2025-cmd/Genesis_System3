@@ -18,12 +18,26 @@ def test_load_spearman_days_uses_firestore_only_in_cloud_mode(tmp_path, monkeypa
                     "rank_correlation_spearman": 0.75,
                     "hit_rate": 0.66,
                     "grade": "A",
+                    "exchange_session_proof": {
+                        "verified": True,
+                        "exchange": "NSE",
+                        "session_date": "2026-08-11",
+                        "previous_session_date": "2026-08-10",
+                        "source_url": "https://www.nseindia.com/all-reports",
+                    },
                 },
                 {
                     "date": "2026-06-12",
                     "rank_correlation_spearman": 0.55,
                     "hit_rate": 0.4,
                     "grade": "B",
+                    "exchange_session_proof": {
+                        "verified": True,
+                        "exchange": "NSE",
+                        "session_date": "2026-06-12",
+                        "previous_session_date": "2026-06-11",
+                        "source_url": "https://www.nseindia.com/all-reports",
+                    },
                 },
             ]
 

@@ -126,13 +126,23 @@ export const PredictionAudit: React.FC = () => {
     let cancelled = false
     const loadAccuracy = async () => {
       const fetchPath = async (path: string) => {
-        const response = await fetch(BASE + path, {
-          cache: 'no-store',
-          credentials: 'include',
-          headers: { Accept: 'application/json', ...API_HEADERS },
-        })
-        if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`)
-        return response.json()
+        const controller = new AbortController()
+        const timeout = window.setTimeout(() => controller.abort(), 10_000)
+        try {
+          const response = await fetch(BASE + path, {
+            cache: 'no-store',
+            credentials: 'include',
+            headers: { Accept: 'application/json', ...API_HEADERS },
+            signal: controller.signal,
+          })
+          if (!response.ok) throw new Error(`${path} returned HTTP ${response.status}`)
+          return await response.json()
+        } catch (error: any) {
+          if (error?.name === 'AbortError') throw new Error(`${path} timed out after 10 seconds`)
+          throw error
+        } finally {
+          window.clearTimeout(timeout)
+        }
       }
       const [accuracyResult, gatesResult] = await Promise.allSettled([
         fetchPath('/api/accuracy_trend'),
@@ -141,13 +151,17 @@ export const PredictionAudit: React.FC = () => {
       if (cancelled) return
       if (accuracyResult.status === 'fulfilled') {
         setAccuracy(accuracyResult.value)
-        setAccuracyError('')
+        setAccuracyError(accuracyResult.value?.stale === true
+          ? `Accuracy data unavailable: ${String(accuracyResult.value.stale_reason || accuracyResult.value.status || 'STALE')}`
+          : '')
       } else {
         setAccuracyError(accuracyResult.reason?.message || String(accuracyResult.reason))
       }
       if (gatesResult.status === 'fulfilled') {
         setGateContract(gatesResult.value)
-        setGatesError('')
+        setGatesError(gatesResult.value?.stale === true
+          ? `Canonical gates unavailable: ${String(gatesResult.value.stale_reason || gatesResult.value.status || 'STALE')}`
+          : '')
       } else {
         setGateContract(null)
         setGatesError(gatesResult.reason?.message || String(gatesResult.reason))
@@ -206,6 +220,8 @@ export const PredictionAudit: React.FC = () => {
                   ? `/api/accuracy_trend reports ${validationDays} day(s), while /api/auto_gates reports ${gateDays}. Promotion is blocked until the backend contracts reconcile.`
                   : gatesError
                   ? `Canonical gates unavailable: ${gatesError}. PASS is blocked until /api/auto_gates.gates loads.`
+                  : accuracyError
+                  ? `${accuracyError}. PASS remains blocked until the current validation data is readable.`
                   : !hasCanonicalGates
                   ? 'Canonical /api/auto_gates.gates is missing. Summary-only proof rows cannot authorize PASS.'
                   : validationProven

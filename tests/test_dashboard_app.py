@@ -11,6 +11,7 @@ import asyncio
 import importlib.util
 import json
 import sys
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -273,6 +274,183 @@ def test_state_endpoint_returns_200(app):
     assert status == 200
     data = json.loads(body)
     assert "state_version" in data
+    proof = data["market"]["calendar_proof"]
+    assert proof["exchange"] == "NSE"
+    assert proof["verified"] is True
+    assert proof["calendar_sha256"]
+
+
+def test_proof_reads_timeout_without_blocking_or_spawning_duplicate_workers(app):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/accuracy_trend")
+    bounded_read = endpoint.__globals__["_bounded_proof_read"]
+    futures = endpoint.__globals__["_PROOF_READ_FUTURES"]
+    started = threading.Event()
+    release = threading.Event()
+    calls = {"count": 0}
+    key = "test_proof_read_timeout_singleflight"
+
+    def slow_read():
+        calls["count"] += 1
+        started.set()
+        release.wait(1.0)
+        return {"status": "ok", "trend": []}
+
+    async def run():
+        first, second = await asyncio.gather(
+            bounded_read(key, slow_read, fallback={"trend": []}, timeout_s=0.05, cache_ttl_s=0),
+            bounded_read(key, slow_read, fallback={"trend": []}, timeout_s=0.05, cache_ttl_s=0),
+        )
+        return first, second
+
+    try:
+        first, second = asyncio.run(run())
+        assert started.is_set()
+        assert calls["count"] == 1
+        assert first["status"] == second["status"] == "timeout"
+        assert first["stale_reason"] == "PROOF_READ_TIMEOUT"
+    finally:
+        release.set()
+        future = futures.pop(key, None)
+        if future is not None:
+            try:
+                future.result(timeout=1.0)
+            except Exception:
+                pass
+
+
+def test_state_endpoint_holds_cached_trade_recommendations_without_verified_live_market(app, monkeypatch):
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 9,
+            "mode": "PAPER",
+            "data_source": "dhan_verified_cache",
+            "market": {"is_open": False, "calendar_verified": False},
+            "model": {"models_loaded": 1, "metrics": {"models_loaded": 1}},
+            "ml_predictions": [{
+                "symbol": "NIFTY",
+                "recommendation": "TRADE",
+                "signal": "BUY",
+                "confidence_pct": 75.2,
+                "model_loaded": True,
+            }],
+            "signals": {
+                "NIFTY": {
+                    "recommendation": "TRADE",
+                    "signal": "BUY",
+                    "confidence": 75.2,
+                }
+            },
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "MARKET_SESSION_NOT_VERIFIED_OPEN",
+    }
+    assert data["ml_predictions"][0]["recommendation"] == "WAIT"
+    assert data["ml_predictions"][0]["signal"] == "HOLD"
+    assert data["ml_predictions"][0]["confidence_pct"] == 0
+    assert data["signals"]["NIFTY"]["recommendation"] == "WAIT"
+    assert data["signals"]["NIFTY"]["signal"] == "HOLD"
+    assert data["signals"]["NIFTY"]["confidence"] == 0
+
+
+def test_state_endpoint_rejects_stale_market_quote_even_with_verified_open_session(app, monkeypatch):
+    import core.utils.nse_holidays as nse_holidays
+
+    monkeypatch.setattr(
+        nse_holidays,
+        "market_calendar_evidence",
+        lambda now=None: {
+            "schema_version": 1, "exchange": "NSE", "session_date": "2026-11-14",
+            "verified": True, "is_open": True, "session_status": "OPEN",
+            "reason": "NSE_REGULAR_SESSION", "source_url": "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf",
+            "calendar_sha256": "a" * 64,
+        },
+    )
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 10,
+            "mode": "PAPER",
+            "data_source": "dhan",
+            "market": {
+                "is_open": True,
+                "calendar_verified": True,
+                "market_data_timestamp_utc": "2026-11-14T03:00:00+00:00",
+            },
+            "signals": {"NIFTY": {"signal": "BUY", "confidence": 80}},
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "FRESH_MARKET_QUOTE_NOT_VERIFIED",
+    }
+    assert data["signals"]["NIFTY"]["signal"] == "HOLD"
+    assert data["signals"]["NIFTY"]["confidence"] == 0
+
+
+def test_state_endpoint_holds_recommendation_for_expired_contract(app, monkeypatch):
+    import core.utils.nse_holidays as nse_holidays
+
+    monkeypatch.setattr(
+        nse_holidays,
+        "market_calendar_evidence",
+        lambda now=None: {
+            "schema_version": 1, "exchange": "NSE", "session_date": "2026-11-14",
+            "verified": True, "is_open": True, "session_status": "OPEN",
+            "reason": "NSE_REGULAR_SESSION", "source_url": "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf",
+            "calendar_sha256": "a" * 64,
+        },
+    )
+    endpoint = next(route.endpoint for route in app.routes if getattr(route, "path", None) == "/api/state")
+    state_store = endpoint.__globals__["state_store"]
+    fresh_quote = datetime.now(timezone.utc).isoformat()
+    expired_date = (datetime.now(timezone.utc).date() - timedelta(days=1)).isoformat()
+    monkeypatch.setattr(
+        state_store,
+        "get_state",
+        lambda: {
+            "state_version": 11,
+            "mode": "PAPER",
+            "data_source": "dhan",
+            "market": {
+                "is_open": True,
+                "calendar_verified": True,
+                "market_data_timestamp_utc": fresh_quote,
+            },
+            "ml_predictions": [{
+                "symbol": "NIFTY",
+                "recommendation": "TRADE",
+                "signal": "BUY",
+                "confidence_pct": 80,
+                "model_loaded": True,
+                "expiry": expired_date,
+            }],
+        },
+    )
+    status, _, body = call(app, "GET", "/api/state")
+    assert status == 200
+    data = json.loads(body)
+    assert data["recommendation_safety"] == {
+        "status": "BLOCKED",
+        "reason": "TRADE_CONTRACT_EXPIRY_NOT_VERIFIED_OR_EXPIRED",
+    }
+    assert data["ml_predictions"][0]["recommendation"] == "WAIT"
+    assert data["ml_predictions"][0]["signal"] == "HOLD"
+    assert data["ml_predictions"][0]["confidence_pct"] == 0
 
 
 def test_missing_model_proof_forces_hold_and_zero_confidence(app):
