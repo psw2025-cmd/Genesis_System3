@@ -283,23 +283,8 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     log.info("[Step 3] Placing paper entry order")
     entry_order = simulate_paper_entry(signal)
     log.info(f"  order_id={entry_order['order_id']} fill_price={entry_order['fill_price']}")
-    try:
-        from dashboard.backend.trade_logger import log_trade_event
-
-        log_trade_event(
-            event_type="POSITION_OPENED",
-            position_id=entry_order["order_id"],
-            underlying=signal.get("symbol"),
-            symbol=signal.get("symbol"),
-            strike=float(signal.get("strike") or 0),
-            option_type=signal.get("option_type"),
-            action="OPEN",
-            entry_price=entry_order.get("fill_price"),
-            qty=int(signal.get("quantity") or entry_order.get("quantity") or 1),
-            strategy="PAPER_LIFECYCLE_PROOF",
-        )
-    except Exception as log_err:
-        log.warning(f"Trade log write skipped: {log_err}")
+    # This diagnostic uses a synthetic paper fill. Never write it into the
+    # operational trade log, where it could be mistaken for a real engine trade.
 
     # Step 4: Brief hold, then exit
     log.info("[Step 4] Simulating hold and paper exit")
@@ -308,35 +293,11 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
     log.info(
         f"  exit_price={exit_record['exit_price']} pnl_total={exit_record['pnl_total']} net_pnl={exit_record['net_pnl']}"
     )
-    try:
-        from dashboard.backend.trade_logger import log_trade_event
-
-        log_trade_event(
-            event_type="POSITION_CLOSED",
-            position_id=entry_order["order_id"],
-            underlying=signal.get("symbol"),
-            symbol=signal.get("symbol"),
-            strike=float(signal.get("strike") or 0),
-            option_type=signal.get("option_type"),
-            action="CLOSE",
-            entry_price=entry_order.get("fill_price"),
-            exit_price=exit_record.get("exit_price"),
-            qty=int(entry_order.get("quantity") or 1),
-            pnl=exit_record.get("pnl_total"),
-            strategy="PAPER_LIFECYCLE_PROOF",
-            exit_reason=exit_record.get("exit_reason"),
-        )
-    except Exception as log_err:
-        log.warning(f"Trade log write skipped: {log_err}")
+    # simulate_paper_exit uses a fixed illustrative move; it is diagnostic only.
 
     # Step 5: Reconcile
     log.info("[Step 5] Reconciling order->fill->exit->P&L")
-    reconciled = (
-        entry_order["order_id"] == exit_record["order_id"]
-        and entry_order["fill_price"] is not None
-        and exit_record["exit_price"] is not None
-        and exit_record["pnl_total"] is not None
-    )
+    reconciled = False
     log.info(f"  reconciled={reconciled}")
 
     # Mandatory lifecycle fields
@@ -371,7 +332,9 @@ def run_proof(dry_run: bool = False, force: bool = False) -> dict:
         "reconciled": reconciled,
         "all_mandatory_fields_present": all_fields_present,
         "mandatory_field_check": field_check,
-        "status": "PASS" if (reconciled and all_fields_present) else "FAIL",
+        "status": "DIAGNOSTIC_ONLY",
+        "acceptance_evidence": False,
+        "diagnostic_reason": "Synthetic paper fill and illustrative exit do not prove engine lifecycle or reconciliation.",
         "live_trading_enabled": False,
         "system3_live_trading_allowed": False,
     }
@@ -390,7 +353,7 @@ def _make_summary(proof: dict, broker_status: dict) -> dict:
     return {
         "gate": "analyzer_paper_lifecycle_proof",
         "status": proof.get("status", "FAIL"),
-        "pass": proof.get("status") == "PASS",
+        "pass": False,
         "auto_repair_allowed": False,
         "blockers": [] if proof.get("status") == "PASS" else ["lifecycle_not_completed"],
         "warnings": [] if broker_status.get("connected") else ["broker_not_connected_paper_simulation_used"],
@@ -401,9 +364,13 @@ def _make_summary(proof: dict, broker_status: dict) -> dict:
             "signal_generated": bool(proof.get("signal", {}).get("signal_id")),
             "entry_order_placed": bool(proof.get("entry_order", {}).get("order_id")),
             "exit_completed": bool(proof.get("exit_record", {}).get("exit_time")),
-            "full_lifecycle_proven": proof.get("reconciled", False)
-            and proof.get("all_mandatory_fields_present", False),
-            "orders_trades_lifecycle_reconciled": proof.get("reconciled", False),
+            "full_lifecycle_proven": False,
+            "orders_trades_lifecycle_reconciled": False,
+            "completed_paper_trades": 0,
+            "missing_trade_links": None,
+            "reconciliation_mismatches": None,
+            "ledger_readback_verified": False,
+            "real_market_data": False,
             "mandatory_lifecycle_fields": list(proof.get("mandatory_field_check", {}).keys()),
             "pnl_total": proof.get("exit_record", {}).get("pnl_total"),
             "net_pnl": proof.get("exit_record", {}).get("net_pnl"),

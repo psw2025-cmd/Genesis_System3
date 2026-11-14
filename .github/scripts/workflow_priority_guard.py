@@ -20,6 +20,7 @@ AUTOMATIC = {
     "sonarqube-audit.yml",
     "system3-preflight-control-plane.yml",
     "system3-runbook-audit.yml",
+    "ui-truth.yml",
     "workflow-priority-guard.yml",
 }
 MANUAL_ONLY: set[str] = set()
@@ -35,6 +36,7 @@ FORENSIC_MONITORED_WORKFLOWS = {
     "CodeQL Security Audit",
     "Security Audit Evidence",
     "SonarQube Audit",
+    "Genesis UI Truth Watcher",
 }
 
 
@@ -100,7 +102,7 @@ def main() -> int:
         if not on_block:
             raise SystemExit(f"WORKFLOW_TRIGGER_BLOCK_MISSING file={name}")
         match = forbidden_trigger.search(on_block)
-        if match:
+        if match and not (name == "ui-truth.yml" and match.group(1).lower() == "schedule"):
             raise SystemExit(f"WORKFLOW_FORBIDDEN_TRIGGER file={name} match={match.group(1)!r}")
         event_match = event_trigger.search(on_block)
         if event_match and name not in EVENT_TRIGGER_WORKFLOWS:
@@ -113,6 +115,18 @@ def main() -> int:
             raise SystemExit(f"WORKFLOW_RETIRED_RUNTIME_REFERENCE file={name}")
         if live_enable.search(text):
             raise SystemExit(f"WORKFLOW_LIVE_TRADING_FORBIDDEN file={name}")
+
+    ui_truth_on = trigger_blocks.get("ui-truth.yml", "")
+    if not re.search(
+        r"(?m)^\s*schedule\s*:\s*\n(?:\s*#.*\n)*\s*-\s*cron:\s*['\"]0 3 \* \* 1-5['\"]\s*$",
+        ui_truth_on,
+    ):
+        raise SystemExit("UI_TRUTH_RESTRICTED_SCHEDULE_MISSING")
+    ui_truth_text = workflow_text.get("ui-truth.yml", "")
+    if not re.search(r"(?m)^permissions:\s*\n\s+contents:\s*read\s*$", ui_truth_text):
+        raise SystemExit("UI_TRUTH_READ_ONLY_PERMISSION_MISSING")
+    if re.search(r"(?m)^\s*(id-token|actions|contents|deployments):\s*write\s*$", ui_truth_text):
+        raise SystemExit("UI_TRUTH_WRITE_PERMISSION_FORBIDDEN")
 
     ci_on = trigger_blocks["ci.yml"]
     if "pull_request:" not in ci_on or "push:" not in ci_on:
@@ -189,7 +203,7 @@ def main() -> int:
             "unexpected": [],
             "self_hosted": False,
             "retired_runtime_workflows": False,
-            "scheduled_github_workflows": False,
+            "scheduled_github_workflows": ["ui-truth.yml: 0 3 * * 1-5 (read-only)"],
             "event_forensic_responder": FORENSIC_WORKFLOW,
             "event_monitored_workflow_count": len(FORENSIC_MONITORED_WORKFLOWS),
             "event_responder_write_permissions": False,

@@ -14,15 +14,7 @@ import pandas as pd
 
 from core.brokers.dhan.nse_option_symbol import build_trading_symbol
 
-# Default lot sizes for major Indian indices
-LOT_SIZES = {
-    "NIFTY": 50,
-    "BANKNIFTY": 15,
-    "FINNIFTY": 25,
-    "MIDCPNIFTY": 50,
-    "SENSEX": 10,
-    "BANKEX": 15,
-}
+INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"}
 
 
 def _configured_chain_limit() -> int:
@@ -216,7 +208,6 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
     unique_strikes = sorted(set(pd.to_numeric(df.get("strike", df.get("strike_price", [])), errors="coerce").dropna()))
     atm_strike = min(unique_strikes, key=lambda s: abs(s - spot_f)) if unique_strikes and spot_f > 0 else 0.0
 
-    lot_size = LOT_SIZES.get(underlying.upper(), 50)
     ce_oi_map: Dict[float, int] = {}
     pe_oi_map: Dict[float, int] = {}
 
@@ -227,6 +218,14 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         opt = str(row.get("option_type", row.get("OptnTp", ""))).upper()
         if opt not in ("CE", "PE"):
             continue
+        # A symbol-level constant is not evidence of this dated contract's lot.
+        raw_lot = next((row.get(key) for key in ("lot_size", "lotsize", "lotSize", "SEM_LOT_UNITS", "NewBrdLotQty")
+                        if pd.notna(row.get(key))), None)
+        try:
+            lot_number = float(raw_lot)
+            lot_size = int(lot_number) if math.isfinite(lot_number) and lot_number > 0 and lot_number.is_integer() else None
+        except (TypeError, ValueError, OverflowError):
+            lot_size = None
         strike = float(row.get("strike", row.get("strike_price", 0)) or 0)
         oi = int(row.get("oi", 0) or 0)
         volume = int(row.get("volume", 0) or 0)
@@ -295,7 +294,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         base: Dict[str, Any] = {
             "exchange": "NSE_FNO",
             "underlying_symbol": underlying.upper(),
-            "underlying_type": "INDEX" if underlying.upper() in LOT_SIZES else "EQUITY",
+            "underlying_type": "INDEX" if underlying.upper() in INDEX_SYMBOLS else "EQUITY",
             "expiry": row_expiry or expiry,
             "strike": strike,
             "option_type": opt,
@@ -334,6 +333,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
             "intrinsic_value": round(intrinsic, 2),
             "time_value": round(time_val, 2),
             "lot_size": lot_size,
+            "lot_size_source": "contract_row" if lot_size is not None else "UNVERIFIED",
             "turnover": round(volume * ltp_val, 2),
             "liquidity_score": liquidity_score,
             "buildup_type": buildup,

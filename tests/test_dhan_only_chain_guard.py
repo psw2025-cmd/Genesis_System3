@@ -1,4 +1,8 @@
-from dashboard.backend.middleware.memory_guard import _blocked_chain_payload, _chain_response_is_dhan_only
+from dashboard.backend.middleware.memory_guard import (
+    _blocked_chain_payload,
+    _chain_response_is_dhan_only,
+    _normalize_verified_chain_payload,
+)
 
 
 def test_dhan_chain_payload_allowed():
@@ -14,6 +18,34 @@ def test_dhan_chain_payload_allowed():
     }
 
     assert _chain_response_is_dhan_only(payload) is True
+
+
+def test_closed_chain_snapshot_cannot_keep_live_labels_or_retrieval_freshness():
+    payload = {
+        "underlying": "NIFTY",
+        "spot": 23100,
+        "contracts": [{"source": "dhan", "strike": 23000, "option_type": "CE", "ltp": 100, "oi": 1}],
+        "total_contracts": 1,
+        "data_source": "dhan",
+        "status": "MARKET_CLOSED_DHAN_SNAPSHOT",
+        "data_mode": "LIVE",
+        "verification_status": "VERIFIED_LIVE",
+        "freshness_seconds": 1,
+        "fetched_at_utc": "2026-11-13T10:00:00Z",
+        "stale": False,
+        "live": True,
+    }
+
+    normalized = _normalize_verified_chain_payload(payload)
+
+    assert normalized["data_mode"] == "SNAPSHOT"
+    assert normalized["verification_status"] == "DHAN_EOD_SNAPSHOT"
+    assert normalized["freshness_seconds"] is None
+    assert normalized["stale"] is True
+    assert normalized["live"] is False
+    assert normalized["snapshot"] is True
+    assert normalized["fetched_at_utc"] == payload["fetched_at_utc"]
+    assert _chain_response_is_dhan_only(normalized) is True
 
 
 def test_csv_fallback_chain_payload_blocked():

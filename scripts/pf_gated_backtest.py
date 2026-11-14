@@ -43,7 +43,6 @@ SEBI_RATE = 0.000001
 SLIPPAGE_PCT = 0.001
 
 INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY"}
-LOT_SIZES = {"NIFTY": 75, "BANKNIFTY": 30, "FINNIFTY": 40, "MIDCPNIFTY": 75}
 
 # B2 gates
 PF_GATE = 1.20
@@ -67,9 +66,10 @@ def is_phantom(close, strike, spot, opt_type):
 
 
 def compute_cost(entry_price, exit_price, symbol, qty):
-    lot_size = LOT_SIZES.get(symbol, 50)
-    lots = max(1, qty // lot_size)
-    contracts = lots * lot_size
+    if isinstance(qty, bool) or not isinstance(qty, int) or qty <= 0:
+        raise ValueError("A positive exchange lot quantity is required")
+    lots = 1
+    contracts = qty
     entry_value = entry_price * contracts
     exit_value = exit_price * contracts
     entry_slip = entry_value * SLIPPAGE_PCT
@@ -127,6 +127,7 @@ def load_bhavcopy(csv_path):
                             "oi_chg": int(float(r.get(chg_c, 0) or 0)),
                             "expiry": str(r.get(exp_c, "")).strip(),
                             "spot": float(r.get(und_c, 0) or 0) if und_c else 0.0,
+                            "lot_size": int(float(r.get("NewBrdLotQty", 0) or 0)),
                         }
                     )
                 except (ValueError, TypeError):
@@ -203,7 +204,10 @@ def run():
             cands.sort(key=lambda r: r["oi_chg"], reverse=True)
             signal = cands[0]
             # Risk cap check
-            lot = LOT_SIZES.get(symbol, 50)
+            lot = signal["lot_size"]
+            if lot <= 0:
+                skipped_risk += 1
+                continue
             risk = signal["close"] * lot
             if risk > MAX_RISK_PER_TRADE_RUPEES:
                 skipped_risk += 1
@@ -220,6 +224,9 @@ def run():
             if not m:
                 continue
             exit_row = m[0]
+            if exit_row["lot_size"] != lot:
+                skipped_risk += 1
+                continue
             if exit_row["close"] <= 0 or signal["close"] <= 0:
                 continue
             cd = compute_cost(signal["close"], exit_row["close"], symbol, lot)
@@ -233,6 +240,7 @@ def run():
                     "entry_price": round(signal["close"], 2),
                     "exit_price": round(exit_row["close"], 2),
                     "spot_at_entry": round(spot, 1),
+                    "lot_size": lot,
                     "gross_pnl": cd["gross_pnl"],
                     "net_pnl": cd["net_pnl"],
                 }
@@ -256,11 +264,17 @@ def run():
     losses = [t for t in trades if t["net_pnl"] <= 0]
     gross_profit = sum(t["net_pnl"] for t in wins)
     gross_loss = abs(sum(t["net_pnl"] for t in losses))
-    pf = gross_profit / gross_loss if gross_loss > 0 else float("inf")
+    pf = gross_profit / gross_loss if gross_loss > 0 else None
     net = sum(t["net_pnl"] for t in trades)
     win_rate = len(wins) / len(trades) * 100
 
-    backtest_pass = pf >= PF_GATE and net > 0
+    # End-of-day settlement prices cannot establish executable entry/exit fills,
+    # observed spread, or latency. Keep this as a research screen only.
+    estimated_profitability_screen_pass = (
+        len(daily) >= 30 and len(trades) >= 30 and pf is not None
+        and pf >= PF_GATE and net > 0
+    )
+    backtest_pass = False
 
     proof = {
         "proof_id": proof_id,
@@ -268,8 +282,9 @@ def run():
         "completed": datetime.now(timezone.utc).isoformat(),
         "backtest_pass": backtest_pass,
         "pass": backtest_pass,
-        "verdict": "PROFITABLE_AFTER_COSTS" if backtest_pass else "NOT_PROFITABLE_BLOCKED",
-        "profit_factor": round(pf, 3) if pf != float("inf") else 999.0,
+        "verdict": "UNVERIFIED_EXECUTION_COSTS_AND_FILLS",
+        "estimated_profitability_screen_pass": estimated_profitability_screen_pass,
+        "profit_factor": round(pf, 3) if pf is not None else None,
         "pf_gate": PF_GATE,
         "trade_count": len(trades),
         "win_count": len(wins),
@@ -293,14 +308,15 @@ def run():
         "live_trading_enabled": False,
         "strategy": "near-ATM CE, OI-change ranked, next-day exit (B2 PF-gated honest backtest)",
         "note": (
-            "backtest_pass=True requires PF>=1.20 AND net>0 after full costs. "
-            "This is a real profitability gate, NOT a pipeline-correctness check."
+            "Daily bhavcopy close prices and estimated fees are research inputs only. "
+            "No observed fill, spread or latency evidence; release acceptance is blocked."
         ),
         "trades": trades[:30],
     }
     (OUT / "pf_gated_backtest.json").write_text(json.dumps(proof, indent=2), encoding="utf-8")
     print(f"[PF-Gated Backtest] {'PASS' if backtest_pass else 'FAIL/BLOCKED'}")
-    print(f"  PF={pf:.2f} (gate {PF_GATE}) | net=Rs{net:.0f} | win_rate={win_rate:.1f}% | trades={len(trades)}")
+    pf_display = f"{pf:.2f}" if pf is not None else "N/A"
+    print(f"  PF={pf_display} (gate {PF_GATE}) | net=Rs{net:.0f} | win_rate={win_rate:.1f}% | trades={len(trades)}")
     print(f"  Dropped phantom rows: {dropped_phantom}")
     return proof
 

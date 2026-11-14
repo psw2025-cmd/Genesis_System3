@@ -11,11 +11,33 @@ from __future__ import annotations
 import copy
 import hashlib
 import base64
+import logging
 import re
 import json
 import os
+import time
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Callable, Dict, Optional
+from urllib.parse import urlparse
+
+
+AUTO_HEAL_LOG_PATH = Path(__file__).resolve().parents[2] / "logs" / "auto_heal.log"
+_logger = logging.getLogger(__name__)
+
+
+def _record_validation_proof_write(session_id: str, proof_saved: bool, attempt: int) -> None:
+    timestamp = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    message = f"proof_saved={str(proof_saved).lower()} session_id={session_id} timestamp={timestamp} attempt={attempt}"
+    _logger.info("%s", message)
+    try:
+        AUTO_HEAL_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+        with AUTO_HEAL_LOG_PATH.open("a", encoding="utf-8", newline="\n") as stream:
+            stream.write(f"{timestamp} FIRESTORE_ML_PROOF {message}\n")
+    except OSError:
+        # Cloud Run stdout remains the durable central log path if its local
+        # writable layer is unavailable; a proof write must not be hidden.
+        _logger.exception("FIRESTORE_ML_PROOF_FILE_LOG_FAILED session_id=%s", session_id)
 
 
 def _json_clone(value: Dict[str, Any]) -> Dict[str, Any]:
@@ -165,6 +187,45 @@ class FirestoreSchedulerEvidenceBackend:
             raise ValueError("validation day rho invalid") from exc
         if incoming.get("error") and rho_f == 0.0:
             raise ValueError("validation day error reports are not durable evidence")
+        session_proof = incoming.get("exchange_session_proof")
+        stored_session_proof = None
+        if session_proof is not None:
+            if not isinstance(session_proof, dict):
+                raise ValueError("exchange session proof must be an object")
+            session_date = str(session_proof.get("session_date") or "")
+            previous_session_date = str(session_proof.get("previous_session_date") or "")
+            source_url = urlparse(str(session_proof.get("source_url") or ""))
+            source_host = (source_url.hostname or "").lower()
+            official_nse = (
+                source_url.scheme.lower() == "https"
+                and (source_host == "nseindia.com" or source_host.endswith(".nseindia.com"))
+                and source_url.username is None
+                and source_url.password is None
+                and not source_url.query
+                and not source_url.fragment
+            )
+            try:
+                session_day = datetime.strptime(session_date, "%Y-%m-%d").date()
+                previous_day = datetime.strptime(previous_session_date, "%Y-%m-%d").date()
+            except ValueError as exc:
+                raise ValueError("exchange session proof dates must use YYYY-MM-DD") from exc
+            if (
+                session_proof.get("verified") is not True
+                or str(session_proof.get("exchange") or "").upper() != "NSE"
+                or session_date != day
+                or session_day.isoformat() != session_date
+                or previous_day.isoformat() != previous_session_date
+                or previous_day >= session_day
+                or not official_nse
+            ):
+                raise ValueError("exchange session proof is not valid official NSE evidence")
+            stored_session_proof = {
+                "verified": True,
+                "exchange": "NSE",
+                "session_date": session_date,
+                "previous_session_date": previous_session_date,
+                "source_url": source_url.geturl(),
+            }
         stored = {
             "schema_version": 1,
             "date": day,
@@ -178,6 +239,8 @@ class FirestoreSchedulerEvidenceBackend:
             "validated_at": incoming.get("validated_at") or self._now().isoformat().replace("+00:00", "Z"),
             "updated_at_utc": self._now().isoformat().replace("+00:00", "Z"),
         }
+        if stored_session_proof is not None:
+            stored["exchange_session_proof"] = stored_session_proof
         day_ref = self.collection.document(f"validation_day_{day}")
         index_ref = self.collection.document("validation_days_index")
 
@@ -186,7 +249,12 @@ class FirestoreSchedulerEvidenceBackend:
             day_ref_snap = day_ref.get(transaction=transaction)
             index_snap = index_ref.get(transaction=transaction)
             existing_day = day_ref_snap.to_dict() if getattr(day_ref_snap, "exists", False) else {}
-            if existing_day and float(existing_day.get("rank_correlation_spearman", 0)) == rho_f:
+            same_evidence = bool(existing_day) and all(
+                existing_day.get(key) == value
+                for key, value in stored.items()
+                if key not in {"updated_at_utc", "validated_at"}
+            )
+            if same_evidence:
                 stored_out = _json_clone(existing_day)
             else:
                 stored_out = stored
@@ -199,7 +267,41 @@ class FirestoreSchedulerEvidenceBackend:
             transaction.set(index_ref, {"schema_version": 1, "dates": dates, "updated_at_utc": stored["updated_at_utc"]})
             return stored_out
 
-        return _persist(self.client.transaction())
+        delay_seconds = 0.25
+        retryable_markers = ("aborted", "deadline", "unavailable", "contention", "timeout")
+        last_error: Optional[Exception] = None
+        for attempt in range(1, 4):
+            try:
+                written = _persist(self.client.transaction())
+                readback = day_ref.get()
+                actual = readback.to_dict() if getattr(readback, "exists", False) else None
+                row_verified = (
+                    isinstance(actual, dict)
+                    and actual.get("date") == day
+                    and actual.get("rank_correlation_spearman") == stored["rank_correlation_spearman"]
+                )
+                proof_verified = (
+                    stored_session_proof is None
+                    or (row_verified and actual.get("exchange_session_proof") == stored_session_proof)
+                )
+                if not row_verified or not proof_verified:
+                    raise RuntimeError("Firestore validation write read-back mismatch")
+                _record_validation_proof_write(day, bool(stored_session_proof and proof_verified), attempt)
+                return _json_clone(written)
+            except Exception as exc:
+                last_error = exc
+                error_kind = str(exc).lower()
+                retryable = "read-back mismatch" in error_kind or any(
+                    marker in error_kind for marker in retryable_markers
+                )
+                if not retryable or attempt == 3:
+                    _record_validation_proof_write(day, False, attempt)
+                    raise
+                time.sleep(delay_seconds)
+                delay_seconds = min(delay_seconds * 2, 2.0)
+        assert last_error is not None
+        _record_validation_proof_write(day, False, 3)
+        raise last_error
 
     def list_validation_days(self) -> list:
         index_snap = self.collection.document("validation_days_index").get()

@@ -1,6 +1,9 @@
 import pytest
 from datetime import datetime, timezone
 
+import pytest
+
+import dashboard.backend.firestore_state_backend as firestore_backend_module
 from dashboard.backend.firestore_state_backend import FirestoreSchedulerEvidenceBackend, FirestoreStateBackend, derive_scheduler_health
 
 
@@ -59,6 +62,11 @@ class FakeClient:
 
 def passthrough_transactional(fn):
     return fn
+
+
+@pytest.fixture(autouse=True)
+def isolate_auto_heal_log(tmp_path, monkeypatch):
+    monkeypatch.setattr(firestore_backend_module, "AUTO_HEAL_LOG_PATH", tmp_path / "logs" / "auto_heal.log")
 
 
 class FakeClock:
@@ -132,6 +140,134 @@ def test_scheduler_collector_lease_is_idempotent_and_exclusive():
     clock.set("2026-08-14T01:05:01Z")
     with pytest.raises(PermissionError, match="expired"):
         backend.publish(evidence, owner="execution-b", fence=2)
+
+
+def test_validation_day_roundtrip_preserves_nse_session_proof_and_same_rho_update():
+    client = FakeClient()
+    clock = FakeClock("2026-08-14T01:00:00Z")
+    backend = FirestoreSchedulerEvidenceBackend(client=client, transactional=passthrough_transactional, clock=clock)
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "source": "market_result_validator",
+    }
+    backend.upsert_validation_day(report)
+    assert "exchange_session_proof" not in backend.list_validation_days()[0]
+
+    report["exchange_session_proof"] = {
+        "verified": True,
+        "exchange": "NSE",
+        "session_date": "2026-08-14",
+        "previous_session_date": "2026-08-13",
+        "source_url": "https://www.nseindia.com/all-reports",
+    }
+    stored = backend.upsert_validation_day(report)
+    assert stored["exchange_session_proof"] == report["exchange_session_proof"]
+    assert backend.list_validation_days()[0]["exchange_session_proof"] == report["exchange_session_proof"]
+    clock.set("2026-08-14T01:00:01Z")
+    assert backend.upsert_validation_day(report) == stored
+
+
+def test_validation_day_write_retries_transient_failure_and_logs_readback(tmp_path, monkeypatch):
+    client = FakeClient()
+    calls = 0
+
+    def retrying_transactional(fn):
+        def run(transaction):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise RuntimeError("Firestore temporarily unavailable")
+            return fn(transaction)
+        return run
+
+    monkeypatch.setattr(firestore_backend_module.time, "sleep", lambda _delay: None)
+    log_path = tmp_path / "logs" / "auto_heal.log"
+    monkeypatch.setattr(firestore_backend_module, "AUTO_HEAL_LOG_PATH", log_path)
+    backend = FirestoreSchedulerEvidenceBackend(
+        client=client, transactional=retrying_transactional,
+        clock=FakeClock("2026-08-14T01:00:00Z"),
+    )
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "exchange_session_proof": {
+            "verified": True,
+            "exchange": "NSE",
+            "session_date": "2026-08-14",
+            "previous_session_date": "2026-08-13",
+            "source_url": "https://www.nseindia.com/all-reports",
+        },
+    }
+
+    saved = backend.upsert_validation_day(report)
+
+    assert calls == 2
+    assert saved["exchange_session_proof"] == report["exchange_session_proof"]
+    assert "proof_saved=true session_id=2026-08-14" in log_path.read_text(encoding="utf-8")
+
+
+def test_validation_day_write_fails_closed_after_three_bad_readbacks(tmp_path, monkeypatch):
+    client = FakeClient()
+    base_collection = client.collection("system3_scheduler_evidence")
+    class ReadbackMissingDocument(FakeDocument):
+        def get(self, transaction=None):
+            if transaction is None:
+                return FakeSnapshot(None)
+            return super().get(transaction=transaction)
+
+    day_document = ReadbackMissingDocument()
+
+    class ReadbackMissingCollection:
+        def document(self, name):
+            if name.startswith("validation_day_"):
+                return day_document
+            return base_collection.document(name)
+
+    backend = FirestoreSchedulerEvidenceBackend(
+        client=client, transactional=passthrough_transactional,
+        clock=FakeClock("2026-08-14T01:00:00Z"),
+    )
+    backend.collection = ReadbackMissingCollection()
+    delays = []
+    log_path = tmp_path / "logs" / "auto_heal.log"
+    monkeypatch.setattr(firestore_backend_module.time, "sleep", delays.append)
+    monkeypatch.setattr(firestore_backend_module, "AUTO_HEAL_LOG_PATH", log_path)
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "exchange_session_proof": {
+            "verified": True, "exchange": "NSE", "session_date": "2026-08-14",
+            "previous_session_date": "2026-08-13",
+            "source_url": "https://www.nseindia.com/all-reports",
+        },
+    }
+
+    with pytest.raises(RuntimeError, match="read-back mismatch"):
+        backend.upsert_validation_day(report)
+
+    assert delays == [0.25, 0.5]
+    assert "proof_saved=false session_id=2026-08-14" in log_path.read_text(encoding="utf-8")
+
+
+def test_validation_day_rejects_non_nse_session_proof():
+    backend = FirestoreSchedulerEvidenceBackend(
+        client=FakeClient(), transactional=passthrough_transactional,
+        clock=FakeClock("2026-08-14T01:00:00Z"),
+    )
+    report = {
+        "date": "2026-08-14",
+        "rank_correlation_spearman": 0.75,
+        "exchange_session_proof": {
+            "verified": True,
+            "exchange": "NSE",
+            "session_date": "2026-08-14",
+            "previous_session_date": "2026-08-13",
+            "source_url": "https://evil.example/?next=nseindia.com",
+        },
+    }
+    with pytest.raises(ValueError, match="official NSE evidence"):
+        backend.upsert_validation_day(report)
 
 
 def test_scheduler_evidence_rejects_future_unknown_and_oversized_payloads():

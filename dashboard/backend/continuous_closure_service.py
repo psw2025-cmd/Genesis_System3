@@ -289,7 +289,7 @@ def build_continuous_closure_report(
             "sources": {"repo": {"ok": backlog_path.exists()}, "reports": {"ok": True}, "live": {"ok": True}},
             "contracts": {
                 "gates_passing": local_payload.get("gates_passing", 7),
-                "gates_total": local_payload.get("gates_total", 7),
+                "gates_total": local_payload.get("gates_total", 8),
                 "serving_sha": deploy_info.get("git_sha", "baa55298b"),
                 "broker_connected": True,
             },

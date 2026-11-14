@@ -262,7 +262,7 @@ def build_genesis_ml_health(
         "blocker_id": None if spearman_pass else "SYS3-BLK-005",
         "latest_rho": latest_rho,
         "spearman_days_passing": spearman.get("days_passing_threshold"),
-        "spearman_days_required": spearman.get("days_required") or 5,
+        "spearman_days_required": spearman.get("days_required") or 30,
         "spearman_gate_pass": spearman_pass,
         "retraining_status": retrain_status,
         "retrain_signal_present": retrain_signal,

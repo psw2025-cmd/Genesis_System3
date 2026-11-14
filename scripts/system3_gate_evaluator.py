@@ -13,21 +13,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "reports" / "latest" / "system3_auto_gates"
 SPEARMAN_THRESHOLD = 0.70
-SPEARMAN_DAYS_REQUIRED = 5
+SPEARMAN_DAYS_REQUIRED = 30
 HUMAN_GATE_PATH = ROOT / "config" / "human_approval_gate.json"
 
 GATE_IDS = [
     "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
     "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
     "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+    "CLOSED_TRADE_RECONCILIATION_100_MIN",
     "WEBSOCKET_TICK_HEALTH_PROVEN",
     "MODEL_ACCURACY_REPORT_PRESENT",
     "OPTION_STRIKE_VISIBILITY_PROVEN",
@@ -71,12 +74,32 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
         day = str(data.get("date") or fallback_date or "").strip()
         if not day:
             return
+        session_proof = data.get("exchange_session_proof")
+        try:
+            source_url = urlparse(str((session_proof or {}).get("source_url") or ""))
+            source_host = (source_url.hostname or "").lower()
+            official_nse_host = (
+                source_url.scheme.lower() == "https"
+                and (source_host == "nseindia.com" or source_host.endswith(".nseindia.com"))
+            )
+        except (AttributeError, ValueError):
+            official_nse_host = False
+        session_verified = bool(
+            isinstance(session_proof, dict)
+            and session_proof.get("verified") is True
+            and str(session_proof.get("exchange") or "").upper() == "NSE"
+            and str(session_proof.get("session_date") or "") == day
+            and bool(str(session_proof.get("previous_session_date") or "").strip())
+            and official_nse_host
+        )
         by_date[day] = {
             "date": day,
             "rho": round(rho, 4),
             "hit_rate": data.get("hit_rate", data.get("match_rate_top3")),
             "status": data.get("status") or data.get("grade"),
-            "pass": rho >= SPEARMAN_THRESHOLD,
+            "pass": rho >= SPEARMAN_THRESHOLD and session_verified,
+            "session_verified": session_verified,
+            "previous_session_date": str((session_proof or {}).get("previous_session_date") or ""),
         }
 
     mv_dir = root / "state" / "market_validations"
@@ -112,21 +135,28 @@ def load_spearman_days(root: Path) -> Tuple[List[Dict[str, Any]], int, Optional[
 def eval_spearman_gate(root: Path) -> Dict[str, Any]:
     days, passing, latest = load_spearman_days(root)
     consecutive_pass = 0
-    for d in reversed(days):
-        if d["pass"]:
+    previous_day = None
+    for d in days:
+        linked = previous_day is None or d.get("previous_session_date") == previous_day
+        if d["pass"] and linked:
             consecutive_pass += 1
+        elif d["pass"]:
+            consecutive_pass = 1
         else:
-            break
-    ok = passing >= SPEARMAN_DAYS_REQUIRED
+            consecutive_pass = 0
+        previous_day = d["date"]
+    # A total of scattered passing rows is not a consecutive validation streak.
+    # Missing/failed sessions and rows without official NSE session provenance break it.
+    ok = consecutive_pass >= SPEARMAN_DAYS_REQUIRED
     return {
         "gate_id": "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
         "pass": ok,
         "days_recorded": len(days),
         "days_passing_threshold": passing,
+        "consecutive_pass_days": consecutive_pass,
         "days_required": SPEARMAN_DAYS_REQUIRED,
         "threshold": SPEARMAN_THRESHOLD,
         "latest_rho": latest,
-        "consecutive_pass_days": consecutive_pass,
         "blocker_id": None if ok else "SYS3-BLK-005",
         "auto_action": "Run daily_gain_validate at 15:35 IST weekdays; auto_retrain if rho<0.40 x3 days",
         "days": days[-14:],
@@ -176,13 +206,20 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
     broker_connected = ev.get("lifecycle_proof_broker_not_connected") is not True
     if live_state:
         broker_connected = bool((live_state.get("broker") or {}).get("connected"))
-    full_proven = ev.get("full_lifecycle_proven") is True
-    if not full_proven and live_state and broker_connected:
-        positions = live_state.get("positions") or []
-        if positions and all(
-            isinstance(p, dict) and p.get("strike") and p.get("entry_price") and p.get("position_id") for p in positions
-        ):
-            full_proven = True
+    try:
+        completed_trades = int(ev.get("completed_paper_trades", -1))
+        missing_links = int(ev.get("missing_trade_links", -1))
+        reconciliation_mismatches = int(ev.get("reconciliation_mismatches", -1))
+    except (TypeError, ValueError, OverflowError):
+        completed_trades, missing_links, reconciliation_mismatches = 0, 1, 1
+    full_proven = (
+        ev.get("full_lifecycle_proven") is True
+        and completed_trades >= 100
+        and missing_links == 0
+        and reconciliation_mismatches == 0
+        and ev.get("ledger_readback_verified") is True
+        and ev.get("real_market_data") is True
+    )
     ok = (
         (data.get("pass") is True or full_proven)
         and full_proven
@@ -195,10 +232,84 @@ def eval_lifecycle_gate(root: Path, live_state: Optional[Dict[str, Any]] = None)
         "pass": ok,
         "report_exists": path.exists(),
         "full_lifecycle_proven": full_proven,
+        "completed_paper_trades": completed_trades if completed_trades >= 0 else None,
+        "required_completed_paper_trades": 100,
+        "missing_trade_links": missing_links,
+        "reconciliation_mismatches": reconciliation_mismatches,
         "broker_connected": broker_connected,
         "market_open": market_open,
         "blocker_id": None if ok else "SYS3-BLK-008",
-        "auto_action": "Run scripts/paper_lifecycle_proof.py during market hours with broker connected",
+        "auto_action": "Accumulate 100 real market-data paper trades and independently read back/reconcile every ledger link",
+    }
+
+
+def eval_trade_reconciliation_gate(root: Path) -> Dict[str, Any]:
+    """Require itemized, independently reviewed reconciliation for >=100 closes."""
+    path = root / "reports" / "latest" / "trade_reconciliation" / "summary.json"
+    data = _read_json(path) or {}
+    ev = data.get("evidence") if isinstance(data.get("evidence"), dict) else {}
+
+    def _evidence_count(value: Any) -> int:
+        if isinstance(value, bool):
+            return -1
+        if isinstance(value, int):
+            return value
+        if isinstance(value, float):
+            return int(value) if math.isfinite(value) and value.is_integer() else -1
+        if isinstance(value, str) and value.strip().isdecimal():
+            return int(value.strip())
+        return -1
+
+    try:
+        completed = _evidence_count(ev.get("completed_trades"))
+        mismatches = _evidence_count(ev.get("mismatch_count"))
+        reported_mismatch_rate = float(ev.get("mismatch_rate", float("nan")))
+    except (TypeError, ValueError, OverflowError):
+        completed, mismatches, reported_mismatch_rate = -1, -1, float("nan")
+    derived_mismatch_rate = mismatches / completed if completed > 0 and mismatches >= 0 else None
+    required_checks = (
+        "entry_price_verified", "exit_price_verified", "quantity_verified",
+        "charges_verified", "pnl_verified", "broker_records_verified",
+        "internal_records_verified", "ledger_readback_verified",
+    )
+    checks_ok = all(ev.get(key) is True for key in required_checks)
+    generator = str(ev.get("generator_id") or "").strip()
+    reviewer = str(ev.get("independent_reviewer_id") or "").strip()
+    independently_reviewed = bool(reviewer and generator and reviewer != generator)
+    hashes = ev.get("evidence_sha256") if isinstance(ev.get("evidence_sha256"), dict) else {}
+    hash_names = ("broker_records", "internal_ledger", "reconciliation")
+    hashes_ok = all(
+        isinstance(hashes.get(name), str)
+        and len(hashes[name]) == 64
+        and all(ch in "0123456789abcdefABCDEF" for ch in hashes[name])
+        for name in hash_names
+    )
+    mismatch_ok = bool(
+        completed >= 100
+        and 0 <= mismatches <= completed
+        and derived_mismatch_rate is not None
+        and math.isfinite(reported_mismatch_rate)
+        and abs(reported_mismatch_rate - derived_mismatch_rate) <= 1e-9
+        and derived_mismatch_rate < 0.001
+    )
+    ok = (
+        data.get("status") == "PASS" and data.get("pass") is True
+        and completed >= 100 and mismatch_ok and checks_ok
+        and independently_reviewed and hashes_ok
+    )
+    return {
+        "gate_id": "CLOSED_TRADE_RECONCILIATION_100_MIN",
+        "pass": ok,
+        "report_exists": path.exists(),
+        "completed_trades": completed if completed >= 0 else None,
+        "required_completed_trades": 100,
+        "mismatch_count": mismatches if mismatches >= 0 else None,
+        "mismatch_rate": derived_mismatch_rate,
+        "itemized_checks_pass": checks_ok,
+        "independent_review_pass": independently_reviewed,
+        "evidence_hashes_pass": hashes_ok,
+        "blocker_id": None if ok else "SYS3-BLK-009",
+        "auto_action": "Reconcile 100+ completed PAPER trades against broker read records and immutable internal ledger; require independent review",
     }
 
 
@@ -334,6 +445,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
         eval_spearman_gate(root),
         eval_expectancy_gate(root),
         eval_lifecycle_gate(root, live_state),
+        eval_trade_reconciliation_gate(root),
         eval_tick_health_gate(root, live_state),
         eval_model_accuracy_report(root),
         eval_option_visibility(root, live_state),
@@ -351,6 +463,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
         "prediction_accuracy_blocked": not gates[0]["pass"],
         "profit_blocked": not gates[1]["pass"],
         "lifecycle_blocked": not gates[2]["pass"],
+        "reconciliation_blocked": not gates[3]["pass"],
         "human_approval": human.get("approved"),
         "live_trading_enabled": False,
         "trade_ready": passing == len(gates),
@@ -364,6 +477,7 @@ def evaluate_all(root: Path, live_state: Optional[Dict[str, Any]] = None) -> Dic
                 "ML_SPEARMAN_RHO_GTE_0_70_OVER_5_DAYS",
                 "POSITIVE_NET_EXPECTANCY_AFTER_COSTS",
                 "REAL_PAPER_LIFECYCLE_MARKET_DAY_PROOF",
+                "CLOSED_TRADE_RECONCILIATION_100_MIN",
                 "WEBSOCKET_TICK_HEALTH_PROVEN",
             )
         ],

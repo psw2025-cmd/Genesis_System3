@@ -12,22 +12,28 @@ export default defineConfig({
   server: {
     port: 3000,
     proxy: {
-      '/api': { target: process.env.DEV_PROXY_TARGET || 'http://localhost:8000', changeOrigin: true, secure: false },
-      '/ws':  { target: (process.env.DEV_PROXY_TARGET || 'http://localhost:8000').replace('http', 'ws'), ws: true },
+      '/api': { target: process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000', changeOrigin: true, secure: false },
+      '/ws':  { target: (process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000').replace('http', 'ws'), ws: true },
+      '^/(genesis-production-brief|autonomous-brain|hidden-secrets-lab|never-die-monitor|hunger-meter|data-truth-score|health|final-message)$': {
+        target: process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000', changeOrigin: true, secure: false,
+      },
     }
   },
   preview: {
     port: 4173,
     proxy: {
       '/api': {
-        target: process.env.DEV_PROXY_TARGET || 'https://genesis-system3-web-doq2wplepa-el.a.run.app',
+        target: process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000',
         changeOrigin: true,
         secure: true,
       },
       '/ws': {
-        target: (process.env.DEV_PROXY_TARGET || 'https://genesis-system3-web-doq2wplepa-el.a.run.app').replace('https', 'wss').replace('http', 'ws'),
+        target: (process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000').replace('https', 'wss').replace('http', 'ws'),
         ws: true,
         changeOrigin: true,
+      },
+      '^/(genesis-production-brief|autonomous-brain|hidden-secrets-lab|never-die-monitor|hunger-meter|data-truth-score|health|final-message)$': {
+        target: process.env.DEV_PROXY_TARGET || 'http://127.0.0.1:8000', changeOrigin: true, secure: false,
       },
     },
   },

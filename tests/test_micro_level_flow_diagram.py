@@ -146,21 +146,20 @@ def test_stage_3_ai_signal_and_top_3_engine():
 def test_stage_4_paper_buy_sell_engine():
     """Stage 4: Simulated execution, charges, slippage, order ID, position ledger, net P&L."""
     engine_mod = backend_or_skip("dashboard.backend.cloud_paper_engine")
-    LOT_SIZES = engine_mod.LOT_SIZES
     BROKERAGE_PER_SIDE = engine_mod.BROKERAGE_PER_SIDE
     STT_RATE = engine_mod.STT_RATE
     EXCHANGE_TXN_CHARGE = engine_mod.EXCHANGE_TXN_CHARGE
     GST_ON_BROKERAGE = engine_mod.GST_ON_BROKERAGE
     SLIPPAGE_PCT = engine_mod.SLIPPAGE_PCT
 
-    # Verify lot sizes
-    assert LOT_SIZES["NIFTY"] == 75
-    assert LOT_SIZES["BANKNIFTY"] == 30
+    # This dated contract lot is input evidence, never a symbol-level constant.
+    assert engine_mod._contract_lot_size({"lot_size": 65}) == 65
+    assert engine_mod._contract_lot_size({}) is None
 
     # Verify charges calculation logic
     entry_price = 100.0
-    lot_size = 75
-    turnover = entry_price * lot_size  # 7500
+    lot_size = 65
+    turnover = entry_price * lot_size
 
     # Slippage
     effective_entry = entry_price * (1 + SLIPPAGE_PCT)
@@ -176,11 +175,34 @@ def test_stage_4_paper_buy_sell_engine():
 
     # Net P&L after round-trip charges
     exit_price = 120.0
-    gross_pnl = (exit_price - entry_price) * lot_size  # 1500
+    gross_pnl = (exit_price - entry_price) * lot_size
     round_trip_charges = total_entry_charges * 2
     net_pnl = gross_pnl - round_trip_charges
     assert net_pnl < gross_pnl
-    assert net_pnl > 1400.0
+    assert net_pnl > 1200.0
+
+
+def test_chain_adapter_preserves_contract_lot_and_marks_missing_lot_unknown():
+    import pandas as pd
+    from dashboard.backend.chain_adapter import fetch_chain_for_api
+
+    class DSM:
+        def __init__(self, lot):
+            self.lot = lot
+
+        def fetch_option_chain(self, underlying, expiry=""):
+            return pd.DataFrame([{
+                "strike": 25000, "option_type": "CE", "oi": 100,
+                "volume": 100, "ltp": 100, "lot_size": self.lot,
+                "expiry_date": "2026-11-17", "source": "dhan",
+            }]), 25000.0
+
+    known = fetch_chain_for_api(DSM(65), "NIFTY")
+    missing = fetch_chain_for_api(DSM(None), "NIFTY")
+    assert known["contracts"][0]["lot_size"] == 65
+    assert known["contracts"][0]["lot_size_source"] == "contract_row"
+    assert missing["contracts"][0]["lot_size"] is None
+    assert missing["contracts"][0]["lot_size_source"] == "UNVERIFIED"
 
 
 def test_stage_5_verify_with_broker_truth():

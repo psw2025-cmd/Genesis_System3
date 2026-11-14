@@ -52,6 +52,22 @@ def test_resolve_from_instrument_master():
     assert resolved["resolved_from"] == "instrument_master"
 
 
+def test_unresolved_contract_does_not_invent_historical_lot_size():
+    with patch("core.brokers.dhan.nse_option_symbol.get_instruments_df", return_value=pd.DataFrame()):
+        resolved = resolve_option_contract("NIFTY", 25300, "CE", expiry_date="2026-11-17")
+    assert resolved["resolved_from"] == "built_symbol"
+    assert resolved["lot_size"] is None
+
+
+def test_verified_master_lot_replaces_stale_input_lot():
+    df = pd.DataFrame(json.loads(FIXTURE_INSTR.read_text(encoding="utf-8")))
+    with patch("core.brokers.dhan.nse_option_symbol.get_instruments_df", return_value=df):
+        row = enrich_option_row({"underlying": "NIFTY", "strike": 23500, "option_type": "CE",
+                                 "expiry_date": SESSION_EXPIRY, "lot_size": 75})
+    assert row["lot_size"] == 50
+    assert row["symbol_resolved_from"] == "instrument_master"
+
+
 def test_enrich_replaces_index_with_trading_symbol():
     row = {
         "underlying": "NIFTY",

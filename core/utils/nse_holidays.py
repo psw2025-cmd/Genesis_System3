@@ -6,11 +6,11 @@ the job scheduler (core/engine/system3_phase82_job_scheduler.py) and any
 other code that needs to distinguish "market closed because weekend/
 holiday" from "market closed because outside trading hours".
 
-2026 dates sourced from Zerodha's official market-intel holiday calendar
-(https://zerodha.com/marketintel/holiday-calendar/), which mirrors NSE's
-own circular. Equity/derivatives segment only (excludes MCX-only,
-settlement-only holidays, and the special Sunday Nov-08 Muhurat Trading
-session, which is a real trading session despite the date).
+2026 dates are reconciled to NSE's official F&O holiday circular
+(https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf).
+Equity/derivatives segment only (excludes MCX-only and settlement-only
+holidays). The special Sunday Nov-08 Muhurat date is handled separately;
+unknown session hours remain UNKNOWN rather than being guessed.
 
 IMPORTANT: this list must be updated annually. NSE publishes the next
 year's calendar in December via circular. There is no reliable free API
@@ -30,8 +30,16 @@ from datetime import date
 
 logger = logging.getLogger("nse_holidays")
 
-# NSE + BSE equity/derivatives segment holidays, source: Zerodha market-intel
-# holiday calendar (mirrors NSE official circular), fetched 2026-06-30.
+# NSE equity-derivatives calendar provenance. No NSE website scraping is used.
+NSE_FO_HOLIDAY_CIRCULAR_URL = "https://nsearchives.nseindia.com/content/circulars/FAOP71777.pdf"
+NSE_MARKET_TIMINGS_URL = "https://www.nseindia.com/static/market-data/market-timings"
+NSE_HOLIDAY_CALENDAR_URL = "https://www.nseindia.com/resources/exchange-communication-holidays"
+NSE_SPECIAL_SESSION_DATES = {
+    2026: {date(2026, 11, 8): "Diwali Laxmi Pujan Muhurat Trading"},
+}
+
+# NSE F&O holiday circular ref. 172/2025, published 2025-12-12;
+# reconciled against the official NSE calendar on 2026-11-14.
 HOLIDAYS_BY_YEAR = {
     2026: {
         date(2026, 1, 15): "Municipal Corporation Elections in Maharashtra",
@@ -85,6 +93,85 @@ def is_trading_day(d: date) -> tuple:
     if is_hol:
         return False, f"NSE/BSE holiday: {hol_name}"
     return True, "Trading day"
+
+
+def market_calendar_evidence(now=None) -> dict:
+    """Evaluate the official circular cache and NSE regular session hours.
+
+    No network call or NSE website scrape is performed. Live market data must
+    still independently satisfy the quote freshness gate.
+    """
+    import hashlib
+    import json
+    from datetime import datetime, time, timezone
+    from zoneinfo import ZoneInfo
+
+    ist = ZoneInfo("Asia/Kolkata")
+    current = datetime.now(ist) if now is None else now
+    current = current.replace(tzinfo=ist) if current.tzinfo is None else current.astimezone(ist)
+    day = current.date()
+    year_holidays = HOLIDAYS_BY_YEAR.get(day.year)
+    special = NSE_SPECIAL_SESSION_DATES.get(day.year, {}).get(day)
+    payload = {
+        "evidence_type": "OFFICIAL_NSE_FO_CIRCULAR_CACHE",
+        "year": day.year,
+        "holidays": sorted((d.isoformat(), name) for d, name in (year_holidays or {}).items()),
+        "special_sessions": sorted((d.isoformat(), name) for d, name in NSE_SPECIAL_SESSION_DATES.get(day.year, {}).items()),
+        "source": NSE_FO_HOLIDAY_CIRCULAR_URL,
+        "market_timings_source": NSE_MARKET_TIMINGS_URL,
+        "regular_session_ist": {"opens": "09:15", "closes_exclusive": "15:30"},
+    }
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    verified = year_holidays is not None
+    is_open = None
+    reason = "NSE_CALENDAR_NOT_LOADED" if not verified else ""
+    status = "UNKNOWN"
+
+    if verified and special:
+        verified, reason = False, "SPECIAL_SESSION_TIMES_NOT_VERIFIED"
+    elif verified and day.weekday() >= 5:
+        is_open, reason, status = False, f"WEEKEND_{day.strftime('%A').upper()}", "CLOSED"
+    elif verified and day in year_holidays:
+        is_open, reason, status = False, f"NSE_FO_HOLIDAY:{year_holidays[day]}", "CLOSED"
+    elif verified and not (time(9, 15) <= current.time().replace(tzinfo=None) < time(15, 30)):
+        is_open, reason, status = False, "OUTSIDE_NSE_REGULAR_SESSION", "CLOSED"
+    elif verified:
+        is_open, reason, status = True, "NSE_REGULAR_SESSION", "OPEN"
+
+    evaluated_utc = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return {
+        "schema_version": 1,
+        "evidence_type": "OFFICIAL_NSE_FO_CIRCULAR_CACHE",
+        "exchange": "NSE",
+        "session_date": day.isoformat(),
+        "verified": verified,
+        "is_open": is_open,
+        "session_status": status,
+        "reason": reason,
+        "source_url": NSE_FO_HOLIDAY_CIRCULAR_URL,
+        "holiday_calendar_url": NSE_HOLIDAY_CALENDAR_URL,
+        "market_hours_source_url": NSE_MARKET_TIMINGS_URL,
+        "calendar_sha256": digest,
+        "evaluated_at_utc": evaluated_utc,
+        "evaluated_at_ist": current.isoformat(timespec="seconds"),
+    }
+
+
+def attach_market_calendar_evidence(state: dict, now=None) -> dict:
+    """Attach calendar evidence and fail closed when the schedule is unknown."""
+    if not isinstance(state, dict):
+        return state
+    result = dict(state)
+    current_market = result.get("market")
+    market = dict(current_market) if isinstance(current_market, dict) else {}
+    proof = market_calendar_evidence(now)
+    market["calendar_proof"] = proof
+    market["calendar_verified"] = proof["verified"]
+    market["calendar_status"] = proof["session_status"]
+    market["calendar_reason"] = proof["reason"]
+    market["is_open"] = proof["is_open"]
+    result["market"] = market
+    return result
 
 
 if __name__ == "__main__":

@@ -1290,6 +1290,12 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 6px 14px;
+  min-width: 0;
+}
+
+.lifecycle-status-grid > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .ml-proof-loading {

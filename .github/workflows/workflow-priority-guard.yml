@@ -25,6 +25,7 @@ on:
       - "CodeQL Security Audit"
       - "Security Audit Evidence"
       - "SonarQube Audit"
+      - "Genesis UI Truth Watcher"
     types: [completed]
   deployment_status:
 

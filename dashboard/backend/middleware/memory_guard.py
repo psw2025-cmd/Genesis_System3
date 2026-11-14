@@ -117,7 +117,12 @@ def _normalize_verified_chain_payload(payload: dict) -> dict:
         data["data_source"] = "dhan"
         data["source_priority"] = "dhan_last_verified_snapshot"
         data["status"] = "MARKET_CLOSED_DHAN_SNAPSHOT"
-        data["stale"] = False
+        # Retrieval/cache time is not exchange time. A previous-session chain
+        # must never inherit LIVE freshness labels from the cached producer.
+        data["data_mode"] = "SNAPSHOT"
+        data["verification_status"] = "DHAN_EOD_SNAPSHOT"
+        data["freshness_seconds"] = None
+        data["stale"] = True
         data["live"] = False
         data["snapshot"] = True
         data["message"] = "Market closed — showing last verified Dhan option-chain snapshot, not live ticks."

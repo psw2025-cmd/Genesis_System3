@@ -198,12 +198,14 @@ def test_automatic_paper_engine_gap_entry_exit_and_restart(tmp_path, monkeypatch
         "session_open_timestamp_ist": observed[0].isoformat(),
         "opening_price_source": "SESSION_OPEN",
         "contracts": [{"strike": 25000, "option_type": "CE", "ltp": 100.0,
-                       "previous_close_price": 70.0, "volume": 500, "oi_change": 100}],
+                       "previous_close_price": 70.0, "volume": 500, "oi_change": 100,
+                       "lot_size": 65}],
     }
     engine.step([chain])
     assert len(engine.open_positions) == 1
     assert engine.master_ledger.snapshot()["gaps"]["NIFTY"]["direction"] == "GAP_UP"
     assert engine.open_positions[0]["opening_gap_status"] == "GAP_UP"
+    assert engine.open_positions[0]["qty"] == 65
 
     # An exact restart reloads the hash-chain, not potentially stale UI JSON.
     restarted = engine_module.CloudPaperEngine(tmp_path)
@@ -246,7 +248,7 @@ def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypa
     engine = engine_module.CloudPaperEngine(tmp_path)
     chain = {"underlying": "NIFTY", "spot": 25000, "contracts": [
         {"strike": 25000, "option_type": "CE", "ltp": 100.0,
-         "previous_close_price": 70.0, "volume": 10}]}
+         "previous_close_price": 70.0, "volume": 10, "lot_size": 65}]}
     engine.step([chain])
     observed[0] = datetime(2026, 11, 9, 15, 16, tzinfo=ist)
     engine.step([{"underlying": "NIFTY", "spot": 25000, "contracts": []}])
@@ -256,6 +258,25 @@ def test_paper_engine_never_fabricates_missing_quote_eod_exit(tmp_path, monkeypa
     restarted = engine_module.CloudPaperEngine(tmp_path)
     assert restarted.open_positions[0]["paper_quote_status"] == "BLOCKED_NO_CURRENT_QUOTE"
     assert restarted.master_ledger.snapshot()["verified_hash_chain"] is True
+
+
+def test_paper_entry_blocks_contract_without_verified_lot(tmp_path, monkeypatch):
+    from dashboard.backend import cloud_paper_engine as engine_module
+    ist = timezone(timedelta(hours=5, minutes=30))
+    monkeypatch.setattr(engine_module, "_now_ist", lambda: datetime(2026, 11, 9, 9, 30, tzinfo=ist))
+    engine = engine_module.CloudPaperEngine(tmp_path)
+    chain = {"underlying": "NIFTY", "spot": 25000, "contracts": [
+        {"strike": 25000, "option_type": "CE", "ltp": 100.0,
+         "previous_close_price": 70.0, "volume": 10}]}
+    engine.step([chain])
+    assert engine.open_positions == []
+    assert engine.master_ledger.snapshot()["event_count"] == 0
+
+
+def test_paper_pipeline_never_invents_one_unit_fo_lot():
+    from dashboard.backend.paper_pipeline_v8 import _paper_qty
+    assert _paper_qty({"symbol": "NIFTY-CE"}) == 0
+    assert _paper_qty({"symbol": "NIFTY-CE", "lot_size": 65}) == 65
 
 
 
@@ -285,7 +306,7 @@ def test_ten_fully_automatic_paper_cycles_produce_shadow_learning(tmp_path, monk
         "opening_price_source": "SESSION_OPEN",
         "contracts": [{"strike": 25000, "option_type": "CE",
                        "ltp": 100.0, "previous_close_price": 70.0,
-                       "volume": 100}],
+                       "volume": 100, "lot_size": 65}],
     }
     for cycle in range(10):
         observed[0] = start + timedelta(minutes=2 * cycle)

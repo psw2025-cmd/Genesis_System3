@@ -328,7 +328,8 @@ def _paper_qty(contract: Dict[str, Any]) -> int:
                 return v
         except Exception:
             pass
-    return 1
+    # An F&O order cannot use a fabricated one-unit lot when master data is missing.
+    return 0
 
 
 # ---------------------------------------------------------------------------
