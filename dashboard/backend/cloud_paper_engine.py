@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import csv
 import json
+import math
 import os
 import threading
 from datetime import datetime, timedelta, timezone
@@ -42,14 +43,6 @@ except ImportError:
 
 IST = timezone(timedelta(hours=5, minutes=30))
 
-LOT_SIZES = {
-    "NIFTY": 75,
-    "BANKNIFTY": 30,
-    "FINNIFTY": 40,
-    "MIDCPNIFTY": 75,
-    "SENSEX": 20,
-}
-DEFAULT_EQUITY_LOT = 1
 BROKERAGE_PER_SIDE = 20.0
 STT_RATE = 0.000625
 EXCHANGE_TXN_CHARGE = 0.0005
@@ -89,9 +82,19 @@ def _is_phantom(ltp: float, strike: float, spot: float, opt_type: str) -> bool:
 
 def _compute_net_pnl(entry: float, exit_p: float, symbol: str,
                      qty: Optional[int] = None) -> float:
-    # Use the recorded position quantity, not an inferred symbol lot size.
-    size = qty if qty is not None else LOT_SIZES.get(symbol, 50)
-    return estimate_costed_paper_pnl(entry, exit_p, size)
+    if _contract_lot_size({"lot_size": qty}) is None:
+        raise PaperEvidenceError("PAPER_POSITION_LOT_SIZE_UNVERIFIED")
+    return estimate_costed_paper_pnl(entry, exit_p, qty)
+
+
+def _contract_lot_size(contract: Dict[str, Any]) -> Optional[int]:
+    try:
+        value = float(contract.get("lot_size"))
+        if math.isfinite(value) and 0 < value <= 100000 and value.is_integer():
+            return int(value)
+    except (TypeError, ValueError, OverflowError):
+        pass
+    return None
 
 
 def _atomic_write_text(path: Path, text: str) -> None:
@@ -241,6 +244,7 @@ class CloudPaperEngine:
                     "moneyness_pct": round(mny, 4),
                     "expiry_date": c.get("expiry_date") or c.get("expiry") or chain.get("expiry_date"),
                     "security_id": c.get("security_id"),
+                    "lot_size": _contract_lot_size(c),
                     "strategy": "MARKET_TOP_GAIN_PCT",
                     "selection_reason": "highest_dhan_gain_pct_near_atm",
                 }
@@ -314,6 +318,7 @@ class CloudPaperEngine:
                 or row.get("expiry_date")
                 or ch.get("expiry_date"),
                 "security_id": match.get("security_id") or row.get("security_id"),
+                "lot_size": _contract_lot_size(match),
                 "strategy": "MARKET_TOP_GAIN_PCT",
                 "selection_reason": f"dhan_market_top_rank_gain_pct={gain_pct:.2f}",
                 "market_match_note": row.get("market_match_note"),
@@ -525,6 +530,7 @@ class CloudPaperEngine:
 
         # 2. Maybe open a new position (one per tick, respect max_open)
         if (len(self.open_positions) < max_open and preferred
+                and _contract_lot_size(preferred) is not None
                 and (preferred["underlying"], preferred["strike"],
                      preferred["option_type"]) not in just_closed):
             # Never close and immediately reopen the same contract in one tick.
@@ -536,6 +542,7 @@ class CloudPaperEngine:
                 for p in self.open_positions
             )
             if not dup:
+                lot_size = _contract_lot_size(best)
                 self.seq += 1
                 entry = round(best["ltp"], 2)
                 expiry = str(best.get("expiry_date") or best.get("expiry") or "")
@@ -565,9 +572,10 @@ class CloudPaperEngine:
                     "entry_price": entry,
                     "current_price": entry,
                     "ltp": entry,
-                    "netQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
-                    "qty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
-                    "buyQty": LOT_SIZES.get(best["underlying"], DEFAULT_EQUITY_LOT),
+                    "netQty": lot_size,
+                    "qty": lot_size,
+                    "buyQty": lot_size,
+                    "lot_size": lot_size,
                     "sellQty": 0,
                     "strategy": best.get("strategy") or "MARKET_TOP_GAIN_PCT",
                     "selection_reason": best.get("selection_reason"),
