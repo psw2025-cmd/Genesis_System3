@@ -2,7 +2,8 @@
 Phase 391 - XGBoost Model Training per Underlying
 ==================================================
 
-Trains per-underlying XGBoost classifiers on balanced Phase 390 dataset.
+Trains per-underlying XGBoost classifiers only on point-in-time raw features.
+Phase 390's pre-split SMOTE data is forbidden because it contaminates holdout.
 Outputs models, metrics, and feature importance rankings.
 
 Uses model_training_v2.py as core trainer. Handles safety verification,
@@ -124,9 +125,9 @@ def run_phase_391(context: Optional[Dict] = None) -> Dict[str, Any]:
             logger.error(result["message"])
             return result
 
-        # ===== LOAD BALANCED DATASET =====
-        logger.info("\n[STEP 1] Loading Phase 390 balanced dataset...")
-        csv_path = "storage/datasets/phase_390_balanced_features.csv"
+        # ===== LOAD UNRESAMPLED POINT-IN-TIME DATASET =====
+        logger.info("\n[STEP 1] Loading unresampled Phase 389 features...")
+        csv_path = "storage/datasets/phase_389_engineered_features.csv"
         df = load_balanced_dataset(csv_path)
         logger.info(f"  [OK] Loaded {len(df)} rows × {len(df.columns)} columns")
 

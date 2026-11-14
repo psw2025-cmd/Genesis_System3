@@ -18,6 +18,7 @@ Date: 2025-12-08
 """
 
 import json
+import hashlib
 import logging
 import os
 import pickle
@@ -35,7 +36,6 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 
 # Try XGBoost; fall back to sklearn ensemble
@@ -105,6 +105,53 @@ def load_balanced_dataset(path: str) -> pd.DataFrame:
 
     logger.info(f"✓ Dataset validation passed")
     return df
+
+
+def point_in_time_split(df: pd.DataFrame, test_size: float) -> tuple[pd.DataFrame, pd.DataFrame, list[str]]:
+    """Separate matured, real sessions before any fitting or resampling.
+
+    A random row split or a pre-balanced/SMOTE frame can leak the same market
+    event into both sets. Only explicitly named, numeric pre-decision features
+    are admitted; forward returns and labels are never candidate features.
+    """
+    required = {"underlying", "signal", "ts", "label_available_at", "data_origin"}
+    missing = required - set(df.columns)
+    if missing:
+        raise ValueError(f"POINT_IN_TIME_PROOF_MISSING:{sorted(missing)}")
+    if not 0 < test_size < 0.5:
+        raise ValueError("INVALID_TEST_SIZE")
+    frame = df.copy()
+    feature_time = pd.to_datetime(frame["ts"], utc=True, errors="coerce")
+    label_time = pd.to_datetime(frame["label_available_at"], utc=True, errors="coerce")
+    if (feature_time.isna().any() or label_time.isna().any()
+            or (label_time <= feature_time).any()
+            or (label_time > pd.Timestamp.now(tz="UTC")).any()):
+        raise ValueError("INVALID_OR_UNMATURED_LABEL_TIME")
+    origins = frame["data_origin"].astype(str).str.lower()
+    if not origins.isin({"dhan_timestamped", "nse_archive_timestamped"}).all():
+        raise ValueError("UNVERIFIED_OR_RESAMPLED_TRAINING_DATA")
+    features = [col for col in frame.columns if col.startswith("feature_")]
+    if not features or any(any(token in col.lower() for token in
+                               ("future", "forward", "label", "target", "outcome", "pnl"))
+                           for col in features):
+        raise ValueError("SAFE_FEATURE_SCHEMA_MISSING")
+    if any(not pd.api.types.is_numeric_dtype(frame[col]) or not frame[col].notna().all()
+           for col in features):
+        raise ValueError("INVALID_POINT_IN_TIME_FEATURE")
+    frame["_feature_time"] = feature_time
+    frame["_label_time"] = label_time
+    sessions = sorted(feature_time.dt.date.unique())
+    if len(sessions) < 30:
+        raise ValueError("NEED_AT_LEAST_30_SOURCE_SESSIONS")
+    split = max(1, int(len(sessions) * (1 - test_size)))
+    first_test_day = sessions[split]
+    test_start = pd.Timestamp(first_test_day, tz="UTC")
+    train = frame[(frame["_feature_time"] < test_start) & (frame["_label_time"] < test_start)]
+    test = frame[frame["_feature_time"] >= test_start]
+    if (train.empty or test.empty or len(set(train["signal"])) < 2
+            or len(set(test["signal"]) - set(train["signal"]))):
+        raise ValueError("CHRONOLOGICAL_SPLIT_UNUSABLE")
+    return train, test, features
 
 
 def _encode_labels(signal_values: np.ndarray) -> Tuple[np.ndarray, Dict[int, str]]:
@@ -212,39 +259,18 @@ def train_models_per_underlying(df: pd.DataFrame, config: TrainingConfig) -> Dic
                 result["warnings"].append(msg)
                 continue
 
-            # Encode signal target
-            y = df_underlying["signal"].values
-            y_encoded, label_map = _encode_labels(y)
-
-            # Prepare features (all columns except metadata)
-            exclude_cols = {"underlying", "strike", "side", "symbol", "ts", "signal"}
-            feature_cols = [c for c in df_underlying.columns if c not in exclude_cols]
-            X = df_underlying[feature_cols].copy()
+            train_rows, test_rows, feature_cols = point_in_time_split(df_underlying, config.test_size)
+            _, label_map = _encode_labels(df_underlying["signal"].values)
+            label_to_id = {label: index for index, label in label_map.items()}
+            X_train = train_rows[feature_cols].to_numpy()
+            X_test = test_rows[feature_cols].to_numpy()
+            y_train = train_rows["signal"].map(label_to_id).to_numpy()
+            y_test = test_rows["signal"].map(label_to_id).to_numpy()
 
             logger.info(f"  Features: {len(feature_cols)}")
             logger.info(f"  Target classes: {sorted(label_map.values())}")
 
-            # Convert all object columns to numeric
-            object_cols = X.select_dtypes(include="object").columns
-            if len(object_cols) > 0:
-                logger.info(f"  Converting {len(object_cols)} object columns to numeric...")
-                for col in object_cols:
-                    try:
-                        X[col] = pd.to_numeric(X[col], errors="coerce")
-                    except Exception as e:
-                        logger.warning(f"    Could not convert {col}: {str(e)}, dropping column")
-                        X.drop(columns=[col], inplace=True)
-
-            # Fill any remaining NaNs with 0
-            X = X.fillna(0)
-            X = X.values  # Convert to numpy array
-
-            logger.info(f"  Feature matrix shape: {X.shape}")
-
-            # Train/test split (stratified)
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y_encoded, test_size=config.test_size, random_state=config.random_state, stratify=y_encoded
-            )
+            logger.info(f"  Feature matrix shape: {(len(df_underlying), len(feature_cols))}")
 
             logger.info(f"  Train/Test split: {len(X_train)}/{len(X_test)}")
 
@@ -300,9 +326,26 @@ def train_models_per_underlying(df: pd.DataFrame, config: TrainingConfig) -> Dic
                 "n_samples": int(n_samples),
                 "n_train": int(len(X_train)),
                 "n_test": int(len(X_test)),
-                "n_features": int(X.shape[1]),
+                "n_train_sessions": int(train_rows["_feature_time"].dt.date.nunique()),
+                "n_test_sessions": int(test_rows["_feature_time"].dt.date.nunique()),
+                "n_features": int(len(feature_cols)),
+                "feature_columns": feature_cols,
+                "validation_method": "chronological_purged_holdout",
+                "train_end_utc": train_rows["_feature_time"].max().isoformat(),
+                "test_start_utc": test_rows["_feature_time"].min().isoformat(),
+                "training_rows_sha256": hashlib.sha256(
+                    train_rows[["ts", "label_available_at", "signal", *feature_cols]]
+                    .to_csv(index=False).encode("utf-8")
+                ).hexdigest(),
+                "holdout_rows_sha256": hashlib.sha256(
+                    test_rows[["ts", "label_available_at", "signal", *feature_cols]]
+                    .to_csv(index=False).encode("utf-8")
+                ).hexdigest(),
                 "accuracy": float(accuracy),
                 "macro_f1": float(macro_f1),
+                "model_proof_ready": False,
+                "ready_for_live": False,
+                "accuracy_status": "CHRONOLOGICAL_HOLDOUT_ONLY_NOT_MARKET_PROOF",
                 "per_class_metrics": {
                     label: {
                         "precision": float(per_class_report[label]["precision"]),
