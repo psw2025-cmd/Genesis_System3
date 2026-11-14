@@ -14,15 +14,7 @@ import pandas as pd
 
 from core.brokers.dhan.nse_option_symbol import build_trading_symbol
 
-# Default lot sizes for major Indian indices
-LOT_SIZES = {
-    "NIFTY": 50,
-    "BANKNIFTY": 15,
-    "FINNIFTY": 25,
-    "MIDCPNIFTY": 50,
-    "SENSEX": 10,
-    "BANKEX": 15,
-}
+INDEX_SYMBOLS = {"NIFTY", "BANKNIFTY", "FINNIFTY", "MIDCPNIFTY", "SENSEX", "BANKEX"}
 
 
 def _configured_chain_limit() -> int:
@@ -302,7 +294,7 @@ def fetch_chain_for_api(dsm: Any, underlying: str, expiry: str = "") -> Optional
         base: Dict[str, Any] = {
             "exchange": "NSE_FNO",
             "underlying_symbol": underlying.upper(),
-            "underlying_type": "INDEX" if underlying.upper() in LOT_SIZES else "EQUITY",
+            "underlying_type": "INDEX" if underlying.upper() in INDEX_SYMBOLS else "EQUITY",
             "expiry": row_expiry or expiry,
             "strike": strike,
             "option_type": opt,

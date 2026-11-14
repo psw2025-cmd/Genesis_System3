@@ -24,12 +24,12 @@ except ImportError:
 
 # NSE index F&O defaults (lot size used when instrument master unavailable)
 INDEX_FO_DEFAULTS: Dict[str, Dict[str, Any]] = {
-    "NIFTY": {"lot_size": 50, "strike_step": 50, "exchange_segment": "NSE_FNO"},
-    "BANKNIFTY": {"lot_size": 15, "strike_step": 100, "exchange_segment": "NSE_FNO"},
-    "FINNIFTY": {"lot_size": 40, "strike_step": 50, "exchange_segment": "NSE_FNO"},
-    "MIDCPNIFTY": {"lot_size": 75, "strike_step": 25, "exchange_segment": "NSE_FNO"},
-    "SENSEX": {"lot_size": 10, "strike_step": 100, "exchange_segment": "BSE_FNO"},
-    "BANKEX": {"lot_size": 15, "strike_step": 100, "exchange_segment": "BSE_FNO"},
+    "NIFTY": {"strike_step": 50, "exchange_segment": "NSE_FNO"},
+    "BANKNIFTY": {"strike_step": 100, "exchange_segment": "NSE_FNO"},
+    "FINNIFTY": {"strike_step": 50, "exchange_segment": "NSE_FNO"},
+    "MIDCPNIFTY": {"strike_step": 25, "exchange_segment": "NSE_FNO"},
+    "SENSEX": {"strike_step": 100, "exchange_segment": "BSE_FNO"},
+    "BANKEX": {"strike_step": 100, "exchange_segment": "BSE_FNO"},
 }
 
 _MONTHS = "JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC"
@@ -334,7 +334,6 @@ def resolve_option_contract(
     master = _lookup_instrument_master(underlying_u, strike, opt, exp, trading_symbol)
     if master:
         defaults = INDEX_FO_DEFAULTS.get(underlying_u, {})
-        master.setdefault("lot_size", defaults.get("lot_size"))
         master.setdefault("exchange_segment", defaults.get("exchange_segment", "NSE_FNO"))
         return master
 
@@ -405,7 +404,7 @@ def enrich_option_row(row: Dict[str, Any], default_expiry: Union[str, date, None
         out["expiry_date"] = resolved["expiry_date"]
     if resolved.get("security_id"):
         out["security_id"] = resolved["security_id"]
-    if resolved.get("lot_size") and not out.get("lot_size"):
+    if resolved.get("lot_size") and (resolved.get("resolved_from") == "instrument_master" or not out.get("lot_size")):
         out["lot_size"] = resolved["lot_size"]
     out["exchange_segment"] = resolved.get("exchange_segment", "NSE_FNO")
     out["symbol_resolved_from"] = resolved.get("resolved_from")
