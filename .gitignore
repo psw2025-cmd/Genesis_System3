@@ -120,3 +120,7 @@ audit/live_agent_issue_ledger/*.pending.jsonl
 # Un-ignore paper validations for Cloud Run deployment
 !state/paper_validations/
 !state/paper_validations/*.json
+
+# Generated local audit and pytest cache; preserve files on disk.
+scratch/pytesttmp/
+FULL_TRUTH_AUDIT.txt
