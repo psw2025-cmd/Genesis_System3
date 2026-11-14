@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import path from 'node:path';
 
 const uiRoot = (process.env.GENESIS_BASE_URL ||
   'https://genesis-system3-web-doq2wplepa-el.a.run.app/ui').replace(/\/$/, '');
@@ -15,7 +16,7 @@ export default defineConfig({
   outputDir: '../../reports/latest/playwright_ui_truth/test-results',
   webServer: localMode ? {
     command: 'npm run dev -- --host 127.0.0.1 --port 5173 --strictPort',
-    cwd: 'dashboard/frontend',
+    cwd: path.resolve(process.cwd(), 'dashboard/frontend'),
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
