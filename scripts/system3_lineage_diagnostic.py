@@ -9,7 +9,10 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
-from system3_release_proof_gate import ROOT, resolve
+try:
+    from .system3_release_proof_gate import ROOT, resolve
+except ImportError:  # direct script execution
+    from system3_release_proof_gate import ROOT, resolve
 
 BASE = "https://genesis-system3-web-doq2wplepa-el.a.run.app"
 OUTPUT = Path("live-production-ui-proof/lineage-diagnostic.json")
