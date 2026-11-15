@@ -106,7 +106,6 @@ jobs:
           retention-days: 30
 
       - name: Diagnose production deployment lineage without granting production PASS
-        if: github.ref == 'refs/heads/main'
         shell: bash
         run: |
           python -m unittest tests.test_system3_lineage_diagnostic
