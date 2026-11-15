@@ -111,6 +111,15 @@ jobs:
           python -m unittest tests.test_system3_lineage_diagnostic
           python scripts/system3_lineage_diagnostic.py
 
+      - name: Upload read-only lineage diagnostic for PR review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lineage-diagnostic-${{ github.run_number }}
+          path: live-production-ui-proof/lineage-diagnostic.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Resolve expected runtime-affecting serving SHA
         if: github.ref == 'refs/heads/main'
         shell: bash
