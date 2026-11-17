@@ -11,15 +11,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
+          persist-credentials: false
       - name: Build exact PR diff
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
+          set -euo pipefail
           if [ -n "$BASE_SHA" ]; then
-            git diff "$BASE_SHA" HEAD > /tmp/council.diff
+            git diff "$BASE_SHA" "$HEAD_SHA" > /tmp/council.diff
           else
-            git diff HEAD^ HEAD > /tmp/council.diff
+            git diff "$HEAD_SHA^" "$HEAD_SHA" > /tmp/council.diff
           fi
           test -s /tmp/council.diff
       - name: Run deterministic unit tests
@@ -29,7 +33,11 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python council/council.py --diff /tmp/council.diff --sha "$GITHUB_SHA" --output council-evidence.json
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test -n "$OPENAI_API_KEY" && test -n "$ANTHROPIC_API_KEY" && test -n "$GEMINI_API_KEY"
+          python council/council.py --diff /tmp/council.diff --sha "$HEAD_SHA" --output council-evidence.json
       - name: Publish review evidence
         if: always()
         uses: actions/upload-artifact@v4
