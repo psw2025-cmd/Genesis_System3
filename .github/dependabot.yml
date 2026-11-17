@@ -8,6 +8,13 @@ updates:
       time: "02:30"
       timezone: "Asia/Kolkata"
     open-pull-requests-limit: 5
+    # Current @vitejs/plugin-react 4.7.0 supports Vite through major 7, but the
+    # first Vite 8 Dependabot PR failed strict npm peer resolution. Stay on the
+    # smallest non-vulnerable major now: Vite 6.4.3+ while blocking 7/8 until a
+    # coordinated toolchain upgrade is separately proven.
+    ignore:
+      - dependency-name: "vite"
+        versions: [">=7.0.0"]
     labels:
       - "dependencies"
       - "security"
