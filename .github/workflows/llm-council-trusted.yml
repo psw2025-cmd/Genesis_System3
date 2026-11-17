@@ -1,0 +1,53 @@
+name: LLM Council Trusted Review
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to review
+        required: true
+        type: string
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  trusted-review:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout trusted default branch only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Verify trusted source and fetch untrusted diff as data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          [[ "$PR_NUMBER" =~ ^[0-9]+$ ]]
+          test "$(git rev-parse HEAD)" = "${{ github.sha }}"
+          gh api "repos/$GH_REPO/pulls/$PR_NUMBER" --jq '.head.sha' > /tmp/council-head-sha
+          gh api -H 'Accept: application/vnd.github.diff' "repos/$GH_REPO/pulls/$PR_NUMBER" > /tmp/council.diff
+          test -s /tmp/council.diff
+          grep -Eq '^[0-9a-f]{40}$' /tmp/council-head-sha
+      - name: Test trusted council code
+        run: python -m unittest discover -s council -p 'test_*.py' -v
+      - name: Run independent reviews from trusted source
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$OPENAI_API_KEY" && test -n "$ANTHROPIC_API_KEY" && test -n "$GEMINI_API_KEY"
+          python council/council.py --diff /tmp/council.diff --sha "$(cat /tmp/council-head-sha)" --output council-evidence.json
+      - name: Upload immutable run evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: council-trusted-evidence
+          path: council-evidence.json
+          if-no-files-found: warn

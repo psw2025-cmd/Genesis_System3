@@ -1,0 +1,43 @@
+name: LLM Council Bootstrap Validation
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  council:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build exact PR diff
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -n "$BASE_SHA" ]; then
+            git diff "$BASE_SHA" "$HEAD_SHA" > /tmp/council.diff
+          else
+            git diff "$HEAD_SHA^" "$HEAD_SHA" > /tmp/council.diff
+          fi
+          test -s /tmp/council.diff
+      - name: Run deterministic unit tests
+        run: python -m unittest discover -s council -p 'test_*.py' -v
+      # Never expose provider API keys to executable code from an untrusted PR.
+      - name: Verify PR bootstrap safety
+        run: |
+          set -euo pipefail
+          python -m py_compile council/council.py council/test_council.py
+          echo 'Untrusted PR validated without exposing model credentials.'
+      - name: Publish review evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: council-evidence
+          path: council-evidence.json
+          if-no-files-found: warn
