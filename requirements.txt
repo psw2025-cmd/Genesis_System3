@@ -15,7 +15,7 @@ requests>=2.33.0
 
 # Google Secret Manager is an explicit production dependency for the dynamic
 # Dhan token provider and the canonical Cloud Run rotation job.
-google-cloud-secret-manager>=2.20.0
+google-cloud-secret-manager>=2.32.0
 
 # dhanhq: DhanHQ broker SDK — REQUIRED for all broker operations
 dhanhq==2.2.0
