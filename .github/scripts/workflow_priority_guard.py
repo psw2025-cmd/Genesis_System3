@@ -15,6 +15,7 @@ AUTOMATIC = {
     "command-center-access.yml",
     "frontend-runtime-smoke.yml",
     "live-proof-center.yml",
+    "llm-council.yml",
     "repo-clean-forensic-toolkit.yml",
     "security-audit.yml",
     "sonarqube-audit.yml",
@@ -22,7 +23,7 @@ AUTOMATIC = {
     "system3-runbook-audit.yml",
     "workflow-priority-guard.yml",
 }
-MANUAL_ONLY: set[str] = set()
+MANUAL_ONLY: set[str] = {"llm-council-trusted.yml"}
 ALLOWED = AUTOMATIC | MANUAL_ONLY
 
 FORENSIC_WORKFLOW = "workflow-priority-guard.yml"
