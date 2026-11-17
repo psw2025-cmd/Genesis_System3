@@ -102,7 +102,11 @@ export default function App() {
     // once the dashboard has mounted so a later tab click cannot sit on the
     // Suspense fallback while the browser fetches its first module chunk.
     const timer = window.setTimeout(() => {
-      void Promise.allSettled([
+      // Genesis is the heaviest independently routed workspace. Fetch its
+      // module first so a burst of background imports cannot starve its
+      // route chunk when desktop/mobile smoke navigates through every tab.
+      // A failed optional preload must not block other routes.
+      void import('./components/GenesisTab').catch(() => undefined).then(() => Promise.allSettled([
         import('./components/Overview'), import('./components/TradeTab'),
         import('./components/Positions'), import('./components/BrokerProofPanel'),
         import('./components/OptionChain'), import('./components/AlertsTab'),
@@ -118,8 +122,7 @@ export default function App() {
         import('./components/workspaces/PredictionAudit'),
         import('./components/Signals'), import('./components/PaperTrading'),
         import('./components/MLPerformance'), import('./components/SystemReadiness'),
-        import('./components/GenesisTab'),
-      ])
+      ]))
     }, 1000)
     return () => window.clearTimeout(timer)
   }, [])
