@@ -16,3 +16,12 @@ PR #657 removes the concurrent background import burst, retains critical Genesis
 
 ## Resume rule
 Read this file, current PR head, exact-head CI logs and current main before any new change. No merge without required reviews and CI. No LIVE NEW deployment to legacy GCP project. Do not treat historical green CI as live market proof.
+
+## 2026-11-17 22:29 IST — exact-head verification cycle
+- PR #657 HEAD before ledger update: `312363ad231c21c0e5c668b1f8f9bd40facd6db9` (draft, unmerged). All seven associated PR workflow runs **completed successfully**: Browser Smoke `44116630858`, Global Safety `44116630994`, CodeQL `44116630817`, SonarQube `44116631049`, Security Audit `44116630919`, Council Bootstrap `44116630851`, Workflow Priority Guard `44116630920`.
+- Global Safety blocking frontend browser job `134156573553` **PASS**; local Chrome 23-tab proof step **PASS**. Standalone browser job `134156390412` **PASS**, local canonical-tab proof **PASS**. Live production serving-SHA and lifecycle steps were **SKIPPED**, so runtime/production proof remains **NOT VERIFIED**.
+- Failure-resolution workstream `UI-CRITICAL-01`: regression CI at repair SHA **PASS** (one isolated correction); production closure **NOT VERIFIED**. Next: inspect exact-head review/branch-protection requirements, obtain independent review, and separately validate deployed SHA and live browser. Do not merge while draft or without reviews.
+- `COUNCIL-01`: PR #654 remains draft, unmerged; three authenticated independent verdicts and artifact hash/readback **NOT VERIFIED**. Next: security review and exact-head required checks before trusted workflow eligibility.
+- `RUNTIME-01`: production SHA and 113 live checks **NOT VERIFIED**; local Chrome green is not deployed proof.
+- `PAPER-01`: Global Safety CI includes passing deterministic PAPER replay and ledger regression steps; integrated live-market proof remains **NOT VERIFIED**. Synthetic evidence must retain its provenance label.
+- Next cycle must re-read PR head (this ledger update changes it), re-check exact-head CI/reviews and production lineage. No cross-lane operations or live orders executed.
