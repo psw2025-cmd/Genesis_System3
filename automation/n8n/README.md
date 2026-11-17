@@ -37,3 +37,10 @@ The CI run for n8n PR #652, head `6bdb4aa6788e7a1f0cfd1dfb720edf910f110dee`, rev
 
 ### Classifier hardening
 The n8n code now checks the GitHub API schema, selects the newest run by timestamp rather than relying on API array order, treats absent runs as NOT VERIFIED, distinguishes RUNNING and FAIL, and explicitly labels provider review, runtime and artifact readback as unverified. A 100-run response still requires pagination before claiming complete workflow coverage.
+
+## 2026-11-17 verification checkpoint
+- Browser regression repair PR #653 was merged as `2dbac5cee02dda8f42b6118a2ac713d3e74f08e8` after seven successful PR-head workflows at `9e0fa4b618c21c0e200225196fd4161a32bf1376`. See https://github.com/psw2025-cmd/Genesis_System3/pull/653 . This is PR-head CI proof, **not** production UI or deployed SHA proof.
+- A commit-scoped workflow lookup for the squash merge SHA returned no runs; the connector only enumerates pull-request-triggered runs, so this **cannot establish** that main CI did not run. Next action: query branch/main workflow runs directly, inspect job conclusions, and compare deployed SHA.
+- PR #652's latest head `61c90e1d4aec254e217d58a8a8fe8dc99920f6e8` had seven successful PR-head workflows, but Cursor Bugbot recorded two potential issues in a COMMENTED review. Next action: retrieve inline review comments and address actionable findings before considering merge; COMMENTED is not approval.
+- n8n Google Cloud self-hosted remains **NOT DEPLOYED / NOT VERIFIED**. The template is inactive. Do not activate or create billable resources without verified cloud access and budget approval.
+- LIVE NEW is strictly out of scope for this legacy-only workflow and its evidence.
