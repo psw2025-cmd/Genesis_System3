@@ -21,3 +21,19 @@ This is an **inactive, importable n8n workflow template**, not an installed or r
 
 ## Safety
 No live broker orders, deployments, secrets exposure, arbitrary shell execution, or untrusted PR code with provider credentials. Keep PAPER_MODE=1, LIVE_ORDER_AUTHORITY=0, REAL_BROKER_ORDERS=0, LIVE_TRADING_ENABLED=0 and ORDER_PLACEMENT_ALLOWED=false. The template does not alter runtime safety settings.
+
+## Verified regression discovered 2026-11-17
+The CI run for n8n PR #652, head `6bdb4aa6788e7a1f0cfd1dfb720edf910f110dee`, revealed **actual failures**, not a scheduler-only delay:
+- Global Safety CI: https://github.com/psw2025-cmd/Genesis_System3/actions/runs/43999881870 — frontend browser runtime job failed, other inspected jobs including policy guard passed.
+- Frontend Browser Runtime Smoke: https://github.com/psw2025-cmd/Genesis_System3/actions/runs/43999881899 — `genesis:lazy_content_still_loading` and `mobile_genesis:render_not_proven`. The other 22 canonical tabs were reported PASS in the inspected run; this is not production proof.
+- UI artifact ID `14291453346`: https://github.com/psw2025-cmd/Genesis_System3/actions/runs/43999881899/artifacts/14291453346. Artifact existence and upload SHA in logs do **not** establish independent downloaded readback.
+
+### Exact next repair sequence
+1. Fetch the current `main` frontend Genesis tab lazy-import/component source and browser harness; reproduce the tab-specific unresolved fallback in a deterministic local Chrome CI run.
+2. Trace import error, missing provider context, API await or render deadlock; distinguish component failure from a test-only timeout. Fix the underlying frontend or harness race without suppressing assertions.
+3. Execute production build, TypeScript check, browser smoke on desktop and mobile, then verify all 23 tab PASS lines and no loading fallback.
+4. Verify the exact new PR SHA and rerun Global Safety CI and Frontend Browser Runtime Smoke; both must conclude success. Only then mark this incident PASS.
+5. Update durable task ledger and delay metrics; never convert FAIL to PASS by raising timeouts alone.
+
+### Classifier hardening
+The n8n code now checks the GitHub API schema, selects the newest run by timestamp rather than relying on API array order, treats absent runs as NOT VERIFIED, distinguishes RUNNING and FAIL, and explicitly labels provider review, runtime and artifact readback as unverified. A 100-run response still requires pagination before claiming complete workflow coverage.
