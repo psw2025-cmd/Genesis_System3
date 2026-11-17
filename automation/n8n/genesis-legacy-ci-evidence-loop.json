@@ -1,0 +1,91 @@
+{
+  "name": "Genesis Legacy CI Evidence Loop — n8n (import template)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "hourly",
+      "name": "Hourly schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/psw2025-cmd/Genesis_System3/actions/runs?per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "runs",
+      "name": "Read GitHub Actions runs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const runs = $input.first().json.workflow_runs ?? [];\nconst now = Date.now();\nconst latest = new Map();\nfor (const r of runs) {\n  if (!latest.has(r.name)) latest.set(r.name, r);\n}\nconst checks = [...latest.values()].map(r => ({\n  workflow: r.name, run_id: r.id, sha: r.head_sha ?? null,\n  status: r.status, conclusion: r.conclusion ?? null,\n  url: r.html_url ?? null,\n  age_minutes: r.created_at ? Math.round((now - Date.parse(r.created_at))/60000) : null\n}));\nconst failing = checks.filter(r => r.status === 'completed' && r.conclusion !== 'success' && r.conclusion !== 'skipped');\nconst stalled = checks.filter(r => r.status !== 'completed' && r.age_minutes !== null && r.age_minutes > 45);\nconst pending = checks.filter(r => r.status !== 'completed');\nconst next = failing.length ? 'INSPECT_FAILED_JOB_LOGS_AND_FIX' : stalled.length ? 'INSPECT_STALLED_WORKFLOWS' : pending.length ? 'WAIT_AND_RECHECK' : 'VERIFY_COUNCIL_PROVIDERS_ARTIFACT_AND_UI';\nconst status = failing.length || stalled.length ? 'FAIL' : pending.length ? 'RUNNING' : 'NOT_VERIFIED';\nreturn [{json:{schema_version:1,observed_at:new Date(now).toISOString(),repository:'psw2025-cmd/Genesis_System3',lane:'LEGACY_ONLY',status,next_action:next,failures:failing,stalled,pending,checks,verified_workflow_count:checks.filter(r=>r.conclusion==='success').length,provider_review_verified:false,artifact_readback_verified:false,live_trading_allowed:false,latency_minutes:Math.max(0,...checks.map(r=>r.age_minutes??0))}}];"
+      },
+      "id": "analyze",
+      "name": "Classify evidence and next action",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Hourly schedule": {
+      "main": [
+        [
+          {
+            "node": "Read GitHub Actions runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read GitHub Actions runs": {
+      "main": [
+        [
+          {
+            "node": "Classify evidence and next action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}
