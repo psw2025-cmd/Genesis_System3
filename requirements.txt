@@ -51,5 +51,5 @@ watchdog>=4.0.0
 # ---- Optional analytics / resilience ----
 statsmodels>=0.14.2
 scikit-learn>=1.5.0
-joblib>=1.4.2
+joblib>=1.6.0
 pytz>=2024.1  # Timezone support for option expiry dates
