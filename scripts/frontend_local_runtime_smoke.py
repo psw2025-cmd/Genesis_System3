@@ -198,6 +198,23 @@ return {
   mainChars: mainText.length,
   mainHeading: heading ? (heading.innerText || '').trim().slice(0, 100) : '',
   loadingFallback: mainText.includes('Loading dashboard section'),
+  // Capture bounded, non-secret browser diagnostics when lazy routes stall.
+  // Resource timing entries represent completed requests, not pending promises.
+  resourceDiagnostics: performance.getEntriesByType('resource')
+    .filter(e => /\.js(?:$|\?)|\.css(?:$|\?)/.test(e.name))
+    .slice(-12).map(e => ({
+      file: e.name.split('/').pop().split('?')[0].slice(0, 90),
+      durationMs: Math.round(e.duration),
+      transferBytes: e.transferSize || 0,
+      decodedBytes: e.decodedBodySize || 0,
+      initiator: e.initiatorType,
+    })),
+  navigationDiagnostics: performance.getEntriesByType('navigation')
+    .slice(0, 1).map(e => ({
+      domContentLoadedMs: Math.round(e.domContentLoadedEventEnd),
+      loadEventMs: Math.round(e.loadEventEnd),
+      responseEndMs: Math.round(e.responseEnd),
+    })),
   overflowNodes,
   bodyText: text.slice(0, 300),
 };
