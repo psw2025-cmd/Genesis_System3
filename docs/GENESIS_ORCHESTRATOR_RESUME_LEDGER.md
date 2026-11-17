@@ -42,3 +42,10 @@ Updated: 2026-11-17 UTC. Scope: **LEGACY** `psw2025-cmd/Genesis_System3` only. T
 - UI-REPAIR-01 | LEGACY | PR CI PASS / runtime NOT VERIFIED | PR #653 merged at `2dbac5cee02dda8f42b6118a2ac713d3e74f08e8`; reported root cause remains chunk-contention hypothesis, not confirmed causality. Next: inspect deployed SHA, desktop/mobile browser output and 23-tab checks; failure-resolution role assigned, not an independent running agent.
 - N8N-01 | LEGACY | NOT VERIFIED | PR #652 remains open, inactive template; do not activate until authenticated isolated hosting and persistence are proven.
 - Safety: no deployments, broker orders, cross-lane writes, or security gate changes performed this cycle.
+
+## Cycle evidence — 2026-11-17 11:44 IST
+- LC-05 | LEGACY | NOT VERIFIED | Fresh main commit search confirms `2dbac5cee02dda8f42b6118a2ac713d3e74f08e8`; commit-scoped workflow lookup returned zero because it only indexes PR-triggered runs. Do not interpret zero as main CI failure or success. Next: obtain repository-wide Actions runs and filter `head_sha` to this exact merge commit.
+- LC-02/03/04 | LEGACY | NOT VERIFIED | Inspected main `.github/workflows/llm-council.yml`: this is PR bootstrap validation (unit tests and compile), not three-provider trusted execution. Next: inspect `.github/workflows/llm-council-trusted.yml`, dispatch trusted review on eligible PR using authorized workflow execution, read back three provider outputs and diff/artifact hashes.
+- UI-REPAIR-01 | LEGACY | PR repair previously merged; production NOT VERIFIED | Existing historical failures are not evidence of an ongoing regression after merge. Next: inspect current browser run job logs and live deployed SHA before initiating further fix.
+- N8N-01 | LEGACY | NOT VERIFIED | PR #652 remains open and inactive; no execution or hosting proof.
+- All trading safety invariants remain required, not independently runtime verified. No deployment, broker order, gate weakening, or cross-lane artifact transfer performed in this cycle.
