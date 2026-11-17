@@ -1,0 +1,26 @@
+{
+  "utc": "2026-11-12T05:58:27.103328+00:00",
+  "url": "https://genesis-system3-web-doq2wplepa-el.a.run.app",
+  "verdict": "UNVERIFIED",
+  "/api/health": {
+    "error_type": "ReadTimeout"
+  },
+  "/api/state": {
+    "error_type": "ReadTimeout"
+  },
+  "disk_used_pct": 77.18,
+  "desktop": {
+    "http": 200,
+    "screenshot": "desktop.png",
+    "js_error_count": 0,
+    "parity": "UNVERIFIED",
+    "utc": "2026-11-12T05:59:37.236016+00:00"
+  },
+  "mobile": {
+    "http": 200,
+    "screenshot": "mobile.png",
+    "js_error_count": 0,
+    "parity": "UNVERIFIED",
+    "utc": "2026-11-12T05:59:39.997146+00:00"
+  }
+}

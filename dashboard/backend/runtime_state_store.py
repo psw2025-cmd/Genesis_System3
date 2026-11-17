@@ -102,8 +102,8 @@ class RuntimeStateStore:
             "mode": "PAPER",  # Always PAPER mode - no real trading allowed
             "data_source": "not_ready" if REAL_ONLY else "SYNTHETIC",
             "market": {
-                "is_open": False,
-                "reason": "Market closed",
+                "is_open": None,
+                "reason": "UNKNOWN: current NSE/Dhan session not verified",
                 "next_open": None,
                 "current_time_ist": datetime.now(IST).isoformat(),
             },
@@ -315,7 +315,7 @@ class RuntimeStateStore:
         Sync state from existing output files.
         This bridges the gap during migration.
         """
-        updates = {}
+        updates = {"market": {"is_open": None, "reason": "UNKNOWN: current NSE/Dhan session not verified"}}
 
         try:
             health_file = self.outputs_dir / "health.json"
@@ -333,11 +333,13 @@ class RuntimeStateStore:
                     "status": broker_status_str,
                     "error": None,
                     "latency_ms": health.get("broker_latency_ms"),
-                    "last_ok": datetime.now(IST).isoformat() if is_connected else None,
+                    "last_ok": health.get("last_ok") if is_connected else None,
                 }
+                # Preserve explicit source status; missing/unrecognized is not CLOSED.
+                status = str(health.get("market_status") or "").lower()
                 updates["market"] = {
-                    "is_open": health.get("market_status") == "open",
-                    "reason": health.get("market_status", "closed"),
+                    "is_open": True if status == "open" else (False if status == "closed" else None),
+                    "reason": status if status in ("open", "closed") else "UNKNOWN: source status unavailable",
                 }
                 health_data_source = health.get("data_source", "not_ready" if REAL_ONLY else "SYNTHETIC")
                 if REAL_ONLY and str(health_data_source).lower() in ("synthetic", "simulated"):
