@@ -1,0 +1,91 @@
+{
+  "name": "Genesis Legacy CI Evidence Loop — n8n (import template)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "id": "hourly",
+      "name": "Hourly schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.github.com/repos/psw2025-cmd/Genesis_System3/actions/runs?per_page=100",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "runs",
+      "name": "Read GitHub Actions runs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fail-closed classification: never equate a successful CI run with production or provider proof.\nconst payload = $input.first()?.json ?? {};\nif (!Array.isArray(payload.workflow_runs)) throw new Error('GITHUB_ACTIONS_SCHEMA_INVALID: workflow_runs missing');\nconst runs = payload.workflow_runs;\nconst now = Date.now();\nconst byWorkflow = new Map();\nfor (const r of runs) {\n  if (!r || !r.name || !r.id || !r.status || !r.created_at) continue;\n  const k = String(r.workflow_id ?? r.name);\n  const prior = byWorkflow.get(k);\n  if (!prior || Date.parse(r.created_at) > Date.parse(prior.created_at) ||\n      (Date.parse(r.created_at) === Date.parse(prior.created_at) && Number(r.id) > Number(prior.id))) byWorkflow.set(k, r);\n}\nconst checks = [...byWorkflow.values()].map(r => {\n  const started = r.run_started_at ?? r.created_at;\n  const age = Math.max(0, Math.floor((now - Date.parse(started)) / 60000));\n  return {workflow:r.name,workflow_id:r.workflow_id ?? null,run_id:r.id,sha:r.head_sha ?? null,\n    status:r.status,conclusion:r.conclusion ?? null,event:r.event ?? null,\n    url:r.html_url ?? null,age_minutes:Number.isFinite(age)?age:null};\n});\nconst failing = checks.filter(r => r.status === 'completed' && !['success','skipped','neutral'].includes(r.conclusion));\nconst stalled = checks.filter(r => r.status !== 'completed' && r.age_minutes !== null && r.age_minutes > 45);\nconst pending = checks.filter(r => r.status !== 'completed');\nconst missing = checks.length === 0;\nconst next = failing.length ? 'READ_FAILED_JOB_LOGS_AND_REPAIR' : stalled.length ? 'INVESTIGATE_STALLED_JOB' :\n  missing ? 'CHECK_GITHUB_API_AND_PAGINATION' : pending.length ? 'RECHECK_IN_PROGRESS' :\n  'VERIFY_COUNCIL_PROVIDERS_ARTIFACT_RUNTIME_AND_SHA';\nconst status = failing.length || stalled.length ? 'FAIL' : pending.length ? 'RUNNING' : 'NOT_VERIFIED';\nreturn [{json:{schema_version:2,observed_at:new Date(now).toISOString(),repository:'psw2025-cmd/Genesis_System3',\n  lane:'LEGACY_ONLY',status,next_action:next,failures:failing,stalled,pending,checks,\n  observed_latest_workflows:checks.length,verified_workflow_count:checks.filter(r=>r.status==='completed'&&r.conclusion==='success').length,\n  incomplete_coverage:runs.length>=100,provider_review_verified:false,artifact_readback_verified:false,\n  runtime_verified:false,live_trading_allowed:false,\n  latency_minutes:Math.max(0,...checks.map(r=>r.age_minutes??0))}}];"
+      },
+      "id": "analyze",
+      "name": "Classify evidence and next action",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Hourly schedule": {
+      "main": [
+        [
+          {
+            "node": "Read GitHub Actions runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read GitHub Actions runs": {
+      "main": [
+        [
+          {
+            "node": "Classify evidence and next action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}
