@@ -2,7 +2,7 @@
 
 ## Permanent standing rule
 
-Only the following twelve GitHub Actions workflows are allowed in `.github/workflows`.
+Only the following fourteen explicitly approved GitHub Actions workflows are allowed in `.github/workflows`.
 
 ### Priority automatic workflows
 
@@ -18,6 +18,13 @@ Only the following twelve GitHub Actions workflows are allowed in `.github/workf
 10. `live-proof-center.yml` — read-only public dashboard/API forensic MRI for multi-agent access.
 11. `system3-runbook-audit.yml` — persistent autonomous runbook validation.
 12. `cloud-verify.yml` — GitHub-hosted, read-only WIF Cloud Run environment inspection, Dhan GET orders, and clearly labeled synthetic PAPER replay evidence, plus **the sole narrowly scoped exception**: commit-addressed audit-results publication to Google Cloud Storage with no-clobber and SHA-256 readback; no deploy or broker POST.
+
+### LLM Council security-scoped additions
+
+13. `llm-council.yml` — unprivileged pull-request bootstrap validation. Executes deterministic unit tests and syntax checks; never receives model provider API credentials.
+14. `llm-council-trusted.yml` — manual-only trusted council runner on the protected `main` branch. Reads pull-request diffs as untrusted data and does not execute pull-request code. Requires separate authorization of the three model API secrets; provider failures must fail closed.
+
+These additions do not grant merge approval, trading permissions, Cloud Run deployment, or general GCP mutation. The trusted runner must be tested with real API credentials before council decisions can be enforced.
 
 ### Retired workflows (GCP Exit Complete)
 
