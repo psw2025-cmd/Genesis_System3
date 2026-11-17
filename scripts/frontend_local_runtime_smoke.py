@@ -201,7 +201,7 @@ return {
   // Capture bounded, non-secret browser diagnostics when lazy routes stall.
   // Resource timing entries represent completed requests, not pending promises.
   resourceDiagnostics: performance.getEntriesByType('resource')
-    .filter(e => /\\.js(?:$|\\?)|\\.css(?:$|\\?)/.test(e.name))
+    .filter(e => /\.js(?:$|\?)|\.css(?:$|\?)/.test(e.name))
     .slice(-12).map(e => ({
       file: e.name.split('/').pop().split('?')[0].slice(0, 90),
       durationMs: Math.round(e.duration),
