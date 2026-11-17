@@ -28,7 +28,9 @@ jobs:
           test -s /tmp/council.diff
       - name: Run deterministic unit tests
         run: python -m unittest discover -s council -p 'test_*.py' -v
+      # Never expose provider API keys to executable code from an untrusted PR.
       - name: Independent three-provider review
+        if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -38,6 +40,11 @@ jobs:
           set -euo pipefail
           test -n "$OPENAI_API_KEY" && test -n "$ANTHROPIC_API_KEY" && test -n "$GEMINI_API_KEY"
           python council/council.py --diff /tmp/council.diff --sha "$HEAD_SHA" --output council-evidence.json
+      - name: Enforce fail-closed PR gate
+        if: github.event_name == 'pull_request'
+        run: |
+          echo 'External council review requires a trusted isolated runner; PR code cannot access model API credentials.'
+          exit 1
       - name: Publish review evidence
         if: always()
         uses: actions/upload-artifact@v4
