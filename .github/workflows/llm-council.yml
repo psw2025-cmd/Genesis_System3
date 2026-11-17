@@ -41,3 +41,54 @@ jobs:
           name: council-evidence
           path: council-evidence.json
           if-no-files-found: warn
+
+  trusted-provider-review:
+    # Never give API credentials to pull_request code or non-main dispatches.
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 2
+          persist-credentials: false
+      - name: Construct reviewed diff and record exact SHA
+        run: |
+          set -euo pipefail
+          git diff HEAD^ HEAD > /tmp/council-trusted.diff
+          test -s /tmp/council-trusted.diff
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+      - name: Obtain three independent provider verdicts (fail closed)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$OPENAI_API_KEY"
+          test -n "$ANTHROPIC_API_KEY"
+          test -n "$GEMINI_API_KEY"
+          python council/council.py --diff /tmp/council-trusted.diff --sha "$GITHUB_SHA" --output council-evidence.json
+      - name: Validate evidence SHA, provider count and verdict
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          e=json.loads(pathlib.Path('council-evidence.json').read_text())
+          diff=pathlib.Path('/tmp/council-trusted.diff').read_text()
+          assert e['commit_sha']==os.environ['GITHUB_SHA']
+          assert e['diff_sha256']==hashlib.sha256(diff.encode()).hexdigest()
+          assert set(e['providers'])=={'openai','anthropic','google'}
+          assert not e['errors'] and e['council_verdict']=='PASS'
+          assert all(v['verdict']=='PASS' for v in e['providers'].values())
+          PY
+      - name: Publish trusted council evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trusted-council-evidence
+          path: council-evidence.json
+          if-no-files-found: error
+          retention-days: 30
