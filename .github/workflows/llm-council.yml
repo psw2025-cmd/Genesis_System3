@@ -90,5 +90,5 @@ jobs:
         with:
           name: trusted-council-evidence
           path: council-evidence.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
