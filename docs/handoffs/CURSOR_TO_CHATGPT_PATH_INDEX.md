@@ -20,11 +20,23 @@ Read these files in this order before accepting or contradicting Cursor work.
 | `docs/authority/TEMPORAL_TRUTH_AND_LIVE_EVIDENCE_POLICY.md` | `latest` is not `live` |
 | `docs/authority/AUTONOMOUS_OPERATIONS_POLICY.md` | GCP/Dhan/IAM safety |
 | `docs/project_control/SYSTEM3_MASTER_GOAL_LOCK.md` | Master objective + LIVE locks |
+| `docs/project_control/CATALYST_EARLY_WARNING_INTELLIGENCE_PLAN.md` | Catalyst/news source, provider-failover, prediction, option, multibagger, UI and proof authority; read before any catalyst implementation |
 | `docs/handoffs/MULTI_AI_COORDINATION_LIVE.md` | Live multi-agent handoff snapshot |
 | `reports/coordination/ruhi_task_ledger.csv` | Rolling task IDs / ownership / proof |
 | `docs/handoffs/RUHI_B002_CURSOR_STATUS.md` | This batch's RUHI status block |
 | GitHub Issue #188 | Append-only runtime/progress bus |
 | `reports/coordination/chatgpt_backlog/` | Shared ChatGPT analysis CSVs any agent can update |
+
+## Catalyst Early Warning directive
+
+- Do **not** interrupt or widen Cursor RUHI-022 / PR #321.
+- Do **not** implement a giant news feature directly.
+- After the current owned P0 lane is clear, the first Catalyst task is **read-only Phase 0 source inventory** from `docs/project_control/CATALYST_EARLY_WARNING_INTELLIGENCE_PLAN.md`.
+- First required artifact: `reports/coordination/catalyst_source_capability_matrix.csv`.
+- The free official baseline must keep working without premium subscriptions; paid providers are optional adapters/enrichment and may never become a single point of failure.
+- The target is not a news widget: it is `source -> catalyst -> historical analogue -> current market/option confirmation -> early-move state -> Top-10 PAPER prediction -> immutable outcome -> calibration`.
+- Index options, equity options and multibagger research remain separate model horizons/surfaces.
+- No catalyst/news implementation may claim DONE without exact source timestamps/provenance, point-in-time anti-lookahead proof, model/outcome artifacts and exact-serving API->store->UI semantic evidence.
 
 ## ChatGPT backlog CSVs (any agent may update)
 
