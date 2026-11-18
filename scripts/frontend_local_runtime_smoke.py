@@ -84,6 +84,7 @@ class Browser:
         self.base = f"http://{HOST}:{self.port}"
         self.proc: subprocess.Popen[str] | None = None
         self.session_id = ""
+        self._diagnostics_enabled = False
 
     def _request(self, method: str, path: str, payload: dict | None = None, timeout: int = 10):
         data = None if payload is None else json.dumps(payload).encode("utf-8")
@@ -162,6 +163,39 @@ class Browser:
             "POST", f"/session/{self.session_id}/execute/sync",
             {"script": script, "args": args or []}, timeout=8,
         )
+
+    def enable_diagnostics(self) -> None:
+        """Capture browser console errors and failed resource requests without credentials."""
+        self._execute(r"""
+window.__genesisSmokeDiagnostics = {errors: [], failures: []};
+window.addEventListener('error', event => {
+  const target = event.target;
+  if (target && target !== window && target.tagName) {
+    window.__genesisSmokeDiagnostics.failures.push({type: 'resource', tag: target.tagName});
+  } else {
+    window.__genesisSmokeDiagnostics.errors.push(String(event.message || 'script_error').slice(0, 200));
+  }
+}, true);
+window.addEventListener('unhandledrejection', () => {
+  window.__genesisSmokeDiagnostics.errors.push('unhandled_promise_rejection');
+});
+""")
+        self._diagnostics_enabled = True
+
+    def diagnostics(self) -> dict:
+        if not self._diagnostics_enabled:
+            return {}
+        return self._execute(r"""
+const d = window.__genesisSmokeDiagnostics || {};
+const resources = performance.getEntriesByType('resource')
+  .filter(r => /\\.js(?:$|\\?)/.test(r.name))
+  .slice(-40).map(r => ({
+    file: r.name.split('/').pop().split('?')[0],
+    duration_ms: Math.round(r.duration),
+    transfer_size: r.transferSize
+  }));
+return {errors: (d.errors || []).slice(-20), failures: (d.failures || []).slice(-20), scripts: resources};
+""") || {}
 
     def activate(self, tab_id: str) -> bool:
         value = self._execute(r"""
@@ -262,6 +296,7 @@ def main() -> int:
         _wait_http(base_url, preview, 20)
         with Browser() as browser:
             browser.navigate(base_url + "?tab=decision-intel")
+            browser.enable_diagnostics()
             first = _wait_tab(browser, "decision-intel", 5)
             if first.get("rootChildren", 0) <= 0 or not first.get("system3"):
                 failures.append("initial_mount:react_root_or_system3_missing")
@@ -288,6 +323,7 @@ def main() -> int:
                 if tab_failures:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
+                    print("BROWSER_DIAGNOSTICS", tab_id, json.dumps(browser.diagnostics(), sort_keys=True))
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
@@ -321,6 +357,7 @@ def main() -> int:
                 ):
                     failures.append(f"mobile_{tab_id}:render_not_proven")
                     print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))
+                    print("MOBILE_BROWSER_DIAGNOSTICS", tab_id, json.dumps(browser.diagnostics(), sort_keys=True))
                     continue
                 if snap.get("horizontalOverflow"):
                     failures.append(f"mobile_{tab_id}:horizontal_overflow")
