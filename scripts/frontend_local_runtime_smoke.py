@@ -188,7 +188,7 @@ window.addEventListener('unhandledrejection', () => {
         return self._execute(r"""
 const d = window.__genesisSmokeDiagnostics || {};
 const resources = performance.getEntriesByType('resource')
-  .filter(r => /\\.js(?:$|\\?)/.test(r.name))
+  .filter(r => /\.js(?:$|\?)/.test(r.name))
   .slice(-40).map(r => ({
     file: r.name.split('/').pop().split('?')[0],
     duration_ms: Math.round(r.duration),
