@@ -82,7 +82,7 @@ jobs:
           rc=1
           for attempt in 1 2; do
             set +e
-            timeout 180s python scripts/frontend_local_runtime_smoke.py
+            timeout 180s python -u scripts/frontend_local_runtime_smoke.py
             rc=$?
             set -e
             if [[ "$rc" -eq 0 ]]; then
