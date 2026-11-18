@@ -335,6 +335,7 @@ def main() -> int:
             browser.__exit__(None, None, None)
             browser = Browser().__enter__()
             browser.navigate(base_url + "?tab=decision-intel")
+            browser.enable_diagnostics()
             _wait_tab(browser, "decision-intel", 10)
             browser.set_viewport(MOBILE_VIEWPORT_WIDTH, 844)
             # Let the app's bounded route-chunk prefetch settle in the new
