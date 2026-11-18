@@ -195,7 +195,7 @@ const resources = performance.getEntriesByType('resource')
     transfer_size: r.transferSize
   }));
 return {errors: (d.errors || []).slice(-20), failures: (d.failures || []).slice(-20), scripts: resources};
-""") || {}
+""") or {}
 
     def activate(self, tab_id: str) -> bool:
         value = self._execute(r"""
