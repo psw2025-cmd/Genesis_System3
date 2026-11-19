@@ -98,31 +98,11 @@ export default function App() {
   // mutation requests; public visibility does not grant execution authority.
   useData()
   useEffect(() => {
-    // Keep navigation responsive after the first screen: warm the route chunks
-    // once the dashboard has mounted so a later tab click cannot sit on the
-    // Suspense fallback while the browser fetches its first module chunk.
+    // Warm only the Genesis workspace after mount. Importing every route at once
+    // competes with user-requested chunks and can leave Suspense on screen.
+    // All other routes retain their existing on-demand React.lazy imports.
     const timer = window.setTimeout(() => {
-      // Genesis is the heaviest independently routed workspace. Fetch its
-      // module first so a burst of background imports cannot starve its
-      // route chunk when desktop/mobile smoke navigates through every tab.
-      // A failed optional preload must not block other routes.
-      void import('./components/GenesisTab').catch(() => undefined).then(() => Promise.allSettled([
-        import('./components/Overview'), import('./components/TradeTab'),
-        import('./components/Positions'), import('./components/BrokerProofPanel'),
-        import('./components/OptionChain'), import('./components/AlertsTab'),
-        import('./components/SystemTab'), import('./components/LiveTradingGate'),
-        import('./components/PerformanceTab'), import('./components/EndToEndProof'),
-        import('./components/LiveSimulation'),
-        import('./components/MobileTradingHub'),
-        import('./components/workspaces/DecisionIntelligence'),
-        import('./components/workspaces/OptionsIntelligence'),
-        import('./components/workspaces/MultibaggerResearch'),
-        import('./components/workspaces/RiskAndScenarios'),
-        import('./components/workspaces/DataIntegrity'),
-        import('./components/workspaces/PredictionAudit'),
-        import('./components/Signals'), import('./components/PaperTrading'),
-        import('./components/MLPerformance'), import('./components/SystemReadiness'),
-      ]))
+      void import('./components/GenesisTab').catch(() => undefined)
     }, 1000)
     return () => window.clearTimeout(timer)
   }, [])
