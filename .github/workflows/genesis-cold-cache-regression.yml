@@ -18,4 +18,4 @@ jobs:
         with:
           python-version: '3.11'
       - name: Execute actual Genesis cold-cache regression tests
-        run: python -m unittest -v tests.test_genesis_cold_cache_acceptance
+        run: python -m unittest discover -s tests -p 'test_genesis_cold_cache_acceptance.py' -v
