@@ -218,7 +218,7 @@ return {
         """Return bounded aggregate resource timing only; never log URLs or credentials."""
         value = self._execute(r"""
 const entries = performance.getEntriesByType('resource');
-const scripts = entries.filter(e => e.initiatorType === 'script' || /\\.js(?:$|\\?)/.test(e.name));
+const scripts = entries.filter(e => e.initiatorType === 'script' || e.name.includes('.js'));
 return {
   resource_count: entries.length,
   script_count: scripts.length,
