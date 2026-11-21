@@ -214,6 +214,20 @@ return {
 """, [tab_id])
         return value if isinstance(value, dict) else {}
 
+    def resource_diagnostics(self) -> dict:
+        """Return bounded aggregate resource timing only; never log URLs or credentials."""
+        value = self._execute(r"""
+const entries = performance.getEntriesByType('resource');
+const scripts = entries.filter(e => e.initiatorType === 'script' || /\\.js(?:$|\\?)/.test(e.name));
+return {
+  resource_count: entries.length,
+  script_count: scripts.length,
+  script_zero_response_count: scripts.filter(e => e.responseEnd === 0).length,
+  script_duration_over_5000ms_count: scripts.filter(e => e.duration > 5000).length,
+};
+""")
+        return value if isinstance(value, dict) else {}
+
     def screenshot(self, path: Path) -> None:
         encoded = self._request("GET", f"/session/{self.session_id}/screenshot", timeout=10)
         if isinstance(encoded, str) and encoded:
@@ -302,6 +316,7 @@ def main() -> int:
                 if tab_failures:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
+                    print("BROWSER_RESOURCE_DIAGNOSTICS", tab_id, json.dumps(browser.resource_diagnostics(), sort_keys=True), flush=True)
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
