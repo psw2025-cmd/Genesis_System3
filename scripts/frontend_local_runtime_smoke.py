@@ -224,6 +224,9 @@ return {
   script_count: scripts.length,
   script_zero_response_count: scripts.filter(e => e.responseEnd === 0).length,
   script_duration_over_5000ms_count: scripts.filter(e => e.duration > 5000).length,
+  script_transfer_over_5000ms_count: scripts.filter(e => e.responseEnd > 0 && e.responseStart > 0 && e.responseEnd - e.responseStart > 5000).length,
+  script_wait_before_response_over_5000ms_count: scripts.filter(e => e.responseStart > 0 && e.responseStart - e.startTime > 5000).length,
+  script_duration_max_ms: Math.round(Math.max(0, ...scripts.map(e => e.duration))),
 };
 """)
         return value if isinstance(value, dict) else {}
