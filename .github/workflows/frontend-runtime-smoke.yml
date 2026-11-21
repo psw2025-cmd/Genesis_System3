@@ -75,6 +75,10 @@ jobs:
             tests.test_live_ui_truth_remediation_contract \
             tests.test_phase02_live_ui_recovery
 
+      - name: Execute Genesis cold-cache acceptance regression tests
+        shell: bash
+        run: python -m unittest discover -s tests -p 'test_genesis_cold_cache_acceptance.py' -v
+
       - name: Prove all canonical tabs render in local Chrome
         shell: bash
         run: |
