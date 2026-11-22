@@ -22,6 +22,13 @@ import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
+# Preserve per-tab evidence even if the outer CI timeout kills the process.
+# No changes to navigation assertions, deadlines, or trading behavior.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(line_buffering=True)
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(line_buffering=True)
+
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
 PROOF_DIR = ROOT / "frontend-ui-proof"
