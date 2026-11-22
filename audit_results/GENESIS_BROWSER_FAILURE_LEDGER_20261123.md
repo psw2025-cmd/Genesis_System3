@@ -37,3 +37,12 @@ Resume cursor: reconcile current PR #665 head and main first; do not assume this
 - LEG-PROD-003 remains NOT VERIFIED; no production deployment or 113-check acceptance proven.
 - LIVE-NEW-ARCHIVE-009 remains NOT VERIFIED; independently read `BUILD_LOG!A18:J24`, archive SHA256 bytes still missing. No LIVE NEW write this cycle; no cross-lane transfer.
 - Resume: test diagnostic branch first; do not merge without required checks and review. Preserve PAPER-only safety.
+
+## Cycle reconciliation — 2026-11-23 04:17 IST
+- PR #665 freshly checked: OPEN/DRAFT, base `2dbac5cee02dda8f42b6118a2ac713d3e74f08e8`, head `6b825b2df84717cdfde98d02c092dfdecfec7969`. Its earlier retry-green browser workflow `45028513366` remains non-acceptance; first-attempt FAIL.
+- LEG-BROWSER-001: FAIL; failure-resolution workstream, no separate agent execution. Implemented safe read-only browser Resource Timing diagnostics on isolated audit branch commit `04c9be4fadc5bee9544e67759e33e51fdb21404d`. Logs slow (over 4 seconds) and HTTP-error resource entries on failed desktop/mobile tabs. Source readback PASS; execution/CI NOT VERIFIED. Vite preview logging from prior cycle remains. Next: run `python -m py_compile scripts/frontend_local_runtime_smoke.py`, build frontend, execute a single cold-cache smoke, correlate resource timing with Vite preview log and console/CDP exceptions; then implement only evidence-supported correction.
+- LEG-COUNCIL-002: NOT VERIFIED; next read actual OpenAI/Anthropic/Gemini provider artifacts and verify reviewed SHA, diff SHA256, artifact bytes. Workflow bootstrap SUCCESS alone insufficient.
+- LEG-PROD-003: NOT VERIFIED; next compare deployed SHA to GitHub main and run authenticated read-only 23-tab/113-check and PAPER lifecycle reconciliation.
+- LIVE-NEW-ARCHIVE-009: NOT VERIFIED; LIVE NEW folder and workbook metadata read independently this cycle. Next obtain v0.9 original bytes within LIVE NEW workspace and compare recorded SHA256; no legacy reuse.
+- GitHub browser artifact 14756772013 exists with metadata digest `sha256:ca80a8d4779c5fd2fa6838c5203b16a3061df10993abc2e90c9a644380f188e5`; downloaded-byte hash NOT VERIFIED.
+- Safety: no merge, deployment, real broker order or cross-lane transfer. Do not claim browser fix or first-attempt PASS.
