@@ -97,12 +97,7 @@ export default function App() {
   // ANALYZER/PAPER and LIVE is locked off. The backend still rejects anonymous
   // mutation requests; public visibility does not grant execution authority.
   useData()
-  useEffect(() => {
-    // Avoid a simultaneous burst of background route imports competing with
-    // the currently selected React.lazy route during cold-cache navigation.
-    // Genesis remains on-demand like every other tab; this is deliberately
-    // free of hidden prefetch side effects.
-  }, [])
+  // Route chunks are loaded only by the selected React.lazy view.
   const activeTab = useStore((s) => s.activeTab)
   useLayoutEffect(() => {
     const main = document.getElementById('dashboard-main')
