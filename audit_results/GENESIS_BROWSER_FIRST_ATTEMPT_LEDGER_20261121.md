@@ -87,3 +87,16 @@ PR #664 head `9645d0d06e30c9f4cc264470be2bf41469401976` remains OPEN/DRAFT; main
 | LEG-UI-003 | LEGACY | Deployed SHA and 113 production UI checks | authorized runtime proof | UI/runtime | browser run 44962781880 | 9645d0d | NOT VERIFIED | 0 | Perform read-only serving-SHA and production browser verification | 2026-11-22 06:43 IST |
 
 LIVE NEW lane: independent control workbook metadata read; all eleven required tabs exist. Prior v0.6 archive/test proof is historical and not re-executed in this cycle. v0.9 bytes/CI remain NOT VERIFIED. No cross-lane transfer, merge, deployment or broker action.
+
+
+## Cycle 2026-11-22 07:23 IST — first-attempt failure persists; independent archive inventory reconciled
+
+Read PR #664 (OPEN/DRAFT), browser run https://github.com/psw2025-cmd/Genesis_System3/actions/runs/44962781880 job 137025043322, current smoke harness, and prior ledger. Latest inspected job shows attempt 2 PASS (23 desktop + 23 mobile, 46 screenshots, elapsed 52.31s), artifact frontend-ui-proof-1639 ID 14729894931, uploaded ZIP digest a11a4d7a6c8f660b19a6c165c6bc1b52cd56c032eb1bc251f5c7d07d8162f65a (runner-reported, NOT independently byte-readback verified). First attempt remains FAIL from prior job evidence; no source-level correction established. Production live proof steps 12–14 SKIPPED. No retry-based PASS may satisfy no-retry acceptance.
+
+| Task ID | Lane | Goal | Dependency | Owner/workstream | Evidence | Last verified SHA/run | State | Attempts | Exact next executable action | Updated |
+|---|---|---|---|---|---|---|---|---|---|---|
+| LEG-BROWSER-001 | LEGACY | Cold-cache no-retry 23+23 render | reproduce pending lazy route | failure-resolution workstream (not an executing agent) | browser job 137025043322 | 44962781880 / prior head 9645d0d | FAIL | 2 in run | Add focused no-retry stale-heading regression, capture sanitized console/response timing, patch only demonstrated cause, run exact-head browser and Global Safety CI | 2026-11-22 07:23 IST |
+| LEG-UI-003 | LEGACY | Deployed SHA and 113 production checks | authorized read-only runtime | UI/runtime | run 44962781880 skipped steps 12–14 | 44962781880 | NOT VERIFIED | 0 this cycle | Run request-scoped production browser proof and compare deployed SHA | 2026-11-22 07:23 IST |
+| LEG-COUNCIL-002 | LEGACY | Three real provider verdicts | trusted artifact readback | council | previous bootstrap workflow only | 44962781849 | NOT VERIFIED | 0 this cycle | Download trusted provider artifacts and verify identities, verdicts, reviewed SHA and diff SHA256 | 2026-11-22 07:23 IST |
+
+LIVE NEW independent read: BUILD_LOG rows confirm v0.9 local-only ZIP claimed SHA256 046663832ee7a9291087e31bdffbd9cd77001c2b69240b75747f1f7113ece15c; folder listing currently includes workbook plus v0.2 (9475 B), v0.4 (18827 B), v0.6 (31586 B), not v0.9. Prior v0.6 33/33 test proof is historical, not rerun. Next LIVE NEW: recover v0.9 bytes from its own authorized workspace, hash readback, create separate repo/CI after provenance confirmation. No legacy code/data/credentials/resource transfer. No merge/deployment/broker action.
