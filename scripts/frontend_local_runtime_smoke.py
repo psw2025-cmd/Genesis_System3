@@ -258,9 +258,11 @@ def main() -> int:
     if not node or not vite_cli.is_file():
         print("FAIL: node or local Vite CLI unavailable", file=sys.stderr)
         return 2
+    # Persist preview startup/request failures without changing browser assertions.
+    preview_log = (PROOF_DIR / "vite-preview.log").open("w", encoding="utf-8")
     preview = subprocess.Popen(
         [node, str(vite_cli), "preview", "--host", HOST, "--port", str(preview_port), "--strictPort"],
-        cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+        cwd=FRONTEND, text=True, stdout=preview_log, stderr=subprocess.STDOUT,
     )
     failures: list[str] = []
     captured = 0
@@ -349,6 +351,9 @@ def main() -> int:
             preview.wait(timeout=5)
         except subprocess.TimeoutExpired:
             preview.kill()
+            preview.wait(timeout=5)
+        finally:
+            preview_log.close()
 
     elapsed = round(time.monotonic() - started, 2)
     desktop_failed = {item.split(":", 1)[0] for item in failures if not item.startswith("mobile_")}
