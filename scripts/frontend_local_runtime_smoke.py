@@ -278,7 +278,9 @@ def main() -> int:
                     failures.append(f"{tab_id}:sidebar_button_missing")
                     print("TAB_FAIL", tab_id, "sidebar_button_missing")
                     continue
+                tab_started = time.monotonic()
                 snap = _wait_tab(browser, tab_id, 10)
+                print("DESKTOP_ROUTE_TIMING", json.dumps({"tab": tab_id, "elapsed_s": round(time.monotonic() - tab_started, 3), "heading": snap.get("mainHeading"), "loading": snap.get("loadingFallback"), "active": snap.get("active")}, sort_keys=True))
                 tab_failures: list[str] = []
                 if snap.get("rootChildren", 0) <= 0:
                     tab_failures.append("react_root_empty")
@@ -315,7 +317,9 @@ def main() -> int:
                 if not browser.activate(tab_id):
                     failures.append(f"mobile_{tab_id}:sidebar_button_missing")
                     continue
+                tab_started = time.monotonic()
                 snap = _wait_tab(browser, tab_id, 10)
+                print("MOBILE_ROUTE_TIMING", json.dumps({"tab": tab_id, "elapsed_s": round(time.monotonic() - tab_started, 3), "heading": snap.get("mainHeading"), "loading": snap.get("loadingFallback"), "active": snap.get("active")}, sort_keys=True))
                 if tab_id == "decision-intel":
                     print("MOBILE_LAYOUT_DIAGNOSTIC", json.dumps(snap.get("overflowNodes", []), sort_keys=True))
                 if (
