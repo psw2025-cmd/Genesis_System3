@@ -28,3 +28,12 @@ Resume cursor: reconcile current PR #665 head and main first; do not assume this
 - LEG-PROD-003: NOT VERIFIED; next action read deployed revision SHA and read-only API/UI evidence before any release decision.
 - LIVE-NEW-ARCHIVE-009: NOT VERIFIED; next action retrieve original v0.9 bytes solely from authorized LIVE NEW workspace, compare SHA256 `046663832ee7a9291087e31bdffbd9cd77001c2b69240b75747f1f7113ece15c`, then establish isolated repository CI.
 - No source correction, deployment, merge, real broker order, or cross-lane write. Ledger update only. Resume from exact PR/main reconciliation and first-attempt instrumentation, not from stale successful workflow conclusion.
+
+## Cycle reconciliation — 2026-11-23 03:28 IST
+- Current PR #665 OPEN/DRAFT; last observed exact-head CI at `6b825b2df84717cdfde98d02c092dfdecfec7969`: seven conclusions SUCCESS, but first-attempt browser FAIL (180s timeout). No new first-attempt acceptance run proven.
+- Implemented diagnostic-only improvement on isolated audit branch: commit `98d01704b0b52d890775fe69bfd63c20b7663af9`, `scripts/frontend_local_runtime_smoke.py` now persists Vite preview stdout/stderr as `frontend-ui-proof/vite-preview.log` and closes the log after process termination. Source GitHub readback PASS, execution/CI NOT VERIFIED. No assertions, timeouts, trading flags, or live behavior changed.
+- LEG-BROWSER-001 remains FAIL; attempt count +1 diagnostic implementation. Next: run exact-branch syntax/unit checks and single cold-cache browser attempt, retrieve preview log and correlate Chrome console/network failures; then minimal cause-specific fix and exact-head no-retry CI.
+- LEG-COUNCIL-002 remains NOT VERIFIED; provider responses and reviewed diff/artifact hashes require independent readback.
+- LEG-PROD-003 remains NOT VERIFIED; no production deployment or 113-check acceptance proven.
+- LIVE-NEW-ARCHIVE-009 remains NOT VERIFIED; independently read `BUILD_LOG!A18:J24`, archive SHA256 bytes still missing. No LIVE NEW write this cycle; no cross-lane transfer.
+- Resume: test diagnostic branch first; do not merge without required checks and review. Preserve PAPER-only safety.
