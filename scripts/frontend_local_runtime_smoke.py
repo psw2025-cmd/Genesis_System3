@@ -26,6 +26,13 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
 PROOF_DIR = ROOT / "frontend-ui-proof"
 HOST = "127.0.0.1"
+TRACE_START = time.monotonic()
+
+
+def _stage(label: str) -> None:
+    """Flush bounded, non-sensitive progress before the outer CI timeout."""
+    print(f"BROWSER_STAGE {label} elapsed_s={time.monotonic() - TRACE_START:.2f}", flush=True)
+
 
 # Keep this contract aligned with dashboard/backend/Dockerfile. A PR must fail
 # before merge if Vite succeeds but the immutable deploy-proof bundle would fail.
@@ -110,7 +117,9 @@ class Browser:
             [driver, f"--port={self.port}", f"--allowed-ips={HOST}"],
             text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
         )
+        _stage("chromedriver_started")
         _wait_http(f"{self.base}/status", self.proc, 20)
+        _stage("chromedriver_ready")
         # GitHub-hosted runners occasionally need >15s to cold-start headless
         # Chrome even after chromedriver /status is ready.  The old 15s HTTP
         # deadline produced false CI failures before any tab was exercised.
@@ -130,6 +139,7 @@ class Browser:
         if not isinstance(value, dict) or not value.get("sessionId"):
             raise RuntimeError("webdriver_session_missing")
         self.session_id = str(value["sessionId"])
+        _stage("chrome_session_created")
         self._request("POST", f"/session/{self.session_id}/timeouts", {
             "implicit": 0, "pageLoad": 10000, "script": 5000,
         })
@@ -204,6 +214,23 @@ return {
 """, [tab_id])
         return value if isinstance(value, dict) else {}
 
+    def resource_diagnostics(self) -> dict:
+        """Return bounded aggregate resource timing only; never log URLs or credentials."""
+        value = self._execute(r"""
+const entries = performance.getEntriesByType('resource');
+const scripts = entries.filter(e => e.initiatorType === 'script' || e.name.includes('.js'));
+return {
+  resource_count: entries.length,
+  script_count: scripts.length,
+  script_zero_response_count: scripts.filter(e => e.responseEnd === 0).length,
+  script_duration_over_5000ms_count: scripts.filter(e => e.duration > 5000).length,
+  script_transfer_over_5000ms_count: scripts.filter(e => e.responseEnd > 0 && e.responseStart > 0 && e.responseEnd - e.responseStart > 5000).length,
+  script_wait_before_response_over_5000ms_count: scripts.filter(e => e.responseStart > 0 && e.responseStart - e.startTime > 5000).length,
+  script_duration_max_ms: Math.round(Math.max(0, ...scripts.map(e => e.duration))),
+};
+""")
+        return value if isinstance(value, dict) else {}
+
     def screenshot(self, path: Path) -> None:
         encoded = self._request("GET", f"/session/{self.session_id}/screenshot", timeout=10)
         if isinstance(encoded, str) and encoded:
@@ -259,14 +286,18 @@ def main() -> int:
     captured = 0
     started = time.monotonic()
     try:
+        _stage("preview_started")
         _wait_http(base_url, preview, 20)
+        _stage("preview_ready")
         with Browser() as browser:
             browser.navigate(base_url + "?tab=decision-intel")
+            _stage("desktop_navigated")
             first = _wait_tab(browser, "decision-intel", 5)
             if first.get("rootChildren", 0) <= 0 or not first.get("system3"):
                 failures.append("initial_mount:react_root_or_system3_missing")
 
             for tab_id in TABS:
+                _stage(f"desktop_tab_start:{tab_id}")
                 if not browser.activate(tab_id):
                     failures.append(f"{tab_id}:sidebar_button_missing")
                     print("TAB_FAIL", tab_id, "sidebar_button_missing")
@@ -288,6 +319,7 @@ def main() -> int:
                 if tab_failures:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
+                    print("BROWSER_RESOURCE_DIAGNOSTICS", tab_id, json.dumps(browser.resource_diagnostics(), sort_keys=True), flush=True)
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
@@ -297,6 +329,7 @@ def main() -> int:
             # Give the mobile viewport a fresh renderer. Desktop chart-heavy tabs
             # otherwise accumulate GPU/DOM state and can crash Chromium mid-loop.
             browser.__exit__(None, None, None)
+            _stage("desktop_complete_mobile_start")
             browser = Browser().__enter__()
             browser.navigate(base_url + "?tab=decision-intel")
             _wait_tab(browser, "decision-intel", 10)
@@ -305,6 +338,7 @@ def main() -> int:
             # mobile renderer before measuring per-tab loading behavior.
             time.sleep(3)
             for tab_id in TABS:
+                _stage(f"mobile_tab_start:{tab_id}")
                 if not browser.activate(tab_id):
                     failures.append(f"mobile_{tab_id}:sidebar_button_missing")
                     continue
