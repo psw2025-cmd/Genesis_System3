@@ -306,7 +306,8 @@ def main() -> int:
                     tab_failures.append("credential_prompt_rendered")
                 if tab_failures:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
-                    print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)\n                    print("BROWSER_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
+                    print("BROWSER_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
@@ -341,7 +342,8 @@ def main() -> int:
                     or snap.get("loadingFallback")
                 ):
                     failures.append(f"mobile_{tab_id}:render_not_proven")
-                    print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))\n                    print("MOBILE_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))
+                    print("MOBILE_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
                     continue
                 if snap.get("horizontalOverflow"):
                     failures.append(f"mobile_{tab_id}:horizontal_overflow")
