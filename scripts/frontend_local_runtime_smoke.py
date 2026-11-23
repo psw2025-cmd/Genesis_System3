@@ -22,6 +22,13 @@ import urllib.request
 from pathlib import Path
 from datetime import datetime, timezone
 
+# Preserve per-tab evidence even if the outer CI timeout kills the process.
+# No changes to navigation assertions, deadlines, or trading behavior.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(line_buffering=True)
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(line_buffering=True)
+
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "dashboard" / "frontend"
 PROOF_DIR = ROOT / "frontend-ui-proof"
@@ -199,6 +206,14 @@ return {
   mainHeading: heading ? (heading.innerText || '').trim().slice(0, 100) : '',
   loadingFallback: mainText.includes('Loading dashboard section'),
   overflowNodes,
+  // Read-only browser diagnostics; no network mutation or relaxed assertions.
+  resourceErrors: performance.getEntriesByType('resource').filter(e => e.responseStatus >= 400 || e.duration > 4000).slice(-12).map(e => ({
+    name: String(e.name).split('?')[0].slice(-160),
+    status: e.responseStatus || 0,
+    durationMs: Math.round(e.duration),
+    transferSize: e.transferSize
+  })),
+  routeResourceCount: performance.getEntriesByType('resource').length,
   bodyText: text.slice(0, 300),
 };
 """, [tab_id])
@@ -251,9 +266,11 @@ def main() -> int:
     if not node or not vite_cli.is_file():
         print("FAIL: node or local Vite CLI unavailable", file=sys.stderr)
         return 2
+    # Persist preview startup/request failures without changing browser assertions.
+    preview_log = (PROOF_DIR / "vite-preview.log").open("w", encoding="utf-8")
     preview = subprocess.Popen(
         [node, str(vite_cli), "preview", "--host", HOST, "--port", str(preview_port), "--strictPort"],
-        cwd=FRONTEND, text=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT,
+        cwd=FRONTEND, text=True, stdout=preview_log, stderr=subprocess.STDOUT,
     )
     failures: list[str] = []
     captured = 0
@@ -271,7 +288,9 @@ def main() -> int:
                     failures.append(f"{tab_id}:sidebar_button_missing")
                     print("TAB_FAIL", tab_id, "sidebar_button_missing")
                     continue
+                tab_started = time.monotonic()
                 snap = _wait_tab(browser, tab_id, 10)
+                print("DESKTOP_ROUTE_TIMING", json.dumps({"tab": tab_id, "elapsed_s": round(time.monotonic() - tab_started, 3), "heading": snap.get("mainHeading"), "loading": snap.get("loadingFallback"), "active": snap.get("active")}, sort_keys=True))
                 tab_failures: list[str] = []
                 if snap.get("rootChildren", 0) <= 0:
                     tab_failures.append("react_root_empty")
@@ -288,6 +307,12 @@ def main() -> int:
                 if tab_failures:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
+                    print("BROWSER_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    # Preserve the failing route's actual screen before the next tab changes it.
+                    try:
+                        browser.screenshot(PROOF_DIR / "_failed_routes" / "desktop" / f"{tab_id}.png")
+                    except Exception as screenshot_error:
+                        print("FAILURE_SCREENSHOT_UNAVAILABLE", tab_id, type(screenshot_error).__name__)
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
@@ -308,7 +333,9 @@ def main() -> int:
                 if not browser.activate(tab_id):
                     failures.append(f"mobile_{tab_id}:sidebar_button_missing")
                     continue
+                tab_started = time.monotonic()
                 snap = _wait_tab(browser, tab_id, 10)
+                print("MOBILE_ROUTE_TIMING", json.dumps({"tab": tab_id, "elapsed_s": round(time.monotonic() - tab_started, 3), "heading": snap.get("mainHeading"), "loading": snap.get("loadingFallback"), "active": snap.get("active")}, sort_keys=True))
                 if tab_id == "decision-intel":
                     print("MOBILE_LAYOUT_DIAGNOSTIC", json.dumps(snap.get("overflowNodes", []), sort_keys=True))
                 if (
@@ -321,6 +348,12 @@ def main() -> int:
                 ):
                     failures.append(f"mobile_{tab_id}:render_not_proven")
                     print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))
+                    print("MOBILE_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    # Preserve the failing route's actual screen before the next tab changes it.
+                    try:
+                        browser.screenshot(PROOF_DIR / "_failed_routes" / "mobile" / f"{tab_id}.png")
+                    except Exception as screenshot_error:
+                        print("FAILURE_SCREENSHOT_UNAVAILABLE", tab_id, type(screenshot_error).__name__)
                     continue
                 if snap.get("horizontalOverflow"):
                     failures.append(f"mobile_{tab_id}:horizontal_overflow")
@@ -338,6 +371,9 @@ def main() -> int:
             preview.wait(timeout=5)
         except subprocess.TimeoutExpired:
             preview.kill()
+            preview.wait(timeout=5)
+        finally:
+            preview_log.close()
 
     elapsed = round(time.monotonic() - started, 2)
     desktop_failed = {item.split(":", 1)[0] for item in failures if not item.startswith("mobile_")}
