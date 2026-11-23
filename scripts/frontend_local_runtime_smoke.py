@@ -308,6 +308,11 @@ def main() -> int:
                     failures.extend(f"{tab_id}:{item}" for item in tab_failures)
                     print("TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True), tab_failures)
                     print("BROWSER_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    # Preserve the failing route's actual screen before the next tab changes it.
+                    try:
+                        browser.screenshot(PROOF_DIR / "_failed_routes" / "desktop" / f"{tab_id}.png")
+                    except Exception as screenshot_error:
+                        print("FAILURE_SCREENSHOT_UNAVAILABLE", tab_id, type(screenshot_error).__name__)
                 else:
                     time.sleep(0.12)
                     browser.screenshot(PROOF_DIR / f"{tab_id}.png")
@@ -344,6 +349,11 @@ def main() -> int:
                     failures.append(f"mobile_{tab_id}:render_not_proven")
                     print("MOBILE_TAB_FAIL", tab_id, json.dumps(snap, sort_keys=True))
                     print("MOBILE_RESOURCE_DIAGNOSTIC", json.dumps({"tab": tab_id, "resources": snap.get("resourceErrors"), "count": snap.get("routeResourceCount")}, sort_keys=True))
+                    # Preserve the failing route's actual screen before the next tab changes it.
+                    try:
+                        browser.screenshot(PROOF_DIR / "_failed_routes" / "mobile" / f"{tab_id}.png")
+                    except Exception as screenshot_error:
+                        print("FAILURE_SCREENSHOT_UNAVAILABLE", tab_id, type(screenshot_error).__name__)
                     continue
                 if snap.get("horizontalOverflow"):
                     failures.append(f"mobile_{tab_id}:horizontal_overflow")
