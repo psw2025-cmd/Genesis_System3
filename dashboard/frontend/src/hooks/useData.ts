@@ -55,7 +55,7 @@ async function fetchJSON(path: string, timeoutMs = 20000) {
       signal: ctrl.signal,
     })
     if (!r.ok) throw new ApiRequestError(path, r.status)
-    return r.json()
+    return await r.json()
   } catch (err: any) {
     if (err instanceof ApiRequestError) throw err
     if (err?.name === 'AbortError') throw new ApiRequestError(path, 0, 'timeout')
