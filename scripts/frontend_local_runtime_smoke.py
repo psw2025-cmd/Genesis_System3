@@ -366,6 +366,15 @@ def main() -> int:
             "mobile_status": "PASS" if mobile_ok else "FAIL",
             "mobile_screenshot": mobile,
         })
+    # Evidence acceptance must agree with the process exit status.
+    for item in tab_results:
+        for mode in ("desktop", "mobile"):
+            if item[f"{mode}_screenshot"]["status"] != "CAPTURED":
+                prefix = "mobile_" if mode == "mobile" else ""
+                failures.append(f"{prefix}{item['tab_id']}:screenshot_missing")
+    if captured != 2 * len(TABS):
+        failures.append(f"screenshot_count_mismatch:{captured}/{2 * len(TABS)}")
+
     manifest = {
         "observed_at_utc": datetime.now(timezone.utc).isoformat(),
         "tabs_expected": len(TABS),
