@@ -15,10 +15,12 @@ import json
 import shutil
 import socket
 import subprocess
+import struct
 import sys
 import time
 import urllib.error
 import urllib.request
+import zlib
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -42,7 +44,44 @@ TABS = [
     "risk-scenarios", "multibagger", "prediction-audit", "performance", "ml",
     "data-integrity", "broker", "alerts", "system", "system-readiness", "gates",
 ]
+DESKTOP_VIEWPORT = (1600, 1000)
 MOBILE_VIEWPORT_WIDTH = 390
+MOBILE_VIEWPORT = (MOBILE_VIEWPORT_WIDTH, 844)
+
+
+def _png_dimensions(data: bytes) -> tuple[int, int]:
+    """Validate PNG chunk framing/CRCs and return the IHDR dimensions."""
+    if data[:8] != b'\x89PNG\r\n\x1a\n':
+        raise ValueError('invalid_png_signature')
+    pos = 8
+    dimensions = None
+    seen_idat = False
+    while pos + 12 <= len(data):
+        size = struct.unpack_from('>I', data, pos)[0]
+        end = pos + 12 + size
+        if end > len(data):
+            raise ValueError('truncated_png_chunk')
+        kind = data[pos + 4:pos + 8]
+        payload = data[pos + 8:end - 4]
+        crc = struct.unpack_from('>I', data, end - 4)[0]
+        if zlib.crc32(kind + payload) & 0xffffffff != crc:
+            raise ValueError('invalid_png_crc')
+        if dimensions is None:
+            if kind != b'IHDR' or size != 13:
+                raise ValueError('invalid_png_ihdr')
+            dimensions = struct.unpack_from('>II', payload)
+            if not all(dimensions):
+                raise ValueError('invalid_png_dimensions')
+        elif kind == b'IHDR':
+            raise ValueError('duplicate_png_ihdr')
+        if kind == b'IDAT':
+            seen_idat = True
+        if kind == b'IEND':
+            if size or not seen_idat or end != len(data):
+                raise ValueError('invalid_png_end')
+            return dimensions
+        pos = end
+    raise ValueError('missing_png_end')
 
 
 def _verify_deploy_markers() -> None:
@@ -151,10 +190,10 @@ class Browser:
     def navigate(self, url: str) -> None:
         self._request("POST", f"/session/{self.session_id}/url", {"url": url}, timeout=12)
 
-    def set_viewport(self, width: int, height: int) -> None:
+    def set_viewport(self, width: int, height: int, *, mobile: bool = True) -> None:
         self._request("POST", f"/session/{self.session_id}/goog/cdp/execute", {
             "cmd": "Emulation.setDeviceMetricsOverride",
-            "params": {"width": width, "height": height, "deviceScaleFactor": 1, "mobile": True},
+            "params": {"width": width, "height": height, "deviceScaleFactor": 1, "mobile": mobile},
         }, timeout=8)
 
     def _execute(self, script: str, args: list | None = None):
@@ -261,6 +300,8 @@ def main() -> int:
     try:
         _wait_http(base_url, preview, 20)
         with Browser() as browser:
+            # Chrome window-size describes outer chrome, not the content viewport.
+            browser.set_viewport(*DESKTOP_VIEWPORT, mobile=False)
             browser.navigate(base_url + "?tab=decision-intel")
             first = _wait_tab(browser, "decision-intel", 5)
             if first.get("rootChildren", 0) <= 0 or not first.get("system3"):
@@ -300,7 +341,7 @@ def main() -> int:
             browser = Browser().__enter__()
             browser.navigate(base_url + "?tab=decision-intel")
             _wait_tab(browser, "decision-intel", 10)
-            browser.set_viewport(MOBILE_VIEWPORT_WIDTH, 844)
+            browser.set_viewport(*MOBILE_VIEWPORT)
             # Let the app's bounded route-chunk prefetch settle in the new
             # mobile renderer before measuring per-tab loading behavior.
             time.sleep(3)
@@ -346,17 +387,26 @@ def main() -> int:
         for item in failures if item.startswith("mobile_")
     }
 
-    def screenshot_record(relative: str) -> dict:
+    def screenshot_record(relative: str, expected: tuple[int, int]) -> dict:
         path = PROOF_DIR / relative
         if not path.is_file():
             return {"path": relative, "status": "MISSING"}
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        return {"path": relative, "status": "CAPTURED", "sha256": digest}
+        data = path.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        try:
+            actual = _png_dimensions(data)
+        except ValueError as exc:
+            return {"path": relative, "status": "INVALID", "sha256": digest, "error": str(exc)}
+        record = {"path": relative, "sha256": digest, "dimensions": list(actual),
+                  "expected_dimensions": list(expected)}
+        if actual != expected:
+            return {**record, "status": "INVALID", "error": "png_dimensions_mismatch"}
+        return {**record, "status": "CAPTURED"}
 
     tab_results = []
     for tab_id in TABS:
-        desktop = screenshot_record(f"{tab_id}.png")
-        mobile = screenshot_record(f"mobile/{tab_id}.png")
+        desktop = screenshot_record(f"{tab_id}.png", DESKTOP_VIEWPORT)
+        mobile = screenshot_record(f"mobile/{tab_id}.png", MOBILE_VIEWPORT)
         desktop_ok = tab_id not in desktop_failed and desktop["status"] == "CAPTURED"
         mobile_ok = tab_id not in mobile_failed and mobile["status"] == "CAPTURED"
         tab_results.append({
@@ -366,6 +416,16 @@ def main() -> int:
             "mobile_status": "PASS" if mobile_ok else "FAIL",
             "mobile_screenshot": mobile,
         })
+    # Evidence acceptance must agree with the process exit status.
+    for item in tab_results:
+        for mode in ("desktop", "mobile"):
+            if item[f"{mode}_screenshot"]["status"] != "CAPTURED":
+                prefix = "mobile_" if mode == "mobile" else ""
+                reason = "missing" if item[f"{mode}_screenshot"]["status"] == "MISSING" else "invalid"
+                failures.append(f"{prefix}{item['tab_id']}:screenshot_{reason}")
+    if captured != 2 * len(TABS):
+        failures.append(f"screenshot_count_mismatch:{captured}/{2 * len(TABS)}")
+
     manifest = {
         "observed_at_utc": datetime.now(timezone.utc).isoformat(),
         "tabs_expected": len(TABS),
@@ -374,7 +434,7 @@ def main() -> int:
         "mobile_tabs_passed": sum(item["mobile_status"] == "PASS" for item in tab_results),
         "failures": failures,
         "elapsed_s": elapsed,
-        "viewports": ["1600x1000", "390x844"],
+        "viewports": [f"{w}x{h}" for w, h in (DESKTOP_VIEWPORT, MOBILE_VIEWPORT)],
         "live_trading_actions": 0,
         "deploy_markers": list(REQUIRED_DEPLOY_MARKERS),
         "tabs": tab_results,
